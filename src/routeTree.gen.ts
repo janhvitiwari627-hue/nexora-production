@@ -21,6 +21,7 @@ import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as HelpRouteImport } from './routes/help'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ForOwnersRouteImport } from './routes/for-owners'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -138,6 +139,11 @@ const JobsRoute = JobsRouteImport.update({
 const HelpRoute = HelpRouteImport.update({
   id: '/help',
   path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForOwnersRoute = ForOwnersRouteImport.update({
@@ -438,6 +444,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/for-owners': typeof ForOwnersRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/help': typeof HelpRoute
   '/jobs': typeof JobsRouteWithChildren
   '/login': typeof LoginRoute
@@ -509,6 +516,7 @@ export interface FileRoutesByTo {
   '/academy': typeof AcademyRoute
   '/contact': typeof ContactRoute
   '/for-owners': typeof ForOwnersRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/help': typeof HelpRoute
   '/jobs': typeof JobsRouteWithChildren
   '/login': typeof LoginRoute
@@ -582,6 +590,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/for-owners': typeof ForOwnersRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/help': typeof HelpRoute
   '/jobs': typeof JobsRouteWithChildren
   '/login': typeof LoginRoute
@@ -656,6 +665,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/for-owners'
+    | '/forgot-password'
     | '/help'
     | '/jobs'
     | '/login'
@@ -727,6 +737,7 @@ export interface FileRouteTypes {
     | '/academy'
     | '/contact'
     | '/for-owners'
+    | '/forgot-password'
     | '/help'
     | '/jobs'
     | '/login'
@@ -799,6 +810,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/for-owners'
+    | '/forgot-password'
     | '/help'
     | '/jobs'
     | '/login'
@@ -872,6 +884,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   ForOwnersRoute: typeof ForOwnersRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   HelpRoute: typeof HelpRoute
   JobsRoute: typeof JobsRouteWithChildren
   LoginRoute: typeof LoginRoute
@@ -1000,6 +1013,13 @@ declare module '@tanstack/react-router' {
       path: '/help'
       fullPath: '/help'
       preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/for-owners': {
@@ -1508,6 +1528,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
   ForOwnersRoute: ForOwnersRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   HelpRoute: HelpRoute,
   JobsRoute: JobsRouteWithChildren,
   LoginRoute: LoginRoute,
