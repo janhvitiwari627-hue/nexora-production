@@ -28,6 +28,7 @@ import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
 import { Route as DashboardWalletRouteImport } from './routes/dashboard.wallet'
 import { Route as DashboardRewardsRouteImport } from './routes/dashboard.rewards'
 import { Route as DashboardReviewsRouteImport } from './routes/dashboard.reviews'
+import { Route as DashboardReferralsRouteImport } from './routes/dashboard.referrals'
 import { Route as DashboardMembershipRouteImport } from './routes/dashboard.membership'
 import { Route as DashboardFavoritesRouteImport } from './routes/dashboard.favorites'
 import { Route as DashboardBookingsRouteImport } from './routes/dashboard.bookings'
@@ -130,6 +131,11 @@ const DashboardReviewsRoute = DashboardReviewsRouteImport.update({
   path: '/reviews',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardReferralsRoute = DashboardReferralsRouteImport.update({
+  id: '/referrals',
+  path: '/referrals',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardMembershipRoute = DashboardMembershipRouteImport.update({
   id: '/membership',
   path: '/membership',
@@ -181,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/membership': typeof DashboardMembershipRoute
+  '/dashboard/referrals': typeof DashboardReferralsRoute
   '/dashboard/reviews': typeof DashboardReviewsRoute
   '/dashboard/rewards': typeof DashboardRewardsRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
@@ -207,6 +214,7 @@ export interface FileRoutesByTo {
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/membership': typeof DashboardMembershipRoute
+  '/dashboard/referrals': typeof DashboardReferralsRoute
   '/dashboard/reviews': typeof DashboardReviewsRoute
   '/dashboard/rewards': typeof DashboardRewardsRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
@@ -235,6 +243,7 @@ export interface FileRoutesById {
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/membership': typeof DashboardMembershipRoute
+  '/dashboard/referrals': typeof DashboardReferralsRoute
   '/dashboard/reviews': typeof DashboardReviewsRoute
   '/dashboard/rewards': typeof DashboardRewardsRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
@@ -264,6 +273,7 @@ export interface FileRouteTypes {
     | '/dashboard/bookings'
     | '/dashboard/favorites'
     | '/dashboard/membership'
+    | '/dashboard/referrals'
     | '/dashboard/reviews'
     | '/dashboard/rewards'
     | '/dashboard/wallet'
@@ -290,6 +300,7 @@ export interface FileRouteTypes {
     | '/dashboard/bookings'
     | '/dashboard/favorites'
     | '/dashboard/membership'
+    | '/dashboard/referrals'
     | '/dashboard/reviews'
     | '/dashboard/rewards'
     | '/dashboard/wallet'
@@ -317,6 +328,7 @@ export interface FileRouteTypes {
     | '/dashboard/bookings'
     | '/dashboard/favorites'
     | '/dashboard/membership'
+    | '/dashboard/referrals'
     | '/dashboard/reviews'
     | '/dashboard/rewards'
     | '/dashboard/wallet'
@@ -480,6 +492,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardReviewsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/referrals': {
+      id: '/dashboard/referrals'
+      path: '/referrals'
+      fullPath: '/dashboard/referrals'
+      preLoaderRoute: typeof DashboardReferralsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/membership': {
       id: '/dashboard/membership'
       path: '/membership'
@@ -540,6 +559,7 @@ interface DashboardRouteChildren {
   DashboardBookingsRoute: typeof DashboardBookingsRouteWithChildren
   DashboardFavoritesRoute: typeof DashboardFavoritesRoute
   DashboardMembershipRoute: typeof DashboardMembershipRoute
+  DashboardReferralsRoute: typeof DashboardReferralsRoute
   DashboardReviewsRoute: typeof DashboardReviewsRoute
   DashboardRewardsRoute: typeof DashboardRewardsRoute
   DashboardWalletRoute: typeof DashboardWalletRoute
@@ -550,6 +570,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardBookingsRoute: DashboardBookingsRouteWithChildren,
   DashboardFavoritesRoute: DashboardFavoritesRoute,
   DashboardMembershipRoute: DashboardMembershipRoute,
+  DashboardReferralsRoute: DashboardReferralsRoute,
   DashboardReviewsRoute: DashboardReviewsRoute,
   DashboardRewardsRoute: DashboardRewardsRoute,
   DashboardWalletRoute: DashboardWalletRoute,
