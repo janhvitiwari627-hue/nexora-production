@@ -61,7 +61,7 @@ export function ShopProfilePage() {
       <TabNav active={active} onChange={switchTab} />
 
       <main className="mx-auto max-w-7xl px-4 py-8 md:px-6 md:py-12">
-        <Suspense fallback={<SkeletonLoader className="h-96 w-full" />}>
+        <Suspense fallback={<ShopCardSkeleton />}>
           <motion.div
             key={active}
             initial={{ opacity: 0, y: 12 }}
