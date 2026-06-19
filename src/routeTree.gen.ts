@@ -52,6 +52,9 @@ import { Route as DashboardBookingsRouteImport } from './routes/dashboard.bookin
 import { Route as DashboardActivityRouteImport } from './routes/dashboard.activity'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as BookSlugRouteImport } from './routes/book.$slug'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
 import { Route as DashboardBookingsIdRouteImport } from './routes/dashboard.bookings.$id'
 
 const TermsRoute = TermsRouteImport.update({
@@ -269,6 +272,21 @@ const BookSlugRoute = BookSlugRouteImport.update({
   path: '/book/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/admin/dashboard',
+  path: '/admin/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminBusinessesRoute = AdminBusinessesRouteImport.update({
+  id: '/admin/businesses',
+  path: '/admin/businesses',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardBookingsIdRoute = DashboardBookingsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -290,6 +308,9 @@ export interface FileRoutesByFullPath {
   '/referrals': typeof ReferralsRoute
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
+  '/admin/businesses': typeof AdminBusinessesRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/login': typeof AdminLoginRoute
   '/book/$slug': typeof BookSlugRoute
   '/category/$slug': typeof CategorySlugRoute
   '/dashboard/activity': typeof DashboardActivityRoute
@@ -335,6 +356,9 @@ export interface FileRoutesByTo {
   '/referrals': typeof ReferralsRoute
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
+  '/admin/businesses': typeof AdminBusinessesRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/login': typeof AdminLoginRoute
   '/book/$slug': typeof BookSlugRoute
   '/category/$slug': typeof CategorySlugRoute
   '/dashboard/activity': typeof DashboardActivityRoute
@@ -382,6 +406,9 @@ export interface FileRoutesById {
   '/referrals': typeof ReferralsRoute
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
+  '/admin/businesses': typeof AdminBusinessesRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/login': typeof AdminLoginRoute
   '/book/$slug': typeof BookSlugRoute
   '/category/$slug': typeof CategorySlugRoute
   '/dashboard/activity': typeof DashboardActivityRoute
@@ -430,6 +457,9 @@ export interface FileRouteTypes {
     | '/referrals'
     | '/search'
     | '/terms'
+    | '/admin/businesses'
+    | '/admin/dashboard'
+    | '/admin/login'
     | '/book/$slug'
     | '/category/$slug'
     | '/dashboard/activity'
@@ -475,6 +505,9 @@ export interface FileRouteTypes {
     | '/referrals'
     | '/search'
     | '/terms'
+    | '/admin/businesses'
+    | '/admin/dashboard'
+    | '/admin/login'
     | '/book/$slug'
     | '/category/$slug'
     | '/dashboard/activity'
@@ -521,6 +554,9 @@ export interface FileRouteTypes {
     | '/referrals'
     | '/search'
     | '/terms'
+    | '/admin/businesses'
+    | '/admin/dashboard'
+    | '/admin/login'
     | '/book/$slug'
     | '/category/$slug'
     | '/dashboard/activity'
@@ -568,6 +604,9 @@ export interface RootRouteChildren {
   ReferralsRoute: typeof ReferralsRoute
   SearchRoute: typeof SearchRoute
   TermsRoute: typeof TermsRoute
+  AdminBusinessesRoute: typeof AdminBusinessesRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminLoginRoute: typeof AdminLoginRoute
   BookSlugRoute: typeof BookSlugRoute
   CategorySlugRoute: typeof CategorySlugRoute
   OwnerAnalyticsRoute: typeof OwnerAnalyticsRoute
@@ -888,6 +927,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BookSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/businesses': {
+      id: '/admin/businesses'
+      path: '/admin/businesses'
+      fullPath: '/admin/businesses'
+      preLoaderRoute: typeof AdminBusinessesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/bookings/$id': {
       id: '/dashboard/bookings/$id'
       path: '/$id'
@@ -962,6 +1022,9 @@ const rootRouteChildren: RootRouteChildren = {
   ReferralsRoute: ReferralsRoute,
   SearchRoute: SearchRoute,
   TermsRoute: TermsRoute,
+  AdminBusinessesRoute: AdminBusinessesRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
+  AdminLoginRoute: AdminLoginRoute,
   BookSlugRoute: BookSlugRoute,
   CategorySlugRoute: CategorySlugRoute,
   OwnerAnalyticsRoute: OwnerAnalyticsRoute,
