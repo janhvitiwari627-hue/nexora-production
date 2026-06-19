@@ -32,7 +32,7 @@ export function MobileBottomNav() {
           return (
             <li key={item.to}>
               <Link
-                to={item.to}
+                to={item.to as "/dashboard"}
                 className={`flex flex-col items-center justify-center gap-1 py-2.5 text-[11px] font-semibold transition-colors ${
                   active ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 }`}
