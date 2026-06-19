@@ -28,6 +28,7 @@ import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
 import { Route as DashboardBookingsRouteImport } from './routes/dashboard.bookings'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as BookSlugRouteImport } from './routes/book.$slug'
+import { Route as DashboardBookingsIdRouteImport } from './routes/dashboard.bookings.$id'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -124,6 +125,11 @@ const BookSlugRoute = BookSlugRouteImport.update({
   path: '/book/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardBookingsIdRoute = DashboardBookingsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => DashboardBookingsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -142,9 +148,10 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/book/$slug': typeof BookSlugRoute
   '/category/$slug': typeof CategorySlugRoute
-  '/dashboard/bookings': typeof DashboardBookingsRoute
+  '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
   '/shop/$slug': typeof ShopSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -162,9 +169,10 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/book/$slug': typeof BookSlugRoute
   '/category/$slug': typeof CategorySlugRoute
-  '/dashboard/bookings': typeof DashboardBookingsRoute
+  '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
   '/shop/$slug': typeof ShopSlugRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -184,9 +192,10 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/book/$slug': typeof BookSlugRoute
   '/category/$slug': typeof CategorySlugRoute
-  '/dashboard/bookings': typeof DashboardBookingsRoute
+  '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
   '/shop/$slug': typeof ShopSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -210,6 +219,7 @@ export interface FileRouteTypes {
     | '/dashboard/bookings'
     | '/shop/$slug'
     | '/dashboard/'
+    | '/dashboard/bookings/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -230,6 +240,7 @@ export interface FileRouteTypes {
     | '/dashboard/bookings'
     | '/shop/$slug'
     | '/dashboard'
+    | '/dashboard/bookings/$id'
   id:
     | '__root__'
     | '/'
@@ -251,6 +262,7 @@ export interface FileRouteTypes {
     | '/dashboard/bookings'
     | '/shop/$slug'
     | '/dashboard/'
+    | '/dashboard/bookings/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -408,16 +420,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BookSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/bookings/$id': {
+      id: '/dashboard/bookings/$id'
+      path: '/$id'
+      fullPath: '/dashboard/bookings/$id'
+      preLoaderRoute: typeof DashboardBookingsIdRouteImport
+      parentRoute: typeof DashboardBookingsRoute
+    }
   }
 }
 
+interface DashboardBookingsRouteChildren {
+  DashboardBookingsIdRoute: typeof DashboardBookingsIdRoute
+}
+
+const DashboardBookingsRouteChildren: DashboardBookingsRouteChildren = {
+  DashboardBookingsIdRoute: DashboardBookingsIdRoute,
+}
+
+const DashboardBookingsRouteWithChildren =
+  DashboardBookingsRoute._addFileChildren(DashboardBookingsRouteChildren)
+
 interface DashboardRouteChildren {
-  DashboardBookingsRoute: typeof DashboardBookingsRoute
+  DashboardBookingsRoute: typeof DashboardBookingsRouteWithChildren
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
-  DashboardBookingsRoute: DashboardBookingsRoute,
+  DashboardBookingsRoute: DashboardBookingsRouteWithChildren,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 
