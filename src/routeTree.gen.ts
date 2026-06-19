@@ -26,6 +26,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
 import { Route as DashboardWalletRouteImport } from './routes/dashboard.wallet'
+import { Route as DashboardSupportRouteImport } from './routes/dashboard.support'
 import { Route as DashboardRewardsRouteImport } from './routes/dashboard.rewards'
 import { Route as DashboardReviewsRouteImport } from './routes/dashboard.reviews'
 import { Route as DashboardReferralsRouteImport } from './routes/dashboard.referrals'
@@ -125,6 +126,11 @@ const DashboardWalletRoute = DashboardWalletRouteImport.update({
   path: '/wallet',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardSupportRoute = DashboardSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardRewardsRoute = DashboardRewardsRouteImport.update({
   id: '/rewards',
   path: '/rewards',
@@ -218,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/referrals': typeof DashboardReferralsRoute
   '/dashboard/reviews': typeof DashboardReviewsRoute
   '/dashboard/rewards': typeof DashboardRewardsRoute
+  '/dashboard/support': typeof DashboardSupportRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -249,6 +256,7 @@ export interface FileRoutesByTo {
   '/dashboard/referrals': typeof DashboardReferralsRoute
   '/dashboard/reviews': typeof DashboardReviewsRoute
   '/dashboard/rewards': typeof DashboardRewardsRoute
+  '/dashboard/support': typeof DashboardSupportRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -282,6 +290,7 @@ export interface FileRoutesById {
   '/dashboard/referrals': typeof DashboardReferralsRoute
   '/dashboard/reviews': typeof DashboardReviewsRoute
   '/dashboard/rewards': typeof DashboardRewardsRoute
+  '/dashboard/support': typeof DashboardSupportRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -316,6 +325,7 @@ export interface FileRouteTypes {
     | '/dashboard/referrals'
     | '/dashboard/reviews'
     | '/dashboard/rewards'
+    | '/dashboard/support'
     | '/dashboard/wallet'
     | '/shop/$slug'
     | '/dashboard/'
@@ -347,6 +357,7 @@ export interface FileRouteTypes {
     | '/dashboard/referrals'
     | '/dashboard/reviews'
     | '/dashboard/rewards'
+    | '/dashboard/support'
     | '/dashboard/wallet'
     | '/shop/$slug'
     | '/dashboard'
@@ -379,6 +390,7 @@ export interface FileRouteTypes {
     | '/dashboard/referrals'
     | '/dashboard/reviews'
     | '/dashboard/rewards'
+    | '/dashboard/support'
     | '/dashboard/wallet'
     | '/shop/$slug'
     | '/dashboard/'
@@ -526,6 +538,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardWalletRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/support': {
+      id: '/dashboard/support'
+      path: '/support'
+      fullPath: '/dashboard/support'
+      preLoaderRoute: typeof DashboardSupportRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/rewards': {
       id: '/dashboard/rewards'
       path: '/rewards'
@@ -642,6 +661,7 @@ interface DashboardRouteChildren {
   DashboardReferralsRoute: typeof DashboardReferralsRoute
   DashboardReviewsRoute: typeof DashboardReviewsRoute
   DashboardRewardsRoute: typeof DashboardRewardsRoute
+  DashboardSupportRoute: typeof DashboardSupportRoute
   DashboardWalletRoute: typeof DashboardWalletRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
@@ -657,6 +677,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardReferralsRoute: DashboardReferralsRoute,
   DashboardReviewsRoute: DashboardReviewsRoute,
   DashboardRewardsRoute: DashboardRewardsRoute,
+  DashboardSupportRoute: DashboardSupportRoute,
   DashboardWalletRoute: DashboardWalletRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
