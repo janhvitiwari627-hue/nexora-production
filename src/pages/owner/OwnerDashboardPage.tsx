@@ -1,0 +1,387 @@
+import { useMemo, useState } from "react";
+import {
+  Bell, Settings, Upload, ArrowUpRight, ArrowDownRight, Check, X,
+  Plus, UserPlus, Tag, Share2, QrCode, BarChart3, Star, Reply, Trophy,
+} from "lucide-react";
+import {
+  ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
+  Area, AreaChart, BarChart, Bar, Legend,
+} from "recharts";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
+import {
+  ownerBusiness, kpis, revenueDaily, revenueWeekly, revenueMonthly,
+  calendarDensity, calendarFirstWeekday, calendarMonthLabel,
+  recentBookings, pendingApprovals, customerInsights,
+  topPerformer, recentReviews, type BookingStatus,
+} from "./mockOwner";
+
+const BRAND = "#635BFF";
+
+function TopBar({ open, onToggle }: { open: boolean; onToggle: (v: boolean) => void }) {
+  return (
+    <header className="sticky top-0 z-30 border-b border-border bg-card/90 backdrop-blur">
+      <div className="mx-auto flex w-full max-w-7xl items-center gap-3 px-4 py-3">
+        <label className="group relative grid h-11 w-11 cursor-pointer place-items-center overflow-hidden rounded-xl border border-dashed border-border bg-muted text-muted-foreground hover:border-primary hover:text-primary">
+          <Upload className="h-4 w-4" />
+          <input type="file" accept="image/*" className="absolute inset-0 cursor-pointer opacity-0" />
+        </label>
+        <div className="min-w-0">
+          <div className="truncate text-sm font-semibold text-heading">{ownerBusiness.name}</div>
+          <div className="text-xs text-muted-foreground">Owner Dashboard</div>
+        </div>
+        <div className="ml-auto flex items-center gap-3">
+          <div className={cn(
+            "flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium",
+            open ? "border-success/30 bg-success/10 text-success" : "border-danger/30 bg-danger/10 text-danger",
+          )}>
+            <span className={cn("h-2 w-2 rounded-full", open ? "bg-success" : "bg-danger")} />
+            {open ? "Open" : "Closed"}
+            <Switch checked={open} onCheckedChange={onToggle} className="ml-1" />
+          </div>
+          <Button variant="ghost" size="icon" className="relative">
+            <Bell className="h-5 w-5" />
+            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary" />
+          </Button>
+          <Button variant="ghost" size="icon"><Settings className="h-5 w-5" /></Button>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function KPICards() {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {kpis.map((k) => (
+        <Card key={k.label} className="p-5">
+          <div className="text-xs font-medium text-muted-foreground">{k.label}</div>
+          <div className="mt-2 flex items-baseline justify-between gap-3">
+            <div className="text-2xl font-bold text-heading">{k.value}</div>
+            <span className={cn(
+              "inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-semibold",
+              k.positive ? "bg-success/10 text-success" : "bg-danger/10 text-danger",
+            )}>
+              {k.positive ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+              {Math.abs(k.delta)}%
+            </span>
+          </div>
+          <div className="mt-1 text-[11px] text-muted-foreground">{k.suffix}</div>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+function RevenueChart() {
+  const [range, setRange] = useState<"daily" | "weekly" | "monthly">("daily");
+  const data = range === "daily" ? revenueDaily : range === "weekly" ? revenueWeekly : revenueMonthly;
+  return (
+    <Card className="p-5">
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-sm font-semibold text-heading">Revenue Trend</div>
+          <div className="text-xs text-muted-foreground">Gross revenue over time</div>
+        </div>
+        <div className="inline-flex rounded-lg border border-border bg-muted p-0.5 text-xs">
+          {(["daily", "weekly", "monthly"] as const).map((r) => (
+            <button key={r}
+              onClick={() => setRange(r)}
+              className={cn(
+                "rounded-md px-3 py-1.5 capitalize transition",
+                range === r ? "bg-card text-heading shadow-sm" : "text-muted-foreground",
+              )}>
+              {r}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="mt-4 h-64">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={data} margin={{ top: 10, right: 8, left: -16, bottom: 0 }}>
+            <defs>
+              <linearGradient id="rev" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={BRAND} stopOpacity={0.35} />
+                <stop offset="100%" stopColor={BRAND} stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+            <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
+            <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
+            <Tooltip
+              contentStyle={{ borderRadius: 12, border: "1px solid hsl(var(--border))", fontSize: 12 }}
+              formatter={(v: number) => [`₹${v.toLocaleString("en-IN")}`, "Revenue"]}
+            />
+            <Area type="monotone" dataKey="revenue" stroke={BRAND} strokeWidth={2.5} fill="url(#rev)" />
+            <Line type="monotone" dataKey="revenue" stroke={BRAND} strokeWidth={0} dot={false} />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    </Card>
+  );
+}
+
+function densityDots(count: number) {
+  const level = count === 0 ? 0 : count < 4 ? 1 : count < 9 ? 2 : 3;
+  return Array.from({ length: level }, (_, i) => i);
+}
+
+function BookingCalendarWidget() {
+  const blanks = Array.from({ length: calendarFirstWeekday });
+  const today = new Date().getDate();
+  return (
+    <Card className="p-5">
+      <div className="flex items-center justify-between">
+        <div className="text-sm font-semibold text-heading">{calendarMonthLabel}</div>
+        <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+          <span className="h-1.5 w-1.5 rounded-full bg-primary/40" />Low
+          <span className="h-1.5 w-1.5 rounded-full bg-primary/70" />Med
+          <span className="h-1.5 w-1.5 rounded-full bg-primary" />High
+        </div>
+      </div>
+      <div className="mt-4 grid grid-cols-7 gap-1.5 text-center text-[10px] uppercase text-muted-foreground">
+        {["S","M","T","W","T","F","S"].map((d, i) => <div key={`${d}${i}`}>{d}</div>)}
+      </div>
+      <div className="mt-2 grid grid-cols-7 gap-1.5">
+        {blanks.map((_, i) => <div key={`b${i}`} />)}
+        {calendarDensity.map(({ day, count }) => (
+          <div key={day} className={cn(
+            "flex aspect-square flex-col items-center justify-center rounded-lg border text-xs",
+            day === today ? "border-primary bg-primary/10 font-semibold text-primary" : "border-border bg-card text-body",
+          )}>
+            <span className="leading-none">{day}</span>
+            <div className="mt-0.5 flex items-center gap-0.5">
+              {densityDots(count).map((i) => (
+                <span key={i} className="h-1 w-1 rounded-full bg-primary" />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+function statusChip(s: BookingStatus) {
+  const map: Record<BookingStatus, string> = {
+    confirmed: "bg-success/10 text-success",
+    pending: "bg-warning/10 text-warning",
+    completed: "bg-primary/10 text-primary",
+    cancelled: "bg-danger/10 text-danger",
+  };
+  return <Badge className={cn("border-0 capitalize", map[s])}>{s}</Badge>;
+}
+
+function RecentBookingsList() {
+  return (
+    <Card className="p-5">
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-sm font-semibold text-heading">Recent Bookings</div>
+          <div className="text-xs text-muted-foreground">Last 5 appointments</div>
+        </div>
+        <Button variant="ghost" size="sm" className="text-primary">View all</Button>
+      </div>
+      <div className="mt-4 space-y-2">
+        {recentBookings.map((b) => (
+          <div key={b.id} className="flex items-center gap-3 rounded-xl border border-border p-3">
+            <Avatar className="h-9 w-9"><AvatarFallback className="bg-primary/10 text-primary text-xs">{b.avatar}</AvatarFallback></Avatar>
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-sm font-medium text-heading">{b.customer}</div>
+              <div className="truncate text-xs text-muted-foreground">{b.service} · {b.time}</div>
+            </div>
+            {statusChip(b.status)}
+            {b.status === "pending" && (
+              <div className="flex gap-1">
+                <Button size="icon" variant="outline" className="h-8 w-8 text-success"><Check className="h-4 w-4" /></Button>
+                <Button size="icon" variant="outline" className="h-8 w-8 text-danger"><X className="h-4 w-4" /></Button>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+function PendingApprovalsWidget() {
+  return (
+    <Card className="p-5">
+      <div className="flex items-center justify-between">
+        <div className="text-sm font-semibold text-heading">Pending Approvals</div>
+        <Badge className="border-0 bg-warning/10 text-warning">{pendingApprovals.length} waiting</Badge>
+      </div>
+      <div className="mt-3 space-y-2">
+        {pendingApprovals.map((p) => (
+          <div key={p.id} className="flex items-center justify-between gap-3 rounded-xl border border-border p-3">
+            <div className="min-w-0">
+              <div className="truncate text-sm font-medium text-heading">{p.customer}</div>
+              <div className="truncate text-xs text-muted-foreground">{p.service} · {p.time}</div>
+            </div>
+            <div className="flex gap-1.5">
+              <Button size="sm" className="h-8 gap-1 bg-success text-white hover:bg-success/90">
+                <Check className="h-4 w-4" />Accept
+              </Button>
+              <Button size="sm" variant="outline" className="h-8 gap-1 text-danger">
+                <X className="h-4 w-4" />Reject
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+function CustomerInsightsWidget() {
+  return (
+    <Card className="p-5">
+      <div className="text-sm font-semibold text-heading">Customer Insights</div>
+      <div className="text-xs text-muted-foreground">New vs Returning · last 4 weeks</div>
+      <div className="mt-4 h-56">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={customerInsights} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+            <XAxis dataKey="week" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
+            <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
+            <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid hsl(var(--border))", fontSize: 12 }} />
+            <Legend wrapperStyle={{ fontSize: 11 }} />
+            <Bar dataKey="new" name="New" fill={BRAND} radius={[6, 6, 0, 0]} />
+            <Bar dataKey="returning" name="Returning" fill="#A5A0FF" radius={[6, 6, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </Card>
+  );
+}
+
+function StaffPerformanceSnapshot() {
+  return (
+    <Card className="overflow-hidden p-0">
+      <div className="bg-gradient-to-br from-primary to-primary-dark p-5 text-primary-foreground">
+        <div className="flex items-center gap-2 text-xs font-medium opacity-90">
+          <Trophy className="h-4 w-4" /> Top Performer This Week
+        </div>
+        <div className="mt-4 flex items-center gap-3">
+          <Avatar className="h-14 w-14 ring-2 ring-white/30">
+            <AvatarFallback className="bg-white/15 text-white">{topPerformer.avatar}</AvatarFallback>
+          </Avatar>
+          <div>
+            <div className="text-lg font-bold">{topPerformer.name}</div>
+            <div className="text-xs opacity-80">{topPerformer.role}</div>
+          </div>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 divide-x divide-border">
+        <div className="p-4">
+          <div className="text-xs text-muted-foreground">Bookings</div>
+          <div className="text-xl font-bold text-heading">{topPerformer.bookings}</div>
+        </div>
+        <div className="p-4">
+          <div className="text-xs text-muted-foreground">Revenue</div>
+          <div className="text-xl font-bold text-heading">{topPerformer.revenue}</div>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function RecentReviewsWidget() {
+  return (
+    <Card className="p-5">
+      <div className="flex items-center justify-between">
+        <div className="text-sm font-semibold text-heading">Recent Reviews</div>
+        <Button variant="ghost" size="sm" className="text-primary">All reviews</Button>
+      </div>
+      <div className="mt-3 space-y-3">
+        {recentReviews.map((r) => (
+          <div key={r.id} className="rounded-xl border border-border p-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-heading">{r.author}</span>
+                <div className="flex">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} className={cn("h-3.5 w-3.5", i < r.rating ? "fill-warning text-warning" : "text-muted")} />
+                  ))}
+                </div>
+              </div>
+              <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-primary">
+                <Reply className="h-3.5 w-3.5" />Reply
+              </Button>
+            </div>
+            <p className="mt-1.5 text-xs text-body">{r.text}</p>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+function QuickActionsRow() {
+  const actions = [
+    { icon: Plus, label: "Add Service" },
+    { icon: UserPlus, label: "Add Staff" },
+    { icon: Tag, label: "Create Offer" },
+    { icon: Share2, label: "Share Website" },
+    { icon: QrCode, label: "Generate QR" },
+    { icon: BarChart3, label: "View Analytics" },
+  ];
+  return (
+    <Card className="p-4">
+      <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+        {actions.map((a) => (
+          <button key={a.label}
+            className="group flex flex-col items-center gap-2 rounded-xl p-3 text-center transition hover:bg-primary/5">
+            <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
+              <a.icon className="h-5 w-5" />
+            </span>
+            <span className="text-xs font-medium text-body">{a.label}</span>
+          </button>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+export function OwnerDashboardPage() {
+  const [open, setOpen] = useState(ownerBusiness.isOpen);
+  const greeting = useMemo(() => {
+    const h = new Date().getHours();
+    return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
+  }, []);
+  return (
+    <div className="min-h-screen bg-background">
+      <TopBar open={open} onToggle={setOpen} />
+      <main className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6">
+        <div>
+          <h1 className="text-2xl font-bold text-heading">{greeting}, {ownerBusiness.name.split(" ")[0]} 👋</h1>
+          <p className="text-sm text-muted-foreground">Here's what's happening at your business today.</p>
+        </div>
+
+        <KPICards />
+        <QuickActionsRow />
+
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <RevenueChart />
+          <BookingCalendarWidget />
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <RecentBookingsList />
+          <PendingApprovalsWidget />
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2"><CustomerInsightsWidget /></div>
+          <StaffPerformanceSnapshot />
+        </div>
+
+        <RecentReviewsWidget />
+      </main>
+    </div>
+  );
+}
