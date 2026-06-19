@@ -66,11 +66,13 @@ function nextMondayMs() {
 }
 
 function useCountdown() {
-  const [ms, setMs] = useState(nextMondayMs);
+  const [ms, setMs] = useState<number | null>(null);
   useEffect(() => {
+    setMs(nextMondayMs());
     const id = setInterval(() => setMs(nextMondayMs()), 1000);
     return () => clearInterval(id);
   }, []);
+  if (ms === null) return "—";
   const d = Math.floor(ms / 86400000);
   const h = Math.floor((ms / 3600000) % 24);
   const m = Math.floor((ms / 60000) % 60);
