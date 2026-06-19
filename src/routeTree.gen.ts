@@ -18,6 +18,7 @@ import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as ForOwnersRouteImport } from './routes/for-owners'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AcademyRouteImport } from './routes/academy'
 import { Route as AboutRouteImport } from './routes/about'
@@ -71,6 +72,11 @@ const ForOwnersRoute = ForOwnersRouteImport.update({
   path: '/for-owners',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/academy': typeof AcademyRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
   '/for-owners': typeof ForOwnersRoute
   '/help': typeof HelpRoute
   '/jobs': typeof JobsRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/academy': typeof AcademyRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
   '/for-owners': typeof ForOwnersRoute
   '/help': typeof HelpRoute
   '/jobs': typeof JobsRoute
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/academy': typeof AcademyRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
   '/for-owners': typeof ForOwnersRoute
   '/help': typeof HelpRoute
   '/jobs': typeof JobsRoute
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/academy'
     | '/contact'
+    | '/dashboard'
     | '/for-owners'
     | '/help'
     | '/jobs'
@@ -187,6 +197,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/academy'
     | '/contact'
+    | '/dashboard'
     | '/for-owners'
     | '/help'
     | '/jobs'
@@ -205,6 +216,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/academy'
     | '/contact'
+    | '/dashboard'
     | '/for-owners'
     | '/help'
     | '/jobs'
@@ -224,6 +236,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AcademyRoute: typeof AcademyRoute
   ContactRoute: typeof ContactRoute
+  DashboardRoute: typeof DashboardRoute
   ForOwnersRoute: typeof ForOwnersRoute
   HelpRoute: typeof HelpRoute
   JobsRoute: typeof JobsRoute
@@ -303,6 +316,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForOwnersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contact': {
       id: '/contact'
       path: '/contact'
@@ -360,6 +380,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AcademyRoute: AcademyRoute,
   ContactRoute: ContactRoute,
+  DashboardRoute: DashboardRoute,
   ForOwnersRoute: ForOwnersRoute,
   HelpRoute: HelpRoute,
   JobsRoute: JobsRoute,
