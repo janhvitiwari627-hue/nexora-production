@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { peakHours } from "./mockAnalytics";
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -14,8 +15,8 @@ export function PeakHoursHeatmap() {
             </div>
           ))}
           {peakHours.map((row, d) => (
-            <>
-              <div key={`label-${d}`} className="text-xs text-muted-foreground flex items-center">
+            <Fragment key={d}>
+              <div className="text-xs text-muted-foreground flex items-center">
                 {DAYS[d]}
               </div>
               {row.map((v, h) => (
@@ -26,7 +27,7 @@ export function PeakHoursHeatmap() {
                   title={`${DAYS[d]} ${h}:00 — ${Math.round(v * 100)}%`}
                 />
               ))}
-            </>
+            </Fragment>
           ))}
         </div>
         <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">

@@ -26,12 +26,14 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as OwnerIndexRouteImport } from './routes/owner.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
+import { Route as OwnerWebsiteRouteImport } from './routes/owner.website'
 import { Route as OwnerStaffRouteImport } from './routes/owner.staff'
 import { Route as OwnerServicesRouteImport } from './routes/owner.services'
 import { Route as OwnerReviewsRouteImport } from './routes/owner.reviews'
 import { Route as OwnerGalleryRouteImport } from './routes/owner.gallery'
 import { Route as OwnerCrmRouteImport } from './routes/owner.crm'
 import { Route as OwnerBookingsRouteImport } from './routes/owner.bookings'
+import { Route as OwnerAnalyticsRouteImport } from './routes/owner.analytics'
 import { Route as DashboardWalletRouteImport } from './routes/dashboard.wallet'
 import { Route as DashboardSupportRouteImport } from './routes/dashboard.support'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
@@ -134,6 +136,11 @@ const ShopSlugRoute = ShopSlugRouteImport.update({
   path: '/shop/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OwnerWebsiteRoute = OwnerWebsiteRouteImport.update({
+  id: '/owner/website',
+  path: '/owner/website',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OwnerStaffRoute = OwnerStaffRouteImport.update({
   id: '/owner/staff',
   path: '/owner/staff',
@@ -162,6 +169,11 @@ const OwnerCrmRoute = OwnerCrmRouteImport.update({
 const OwnerBookingsRoute = OwnerBookingsRouteImport.update({
   id: '/owner/bookings',
   path: '/owner/bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OwnerAnalyticsRoute = OwnerAnalyticsRouteImport.update({
+  id: '/owner/analytics',
+  path: '/owner/analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardWalletRoute = DashboardWalletRouteImport.update({
@@ -275,12 +287,14 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/support': typeof DashboardSupportRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
+  '/owner/analytics': typeof OwnerAnalyticsRoute
   '/owner/bookings': typeof OwnerBookingsRoute
   '/owner/crm': typeof OwnerCrmRoute
   '/owner/gallery': typeof OwnerGalleryRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/owner/staff': typeof OwnerStaffRoute
+  '/owner/website': typeof OwnerWebsiteRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/owner/': typeof OwnerIndexRoute
@@ -315,12 +329,14 @@ export interface FileRoutesByTo {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/support': typeof DashboardSupportRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
+  '/owner/analytics': typeof OwnerAnalyticsRoute
   '/owner/bookings': typeof OwnerBookingsRoute
   '/owner/crm': typeof OwnerCrmRoute
   '/owner/gallery': typeof OwnerGalleryRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/owner/staff': typeof OwnerStaffRoute
+  '/owner/website': typeof OwnerWebsiteRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/dashboard': typeof DashboardIndexRoute
   '/owner': typeof OwnerIndexRoute
@@ -357,12 +373,14 @@ export interface FileRoutesById {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/support': typeof DashboardSupportRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
+  '/owner/analytics': typeof OwnerAnalyticsRoute
   '/owner/bookings': typeof OwnerBookingsRoute
   '/owner/crm': typeof OwnerCrmRoute
   '/owner/gallery': typeof OwnerGalleryRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/owner/staff': typeof OwnerStaffRoute
+  '/owner/website': typeof OwnerWebsiteRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/owner/': typeof OwnerIndexRoute
@@ -400,12 +418,14 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/support'
     | '/dashboard/wallet'
+    | '/owner/analytics'
     | '/owner/bookings'
     | '/owner/crm'
     | '/owner/gallery'
     | '/owner/reviews'
     | '/owner/services'
     | '/owner/staff'
+    | '/owner/website'
     | '/shop/$slug'
     | '/dashboard/'
     | '/owner/'
@@ -440,12 +460,14 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/support'
     | '/dashboard/wallet'
+    | '/owner/analytics'
     | '/owner/bookings'
     | '/owner/crm'
     | '/owner/gallery'
     | '/owner/reviews'
     | '/owner/services'
     | '/owner/staff'
+    | '/owner/website'
     | '/shop/$slug'
     | '/dashboard'
     | '/owner'
@@ -481,12 +503,14 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/support'
     | '/dashboard/wallet'
+    | '/owner/analytics'
     | '/owner/bookings'
     | '/owner/crm'
     | '/owner/gallery'
     | '/owner/reviews'
     | '/owner/services'
     | '/owner/staff'
+    | '/owner/website'
     | '/shop/$slug'
     | '/dashboard/'
     | '/owner/'
@@ -510,12 +534,14 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   BookSlugRoute: typeof BookSlugRoute
   CategorySlugRoute: typeof CategorySlugRoute
+  OwnerAnalyticsRoute: typeof OwnerAnalyticsRoute
   OwnerBookingsRoute: typeof OwnerBookingsRoute
   OwnerCrmRoute: typeof OwnerCrmRoute
   OwnerGalleryRoute: typeof OwnerGalleryRoute
   OwnerReviewsRoute: typeof OwnerReviewsRoute
   OwnerServicesRoute: typeof OwnerServicesRoute
   OwnerStaffRoute: typeof OwnerStaffRoute
+  OwnerWebsiteRoute: typeof OwnerWebsiteRoute
   ShopSlugRoute: typeof ShopSlugRoute
   OwnerIndexRoute: typeof OwnerIndexRoute
 }
@@ -641,6 +667,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/owner/website': {
+      id: '/owner/website'
+      path: '/owner/website'
+      fullPath: '/owner/website'
+      preLoaderRoute: typeof OwnerWebsiteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/owner/staff': {
       id: '/owner/staff'
       path: '/owner/staff'
@@ -681,6 +714,13 @@ declare module '@tanstack/react-router' {
       path: '/owner/bookings'
       fullPath: '/owner/bookings'
       preLoaderRoute: typeof OwnerBookingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/owner/analytics': {
+      id: '/owner/analytics'
+      path: '/owner/analytics'
+      fullPath: '/owner/analytics'
+      preLoaderRoute: typeof OwnerAnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/wallet': {
@@ -864,12 +904,14 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   BookSlugRoute: BookSlugRoute,
   CategorySlugRoute: CategorySlugRoute,
+  OwnerAnalyticsRoute: OwnerAnalyticsRoute,
   OwnerBookingsRoute: OwnerBookingsRoute,
   OwnerCrmRoute: OwnerCrmRoute,
   OwnerGalleryRoute: OwnerGalleryRoute,
   OwnerReviewsRoute: OwnerReviewsRoute,
   OwnerServicesRoute: OwnerServicesRoute,
   OwnerStaffRoute: OwnerStaffRoute,
+  OwnerWebsiteRoute: OwnerWebsiteRoute,
   ShopSlugRoute: ShopSlugRoute,
   OwnerIndexRoute: OwnerIndexRoute,
 }
