@@ -28,6 +28,7 @@ import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
 import { Route as DashboardWalletRouteImport } from './routes/dashboard.wallet'
 import { Route as DashboardRewardsRouteImport } from './routes/dashboard.rewards'
 import { Route as DashboardMembershipRouteImport } from './routes/dashboard.membership'
+import { Route as DashboardFavoritesRouteImport } from './routes/dashboard.favorites'
 import { Route as DashboardBookingsRouteImport } from './routes/dashboard.bookings'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as BookSlugRouteImport } from './routes/book.$slug'
@@ -128,6 +129,11 @@ const DashboardMembershipRoute = DashboardMembershipRouteImport.update({
   path: '/membership',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardFavoritesRoute = DashboardFavoritesRouteImport.update({
+  id: '/favorites',
+  path: '/favorites',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardBookingsRoute = DashboardBookingsRouteImport.update({
   id: '/bookings',
   path: '/bookings',
@@ -167,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/book/$slug': typeof BookSlugRoute
   '/category/$slug': typeof CategorySlugRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
+  '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/membership': typeof DashboardMembershipRoute
   '/dashboard/rewards': typeof DashboardRewardsRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
@@ -191,6 +198,7 @@ export interface FileRoutesByTo {
   '/book/$slug': typeof BookSlugRoute
   '/category/$slug': typeof CategorySlugRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
+  '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/membership': typeof DashboardMembershipRoute
   '/dashboard/rewards': typeof DashboardRewardsRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
@@ -217,6 +225,7 @@ export interface FileRoutesById {
   '/book/$slug': typeof BookSlugRoute
   '/category/$slug': typeof CategorySlugRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
+  '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/membership': typeof DashboardMembershipRoute
   '/dashboard/rewards': typeof DashboardRewardsRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
@@ -244,6 +253,7 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/category/$slug'
     | '/dashboard/bookings'
+    | '/dashboard/favorites'
     | '/dashboard/membership'
     | '/dashboard/rewards'
     | '/dashboard/wallet'
@@ -268,6 +278,7 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/category/$slug'
     | '/dashboard/bookings'
+    | '/dashboard/favorites'
     | '/dashboard/membership'
     | '/dashboard/rewards'
     | '/dashboard/wallet'
@@ -293,6 +304,7 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/category/$slug'
     | '/dashboard/bookings'
+    | '/dashboard/favorites'
     | '/dashboard/membership'
     | '/dashboard/rewards'
     | '/dashboard/wallet'
@@ -456,6 +468,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardMembershipRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/favorites': {
+      id: '/dashboard/favorites'
+      path: '/favorites'
+      fullPath: '/dashboard/favorites'
+      preLoaderRoute: typeof DashboardFavoritesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/bookings': {
       id: '/dashboard/bookings'
       path: '/bookings'
@@ -500,6 +519,7 @@ const DashboardBookingsRouteWithChildren =
 
 interface DashboardRouteChildren {
   DashboardBookingsRoute: typeof DashboardBookingsRouteWithChildren
+  DashboardFavoritesRoute: typeof DashboardFavoritesRoute
   DashboardMembershipRoute: typeof DashboardMembershipRoute
   DashboardRewardsRoute: typeof DashboardRewardsRoute
   DashboardWalletRoute: typeof DashboardWalletRoute
@@ -508,6 +528,7 @@ interface DashboardRouteChildren {
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardBookingsRoute: DashboardBookingsRouteWithChildren,
+  DashboardFavoritesRoute: DashboardFavoritesRoute,
   DashboardMembershipRoute: DashboardMembershipRoute,
   DashboardRewardsRoute: DashboardRewardsRoute,
   DashboardWalletRoute: DashboardWalletRoute,
