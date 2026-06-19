@@ -52,9 +52,17 @@ import { Route as DashboardBookingsRouteImport } from './routes/dashboard.bookin
 import { Route as DashboardActivityRouteImport } from './routes/dashboard.activity'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as BookSlugRouteImport } from './routes/book.$slug'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminRewardsRouteImport } from './routes/admin.rewards'
+import { Route as AdminReviewsRouteImport } from './routes/admin.reviews'
+import { Route as AdminRankingsRouteImport } from './routes/admin.rankings'
+import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
+import { Route as AdminPartnersRouteImport } from './routes/admin.partners'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
+import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising'
 import { Route as DashboardBookingsIdRouteImport } from './routes/dashboard.bookings.$id'
 
 const TermsRoute = TermsRouteImport.update({
@@ -272,6 +280,36 @@ const BookSlugRoute = BookSlugRouteImport.update({
   path: '/book/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRewardsRoute = AdminRewardsRouteImport.update({
+  id: '/admin/rewards',
+  path: '/admin/rewards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminReviewsRoute = AdminReviewsRouteImport.update({
+  id: '/admin/reviews',
+  path: '/admin/reviews',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRankingsRoute = AdminRankingsRouteImport.update({
+  id: '/admin/rankings',
+  path: '/admin/rankings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
+  id: '/admin/payments',
+  path: '/admin/payments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminPartnersRoute = AdminPartnersRouteImport.update({
+  id: '/admin/partners',
+  path: '/admin/partners',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin/login',
   path: '/admin/login',
@@ -285,6 +323,16 @@ const AdminDashboardRoute = AdminDashboardRouteImport.update({
 const AdminBusinessesRoute = AdminBusinessesRouteImport.update({
   id: '/admin/businesses',
   path: '/admin/businesses',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/admin/analytics',
+  path: '/admin/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAdvertisingRoute = AdminAdvertisingRouteImport.update({
+  id: '/admin/advertising',
+  path: '/admin/advertising',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardBookingsIdRoute = DashboardBookingsIdRouteImport.update({
@@ -308,9 +356,17 @@ export interface FileRoutesByFullPath {
   '/referrals': typeof ReferralsRoute
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
+  '/admin/advertising': typeof AdminAdvertisingRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/partners': typeof AdminPartnersRoute
+  '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/rankings': typeof AdminRankingsRoute
+  '/admin/reviews': typeof AdminReviewsRoute
+  '/admin/rewards': typeof AdminRewardsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/book/$slug': typeof BookSlugRoute
   '/category/$slug': typeof CategorySlugRoute
   '/dashboard/activity': typeof DashboardActivityRoute
@@ -356,9 +412,17 @@ export interface FileRoutesByTo {
   '/referrals': typeof ReferralsRoute
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
+  '/admin/advertising': typeof AdminAdvertisingRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/partners': typeof AdminPartnersRoute
+  '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/rankings': typeof AdminRankingsRoute
+  '/admin/reviews': typeof AdminReviewsRoute
+  '/admin/rewards': typeof AdminRewardsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/book/$slug': typeof BookSlugRoute
   '/category/$slug': typeof CategorySlugRoute
   '/dashboard/activity': typeof DashboardActivityRoute
@@ -406,9 +470,17 @@ export interface FileRoutesById {
   '/referrals': typeof ReferralsRoute
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
+  '/admin/advertising': typeof AdminAdvertisingRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/partners': typeof AdminPartnersRoute
+  '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/rankings': typeof AdminRankingsRoute
+  '/admin/reviews': typeof AdminReviewsRoute
+  '/admin/rewards': typeof AdminRewardsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/book/$slug': typeof BookSlugRoute
   '/category/$slug': typeof CategorySlugRoute
   '/dashboard/activity': typeof DashboardActivityRoute
@@ -457,9 +529,17 @@ export interface FileRouteTypes {
     | '/referrals'
     | '/search'
     | '/terms'
+    | '/admin/advertising'
+    | '/admin/analytics'
     | '/admin/businesses'
     | '/admin/dashboard'
     | '/admin/login'
+    | '/admin/partners'
+    | '/admin/payments'
+    | '/admin/rankings'
+    | '/admin/reviews'
+    | '/admin/rewards'
+    | '/admin/users'
     | '/book/$slug'
     | '/category/$slug'
     | '/dashboard/activity'
@@ -505,9 +585,17 @@ export interface FileRouteTypes {
     | '/referrals'
     | '/search'
     | '/terms'
+    | '/admin/advertising'
+    | '/admin/analytics'
     | '/admin/businesses'
     | '/admin/dashboard'
     | '/admin/login'
+    | '/admin/partners'
+    | '/admin/payments'
+    | '/admin/rankings'
+    | '/admin/reviews'
+    | '/admin/rewards'
+    | '/admin/users'
     | '/book/$slug'
     | '/category/$slug'
     | '/dashboard/activity'
@@ -554,9 +642,17 @@ export interface FileRouteTypes {
     | '/referrals'
     | '/search'
     | '/terms'
+    | '/admin/advertising'
+    | '/admin/analytics'
     | '/admin/businesses'
     | '/admin/dashboard'
     | '/admin/login'
+    | '/admin/partners'
+    | '/admin/payments'
+    | '/admin/rankings'
+    | '/admin/reviews'
+    | '/admin/rewards'
+    | '/admin/users'
     | '/book/$slug'
     | '/category/$slug'
     | '/dashboard/activity'
@@ -604,9 +700,17 @@ export interface RootRouteChildren {
   ReferralsRoute: typeof ReferralsRoute
   SearchRoute: typeof SearchRoute
   TermsRoute: typeof TermsRoute
+  AdminAdvertisingRoute: typeof AdminAdvertisingRoute
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminBusinessesRoute: typeof AdminBusinessesRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminPartnersRoute: typeof AdminPartnersRoute
+  AdminPaymentsRoute: typeof AdminPaymentsRoute
+  AdminRankingsRoute: typeof AdminRankingsRoute
+  AdminReviewsRoute: typeof AdminReviewsRoute
+  AdminRewardsRoute: typeof AdminRewardsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
   BookSlugRoute: typeof BookSlugRoute
   CategorySlugRoute: typeof CategorySlugRoute
   OwnerAnalyticsRoute: typeof OwnerAnalyticsRoute
@@ -927,6 +1031,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BookSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/rewards': {
+      id: '/admin/rewards'
+      path: '/admin/rewards'
+      fullPath: '/admin/rewards'
+      preLoaderRoute: typeof AdminRewardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/reviews': {
+      id: '/admin/reviews'
+      path: '/admin/reviews'
+      fullPath: '/admin/reviews'
+      preLoaderRoute: typeof AdminReviewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/rankings': {
+      id: '/admin/rankings'
+      path: '/admin/rankings'
+      fullPath: '/admin/rankings'
+      preLoaderRoute: typeof AdminRankingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/payments': {
+      id: '/admin/payments'
+      path: '/admin/payments'
+      fullPath: '/admin/payments'
+      preLoaderRoute: typeof AdminPaymentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/partners': {
+      id: '/admin/partners'
+      path: '/admin/partners'
+      fullPath: '/admin/partners'
+      preLoaderRoute: typeof AdminPartnersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/login': {
       id: '/admin/login'
       path: '/admin/login'
@@ -946,6 +1092,20 @@ declare module '@tanstack/react-router' {
       path: '/admin/businesses'
       fullPath: '/admin/businesses'
       preLoaderRoute: typeof AdminBusinessesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/admin/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/advertising': {
+      id: '/admin/advertising'
+      path: '/admin/advertising'
+      fullPath: '/admin/advertising'
+      preLoaderRoute: typeof AdminAdvertisingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/bookings/$id': {
@@ -1022,9 +1182,17 @@ const rootRouteChildren: RootRouteChildren = {
   ReferralsRoute: ReferralsRoute,
   SearchRoute: SearchRoute,
   TermsRoute: TermsRoute,
+  AdminAdvertisingRoute: AdminAdvertisingRoute,
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminBusinessesRoute: AdminBusinessesRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminPartnersRoute: AdminPartnersRoute,
+  AdminPaymentsRoute: AdminPaymentsRoute,
+  AdminRankingsRoute: AdminRankingsRoute,
+  AdminReviewsRoute: AdminReviewsRoute,
+  AdminRewardsRoute: AdminRewardsRoute,
+  AdminUsersRoute: AdminUsersRoute,
   BookSlugRoute: BookSlugRoute,
   CategorySlugRoute: CategorySlugRoute,
   OwnerAnalyticsRoute: OwnerAnalyticsRoute,
