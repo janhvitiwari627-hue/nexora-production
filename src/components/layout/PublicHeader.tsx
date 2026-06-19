@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Bell, Heart, MapPin, Menu, Search, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { MobileMenuOverlay } from "./MobileMenuOverlay";
 
 export function PublicHeader() {
   const [scrolled, setScrolled] = useState(false);
@@ -79,29 +80,7 @@ export function PublicHeader() {
         </div>
       </div>
 
-      {menuOpen && (
-        <div className="border-border bg-card border-t md:hidden">
-          <nav className="mx-auto flex max-w-7xl flex-col gap-1 p-4 text-sm">
-            <Link to="/search" className="hover:bg-muted rounded-lg px-3 py-2">
-              Search salons
-            </Link>
-            <Link to="/" className="hover:bg-muted rounded-lg px-3 py-2">
-              Membership
-            </Link>
-            <Link to="/" className="hover:bg-muted rounded-lg px-3 py-2">
-              For owners
-            </Link>
-            <div className="mt-2 flex gap-2">
-              <Button variant="outline" className="flex-1">
-                Login
-              </Button>
-              <Button className="bg-gradient-cta text-primary-foreground flex-1">
-                Register
-              </Button>
-            </div>
-          </nav>
-        </div>
-      )}
+      <MobileMenuOverlay open={menuOpen} onClose={() => setMenuOpen(false)} />
     </header>
   );
 }
