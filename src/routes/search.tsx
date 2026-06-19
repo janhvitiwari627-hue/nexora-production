@@ -5,7 +5,7 @@ import { Search, SlidersHorizontal } from "lucide-react";
 import { z } from "zod";
 import { PublicHeader } from "@/components/layout/PublicHeader";
 import { PublicFooter } from "@/components/layout/PublicFooter";
-import { ShopCard } from "@/components/cards/ShopCard";
+import { ShopCard } from "@/components/shared/ShopCard";
 import { shopsQueryOptions } from "@/lib/shops.queries";
 
 const searchSchema = z.object({

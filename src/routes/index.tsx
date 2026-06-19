@@ -3,7 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { ArrowRight, Calendar, MapPin, Scissors, Search, Sparkles, Star } from "lucide-react";
 import { PublicHeader } from "@/components/layout/PublicHeader";
 import { PublicFooter } from "@/components/layout/PublicFooter";
-import { ShopCard } from "@/components/cards/ShopCard";
+import { ShopCard } from "@/components/shared/ShopCard";
 import { Button } from "@/components/ui/button";
 import { shopsQueryOptions } from "@/lib/shops.queries";
 
