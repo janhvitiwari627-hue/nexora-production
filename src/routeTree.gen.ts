@@ -18,6 +18,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PartnerRouteImport } from './routes/partner'
 import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as MembershipRouteImport } from './routes/membership'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as ForOwnersRouteImport } from './routes/for-owners'
@@ -122,6 +123,11 @@ const OfflineRoute = OfflineRouteImport.update({
 const MembershipRoute = MembershipRouteImport.update({
   id: '/membership',
   path: '/membership',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JobsRoute = JobsRouteImport.update({
@@ -434,6 +440,7 @@ export interface FileRoutesByFullPath {
   '/for-owners': typeof ForOwnersRoute
   '/help': typeof HelpRoute
   '/jobs': typeof JobsRouteWithChildren
+  '/login': typeof LoginRoute
   '/membership': typeof MembershipRoute
   '/offline': typeof OfflineRoute
   '/partner': typeof PartnerRouteWithChildren
@@ -504,6 +511,7 @@ export interface FileRoutesByTo {
   '/for-owners': typeof ForOwnersRoute
   '/help': typeof HelpRoute
   '/jobs': typeof JobsRouteWithChildren
+  '/login': typeof LoginRoute
   '/membership': typeof MembershipRoute
   '/offline': typeof OfflineRoute
   '/partner': typeof PartnerRouteWithChildren
@@ -576,6 +584,7 @@ export interface FileRoutesById {
   '/for-owners': typeof ForOwnersRoute
   '/help': typeof HelpRoute
   '/jobs': typeof JobsRouteWithChildren
+  '/login': typeof LoginRoute
   '/membership': typeof MembershipRoute
   '/offline': typeof OfflineRoute
   '/partner': typeof PartnerRouteWithChildren
@@ -649,6 +658,7 @@ export interface FileRouteTypes {
     | '/for-owners'
     | '/help'
     | '/jobs'
+    | '/login'
     | '/membership'
     | '/offline'
     | '/partner'
@@ -719,6 +729,7 @@ export interface FileRouteTypes {
     | '/for-owners'
     | '/help'
     | '/jobs'
+    | '/login'
     | '/membership'
     | '/offline'
     | '/partner'
@@ -790,6 +801,7 @@ export interface FileRouteTypes {
     | '/for-owners'
     | '/help'
     | '/jobs'
+    | '/login'
     | '/membership'
     | '/offline'
     | '/partner'
@@ -862,6 +874,7 @@ export interface RootRouteChildren {
   ForOwnersRoute: typeof ForOwnersRoute
   HelpRoute: typeof HelpRoute
   JobsRoute: typeof JobsRouteWithChildren
+  LoginRoute: typeof LoginRoute
   MembershipRoute: typeof MembershipRoute
   OfflineRoute: typeof OfflineRoute
   PartnerRoute: typeof PartnerRouteWithChildren
@@ -966,6 +979,13 @@ declare module '@tanstack/react-router' {
       path: '/membership'
       fullPath: '/membership'
       preLoaderRoute: typeof MembershipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/jobs': {
@@ -1490,6 +1510,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForOwnersRoute: ForOwnersRoute,
   HelpRoute: HelpRoute,
   JobsRoute: JobsRouteWithChildren,
+  LoginRoute: LoginRoute,
   MembershipRoute: MembershipRoute,
   OfflineRoute: OfflineRoute,
   PartnerRoute: PartnerRouteWithChildren,

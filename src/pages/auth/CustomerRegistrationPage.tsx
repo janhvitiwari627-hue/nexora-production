@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
@@ -25,6 +25,7 @@ const registrationSchema = z.object({
 
 export default function CustomerRegistrationPage() {
   const navigate = useNavigate();
+  const search = useSearch({ strict: false }) as { ref?: string };
   const [form, setForm] = useState({
     full_name: "",
     email: "",
@@ -32,6 +33,12 @@ export default function CustomerRegistrationPage() {
     password: "",
     referred_by: "",
   });
+
+  useEffect(() => {
+    if (search?.ref) {
+      setForm((f) => (f.referred_by ? f : { ...f, referred_by: search.ref! }));
+    }
+  }, [search?.ref]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [googleSubmitting, setGoogleSubmitting] = useState(false);
