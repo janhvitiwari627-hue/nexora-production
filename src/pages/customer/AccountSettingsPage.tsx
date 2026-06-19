@@ -1,0 +1,113 @@
+import { useState } from "react";
+import {
+  Bell, CreditCard, Globe2, Link2, Lock, Mail, ShieldAlert, ShieldCheck, User, UserCircle,
+} from "lucide-react";
+import { PersonalInfoPanel } from "./settings/PersonalInfoPanel";
+import { ContactInfoPanel } from "./settings/ContactInfoPanel";
+import { SecurityPanel } from "./settings/SecurityPanel";
+import { LanguagePanel } from "./settings/LanguagePanel";
+import { NotificationsPanel } from "./settings/NotificationsPanel";
+import { PrivacyPanel } from "./settings/PrivacyPanel";
+import { ConnectedAccountsPanel } from "./settings/ConnectedAccountsPanel";
+import { PaymentMethodsPanel } from "./settings/PaymentMethodsPanel";
+import { DangerZonePanel } from "./settings/DangerZonePanel";
+
+const SECTIONS = [
+  { id: "personal", label: "Personal info", icon: User, Comp: PersonalInfoPanel },
+  { id: "contact", label: "Contact info", icon: Mail, Comp: ContactInfoPanel },
+  { id: "security", label: "Security", icon: Lock, Comp: SecurityPanel },
+  { id: "language", label: "Language & region", icon: Globe2, Comp: LanguagePanel },
+  { id: "notifications", label: "Notifications", icon: Bell, Comp: NotificationsPanel },
+  { id: "privacy", label: "Privacy", icon: ShieldCheck, Comp: PrivacyPanel },
+  { id: "connected", label: "Connected accounts", icon: Link2, Comp: ConnectedAccountsPanel },
+  { id: "payments", label: "Payment methods", icon: CreditCard, Comp: PaymentMethodsPanel },
+  { id: "profile-card", label: "Profile preview", icon: UserCircle, Comp: ProfilePreviewPanel },
+  { id: "danger", label: "Danger zone", icon: ShieldAlert, Comp: DangerZonePanel },
+] as const;
+
+type SectionId = typeof SECTIONS[number]["id"];
+
+export function AccountSettingsPage() {
+  const [active, setActive] = useState<SectionId>("personal");
+  const ActiveComp = SECTIONS.find((s) => s.id === active)!.Comp;
+
+  return (
+    <div className="bg-background min-h-screen">
+      <div className="mx-auto max-w-6xl px-4 py-8 md:px-6 md:py-10">
+        <header className="mb-6">
+          <h1 className="text-heading text-3xl font-black md:text-4xl">Account settings</h1>
+          <p className="text-muted-foreground mt-1 text-sm">Manage your profile, security, payments and preferences.</p>
+        </header>
+
+        {/* Mobile scroll tabs */}
+        <nav className="-mx-4 mb-5 overflow-x-auto px-4 md:hidden">
+          <div className="flex gap-2">
+            {SECTIONS.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => setActive(s.id)}
+                className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold transition ${
+                  active === s.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/70"
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </nav>
+
+        <div className="grid gap-6 md:grid-cols-[240px_1fr]">
+          {/* Desktop sidebar */}
+          <aside className="hidden md:block">
+            <nav className="bg-card border-border sticky top-6 space-y-1 rounded-[var(--radius-card-lg)] border p-2">
+              {SECTIONS.map((s) => {
+                const Icon = s.icon;
+                const isActive = active === s.id;
+                const isDanger = s.id === "danger";
+                return (
+                  <button
+                    key={s.id}
+                    onClick={() => setActive(s.id)}
+                    className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm font-semibold transition ${
+                      isActive
+                        ? isDanger
+                          ? "bg-destructive/10 text-destructive"
+                          : "bg-primary/10 text-primary"
+                        : isDanger
+                          ? "text-destructive hover:bg-destructive/5"
+                          : "text-foreground hover:bg-accent"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {s.label}
+                  </button>
+                );
+              })}
+            </nav>
+          </aside>
+
+          <div className="min-w-0">
+            <ActiveComp />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProfilePreviewPanel() {
+  return (
+    <section className="bg-card border-border rounded-[var(--radius-card-lg)] border p-6">
+      <h2 className="text-heading text-xl font-black">Profile preview</h2>
+      <p className="text-muted-foreground mt-1 text-sm">This is how others see you on Nexora.</p>
+      <div className="border-border bg-background mt-5 flex items-center gap-4 rounded-xl border p-4">
+        <div className="bg-primary/15 text-primary grid h-16 w-16 place-items-center rounded-full text-xl font-black">AS</div>
+        <div>
+          <p className="text-heading text-lg font-black">Aarav Sharma</p>
+          <p className="text-muted-foreground text-sm">@aarav.sharma · Bengaluru, IN</p>
+          <p className="text-muted-foreground mt-1 text-xs">Gold member · 24 bookings · 8 reviews</p>
+        </div>
+      </div>
+    </section>
+  );
+}
