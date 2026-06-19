@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,14 +7,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, MapPin, Plus, Share2, Sparkles, Trash2, Upload } from "lucide-react";
+import { Check, MapPin, Plus, Share2, Sparkles, Trash2, Upload, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuthStore } from "@/stores/authStore";
 
 const STEPS = ["Account", "Business", "Services", "Staff", "Gallery", "Payment", "Review"];
 const CATEGORIES = ["Salon", "Spa", "Tattoo", "Barber", "Bridal", "Nail Art"];
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+const DRAFT_KEY_PREFIX = "nexora:ownerOnboardingDraft:";
+const ANON_DRAFT_KEY = `${DRAFT_KEY_PREFIX}anon`;
 
 const passStrength = (p: string) => {
   let s = 0;
@@ -25,21 +29,156 @@ const passStrength = (p: string) => {
   return s;
 };
 
+type Account = { ownerName: string; businessName: string; mobile: string; otp: string; email: string; password: string; category: string };
+type Business = { address: string; city: string; area: string; whatsapp: string; lat: number; lng: number; type: string };
+type Hour = { day: string; open: string; close: string };
+type Service = { name: string; price: string; duration: string; desc: string };
+type Staff = { name: string; designation: string; experience: string };
+type Payment = { upi: string; qrName: string };
+
+type Draft = {
+  step: number;
+  account: Omit<Account, "password" | "otp">;
+  business: Business;
+  hours: Hour[];
+  services: Service[];
+  staff: Staff[];
+  gallery: string[];
+  payment: Payment;
+};
+
+const DEFAULT_ACCOUNT: Account = { ownerName: "", businessName: "", mobile: "", otp: "", email: "", password: "", category: "" };
+const DEFAULT_BUSINESS: Business = { address: "", city: "", area: "", whatsapp: "", lat: 19.07, lng: 72.87, type: "Independent" };
+const DEFAULT_HOURS: Hour[] = DAYS.map(d => ({ day: d, open: "10:00", close: "21:00" }));
+
+function loadDraft(key: string): Partial<Draft> | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as Draft) : null;
+  } catch {
+    return null;
+  }
+}
+
 export function OwnerOnboardingPage() {
+  const authUser = useAuthStore(s => s.user);
+  const refreshProfile = useAuthStore(s => s.refreshProfile);
+  const draftKey = useMemo(() => (authUser ? `${DRAFT_KEY_PREFIX}${authUser.id}` : ANON_DRAFT_KEY), [authUser]);
+
+  const [hydrated, setHydrated] = useState(false);
   const [step, setStep] = useState(0);
   const [published, setPublished] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [accountCreated, setAccountCreated] = useState(false);
 
-  const [account, setAccount] = useState({ ownerName: "", businessName: "", mobile: "", otp: "", email: "", password: "", category: "" });
-  const [business, setBusiness] = useState({ address: "", city: "", area: "", whatsapp: "", lat: 19.07, lng: 72.87, type: "Independent" });
-  const [hours, setHours] = useState(DAYS.map(d => ({ day: d, open: "10:00", close: "21:00" })));
-  const [services, setServices] = useState([{ name: "", price: "", duration: "", desc: "" }]);
-  const [staff, setStaff] = useState([{ name: "", designation: "", experience: "" }]);
+  const [account, setAccount] = useState<Account>(DEFAULT_ACCOUNT);
+  const [business, setBusiness] = useState<Business>(DEFAULT_BUSINESS);
+  const [hours, setHours] = useState<Hour[]>(DEFAULT_HOURS);
+  const [services, setServices] = useState<Service[]>([{ name: "", price: "", duration: "", desc: "" }]);
+  const [staff, setStaff] = useState<Staff[]>([{ name: "", designation: "", experience: "" }]);
   const [gallery, setGallery] = useState<string[]>([]);
-  const [payment, setPayment] = useState({ upi: "", qrName: "" });
+  const [payment, setPayment] = useState<Payment>({ upi: "", qrName: "" });
 
-  const next = () => setStep(s => Math.min(STEPS.length - 1, s + 1));
+  // Hydrate from localStorage (prefer user-scoped draft, fall back to anon and migrate)
+  useEffect(() => {
+    const userDraft = loadDraft(draftKey);
+    const anonDraft = !userDraft && authUser ? loadDraft(ANON_DRAFT_KEY) : null;
+    const d = userDraft ?? anonDraft;
+    if (d) {
+      if (typeof d.step === "number") setStep(d.step);
+      if (d.account) setAccount(a => ({ ...a, ...d.account }));
+      if (d.business) setBusiness(d.business);
+      if (d.hours) setHours(d.hours);
+      if (d.services) setServices(d.services);
+      if (d.staff) setStaff(d.staff);
+      if (d.gallery) setGallery(d.gallery);
+      if (d.payment) setPayment(d.payment);
+      if (anonDraft && authUser) {
+        try { window.localStorage.removeItem(ANON_DRAFT_KEY); } catch { /* noop */ }
+      }
+    }
+    if (authUser) setAccountCreated(true);
+    setHydrated(true);
+  }, [draftKey, authUser]);
+
+  // Persist progress after every change (excluding password/otp)
+  useEffect(() => {
+    if (!hydrated || typeof window === "undefined") return;
+    const { password: _p, otp: _o, ...accountSafe } = account;
+    const draft: Draft = { step, account: accountSafe, business, hours, services, staff, gallery, payment };
+    try {
+      window.localStorage.setItem(draftKey, JSON.stringify(draft));
+    } catch { /* quota */ }
+  }, [hydrated, draftKey, step, account, business, hours, services, staff, gallery, payment]);
+
+  const next = async () => {
+    // Step 0 → create the auth account before moving on
+    if (step === 0 && !accountCreated) {
+      if (!account.email || !account.password) {
+        toast.error("Email and password are required");
+        return;
+      }
+      if (passStrength(account.password) < 2) {
+        toast.error("Choose a stronger password");
+        return;
+      }
+      setSubmitting(true);
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email: account.email,
+          password: account.password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/owner/onboarding`,
+            data: {
+              full_name: account.ownerName,
+              mobile: account.mobile,
+              role: "owner",
+              business_name: account.businessName,
+              business_category: account.category,
+            },
+          },
+        });
+        if (error) throw error;
+        setAccountCreated(true);
+        if (!data.session) {
+          toast.success("Check your email to verify, then continue here. Your progress is saved.");
+        } else {
+          toast.success("Account created");
+        }
+        setStep(s => Math.min(STEPS.length - 1, s + 1));
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "Sign up failed";
+        toast.error(msg);
+      } finally {
+        setSubmitting(false);
+      }
+      return;
+    }
+    setStep(s => Math.min(STEPS.length - 1, s + 1));
+  };
   const back = () => setStep(s => Math.max(0, s - 1));
+
+  const handlePublish = async () => {
+    setSubmitting(true);
+    try {
+      // Ensure profile role reflects 'owner' (handle_new_user sets it from metadata,
+      // but if the user signed up elsewhere first we update the metadata here).
+      if (authUser) {
+        await supabase.auth.updateUser({ data: { role: "owner" } });
+        await refreshProfile();
+      }
+      // shops record creation + subdomain/SSL are Phase 6.
+      try { window.localStorage.removeItem(draftKey); } catch { /* noop */ }
+      setPublished(true);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Publish failed";
+      toast.error(msg);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   if (published) return <SuccessScreen business={account.businessName || "Your Business"} />;
 
@@ -49,6 +188,9 @@ export function OwnerOnboardingPage() {
         <header className="text-center">
           <h1 className="text-heading text-2xl font-bold md:text-3xl">Create Your Business</h1>
           <p className="text-muted-foreground text-sm">Get your white-label website live in 7 quick steps</p>
+          {hydrated && (step > 0 || accountCreated) && (
+            <p className="text-muted-foreground mt-1 text-xs">Progress auto-saved · Resume anytime</p>
+          )}
         </header>
 
         <Stepper current={step} />
@@ -60,19 +202,19 @@ export function OwnerOnboardingPage() {
                 {step === 0 && (
                   <Step title="Account Setup" subtitle="Tell us about you and your business">
                     <div className="grid gap-3 md:grid-cols-2">
-                      <Field label="Owner Name"><Input value={account.ownerName} onChange={e => setAccount({ ...account, ownerName: e.target.value })} /></Field>
+                      <Field label="Owner Name"><Input value={account.ownerName} onChange={e => setAccount({ ...account, ownerName: e.target.value })} disabled={accountCreated} /></Field>
                       <Field label="Business Name"><Input value={account.businessName} onChange={e => setAccount({ ...account, businessName: e.target.value })} /></Field>
                       <Field label="Mobile">
                         <div className="flex gap-2">
                           <Input value={account.mobile} onChange={e => setAccount({ ...account, mobile: e.target.value })} placeholder="+91 …" />
-                          <Button size="sm" variant="outline" onClick={() => { setOtpSent(true); toast.success("OTP sent"); }}>{otpSent ? "Resend" : "Send OTP"}</Button>
+                          <Button size="sm" variant="outline" onClick={() => { setOtpSent(true); toast.success("OTP sent (WhatsApp verification in Phase 7)"); }}>{otpSent ? "Resend" : "Send OTP"}</Button>
                         </div>
                       </Field>
                       {otpSent && <Field label="OTP"><Input maxLength={6} value={account.otp} onChange={e => setAccount({ ...account, otp: e.target.value })} placeholder="6-digit" /></Field>}
-                      <Field label="Email"><Input type="email" value={account.email} onChange={e => setAccount({ ...account, email: e.target.value })} /></Field>
+                      <Field label="Email"><Input type="email" value={account.email} onChange={e => setAccount({ ...account, email: e.target.value })} disabled={accountCreated} /></Field>
                       <Field label="Password">
-                        <Input type="password" value={account.password} onChange={e => setAccount({ ...account, password: e.target.value })} />
-                        <PasswordMeter score={passStrength(account.password)} />
+                        <Input type="password" value={account.password} onChange={e => setAccount({ ...account, password: e.target.value })} disabled={accountCreated} placeholder={accountCreated ? "Account already created" : ""} />
+                        {!accountCreated && <PasswordMeter score={passStrength(account.password)} />}
                       </Field>
                       <Field label="Business Category">
                         <Select value={account.category} onValueChange={v => setAccount({ ...account, category: v })}>
@@ -220,7 +362,9 @@ export function OwnerOnboardingPage() {
                     </Accordion>
                     <div className="mt-4 flex flex-wrap gap-2">
                       <Button variant="outline" onClick={() => toast.success("AI content generated for all sections")}><Sparkles className="h-4 w-4" /> Generate AI Content</Button>
-                      <Button className="bg-gradient-to-r from-primary to-accent flex-1" onClick={() => setPublished(true)}><Check className="h-4 w-4" /> Publish My Website</Button>
+                      <Button className="bg-gradient-to-r from-primary to-accent flex-1" disabled={submitting} onClick={handlePublish}>
+                        {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />} Publish My Website
+                      </Button>
                     </div>
                   </Step>
                 )}
@@ -228,8 +372,13 @@ export function OwnerOnboardingPage() {
             </AnimatePresence>
 
             <div className="mt-6 flex justify-between border-t pt-4">
-              <Button variant="ghost" onClick={back} disabled={step === 0}>Back</Button>
-              {step < STEPS.length - 1 && <Button onClick={next}>Continue</Button>}
+              <Button variant="ghost" onClick={back} disabled={step === 0 || submitting}>Back</Button>
+              {step < STEPS.length - 1 && (
+                <Button onClick={next} disabled={submitting}>
+                  {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {step === 0 && !accountCreated ? "Create Account & Continue" : "Continue"}
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
