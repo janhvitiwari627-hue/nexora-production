@@ -35,7 +35,7 @@ export function ScrollCarousel({ children }: { children: ReactNode }) {
         drag="x"
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.15}
-        className="no-scrollbar flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth px-1 pb-3 [&>*]:snap-start"
+        className="flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth px-1 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:snap-start"
         style={{ cursor: "grab" }}
       >
         {children}
