@@ -53,7 +53,7 @@ function SearchPage() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            navigate({ search: (s) => ({ ...s, q: q || undefined }) });
+            navigate({ search: (s: { q?: string; category?: string }) => ({ ...s, q: q || undefined }) });
           }}
           className="bg-card border-border mt-6 flex items-center gap-2 rounded-[var(--radius-card)] border p-2 shadow-[var(--shadow-card)]"
         >
