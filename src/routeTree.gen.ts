@@ -25,6 +25,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
+import { Route as DashboardWalletRouteImport } from './routes/dashboard.wallet'
 import { Route as DashboardRewardsRouteImport } from './routes/dashboard.rewards'
 import { Route as DashboardBookingsRouteImport } from './routes/dashboard.bookings'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
@@ -111,6 +112,11 @@ const ShopSlugRoute = ShopSlugRouteImport.update({
   path: '/shop/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardWalletRoute = DashboardWalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardRewardsRoute = DashboardRewardsRouteImport.update({
   id: '/rewards',
   path: '/rewards',
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/category/$slug': typeof CategorySlugRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
   '/dashboard/rewards': typeof DashboardRewardsRoute
+  '/dashboard/wallet': typeof DashboardWalletRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
@@ -178,6 +185,7 @@ export interface FileRoutesByTo {
   '/category/$slug': typeof CategorySlugRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
   '/dashboard/rewards': typeof DashboardRewardsRoute
+  '/dashboard/wallet': typeof DashboardWalletRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/dashboard': typeof DashboardIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
@@ -202,6 +210,7 @@ export interface FileRoutesById {
   '/category/$slug': typeof CategorySlugRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
   '/dashboard/rewards': typeof DashboardRewardsRoute
+  '/dashboard/wallet': typeof DashboardWalletRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
@@ -227,6 +236,7 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/dashboard/bookings'
     | '/dashboard/rewards'
+    | '/dashboard/wallet'
     | '/shop/$slug'
     | '/dashboard/'
     | '/dashboard/bookings/$id'
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/dashboard/bookings'
     | '/dashboard/rewards'
+    | '/dashboard/wallet'
     | '/shop/$slug'
     | '/dashboard'
     | '/dashboard/bookings/$id'
@@ -272,6 +283,7 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/dashboard/bookings'
     | '/dashboard/rewards'
+    | '/dashboard/wallet'
     | '/shop/$slug'
     | '/dashboard/'
     | '/dashboard/bookings/$id'
@@ -411,6 +423,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/wallet': {
+      id: '/dashboard/wallet'
+      path: '/wallet'
+      fullPath: '/dashboard/wallet'
+      preLoaderRoute: typeof DashboardWalletRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/rewards': {
       id: '/dashboard/rewards'
       path: '/rewards'
@@ -463,12 +482,14 @@ const DashboardBookingsRouteWithChildren =
 interface DashboardRouteChildren {
   DashboardBookingsRoute: typeof DashboardBookingsRouteWithChildren
   DashboardRewardsRoute: typeof DashboardRewardsRoute
+  DashboardWalletRoute: typeof DashboardWalletRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardBookingsRoute: DashboardBookingsRouteWithChildren,
   DashboardRewardsRoute: DashboardRewardsRoute,
+  DashboardWalletRoute: DashboardWalletRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 
