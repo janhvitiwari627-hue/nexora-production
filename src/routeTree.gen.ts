@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ReferralsRouteImport } from './routes/referrals'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PartnerRouteImport } from './routes/partner'
@@ -91,6 +92,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReferralsRoute = ReferralsRouteImport.update({
@@ -433,6 +439,7 @@ export interface FileRoutesByFullPath {
   '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/referrals': typeof ReferralsRoute
+  '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -502,6 +509,7 @@ export interface FileRoutesByTo {
   '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/referrals': typeof ReferralsRoute
+  '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -573,6 +581,7 @@ export interface FileRoutesById {
   '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/referrals': typeof ReferralsRoute
+  '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -645,6 +654,7 @@ export interface FileRouteTypes {
     | '/partner'
     | '/privacy'
     | '/referrals'
+    | '/register'
     | '/search'
     | '/sitemap.xml'
     | '/terms'
@@ -714,6 +724,7 @@ export interface FileRouteTypes {
     | '/partner'
     | '/privacy'
     | '/referrals'
+    | '/register'
     | '/search'
     | '/sitemap.xml'
     | '/terms'
@@ -784,6 +795,7 @@ export interface FileRouteTypes {
     | '/partner'
     | '/privacy'
     | '/referrals'
+    | '/register'
     | '/search'
     | '/sitemap.xml'
     | '/terms'
@@ -855,6 +867,7 @@ export interface RootRouteChildren {
   PartnerRoute: typeof PartnerRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   ReferralsRoute: typeof ReferralsRoute
+  RegisterRoute: typeof RegisterRoute
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
@@ -911,6 +924,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/referrals': {
@@ -1475,6 +1495,7 @@ const rootRouteChildren: RootRouteChildren = {
   PartnerRoute: PartnerRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   ReferralsRoute: ReferralsRoute,
+  RegisterRoute: RegisterRoute,
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,

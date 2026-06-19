@@ -119,6 +119,18 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  useEffect(() => {
+    let unsubscribe: (() => void) | undefined;
+    void import("@/stores/authStore").then(({ useAuthStore }) => {
+      useAuthStore.getState().initialize().then((unsub) => {
+        unsubscribe = unsub;
+      });
+    });
+    return () => {
+      unsubscribe?.();
+    };
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
