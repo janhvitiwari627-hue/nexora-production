@@ -18,17 +18,17 @@ import { ShopCard, type Shop } from "@/components/shared/ShopCard";
 import { ShopCardSkeleton } from "@/components/shared/SkeletonLoader";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { shopsQueryOptions } from "@/lib/shops.queries";
-import { FilterSidebar } from "./FilterSidebar";
-import { FilterBottomSheet } from "./FilterBottomSheet";
-import { SortDropdown } from "./SortDropdown";
-import { ActiveFiltersBar } from "./ActiveFiltersBar";
-import { InstantBookingSection } from "./InstantBookingSection";
+import { FilterSidebar } from "./search/FilterSidebar";
+import { FilterBottomSheet } from "./search/FilterBottomSheet";
+import { SortDropdown } from "./search/SortDropdown";
+import { ActiveFiltersBar } from "./search/ActiveFiltersBar";
+import { InstantBookingSection } from "./search/InstantBookingSection";
 import {
   DEFAULT_FILTERS,
   isDefault,
   type Filters,
   type SortKey,
-} from "./filters";
+} from "./search/filters";
 
 type SearchParams = { q?: string; category?: string };
 
