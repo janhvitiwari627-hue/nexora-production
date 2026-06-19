@@ -1,6 +1,6 @@
 import { lazy, Suspense, useState } from "react";
 import { motion } from "framer-motion";
-import { SkeletonLoader } from "@/components/shared/SkeletonLoader";
+import { ShopCardSkeleton } from "@/components/shared/SkeletonLoader";
 import { MOCK_SHOP } from "./shop/mockShop";
 import { HeroCarousel } from "./shop/HeroCarousel";
 import { StickySubHeader } from "./shop/StickySubHeader";
