@@ -28,6 +28,8 @@ import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
 import { Route as OwnerStaffRouteImport } from './routes/owner.staff'
 import { Route as OwnerServicesRouteImport } from './routes/owner.services'
+import { Route as OwnerReviewsRouteImport } from './routes/owner.reviews'
+import { Route as OwnerGalleryRouteImport } from './routes/owner.gallery'
 import { Route as OwnerCrmRouteImport } from './routes/owner.crm'
 import { Route as OwnerBookingsRouteImport } from './routes/owner.bookings'
 import { Route as DashboardWalletRouteImport } from './routes/dashboard.wallet'
@@ -140,6 +142,16 @@ const OwnerStaffRoute = OwnerStaffRouteImport.update({
 const OwnerServicesRoute = OwnerServicesRouteImport.update({
   id: '/owner/services',
   path: '/owner/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OwnerReviewsRoute = OwnerReviewsRouteImport.update({
+  id: '/owner/reviews',
+  path: '/owner/reviews',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OwnerGalleryRoute = OwnerGalleryRouteImport.update({
+  id: '/owner/gallery',
+  path: '/owner/gallery',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OwnerCrmRoute = OwnerCrmRouteImport.update({
@@ -265,6 +277,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/owner/bookings': typeof OwnerBookingsRoute
   '/owner/crm': typeof OwnerCrmRoute
+  '/owner/gallery': typeof OwnerGalleryRoute
+  '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/owner/staff': typeof OwnerStaffRoute
   '/shop/$slug': typeof ShopSlugRoute
@@ -303,6 +317,8 @@ export interface FileRoutesByTo {
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/owner/bookings': typeof OwnerBookingsRoute
   '/owner/crm': typeof OwnerCrmRoute
+  '/owner/gallery': typeof OwnerGalleryRoute
+  '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/owner/staff': typeof OwnerStaffRoute
   '/shop/$slug': typeof ShopSlugRoute
@@ -343,6 +359,8 @@ export interface FileRoutesById {
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/owner/bookings': typeof OwnerBookingsRoute
   '/owner/crm': typeof OwnerCrmRoute
+  '/owner/gallery': typeof OwnerGalleryRoute
+  '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/owner/staff': typeof OwnerStaffRoute
   '/shop/$slug': typeof ShopSlugRoute
@@ -384,6 +402,8 @@ export interface FileRouteTypes {
     | '/dashboard/wallet'
     | '/owner/bookings'
     | '/owner/crm'
+    | '/owner/gallery'
+    | '/owner/reviews'
     | '/owner/services'
     | '/owner/staff'
     | '/shop/$slug'
@@ -422,6 +442,8 @@ export interface FileRouteTypes {
     | '/dashboard/wallet'
     | '/owner/bookings'
     | '/owner/crm'
+    | '/owner/gallery'
+    | '/owner/reviews'
     | '/owner/services'
     | '/owner/staff'
     | '/shop/$slug'
@@ -461,6 +483,8 @@ export interface FileRouteTypes {
     | '/dashboard/wallet'
     | '/owner/bookings'
     | '/owner/crm'
+    | '/owner/gallery'
+    | '/owner/reviews'
     | '/owner/services'
     | '/owner/staff'
     | '/shop/$slug'
@@ -488,6 +512,8 @@ export interface RootRouteChildren {
   CategorySlugRoute: typeof CategorySlugRoute
   OwnerBookingsRoute: typeof OwnerBookingsRoute
   OwnerCrmRoute: typeof OwnerCrmRoute
+  OwnerGalleryRoute: typeof OwnerGalleryRoute
+  OwnerReviewsRoute: typeof OwnerReviewsRoute
   OwnerServicesRoute: typeof OwnerServicesRoute
   OwnerStaffRoute: typeof OwnerStaffRoute
   ShopSlugRoute: typeof ShopSlugRoute
@@ -627,6 +653,20 @@ declare module '@tanstack/react-router' {
       path: '/owner/services'
       fullPath: '/owner/services'
       preLoaderRoute: typeof OwnerServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/owner/reviews': {
+      id: '/owner/reviews'
+      path: '/owner/reviews'
+      fullPath: '/owner/reviews'
+      preLoaderRoute: typeof OwnerReviewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/owner/gallery': {
+      id: '/owner/gallery'
+      path: '/owner/gallery'
+      fullPath: '/owner/gallery'
+      preLoaderRoute: typeof OwnerGalleryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/owner/crm': {
@@ -826,6 +866,8 @@ const rootRouteChildren: RootRouteChildren = {
   CategorySlugRoute: CategorySlugRoute,
   OwnerBookingsRoute: OwnerBookingsRoute,
   OwnerCrmRoute: OwnerCrmRoute,
+  OwnerGalleryRoute: OwnerGalleryRoute,
+  OwnerReviewsRoute: OwnerReviewsRoute,
   OwnerServicesRoute: OwnerServicesRoute,
   OwnerStaffRoute: OwnerStaffRoute,
   ShopSlugRoute: ShopSlugRoute,
