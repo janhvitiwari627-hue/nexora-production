@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
