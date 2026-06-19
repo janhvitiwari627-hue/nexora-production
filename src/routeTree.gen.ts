@@ -29,6 +29,8 @@ import { Route as DashboardWalletRouteImport } from './routes/dashboard.wallet'
 import { Route as DashboardRewardsRouteImport } from './routes/dashboard.rewards'
 import { Route as DashboardReviewsRouteImport } from './routes/dashboard.reviews'
 import { Route as DashboardReferralsRouteImport } from './routes/dashboard.referrals'
+import { Route as DashboardOffersRouteImport } from './routes/dashboard.offers'
+import { Route as DashboardNotificationsRouteImport } from './routes/dashboard.notifications'
 import { Route as DashboardMembershipRouteImport } from './routes/dashboard.membership'
 import { Route as DashboardFavoritesRouteImport } from './routes/dashboard.favorites'
 import { Route as DashboardBookingsRouteImport } from './routes/dashboard.bookings'
@@ -136,6 +138,16 @@ const DashboardReferralsRoute = DashboardReferralsRouteImport.update({
   path: '/referrals',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardOffersRoute = DashboardOffersRouteImport.update({
+  id: '/offers',
+  path: '/offers',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardNotificationsRoute = DashboardNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardMembershipRoute = DashboardMembershipRouteImport.update({
   id: '/membership',
   path: '/membership',
@@ -187,6 +199,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/membership': typeof DashboardMembershipRoute
+  '/dashboard/notifications': typeof DashboardNotificationsRoute
+  '/dashboard/offers': typeof DashboardOffersRoute
   '/dashboard/referrals': typeof DashboardReferralsRoute
   '/dashboard/reviews': typeof DashboardReviewsRoute
   '/dashboard/rewards': typeof DashboardRewardsRoute
@@ -214,6 +228,8 @@ export interface FileRoutesByTo {
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/membership': typeof DashboardMembershipRoute
+  '/dashboard/notifications': typeof DashboardNotificationsRoute
+  '/dashboard/offers': typeof DashboardOffersRoute
   '/dashboard/referrals': typeof DashboardReferralsRoute
   '/dashboard/reviews': typeof DashboardReviewsRoute
   '/dashboard/rewards': typeof DashboardRewardsRoute
@@ -243,6 +259,8 @@ export interface FileRoutesById {
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/membership': typeof DashboardMembershipRoute
+  '/dashboard/notifications': typeof DashboardNotificationsRoute
+  '/dashboard/offers': typeof DashboardOffersRoute
   '/dashboard/referrals': typeof DashboardReferralsRoute
   '/dashboard/reviews': typeof DashboardReviewsRoute
   '/dashboard/rewards': typeof DashboardRewardsRoute
@@ -273,6 +291,8 @@ export interface FileRouteTypes {
     | '/dashboard/bookings'
     | '/dashboard/favorites'
     | '/dashboard/membership'
+    | '/dashboard/notifications'
+    | '/dashboard/offers'
     | '/dashboard/referrals'
     | '/dashboard/reviews'
     | '/dashboard/rewards'
@@ -300,6 +320,8 @@ export interface FileRouteTypes {
     | '/dashboard/bookings'
     | '/dashboard/favorites'
     | '/dashboard/membership'
+    | '/dashboard/notifications'
+    | '/dashboard/offers'
     | '/dashboard/referrals'
     | '/dashboard/reviews'
     | '/dashboard/rewards'
@@ -328,6 +350,8 @@ export interface FileRouteTypes {
     | '/dashboard/bookings'
     | '/dashboard/favorites'
     | '/dashboard/membership'
+    | '/dashboard/notifications'
+    | '/dashboard/offers'
     | '/dashboard/referrals'
     | '/dashboard/reviews'
     | '/dashboard/rewards'
@@ -499,6 +523,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardReferralsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/offers': {
+      id: '/dashboard/offers'
+      path: '/offers'
+      fullPath: '/dashboard/offers'
+      preLoaderRoute: typeof DashboardOffersRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/notifications': {
+      id: '/dashboard/notifications'
+      path: '/notifications'
+      fullPath: '/dashboard/notifications'
+      preLoaderRoute: typeof DashboardNotificationsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/membership': {
       id: '/dashboard/membership'
       path: '/membership'
@@ -559,6 +597,8 @@ interface DashboardRouteChildren {
   DashboardBookingsRoute: typeof DashboardBookingsRouteWithChildren
   DashboardFavoritesRoute: typeof DashboardFavoritesRoute
   DashboardMembershipRoute: typeof DashboardMembershipRoute
+  DashboardNotificationsRoute: typeof DashboardNotificationsRoute
+  DashboardOffersRoute: typeof DashboardOffersRoute
   DashboardReferralsRoute: typeof DashboardReferralsRoute
   DashboardReviewsRoute: typeof DashboardReviewsRoute
   DashboardRewardsRoute: typeof DashboardRewardsRoute
@@ -570,6 +610,8 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardBookingsRoute: DashboardBookingsRouteWithChildren,
   DashboardFavoritesRoute: DashboardFavoritesRoute,
   DashboardMembershipRoute: DashboardMembershipRoute,
+  DashboardNotificationsRoute: DashboardNotificationsRoute,
+  DashboardOffersRoute: DashboardOffersRoute,
   DashboardReferralsRoute: DashboardReferralsRoute,
   DashboardReviewsRoute: DashboardReviewsRoute,
   DashboardRewardsRoute: DashboardRewardsRoute,
