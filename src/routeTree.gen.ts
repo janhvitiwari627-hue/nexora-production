@@ -23,6 +23,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AcademyRouteImport } from './routes/academy'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
 import { Route as DashboardBookingsRouteImport } from './routes/dashboard.bookings'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
@@ -98,6 +99,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const ShopSlugRoute = ShopSlugRouteImport.update({
   id: '/shop/$slug',
   path: '/shop/$slug',
@@ -138,13 +144,13 @@ export interface FileRoutesByFullPath {
   '/category/$slug': typeof CategorySlugRoute
   '/dashboard/bookings': typeof DashboardBookingsRoute
   '/shop/$slug': typeof ShopSlugRoute
+  '/dashboard/': typeof DashboardIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/academy': typeof AcademyRoute
   '/contact': typeof ContactRoute
-  '/dashboard': typeof DashboardRouteWithChildren
   '/for-owners': typeof ForOwnersRoute
   '/help': typeof HelpRoute
   '/jobs': typeof JobsRoute
@@ -158,6 +164,7 @@ export interface FileRoutesByTo {
   '/category/$slug': typeof CategorySlugRoute
   '/dashboard/bookings': typeof DashboardBookingsRoute
   '/shop/$slug': typeof ShopSlugRoute
+  '/dashboard': typeof DashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -179,6 +186,7 @@ export interface FileRoutesById {
   '/category/$slug': typeof CategorySlugRoute
   '/dashboard/bookings': typeof DashboardBookingsRoute
   '/shop/$slug': typeof ShopSlugRoute
+  '/dashboard/': typeof DashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -201,13 +209,13 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/dashboard/bookings'
     | '/shop/$slug'
+    | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/academy'
     | '/contact'
-    | '/dashboard'
     | '/for-owners'
     | '/help'
     | '/jobs'
@@ -221,6 +229,7 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/dashboard/bookings'
     | '/shop/$slug'
+    | '/dashboard'
   id:
     | '__root__'
     | '/'
@@ -241,6 +250,7 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/dashboard/bookings'
     | '/shop/$slug'
+    | '/dashboard/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -363,6 +373,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/shop/$slug': {
       id: '/shop/$slug'
       path: '/shop/$slug'
@@ -396,10 +413,12 @@ declare module '@tanstack/react-router' {
 
 interface DashboardRouteChildren {
   DashboardBookingsRoute: typeof DashboardBookingsRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardBookingsRoute: DashboardBookingsRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
