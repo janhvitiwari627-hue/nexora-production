@@ -82,7 +82,7 @@ function SearchPage() {
               <Link
                 key={f}
                 to="/search"
-                search={(s) => ({ ...s, category: f === "All" ? undefined : f })}
+                search={(s: { q?: string; category?: string }) => ({ ...s, category: f === "All" ? undefined : f })}
                 className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
                   active
                     ? "bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
