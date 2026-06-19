@@ -14,7 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      shops: {
+        Row: {
+          address: string | null
+          area: string | null
+          category: string
+          city: string
+          cover_image: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_verified: boolean
+          name: string
+          price_level: number
+          rating: number
+          review_count: number
+          slug: string
+          tagline: string | null
+        }
+        Insert: {
+          address?: string | null
+          area?: string | null
+          category: string
+          city: string
+          cover_image?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_verified?: boolean
+          name: string
+          price_level?: number
+          rating?: number
+          review_count?: number
+          slug: string
+          tagline?: string | null
+        }
+        Update: {
+          address?: string | null
+          area?: string | null
+          category?: string
+          city?: string
+          cover_image?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_verified?: boolean
+          name?: string
+          price_level?: number
+          rating?: number
+          review_count?: number
+          slug?: string
+          tagline?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
