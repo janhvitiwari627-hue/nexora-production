@@ -9,14 +9,81 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as ReferralsRouteImport } from './routes/referrals'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PartnerRouteImport } from './routes/partner'
+import { Route as MembershipRouteImport } from './routes/membership'
+import { Route as JobsRouteImport } from './routes/jobs'
+import { Route as HelpRouteImport } from './routes/help'
+import { Route as ForOwnersRouteImport } from './routes/for-owners'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AcademyRouteImport } from './routes/academy'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
+import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as BookSlugRouteImport } from './routes/book.$slug'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReferralsRoute = ReferralsRouteImport.update({
+  id: '/referrals',
+  path: '/referrals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartnerRoute = PartnerRouteImport.update({
+  id: '/partner',
+  path: '/partner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MembershipRoute = MembershipRouteImport.update({
+  id: '/membership',
+  path: '/membership',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobsRoute = JobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForOwnersRoute = ForOwnersRouteImport.update({
+  id: '/for-owners',
+  path: '/for-owners',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AcademyRoute = AcademyRouteImport.update({
+  id: '/academy',
+  path: '/academy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -29,6 +96,11 @@ const ShopSlugRoute = ShopSlugRouteImport.update({
   path: '/shop/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CategorySlugRoute = CategorySlugRouteImport.update({
+  id: '/category/$slug',
+  path: '/category/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BookSlugRoute = BookSlugRouteImport.update({
   id: '/book/$slug',
   path: '/book/$slug',
@@ -37,45 +109,219 @@ const BookSlugRoute = BookSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/academy': typeof AcademyRoute
+  '/contact': typeof ContactRoute
+  '/for-owners': typeof ForOwnersRoute
+  '/help': typeof HelpRoute
+  '/jobs': typeof JobsRoute
+  '/membership': typeof MembershipRoute
+  '/partner': typeof PartnerRoute
+  '/privacy': typeof PrivacyRoute
+  '/referrals': typeof ReferralsRoute
   '/search': typeof SearchRoute
+  '/terms': typeof TermsRoute
   '/book/$slug': typeof BookSlugRoute
+  '/category/$slug': typeof CategorySlugRoute
   '/shop/$slug': typeof ShopSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/academy': typeof AcademyRoute
+  '/contact': typeof ContactRoute
+  '/for-owners': typeof ForOwnersRoute
+  '/help': typeof HelpRoute
+  '/jobs': typeof JobsRoute
+  '/membership': typeof MembershipRoute
+  '/partner': typeof PartnerRoute
+  '/privacy': typeof PrivacyRoute
+  '/referrals': typeof ReferralsRoute
   '/search': typeof SearchRoute
+  '/terms': typeof TermsRoute
   '/book/$slug': typeof BookSlugRoute
+  '/category/$slug': typeof CategorySlugRoute
   '/shop/$slug': typeof ShopSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/academy': typeof AcademyRoute
+  '/contact': typeof ContactRoute
+  '/for-owners': typeof ForOwnersRoute
+  '/help': typeof HelpRoute
+  '/jobs': typeof JobsRoute
+  '/membership': typeof MembershipRoute
+  '/partner': typeof PartnerRoute
+  '/privacy': typeof PrivacyRoute
+  '/referrals': typeof ReferralsRoute
   '/search': typeof SearchRoute
+  '/terms': typeof TermsRoute
   '/book/$slug': typeof BookSlugRoute
+  '/category/$slug': typeof CategorySlugRoute
   '/shop/$slug': typeof ShopSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/search' | '/book/$slug' | '/shop/$slug'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/academy'
+    | '/contact'
+    | '/for-owners'
+    | '/help'
+    | '/jobs'
+    | '/membership'
+    | '/partner'
+    | '/privacy'
+    | '/referrals'
+    | '/search'
+    | '/terms'
+    | '/book/$slug'
+    | '/category/$slug'
+    | '/shop/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/search' | '/book/$slug' | '/shop/$slug'
-  id: '__root__' | '/' | '/search' | '/book/$slug' | '/shop/$slug'
+  to:
+    | '/'
+    | '/about'
+    | '/academy'
+    | '/contact'
+    | '/for-owners'
+    | '/help'
+    | '/jobs'
+    | '/membership'
+    | '/partner'
+    | '/privacy'
+    | '/referrals'
+    | '/search'
+    | '/terms'
+    | '/book/$slug'
+    | '/category/$slug'
+    | '/shop/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/academy'
+    | '/contact'
+    | '/for-owners'
+    | '/help'
+    | '/jobs'
+    | '/membership'
+    | '/partner'
+    | '/privacy'
+    | '/referrals'
+    | '/search'
+    | '/terms'
+    | '/book/$slug'
+    | '/category/$slug'
+    | '/shop/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  AcademyRoute: typeof AcademyRoute
+  ContactRoute: typeof ContactRoute
+  ForOwnersRoute: typeof ForOwnersRoute
+  HelpRoute: typeof HelpRoute
+  JobsRoute: typeof JobsRoute
+  MembershipRoute: typeof MembershipRoute
+  PartnerRoute: typeof PartnerRoute
+  PrivacyRoute: typeof PrivacyRoute
+  ReferralsRoute: typeof ReferralsRoute
   SearchRoute: typeof SearchRoute
+  TermsRoute: typeof TermsRoute
   BookSlugRoute: typeof BookSlugRoute
+  CategorySlugRoute: typeof CategorySlugRoute
   ShopSlugRoute: typeof ShopSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/search': {
       id: '/search'
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/referrals': {
+      id: '/referrals'
+      path: '/referrals'
+      fullPath: '/referrals'
+      preLoaderRoute: typeof ReferralsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partner': {
+      id: '/partner'
+      path: '/partner'
+      fullPath: '/partner'
+      preLoaderRoute: typeof PartnerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/membership': {
+      id: '/membership'
+      path: '/membership'
+      fullPath: '/membership'
+      preLoaderRoute: typeof MembershipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jobs': {
+      id: '/jobs'
+      path: '/jobs'
+      fullPath: '/jobs'
+      preLoaderRoute: typeof JobsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for-owners': {
+      id: '/for-owners'
+      path: '/for-owners'
+      fullPath: '/for-owners'
+      preLoaderRoute: typeof ForOwnersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/academy': {
+      id: '/academy'
+      path: '/academy'
+      fullPath: '/academy'
+      preLoaderRoute: typeof AcademyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -92,6 +338,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/category/$slug': {
+      id: '/category/$slug'
+      path: '/category/$slug'
+      fullPath: '/category/$slug'
+      preLoaderRoute: typeof CategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/book/$slug': {
       id: '/book/$slug'
       path: '/book/$slug'
@@ -104,8 +357,20 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  AcademyRoute: AcademyRoute,
+  ContactRoute: ContactRoute,
+  ForOwnersRoute: ForOwnersRoute,
+  HelpRoute: HelpRoute,
+  JobsRoute: JobsRoute,
+  MembershipRoute: MembershipRoute,
+  PartnerRoute: PartnerRoute,
+  PrivacyRoute: PrivacyRoute,
+  ReferralsRoute: ReferralsRoute,
   SearchRoute: SearchRoute,
+  TermsRoute: TermsRoute,
   BookSlugRoute: BookSlugRoute,
+  CategorySlugRoute: CategorySlugRoute,
   ShopSlugRoute: ShopSlugRoute,
 }
 export const routeTree = rootRouteImport
