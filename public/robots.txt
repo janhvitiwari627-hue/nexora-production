@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /owner
+Disallow: /partner
+
+Sitemap: https://radiant-hub-os.lovable.app/sitemap.xml
