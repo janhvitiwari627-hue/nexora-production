@@ -23,7 +23,9 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AcademyRouteImport } from './routes/academy'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
+import { Route as DashboardBookingsRouteImport } from './routes/dashboard.bookings'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as BookSlugRouteImport } from './routes/book.$slug'
 
@@ -97,10 +99,20 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const ShopSlugRoute = ShopSlugRouteImport.update({
   id: '/shop/$slug',
   path: '/shop/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardBookingsRoute = DashboardBookingsRouteImport.update({
+  id: '/bookings',
+  path: '/bookings',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/category/$slug',
@@ -118,7 +130,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/academy': typeof AcademyRoute
   '/contact': typeof ContactRoute
-  '/dashboard': typeof DashboardRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/for-owners': typeof ForOwnersRoute
   '/help': typeof HelpRoute
   '/jobs': typeof JobsRoute
@@ -130,14 +142,15 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/book/$slug': typeof BookSlugRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/dashboard/bookings': typeof DashboardBookingsRoute
   '/shop/$slug': typeof ShopSlugRoute
+  '/dashboard/': typeof DashboardIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/academy': typeof AcademyRoute
   '/contact': typeof ContactRoute
-  '/dashboard': typeof DashboardRoute
   '/for-owners': typeof ForOwnersRoute
   '/help': typeof HelpRoute
   '/jobs': typeof JobsRoute
@@ -149,7 +162,9 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/book/$slug': typeof BookSlugRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/dashboard/bookings': typeof DashboardBookingsRoute
   '/shop/$slug': typeof ShopSlugRoute
+  '/dashboard': typeof DashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -157,7 +172,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/academy': typeof AcademyRoute
   '/contact': typeof ContactRoute
-  '/dashboard': typeof DashboardRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/for-owners': typeof ForOwnersRoute
   '/help': typeof HelpRoute
   '/jobs': typeof JobsRoute
@@ -169,7 +184,9 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/book/$slug': typeof BookSlugRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/dashboard/bookings': typeof DashboardBookingsRoute
   '/shop/$slug': typeof ShopSlugRoute
+  '/dashboard/': typeof DashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -190,14 +207,15 @@ export interface FileRouteTypes {
     | '/terms'
     | '/book/$slug'
     | '/category/$slug'
+    | '/dashboard/bookings'
     | '/shop/$slug'
+    | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/academy'
     | '/contact'
-    | '/dashboard'
     | '/for-owners'
     | '/help'
     | '/jobs'
@@ -209,7 +227,9 @@ export interface FileRouteTypes {
     | '/terms'
     | '/book/$slug'
     | '/category/$slug'
+    | '/dashboard/bookings'
     | '/shop/$slug'
+    | '/dashboard'
   id:
     | '__root__'
     | '/'
@@ -228,7 +248,9 @@ export interface FileRouteTypes {
     | '/terms'
     | '/book/$slug'
     | '/category/$slug'
+    | '/dashboard/bookings'
     | '/shop/$slug'
+    | '/dashboard/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -236,7 +258,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AcademyRoute: typeof AcademyRoute
   ContactRoute: typeof ContactRoute
-  DashboardRoute: typeof DashboardRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
   ForOwnersRoute: typeof ForOwnersRoute
   HelpRoute: typeof HelpRoute
   JobsRoute: typeof JobsRoute
@@ -351,12 +373,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/shop/$slug': {
       id: '/shop/$slug'
       path: '/shop/$slug'
       fullPath: '/shop/$slug'
       preLoaderRoute: typeof ShopSlugRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/bookings': {
+      id: '/dashboard/bookings'
+      path: '/bookings'
+      fullPath: '/dashboard/bookings'
+      preLoaderRoute: typeof DashboardBookingsRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/category/$slug': {
       id: '/category/$slug'
@@ -375,12 +411,26 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface DashboardRouteChildren {
+  DashboardBookingsRoute: typeof DashboardBookingsRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardBookingsRoute: DashboardBookingsRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AcademyRoute: AcademyRoute,
   ContactRoute: ContactRoute,
-  DashboardRoute: DashboardRoute,
+  DashboardRoute: DashboardRouteWithChildren,
   ForOwnersRoute: ForOwnersRoute,
   HelpRoute: HelpRoute,
   JobsRoute: JobsRoute,
