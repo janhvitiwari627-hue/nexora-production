@@ -14,6 +14,7 @@ import { Route as SearchRouteImport } from './routes/search'
 import { Route as ReferralsRouteImport } from './routes/referrals'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PartnerRouteImport } from './routes/partner'
+import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as HelpRouteImport } from './routes/help'
@@ -38,10 +39,14 @@ import { Route as OwnerReviewsRouteImport } from './routes/owner.reviews'
 import { Route as OwnerPaymentsRouteImport } from './routes/owner.payments'
 import { Route as OwnerOnboardingRouteImport } from './routes/owner.onboarding'
 import { Route as OwnerMarketingRouteImport } from './routes/owner.marketing'
+import { Route as OwnerJobsRouteImport } from './routes/owner.jobs'
 import { Route as OwnerGalleryRouteImport } from './routes/owner.gallery'
 import { Route as OwnerCrmRouteImport } from './routes/owner.crm'
 import { Route as OwnerBookingsRouteImport } from './routes/owner.bookings'
 import { Route as OwnerAnalyticsRouteImport } from './routes/owner.analytics'
+import { Route as JobsSearchRouteImport } from './routes/jobs.search'
+import { Route as JobsProfileRouteImport } from './routes/jobs.profile'
+import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
 import { Route as DashboardWalletRouteImport } from './routes/dashboard.wallet'
 import { Route as DashboardSupportRouteImport } from './routes/dashboard.support'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
@@ -69,6 +74,7 @@ import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising'
+import { Route as OwnerJobsNewRouteImport } from './routes/owner.jobs.new'
 import { Route as DashboardBookingsIdRouteImport } from './routes/dashboard.bookings.$id'
 
 const TermsRoute = TermsRouteImport.update({
@@ -94,6 +100,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const PartnerRoute = PartnerRouteImport.update({
   id: '/partner',
   path: '/partner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OfflineRoute = OfflineRouteImport.update({
+  id: '/offline',
+  path: '/offline',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MembershipRoute = MembershipRouteImport.update({
@@ -216,6 +227,11 @@ const OwnerMarketingRoute = OwnerMarketingRouteImport.update({
   path: '/owner/marketing',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OwnerJobsRoute = OwnerJobsRouteImport.update({
+  id: '/owner/jobs',
+  path: '/owner/jobs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OwnerGalleryRoute = OwnerGalleryRouteImport.update({
   id: '/owner/gallery',
   path: '/owner/gallery',
@@ -235,6 +251,21 @@ const OwnerAnalyticsRoute = OwnerAnalyticsRouteImport.update({
   id: '/owner/analytics',
   path: '/owner/analytics',
   getParentRoute: () => rootRouteImport,
+} as any)
+const JobsSearchRoute = JobsSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => JobsRoute,
+} as any)
+const JobsProfileRoute = JobsProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => JobsRoute,
+} as any)
+const JobsJobIdRoute = JobsJobIdRouteImport.update({
+  id: '/$jobId',
+  path: '/$jobId',
+  getParentRoute: () => JobsRoute,
 } as any)
 const DashboardWalletRoute = DashboardWalletRouteImport.update({
   id: '/wallet',
@@ -371,6 +402,11 @@ const AdminAdvertisingRoute = AdminAdvertisingRouteImport.update({
   path: '/admin/advertising',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OwnerJobsNewRoute = OwnerJobsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => OwnerJobsRoute,
+} as any)
 const DashboardBookingsIdRoute = DashboardBookingsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -385,8 +421,9 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRouteWithChildren
   '/for-owners': typeof ForOwnersRoute
   '/help': typeof HelpRoute
-  '/jobs': typeof JobsRoute
+  '/jobs': typeof JobsRouteWithChildren
   '/membership': typeof MembershipRoute
+  '/offline': typeof OfflineRoute
   '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/referrals': typeof ReferralsRoute
@@ -419,10 +456,14 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/support': typeof DashboardSupportRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
+  '/jobs/$jobId': typeof JobsJobIdRoute
+  '/jobs/profile': typeof JobsProfileRoute
+  '/jobs/search': typeof JobsSearchRoute
   '/owner/analytics': typeof OwnerAnalyticsRoute
   '/owner/bookings': typeof OwnerBookingsRoute
   '/owner/crm': typeof OwnerCrmRoute
   '/owner/gallery': typeof OwnerGalleryRoute
+  '/owner/jobs': typeof OwnerJobsRouteWithChildren
   '/owner/marketing': typeof OwnerMarketingRoute
   '/owner/onboarding': typeof OwnerOnboardingRoute
   '/owner/payments': typeof OwnerPaymentsRoute
@@ -439,6 +480,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof DashboardIndexRoute
   '/owner/': typeof OwnerIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
+  '/owner/jobs/new': typeof OwnerJobsNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -447,8 +489,9 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/for-owners': typeof ForOwnersRoute
   '/help': typeof HelpRoute
-  '/jobs': typeof JobsRoute
+  '/jobs': typeof JobsRouteWithChildren
   '/membership': typeof MembershipRoute
+  '/offline': typeof OfflineRoute
   '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/referrals': typeof ReferralsRoute
@@ -481,10 +524,14 @@ export interface FileRoutesByTo {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/support': typeof DashboardSupportRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
+  '/jobs/$jobId': typeof JobsJobIdRoute
+  '/jobs/profile': typeof JobsProfileRoute
+  '/jobs/search': typeof JobsSearchRoute
   '/owner/analytics': typeof OwnerAnalyticsRoute
   '/owner/bookings': typeof OwnerBookingsRoute
   '/owner/crm': typeof OwnerCrmRoute
   '/owner/gallery': typeof OwnerGalleryRoute
+  '/owner/jobs': typeof OwnerJobsRouteWithChildren
   '/owner/marketing': typeof OwnerMarketingRoute
   '/owner/onboarding': typeof OwnerOnboardingRoute
   '/owner/payments': typeof OwnerPaymentsRoute
@@ -501,6 +548,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardIndexRoute
   '/owner': typeof OwnerIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
+  '/owner/jobs/new': typeof OwnerJobsNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -511,8 +559,9 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteWithChildren
   '/for-owners': typeof ForOwnersRoute
   '/help': typeof HelpRoute
-  '/jobs': typeof JobsRoute
+  '/jobs': typeof JobsRouteWithChildren
   '/membership': typeof MembershipRoute
+  '/offline': typeof OfflineRoute
   '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/referrals': typeof ReferralsRoute
@@ -545,10 +594,14 @@ export interface FileRoutesById {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/support': typeof DashboardSupportRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
+  '/jobs/$jobId': typeof JobsJobIdRoute
+  '/jobs/profile': typeof JobsProfileRoute
+  '/jobs/search': typeof JobsSearchRoute
   '/owner/analytics': typeof OwnerAnalyticsRoute
   '/owner/bookings': typeof OwnerBookingsRoute
   '/owner/crm': typeof OwnerCrmRoute
   '/owner/gallery': typeof OwnerGalleryRoute
+  '/owner/jobs': typeof OwnerJobsRouteWithChildren
   '/owner/marketing': typeof OwnerMarketingRoute
   '/owner/onboarding': typeof OwnerOnboardingRoute
   '/owner/payments': typeof OwnerPaymentsRoute
@@ -565,6 +618,7 @@ export interface FileRoutesById {
   '/dashboard/': typeof DashboardIndexRoute
   '/owner/': typeof OwnerIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
+  '/owner/jobs/new': typeof OwnerJobsNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -578,6 +632,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/jobs'
     | '/membership'
+    | '/offline'
     | '/partner'
     | '/privacy'
     | '/referrals'
@@ -610,10 +665,14 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/support'
     | '/dashboard/wallet'
+    | '/jobs/$jobId'
+    | '/jobs/profile'
+    | '/jobs/search'
     | '/owner/analytics'
     | '/owner/bookings'
     | '/owner/crm'
     | '/owner/gallery'
+    | '/owner/jobs'
     | '/owner/marketing'
     | '/owner/onboarding'
     | '/owner/payments'
@@ -630,6 +689,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/owner/'
     | '/dashboard/bookings/$id'
+    | '/owner/jobs/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -640,6 +700,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/jobs'
     | '/membership'
+    | '/offline'
     | '/partner'
     | '/privacy'
     | '/referrals'
@@ -672,10 +733,14 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/support'
     | '/dashboard/wallet'
+    | '/jobs/$jobId'
+    | '/jobs/profile'
+    | '/jobs/search'
     | '/owner/analytics'
     | '/owner/bookings'
     | '/owner/crm'
     | '/owner/gallery'
+    | '/owner/jobs'
     | '/owner/marketing'
     | '/owner/onboarding'
     | '/owner/payments'
@@ -692,6 +757,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/owner'
     | '/dashboard/bookings/$id'
+    | '/owner/jobs/new'
   id:
     | '__root__'
     | '/'
@@ -703,6 +769,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/jobs'
     | '/membership'
+    | '/offline'
     | '/partner'
     | '/privacy'
     | '/referrals'
@@ -735,10 +802,14 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/support'
     | '/dashboard/wallet'
+    | '/jobs/$jobId'
+    | '/jobs/profile'
+    | '/jobs/search'
     | '/owner/analytics'
     | '/owner/bookings'
     | '/owner/crm'
     | '/owner/gallery'
+    | '/owner/jobs'
     | '/owner/marketing'
     | '/owner/onboarding'
     | '/owner/payments'
@@ -755,6 +826,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/owner/'
     | '/dashboard/bookings/$id'
+    | '/owner/jobs/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -765,8 +837,9 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRouteWithChildren
   ForOwnersRoute: typeof ForOwnersRoute
   HelpRoute: typeof HelpRoute
-  JobsRoute: typeof JobsRoute
+  JobsRoute: typeof JobsRouteWithChildren
   MembershipRoute: typeof MembershipRoute
+  OfflineRoute: typeof OfflineRoute
   PartnerRoute: typeof PartnerRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   ReferralsRoute: typeof ReferralsRoute
@@ -790,6 +863,7 @@ export interface RootRouteChildren {
   OwnerBookingsRoute: typeof OwnerBookingsRoute
   OwnerCrmRoute: typeof OwnerCrmRoute
   OwnerGalleryRoute: typeof OwnerGalleryRoute
+  OwnerJobsRoute: typeof OwnerJobsRouteWithChildren
   OwnerMarketingRoute: typeof OwnerMarketingRoute
   OwnerOnboardingRoute: typeof OwnerOnboardingRoute
   OwnerPaymentsRoute: typeof OwnerPaymentsRoute
@@ -838,6 +912,13 @@ declare module '@tanstack/react-router' {
       path: '/partner'
       fullPath: '/partner'
       preLoaderRoute: typeof PartnerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/offline': {
+      id: '/offline'
+      path: '/offline'
+      fullPath: '/offline'
+      preLoaderRoute: typeof OfflineRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/membership': {
@@ -1008,6 +1089,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OwnerMarketingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/owner/jobs': {
+      id: '/owner/jobs'
+      path: '/owner/jobs'
+      fullPath: '/owner/jobs'
+      preLoaderRoute: typeof OwnerJobsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/owner/gallery': {
       id: '/owner/gallery'
       path: '/owner/gallery'
@@ -1035,6 +1123,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/owner/analytics'
       preLoaderRoute: typeof OwnerAnalyticsRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/jobs/search': {
+      id: '/jobs/search'
+      path: '/search'
+      fullPath: '/jobs/search'
+      preLoaderRoute: typeof JobsSearchRouteImport
+      parentRoute: typeof JobsRoute
+    }
+    '/jobs/profile': {
+      id: '/jobs/profile'
+      path: '/profile'
+      fullPath: '/jobs/profile'
+      preLoaderRoute: typeof JobsProfileRouteImport
+      parentRoute: typeof JobsRoute
+    }
+    '/jobs/$jobId': {
+      id: '/jobs/$jobId'
+      path: '/$jobId'
+      fullPath: '/jobs/$jobId'
+      preLoaderRoute: typeof JobsJobIdRouteImport
+      parentRoute: typeof JobsRoute
     }
     '/dashboard/wallet': {
       id: '/dashboard/wallet'
@@ -1225,6 +1334,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdvertisingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/owner/jobs/new': {
+      id: '/owner/jobs/new'
+      path: '/new'
+      fullPath: '/owner/jobs/new'
+      preLoaderRoute: typeof OwnerJobsNewRouteImport
+      parentRoute: typeof OwnerJobsRoute
+    }
     '/dashboard/bookings/$id': {
       id: '/dashboard/bookings/$id'
       path: '/$id'
@@ -1284,6 +1400,20 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
   DashboardRouteChildren,
 )
 
+interface JobsRouteChildren {
+  JobsJobIdRoute: typeof JobsJobIdRoute
+  JobsProfileRoute: typeof JobsProfileRoute
+  JobsSearchRoute: typeof JobsSearchRoute
+}
+
+const JobsRouteChildren: JobsRouteChildren = {
+  JobsJobIdRoute: JobsJobIdRoute,
+  JobsProfileRoute: JobsProfileRoute,
+  JobsSearchRoute: JobsSearchRoute,
+}
+
+const JobsRouteWithChildren = JobsRoute._addFileChildren(JobsRouteChildren)
+
 interface PartnerRouteChildren {
   PartnerDistributorRoute: typeof PartnerDistributorRoute
   PartnerDistrictRoute: typeof PartnerDistrictRoute
@@ -1299,6 +1429,18 @@ const PartnerRouteChildren: PartnerRouteChildren = {
 const PartnerRouteWithChildren =
   PartnerRoute._addFileChildren(PartnerRouteChildren)
 
+interface OwnerJobsRouteChildren {
+  OwnerJobsNewRoute: typeof OwnerJobsNewRoute
+}
+
+const OwnerJobsRouteChildren: OwnerJobsRouteChildren = {
+  OwnerJobsNewRoute: OwnerJobsNewRoute,
+}
+
+const OwnerJobsRouteWithChildren = OwnerJobsRoute._addFileChildren(
+  OwnerJobsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -1307,8 +1449,9 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRouteWithChildren,
   ForOwnersRoute: ForOwnersRoute,
   HelpRoute: HelpRoute,
-  JobsRoute: JobsRoute,
+  JobsRoute: JobsRouteWithChildren,
   MembershipRoute: MembershipRoute,
+  OfflineRoute: OfflineRoute,
   PartnerRoute: PartnerRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   ReferralsRoute: ReferralsRoute,
@@ -1332,6 +1475,7 @@ const rootRouteChildren: RootRouteChildren = {
   OwnerBookingsRoute: OwnerBookingsRoute,
   OwnerCrmRoute: OwnerCrmRoute,
   OwnerGalleryRoute: OwnerGalleryRoute,
+  OwnerJobsRoute: OwnerJobsRouteWithChildren,
   OwnerMarketingRoute: OwnerMarketingRoute,
   OwnerOnboardingRoute: OwnerOnboardingRoute,
   OwnerPaymentsRoute: OwnerPaymentsRoute,
