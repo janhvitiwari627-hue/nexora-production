@@ -25,13 +25,18 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OwnerIndexRouteImport } from './routes/owner.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
+import { Route as SiteBusinessSlugRouteImport } from './routes/site.$businessSlug'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
+import { Route as PartnerGrowthRouteImport } from './routes/partner.growth'
+import { Route as PartnerDistrictRouteImport } from './routes/partner.district'
+import { Route as PartnerDistributorRouteImport } from './routes/partner.distributor'
 import { Route as OwnerWebsiteRouteImport } from './routes/owner.website'
 import { Route as OwnerTemplatesRouteImport } from './routes/owner.templates'
 import { Route as OwnerStaffRouteImport } from './routes/owner.staff'
 import { Route as OwnerServicesRouteImport } from './routes/owner.services'
 import { Route as OwnerReviewsRouteImport } from './routes/owner.reviews'
 import { Route as OwnerPaymentsRouteImport } from './routes/owner.payments'
+import { Route as OwnerOnboardingRouteImport } from './routes/owner.onboarding'
 import { Route as OwnerMarketingRouteImport } from './routes/owner.marketing'
 import { Route as OwnerGalleryRouteImport } from './routes/owner.gallery'
 import { Route as OwnerCrmRouteImport } from './routes/owner.crm'
@@ -146,10 +151,30 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
+const SiteBusinessSlugRoute = SiteBusinessSlugRouteImport.update({
+  id: '/site/$businessSlug',
+  path: '/site/$businessSlug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopSlugRoute = ShopSlugRouteImport.update({
   id: '/shop/$slug',
   path: '/shop/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PartnerGrowthRoute = PartnerGrowthRouteImport.update({
+  id: '/growth',
+  path: '/growth',
+  getParentRoute: () => PartnerRoute,
+} as any)
+const PartnerDistrictRoute = PartnerDistrictRouteImport.update({
+  id: '/district',
+  path: '/district',
+  getParentRoute: () => PartnerRoute,
+} as any)
+const PartnerDistributorRoute = PartnerDistributorRouteImport.update({
+  id: '/distributor',
+  path: '/distributor',
+  getParentRoute: () => PartnerRoute,
 } as any)
 const OwnerWebsiteRoute = OwnerWebsiteRouteImport.update({
   id: '/owner/website',
@@ -179,6 +204,11 @@ const OwnerReviewsRoute = OwnerReviewsRouteImport.update({
 const OwnerPaymentsRoute = OwnerPaymentsRouteImport.update({
   id: '/owner/payments',
   path: '/owner/payments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OwnerOnboardingRoute = OwnerOnboardingRouteImport.update({
+  id: '/owner/onboarding',
+  path: '/owner/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OwnerMarketingRoute = OwnerMarketingRouteImport.update({
@@ -357,7 +387,7 @@ export interface FileRoutesByFullPath {
   '/help': typeof HelpRoute
   '/jobs': typeof JobsRoute
   '/membership': typeof MembershipRoute
-  '/partner': typeof PartnerRoute
+  '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/referrals': typeof ReferralsRoute
   '/search': typeof SearchRoute
@@ -394,13 +424,18 @@ export interface FileRoutesByFullPath {
   '/owner/crm': typeof OwnerCrmRoute
   '/owner/gallery': typeof OwnerGalleryRoute
   '/owner/marketing': typeof OwnerMarketingRoute
+  '/owner/onboarding': typeof OwnerOnboardingRoute
   '/owner/payments': typeof OwnerPaymentsRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
+  '/partner/distributor': typeof PartnerDistributorRoute
+  '/partner/district': typeof PartnerDistrictRoute
+  '/partner/growth': typeof PartnerGrowthRoute
   '/shop/$slug': typeof ShopSlugRoute
+  '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/owner/': typeof OwnerIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
@@ -414,7 +449,7 @@ export interface FileRoutesByTo {
   '/help': typeof HelpRoute
   '/jobs': typeof JobsRoute
   '/membership': typeof MembershipRoute
-  '/partner': typeof PartnerRoute
+  '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/referrals': typeof ReferralsRoute
   '/search': typeof SearchRoute
@@ -451,13 +486,18 @@ export interface FileRoutesByTo {
   '/owner/crm': typeof OwnerCrmRoute
   '/owner/gallery': typeof OwnerGalleryRoute
   '/owner/marketing': typeof OwnerMarketingRoute
+  '/owner/onboarding': typeof OwnerOnboardingRoute
   '/owner/payments': typeof OwnerPaymentsRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
+  '/partner/distributor': typeof PartnerDistributorRoute
+  '/partner/district': typeof PartnerDistrictRoute
+  '/partner/growth': typeof PartnerGrowthRoute
   '/shop/$slug': typeof ShopSlugRoute
+  '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/dashboard': typeof DashboardIndexRoute
   '/owner': typeof OwnerIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
@@ -473,7 +513,7 @@ export interface FileRoutesById {
   '/help': typeof HelpRoute
   '/jobs': typeof JobsRoute
   '/membership': typeof MembershipRoute
-  '/partner': typeof PartnerRoute
+  '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/referrals': typeof ReferralsRoute
   '/search': typeof SearchRoute
@@ -510,13 +550,18 @@ export interface FileRoutesById {
   '/owner/crm': typeof OwnerCrmRoute
   '/owner/gallery': typeof OwnerGalleryRoute
   '/owner/marketing': typeof OwnerMarketingRoute
+  '/owner/onboarding': typeof OwnerOnboardingRoute
   '/owner/payments': typeof OwnerPaymentsRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
+  '/partner/distributor': typeof PartnerDistributorRoute
+  '/partner/district': typeof PartnerDistrictRoute
+  '/partner/growth': typeof PartnerGrowthRoute
   '/shop/$slug': typeof ShopSlugRoute
+  '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/owner/': typeof OwnerIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
@@ -570,13 +615,18 @@ export interface FileRouteTypes {
     | '/owner/crm'
     | '/owner/gallery'
     | '/owner/marketing'
+    | '/owner/onboarding'
     | '/owner/payments'
     | '/owner/reviews'
     | '/owner/services'
     | '/owner/staff'
     | '/owner/templates'
     | '/owner/website'
+    | '/partner/distributor'
+    | '/partner/district'
+    | '/partner/growth'
     | '/shop/$slug'
+    | '/site/$businessSlug'
     | '/dashboard/'
     | '/owner/'
     | '/dashboard/bookings/$id'
@@ -627,13 +677,18 @@ export interface FileRouteTypes {
     | '/owner/crm'
     | '/owner/gallery'
     | '/owner/marketing'
+    | '/owner/onboarding'
     | '/owner/payments'
     | '/owner/reviews'
     | '/owner/services'
     | '/owner/staff'
     | '/owner/templates'
     | '/owner/website'
+    | '/partner/distributor'
+    | '/partner/district'
+    | '/partner/growth'
     | '/shop/$slug'
+    | '/site/$businessSlug'
     | '/dashboard'
     | '/owner'
     | '/dashboard/bookings/$id'
@@ -685,13 +740,18 @@ export interface FileRouteTypes {
     | '/owner/crm'
     | '/owner/gallery'
     | '/owner/marketing'
+    | '/owner/onboarding'
     | '/owner/payments'
     | '/owner/reviews'
     | '/owner/services'
     | '/owner/staff'
     | '/owner/templates'
     | '/owner/website'
+    | '/partner/distributor'
+    | '/partner/district'
+    | '/partner/growth'
     | '/shop/$slug'
+    | '/site/$businessSlug'
     | '/dashboard/'
     | '/owner/'
     | '/dashboard/bookings/$id'
@@ -707,7 +767,7 @@ export interface RootRouteChildren {
   HelpRoute: typeof HelpRoute
   JobsRoute: typeof JobsRoute
   MembershipRoute: typeof MembershipRoute
-  PartnerRoute: typeof PartnerRoute
+  PartnerRoute: typeof PartnerRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   ReferralsRoute: typeof ReferralsRoute
   SearchRoute: typeof SearchRoute
@@ -731,6 +791,7 @@ export interface RootRouteChildren {
   OwnerCrmRoute: typeof OwnerCrmRoute
   OwnerGalleryRoute: typeof OwnerGalleryRoute
   OwnerMarketingRoute: typeof OwnerMarketingRoute
+  OwnerOnboardingRoute: typeof OwnerOnboardingRoute
   OwnerPaymentsRoute: typeof OwnerPaymentsRoute
   OwnerReviewsRoute: typeof OwnerReviewsRoute
   OwnerServicesRoute: typeof OwnerServicesRoute
@@ -738,6 +799,7 @@ export interface RootRouteChildren {
   OwnerTemplatesRoute: typeof OwnerTemplatesRoute
   OwnerWebsiteRoute: typeof OwnerWebsiteRoute
   ShopSlugRoute: typeof ShopSlugRoute
+  SiteBusinessSlugRoute: typeof SiteBusinessSlugRoute
   OwnerIndexRoute: typeof OwnerIndexRoute
 }
 
@@ -855,12 +917,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/site/$businessSlug': {
+      id: '/site/$businessSlug'
+      path: '/site/$businessSlug'
+      fullPath: '/site/$businessSlug'
+      preLoaderRoute: typeof SiteBusinessSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/$slug': {
       id: '/shop/$slug'
       path: '/shop/$slug'
       fullPath: '/shop/$slug'
       preLoaderRoute: typeof ShopSlugRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/partner/growth': {
+      id: '/partner/growth'
+      path: '/growth'
+      fullPath: '/partner/growth'
+      preLoaderRoute: typeof PartnerGrowthRouteImport
+      parentRoute: typeof PartnerRoute
+    }
+    '/partner/district': {
+      id: '/partner/district'
+      path: '/district'
+      fullPath: '/partner/district'
+      preLoaderRoute: typeof PartnerDistrictRouteImport
+      parentRoute: typeof PartnerRoute
+    }
+    '/partner/distributor': {
+      id: '/partner/distributor'
+      path: '/distributor'
+      fullPath: '/partner/distributor'
+      preLoaderRoute: typeof PartnerDistributorRouteImport
+      parentRoute: typeof PartnerRoute
     }
     '/owner/website': {
       id: '/owner/website'
@@ -902,6 +992,13 @@ declare module '@tanstack/react-router' {
       path: '/owner/payments'
       fullPath: '/owner/payments'
       preLoaderRoute: typeof OwnerPaymentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/owner/onboarding': {
+      id: '/owner/onboarding'
+      path: '/owner/onboarding'
+      fullPath: '/owner/onboarding'
+      preLoaderRoute: typeof OwnerOnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/owner/marketing': {
@@ -1187,6 +1284,21 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
   DashboardRouteChildren,
 )
 
+interface PartnerRouteChildren {
+  PartnerDistributorRoute: typeof PartnerDistributorRoute
+  PartnerDistrictRoute: typeof PartnerDistrictRoute
+  PartnerGrowthRoute: typeof PartnerGrowthRoute
+}
+
+const PartnerRouteChildren: PartnerRouteChildren = {
+  PartnerDistributorRoute: PartnerDistributorRoute,
+  PartnerDistrictRoute: PartnerDistrictRoute,
+  PartnerGrowthRoute: PartnerGrowthRoute,
+}
+
+const PartnerRouteWithChildren =
+  PartnerRoute._addFileChildren(PartnerRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -1197,7 +1309,7 @@ const rootRouteChildren: RootRouteChildren = {
   HelpRoute: HelpRoute,
   JobsRoute: JobsRoute,
   MembershipRoute: MembershipRoute,
-  PartnerRoute: PartnerRoute,
+  PartnerRoute: PartnerRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   ReferralsRoute: ReferralsRoute,
   SearchRoute: SearchRoute,
@@ -1221,6 +1333,7 @@ const rootRouteChildren: RootRouteChildren = {
   OwnerCrmRoute: OwnerCrmRoute,
   OwnerGalleryRoute: OwnerGalleryRoute,
   OwnerMarketingRoute: OwnerMarketingRoute,
+  OwnerOnboardingRoute: OwnerOnboardingRoute,
   OwnerPaymentsRoute: OwnerPaymentsRoute,
   OwnerReviewsRoute: OwnerReviewsRoute,
   OwnerServicesRoute: OwnerServicesRoute,
@@ -1228,6 +1341,7 @@ const rootRouteChildren: RootRouteChildren = {
   OwnerTemplatesRoute: OwnerTemplatesRoute,
   OwnerWebsiteRoute: OwnerWebsiteRoute,
   ShopSlugRoute: ShopSlugRoute,
+  SiteBusinessSlugRoute: SiteBusinessSlugRoute,
   OwnerIndexRoute: OwnerIndexRoute,
 }
 export const routeTree = rootRouteImport
