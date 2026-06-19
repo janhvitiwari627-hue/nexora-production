@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ReferralsRouteImport } from './routes/referrals'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -21,6 +22,7 @@ import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as HelpRouteImport } from './routes/help'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ForOwnersRouteImport } from './routes/for-owners'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -95,6 +97,11 @@ const SearchRoute = SearchRouteImport.update({
   path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
@@ -138,6 +145,11 @@ const JobsRoute = JobsRouteImport.update({
 const HelpRoute = HelpRouteImport.update({
   id: '/help',
   path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForOwnersRoute = ForOwnersRouteImport.update({
@@ -438,6 +450,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/for-owners': typeof ForOwnersRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/help': typeof HelpRoute
   '/jobs': typeof JobsRouteWithChildren
   '/login': typeof LoginRoute
@@ -447,6 +460,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/referrals': typeof ReferralsRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -509,6 +523,7 @@ export interface FileRoutesByTo {
   '/academy': typeof AcademyRoute
   '/contact': typeof ContactRoute
   '/for-owners': typeof ForOwnersRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/help': typeof HelpRoute
   '/jobs': typeof JobsRouteWithChildren
   '/login': typeof LoginRoute
@@ -518,6 +533,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/referrals': typeof ReferralsRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -582,6 +598,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/for-owners': typeof ForOwnersRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/help': typeof HelpRoute
   '/jobs': typeof JobsRouteWithChildren
   '/login': typeof LoginRoute
@@ -591,6 +608,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/referrals': typeof ReferralsRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -656,6 +674,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/for-owners'
+    | '/forgot-password'
     | '/help'
     | '/jobs'
     | '/login'
@@ -665,6 +684,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/referrals'
     | '/register'
+    | '/reset-password'
     | '/search'
     | '/sitemap.xml'
     | '/terms'
@@ -727,6 +747,7 @@ export interface FileRouteTypes {
     | '/academy'
     | '/contact'
     | '/for-owners'
+    | '/forgot-password'
     | '/help'
     | '/jobs'
     | '/login'
@@ -736,6 +757,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/referrals'
     | '/register'
+    | '/reset-password'
     | '/search'
     | '/sitemap.xml'
     | '/terms'
@@ -799,6 +821,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/for-owners'
+    | '/forgot-password'
     | '/help'
     | '/jobs'
     | '/login'
@@ -808,6 +831,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/referrals'
     | '/register'
+    | '/reset-password'
     | '/search'
     | '/sitemap.xml'
     | '/terms'
@@ -872,6 +896,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   ForOwnersRoute: typeof ForOwnersRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   HelpRoute: typeof HelpRoute
   JobsRoute: typeof JobsRouteWithChildren
   LoginRoute: typeof LoginRoute
@@ -881,6 +906,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   ReferralsRoute: typeof ReferralsRoute
   RegisterRoute: typeof RegisterRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
@@ -937,6 +963,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/register': {
@@ -1000,6 +1033,13 @@ declare module '@tanstack/react-router' {
       path: '/help'
       fullPath: '/help'
       preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/for-owners': {
@@ -1508,6 +1548,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
   ForOwnersRoute: ForOwnersRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   HelpRoute: HelpRoute,
   JobsRoute: JobsRouteWithChildren,
   LoginRoute: LoginRoute,
@@ -1517,6 +1558,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   ReferralsRoute: ReferralsRoute,
   RegisterRoute: RegisterRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
