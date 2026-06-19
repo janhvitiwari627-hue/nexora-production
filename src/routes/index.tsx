@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { HomePage } from "@/pages/public/HomePage";
-import { shopsQueryOptions } from "@/lib/shops.queries";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -18,6 +17,6 @@ export const Route = createFileRoute("/")({
       },
     ],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(shopsQueryOptions({ limit: 6 })),
   component: HomePage,
 });
+
