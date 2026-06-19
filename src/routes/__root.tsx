@@ -68,13 +68,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "Discover top-rated salons, spas and barbershops. Instant booking, member rewards, and exclusive offers on Nexora SalonOS.",
       },
-      { property: "og:title", content: "Nexora SalonOS" },
+      { property: "og:title", content: "Nexora — Book salons, spas & barbers near you" },
       {
         property: "og:description",
         content: "Discover, book, and grow with the operating system for modern salons.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Nexora — Book salons, spas & barbers near you" },
+      { name: "description", content: "Nexora SalonOS is a comprehensive platform for salon discovery, booking, and management." },
+      { property: "og:description", content: "Nexora SalonOS is a comprehensive platform for salon discovery, booking, and management." },
+      { name: "twitter:description", content: "Nexora SalonOS is a comprehensive platform for salon discovery, booking, and management." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/232256ad-c4f3-4f72-84f1-0c97aa408c63/id-preview-d451d0e4--822fe342-2aa4-466c-8092-9280657c85a5.lovable.app-1781852479510.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/232256ad-c4f3-4f72-84f1-0c97aa408c63/id-preview-d451d0e4--822fe342-2aa4-466c-8092-9280657c85a5.lovable.app-1781852479510.png" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
