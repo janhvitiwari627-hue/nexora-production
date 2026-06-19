@@ -53,6 +53,7 @@ import { Route as DashboardActivityRouteImport } from './routes/dashboard.activi
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as BookSlugRouteImport } from './routes/book.$slug'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminRewardsRouteImport } from './routes/admin.rewards'
 import { Route as AdminReviewsRouteImport } from './routes/admin.reviews'
 import { Route as AdminRankingsRouteImport } from './routes/admin.rankings'
@@ -285,6 +286,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/admin/users',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/admin/settings',
+  path: '/admin/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRewardsRoute = AdminRewardsRouteImport.update({
   id: '/admin/rewards',
   path: '/admin/rewards',
@@ -366,6 +372,7 @@ export interface FileRoutesByFullPath {
   '/admin/rankings': typeof AdminRankingsRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/rewards': typeof AdminRewardsRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/book/$slug': typeof BookSlugRoute
   '/category/$slug': typeof CategorySlugRoute
@@ -422,6 +429,7 @@ export interface FileRoutesByTo {
   '/admin/rankings': typeof AdminRankingsRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/rewards': typeof AdminRewardsRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/book/$slug': typeof BookSlugRoute
   '/category/$slug': typeof CategorySlugRoute
@@ -480,6 +488,7 @@ export interface FileRoutesById {
   '/admin/rankings': typeof AdminRankingsRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/rewards': typeof AdminRewardsRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/book/$slug': typeof BookSlugRoute
   '/category/$slug': typeof CategorySlugRoute
@@ -539,6 +548,7 @@ export interface FileRouteTypes {
     | '/admin/rankings'
     | '/admin/reviews'
     | '/admin/rewards'
+    | '/admin/settings'
     | '/admin/users'
     | '/book/$slug'
     | '/category/$slug'
@@ -595,6 +605,7 @@ export interface FileRouteTypes {
     | '/admin/rankings'
     | '/admin/reviews'
     | '/admin/rewards'
+    | '/admin/settings'
     | '/admin/users'
     | '/book/$slug'
     | '/category/$slug'
@@ -652,6 +663,7 @@ export interface FileRouteTypes {
     | '/admin/rankings'
     | '/admin/reviews'
     | '/admin/rewards'
+    | '/admin/settings'
     | '/admin/users'
     | '/book/$slug'
     | '/category/$slug'
@@ -710,6 +722,7 @@ export interface RootRouteChildren {
   AdminRankingsRoute: typeof AdminRankingsRoute
   AdminReviewsRoute: typeof AdminReviewsRoute
   AdminRewardsRoute: typeof AdminRewardsRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   BookSlugRoute: typeof BookSlugRoute
   CategorySlugRoute: typeof CategorySlugRoute
@@ -1038,6 +1051,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/admin/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/rewards': {
       id: '/admin/rewards'
       path: '/admin/rewards'
@@ -1192,6 +1212,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRankingsRoute: AdminRankingsRoute,
   AdminReviewsRoute: AdminReviewsRoute,
   AdminRewardsRoute: AdminRewardsRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
   AdminUsersRoute: AdminUsersRoute,
   BookSlugRoute: BookSlugRoute,
   CategorySlugRoute: CategorySlugRoute,
