@@ -1,13 +1,15 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Calendar, Home, Sparkles, User, Wallet } from "lucide-react";
 
-const ITEMS = [
+type NavItem = { to: string; label: string; icon: typeof Home; exact?: boolean };
+
+const ITEMS: NavItem[] = [
   { to: "/dashboard", label: "Home", icon: Home, exact: true },
   { to: "/dashboard/bookings", label: "Bookings", icon: Calendar },
   { to: "/dashboard/rewards", label: "Rewards", icon: Sparkles },
   { to: "/dashboard/wallet", label: "Wallet", icon: Wallet },
   { to: "/dashboard/settings", label: "Account", icon: User },
-] as const;
+];
 
 export function MobileBottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
