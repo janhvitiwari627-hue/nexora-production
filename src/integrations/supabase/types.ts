@@ -14,6 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          date_of_birth: string | null
+          email: string | null
+          full_name: string | null
+          gender: string | null
+          id: string
+          is_active: boolean
+          is_verified: boolean
+          mobile: string | null
+          nexora_id: string | null
+          referral_code: string | null
+          referred_by: string | null
+          state: string | null
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string | null
+          full_name?: string | null
+          gender?: string | null
+          id: string
+          is_active?: boolean
+          is_verified?: boolean
+          mobile?: string | null
+          nexora_id?: string | null
+          referral_code?: string | null
+          referred_by?: string | null
+          state?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string | null
+          full_name?: string | null
+          gender?: string | null
+          id?: string
+          is_active?: boolean
+          is_verified?: boolean
+          mobile?: string | null
+          nexora_id?: string | null
+          referral_code?: string | null
+          referred_by?: string | null
+          state?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
       shops: {
         Row: {
           address: string | null
@@ -68,15 +131,49 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_referral_code: { Args: never; Returns: string }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role:
+        | "customer"
+        | "owner"
+        | "admin"
+        | "growth_partner"
+        | "district_partner"
+        | "distributor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -203,6 +300,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: [
+        "customer",
+        "owner",
+        "admin",
+        "growth_partner",
+        "district_partner",
+        "distributor",
+      ],
+    },
   },
 } as const
