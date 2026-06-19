@@ -220,8 +220,8 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
                   <EmptyState
                     title="No salons match your filters."
                     description="Try widening your distance, rating, or price range."
-                    actionLabel="Reset filters"
-                    onAction={resetFilters}
+                    ctaLabel="Reset filters"
+                    onCta={resetFilters}
                   />
                 </motion.div>
               ) : view === "map" ? (
