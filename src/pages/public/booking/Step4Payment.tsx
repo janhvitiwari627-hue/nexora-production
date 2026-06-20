@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Check,
   CreditCard,
@@ -8,6 +8,7 @@ import {
   ShieldCheck,
   Smartphone,
   Tag,
+  Upload,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -24,6 +25,7 @@ import {
   type BookingState,
   type PaymentMethod,
 } from "./state";
+
 
 export function Step4Payment({
   booking,
