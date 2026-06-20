@@ -11,6 +11,10 @@ function computeGreeting() {
 }
 
 export function ProfileHeaderWidget() {
+  const [greeting, setGreeting] = useState<string | null>(null);
+  useEffect(() => {
+    setGreeting(computeGreeting());
+  }, []);
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -23,7 +27,9 @@ export function ProfileHeaderWidget() {
         className="h-[60px] w-[60px] shrink-0 rounded-full object-cover ring-2 ring-primary/30"
       />
       <div className="min-w-0">
-        <p className="text-sm text-muted-foreground">{greeting()},</p>
+        <p className="text-sm text-muted-foreground" suppressHydrationWarning>
+          {greeting ?? "Welcome"},
+        </p>
         <h1 className="truncate text-xl font-bold sm:text-2xl">
           {mockUser.name}
         </h1>
