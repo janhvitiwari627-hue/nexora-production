@@ -1,9 +1,8 @@
 import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import Lottie from "lottie-react";
 import { QRCodeCanvas } from "qrcode.react";
 import { motion } from "framer-motion";
-import { Calendar, Check, Copy, MessageCircle } from "lucide-react";
+import { Calendar, Check, CheckCircle2, Copy, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   advancePayable,
@@ -13,116 +12,7 @@ import {
   type BookingState,
 } from "./state";
 
-// Minimal embedded "success check" Lottie (small, deterministic, no fetch).
-const successAnimation = {
-  v: "5.7.4",
-  fr: 30,
-  ip: 0,
-  op: 60,
-  w: 200,
-  h: 200,
-  nm: "success",
-  ddd: 0,
-  assets: [],
-  layers: [
-    {
-      ddd: 0,
-      ind: 1,
-      ty: 4,
-      nm: "circle",
-      sr: 1,
-      ks: {
-        o: { a: 0, k: 100 },
-        r: { a: 0, k: 0 },
-        p: { a: 0, k: [100, 100] },
-        a: { a: 0, k: [0, 0] },
-        s: {
-          a: 1,
-          k: [
-            { t: 0, s: [0, 0, 100], h: 0, i: { x: [0.4], y: [1] }, o: { x: [0.4], y: [0] } },
-            { t: 25, s: [100, 100, 100] },
-          ],
-        },
-      },
-      ao: 0,
-      shapes: [
-        {
-          ty: "el",
-          d: 1,
-          s: { a: 0, k: [140, 140] },
-          p: { a: 0, k: [0, 0] },
-          nm: "Ellipse",
-        },
-        {
-          ty: "fl",
-          c: { a: 0, k: [0.149, 0.769, 0.439, 1] },
-          o: { a: 0, k: 100 },
-          nm: "Fill",
-        },
-      ],
-      ip: 0,
-      op: 60,
-      st: 0,
-      bm: 0,
-    },
-    {
-      ddd: 0,
-      ind: 2,
-      ty: 4,
-      nm: "check",
-      sr: 1,
-      ks: {
-        o: { a: 0, k: 100 },
-        r: { a: 0, k: 0 },
-        p: { a: 0, k: [100, 100] },
-        a: { a: 0, k: [0, 0] },
-        s: { a: 0, k: [100, 100, 100] },
-      },
-      ao: 0,
-      shapes: [
-        {
-          ty: "sh",
-          ks: {
-            a: 0,
-            k: {
-              i: [[0, 0], [0, 0], [0, 0]],
-              o: [[0, 0], [0, 0], [0, 0]],
-              v: [[-30, 0], [-8, 22], [34, -22]],
-              c: false,
-            },
-          },
-          nm: "Check path",
-        },
-        {
-          ty: "tm",
-          s: { a: 0, k: 0 },
-          e: {
-            a: 1,
-            k: [
-              { t: 20, s: [0], h: 0, i: { x: [0.4], y: [1] }, o: { x: [0.4], y: [0] } },
-              { t: 50, s: [100] },
-            ],
-          },
-          o: { a: 0, k: 0 },
-          m: 1,
-        },
-        {
-          ty: "st",
-          c: { a: 0, k: [1, 1, 1, 1] },
-          o: { a: 0, k: 100 },
-          w: { a: 0, k: 14 },
-          lc: 2,
-          lj: 2,
-          nm: "Stroke",
-        },
-      ],
-      ip: 0,
-      op: 60,
-      st: 0,
-      bm: 0,
-    },
-  ],
-} as const;
+// (Removed Lottie animation in favor of a lightweight SVG check to avoid ESM interop issues.)
 
 function buildICS({
   uid,
@@ -227,9 +117,14 @@ export function BookingConfirmationScreen({
   return (
     <div className="mx-auto max-w-2xl py-10">
       <div className="flex flex-col items-center text-center">
-        <div className="h-40 w-40">
-          <Lottie animationData={successAnimation} loop={false} />
-        </div>
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 200, damping: 15 }}
+          className="grid h-32 w-32 place-items-center rounded-full bg-success/15"
+        >
+          <CheckCircle2 className="h-20 w-20 text-success" strokeWidth={2.5} />
+        </motion.div>
         <motion.h2
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
