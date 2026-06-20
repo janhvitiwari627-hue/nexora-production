@@ -117,9 +117,14 @@ export function BookingConfirmationScreen({
   return (
     <div className="mx-auto max-w-2xl py-10">
       <div className="flex flex-col items-center text-center">
-        <div className="h-40 w-40">
-          <Lottie animationData={successAnimation} loop={false} />
-        </div>
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 200, damping: 15 }}
+          className="grid h-32 w-32 place-items-center rounded-full bg-success/15"
+        >
+          <CheckCircle2 className="h-20 w-20 text-success" strokeWidth={2.5} />
+        </motion.div>
         <motion.h2
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
