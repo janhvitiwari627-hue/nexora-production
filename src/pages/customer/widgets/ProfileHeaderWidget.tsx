@@ -1,8 +1,9 @@
 import { Star, Wallet, Crown } from "lucide-react";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { mockUser, tierGradient } from "../mockUser";
 
-function greeting() {
+function computeGreeting() {
   const h = new Date().getHours();
   if (h < 12) return "Good Morning";
   if (h < 17) return "Good Afternoon";
