@@ -149,7 +149,8 @@ export function ShopCard({
       )}
     >
       <Link
-        to="/search"
+        to="/book/$slug"
+        params={{ slug: shop.slug }}
         aria-label={shop.name}
         className={cn(
           "bg-card block overflow-hidden rounded-[var(--radius-card)]",

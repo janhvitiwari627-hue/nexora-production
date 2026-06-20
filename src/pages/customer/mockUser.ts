@@ -49,7 +49,7 @@ export const mockUpcomingBooking: UpcomingBooking | null = {
     "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80",
   service: "Haircut + Hair Spa",
   staff: "Priya M.",
-  dateISO: new Date(Date.now() + 1000 * 60 * 60 * 26).toISOString(),
+  dateISO: "2026-06-21T15:30:00+05:30",
   status: "confirmed",
   phone: "+919876543210",
   mapsUrl: "https://maps.google.com/?q=Glow+and+Co+Salon",
