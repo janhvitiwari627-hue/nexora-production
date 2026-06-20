@@ -45,7 +45,9 @@ export function Step4Payment({
   onPay: () => void;
 }) {
   const [couponError, setCouponError] = useState<string | null>(null);
+  const [qrOpen, setQrOpen] = useState(false);
   const items = selectedServices(booking);
+
 
   const handleApply = () => {
     const code = booking.coupon.trim().toUpperCase();
