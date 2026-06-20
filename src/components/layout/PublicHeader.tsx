@@ -54,11 +54,14 @@ export function PublicHeader() {
           <Button variant="ghost" size="icon" aria-label="Wishlist">
             <Heart className="h-5 w-5" />
           </Button>
-          <Button variant="ghost" className="font-semibold">
-            Login
+          <Button variant="ghost" className="font-semibold" asChild>
+            <Link to="/login">Login</Link>
           </Button>
-          <Button className="bg-gradient-cta text-primary-foreground rounded-[var(--radius-button)] font-semibold shadow-[var(--shadow-glow)] hover:opacity-95">
-            Register →
+          <Button
+            className="bg-gradient-cta text-primary-foreground rounded-[var(--radius-button)] font-semibold shadow-[var(--shadow-glow)] hover:opacity-95"
+            asChild
+          >
+            <Link to="/register">Register →</Link>
           </Button>
         </div>
 

@@ -112,7 +112,7 @@ export function HeroSection() {
 
           <motion.div variants={item} className="mt-5">
             <Link
-              to="/search"
+              to="/for-owners"
               className="inline-flex items-center gap-1.5 text-sm font-semibold text-white/80 underline-offset-4 hover:text-white hover:underline"
             >
               Become a Shop Owner <ArrowRight className="h-4 w-4" />
