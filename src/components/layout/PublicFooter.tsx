@@ -35,10 +35,10 @@ const COLUMNS: Col[] = [
   {
     title: "For Owners",
     links: [
-      { label: "Run your salon", to: "/" },
-      { label: "Become a partner", to: "/" },
-      { label: "Pricing", to: "/" },
-      { label: "Owner login", to: "/" },
+      { label: "Run your salon", to: "/for-owners" },
+      { label: "Become a partner", to: "/partner" },
+      { label: "Pricing", to: "/for-owners" },
+      { label: "Owner login", to: "/login" },
     ],
   },
   {
