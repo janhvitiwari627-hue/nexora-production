@@ -266,12 +266,13 @@ export function Step4Payment({
         <motion.button
           type="button"
           whileTap={{ scale: 0.98 }}
-          onClick={onPay}
+          onClick={() => setQrOpen(true)}
           className="bg-gradient-cta text-primary-foreground mt-5 inline-flex w-full items-center justify-center rounded-[var(--radius-button)] px-4 py-3.5 text-sm font-bold shadow-[var(--shadow-glow)] hover:brightness-110"
         >
           Pay {formatINR(advance)} to confirm
         </motion.button>
         <p className="text-muted-foreground mt-3 inline-flex items-center gap-1.5 text-[11px]">
+
           <ShieldCheck className="text-success h-3.5 w-3.5" /> 256-bit secure payment
         </p>
       </aside>
