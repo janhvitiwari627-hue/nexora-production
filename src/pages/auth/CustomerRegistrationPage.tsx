@@ -82,7 +82,11 @@ export default function CustomerRegistrationPage() {
       });
 
       if (error) {
-        setServerError(error.message);
+        const msg =
+          typeof error.message === "string" && error.message.trim().length > 0
+            ? error.message
+            : "Sign up failed. Please try again.";
+        setServerError(msg);
         return;
       }
 
@@ -268,7 +272,7 @@ export default function CustomerRegistrationPage() {
 
           <p className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link to="/auth" className="text-primary underline-offset-4 hover:underline">
+            <Link to="/login" className="text-primary underline-offset-4 hover:underline">
               Sign in
             </Link>
           </p>
