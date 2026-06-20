@@ -1,9 +1,8 @@
 import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import Lottie from "lottie-react";
 import { QRCodeCanvas } from "qrcode.react";
 import { motion } from "framer-motion";
-import { Calendar, Check, Copy, MessageCircle } from "lucide-react";
+import { Calendar, Check, CheckCircle2, Copy, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   advancePayable,
