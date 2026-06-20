@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { Clock, Zap } from "lucide-react";
 import type { Shop } from "@/components/shared/ShopCard";
 
@@ -42,12 +43,13 @@ export function InstantBookingSection({ shops }: { shops: Shop[] }) {
                 <Clock className="h-3 w-3" /> Next: {SLOTS[i % SLOTS.length]}
               </div>
             </div>
-            <button
-              type="button"
+            <Link
+              to="/book/$slug"
+              params={{ slug: s.slug }}
               className="shrink-0 rounded-full bg-gradient-cta px-3 py-1.5 text-[11px] font-bold text-primary-foreground shadow-[var(--shadow-glow)] hover:brightness-110"
             >
               Book
-            </button>
+            </Link>
           </li>
         ))}
       </ul>

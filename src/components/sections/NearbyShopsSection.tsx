@@ -166,7 +166,8 @@ export function NearbyShopsSection() {
                 </p>
                 <div className="mt-auto pt-2">
                   <Link
-                    to="/search"
+                    to="/book/$slug"
+                    params={{ slug: s.slug }}
                     className="inline-flex items-center justify-center rounded-[var(--radius-button)] bg-gradient-cta px-3 py-1.5 text-xs font-bold text-primary-foreground transition hover:brightness-110"
                   >
                     Quick Book
