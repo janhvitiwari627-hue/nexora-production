@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Check,
   CreditCard,
@@ -8,6 +8,7 @@ import {
   ShieldCheck,
   Smartphone,
   Tag,
+  Upload,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -24,6 +25,7 @@ import {
   type BookingState,
   type PaymentMethod,
 } from "./state";
+
 
 export function Step4Payment({
   booking,
@@ -43,7 +45,9 @@ export function Step4Payment({
   onPay: () => void;
 }) {
   const [couponError, setCouponError] = useState<string | null>(null);
+  const [qrOpen, setQrOpen] = useState(false);
   const items = selectedServices(booking);
+
 
   const handleApply = () => {
     const code = booking.coupon.trim().toUpperCase();
@@ -262,18 +266,198 @@ export function Step4Payment({
         <motion.button
           type="button"
           whileTap={{ scale: 0.98 }}
-          onClick={onPay}
+          onClick={() => setQrOpen(true)}
           className="bg-gradient-cta text-primary-foreground mt-5 inline-flex w-full items-center justify-center rounded-[var(--radius-button)] px-4 py-3.5 text-sm font-bold shadow-[var(--shadow-glow)] hover:brightness-110"
         >
           Pay {formatINR(advance)} to confirm
         </motion.button>
         <p className="text-muted-foreground mt-3 inline-flex items-center gap-1.5 text-[11px]">
+
           <ShieldCheck className="text-success h-3.5 w-3.5" /> 256-bit secure payment
         </p>
       </aside>
+
+      <AnimatePresence>
+        {qrOpen && (
+          <QrPaymentModal
+            amount={advance}
+            booking={booking}
+            onClose={() => setQrOpen(false)}
+            onSubmitted={() => {
+              setQrOpen(false);
+              onPay();
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
+
+function QrPaymentModal({
+  amount,
+  booking,
+  onClose,
+  onSubmitted,
+}: {
+  amount: number;
+  booking: BookingState;
+  onClose: () => void;
+  onSubmitted: () => void;
+}) {
+  const [txnId, setTxnId] = useState("");
+  const [screenshot, setScreenshot] = useState<string | null>(null);
+  const [fileName, setFileName] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const upiId = "nexora@upi";
+  const payee = encodeURIComponent(booking.shopName || "Nexora");
+  const upiUri = `upi://pay?pa=${upiId}&pn=${payee}&am=${amount}&cu=INR&tn=Booking`;
+  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(upiUri)}`;
+
+  const handleFile = (f: File | null) => {
+    if (!f) return;
+    if (f.size > 5 * 1024 * 1024) {
+      setError("Screenshot must be under 5 MB");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setScreenshot(reader.result as string);
+      setFileName(f.name);
+      setError(null);
+    };
+    reader.readAsDataURL(f);
+  };
+
+  const handleSubmit = () => {
+    if (!screenshot) return setError("Upload payment screenshot");
+    if (txnId.trim().length < 6) return setError("Enter a valid transaction ID");
+    setSubmitting(true);
+    try {
+      const key = "nx_pending_payments";
+      const list = JSON.parse(localStorage.getItem(key) || "[]");
+      list.push({
+        id: `PAY-${Date.now()}`,
+        amount,
+        txnId: txnId.trim(),
+        screenshot,
+        shopName: booking.shopName,
+        date: booking.date,
+        time: booking.time,
+        status: "pending_admin_approval",
+        submittedAt: new Date().toISOString(),
+      });
+      localStorage.setItem(key, JSON.stringify(list));
+    } catch {
+      // ignore storage errors
+    }
+    setTimeout(() => {
+      setSubmitting(false);
+      onSubmitted();
+    }, 400);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ y: 30, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 30, opacity: 0 }}
+        onClick={(e) => e.stopPropagation()}
+        className="bg-card relative w-full max-w-md rounded-[var(--radius-card-lg)] border border-border p-6 shadow-xl max-h-[90vh] overflow-y-auto"
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close"
+          className="hover:bg-muted absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full"
+        >
+          <X className="h-4 w-4" />
+        </button>
+
+        <h3 className="text-heading text-lg font-black">Scan & Pay</h3>
+        <p className="text-muted-foreground mt-1 text-xs">
+          Scan the QR with any UPI app, pay {formatINR(amount)}, then upload screenshot & transaction ID.
+        </p>
+
+        <div className="mt-4 grid place-items-center rounded-[var(--radius-card)] border border-border bg-background p-4">
+          <img src={qrSrc} alt="UPI QR code" className="h-56 w-56" />
+          <div className="text-heading mt-2 text-sm font-bold">{upiId}</div>
+          <div className="text-primary text-xl font-black">{formatINR(amount)}</div>
+        </div>
+
+        <div className="mt-5 space-y-3">
+          <div>
+            <label className="text-heading mb-1.5 block text-xs font-bold uppercase tracking-wider">
+              Payment Screenshot
+            </label>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
+            />
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              className="border-border hover:border-primary flex w-full items-center justify-center gap-2 rounded-[var(--radius-button)] border-2 border-dashed px-3 py-3 text-sm font-semibold"
+            >
+              <Upload className="h-4 w-4" />
+              {fileName ? `Selected: ${fileName}` : "Upload screenshot"}
+            </button>
+            {screenshot && (
+              <img
+                src={screenshot}
+                alt="Preview"
+                className="mt-2 max-h-40 w-full rounded-[var(--radius-card)] border border-border object-contain"
+              />
+            )}
+          </div>
+
+          <div>
+            <label className="text-heading mb-1.5 block text-xs font-bold uppercase tracking-wider">
+              Transaction ID / UTR
+            </label>
+            <input
+              value={txnId}
+              onChange={(e) => {
+                setTxnId(e.target.value);
+                setError(null);
+              }}
+              placeholder="e.g. 4123456789AB"
+              className="border-border bg-background w-full rounded-[var(--radius-button)] border px-3 py-2.5 text-sm outline-none focus:border-primary"
+            />
+          </div>
+
+          {error && <p className="text-danger text-xs font-semibold">{error}</p>}
+
+          <button
+            type="button"
+            disabled={submitting}
+            onClick={handleSubmit}
+            className="bg-gradient-cta text-primary-foreground mt-2 w-full rounded-[var(--radius-button)] px-4 py-3 text-sm font-bold shadow-[var(--shadow-glow)] hover:brightness-110 disabled:opacity-60"
+          >
+            {submitting ? "Submitting..." : "Submit for admin approval"}
+          </button>
+          <p className="text-muted-foreground text-center text-[11px]">
+            Your payment will be verified by admin within a few minutes.
+          </p>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 
 function Detail({ label, value }: { label: string; value: string }) {
   return (
