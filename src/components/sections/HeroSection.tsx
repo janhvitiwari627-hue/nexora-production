@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { ArrowRight, ShieldCheck, Sparkles, Users } from "lucide-react";
+import { ArrowRight, ShieldCheck, Sparkles, Star, Users } from "lucide-react";
 import { SmartSearchCard } from "./SmartSearchCard";
 
 const TRUST = [
@@ -12,7 +12,7 @@ const TRUST = [
 export function HeroSection() {
   const stagger = {
     hidden: {},
-    show: { transition: { staggerChildren: 0.18, delayChildren: 0.1 } },
+    show: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } },
   };
   const item = {
     hidden: { opacity: 0, y: 24 },
@@ -20,95 +20,80 @@ export function HeroSection() {
   };
 
   return (
-    <section
-      className="relative flex min-h-screen flex-col justify-between overflow-hidden pt-24 pb-8"
-      style={{
-        background:
-          "linear-gradient(135deg, #0A2540 0%, #1a1060 50%, #635BFF 100%)",
-      }}
-    >
-      {/* Hawa Mahal silhouette */}
-      <svg
-        aria-hidden
-        viewBox="0 0 1200 400"
-        preserveAspectRatio="xMidYMax slice"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] w-full opacity-15"
-      >
-        <defs>
-          <pattern id="windows" x="0" y="0" width="40" height="48" patternUnits="userSpaceOnUse">
-            <rect width="22" height="34" x="9" y="8" rx="11" fill="#fff" opacity="0.35" />
-          </pattern>
-        </defs>
-        <path
-          d="M0,400 L0,260 L60,260 L70,200 L120,200 L130,140 L180,140 L190,80 L240,80 L255,40 L290,20 L325,40 L340,80 L390,80 L400,140 L450,140 L460,200 L510,200 L520,140 L570,140 L580,80 L620,80 L635,40 L670,20 L705,40 L720,80 L760,80 L770,140 L820,140 L830,200 L880,200 L890,140 L940,140 L950,200 L1000,200 L1010,260 L1080,260 L1090,300 L1140,300 L1200,300 L1200,400 Z"
-          fill="#fff"
-        />
-        <rect x="0" y="80" width="1200" height="320" fill="url(#windows)" opacity="0.5" />
-      </svg>
+    <section className="relative overflow-hidden bg-background pt-20 pb-12 md:pt-28 md:pb-20">
+      {/* Soft mesh background */}
+      <div className="bg-gradient-mesh pointer-events-none absolute inset-0 opacity-80" />
+      <div className="pointer-events-none absolute -top-32 -right-32 h-[480px] w-[480px] rounded-full bg-primary/10 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-40 -left-32 h-[420px] w-[420px] rounded-full bg-accent/15 blur-3xl" />
 
-      {/* Glow blobs */}
-      <div className="pointer-events-none absolute -top-32 -left-32 h-96 w-96 rounded-full bg-[#635BFF] opacity-30 blur-3xl" />
-      <div className="pointer-events-none absolute top-1/3 -right-32 h-96 w-96 rounded-full bg-[#00D4FF] opacity-20 blur-3xl" />
+      <div className="relative mx-auto grid w-full max-w-7xl items-center gap-12 px-4 md:px-6 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
+        {/* LEFT — copy */}
+        <motion.div variants={stagger} initial="hidden" animate="show" className="min-w-0">
+          <motion.div
+            variants={item}
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-body shadow-[var(--shadow-card)]"
+          >
+            <span className="bg-gradient-cta inline-block h-2 w-2 rounded-full" />
+            Now live in Jaipur
+          </motion.div>
 
-      <div className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col items-center justify-center px-4 text-center md:px-6">
-        <motion.div variants={stagger} initial="hidden" animate="show" className="max-w-4xl">
           <motion.h1
             variants={item}
-            className="text-4xl font-black leading-[1.05] tracking-tight text-white md:text-6xl lg:text-7xl"
+            className="mt-5 text-4xl font-black leading-[1.05] tracking-tight text-heading md:text-5xl lg:text-6xl"
           >
-            India's Smart Beauty
+            Find Jaipur's Best
             <br />
-            <span className="bg-gradient-to-r from-white via-[#E0F7FF] to-[#00D4FF] bg-clip-text text-transparent">
-              Booking Platform
-            </span>
+            <span className="text-gradient-brand">Beauty Services</span>
           </motion.h1>
 
           <motion.p
             variants={item}
-            className="mx-auto mt-6 max-w-2xl text-base font-light text-[#E0E0E0] md:text-lg"
+            className="mt-5 max-w-xl text-base text-body md:text-lg"
           >
-            Book Salons, Beauty Parlours, Spas, Tattoo Studios, Massage Centers and Nail
-            Art Studios in under 60 seconds.
+            Book in seconds. Earn rewards. Save more. The premium operating system
+            for India's beauty industry — built for customers, salons and stylists.
           </motion.p>
 
-          <motion.div variants={item} className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <motion.div variants={item} className="mt-7 flex flex-wrap items-center gap-3">
             <Link
               to="/search"
-              className="ripple relative overflow-hidden rounded-[12px] bg-gradient-to-r from-[#635BFF] to-[#00D4FF] px-8 py-3.5 text-sm font-bold text-white shadow-[0_15px_40px_-10px_rgba(0,212,255,0.7)] transition hover:scale-[1.03]"
+              className="bg-gradient-cta group inline-flex h-[52px] items-center gap-2 rounded-[12px] px-7 text-sm font-bold text-primary-foreground shadow-[var(--shadow-glow)] transition-transform duration-300 hover:-translate-y-0.5"
             >
               Book Now
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
-            <Link
-              to="/search"
-              className="rounded-[12px] border border-white/40 bg-white/5 px-8 py-3.5 text-sm font-bold text-white backdrop-blur-md transition hover:bg-white/15"
-            >
-              Explore Nearby
-            </Link>
-          </motion.div>
-
-          <motion.div variants={item} className="mt-5">
             <Link
               to="/for-owners"
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-white/80 underline-offset-4 hover:text-white hover:underline"
+              className="inline-flex h-[52px] items-center rounded-[12px] border border-border bg-card px-7 text-sm font-bold text-heading shadow-[var(--shadow-card)] transition hover:-translate-y-0.5"
             >
-              Become a Shop Owner <ArrowRight className="h-4 w-4" />
+              Become Shop Owner
             </Link>
           </motion.div>
 
           <motion.ul
             variants={item}
-            className="mt-10 flex flex-wrap items-center justify-center gap-3"
+            className="mt-8 flex flex-wrap items-center gap-2"
           >
             {TRUST.map((t) => (
               <li
                 key={t.label}
-                className="flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold text-white/90 backdrop-blur-md"
+                className="flex items-center gap-2 rounded-full border border-border bg-card/80 px-3.5 py-1.5 text-xs font-semibold text-body backdrop-blur"
               >
-                <t.icon className="h-4 w-4 text-[#00D4FF]" />
+                <t.icon className="h-3.5 w-3.5 text-primary" />
                 {t.label}
               </li>
             ))}
           </motion.ul>
+        </motion.div>
+
+        {/* RIGHT — illustration */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96, y: 16 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+          className="relative mx-auto w-full max-w-xl"
+        >
+          <HeroIllustration />
         </motion.div>
       </div>
 
@@ -116,11 +101,96 @@ export function HeroSection() {
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.9, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="relative z-10 mt-8"
+        transition={{ delay: 0.6, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        className="relative z-10 mt-12 md:mt-16"
       >
         <SmartSearchCard />
       </motion.div>
     </section>
+  );
+}
+
+function HeroIllustration() {
+  return (
+    <div className="relative aspect-[5/4] w-full">
+      {/* Card frame */}
+      <div className="absolute inset-0 rounded-[28px] border border-border bg-card shadow-[var(--shadow-float)]">
+        {/* Sky gradient */}
+        <div
+          className="absolute inset-x-0 top-0 h-2/3 rounded-t-[28px]"
+          style={{
+            background:
+              "linear-gradient(180deg, #635BFF 0%, #7A73FF 45%, #BFA8FF 80%, #FFE6D6 100%)",
+          }}
+        />
+
+        {/* Stars */}
+        <div className="absolute top-6 left-8 h-1.5 w-1.5 rounded-full bg-white/80" />
+        <div className="absolute top-10 left-20 h-1 w-1 rounded-full bg-white/60" />
+        <div className="absolute top-16 right-16 h-1.5 w-1.5 rounded-full bg-white/70" />
+        <div className="absolute top-8 right-32 h-1 w-1 rounded-full bg-white/50" />
+
+        {/* Jaipur skyline silhouette */}
+        <svg
+          aria-hidden
+          viewBox="0 0 600 240"
+          preserveAspectRatio="xMidYMax slice"
+          className="absolute inset-x-0 bottom-[32%] w-full"
+        >
+          <defs>
+            <pattern id="hero-windows" x="0" y="0" width="22" height="28" patternUnits="userSpaceOnUse">
+              <rect width="10" height="16" x="6" y="6" rx="5" fill="#FFE6D6" opacity="0.55" />
+            </pattern>
+            <linearGradient id="hero-mahal" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#FF8A65" />
+              <stop offset="100%" stopColor="#E85D3A" />
+            </linearGradient>
+          </defs>
+          {/* Hawa Mahal-inspired silhouette */}
+          <path
+            d="M0,240 L0,160 L40,160 L48,130 L80,130 L88,100 L120,100 L128,70 L160,70 L170,45 L195,30 L220,45 L230,70 L262,70 L270,100 L302,100 L310,70 L342,70 L352,45 L380,30 L408,45 L418,70 L450,70 L458,100 L490,100 L498,130 L530,130 L538,160 L600,160 L600,240 Z"
+            fill="url(#hero-mahal)"
+          />
+          <rect x="0" y="60" width="600" height="180" fill="url(#hero-windows)" />
+        </svg>
+
+        {/* Ground / base */}
+        <div
+          className="absolute inset-x-0 bottom-0 h-1/3 rounded-b-[28px]"
+          style={{
+            background:
+              "linear-gradient(180deg, #F6F9FC 0%, #FFFFFF 60%, #FFFFFF 100%)",
+          }}
+        />
+
+        {/* Floating booking card */}
+        <div className="absolute right-6 bottom-6 w-[58%] rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-float)]">
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-cta grid h-10 w-10 shrink-0 place-items-center rounded-xl text-primary-foreground">
+              <Sparkles className="h-4 w-4" />
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-bold text-heading">Lakmé Salon, C-Scheme</p>
+              <p className="flex items-center gap-1 text-xs text-body">
+                <Star className="h-3 w-3 fill-warning text-warning" />
+                4.9 · 0.8 km away
+              </p>
+            </div>
+          </div>
+          <div className="mt-3 flex items-center justify-between">
+            <span className="text-xs font-semibold text-success">Slot at 6:30 PM</span>
+            <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-bold text-primary">
+              BOOK
+            </span>
+          </div>
+        </div>
+
+        {/* Floating membership chip */}
+        <div className="bg-gradient-gold absolute top-6 left-6 flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold text-[#3D2A00] shadow-[var(--shadow-float)]">
+          <Sparkles className="h-3.5 w-3.5" />
+          Gold Member · 25% off
+        </div>
+      </div>
+    </div>
   );
 }
