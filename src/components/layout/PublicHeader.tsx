@@ -1,8 +1,15 @@
 import { Link } from "@tanstack/react-router";
-import { Bell, Heart, MapPin, Menu, Search, Sparkles } from "lucide-react";
+import { Bell, Crown, Menu, Search, Sparkles, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MobileMenuOverlay } from "./MobileMenuOverlay";
+
+const NAV = [
+  { to: "/", label: "Home" },
+  { to: "/search", label: "Explore" },
+  { to: "/membership", label: "Membership" },
+  { to: "/for-owners", label: "Become Owner" },
+] as const;
 
 export function PublicHeader() {
   const [scrolled, setScrolled] = useState(false);
@@ -24,6 +31,7 @@ export function PublicHeader() {
       }`}
     >
       <div className="mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-4 px-4 py-3 md:px-6">
+        {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
           <div className="bg-gradient-cta grid h-9 w-9 place-items-center rounded-xl text-primary-foreground shadow-[var(--shadow-glow)]">
             <Sparkles className="h-4 w-4" />
@@ -33,26 +41,33 @@ export function PublicHeader() {
           </span>
         </Link>
 
-        <div className="hidden min-w-0 items-center justify-center gap-2 md:flex">
-          <button className="text-foreground hover:bg-muted inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium transition">
-            <MapPin className="text-primary h-4 w-4" />
-            Jaipur
-            <span className="text-muted-foreground">▾</span>
-          </button>
-          <Link
-            to="/search"
-            className="text-muted-foreground hover:text-foreground hover:bg-muted ml-2 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm transition"
-          >
-            <Search className="h-4 w-4" /> Search salons, services…
-          </Link>
-        </div>
+        {/* Center nav */}
+        <nav className="hidden items-center justify-center gap-1 md:flex">
+          {NAV.map((n) => (
+            <Link
+              key={n.to}
+              to={n.to}
+              activeOptions={{ exact: n.to === "/" }}
+              className="rounded-full px-4 py-2 text-sm font-semibold text-body transition hover:bg-muted hover:text-heading [&.active]:bg-muted [&.active]:text-heading"
+            >
+              {n.label}
+            </Link>
+          ))}
+        </nav>
 
+        {/* Right actions */}
         <div className="hidden items-center gap-1 md:flex">
-          <Button variant="ghost" size="icon" aria-label="Notifications">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" aria-label="Search" asChild>
+            <Link to="/search"><Search className="h-5 w-5" /></Link>
           </Button>
-          <Button variant="ghost" size="icon" aria-label="Wishlist">
-            <Heart className="h-5 w-5" />
+          <Button variant="ghost" size="icon" aria-label="Notifications" asChild>
+            <Link to="/dashboard/notifications"><Bell className="h-5 w-5" /></Link>
+          </Button>
+          <Button variant="ghost" className="gap-1.5 font-semibold" asChild>
+            <Link to="/membership">
+              <Crown className="h-4 w-4 text-primary" />
+              Membership
+            </Link>
           </Button>
           <Button variant="ghost" className="font-semibold" asChild>
             <Link to="/login">Login</Link>
@@ -61,16 +76,24 @@ export function PublicHeader() {
             className="bg-gradient-cta text-primary-foreground rounded-[var(--radius-button)] font-semibold shadow-[var(--shadow-glow)] hover:opacity-95"
             asChild
           >
-            <Link to="/register">Register →</Link>
+            <Link to="/register">Register</Link>
           </Button>
+          <Link
+            to="/dashboard"
+            aria-label="Profile"
+            className="ml-1 grid h-9 w-9 place-items-center rounded-full bg-muted text-heading ring-1 ring-border transition hover:bg-card hover:shadow-[var(--shadow-card)]"
+          >
+            <User className="h-4 w-4" />
+          </Link>
         </div>
 
+        {/* Mobile */}
         <div className="flex items-center gap-2 md:hidden">
-          <button className="bg-muted inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium">
-            <MapPin className="text-primary h-3.5 w-3.5" /> Jaipur
-          </button>
-          <Button variant="ghost" size="icon" aria-label="Notifications">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" aria-label="Search" asChild>
+            <Link to="/search"><Search className="h-5 w-5" /></Link>
+          </Button>
+          <Button variant="ghost" size="icon" aria-label="Notifications" asChild>
+            <Link to="/dashboard/notifications"><Bell className="h-5 w-5" /></Link>
           </Button>
           <Button
             variant="ghost"
