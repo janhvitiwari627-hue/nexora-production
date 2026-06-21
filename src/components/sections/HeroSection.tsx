@@ -116,121 +116,89 @@ export function HeroSection() {
 function HeroBackground() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      {/* Gradient mesh */}
-      <div className="bg-gradient-mesh absolute inset-0 opacity-90" />
-
-      {/* Abstract SaaS glow orbs */}
+      {/* Soft premium gradient mesh */}
       <div
-        className="absolute -top-20 left-1/4 h-[500px] w-[500px] rounded-full opacity-60 blur-3xl"
-        style={{ background: "radial-gradient(circle, rgba(99,91,255,0.25) 0%, transparent 70%)" }}
-      />
-      <div
-        className="absolute top-1/3 -right-20 h-[440px] w-[440px] rounded-full opacity-50 blur-3xl"
-        style={{ background: "radial-gradient(circle, rgba(0,212,255,0.22) 0%, transparent 70%)" }}
-      />
-      <div
-        className="absolute -bottom-32 left-1/2 h-[560px] w-[560px] -translate-x-1/2 rounded-full opacity-55 blur-3xl"
-        style={{ background: "radial-gradient(circle, rgba(122,115,255,0.2) 0%, transparent 70%)" }}
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(60% 50% at 20% 10%, rgba(99,91,255,0.10) 0%, transparent 60%), radial-gradient(50% 50% at 85% 5%, rgba(0,212,255,0.08) 0%, transparent 60%), radial-gradient(55% 45% at 70% 90%, rgba(122,115,255,0.10) 0%, transparent 60%)",
+        }}
       />
 
-      {/* Abstract geometric shapes */}
-      <div className="absolute top-20 right-[12%] h-24 w-24 rotate-12 rounded-3xl border border-primary/20 bg-primary/5 blur-[1px]" />
-      <div className="absolute top-32 left-[10%] h-16 w-16 -rotate-12 rounded-2xl border border-accent/20 bg-accent/5 blur-[1px]" />
-      <div className="absolute bottom-[42%] right-[8%] h-20 w-20 rotate-45 rounded-3xl border border-warning/20 bg-warning/5 blur-[1px]" />
+      {/* Subtle dot grid */}
+      <div
+        className="absolute inset-0 opacity-[0.35]"
+        style={{
+          backgroundImage:
+            "radial-gradient(rgba(10,37,64,0.08) 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
+          maskImage:
+            "radial-gradient(ellipse at center, black 40%, transparent 75%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse at center, black 40%, transparent 75%)",
+        }}
+      />
 
-      {/* Floating glass cards representing salon lifestyle */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8, duration: 0.8 }}
-        className="absolute top-28 left-[6%] hidden rounded-2xl border border-border/60 bg-card/70 p-3 shadow-[var(--shadow-card)] backdrop-blur md:block"
-      >
-        <div className="flex items-center gap-2">
-          <div className="bg-gradient-cta grid h-8 w-8 place-items-center rounded-lg text-primary-foreground">
-            <Sparkles className="h-4 w-4" />
-          </div>
-          <div>
-            <p className="text-xs font-bold text-heading">Premium Spa</p>
-            <p className="text-[10px] text-body">Jaipur · 4.9</p>
-          </div>
-        </div>
-      </motion.div>
+      {/* Soft indigo blur orbs */}
+      <div
+        className="absolute -top-24 left-1/4 h-[480px] w-[480px] rounded-full blur-3xl"
+        style={{ background: "radial-gradient(circle, rgba(99,91,255,0.18) 0%, transparent 70%)" }}
+      />
+      <div
+        className="absolute top-1/3 -right-24 h-[420px] w-[420px] rounded-full blur-3xl"
+        style={{ background: "radial-gradient(circle, rgba(0,212,255,0.15) 0%, transparent 70%)" }}
+      />
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1, duration: 0.8 }}
-        className="absolute top-36 right-[5%] hidden rounded-2xl border border-border/60 bg-card/70 p-3 shadow-[var(--shadow-card)] backdrop-blur md:block"
-      >
-        <div className="flex items-center gap-2">
-          <div className="bg-gradient-gold grid h-8 w-8 place-items-center rounded-lg text-[#3D2A00]">
-            <Star className="h-4 w-4 fill-current" />
-          </div>
-          <div>
-            <p className="text-xs font-bold text-heading">Gold Member</p>
-            <p className="text-[10px] text-body">25% off every booking</p>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Jaipur skyline + Amber Fort + Hawa Mahal silhouette */}
+      {/* Elegant Jaipur line-art silhouette — Hawa Mahal + Amber Fort + skyline */}
       <svg
         aria-hidden
         viewBox="0 0 1440 320"
         preserveAspectRatio="xMidYMax slice"
-        className="absolute inset-x-0 bottom-0 h-[45%] w-full opacity-[0.85]"
+        className="absolute inset-x-0 bottom-0 h-[42%] w-full"
       >
         <defs>
-          <linearGradient id="jaipur-skyline" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#FF8A65" stopOpacity="0.9" />
-            <stop offset="60%" stopColor="#E85D3A" stopOpacity="0.95" />
-            <stop offset="100%" stopColor="#635BFF" stopOpacity="0.85" />
+          <linearGradient id="jaipur-line" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#635BFF" stopOpacity="0.55" />
+            <stop offset="100%" stopColor="#635BFF" stopOpacity="0.15" />
           </linearGradient>
-          <pattern id="palace-windows" x="0" y="0" width="28" height="36" patternUnits="userSpaceOnUse">
-            <rect width="12" height="20" x="8" y="8" rx="6" fill="#FFE6D6" opacity="0.5" />
-          </pattern>
         </defs>
 
-        {/* Ground hill */}
-        <path
-          d="M0,320 L0,260 C120,240 240,280 360,255 C480,230 600,200 720,210 C840,220 960,180 1080,175 C1200,170 1320,200 1440,185 L1440,320 Z"
-          fill="url(#jaipur-skyline)"
-          opacity="0.15"
-        />
+        <g
+          fill="none"
+          stroke="url(#jaipur-line)"
+          strokeWidth="1.25"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        >
+          {/* Amber Fort */}
+          <path d="M40,300 L40,240 L60,240 L70,220 L90,220 L100,200 L130,200 L140,180 L170,180 L180,160 L210,160 L220,180 L250,180 L260,200 L290,200 L300,220 L330,220 L340,240 L360,240 L360,300" />
 
-        {/* Amber Fort inspired silhouette */}
-        <path
-          d="M40,320 L40,240 L60,240 L70,220 L90,220 L100,200 L130,200 L140,180 L170,180 L180,160 L210,160 L220,180 L250,180 L260,200 L290,200 L300,220 L330,220 L340,240 L360,240 L360,320 Z"
-          fill="url(#jaipur-skyline)"
-          opacity="0.35"
-        />
+          {/* Hawa Mahal */}
+          <path d="M500,300 L500,230 L530,230 L538,200 L560,200 L568,170 L590,170 L598,140 L620,140 L630,115 L655,100 L680,115 L690,140 L712,140 L720,170 L742,170 L750,200 L772,200 L780,170 L802,170 L810,140 L832,140 L842,115 L865,100 L890,115 L900,140 L922,140 L930,170 L952,170 L960,200 L982,200 L990,230 L1020,230 L1020,300" />
 
-        {/* Hawa Mahal inspired silhouette */}
-        <path
-          d="M500,320 L500,230 L530,230 L538,200 L560,200 L568,170 L590,170 L598,140 L620,140 L630,115 L655,100 L680,115 L690,140 L712,140 L720,170 L742,170 L750,200 L772,200 L780,170 L802,170 L810,140 L832,140 L842,115 L865,100 L890,115 L900,140 L922,140 L930,170 L952,170 L960,200 L982,200 L990,230 L1020,230 L1020,320 Z"
-          fill="url(#jaipur-skyline)"
-        />
-        <rect x="500" y="140" width="520" height="180" fill="url(#palace-windows)" opacity="0.4" />
+          {/* Window arches */}
+          <g stroke="rgba(99,91,255,0.35)" strokeWidth="1">
+            <path d="M548,230 q12,-18 24,0" />
+            <path d="M608,200 q12,-18 24,0" />
+            <path d="M668,170 q12,-18 24,0" />
+            <path d="M728,200 q12,-18 24,0" />
+            <path d="M788,170 q12,-18 24,0" />
+            <path d="M848,200 q12,-18 24,0" />
+            <path d="M908,170 q12,-18 24,0" />
+            <path d="M968,200 q12,-18 24,0" />
+          </g>
 
-        {/* Jaipur city skyline */}
-        <path
-          d="M1080,320 L1080,250 L1100,250 L1108,230 L1130,230 L1140,250 L1170,250 L1170,320 Z"
-          fill="url(#jaipur-skyline)"
-          opacity="0.5"
-        />
-        <path
-          d="M1200,320 L1200,220 L1230,220 L1240,200 L1270,200 L1280,220 L1310,220 L1310,320 Z"
-          fill="url(#jaipur-skyline)"
-          opacity="0.45"
-        />
-        <path
-          d="M1340,320 L1340,260 L1360,260 L1370,240 L1390,240 L1400,260 L1420,260 L1420,320 Z"
-          fill="url(#jaipur-skyline)"
-          opacity="0.5"
-        />
+          {/* Skyline towers */}
+          <path d="M1080,300 L1080,250 L1100,250 L1108,230 L1130,230 L1140,250 L1170,250 L1170,300" />
+          <path d="M1200,300 L1200,220 L1230,220 L1240,200 L1270,200 L1280,220 L1310,220 L1310,300" />
+          <path d="M1340,300 L1340,260 L1360,260 L1370,240 L1390,240 L1400,260 L1420,260 L1420,300" />
+
+          {/* Subtle ground line */}
+          <path d="M0,300 L1440,300" stroke="rgba(10,37,64,0.08)" strokeWidth="1" />
+        </g>
       </svg>
 
-      {/* Bottom gradient fade to background */}
+      {/* Bottom fade */}
       <div
         className="absolute inset-x-0 bottom-0 h-32"
         style={{ background: "linear-gradient(to top, var(--background) 0%, transparent 100%)" }}
@@ -238,3 +206,4 @@ function HeroBackground() {
     </div>
   );
 }
+
