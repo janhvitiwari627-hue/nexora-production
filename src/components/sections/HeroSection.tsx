@@ -39,19 +39,23 @@ export function HeroSection() {
 
           <motion.h1
             variants={item}
-            className="mt-5 text-4xl font-black leading-[1.05] tracking-tight text-heading md:text-5xl lg:text-6xl"
+            className="mt-5 text-4xl font-black leading-[1.08] tracking-tight text-heading md:text-5xl lg:text-6xl"
           >
-            Find Jaipur's Best
+            Find Jaipur's Best Beauty Services
             <br />
-            <span className="text-gradient-brand">Beauty Services</span>
+            <span className="text-gradient-brand">Book In Seconds.</span>
+            <br />
+            <span className="text-gradient-brand">Earn Rewards.</span>
+            <br />
+            <span className="text-gradient-brand">Save More.</span>
           </motion.h1>
 
           <motion.p
             variants={item}
             className="mt-5 max-w-xl text-base text-body md:text-lg"
           >
-            Book in seconds. Earn rewards. Save more. The premium operating system
-            for India's beauty industry — built for customers, salons and stylists.
+            The premium operating system for India's beauty industry — built for
+            customers, salons and stylists.
           </motion.p>
 
           <motion.div variants={item} className="mt-7 flex flex-wrap items-center gap-3">
