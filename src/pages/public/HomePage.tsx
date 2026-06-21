@@ -31,7 +31,7 @@ function Reveal({ children }: { children: ReactNode }) {
 
 export function HomePage() {
   return (
-    <div className="min-h-screen bg-background [&>section]:py-12 md:[&>section]:py-20">
+    <div className="min-h-screen bg-background [&>section]:py-16 md:[&>section]:py-[120px]">
       <PublicHeader />
 
       <HeroSection />
