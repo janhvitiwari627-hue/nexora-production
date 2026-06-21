@@ -64,7 +64,8 @@ export function HeroSection() {
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
             <Link
-              to="/nearby"
+              to="/search"
+              search={{ q: "nearby" }}
               className="inline-flex h-[52px] w-full items-center justify-center gap-2 rounded-[12px] border border-border bg-card px-7 text-sm font-bold text-heading shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 sm:w-auto"
             >
               <MapPin className="h-4 w-4 text-primary" />
