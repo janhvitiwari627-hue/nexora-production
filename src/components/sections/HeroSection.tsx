@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { ArrowRight, MapPin, ShieldCheck, Sparkles, Star, Store, Users } from "lucide-react";
+import { ArrowRight, MapPin, ShieldCheck, Sparkles, Store, Users } from "lucide-react";
 import { SmartSearchCard } from "./SmartSearchCard";
 
 const TRUST = [
