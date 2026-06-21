@@ -1,14 +1,7 @@
-import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { ArrowRight, ShieldCheck, Sparkles, Users } from "lucide-react";
 import { SmartSearchCard } from "./SmartSearchCard";
-
-const HEADLINES = [
-  "Book Your Salon. Skip The Wait.",
-  "Find Top Barbers in Jaipur.",
-  "Premium Beauty. Instant Booking.",
-];
 
 const TRUST = [
   { icon: ShieldCheck, label: "1000+ Verified Salons" },
@@ -17,25 +10,6 @@ const TRUST = [
 ];
 
 export function HeroSection() {
-  const [idx, setIdx] = useState(0);
-  const [typed, setTyped] = useState("");
-
-  useEffect(() => {
-    const full = HEADLINES[idx];
-    let i = 0;
-    setTyped("");
-    const typer = setInterval(() => {
-      i++;
-      setTyped(full.slice(0, i));
-      if (i >= full.length) clearInterval(typer);
-    }, 45);
-    const next = setTimeout(() => setIdx((n) => (n + 1) % HEADLINES.length), 3800);
-    return () => {
-      clearInterval(typer);
-      clearTimeout(next);
-    };
-  }, [idx]);
-
   const stagger = {
     hidden: {},
     show: { transition: { staggerChildren: 0.18, delayChildren: 0.1 } },
@@ -80,19 +54,21 @@ export function HeroSection() {
         <motion.div variants={stagger} initial="hidden" animate="show" className="max-w-4xl">
           <motion.h1
             variants={item}
-            className="min-h-[1.1em] text-4xl font-black leading-[1.05] tracking-tight text-white md:text-6xl lg:text-7xl"
+            className="text-4xl font-black leading-[1.05] tracking-tight text-white md:text-6xl lg:text-7xl"
           >
-            {typed}
-            <span className="ml-1 inline-block w-[3px] animate-pulse bg-[#00D4FF] align-middle" style={{ height: "0.9em" }} />
+            India's Smart Beauty
+            <br />
+            <span className="bg-gradient-to-r from-white via-[#E0F7FF] to-[#00D4FF] bg-clip-text text-transparent">
+              Booking Platform
+            </span>
           </motion.h1>
 
           <motion.p
             variants={item}
             className="mx-auto mt-6 max-w-2xl text-base font-light text-[#E0E0E0] md:text-lg"
-            style={{ letterSpacing: "0.05em" }}
           >
-            Discover Jaipur's finest salons, spas and barbers. Book instantly, earn rewards,
-            walk in like a regular.
+            Book Salons, Beauty Parlours, Spas, Tattoo Studios, Massage Centers and Nail
+            Art Studios in under 60 seconds.
           </motion.p>
 
           <motion.div variants={item} className="mt-8 flex flex-wrap items-center justify-center gap-3">
