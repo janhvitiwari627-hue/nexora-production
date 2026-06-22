@@ -68,7 +68,7 @@ export const listOwnerBookings = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     let q = context.supabase
       .from("bookings")
-      .select("id, user_id, service_name, staff_name, booking_date, booking_time, duration_minutes, price, advance_amount, status, payment_status, notes, created_at")
+      .select("id, user_id, service_name, booking_date, booking_time, price, advance_amount, status, payment_status, created_at")
       .eq("salon_id", data.salon_id)
       .order("booking_date", { ascending: false })
       .order("booking_time", { ascending: false })
@@ -84,16 +84,14 @@ export const listOwnerBookings = createServerFn({ method: "GET" })
 const UpdateBookingStatusInput = z.object({
   booking_id: z.string().uuid(),
   status: z.enum(["confirmed", "completed", "cancelled"]),
-  notes: z.string().max(500).optional(),
 });
 
 export const updateOwnerBookingStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => UpdateBookingStatusInput.parse(d))
   .handler(async ({ data, context }) => {
-    const patch: { status: typeof data.status; cancelled_at?: string; notes?: string } = { status: data.status };
+    const patch: { status: typeof data.status; cancelled_at?: string } = { status: data.status };
     if (data.status === "cancelled") patch.cancelled_at = new Date().toISOString();
-    if (data.notes !== undefined) patch.notes = data.notes;
     const { data: row, error } = await context.supabase
       .from("bookings").update(patch).eq("id", data.booking_id).select().single();
     if (error) throw new Error(error.message);
