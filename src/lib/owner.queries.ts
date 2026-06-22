@@ -7,6 +7,8 @@ import {
   listOwnerStaff,
   getOwnerAnalyticsTimeseries,
   getOwnerSalonFull,
+  getOwnerWallet,
+  listOwnerWithdrawals,
 } from "./owner.functions";
 
 export const myOwnedSalonsQuery = () =>
@@ -55,5 +57,19 @@ export const ownerSalonFullQuery = (salonId: string) =>
   queryOptions({
     queryKey: ["owner", "salon-full", salonId],
     queryFn: () => getOwnerSalonFull({ data: { salon_id: salonId } }),
+    enabled: !!salonId,
+  });
+
+export const ownerWalletQuery = (salonId: string) =>
+  queryOptions({
+    queryKey: ["owner", "wallet", salonId],
+    queryFn: () => getOwnerWallet({ data: { salon_id: salonId } }),
+    enabled: !!salonId,
+  });
+
+export const ownerWithdrawalsQuery = (salonId: string) =>
+  queryOptions({
+    queryKey: ["owner", "withdrawals", salonId],
+    queryFn: () => listOwnerWithdrawals({ data: { salon_id: salonId } }),
     enabled: !!salonId,
   });

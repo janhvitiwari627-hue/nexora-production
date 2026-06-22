@@ -306,3 +306,98 @@ export const updateOwnerSalon = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return row;
   });
+
+// ---------- Wallet ----------
+export const getOwnerWallet = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => SalonInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    let { data: wallet } = await supabase
+      .from("salon_wallets").select("*").eq("salon_id", data.salon_id).maybeSingle();
+    if (!wallet) {
+      const { data: created, error } = await supabase
+        .from("salon_wallets").insert({ salon_id: data.salon_id }).select().single();
+      if (error) throw new Error(error.message);
+      wallet = created;
+    }
+    const { data: txns } = await supabase
+      .from("wallet_transactions").select("*")
+      .order("created_at", { ascending: false }).limit(50);
+    return { wallet, transactions: txns ?? [] };
+  });
+
+// ---------- Withdrawals ----------
+const WithdrawalRequestInput = z.object({
+  salon_id: z.string().uuid(),
+  amount: z.number().positive(),
+  bank_account_details: z.record(z.string(), z.any()).optional(),
+});
+
+export const requestOwnerWithdrawal = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => WithdrawalRequestInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: wallet } = await supabase
+      .from("salon_wallets").select("available_balance").eq("salon_id", data.salon_id).maybeSingle();
+    const available = Number(wallet?.available_balance ?? 0);
+    if (data.amount > available) throw new Error("Insufficient balance");
+    const { data: row, error } = await supabase
+      .from("withdrawals")
+      .insert({
+        salon_id: data.salon_id,
+        amount: data.amount,
+        bank_account_details: data.bank_account_details ?? null,
+        status: "PENDING",
+      })
+      .select().single();
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+export const listOwnerWithdrawals = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => SalonInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { data: rows, error } = await context.supabase
+      .from("withdrawals").select("*")
+      .eq("salon_id", data.salon_id)
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+// ---------- Bulk service pricing ----------
+const BulkPricingInput = z.object({
+  salon_id: z.string().uuid(),
+  service_ids: z.array(z.string().uuid()).min(1),
+  mode: z.enum(["set", "percent", "delta"]),
+  value: z.number(),
+});
+
+export const bulkUpdateServicePricing = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => BulkPricingInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: rows, error } = await supabase
+      .from("services").select("id, price")
+      .eq("salon_id", data.salon_id)
+      .in("id", data.service_ids);
+    if (error) throw new Error(error.message);
+    const updates = (rows ?? []).map((r) => {
+      const current = Number(r.price);
+      let next = current;
+      if (data.mode === "set") next = data.value;
+      else if (data.mode === "percent") next = current * (1 + data.value / 100);
+      else if (data.mode === "delta") next = current + data.value;
+      return { id: r.id, price: Math.max(0, Number(next.toFixed(2))) };
+    });
+    for (const u of updates) {
+      const { error: upErr } = await supabase
+        .from("services").update({ price: u.price }).eq("id", u.id);
+      if (upErr) throw new Error(upErr.message);
+    }
+    return { updated: updates.length };
+  });
