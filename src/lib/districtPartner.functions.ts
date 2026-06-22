@@ -93,7 +93,13 @@ export const verifyDistrictPartner = createServerFn({ method: "POST" })
     const status =
       data.action === "verify" ? "verified" : data.action === "reject" ? "rejected" : "suspended";
 
-    const patch: Record<string, unknown> = {
+    const patch: {
+      status: "verified" | "rejected" | "suspended";
+      rejection_reason: string | null;
+      verified_at?: string;
+      verified_by?: string;
+      tier?: "welcome" | "recognition" | "growth_builder" | "platinum" | "leadership_circle";
+    } = {
       status,
       rejection_reason: data.action === "reject" ? data.reason ?? null : null,
     };
