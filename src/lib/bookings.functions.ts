@@ -32,7 +32,8 @@ export const createBooking = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: row, error } = await supabase
       .from("bookings")
-      .insert({ ...data, user_id: userId, status: "pending", payment_status: "pending" })
+      // booking_reference is auto-assigned by the validate_booking trigger
+      .insert({ ...data, user_id: userId, status: "pending", payment_status: "pending" } as never)
       .select("*")
       .single();
     if (error) {
