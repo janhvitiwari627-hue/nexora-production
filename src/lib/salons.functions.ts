@@ -10,6 +10,16 @@ function publicClient() {
   );
 }
 
+export type PublicStaffMember = {
+  id: string;
+  salon_id: string;
+  name: string;
+  role: string | null;
+  bio: string | null;
+  avatar_url: string | null;
+  rating: number | null;
+};
+
 const SlugInput = z.object({ slug: z.string().trim().min(1).max(200) });
 
 export const getSalonBySlug = createServerFn({ method: "GET" })
@@ -33,11 +43,7 @@ export const getSalonBySlug = createServerFn({ method: "GET" })
         .eq("salon_id", salon.id)
         .eq("is_active", true)
         .order("price", { ascending: true }),
-      supabase
-        .from("staff")
-        .select("id, name, role, bio, avatar_url, rating")
-        .eq("salon_id", salon.id)
-        .eq("is_active", true),
+      supabase.rpc("list_salon_staff", { _salon_id: salon.id }),
       supabase
         .from("reviews")
         .select("id, rating, comment, created_at, user_id")
@@ -49,7 +55,7 @@ export const getSalonBySlug = createServerFn({ method: "GET" })
     return {
       salon,
       services: services ?? [],
-      staff: staff ?? [],
+      staff: (staff ?? []) as PublicStaffMember[],
       reviews: reviews ?? [],
     };
   });
