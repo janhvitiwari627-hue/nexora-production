@@ -160,7 +160,7 @@ export function NearbyShopsSection() {
             ))}
           </svg>
           {/* Pins */}
-          {SHOPS.map((s, i) => (
+          {shops.map((s, i) => (
             <div
               key={s.slug}
               className="absolute -translate-x-1/2 -translate-y-full"
@@ -178,7 +178,7 @@ export function NearbyShopsSection() {
 
         {/* LIST */}
         <ul className="flex flex-col gap-3">
-          {SHOPS.map((s) => (
+          {shops.map((s) => (
             <li
               key={s.slug}
               className="flex gap-3 rounded-[var(--radius-card)] border border-border bg-card p-3 shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-glow)]"
