@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Bell, LayoutDashboard, LogOut, Menu, Search, Sparkles, User } from "lucide-react";
+import { Bell, LayoutDashboard, LogOut, Menu, Search, Settings, Sparkles, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -146,6 +146,12 @@ export function PublicHeader() {
                   <Link to="/profile" className="cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
                     Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard/settings" className="cursor-pointer">
+                    <Settings className="mr-2 h-4 w-4" />
+                    Account Settings
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
