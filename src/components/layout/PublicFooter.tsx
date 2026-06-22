@@ -24,15 +24,6 @@ const COLUMNS: Col[] = [
     ],
   },
   {
-    title: "Membership",
-    links: [
-      { label: "Plans & pricing", to: "/" },
-      { label: "Rewards", to: "/" },
-      { label: "Referrals", to: "/" },
-      { label: "Gift cards", to: "/" },
-    ],
-  },
-  {
     title: "For Owners",
     links: [
       { label: "Run your salon", to: "/for-owners" },
