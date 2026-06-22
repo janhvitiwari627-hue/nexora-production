@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { z } from "zod";
-import { Award, BadgeCheck, Crown, IndianRupee, Sparkles, Trophy, Users } from "lucide-react";
+import { Activity, Award, BadgeCheck, CalendarClock, Crown, IndianRupee, LayoutDashboard, Rocket, Sparkles, Target, TrendingUp, Trophy, Users, Wallet, Zap } from "lucide-react";
 
 const STEPS = [
   { title: "Register your business", body: "Tell us about your salon — services, location, hours." },
@@ -99,6 +99,174 @@ export function BecomePartnerPage() {
               <div><div className="text-xs text-white/70">Monthly</div><div className="text-lg font-black">₹{(projected.monthly/1000).toFixed(0)}k</div></div>
               <div><div className="text-xs text-white/70">Platform fee</div><div className="text-lg font-black">₹{(projected.platformFee/1000).toFixed(1)}k</div></div>
               <div><div className="text-xs text-white/70">Your earnings</div><div className="text-2xl font-black text-amber-300">₹{(projected.earnings/1000).toFixed(0)}k</div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How Growth Partners Earn */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background py-20 md:py-28">
+        <div className="mx-auto max-w-6xl px-4 md:px-6">
+          <div className="text-center">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+              <Rocket className="h-3 w-3" /> How Growth Partners Earn
+            </span>
+            <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-5xl">
+              Nexora Growth Partner Program
+            </h2>
+            <div className="text-muted-foreground mt-5 flex flex-wrap items-center justify-center gap-2 text-sm font-semibold">
+              {["Ye Naukri Nahi", "Ye Franchise Nahi", "Ye MLM Nahi"].map((t) => (
+                <span key={t} className="rounded-full border border-border bg-card px-3 py-1.5">{t}</span>
+              ))}
+            </div>
+            <p className="text-heading mx-auto mt-4 max-w-2xl text-base font-bold md:text-lg">
+              Ye Beauty Industry Ko Digital Banane Ka Mission Hai.
+            </p>
+          </div>
+
+          {/* 1. Activation Reward */}
+          <div className="mt-16">
+            <div className="flex items-center gap-3">
+              <span className="bg-gradient-cta text-primary-foreground grid h-10 w-10 place-items-center rounded-xl text-sm font-black shadow-[var(--shadow-glow)]">1</span>
+              <h3 className="text-heading text-2xl font-black md:text-3xl">One-Time Activation Reward</h3>
+              <span className="ml-auto hidden rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary md:inline-block">15 Day Model</span>
+            </div>
+
+            <div className="mt-8 grid gap-4 md:grid-cols-3">
+              {[
+                { icon: Users, step: "STEP 1", title: "Shop / Salon Onboard Karo", body: "Apne network ke salon ko Nexora pe live karwao." },
+                { icon: CalendarClock, step: "STEP 2", title: "15 Din Active Revenue Complete", body: "Shop 15 din ke andar real revenue generate kare." },
+                { icon: Zap, step: "STEP 3", title: "Activation Reward Unlock", body: "Aapka one-time activation reward instantly credit." },
+              ].map((s) => (
+                <article key={s.step} className="border-border bg-card rounded-[var(--radius-card)] border p-6 shadow-[var(--shadow-card)]">
+                  <div className="bg-primary/10 text-primary grid h-11 w-11 place-items-center rounded-xl">
+                    <s.icon className="h-5 w-5" />
+                  </div>
+                  <div className="text-primary mt-4 text-[11px] font-black uppercase tracking-widest">{s.step}</div>
+                  <h4 className="text-heading mt-1 text-lg font-bold">{s.title}</h4>
+                  <p className="text-muted-foreground mt-2 text-sm">{s.body}</p>
+                </article>
+              ))}
+            </div>
+
+            <div className="mt-8 grid gap-4 md:grid-cols-2">
+              <div className="border-border bg-card rounded-[var(--radius-card)] border p-6">
+                <div className="text-muted-foreground text-xs font-black uppercase tracking-wider">Single Shop Example</div>
+                <ul className="mt-4 space-y-3 text-sm">
+                  {[
+                    ["Salon Revenue", "₹15,000"],
+                    ["Nexora Revenue (10%)", "₹1,500"],
+                    ["Partner Activation Reward (10%)", "₹150"],
+                  ].map(([k, v]) => (
+                    <li key={k} className="flex items-center justify-between border-b border-border/60 pb-2 last:border-0 last:pb-0">
+                      <span className="text-muted-foreground">{k}</span>
+                      <span className="text-heading font-black">{v}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="rounded-[var(--radius-card)] bg-gradient-to-br from-[#0A2540] via-[#1a1060] to-[#635BFF] p-6 text-white shadow-[var(--shadow-card)]">
+                <div className="text-xs font-black uppercase tracking-wider text-white/70">100 Active Shops</div>
+                <ul className="mt-4 space-y-3 text-sm">
+                  {[
+                    ["Total Revenue Generated", "₹15,00,000"],
+                    ["Nexora Revenue", "₹1,50,000"],
+                    ["Partner Activation Rewards", "₹15,000"],
+                  ].map(([k, v]) => (
+                    <li key={k} className="flex items-center justify-between border-b border-white/15 pb-2 last:border-0 last:pb-0">
+                      <span className="text-white/75">{k}</span>
+                      <span className="font-black text-amber-300">{v}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <blockquote className="border-primary bg-primary/5 text-heading mt-6 rounded-[var(--radius-card)] border-l-4 p-5 text-sm font-semibold italic md:text-base">
+              "Maine Company Ko ₹1.5 Lakh Revenue Generate Karne Me Help Ki Aur Mujhe ₹15,000 Activation Reward Mila."
+            </blockquote>
+          </div>
+
+          {/* 2. 7-Day Growth Share */}
+          <div className="mt-20">
+            <div className="flex items-center gap-3">
+              <span className="bg-gradient-cta text-primary-foreground grid h-10 w-10 place-items-center rounded-xl text-sm font-black shadow-[var(--shadow-glow)]">2</span>
+              <h3 className="text-heading text-2xl font-black md:text-3xl">7-Day Growth Share</h3>
+              <span className="ml-auto hidden rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary md:inline-block">Recurring Earning</span>
+            </div>
+
+            <div className="mt-8 grid gap-4 md:grid-cols-3">
+              {[
+                { label: "First 6 Months", pct: "10%", tone: "from-emerald-400 to-emerald-600" },
+                { label: "Month 7 – 12", pct: "5%", tone: "from-sky-400 to-indigo-600" },
+                { label: "After 12 Months", pct: "2%", tone: "from-amber-400 to-orange-600" },
+              ].map((t) => (
+                <div key={t.label} className={`relative overflow-hidden rounded-[var(--radius-card)] bg-gradient-to-br ${t.tone} p-6 text-white shadow-[var(--shadow-card)]`}>
+                  <TrendingUp className="h-6 w-6 opacity-90" />
+                  <div className="mt-3 text-xs font-black uppercase tracking-wider text-white/85">{t.label}</div>
+                  <div className="mt-1 text-5xl font-black">{t.pct}</div>
+                  <div className="mt-1 text-sm font-semibold text-white/90">Partner Share</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="border-border bg-card mt-6 rounded-[var(--radius-card)] border p-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <CalendarClock className="text-primary h-5 w-5" />
+                  <span className="text-heading font-bold">Every 7 Days Payout Cycle</span>
+                </div>
+                <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">Transparent · Performance Based</span>
+              </div>
+              <ul className="mt-5 grid gap-3 md:grid-cols-2">
+                {[
+                  "Active Shops Jitni Zyada",
+                  "Growth Share Utna Zyada",
+                  "Performance Based System",
+                  "Transparent Weekly Earnings",
+                ].map((n) => (
+                  <li key={n} className="flex items-start gap-2 text-sm">
+                    <BadgeCheck className="text-success mt-0.5 h-4 w-4 shrink-0" />
+                    <span className="text-heading font-semibold">{n}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* 3. Dashboard preview */}
+          <div className="mt-20">
+            <div className="flex items-center gap-3">
+              <span className="bg-gradient-cta text-primary-foreground grid h-10 w-10 place-items-center rounded-xl text-sm font-black shadow-[var(--shadow-glow)]">3</span>
+              <h3 className="text-heading text-2xl font-black md:text-3xl">Growth Partner Dashboard</h3>
+              <span className="ml-auto hidden items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary md:inline-flex">
+                <LayoutDashboard className="h-3 w-3" /> Live KPIs
+              </span>
+            </div>
+
+            <div className="mt-8 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+              {[
+                { icon: Users, label: "Shops Added" },
+                { icon: Activity, label: "Active Shops" },
+                { icon: TrendingUp, label: "Active Revenue" },
+                { icon: IndianRupee, label: "Total Revenue Generated" },
+                { icon: Sparkles, label: "Nexora Revenue" },
+                { icon: Wallet, label: "Your Earnings" },
+                { icon: CalendarClock, label: "Pending Earnings" },
+                { icon: Zap, label: "Weekly Payout" },
+                { icon: Trophy, label: "Lifetime Earnings" },
+                { icon: Target, label: "Next Milestone" },
+              ].map((k) => (
+                <div key={k.label} className="border-border bg-card rounded-[var(--radius-card)] border p-4 shadow-[var(--shadow-card)]">
+                  <div className="flex items-center gap-2">
+                    <div className="bg-primary/10 text-primary grid h-8 w-8 place-items-center rounded-lg">
+                      <k.icon className="h-4 w-4" />
+                    </div>
+                    <span className="text-muted-foreground text-[11px] font-black uppercase tracking-wider">{k.label}</span>
+                  </div>
+                  <div className="text-heading mt-3 text-xl font-black">—</div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
