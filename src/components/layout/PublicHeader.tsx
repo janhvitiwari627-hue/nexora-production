@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Bell, Crown, Menu, Search, Sparkles, User } from "lucide-react";
+import { Bell, Menu, Search, Sparkles, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MobileMenuOverlay } from "./MobileMenuOverlay";
@@ -8,7 +8,6 @@ import { LocationChip } from "./LocationChip";
 const NAV = [
   { to: "/", label: "Home" },
   { to: "/search", label: "Explore" },
-  { to: "/membership", label: "Membership" },
   { to: "/for-owners", label: "Become Owner" },
 ] as const;
 
