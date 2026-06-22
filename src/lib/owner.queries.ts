@@ -6,6 +6,7 @@ import {
   listOwnerServices,
   listOwnerStaff,
   getOwnerAnalyticsTimeseries,
+  getOwnerSalonFull,
 } from "./owner.functions";
 
 export const myOwnedSalonsQuery = () =>
