@@ -119,10 +119,10 @@ export function AdvancedSearchPanel({
 
               <Section
                 title="AI Suggestions"
-                icon={<Sparkles className="h-4 w-4 text-[#635BFF]" />}
+                icon={<Sparkles className="h-4 w-4 text-primary" />}
               >
                 {query.trim().length === 0 ? (
-                  <p className="text-xs text-[#425466]">Start typing for smart suggestions.</p>
+                  <p className="text-sm font-medium text-body">Start typing for smart suggestions.</p>
                 ) : (
                   <div className="space-y-2">
                     {[
@@ -133,9 +133,9 @@ export function AdvancedSearchPanel({
                       <button
                         key={s}
                         onClick={() => onPick(s)}
-                        className="block w-full rounded-lg bg-gradient-to-r from-[#635BFF]/10 to-[#00D4FF]/10 px-3 py-2 text-left text-sm text-[#0A2540] hover:from-[#635BFF]/20 hover:to-[#00D4FF]/20"
+                        className="block w-full rounded-lg bg-muted px-3 py-2 text-left text-sm font-semibold text-heading transition duration-300 hover:bg-primary/10"
                       >
-                        ✨ {s}
+                        {s}
                       </button>
                     ))}
                   </div>
@@ -163,7 +163,7 @@ function Section({
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#425466]">
+        <div className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-[0.12em] text-heading">
           {icon}
           {title}
         </div>
@@ -178,7 +178,7 @@ function Chip({ label, onClick }: { label: string; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="rounded-full border border-[#E6EBF1] bg-white px-3 py-1.5 text-xs font-semibold text-[#425466] transition hover:border-[#635BFF] hover:text-[#0A2540] hover:shadow-[0_2px_8px_rgba(99,91,255,0.15)]"
+      className="rounded-full border border-border bg-card px-3.5 py-2 text-sm font-bold text-heading shadow-sm transition duration-300 hover:border-primary hover:text-primary hover:shadow-[0_8px_20px_-12px_rgba(99,91,255,0.45)]"
     >
       {label}
     </button>
