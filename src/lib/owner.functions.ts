@@ -563,10 +563,11 @@ export const bulkUpdateServicePricing = createServerFn({ method: "POST" })
 // ---------- Salon gallery (live photos) ----------
 const SalonIdInput = z.object({ salon_id: z.string().uuid() });
 
-async function assertOwnsSalon(supabase: { rpc: (n: string, p: object) => Promise<{ data: boolean | null }> }, userId: string, salonId: string) {
+async function assertOwnsSalon(supabase: SupabaseAuthed, userId: string, salonId: string) {
   const { data } = await supabase.rpc("is_salon_owner", { _user_id: userId, _salon_id: salonId });
   if (!data) throw new Error("Forbidden");
 }
+type SupabaseAuthed = Parameters<Parameters<typeof requireSupabaseAuth>[0]>[0] extends { context: infer C } ? C extends { supabase: infer S } ? S : never : never;
 
 export const getSalonGallery = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
