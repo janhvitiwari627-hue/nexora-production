@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -21,7 +22,7 @@ import { useOwnerContext } from "@/hooks/use-owner-context";
 import {
   ownerDashboardMetricsQuery, ownerAnalyticsQuery, ownerBookingsQuery,
 } from "@/lib/owner.queries";
-import { updateOwnerBookingStatus } from "@/lib/owner.functions";
+import { updateOwnerBookingStatus, getMyOwnerApprovalStatus } from "@/lib/owner.functions";
 import {
   ownerBusiness, kpis as mockKpis, revenueDaily, revenueWeekly, revenueMonthly,
   calendarDensity, calendarFirstWeekday, calendarMonthLabel,
