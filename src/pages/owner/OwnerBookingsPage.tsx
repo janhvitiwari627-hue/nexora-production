@@ -84,13 +84,23 @@ export function OwnerBookingsPage() {
   };
 
   const acceptSelected = () => {
-    setBookings((prev) =>
-      prev.map((b) =>
-        selectedIds.has(b.id) && (b.status === "pending" || b.status === "confirmed")
-          ? { ...b, status: "accepted" }
-          : b,
-      ),
-    );
+    const ids = Array.from(selectedIds);
+    if (isLive) {
+      ids.forEach((id) => {
+        const b = bookings.find((x) => x.id === id);
+        if (b && (b.status === "pending" || b.status === "confirmed")) {
+          live.setStatus(id, "accepted");
+        }
+      });
+    } else {
+      setMockBookings((prev) =>
+        prev.map((b) =>
+          selectedIds.has(b.id) && (b.status === "pending" || b.status === "confirmed")
+            ? { ...b, status: "accepted" }
+            : b,
+        ),
+      );
+    }
     setSelectedIds(new Set());
   };
 
