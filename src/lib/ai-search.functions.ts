@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
-import { generateText, Output } from "ai";
 import { z } from "zod";
-import { createLovableAiGatewayProvider } from "./ai-gateway.server";
+
+
 
 const CATEGORIES = [
   "Hair Salon",
@@ -34,6 +34,10 @@ export const parseSmartQuery = createServerFn({ method: "POST" })
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("Missing LOVABLE_API_KEY");
 
+    const [{ generateText, Output }, { createLovableAiGatewayProvider }] = await Promise.all([
+      import("ai"),
+      import("./ai-gateway.server"),
+    ]);
     const gateway = createLovableAiGatewayProvider(key);
     const model = gateway("google/gemini-3-flash-preview");
 
