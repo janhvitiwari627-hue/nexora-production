@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,9 +18,11 @@ import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
-  CalendarDays, Edit2, Megaphone, Plus, Sparkles, Trash2, TrendingUp, Wand2,
+  CalendarDays, Copy, Edit2, Megaphone, Plus, Sparkles, Trash2, TrendingUp, Wand2, Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useOwnerContext } from "@/hooks/use-owner-context";
+import { generateMarketingCopy } from "@/lib/owner.functions";
 import {
   INITIAL_OFFERS, INITIAL_CAMPAIGNS, INITIAL_AUTOMATIONS, AI_SUGGESTIONS,
   type Offer, type Campaign,
@@ -366,13 +370,102 @@ function AutomationsTab() {
 }
 
 /* ---------- AI MARKETING ---------- */
+type AICopy = { sms: string; whatsapp: string; email_subject: string; email_body: string };
+
 function AITab() {
+  const { activeSalonId } = useOwnerContext();
+  const generateFn = useServerFn(generateMarketingCopy);
+  const [goal, setGoal] = useState<"winback" | "promo" | "review_request" | "festival" | "new_service">("winback");
+  const [tone, setTone] = useState<"friendly" | "premium" | "playful" | "urgent">("friendly");
+  const [extra, setExtra] = useState("");
+  const [copy, setCopy] = useState<AICopy | null>(null);
+
+  const gen = useMutation({
+    mutationFn: () =>
+      generateFn({ data: { salon_id: activeSalonId!, goal, tone, extra: extra || undefined } }) as Promise<AICopy>,
+    onSuccess: (r) => { setCopy(r); toast.success("Copy generated"); },
+    onError: (e: Error) => toast.error(e.message || "AI generation failed"),
+  });
+
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success(`${label} copied`);
+  };
+
   return (
     <div className="space-y-4">
+      <Card className="bg-gradient-to-br from-primary/5 to-pink-500/5 border-primary/20">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-primary" /> AI Campaign Generator
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 md:grid-cols-3">
+            <div>
+              <Label>Campaign goal</Label>
+              <Select value={goal} onValueChange={(v) => setGoal(v as typeof goal)}>
+                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="winback">Win back lapsed customers</SelectItem>
+                  <SelectItem value="promo">Promotional offer</SelectItem>
+                  <SelectItem value="review_request">Request reviews</SelectItem>
+                  <SelectItem value="festival">Festival greeting</SelectItem>
+                  <SelectItem value="new_service">Announce new service</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Tone</Label>
+              <Select value={tone} onValueChange={(v) => setTone(v as typeof tone)}>
+                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="friendly">Friendly</SelectItem>
+                  <SelectItem value="premium">Premium</SelectItem>
+                  <SelectItem value="playful">Playful</SelectItem>
+                  <SelectItem value="urgent">Urgent</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-end">
+              <Button
+                className="w-full"
+                disabled={!activeSalonId || gen.isPending}
+                onClick={() => gen.mutate()}
+              >
+                {gen.isPending ? <><Loader2 className="h-4 w-4 animate-spin" /> Generating…</> : <><Wand2 className="h-4 w-4" /> Generate copy</>}
+              </Button>
+            </div>
+          </div>
+          <div>
+            <Label>Extra details (optional)</Label>
+            <Textarea
+              rows={2} maxLength={500}
+              placeholder="e.g. 25% off, Diwali week, mention Bridal Makeup specialist"
+              value={extra}
+              onChange={(e) => setExtra(e.target.value)}
+              className="mt-1"
+            />
+          </div>
+          {!activeSalonId && (
+            <p className="text-xs text-muted-foreground">Connect a salon during onboarding to enable AI generation.</p>
+          )}
+
+          {copy && (
+            <div className="grid gap-3 md:grid-cols-2">
+              <CopyBlock label="SMS" text={copy.sms} onCopy={() => copyToClipboard(copy.sms, "SMS")} />
+              <CopyBlock label="WhatsApp" text={copy.whatsapp} onCopy={() => copyToClipboard(copy.whatsapp, "WhatsApp")} />
+              <CopyBlock label="Email subject" text={copy.email_subject} onCopy={() => copyToClipboard(copy.email_subject, "Subject")} />
+              <CopyBlock label="Email body" text={copy.email_body} onCopy={() => copyToClipboard(copy.email_body, "Email body")} />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       <div className="flex items-center gap-2 text-sm">
         <Sparkles className="h-4 w-4 text-primary" />
         <span className="font-medium">AI suggestions for this week</span>
-        <Badge variant="secondary">Updated daily</Badge>
+        <Badge variant="secondary">Demo</Badge>
       </div>
 
       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
@@ -406,6 +499,18 @@ function AITab() {
           </Button>
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+function CopyBlock({ label, text, onCopy }: { label: string; text: string; onCopy: () => void }) {
+  return (
+    <div className="bg-card border rounded-lg p-3 space-y-2">
+      <div className="flex items-center justify-between">
+        <Label className="text-xs uppercase tracking-wide">{label}</Label>
+        <Button size="sm" variant="ghost" onClick={onCopy}><Copy className="h-3.5 w-3.5" /> Copy</Button>
+      </div>
+      <p className="text-sm whitespace-pre-wrap">{text}</p>
     </div>
   );
 }
