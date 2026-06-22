@@ -13,6 +13,8 @@ import { BookingCard } from "./bookings/BookingCard";
 import { CalendarView } from "./bookings/CalendarView";
 import { ListView } from "./bookings/ListView";
 import { BookingDetailModal } from "./bookings/BookingDetailModal";
+import { useOwnerLiveBookings } from "@/hooks/use-owner-live-bookings";
+import { useOwnerContext } from "@/hooks/use-owner-context";
 
 type FilterTab = "all" | OwnerBookingStatus;
 const TABS: { key: FilterTab; label: string }[] = [
