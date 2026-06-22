@@ -24,15 +24,6 @@ const COLUMNS: Col[] = [
     ],
   },
   {
-    title: "Membership",
-    links: [
-      { label: "Plans & pricing", to: "/" },
-      { label: "Rewards", to: "/" },
-      { label: "Referrals", to: "/" },
-      { label: "Gift cards", to: "/" },
-    ],
-  },
-  {
     title: "For Owners",
     links: [
       { label: "Run your salon", to: "/for-owners" },
@@ -113,7 +104,7 @@ export function PublicFooter() {
         </div>
 
         {/* Columns: 2 cols on mobile, 6 on desktop */}
-        <div className="grid grid-cols-2 gap-8 pt-10 md:grid-cols-6">
+        <div className="grid grid-cols-2 gap-8 pt-10 md:grid-cols-5">
           {COLUMNS.map((col) => (
             <div key={col.title}>
               <h4 className="text-heading text-sm font-bold">{col.title}</h4>

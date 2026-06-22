@@ -12,7 +12,7 @@ import { SponsoredVideosSection } from "@/components/sections/SponsoredVideosSec
 import { OffersSection } from "@/components/sections/OffersSection";
 import { NearbyShopsSection } from "@/components/sections/NearbyShopsSection";
 import { TrendingSection } from "@/components/sections/TrendingSection";
-import { MembershipSection } from "@/components/sections/MembershipSection";
+
 import { AppDownloadSection } from "@/components/sections/AppDownloadSection";
 import { Button } from "@/components/ui/button";
 
@@ -59,9 +59,6 @@ export function HomePage() {
       </Reveal>
       <Reveal>
         <TrendingSection />
-      </Reveal>
-      <Reveal>
-        <MembershipSection />
       </Reveal>
       <Reveal>
         <AppDownloadSection />

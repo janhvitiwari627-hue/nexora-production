@@ -110,11 +110,6 @@ export function ShopCard({
         <span className="bg-muted text-heading rounded-full px-2 py-0.5 text-[11px] font-semibold">
           {shop.category}
         </span>
-        {shop.membership_perk && (
-          <span className="bg-gradient-gold inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold text-heading">
-            <Sparkles className="h-3 w-3" /> {shop.membership_perk}
-          </span>
-        )}
       </div>
 
       <div className="text-muted-foreground flex items-center gap-1 text-xs">
