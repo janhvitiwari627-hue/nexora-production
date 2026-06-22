@@ -362,6 +362,9 @@ export type Database = {
           id: string
           is_active: boolean
           is_verified: boolean
+          latitude: number | null
+          location_captured_at: string | null
+          longitude: number | null
           mobile: string | null
           nexora_id: string | null
           referral_code: string | null
@@ -382,6 +385,9 @@ export type Database = {
           id: string
           is_active?: boolean
           is_verified?: boolean
+          latitude?: number | null
+          location_captured_at?: string | null
+          longitude?: number | null
           mobile?: string | null
           nexora_id?: string | null
           referral_code?: string | null
@@ -402,6 +408,9 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_verified?: boolean
+          latitude?: number | null
+          location_captured_at?: string | null
+          longitude?: number | null
           mobile?: string | null
           nexora_id?: string | null
           referral_code?: string | null
