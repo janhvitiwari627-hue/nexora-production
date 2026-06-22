@@ -280,11 +280,11 @@ export default function CustomerRegistrationPage() {
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="mobile">Mobile {accountType === "customer" && <span className="text-xs text-muted-foreground">(optional)</span>}</Label>
+              <Label htmlFor="mobile">Mobile</Label>
               <Input
                 id="mobile" type="tel" value={form.mobile} onChange={update("mobile")}
                 autoComplete="tel" placeholder="+91 9876543210"
-                required={accountType !== "customer"}
+                required
               />
               {errors.mobile && <p className="text-xs text-destructive">{errors.mobile}</p>}
             </div>
