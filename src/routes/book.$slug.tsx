@@ -8,8 +8,10 @@ import type { Staff } from "@/components/shared/StaffCard";
 export const Route = createFileRoute("/book/$slug")({
   loader: async ({ context, params }) => {
     try {
-      await context.queryClient.ensureQueryData(salonBySlugQueryOptions(params.slug));
-      return { hasReal: true };
+      const result = await context.queryClient.ensureQueryData(
+        salonBySlugQueryOptions(params.slug),
+      );
+      return { hasReal: !!result };
     } catch {
       return { hasReal: false };
     }
@@ -35,6 +37,7 @@ function BookingRoute() {
 
 function RealBookingLoader({ slug }: { slug: string }) {
   const { data } = useSuspenseQuery(salonBySlugQueryOptions(slug));
+  if (!data) return <BookingFlowPage />;
   const services: Service[] = data.services.map((s) => ({
     id: s.id,
     name: s.name,
