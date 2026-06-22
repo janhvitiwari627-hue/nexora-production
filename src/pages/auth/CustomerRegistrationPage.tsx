@@ -31,6 +31,10 @@ const ownerSchema = baseSchema.extend({
   business_name: z.string().trim().min(2, "Business name is required").max(120),
   business_city: z.string().trim().max(80).optional().or(z.literal("")),
 });
+const dbpSchema = baseSchema.extend({
+  district: z.string().trim().min(2, "District is required").max(80),
+  state: z.string().trim().max(80).optional().or(z.literal("")),
+});
 
 export default function CustomerRegistrationPage() {
   const navigate = useNavigate();
