@@ -24,7 +24,7 @@ export const getSalonBySlug = createServerFn({ method: "GET" })
       .eq("slug", data.slug)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    if (!salon) throw new Error("Salon not found");
+    if (!salon) return null;
 
     const [{ data: services }, { data: staff }, { data: reviews }] = await Promise.all([
       supabase
