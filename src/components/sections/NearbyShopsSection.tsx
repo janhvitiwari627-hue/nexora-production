@@ -1,5 +1,8 @@
+import { useMemo } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, MapPin, Star } from "lucide-react";
+import { ArrowRight, MapPin, Navigation, Star } from "lucide-react";
+import { useUserLocation } from "@/hooks/use-user-location";
+import { Button } from "@/components/ui/button";
 
 type NearbyShop = {
   slug: string;
@@ -60,7 +63,27 @@ const SHOPS: NearbyShop[] = [
   },
 ];
 
+function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
+  const R = 6371;
+  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
+  const dLng = ((b.lng - a.lng) * Math.PI) / 180;
+  const lat1 = (a.lat * Math.PI) / 180;
+  const lat2 = (b.lat * Math.PI) / 180;
+  const x =
+    Math.sin(dLat / 2) ** 2 + Math.sin(dLng / 2) ** 2 * Math.cos(lat1) * Math.cos(lat2);
+  return 2 * R * Math.asin(Math.sqrt(x));
+}
+
 export function NearbyShopsSection() {
+  const { location, status, requestGps } = useUserLocation();
+
+  const shops = useMemo(() => {
+    if (!location) return SHOPS;
+    return [...SHOPS]
+      .map((s) => ({ ...s, distance_km: Number(haversineKm(location, s).toFixed(1)) }))
+      .sort((a, b) => a.distance_km - b.distance_km);
+  }, [location]);
+
   return (
     <section className="mx-auto max-w-7xl px-4 pt-20 md:px-6">
       <div className="mb-6 flex items-end justify-between gap-4">
@@ -69,15 +92,31 @@ export function NearbyShopsSection() {
             Nearby in Jaipur
           </h2>
           <p className="mt-2 text-muted-foreground">
-            Showing salons within a 5 km radius of you.
+            {location
+              ? `Sorted by distance from your ${location.source === "gps" ? "current location" : "saved location"}.`
+              : "Enable location to see salons sorted by distance from you."}
           </p>
         </div>
-        <Link
-          to="/search"
-          className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-primary hover:underline"
-        >
-          View All Nearby <ArrowRight className="h-4 w-4" />
-        </Link>
+        <div className="flex shrink-0 items-center gap-3">
+          {!location ? (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={requestGps}
+              disabled={status === "loading"}
+              className="gap-1.5"
+            >
+              <Navigation className="h-3.5 w-3.5" />
+              {status === "loading" ? "Locating…" : "Use my location"}
+            </Button>
+          ) : null}
+          <Link
+            to="/search"
+            className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
+          >
+            View All Nearby <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
       </div>
 
       <div className="grid gap-5 lg:grid-cols-[55fr_45fr]">
