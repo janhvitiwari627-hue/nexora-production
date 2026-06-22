@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { z } from "zod";
-import { Award, BadgeCheck, Crown, IndianRupee, Sparkles, Trophy, Users } from "lucide-react";
+import { Activity, Award, BadgeCheck, CalendarClock, Crown, IndianRupee, LayoutDashboard, Rocket, Sparkles, Target, TrendingUp, Trophy, Users, Wallet, Zap } from "lucide-react";
 
 const STEPS = [
   { title: "Register your business", body: "Tell us about your salon — services, location, hours." },
