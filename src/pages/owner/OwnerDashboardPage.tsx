@@ -65,11 +65,12 @@ function TopBar({ open, onToggle }: { open: boolean; onToggle: (v: boolean) => v
             {open ? "Open" : "Closed"}
             <Switch checked={open} onCheckedChange={onToggle} className="ml-1" />
           </div>
-          <Button variant="ghost" size="icon" className="relative">
+          <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
             <Bell className="h-5 w-5" />
             <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary" />
           </Button>
-          <Button variant="ghost" size="icon"><Settings className="h-5 w-5" /></Button>
+          <Button variant="ghost" size="icon" aria-label="Settings"><Settings className="h-5 w-5" /></Button>
+
         </div>
       </div>
     </header>
@@ -292,15 +293,18 @@ function RecentBookingsList() {
             {b.status === "pending" && liveList && (
               <div className="flex gap-1">
                 <Button size="icon" variant="outline" className="h-8 w-8 text-success"
+                  aria-label="Confirm booking"
                   disabled={mutate.isPending}
                   onClick={() => mutate.mutate({ booking_id: b.id, status: "confirmed" })}>
                   <Check className="h-4 w-4" />
                 </Button>
                 <Button size="icon" variant="outline" className="h-8 w-8 text-danger"
+                  aria-label="Cancel booking"
                   disabled={mutate.isPending}
                   onClick={() => mutate.mutate({ booking_id: b.id, status: "cancelled" })}>
                   <X className="h-4 w-4" />
                 </Button>
+
               </div>
             )}
           </div>

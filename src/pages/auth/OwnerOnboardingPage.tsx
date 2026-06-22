@@ -284,7 +284,7 @@ export function OwnerOnboardingPage() {
                           <Input placeholder="Service name" value={s.name} onChange={e => setServices(p => p.map((x, i) => i === idx ? { ...x, name: e.target.value } : x))} />
                           <Input placeholder="₹ Price" type="number" value={s.price} onChange={e => setServices(p => p.map((x, i) => i === idx ? { ...x, price: e.target.value } : x))} />
                           <Input placeholder="Duration (min)" type="number" value={s.duration} onChange={e => setServices(p => p.map((x, i) => i === idx ? { ...x, duration: e.target.value } : x))} />
-                          <Button size="icon" variant="ghost" onClick={() => setServices(p => p.filter((_, i) => i !== idx))}><Trash2 className="text-destructive h-4 w-4" /></Button>
+                          <Button size="icon" variant="ghost" aria-label="Remove service" onClick={() => setServices(p => p.filter((_, i) => i !== idx))}><Trash2 className="text-destructive h-4 w-4" /></Button>
                           <div className="flex gap-2 md:col-span-4">
                             <Textarea rows={2} className="flex-1" placeholder="Description" value={s.desc} onChange={e => setServices(p => p.map((x, i) => i === idx ? { ...x, desc: e.target.value } : x))} />
                             <Button variant="outline" size="sm" onClick={() => { setServices(p => p.map((x, i) => i === idx ? { ...x, desc: `Premium ${x.name || "service"} crafted by skilled professionals using top brands.` } : x)); toast.success("AI description generated"); }}><Sparkles className="h-3.5 w-3.5" /> AI</Button>
@@ -306,7 +306,7 @@ export function OwnerOnboardingPage() {
                           <Input placeholder="Name" value={s.name} onChange={e => setStaff(p => p.map((x, i) => i === idx ? { ...x, name: e.target.value } : x))} />
                           <Input placeholder="Designation" value={s.designation} onChange={e => setStaff(p => p.map((x, i) => i === idx ? { ...x, designation: e.target.value } : x))} />
                           <Input placeholder="Experience (yrs)" type="number" value={s.experience} onChange={e => setStaff(p => p.map((x, i) => i === idx ? { ...x, experience: e.target.value } : x))} />
-                          <Button size="icon" variant="ghost" onClick={() => setStaff(p => p.filter((_, i) => i !== idx))}><Trash2 className="text-destructive h-4 w-4" /></Button>
+                          <Button size="icon" variant="ghost" aria-label="Remove staff member" onClick={() => setStaff(p => p.filter((_, i) => i !== idx))}><Trash2 className="text-destructive h-4 w-4" /></Button>
                         </div>
                       ))}
                       <Button variant="outline" onClick={() => setStaff(p => [...p, { name: "", designation: "", experience: "" }])}><Plus className="h-4 w-4" /> Add Staff</Button>
