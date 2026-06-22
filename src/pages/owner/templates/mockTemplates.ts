@@ -13,27 +13,35 @@ export const TEMPLATE_CATEGORIES = [
 
 export const TEMPLATES: Template[] = [
   {
-    id: "elegant-studio",
-    name: "Elegant Studio",
-    category: ["Salon", "Bridal"],
+    id: "RoyalLuxe",
+    name: "Royal Luxe",
+    category: ["Salon", "Spa", "Bridal", "Wellness"],
     screenshot: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&q=70",
-    demoUrl: "https://example.com/demo/elegant-studio",
-    description: "Editorial typography, generous whitespace, gold accents.",
+    demoUrl: "/site/luxe-hair-spa",
+    description: "Luxury black & gold. Full-screen video hero, glassmorphism cards, premium animations. Rolex × Taj Hotel energy.",
   },
   {
-    id: "urban-barber",
-    name: "Urban Barber",
-    category: ["Barber"],
+    id: "UrbanPro",
+    name: "Urban Pro",
+    category: ["Barber", "Salon"],
     screenshot: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1200&q=70",
-    demoUrl: "https://example.com/demo/urban-barber",
-    description: "Bold dark theme with vintage barbershop vibe.",
+    demoUrl: "/site/luxe-hair-spa",
+    description: "Bold red & white. Service-first layout, fast booking focus, modern cards. Uber × Urban Company energy.",
+  },
+  {
+    id: "BeautyBlossom",
+    name: "Beauty Blossom",
+    category: ["Salon", "Bridal", "Nails"],
+    screenshot: "https://images.unsplash.com/photo-1519415943484-9fa1873496d4?w=1200&q=70",
+    demoUrl: "/site/luxe-hair-spa",
+    description: "Soft pink & rose gold. Instagram-style visual portfolio, elegant typography. Nykaa × Sephora energy.",
   },
   {
     id: "serene-spa",
     name: "Serene Spa",
     category: ["Spa", "Wellness"],
     screenshot: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1200&q=70",
-    demoUrl: "https://example.com/demo/serene-spa",
+    demoUrl: "/site/luxe-hair-spa",
     description: "Calm palette, soft gradients, mindful spacing.",
   },
   {
@@ -41,25 +49,17 @@ export const TEMPLATES: Template[] = [
     name: "Ink Canvas",
     category: ["Tattoo"],
     screenshot: "https://images.unsplash.com/photo-1565058379802-bbe93b2f703a?w=1200&q=70",
-    demoUrl: "https://example.com/demo/ink-canvas",
+    demoUrl: "/site/luxe-hair-spa",
     description: "Gallery-first layout to showcase artist portfolios.",
-  },
-  {
-    id: "bridal-bloom",
-    name: "Bridal Bloom",
-    category: ["Bridal", "Salon"],
-    screenshot: "https://images.unsplash.com/photo-1519415943484-9fa1873496d4?w=1200&q=70",
-    demoUrl: "https://example.com/demo/bridal-bloom",
-    description: "Romantic florals with cinematic hero video support.",
   },
   {
     id: "nail-atelier",
     name: "Nail Atelier",
     category: ["Nails", "Salon"],
     screenshot: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=1200&q=70",
-    demoUrl: "https://example.com/demo/nail-atelier",
+    demoUrl: "/site/luxe-hair-spa",
     description: "Playful pastels and grid-based service showcase.",
   },
 ];
 
-export const CURRENT_TEMPLATE_ID = "elegant-studio";
+export const CURRENT_TEMPLATE_ID = "RoyalLuxe";
