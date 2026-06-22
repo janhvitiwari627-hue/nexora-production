@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Mail, CheckCircle2, User, Building2, BadgeCheck, XCircle, Crown } from "lucide-react";
+import { Loader2, Mail, User, Building2, BadgeCheck, XCircle, Crown, Eye, EyeOff } from "lucide-react";
 import { PasswordStrengthIndicator, scorePassword } from "@/components/auth/PasswordStrengthIndicator";
 import { validateReferralCode, registerMySalon } from "@/lib/owner.functions";
 import { registerDistrictPartner } from "@/lib/districtPartner.functions";
@@ -62,7 +62,7 @@ export default function CustomerRegistrationPage() {
   const [submitting, setSubmitting] = useState(false);
   const [googleSubmitting, setGoogleSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
-  const [verificationSent, setVerificationSent] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Referral code live validation
   const [refStatus, setRefStatus] = useState<"idle" | "checking" | "valid" | "invalid">("idle");
@@ -172,9 +172,9 @@ export default function CustomerRegistrationPage() {
         }
       }
 
-      // No session yet → email confirmation required.
+      // Auto-confirm is enabled; if no session for any reason, send to login.
       if (!data.session) {
-        setVerificationSent(true);
+        navigate({ to: "/login" });
         return;
       }
 
@@ -213,33 +213,6 @@ export default function CustomerRegistrationPage() {
     }
   };
 
-  if (verificationSent) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-              <CheckCircle2 className="h-6 w-6 text-primary" />
-            </div>
-            <CardTitle>Check your email</CardTitle>
-            <CardDescription>
-              We sent a verification link to <strong>{form.email}</strong>. Click it to activate your account.
-              {accountType === "owner" && (
-                <span className="mt-2 block text-xs">
-                  After verifying, you'll wait for admin approval before accessing the owner dashboard.
-                </span>
-              )}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline" className="w-full" onClick={() => setVerificationSent(false)}>
-              Use a different email
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
@@ -345,8 +318,28 @@ export default function CustomerRegistrationPage() {
             )}
 
             <div className="space-y-1.5">
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" value={form.password} onChange={update("password")} autoComplete="new-password" required />
+              <Label htmlFor="password">Password <span className="text-xs text-muted-foreground">(minimum 8 characters)</span></Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={form.password}
+                  onChange={update("password")}
+                  autoComplete="new-password"
+                  required
+                  minLength={8}
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
               <PasswordStrengthIndicator password={form.password} />
               {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
             </div>
