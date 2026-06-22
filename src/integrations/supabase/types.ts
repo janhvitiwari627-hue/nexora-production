@@ -507,22 +507,31 @@ export type Database = {
       }
       salon_owners: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
           created_at: string
           id: string
+          is_approved: boolean
           role: string
           salon_id: string
           user_id: string
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
           id?: string
+          is_approved?: boolean
           role?: string
           salon_id: string
           user_id: string
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
           id?: string
+          is_approved?: boolean
           role?: string
           salon_id?: string
           user_id?: string
