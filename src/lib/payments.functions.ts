@@ -84,7 +84,7 @@ export const verifyPayment = createServerFn({ method: "POST" })
         failure_reason: success ? null : "Mock failure",
       })
       .eq("id", data.paymentId)
-      .eq("status", "PENDING") // only transition from PENDING — second-layer race guard
+      .eq("status", "CREATED") // only transition from CREATED — second-layer race guard
       .select()
       .single();
     if (error) throw new Error(error.message);
