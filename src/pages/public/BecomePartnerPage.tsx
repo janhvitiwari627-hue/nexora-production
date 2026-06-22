@@ -1,7 +1,11 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { z } from "zod";
-import { Activity, Award, BadgeCheck, CalendarClock, Crown, IndianRupee, LayoutDashboard, Rocket, Sparkles, Target, TrendingUp, Trophy, Users, Wallet, Zap } from "lucide-react";
+import { Activity, ArrowRight, Award, BadgeCheck, CalendarClock, Crown, IndianRupee, LayoutDashboard, Rocket, Sparkles, Target, TrendingUp, Trophy, Users, Wallet, Zap } from "lucide-react";
+import rewardWelcomeKit from "@/assets/reward-welcome-kit.jpg";
+import rewardTabletBadge from "@/assets/reward-tablet-badge.jpg";
+import rewardLaptop from "@/assets/reward-laptop.jpg";
+import rewardCar from "@/assets/reward-car.jpg";
 
 const STEPS = [
   { title: "Register your business", body: "Tell us about your salon — services, location, hours." },
@@ -282,35 +286,39 @@ export function BecomePartnerPage() {
             <span className="ml-auto hidden rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary md:inline-block">Unlock as you grow</span>
           </div>
 
-          <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {[
               {
                 count: "25",
                 label: "Active Shops",
                 tone: "from-emerald-400 to-emerald-600",
-                items: ["🎁 Welcome Kit", "🎽 Official Nexora T-Shirt"],
+                image: rewardWelcomeKit,
+                items: ["Welcome Kit"],
               },
               {
                 count: "100",
                 label: "Active Shops",
                 tone: "from-sky-400 to-indigo-600",
-                items: ["🏅 Growth Builder Badge", "📱 Tablet Reward"],
+                image: rewardTabletBadge,
+                items: ["Tablet", "Growth Builder Badge"],
               },
               {
                 count: "500",
                 label: "Active Shops",
                 tone: "from-amber-400 to-orange-600",
-                items: ["💻 Branded Laptop", "👑 Platinum Growth Partner Status"],
+                image: rewardLaptop,
+                items: ["Branded Laptop", "Platinum Growth Partner"],
               },
               {
                 count: "1000+",
                 label: "Active Shops",
                 tone: "from-fuchsia-500 via-rose-500 to-amber-500",
+                image: rewardCar,
                 items: [
-                  "🚘 Car Reward Program Eligibility",
-                  "🏆 District Business Partner",
-                  "🏆 Leadership Circle",
-                  "🏆 Hall Of Fame Entry",
+                  "District Business Partner",
+                  "Leadership Circle",
+                  "Hall Of Fame",
+                  "Car Reward Program Eligibility",
                 ],
               },
             ].map((m) => (
@@ -319,15 +327,22 @@ export function BecomePartnerPage() {
                   <div className="text-xs font-black uppercase tracking-wider text-white/80">{m.label}</div>
                   <div className="mt-1 text-4xl font-black">{m.count}</div>
                 </div>
-                <ul className="space-y-2.5 p-5">
+                <div className="aspect-square overflow-hidden bg-muted">
+                  <img src={m.image} alt={`${m.count} active shops reward`} loading="lazy" width={1024} height={1024} className="h-full w-full object-cover" />
+                </div>
+                <ul className="space-y-2 p-5">
                   {m.items.map((it) => (
-                    <li key={it} className="text-heading text-sm font-semibold">{it}</li>
+                    <li key={it} className="text-heading flex items-start gap-2 text-sm font-semibold">
+                      <BadgeCheck className="text-success mt-0.5 h-4 w-4 shrink-0" />
+                      {it}
+                    </li>
                   ))}
                 </ul>
               </article>
             ))}
           </div>
         </div>
+
 
         {/* 5 & 6 side-by-side */}
         <div className="mt-16 grid gap-6 md:grid-cols-2">
