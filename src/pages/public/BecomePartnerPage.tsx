@@ -399,6 +399,59 @@ export function BecomePartnerPage() {
         </div>
       </section>
 
+      {/* 7. Success Formula */}
+      <section className="mx-auto max-w-6xl px-4 py-20 md:px-6">
+        <div className="border-border bg-card rounded-[var(--radius-card)] border p-8 shadow-[var(--shadow-card)] md:p-12">
+          <div className="flex items-center gap-3">
+            <span className="bg-gradient-cta text-primary-foreground grid h-10 w-10 place-items-center rounded-xl text-sm font-black shadow-[var(--shadow-glow)]">7</span>
+            <h3 className="text-heading text-2xl font-black md:text-3xl">Success Formula</h3>
+          </div>
+          <div className="mt-8 grid items-stretch gap-4 md:grid-cols-4">
+            {[
+              { k: "Jitni", v: "Active Shops", icon: Users },
+              { k: "Utna", v: "Growth Share", icon: TrendingUp },
+              { k: "Utni", v: "Recognition", icon: Award },
+              { k: "Utni", v: "Leadership Opportunity", icon: Crown },
+            ].map((s) => (
+              <div key={s.v} className="relative overflow-hidden rounded-[var(--radius-card)] bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20 p-6 text-center">
+                <s.icon className="text-primary mx-auto h-8 w-8" />
+                <div className="text-muted-foreground mt-3 text-xs font-bold uppercase tracking-wider">{s.k}</div>
+                <div className="text-heading mt-1 text-lg font-black">{s.v}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 8. CTA */}
+      <section className="mx-auto max-w-6xl px-4 pb-20 md:px-6">
+        <div className="relative overflow-hidden rounded-[var(--radius-card)] bg-gradient-to-br from-[#0A2540] via-[#1a1060] to-[#635BFF] p-10 text-center text-white shadow-[var(--shadow-card)] md:p-16">
+          <div className="absolute inset-0 opacity-15 [background-image:radial-gradient(circle_at_2px_2px,white_1px,transparent_0)] [background-size:24px_24px]" />
+          <div className="relative">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 text-sm font-black backdrop-blur">8</span>
+            <h2 className="mt-5 text-3xl font-black leading-tight md:text-5xl">
+              Aaj Hi Nexora Growth Partner Baniye
+            </h2>
+            <p className="mt-3 text-base text-white/80 md:text-lg">
+              Apne District Ka Growth Leader Baniye
+            </p>
+            <div className="mt-8 grid gap-3 sm:grid-cols-2 md:grid-cols-4">
+              {["More Shops", "More Growth", "More Rewards", "More Recognition"].map((t) => (
+                <div key={t} className="rounded-xl bg-white/10 px-4 py-3 font-bold backdrop-blur">{t}</div>
+              ))}
+            </div>
+            <a
+              href="/register?type=growth-partner"
+              className="bg-gradient-cta text-primary-foreground mt-10 inline-flex items-center gap-2 rounded-full px-8 py-4 text-base font-black shadow-[var(--shadow-glow)] transition hover:scale-[1.02]"
+            >
+              Join as Growth Partner <ArrowRight className="h-5 w-5" />
+            </a>
+          </div>
+        </div>
+      </section>
+
+
+
       {/* Steps */}
       <section className="mx-auto max-w-6xl px-4 py-20 md:px-6">
         <h2 className="text-heading text-center text-3xl font-black md:text-4xl">How to join in 4 steps</h2>
