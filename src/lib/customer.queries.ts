@@ -28,13 +28,6 @@ export const nearbySalonsQueryOptions = (input: {
     queryFn: () => nearbySalons({ data: input }),
   });
 
-
-export const availableSlotsQueryOptions = (input: { salon_id: string; date: string }) =>
-  queryOptions({
-    queryKey: ["bookings", "slots", input],
-    queryFn: () => getAvailableSlots({ data: input }),
-  });
-
 export const customerDashboardQueryOptions = () =>
   queryOptions({ queryKey: ["customer", "dashboard"], queryFn: () => getCustomerDashboard() });
 
