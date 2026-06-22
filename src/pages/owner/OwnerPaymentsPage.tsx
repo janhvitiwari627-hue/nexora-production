@@ -12,7 +12,10 @@ import {
   Banknote, Clock, Download, QrCode, TrendingUp, Upload, Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 import { PAYOUT_SUMMARY, TRANSACTIONS, SETTLEMENTS } from "./payments/mockPayments";
+import { useOwnerContext } from "@/hooks/use-owner-context";
+import { ownerDashboardMetricsQuery } from "@/lib/owner.queries";
 
 const formatINR = (n: number) => `₹${n.toLocaleString("en-IN")}`;
 
@@ -22,14 +25,40 @@ const TXN_CLR: Record<string, string> = {
   processing: "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
 };
 
+const PLATFORM_FEE = 0.1;
+
 export function OwnerPaymentsPage() {
+  const { activeSalonId } = useOwnerContext();
+  const { data: metrics } = useQuery({
+    ...ownerDashboardMetricsQuery(activeSalonId ?? ""),
+    enabled: !!activeSalonId,
+  });
+
+  const live = metrics
+    ? {
+        pending: Math.round(metrics.today.revenue * (1 - PLATFORM_FEE)),
+        thisMonth: Math.round(metrics.month.revenue),
+        settled: Math.round(metrics.month.revenue * (1 - PLATFORM_FEE)),
+      }
+    : null;
+  const summary = live ?? {
+    pending: PAYOUT_SUMMARY.pending,
+    thisMonth: PAYOUT_SUMMARY.thisMonth,
+    settled: PAYOUT_SUMMARY.thisMonth - PAYOUT_SUMMARY.pending,
+  };
+
   return (
     <div className="container mx-auto max-w-6xl px-4 py-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Payments & Payouts</h1>
-        <p className="text-sm text-muted-foreground">
-          Track settlements, manage QR collection and update your bank account.
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Payments & Payouts</h1>
+          <p className="text-sm text-muted-foreground">
+            Track settlements, manage QR collection and update your bank account.
+          </p>
+        </div>
+        <Badge variant={live ? "default" : "outline"}>
+          {live ? "Live data" : "Demo data"}
+        </Badge>
       </div>
 
       {/* Payout summary */}
