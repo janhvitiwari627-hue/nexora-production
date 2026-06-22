@@ -764,6 +764,44 @@ export type Database = {
         }
         Relationships: []
       }
+      search_history: {
+        Row: {
+          clicked_salon_id: string | null
+          created_at: string
+          filters: Json
+          id: string
+          query: string | null
+          results_count: number
+          user_id: string
+        }
+        Insert: {
+          clicked_salon_id?: string | null
+          created_at?: string
+          filters?: Json
+          id?: string
+          query?: string | null
+          results_count?: number
+          user_id: string
+        }
+        Update: {
+          clicked_salon_id?: string | null
+          created_at?: string
+          filters?: Json
+          id?: string
+          query?: string | null
+          results_count?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "search_history_clicked_salon_id_fkey"
+            columns: ["clicked_salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       security_events: {
         Row: {
           created_at: string
@@ -1097,6 +1135,20 @@ export type Database = {
           latitude: number
           location: string
           longitude: number
+          name: string
+          price_range: string
+          rating: number
+          reviews_count: number
+        }[]
+      }
+      recommended_salons: {
+        Args: { _limit?: number }
+        Returns: {
+          category: string
+          discount: string
+          id: string
+          image_url: string
+          location: string
           name: string
           price_range: string
           rating: number
