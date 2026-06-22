@@ -113,15 +113,24 @@ export function MobileMenuOverlay({
             </nav>
 
             <div className="border-border bg-card flex flex-col gap-2 border-t p-4">
-              <Button variant="outline" className="h-11 font-semibold">
-                Login
-              </Button>
-              <Button className="bg-gradient-cta text-primary-foreground h-11 font-semibold shadow-[var(--shadow-glow)]">
-                Register →
-              </Button>
-              <p className="text-muted-foreground mt-1 text-center text-[11px]">
-                Join 50k+ members getting their best looks on Nexora.
-              </p>
+              {isAuthed ? (
+                <Button variant="outline" className="h-11 font-semibold" onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </Button>
+              ) : (
+                <>
+                  <Button variant="outline" className="h-11 font-semibold" asChild>
+                    <Link to="/login" onClick={onClose}>Login</Link>
+                  </Button>
+                  <Button className="bg-gradient-cta text-primary-foreground h-11 font-semibold shadow-[var(--shadow-glow)]" asChild>
+                    <Link to="/register" onClick={onClose}>Register →</Link>
+                  </Button>
+                  <p className="text-muted-foreground mt-1 text-center text-[11px]">
+                    Join 50k+ members getting their best looks on Nexora.
+                  </p>
+                </>
+              )}
             </div>
           </motion.aside>
         </>
