@@ -483,9 +483,12 @@ function QuickActionsRow() {
 export function OwnerDashboardPage() {
   const [open, setOpen] = useState(ownerBusiness.isOpen);
   const { activeSalon, isLoading: ctxLoading } = useOwnerContext();
-  const greeting = useMemo(() => {
+  // Compute greeting on the client only to avoid SSR/CSR hydration mismatch
+  // (server's hour can differ from the user's local hour).
+  const [greeting, setGreeting] = useState("Welcome");
+  useEffect(() => {
     const h = new Date().getHours();
-    return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
+    setGreeting(h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening");
   }, []);
   const displayName = activeSalon?.name ?? ownerBusiness.name;
   return (
