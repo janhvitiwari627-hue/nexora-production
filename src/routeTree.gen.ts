@@ -84,6 +84,7 @@ import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising
 import { Route as OwnerJobsNewRouteImport } from './routes/owner.jobs.new'
 import { Route as DashboardBookingsIdRouteImport } from './routes/dashboard.bookings.$id'
 import { Route as ApiPublicHooksReleaseExpiredBookingsRouteImport } from './routes/api/public/hooks/release-expired-bookings'
+import { Route as ApiPublicHooksProcessSettlementsRouteImport } from './routes/api/public/hooks/process-settlements'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -461,6 +462,12 @@ const ApiPublicHooksReleaseExpiredBookingsRoute =
     path: '/api/public/hooks/release-expired-bookings',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksProcessSettlementsRoute =
+  ApiPublicHooksProcessSettlementsRouteImport.update({
+    id: '/api/public/hooks/process-settlements',
+    path: '/api/public/hooks/process-settlements',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -537,6 +544,7 @@ export interface FileRoutesByFullPath {
   '/owner/': typeof OwnerIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
+  '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
   '/api/public/hooks/release-expired-bookings': typeof ApiPublicHooksReleaseExpiredBookingsRoute
 }
 export interface FileRoutesByTo {
@@ -613,6 +621,7 @@ export interface FileRoutesByTo {
   '/owner': typeof OwnerIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
+  '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
   '/api/public/hooks/release-expired-bookings': typeof ApiPublicHooksReleaseExpiredBookingsRoute
 }
 export interface FileRoutesById {
@@ -691,6 +700,7 @@ export interface FileRoutesById {
   '/owner/': typeof OwnerIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
+  '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
   '/api/public/hooks/release-expired-bookings': typeof ApiPublicHooksReleaseExpiredBookingsRoute
 }
 export interface FileRouteTypes {
@@ -770,6 +780,7 @@ export interface FileRouteTypes {
     | '/owner/'
     | '/dashboard/bookings/$id'
     | '/owner/jobs/new'
+    | '/api/public/hooks/process-settlements'
     | '/api/public/hooks/release-expired-bookings'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -846,6 +857,7 @@ export interface FileRouteTypes {
     | '/owner'
     | '/dashboard/bookings/$id'
     | '/owner/jobs/new'
+    | '/api/public/hooks/process-settlements'
     | '/api/public/hooks/release-expired-bookings'
   id:
     | '__root__'
@@ -923,6 +935,7 @@ export interface FileRouteTypes {
     | '/owner/'
     | '/dashboard/bookings/$id'
     | '/owner/jobs/new'
+    | '/api/public/hooks/process-settlements'
     | '/api/public/hooks/release-expired-bookings'
   fileRoutesById: FileRoutesById
 }
@@ -979,6 +992,7 @@ export interface RootRouteChildren {
   ShopSlugRoute: typeof ShopSlugRoute
   SiteBusinessSlugRoute: typeof SiteBusinessSlugRoute
   OwnerIndexRoute: typeof OwnerIndexRoute
+  ApiPublicHooksProcessSettlementsRoute: typeof ApiPublicHooksProcessSettlementsRoute
   ApiPublicHooksReleaseExpiredBookingsRoute: typeof ApiPublicHooksReleaseExpiredBookingsRoute
 }
 
@@ -1509,6 +1523,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksReleaseExpiredBookingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/process-settlements': {
+      id: '/api/public/hooks/process-settlements'
+      path: '/api/public/hooks/process-settlements'
+      fullPath: '/api/public/hooks/process-settlements'
+      preLoaderRoute: typeof ApiPublicHooksProcessSettlementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1655,6 +1676,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopSlugRoute: ShopSlugRoute,
   SiteBusinessSlugRoute: SiteBusinessSlugRoute,
   OwnerIndexRoute: OwnerIndexRoute,
+  ApiPublicHooksProcessSettlementsRoute: ApiPublicHooksProcessSettlementsRoute,
   ApiPublicHooksReleaseExpiredBookingsRoute:
     ApiPublicHooksReleaseExpiredBookingsRoute,
 }
