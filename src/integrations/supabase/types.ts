@@ -18,8 +18,11 @@ export type Database = {
         Row: {
           advance_amount: number | null
           booking_date: string
+          booking_reference: string
           booking_time: string
+          cancellation_reason: string | null
           cancelled_at: string | null
+          cancelled_by: string | null
           created_at: string
           id: string
           payment_deadline: string | null
@@ -35,8 +38,11 @@ export type Database = {
         Insert: {
           advance_amount?: number | null
           booking_date: string
+          booking_reference: string
           booking_time: string
+          cancellation_reason?: string | null
           cancelled_at?: string | null
+          cancelled_by?: string | null
           created_at?: string
           id?: string
           payment_deadline?: string | null
@@ -52,8 +58,11 @@ export type Database = {
         Update: {
           advance_amount?: number | null
           booking_date?: string
+          booking_reference?: string
           booking_time?: string
+          cancellation_reason?: string | null
           cancelled_at?: string | null
+          cancelled_by?: string | null
           created_at?: string
           id?: string
           payment_deadline?: string | null
@@ -1059,6 +1068,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_booking_reference: { Args: never; Returns: string }
       generate_referral_code: { Args: never; Returns: string }
       has_role: {
         Args: {
