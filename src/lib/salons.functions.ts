@@ -33,11 +33,7 @@ export const getSalonBySlug = createServerFn({ method: "GET" })
         .eq("salon_id", salon.id)
         .eq("is_active", true)
         .order("price", { ascending: true }),
-      supabase
-        .from("staff")
-        .select("id, name, role, bio, avatar_url, rating")
-        .eq("salon_id", salon.id)
-        .eq("is_active", true),
+      supabase.rpc("list_salon_staff", { _salon_id: salon.id }),
       supabase
         .from("reviews")
         .select("id, rating, comment, created_at, user_id")
