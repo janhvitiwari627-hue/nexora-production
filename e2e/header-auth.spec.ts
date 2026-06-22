@@ -37,13 +37,14 @@ async function seedSession(page: Page) {
 test.describe("PublicHeader — anonymous", () => {
   test("eventually shows Login + Register and never the account dropdown", async ({ page }) => {
     await page.goto("/");
+    const header = page.locator("header").first();
 
-    // After auth resolves, both CTAs are visible.
-    await expect(page.getByRole("link", { name: "Login" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Register" })).toBeVisible();
+    // After auth resolves, both CTAs are visible in the header.
+    await expect(header.getByRole("link", { name: "Login" })).toBeVisible();
+    await expect(header.getByRole("link", { name: "Register" })).toBeVisible();
 
     // Account dropdown trigger must not exist for an anon user.
-    await expect(page.getByRole("button", { name: "Open account menu" })).toHaveCount(0);
+    await expect(header.getByRole("button", { name: "Open account menu" })).toHaveCount(0);
   });
 });
 
