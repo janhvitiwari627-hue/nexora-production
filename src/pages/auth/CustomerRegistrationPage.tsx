@@ -53,14 +53,6 @@ export default function CustomerRegistrationPage() {
     district: "",
     state: "",
   });
-    full_name: "",
-    email: "",
-    mobile: "",
-    password: "",
-    referred_by: "",
-    business_name: "",
-    business_city: "",
-  });
 
   useEffect(() => {
     if (search?.ref) setForm((f) => (f.referred_by ? f : { ...f, referred_by: search.ref! }));
