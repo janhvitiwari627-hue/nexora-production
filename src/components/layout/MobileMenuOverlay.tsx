@@ -1,8 +1,9 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Briefcase, Building2, Handshake, Sparkles, X } from "lucide-react";
-import { useEffect } from "react";
+import { ArrowRight, Briefcase, Building2, Handshake, LogOut, Sparkles, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/stores/authStore";
 
 const NAV = [
   { label: "Explore", to: "/search", icon: Sparkles, desc: "Salons, spas & barbers near you" },
@@ -18,6 +19,14 @@ export function MobileMenuOverlay({
   open: boolean;
   onClose: () => void;
 }) {
+  const [mounted, setMounted] = useState(false);
+  const user = useAuthStore((s) => s.user);
+  const signOut = useAuthStore((s) => s.signOut);
+  const navigate = useNavigate();
+  const isAuthed = mounted && !!user;
+
+  useEffect(() => setMounted(true), []);
+
   // Lock body scroll while open
   useEffect(() => {
     if (!open) return;
@@ -27,6 +36,12 @@ export function MobileMenuOverlay({
       document.body.style.overflow = prev;
     };
   }, [open]);
+
+  const handleLogout = async () => {
+    onClose();
+    await signOut();
+    navigate({ to: "/" });
+  };
 
   return (
     <AnimatePresence>
@@ -98,15 +113,24 @@ export function MobileMenuOverlay({
             </nav>
 
             <div className="border-border bg-card flex flex-col gap-2 border-t p-4">
-              <Button variant="outline" className="h-11 font-semibold">
-                Login
-              </Button>
-              <Button className="bg-gradient-cta text-primary-foreground h-11 font-semibold shadow-[var(--shadow-glow)]">
-                Register →
-              </Button>
-              <p className="text-muted-foreground mt-1 text-center text-[11px]">
-                Join 50k+ members getting their best looks on Nexora.
-              </p>
+              {isAuthed ? (
+                <Button variant="outline" className="h-11 font-semibold" onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </Button>
+              ) : (
+                <>
+                  <Button variant="outline" className="h-11 font-semibold" asChild>
+                    <Link to="/login" onClick={onClose}>Login</Link>
+                  </Button>
+                  <Button className="bg-gradient-cta text-primary-foreground h-11 font-semibold shadow-[var(--shadow-glow)]" asChild>
+                    <Link to="/register" onClick={onClose}>Register →</Link>
+                  </Button>
+                  <p className="text-muted-foreground mt-1 text-center text-[11px]">
+                    Join 50k+ members getting their best looks on Nexora.
+                  </p>
+                </>
+              )}
             </div>
           </motion.aside>
         </>
