@@ -61,9 +61,6 @@ export function HomePage() {
         <TrendingSection />
       </Reveal>
       <Reveal>
-        <MembershipSection />
-      </Reveal>
-      <Reveal>
         <AppDownloadSection />
       </Reveal>
 
