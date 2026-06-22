@@ -1,8 +1,9 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Briefcase, Building2, Handshake, LogOut, Sparkles, X } from "lucide-react";
+import { ArrowRight, Briefcase, Building2, Handshake, LayoutDashboard, LogOut, Sparkles, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthStore } from "@/stores/authStore";
 
 const NAV = [
@@ -21,9 +22,12 @@ export function MobileMenuOverlay({
 }) {
   const [mounted, setMounted] = useState(false);
   const user = useAuthStore((s) => s.user);
+  const profile = useAuthStore((s) => s.profile);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
   const signOut = useAuthStore((s) => s.signOut);
   const navigate = useNavigate();
-  const isAuthed = mounted && !!user;
+  const authResolved = mounted && isInitialized;
+  const isAuthed = authResolved && !!user;
 
   useEffect(() => setMounted(true), []);
 
@@ -40,8 +44,13 @@ export function MobileMenuOverlay({
   const handleLogout = async () => {
     onClose();
     await signOut();
-    navigate({ to: "/" });
+    navigate({ to: "/", replace: true });
   };
+
+  const displayName =
+    profile?.full_name ||
+    (user?.email ? user.email.split("@")[0] : "Account");
+  const email = user?.email ?? "";
 
   return (
     <AnimatePresence>
@@ -113,11 +122,41 @@ export function MobileMenuOverlay({
             </nav>
 
             <div className="border-border bg-card flex flex-col gap-2 border-t p-4">
-              {isAuthed ? (
-                <Button variant="outline" className="h-11 font-semibold" onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Logout
-                </Button>
+              {!authResolved ? (
+                <>
+                  <Skeleton className="h-11 w-full rounded-md" />
+                  <Skeleton className="h-11 w-full rounded-md" />
+                </>
+              ) : isAuthed ? (
+                <>
+                  <div className="flex items-center gap-3 rounded-2xl bg-muted px-3 py-2">
+                    <div className="bg-gradient-cta grid h-10 w-10 place-items-center rounded-full text-sm font-bold text-primary-foreground">
+                      {(displayName[0] || "U").toUpperCase()}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-bold text-heading">{displayName}</div>
+                      {email && (
+                        <div className="truncate text-xs text-muted-foreground">{email}</div>
+                      )}
+                    </div>
+                  </div>
+                  <Button variant="outline" className="h-11 justify-start font-semibold" asChild>
+                    <Link to="/dashboard" onClick={onClose}>
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </Link>
+                  </Button>
+                  <Button variant="outline" className="h-11 justify-start font-semibold" asChild>
+                    <Link to="/profile" onClick={onClose}>
+                      <User className="mr-2 h-4 w-4" />
+                      Profile
+                    </Link>
+                  </Button>
+                  <Button variant="outline" className="h-11 justify-start font-semibold text-destructive hover:text-destructive" onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </Button>
+                </>
               ) : (
                 <>
                   <Button variant="outline" className="h-11 font-semibold" asChild>

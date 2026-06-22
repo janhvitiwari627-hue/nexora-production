@@ -1,7 +1,16 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Bell, LogOut, Menu, Search, Sparkles, User } from "lucide-react";
+import { Bell, LayoutDashboard, LogOut, Menu, Search, Sparkles, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 import { MobileMenuOverlay } from "./MobileMenuOverlay";
 import { LocationChip } from "./LocationChip";
 import { useAuthStore } from "@/stores/authStore";
@@ -17,9 +26,15 @@ export function PublicHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const user = useAuthStore((s) => s.user);
+  const profile = useAuthStore((s) => s.profile);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
   const signOut = useAuthStore((s) => s.signOut);
   const navigate = useNavigate();
-  const isAuthed = mounted && !!user;
+
+  // Only trust auth state after the component is mounted AND the auth store
+  // has finished bootstrapping the session from storage.
+  const authResolved = mounted && isInitialized;
+  const isAuthed = authResolved && !!user;
 
   useEffect(() => {
     setMounted(true);
@@ -31,8 +46,20 @@ export function PublicHeader() {
 
   const handleLogout = async () => {
     await signOut();
-    navigate({ to: "/" });
+    navigate({ to: "/", replace: true });
   };
+
+  const displayName =
+    profile?.full_name ||
+    (user?.email ? user.email.split("@")[0] : "Account");
+  const email = user?.email ?? "";
+  const initials = displayName
+    .split(" ")
+    .map((s) => s[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase() || "U";
 
   return (
     <header
@@ -72,28 +99,62 @@ export function PublicHeader() {
           <Button variant="ghost" size="icon" aria-label="Search" asChild>
             <Link to="/search"><Search className="h-5 w-5" /></Link>
           </Button>
-          <Button variant="ghost" size="icon" aria-label="Notifications" asChild>
-            <Link to="/dashboard/notifications"><Bell className="h-5 w-5" /></Link>
-          </Button>
+          {isAuthed && (
+            <Button variant="ghost" size="icon" aria-label="Notifications" asChild>
+              <Link to="/dashboard/notifications"><Bell className="h-5 w-5" /></Link>
+            </Button>
+          )}
           <LocationChip className="mr-1 hidden lg:inline-flex" />
-          {isAuthed ? (
-            <>
-              <Button
-                variant="ghost"
-                className="font-semibold"
-                onClick={handleLogout}
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </Button>
-              <Link
-                to="/dashboard"
-                aria-label="Profile"
-                className="ml-1 grid h-9 w-9 place-items-center rounded-full bg-muted text-heading ring-1 ring-border transition hover:bg-card hover:shadow-[var(--shadow-card)]"
-              >
-                <User className="h-4 w-4" />
-              </Link>
-            </>
+
+          {!authResolved ? (
+            <div className="flex items-center gap-2 px-1">
+              <Skeleton className="h-9 w-20 rounded-md" />
+              <Skeleton className="h-9 w-9 rounded-full" />
+            </div>
+          ) : isAuthed ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className="ml-1 flex items-center gap-2 rounded-full bg-muted px-2 py-1 pr-3 text-heading ring-1 ring-border transition hover:bg-card hover:shadow-[var(--shadow-card)]"
+                  aria-label="Open account menu"
+                >
+                  <span className="bg-gradient-cta grid h-7 w-7 place-items-center rounded-full text-[11px] font-bold text-primary-foreground">
+                    {initials}
+                  </span>
+                  <span className="max-w-[120px] truncate text-sm font-semibold">
+                    {displayName}
+                  </span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-60">
+                <DropdownMenuLabel className="flex flex-col gap-0.5">
+                  <span className="truncate text-sm font-semibold text-heading">{displayName}</span>
+                  {email && (
+                    <span className="truncate text-xs font-normal text-muted-foreground">
+                      {email}
+                    </span>
+                  )}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/dashboard" className="cursor-pointer">
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/profile" className="cursor-pointer">
+                    <User className="mr-2 h-4 w-4" />
+                    Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={handleLogout} className="cursor-pointer text-destructive focus:text-destructive">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <>
               <Button variant="ghost" className="font-semibold" asChild>
@@ -105,13 +166,6 @@ export function PublicHeader() {
               >
                 <Link to="/register">Register</Link>
               </Button>
-              <Link
-                to="/dashboard"
-                aria-label="Profile"
-                className="ml-1 grid h-9 w-9 place-items-center rounded-full bg-muted text-heading ring-1 ring-border transition hover:bg-card hover:shadow-[var(--shadow-card)]"
-              >
-                <User className="h-4 w-4" />
-              </Link>
             </>
           )}
         </div>
@@ -121,9 +175,11 @@ export function PublicHeader() {
           <Button variant="ghost" size="icon" aria-label="Search" asChild>
             <Link to="/search"><Search className="h-5 w-5" /></Link>
           </Button>
-          <Button variant="ghost" size="icon" aria-label="Notifications" asChild>
-            <Link to="/dashboard/notifications"><Bell className="h-5 w-5" /></Link>
-          </Button>
+          {isAuthed && (
+            <Button variant="ghost" size="icon" aria-label="Notifications" asChild>
+              <Link to="/dashboard/notifications"><Bell className="h-5 w-5" /></Link>
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="icon"

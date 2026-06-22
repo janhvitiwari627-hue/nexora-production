@@ -48,8 +48,30 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   setSession: (session) => set({ session, user: session?.user ?? null }),
 
   signOut: async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      // ignore — we still wipe local state below
+    }
     set({ user: null, profile: null, session: null, role: null, roles: [] });
+    if (typeof window !== "undefined") {
+      try {
+        // Clear cached profile/session helpers but preserve Supabase's own keys
+        // (signOut already cleared those). Wipe sessionStorage entirely.
+        sessionStorage.clear();
+        // Notify other tabs
+        localStorage.setItem("nx_auth_event", `signout:${Date.now()}`);
+        try {
+          const bc = new BroadcastChannel("nx_auth");
+          bc.postMessage({ type: "SIGNED_OUT" });
+          bc.close();
+        } catch {
+          // BroadcastChannel may not exist
+        }
+      } catch {
+        // storage may be unavailable
+      }
+    }
   },
 
   refreshProfile: async () => {
@@ -118,6 +140,33 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       }
     });
 
-    return () => sub.subscription.unsubscribe();
+    // Multi-tab sync: if another tab signs out, mirror it here
+    let bc: BroadcastChannel | null = null;
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "nx_auth_event" && e.newValue?.startsWith("signout")) {
+        set({ user: null, profile: null, session: null, role: null, roles: [] });
+      }
+    };
+    if (typeof window !== "undefined") {
+      window.addEventListener("storage", onStorage);
+      try {
+        bc = new BroadcastChannel("nx_auth");
+        bc.onmessage = (ev) => {
+          if (ev.data?.type === "SIGNED_OUT") {
+            set({ user: null, profile: null, session: null, role: null, roles: [] });
+          }
+        };
+      } catch {
+        // ignore
+      }
+    }
+
+    return () => {
+      sub.subscription.unsubscribe();
+      if (typeof window !== "undefined") {
+        window.removeEventListener("storage", onStorage);
+      }
+      bc?.close();
+    };
   },
 }));

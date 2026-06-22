@@ -15,6 +15,7 @@ import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ReferralsRouteImport } from './routes/referrals'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as MembershipRouteImport } from './routes/membership'
@@ -118,6 +119,11 @@ const RegisterRoute = RegisterRouteImport.update({
 const ReferralsRoute = ReferralsRouteImport.update({
   id: '/referrals',
   path: '/referrals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -511,6 +517,7 @@ export interface FileRoutesByFullPath {
   '/membership': typeof MembershipRoute
   '/offline': typeof OfflineRoute
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -592,6 +599,7 @@ export interface FileRoutesByTo {
   '/membership': typeof MembershipRoute
   '/offline': typeof OfflineRoute
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -675,6 +683,7 @@ export interface FileRoutesById {
   '/membership': typeof MembershipRoute
   '/offline': typeof OfflineRoute
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -759,6 +768,7 @@ export interface FileRouteTypes {
     | '/membership'
     | '/offline'
     | '/privacy'
+    | '/profile'
     | '/referrals'
     | '/register'
     | '/reset-password'
@@ -840,6 +850,7 @@ export interface FileRouteTypes {
     | '/membership'
     | '/offline'
     | '/privacy'
+    | '/profile'
     | '/referrals'
     | '/register'
     | '/reset-password'
@@ -922,6 +933,7 @@ export interface FileRouteTypes {
     | '/membership'
     | '/offline'
     | '/privacy'
+    | '/profile'
     | '/referrals'
     | '/register'
     | '/reset-password'
@@ -1005,6 +1017,7 @@ export interface RootRouteChildren {
   MembershipRoute: typeof MembershipRoute
   OfflineRoute: typeof OfflineRoute
   PrivacyRoute: typeof PrivacyRoute
+  ProfileRoute: typeof ProfileRoute
   ReferralsRoute: typeof ReferralsRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -1095,6 +1108,13 @@ declare module '@tanstack/react-router' {
       path: '/referrals'
       fullPath: '/referrals'
       preLoaderRoute: typeof ReferralsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -1722,6 +1742,7 @@ const rootRouteChildren: RootRouteChildren = {
   MembershipRoute: MembershipRoute,
   OfflineRoute: OfflineRoute,
   PrivacyRoute: PrivacyRoute,
+  ProfileRoute: ProfileRoute,
   ReferralsRoute: ReferralsRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
