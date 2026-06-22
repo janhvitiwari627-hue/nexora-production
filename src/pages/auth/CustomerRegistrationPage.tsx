@@ -311,7 +311,7 @@ export default function CustomerRegistrationPage() {
               <Input
                 id="mobile" type="tel" value={form.mobile} onChange={update("mobile")}
                 autoComplete="tel" placeholder="+91 9876543210"
-                required={accountType === "owner"}
+                required={accountType !== "customer"}
               />
               {errors.mobile && <p className="text-xs text-destructive">{errors.mobile}</p>}
             </div>
@@ -326,6 +326,20 @@ export default function CustomerRegistrationPage() {
                 <div className="space-y-1">
                   <Label htmlFor="business_city">City <span className="text-xs text-muted-foreground">(optional)</span></Label>
                   <Input id="business_city" value={form.business_city} onChange={update("business_city")} placeholder="Mumbai" />
+                </div>
+              </>
+            )}
+
+            {accountType === "district_partner" && (
+              <>
+                <div className="space-y-1">
+                  <Label htmlFor="district">District</Label>
+                  <Input id="district" value={form.district} onChange={update("district")} required placeholder="e.g. Jaipur" />
+                  {errors.district && <p className="text-xs text-destructive">{errors.district}</p>}
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="state">State <span className="text-xs text-muted-foreground">(optional)</span></Label>
+                  <Input id="state" value={form.state} onChange={update("state")} placeholder="Rajasthan" />
                 </div>
               </>
             )}
