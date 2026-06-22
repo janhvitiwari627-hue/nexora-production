@@ -81,6 +81,7 @@ import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising'
 import { Route as OwnerJobsNewRouteImport } from './routes/owner.jobs.new'
 import { Route as DashboardBookingsIdRouteImport } from './routes/dashboard.bookings.$id'
+import { Route as ApiPublicHooksReleaseExpiredBookingsRouteImport } from './routes/api/public/hooks/release-expired-bookings'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -442,6 +443,12 @@ const DashboardBookingsIdRoute = DashboardBookingsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => DashboardBookingsRoute,
 } as any)
+const ApiPublicHooksReleaseExpiredBookingsRoute =
+  ApiPublicHooksReleaseExpiredBookingsRouteImport.update({
+    id: '/api/public/hooks/release-expired-bookings',
+    path: '/api/public/hooks/release-expired-bookings',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -516,6 +523,7 @@ export interface FileRoutesByFullPath {
   '/owner/': typeof OwnerIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
+  '/api/public/hooks/release-expired-bookings': typeof ApiPublicHooksReleaseExpiredBookingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -589,6 +597,7 @@ export interface FileRoutesByTo {
   '/owner': typeof OwnerIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
+  '/api/public/hooks/release-expired-bookings': typeof ApiPublicHooksReleaseExpiredBookingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -664,6 +673,7 @@ export interface FileRoutesById {
   '/owner/': typeof OwnerIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
+  '/api/public/hooks/release-expired-bookings': typeof ApiPublicHooksReleaseExpiredBookingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -740,6 +750,7 @@ export interface FileRouteTypes {
     | '/owner/'
     | '/dashboard/bookings/$id'
     | '/owner/jobs/new'
+    | '/api/public/hooks/release-expired-bookings'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -813,6 +824,7 @@ export interface FileRouteTypes {
     | '/owner'
     | '/dashboard/bookings/$id'
     | '/owner/jobs/new'
+    | '/api/public/hooks/release-expired-bookings'
   id:
     | '__root__'
     | '/'
@@ -887,6 +899,7 @@ export interface FileRouteTypes {
     | '/owner/'
     | '/dashboard/bookings/$id'
     | '/owner/jobs/new'
+    | '/api/public/hooks/release-expired-bookings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -940,6 +953,7 @@ export interface RootRouteChildren {
   ShopSlugRoute: typeof ShopSlugRoute
   SiteBusinessSlugRoute: typeof SiteBusinessSlugRoute
   OwnerIndexRoute: typeof OwnerIndexRoute
+  ApiPublicHooksReleaseExpiredBookingsRoute: typeof ApiPublicHooksReleaseExpiredBookingsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1448,6 +1462,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardBookingsIdRouteImport
       parentRoute: typeof DashboardBookingsRoute
     }
+    '/api/public/hooks/release-expired-bookings': {
+      id: '/api/public/hooks/release-expired-bookings'
+      path: '/api/public/hooks/release-expired-bookings'
+      fullPath: '/api/public/hooks/release-expired-bookings'
+      preLoaderRoute: typeof ApiPublicHooksReleaseExpiredBookingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1592,6 +1613,8 @@ const rootRouteChildren: RootRouteChildren = {
   ShopSlugRoute: ShopSlugRoute,
   SiteBusinessSlugRoute: SiteBusinessSlugRoute,
   OwnerIndexRoute: OwnerIndexRoute,
+  ApiPublicHooksReleaseExpiredBookingsRoute:
+    ApiPublicHooksReleaseExpiredBookingsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
