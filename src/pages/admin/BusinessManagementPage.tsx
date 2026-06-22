@@ -221,24 +221,25 @@ export function BusinessManagementPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">
-                      <Button variant="ghost" size="icon" onClick={() => setDetail(b)}>
+                      <Button variant="ghost" size="icon" aria-label="View business details" onClick={() => setDetail(b)}>
                         <Eye className="h-4 w-4" />
                       </Button>
                       {b.status === "pending" && (
                         <>
-                          <Button variant="ghost" size="icon" onClick={() => setStatus(b.id, "active", "Business approved")}>
+                          <Button variant="ghost" size="icon" aria-label="Approve business" onClick={() => setStatus(b.id, "active", "Business approved")}>
                             <Check className="h-4 w-4 text-emerald-600" />
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => setReasonModal({ business: b, action: "reject" })}>
+                          <Button variant="ghost" size="icon" aria-label="Reject business" onClick={() => setReasonModal({ business: b, action: "reject" })}>
                             <X className="h-4 w-4 text-red-600" />
                           </Button>
                         </>
                       )}
                       {b.status === "active" && (
-                        <Button variant="ghost" size="icon" onClick={() => setReasonModal({ business: b, action: "suspend" })}>
+                        <Button variant="ghost" size="icon" aria-label="Suspend business" onClick={() => setReasonModal({ business: b, action: "suspend" })}>
                           <Ban className="h-4 w-4 text-orange-600" />
                         </Button>
                       )}
+
                       {b.status === "suspended" && (
                         <Button variant="ghost" size="sm" onClick={() => setStatus(b.id, "active", "Business reactivated")}>
                           Reactivate

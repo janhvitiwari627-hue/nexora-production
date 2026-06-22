@@ -226,12 +226,19 @@ function AddressModal({
 
 export function ModalShell({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4" onClick={onClose}>
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
+      className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4"
+      onClick={onClose}
+    >
       <div className="bg-card border-border w-full max-w-md rounded-2xl border p-5 shadow-2xl space-y-3" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between">
           <h3 className="text-heading text-base font-black">{title}</h3>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
+          <button onClick={onClose} aria-label="Close dialog" className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
         </div>
+
         {children}
       </div>
     </div>

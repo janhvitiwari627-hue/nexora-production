@@ -75,7 +75,7 @@ export function ManageCategoriesModal({
                       autoFocus
                     />
                     <Button size="sm" onClick={saveRename}>Save</Button>
-                    <Button size="icon" variant="ghost" onClick={() => setEditing(null)}>
+                    <Button size="icon" variant="ghost" aria-label="Cancel edit" onClick={() => setEditing(null)}>
                       <X className="h-4 w-4" />
                     </Button>
                   </>
@@ -85,17 +85,19 @@ export function ManageCategoriesModal({
                       <div className="text-heading font-medium">{c.name}</div>
                       <div className="text-muted-foreground text-xs">{countFor(c.id)} services</div>
                     </div>
-                    <Button size="icon" variant="ghost" onClick={() => setEditing({ id: c.id, name: c.name })}>
+                    <Button size="icon" variant="ghost" aria-label="Rename category" onClick={() => setEditing({ id: c.id, name: c.name })}>
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <Button
                       size="icon"
                       variant="ghost"
+                      aria-label="Delete category"
                       className="text-danger hover:bg-danger/10"
                       onClick={() => remove(c.id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
+
                   </>
                 )}
               </li>
