@@ -24,6 +24,7 @@ import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ForOwnersRouteImport } from './routes/for-owners'
+import { Route as DistrictBusinessPartnerRouteImport } from './routes/district-business-partner'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AcademyRouteImport } from './routes/academy'
@@ -161,6 +162,11 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
 const ForOwnersRoute = ForOwnersRouteImport.update({
   id: '/for-owners',
   path: '/for-owners',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DistrictBusinessPartnerRoute = DistrictBusinessPartnerRouteImport.update({
+  id: '/district-business-partner',
+  path: '/district-business-partner',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -489,6 +495,7 @@ export interface FileRoutesByFullPath {
   '/academy': typeof AcademyRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/district-business-partner': typeof DistrictBusinessPartnerRoute
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/help': typeof HelpRoute
@@ -568,6 +575,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/academy': typeof AcademyRoute
   '/contact': typeof ContactRoute
+  '/district-business-partner': typeof DistrictBusinessPartnerRoute
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/help': typeof HelpRoute
@@ -649,6 +657,7 @@ export interface FileRoutesById {
   '/academy': typeof AcademyRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/district-business-partner': typeof DistrictBusinessPartnerRoute
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/help': typeof HelpRoute
@@ -731,6 +740,7 @@ export interface FileRouteTypes {
     | '/academy'
     | '/contact'
     | '/dashboard'
+    | '/district-business-partner'
     | '/for-owners'
     | '/forgot-password'
     | '/help'
@@ -810,6 +820,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/academy'
     | '/contact'
+    | '/district-business-partner'
     | '/for-owners'
     | '/forgot-password'
     | '/help'
@@ -890,6 +901,7 @@ export interface FileRouteTypes {
     | '/academy'
     | '/contact'
     | '/dashboard'
+    | '/district-business-partner'
     | '/for-owners'
     | '/forgot-password'
     | '/help'
@@ -971,6 +983,7 @@ export interface RootRouteChildren {
   AcademyRoute: typeof AcademyRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
+  DistrictBusinessPartnerRoute: typeof DistrictBusinessPartnerRoute
   ForOwnersRoute: typeof ForOwnersRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   HelpRoute: typeof HelpRoute
@@ -1129,6 +1142,13 @@ declare module '@tanstack/react-router' {
       path: '/for-owners'
       fullPath: '/for-owners'
       preLoaderRoute: typeof ForOwnersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/district-business-partner': {
+      id: '/district-business-partner'
+      path: '/district-business-partner'
+      fullPath: '/district-business-partner'
+      preLoaderRoute: typeof DistrictBusinessPartnerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -1671,6 +1691,7 @@ const rootRouteChildren: RootRouteChildren = {
   AcademyRoute: AcademyRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
+  DistrictBusinessPartnerRoute: DistrictBusinessPartnerRoute,
   ForOwnersRoute: ForOwnersRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   HelpRoute: HelpRoute,
