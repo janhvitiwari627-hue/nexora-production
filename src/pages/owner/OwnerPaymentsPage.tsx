@@ -68,9 +68,9 @@ export function OwnerPaymentsPage() {
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Wallet className="h-4 w-4" /> Pending settlement
             </div>
-            <div className="text-3xl font-bold mt-2">{formatINR(PAYOUT_SUMMARY.pending)}</div>
+            <div className="text-3xl font-bold mt-2">{formatINR(summary.pending)}</div>
             <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-              <Clock className="h-3 w-3" /> Next settlement {PAYOUT_SUMMARY.nextSettlement}
+              <Clock className="h-3 w-3" /> {live ? "Today's net (after 10% fee)" : `Next settlement ${PAYOUT_SUMMARY.nextSettlement}`}
             </div>
           </CardContent>
         </Card>
@@ -79,9 +79,9 @@ export function OwnerPaymentsPage() {
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <TrendingUp className="h-4 w-4" /> Earned this month
             </div>
-            <div className="text-3xl font-bold mt-2">{formatINR(PAYOUT_SUMMARY.thisMonth)}</div>
-            <div className="text-xs text-emerald-600 mt-1">
-              +{(((PAYOUT_SUMMARY.thisMonth - PAYOUT_SUMMARY.lastMonth) / PAYOUT_SUMMARY.lastMonth) * 100).toFixed(1)}% vs last month
+            <div className="text-3xl font-bold mt-2">{formatINR(summary.thisMonth)}</div>
+            <div className="text-xs text-muted-foreground mt-1">
+              {live ? `${metrics?.month.count ?? 0} completed bookings (30d)` : `+${(((PAYOUT_SUMMARY.thisMonth - PAYOUT_SUMMARY.lastMonth) / PAYOUT_SUMMARY.lastMonth) * 100).toFixed(1)}% vs last month`}
             </div>
           </CardContent>
         </Card>
@@ -90,7 +90,7 @@ export function OwnerPaymentsPage() {
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Banknote className="h-4 w-4" /> Total settled this month
             </div>
-            <div className="text-3xl font-bold mt-2">{formatINR(PAYOUT_SUMMARY.thisMonth - PAYOUT_SUMMARY.pending)}</div>
+            <div className="text-3xl font-bold mt-2">{formatINR(summary.settled)}</div>
             <div className="text-xs text-muted-foreground mt-1">After 10% platform fee</div>
           </CardContent>
         </Card>
