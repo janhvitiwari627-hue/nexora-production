@@ -140,6 +140,33 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       }
     });
 
-    return () => sub.subscription.unsubscribe();
+    // Multi-tab sync: if another tab signs out, mirror it here
+    let bc: BroadcastChannel | null = null;
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "nx_auth_event" && e.newValue?.startsWith("signout")) {
+        set({ user: null, profile: null, session: null, role: null, roles: [] });
+      }
+    };
+    if (typeof window !== "undefined") {
+      window.addEventListener("storage", onStorage);
+      try {
+        bc = new BroadcastChannel("nx_auth");
+        bc.onmessage = (ev) => {
+          if (ev.data?.type === "SIGNED_OUT") {
+            set({ user: null, profile: null, session: null, role: null, roles: [] });
+          }
+        };
+      } catch {
+        // ignore
+      }
+    }
+
+    return () => {
+      sub.subscription.unsubscribe();
+      if (typeof window !== "undefined") {
+        window.removeEventListener("storage", onStorage);
+      }
+      bc?.close();
+    };
   },
 }));
