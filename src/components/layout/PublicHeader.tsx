@@ -1,9 +1,10 @@
-import { Link } from "@tanstack/react-router";
-import { Bell, Menu, Search, Sparkles, User } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Bell, LogOut, Menu, Search, Sparkles, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MobileMenuOverlay } from "./MobileMenuOverlay";
 import { LocationChip } from "./LocationChip";
+import { useAuthStore } from "@/stores/authStore";
 
 const NAV = [
   { to: "/", label: "Home" },
@@ -14,13 +15,24 @@ const NAV = [
 export function PublicHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const user = useAuthStore((s) => s.user);
+  const signOut = useAuthStore((s) => s.signOut);
+  const navigate = useNavigate();
+  const isAuthed = mounted && !!user;
 
   useEffect(() => {
+    setMounted(true);
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate({ to: "/" });
+  };
 
   return (
     <header
@@ -64,22 +76,44 @@ export function PublicHeader() {
             <Link to="/dashboard/notifications"><Bell className="h-5 w-5" /></Link>
           </Button>
           <LocationChip className="mr-1 hidden lg:inline-flex" />
-          <Button variant="ghost" className="font-semibold" asChild>
-            <Link to="/login">Login</Link>
-          </Button>
-          <Button
-            className="bg-gradient-cta text-primary-foreground rounded-[var(--radius-button)] font-semibold shadow-[var(--shadow-glow)] hover:opacity-95"
-            asChild
-          >
-            <Link to="/register">Register</Link>
-          </Button>
-          <Link
-            to="/dashboard"
-            aria-label="Profile"
-            className="ml-1 grid h-9 w-9 place-items-center rounded-full bg-muted text-heading ring-1 ring-border transition hover:bg-card hover:shadow-[var(--shadow-card)]"
-          >
-            <User className="h-4 w-4" />
-          </Link>
+          {isAuthed ? (
+            <>
+              <Button
+                variant="ghost"
+                className="font-semibold"
+                onClick={handleLogout}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </Button>
+              <Link
+                to="/dashboard"
+                aria-label="Profile"
+                className="ml-1 grid h-9 w-9 place-items-center rounded-full bg-muted text-heading ring-1 ring-border transition hover:bg-card hover:shadow-[var(--shadow-card)]"
+              >
+                <User className="h-4 w-4" />
+              </Link>
+            </>
+          ) : (
+            <>
+              <Button variant="ghost" className="font-semibold" asChild>
+                <Link to="/login">Login</Link>
+              </Button>
+              <Button
+                className="bg-gradient-cta text-primary-foreground rounded-[var(--radius-button)] font-semibold shadow-[var(--shadow-glow)] hover:opacity-95"
+                asChild
+              >
+                <Link to="/register">Register</Link>
+              </Button>
+              <Link
+                to="/dashboard"
+                aria-label="Profile"
+                className="ml-1 grid h-9 w-9 place-items-center rounded-full bg-muted text-heading ring-1 ring-border transition hover:bg-card hover:shadow-[var(--shadow-card)]"
+              >
+                <User className="h-4 w-4" />
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile */}
