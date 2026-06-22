@@ -1,7 +1,11 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { z } from "zod";
-import { Activity, Award, BadgeCheck, CalendarClock, Crown, IndianRupee, LayoutDashboard, Rocket, Sparkles, Target, TrendingUp, Trophy, Users, Wallet, Zap } from "lucide-react";
+import { Activity, ArrowRight, Award, BadgeCheck, CalendarClock, Crown, IndianRupee, LayoutDashboard, Rocket, Sparkles, Target, TrendingUp, Trophy, Users, Wallet, Zap } from "lucide-react";
+import rewardWelcomeKit from "@/assets/reward-welcome-kit.jpg";
+import rewardTabletBadge from "@/assets/reward-tablet-badge.jpg";
+import rewardLaptop from "@/assets/reward-laptop.jpg";
+import rewardCar from "@/assets/reward-car.jpg";
 
 const STEPS = [
   { title: "Register your business", body: "Tell us about your salon — services, location, hours." },
@@ -282,35 +286,39 @@ export function BecomePartnerPage() {
             <span className="ml-auto hidden rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary md:inline-block">Unlock as you grow</span>
           </div>
 
-          <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {[
               {
                 count: "25",
                 label: "Active Shops",
                 tone: "from-emerald-400 to-emerald-600",
-                items: ["🎁 Welcome Kit", "🎽 Official Nexora T-Shirt"],
+                image: rewardWelcomeKit,
+                items: ["Welcome Kit"],
               },
               {
                 count: "100",
                 label: "Active Shops",
                 tone: "from-sky-400 to-indigo-600",
-                items: ["🏅 Growth Builder Badge", "📱 Tablet Reward"],
+                image: rewardTabletBadge,
+                items: ["Tablet", "Growth Builder Badge"],
               },
               {
                 count: "500",
                 label: "Active Shops",
                 tone: "from-amber-400 to-orange-600",
-                items: ["💻 Branded Laptop", "👑 Platinum Growth Partner Status"],
+                image: rewardLaptop,
+                items: ["Branded Laptop", "Platinum Growth Partner"],
               },
               {
                 count: "1000+",
                 label: "Active Shops",
                 tone: "from-fuchsia-500 via-rose-500 to-amber-500",
+                image: rewardCar,
                 items: [
-                  "🚘 Car Reward Program Eligibility",
-                  "🏆 District Business Partner",
-                  "🏆 Leadership Circle",
-                  "🏆 Hall Of Fame Entry",
+                  "District Business Partner",
+                  "Leadership Circle",
+                  "Hall Of Fame",
+                  "Car Reward Program Eligibility",
                 ],
               },
             ].map((m) => (
@@ -319,15 +327,22 @@ export function BecomePartnerPage() {
                   <div className="text-xs font-black uppercase tracking-wider text-white/80">{m.label}</div>
                   <div className="mt-1 text-4xl font-black">{m.count}</div>
                 </div>
-                <ul className="space-y-2.5 p-5">
+                <div className="aspect-square overflow-hidden bg-muted">
+                  <img src={m.image} alt={`${m.count} active shops reward`} loading="lazy" width={1024} height={1024} className="h-full w-full object-cover" />
+                </div>
+                <ul className="space-y-2 p-5">
                   {m.items.map((it) => (
-                    <li key={it} className="text-heading text-sm font-semibold">{it}</li>
+                    <li key={it} className="text-heading flex items-start gap-2 text-sm font-semibold">
+                      <BadgeCheck className="text-success mt-0.5 h-4 w-4 shrink-0" />
+                      {it}
+                    </li>
                   ))}
                 </ul>
               </article>
             ))}
           </div>
         </div>
+
 
         {/* 5 & 6 side-by-side */}
         <div className="mt-16 grid gap-6 md:grid-cols-2">
@@ -383,6 +398,59 @@ export function BecomePartnerPage() {
           </div>
         </div>
       </section>
+
+      {/* 7. Success Formula */}
+      <section className="mx-auto max-w-6xl px-4 py-20 md:px-6">
+        <div className="border-border bg-card rounded-[var(--radius-card)] border p-8 shadow-[var(--shadow-card)] md:p-12">
+          <div className="flex items-center gap-3">
+            <span className="bg-gradient-cta text-primary-foreground grid h-10 w-10 place-items-center rounded-xl text-sm font-black shadow-[var(--shadow-glow)]">7</span>
+            <h3 className="text-heading text-2xl font-black md:text-3xl">Success Formula</h3>
+          </div>
+          <div className="mt-8 grid items-stretch gap-4 md:grid-cols-4">
+            {[
+              { k: "Jitni", v: "Active Shops", icon: Users },
+              { k: "Utna", v: "Growth Share", icon: TrendingUp },
+              { k: "Utni", v: "Recognition", icon: Award },
+              { k: "Utni", v: "Leadership Opportunity", icon: Crown },
+            ].map((s) => (
+              <div key={s.v} className="relative overflow-hidden rounded-[var(--radius-card)] bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20 p-6 text-center">
+                <s.icon className="text-primary mx-auto h-8 w-8" />
+                <div className="text-muted-foreground mt-3 text-xs font-bold uppercase tracking-wider">{s.k}</div>
+                <div className="text-heading mt-1 text-lg font-black">{s.v}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 8. CTA */}
+      <section className="mx-auto max-w-6xl px-4 pb-20 md:px-6">
+        <div className="relative overflow-hidden rounded-[var(--radius-card)] bg-gradient-to-br from-[#0A2540] via-[#1a1060] to-[#635BFF] p-10 text-center text-white shadow-[var(--shadow-card)] md:p-16">
+          <div className="absolute inset-0 opacity-15 [background-image:radial-gradient(circle_at_2px_2px,white_1px,transparent_0)] [background-size:24px_24px]" />
+          <div className="relative">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 text-sm font-black backdrop-blur">8</span>
+            <h2 className="mt-5 text-3xl font-black leading-tight md:text-5xl">
+              Aaj Hi Nexora Growth Partner Baniye
+            </h2>
+            <p className="mt-3 text-base text-white/80 md:text-lg">
+              Apne District Ka Growth Leader Baniye
+            </p>
+            <div className="mt-8 grid gap-3 sm:grid-cols-2 md:grid-cols-4">
+              {["More Shops", "More Growth", "More Rewards", "More Recognition"].map((t) => (
+                <div key={t} className="rounded-xl bg-white/10 px-4 py-3 font-bold backdrop-blur">{t}</div>
+              ))}
+            </div>
+            <a
+              href="/register?type=growth-partner"
+              className="bg-gradient-cta text-primary-foreground mt-10 inline-flex items-center gap-2 rounded-full px-8 py-4 text-base font-black shadow-[var(--shadow-glow)] transition hover:scale-[1.02]"
+            >
+              Join as Growth Partner <ArrowRight className="h-5 w-5" />
+            </a>
+          </div>
+        </div>
+      </section>
+
+
 
       {/* Steps */}
       <section className="mx-auto max-w-6xl px-4 py-20 md:px-6">
