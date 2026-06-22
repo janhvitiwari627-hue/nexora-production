@@ -4,12 +4,12 @@ import { Clock, Sparkles, TrendingUp, X } from "lucide-react";
 
 const TRENDING = ["Balayage", "Keratin", "Bridal Makeup", "Beard Trim", "Manicure", "Facial"];
 const POPULAR = [
-  { name: "Haircut", icon: "✂️" },
-  { name: "Spa", icon: "💆" },
-  { name: "Nails", icon: "💅" },
-  { name: "Makeup", icon: "💄" },
-  { name: "Massage", icon: "🧖" },
-  { name: "Tattoo", icon: "🎨" },
+  "Haircut",
+  "Spa",
+  "Nails",
+  "Makeup",
+  "Massage",
+  "Tattoo",
 ];
 
 interface Props {
@@ -58,11 +58,11 @@ export function AdvancedSearchPanel({
           animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
           transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="overflow-hidden"
+          className="relative z-50 overflow-hidden"
         >
-          <div className="mt-3 rounded-[24px] border border-[#E6EBF1] bg-white p-5 shadow-[0_10px_40px_-12px_rgba(50,50,93,0.12),0_4px_10px_-4px_rgba(10,37,64,0.06)]">
+          <div className="mt-3 rounded-[24px] border border-border bg-card p-5 shadow-[var(--shadow-float)] md:p-6">
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-              <Section title="Trending" icon={<TrendingUp className="h-4 w-4" />}>
+              <Section title="Trending" icon={<TrendingUp className="h-4 w-4 text-primary" />}>
                 <div className="flex flex-wrap gap-2">
                   {TRENDING.map((t) => (
                     <Chip key={t} label={t} onClick={() => onPick(t)} />
@@ -73,19 +73,19 @@ export function AdvancedSearchPanel({
               <Section title="Popular Services">
                 <div className="flex flex-wrap gap-2">
                   {POPULAR.map((p) => (
-                    <Chip key={p.name} label={`${p.icon} ${p.name}`} onClick={() => onPick(p.name)} />
+                    <Chip key={p} label={p} onClick={() => onPick(p)} />
                   ))}
                 </div>
               </Section>
 
               <Section
                 title="Recent"
-                icon={<Clock className="h-4 w-4" />}
+                icon={<Clock className="h-4 w-4 text-primary" />}
                 action={
                   recent.length > 0 && (
                     <button
                       onClick={onRecentClear}
-                      className="text-[11px] font-semibold text-[#425466] hover:text-[#0A2540]"
+                      className="text-[11px] font-bold text-body transition duration-300 hover:text-heading"
                     >
                       Clear All
                     </button>
@@ -93,13 +93,13 @@ export function AdvancedSearchPanel({
                 }
               >
                 {recent.length === 0 ? (
-                  <p className="text-xs text-[#425466]">No recent searches.</p>
+                  <p className="text-sm font-medium text-body">No recent searches.</p>
                 ) : (
                   <ul className="space-y-1.5">
                     {recent.map((r) => (
                       <li
                         key={r}
-                        className="flex items-center justify-between rounded-lg px-2 py-1.5 text-sm text-[#0A2540] hover:bg-[#F6F9FC]"
+                        className="flex items-center justify-between rounded-lg px-2 py-1.5 text-sm font-semibold text-heading transition duration-300 hover:bg-muted"
                       >
                         <button onClick={() => onPick(r)} className="flex-1 text-left">
                           {r}
@@ -107,7 +107,7 @@ export function AdvancedSearchPanel({
                         <button
                           onClick={() => onRecentDelete(r)}
                           aria-label={`Remove ${r}`}
-                          className="rounded p-1 text-[#425466] hover:text-[#0A2540]"
+                          className="rounded p-1 text-body transition duration-300 hover:text-heading"
                         >
                           <X className="h-3.5 w-3.5" />
                         </button>
