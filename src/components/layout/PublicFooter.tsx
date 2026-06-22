@@ -104,7 +104,7 @@ export function PublicFooter() {
         </div>
 
         {/* Columns: 2 cols on mobile, 6 on desktop */}
-        <div className="grid grid-cols-2 gap-8 pt-10 md:grid-cols-6">
+        <div className="grid grid-cols-2 gap-8 pt-10 md:grid-cols-5">
           {COLUMNS.map((col) => (
             <div key={col.title}>
               <h4 className="text-heading text-sm font-bold">{col.title}</h4>
