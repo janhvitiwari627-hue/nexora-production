@@ -22,22 +22,12 @@ export const listShops = createServerFn({ method: "GET" })
   .inputValidator((data: unknown) => ListInput.parse(data))
   .handler(async ({ data }) => {
     const supabase = publicClient();
-    let query = supabase
-      .from("shops")
-      .select(
-        "id, slug, name, tagline, category, city, area, cover_image, rating, review_count, price_level, is_verified",
-      )
-      .order("rating", { ascending: false });
-
-    if (data?.q) {
-      query = query.or(
-        `name.ilike.%${data.q}%,tagline.ilike.%${data.q}%,category.ilike.%${data.q}%,area.ilike.%${data.q}%`,
-      );
-    }
-    if (data?.category) query = query.eq("category", data.category);
-    if (data?.limit) query = query.limit(data.limit);
-
-    const { data: rows, error } = await query;
+    const { data: rows, error } = await supabase.rpc("shops_search", {
+      _q: data?.q ?? null,
+      _category: data?.category ?? null,
+      _limit: data?.limit ?? 50,
+    });
     if (error) throw new Error(error.message);
     return rows ?? [];
   });
+
