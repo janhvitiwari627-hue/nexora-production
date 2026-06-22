@@ -353,6 +353,7 @@ export type Database = {
           created_at: string | null
           currency: string | null
           customer_id: string | null
+          escrow_release_at: string | null
           failure_reason: string | null
           gateway_response: Json | null
           id: string
@@ -361,6 +362,7 @@ export type Database = {
           processed_at: string | null
           razorpay_order_id: string | null
           razorpay_payment_id: string | null
+          released_to_wallet: boolean | null
           salon_id: string | null
           status: string | null
           transaction_id: string
@@ -371,6 +373,7 @@ export type Database = {
           created_at?: string | null
           currency?: string | null
           customer_id?: string | null
+          escrow_release_at?: string | null
           failure_reason?: string | null
           gateway_response?: Json | null
           id?: string
@@ -379,6 +382,7 @@ export type Database = {
           processed_at?: string | null
           razorpay_order_id?: string | null
           razorpay_payment_id?: string | null
+          released_to_wallet?: boolean | null
           salon_id?: string | null
           status?: string | null
           transaction_id?: string
@@ -389,6 +393,7 @@ export type Database = {
           created_at?: string | null
           currency?: string | null
           customer_id?: string | null
+          escrow_release_at?: string | null
           failure_reason?: string | null
           gateway_response?: Json | null
           id?: string
@@ -397,6 +402,7 @@ export type Database = {
           processed_at?: string | null
           razorpay_order_id?: string | null
           razorpay_payment_id?: string | null
+          released_to_wallet?: boolean | null
           salon_id?: string | null
           status?: string | null
           transaction_id?: string
@@ -770,32 +776,41 @@ export type Database = {
       salon_wallets: {
         Row: {
           available_balance: number
+          commission_rate: number | null
           created_at: string
           id: string
+          last_settlement_at: string | null
           last_withdrawal_at: string | null
           pending_balance: number
           salon_id: string
           total_earnings: number
+          total_withdrawals: number | null
           updated_at: string
         }
         Insert: {
           available_balance?: number
+          commission_rate?: number | null
           created_at?: string
           id?: string
+          last_settlement_at?: string | null
           last_withdrawal_at?: string | null
           pending_balance?: number
           salon_id: string
           total_earnings?: number
+          total_withdrawals?: number | null
           updated_at?: string
         }
         Update: {
           available_balance?: number
+          commission_rate?: number | null
           created_at?: string
           id?: string
+          last_settlement_at?: string | null
           last_withdrawal_at?: string | null
           pending_balance?: number
           salon_id?: string
           total_earnings?: number
+          total_withdrawals?: number | null
           updated_at?: string
         }
         Relationships: [
@@ -1200,8 +1215,10 @@ export type Database = {
           id: string
           reason: string | null
           reference_id: string | null
+          salon_id: string | null
           type: string
           user_id: string
+          wallet_id: string | null
         }
         Insert: {
           amount: number
@@ -1210,8 +1227,10 @@ export type Database = {
           id?: string
           reason?: string | null
           reference_id?: string | null
+          salon_id?: string | null
           type: string
           user_id: string
+          wallet_id?: string | null
         }
         Update: {
           amount?: number
@@ -1220,15 +1239,31 @@ export type Database = {
           id?: string
           reason?: string | null
           reference_id?: string | null
+          salon_id?: string | null
           type?: string
           user_id?: string
+          wallet_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "wallet_transactions_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "wallet_transactions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wallet_transactions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "salon_wallets"
             referencedColumns: ["id"]
           },
         ]
@@ -1279,6 +1314,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      auto_release_escrow: { Args: never; Returns: number }
       generate_booking_reference: { Args: never; Returns: string }
       generate_referral_code: { Args: never; Returns: string }
       has_role: {
@@ -1314,6 +1350,7 @@ export type Database = {
           reviews_count: number
         }[]
       }
+      process_pending_settlements: { Args: never; Returns: number }
       recommended_salons: {
         Args: { _limit?: number }
         Returns: {
@@ -1330,6 +1367,14 @@ export type Database = {
       }
       recompute_nexora_scores: { Args: never; Returns: number }
       release_expired_bookings: { Args: never; Returns: number }
+      release_payment_to_wallet: {
+        Args: { _payment_id: string }
+        Returns: Json
+      }
+      request_withdrawal: {
+        Args: { _amount: number; _bank: Json; _salon_id: string }
+        Returns: string
+      }
       shops_search: {
         Args: { _category?: string; _limit?: number; _q?: string }
         Returns: {
