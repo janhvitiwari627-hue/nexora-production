@@ -25,18 +25,24 @@ export function CountUp({
   className,
 }: CountUpProps) {
   const ref = useRef<HTMLSpanElement>(null);
+  const [mounted, setMounted] = useState(false);
   const inView = useInView(ref, { once: true, amount: 0.4 });
-  const [value, setValue] = useState(from);
+  const [value, setValue] = useState(to);
 
   useEffect(() => {
-    if (!inView) return;
+    setMounted(true);
+    setValue(from);
+  }, [from]);
+
+  useEffect(() => {
+    if (!mounted || !inView) return;
     const controls = animate(from, to, {
       duration,
       ease: [0.16, 1, 0.3, 1],
       onUpdate: (v) => setValue(v),
     });
     return () => controls.stop();
-  }, [inView, from, to, duration]);
+  }, [mounted, inView, from, to, duration]);
 
   return (
     <span ref={ref} className={className}>
