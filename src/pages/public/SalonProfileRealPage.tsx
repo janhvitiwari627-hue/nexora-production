@@ -21,6 +21,13 @@ const route = getRouteApi("/s/$slug");
 export function SalonProfileRealPage() {
   const { slug } = route.useParams();
   const { data } = useSuspenseQuery(salonBySlugQueryOptions(slug));
+  if (!data) {
+    return (
+      <div className="mx-auto max-w-xl px-4 py-16 text-center">
+        <h1 className="text-heading text-2xl font-black">Salon not found</h1>
+      </div>
+    );
+  }
   const { salon, services, staff, reviews } = data;
 
   const gallery = [
