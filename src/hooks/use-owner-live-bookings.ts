@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { ownerBookingsQuery } from "@/lib/owner.queries";
 import { updateOwnerBookingStatus } from "@/lib/owner.functions";
 import { useOwnerContext } from "@/hooks/use-owner-context";
+import { useRealtimeOwnerBookings } from "@/hooks/use-realtime-owner-bookings";
 import type {
   OwnerBooking,
   OwnerBookingStatus,
@@ -25,6 +26,7 @@ export function useOwnerLiveBookings(mockFallback: OwnerBooking[]) {
   const { activeSalonId, hasSalon } = useOwnerContext();
   const qc = useQueryClient();
   const liveQ = useQuery(ownerBookingsQuery(activeSalonId ?? ""));
+  useRealtimeOwnerBookings(activeSalonId);
   const updateFn = useServerFn(updateOwnerBookingStatus);
 
   const mutation = useMutation({
