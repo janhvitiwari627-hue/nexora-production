@@ -16,11 +16,16 @@ export type Database = {
     Tables: {
       bookings: {
         Row: {
+          advance_amount: number | null
           booking_date: string
           booking_time: string
+          cancelled_at: string | null
           created_at: string
           id: string
+          payment_deadline: string | null
+          payment_status: string
           price: number
+          refund_status: string | null
           salon_id: string
           service_name: string
           status: string
@@ -28,11 +33,16 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          advance_amount?: number | null
           booking_date: string
           booking_time: string
+          cancelled_at?: string | null
           created_at?: string
           id?: string
+          payment_deadline?: string | null
+          payment_status?: string
           price?: number
+          refund_status?: string | null
           salon_id: string
           service_name: string
           status?: string
@@ -40,11 +50,16 @@ export type Database = {
           user_id: string
         }
         Update: {
+          advance_amount?: number | null
           booking_date?: string
           booking_time?: string
+          cancelled_at?: string | null
           created_at?: string
           id?: string
+          payment_deadline?: string | null
+          payment_status?: string
           price?: number
+          refund_status?: string | null
           salon_id?: string
           service_name?: string
           status?: string
@@ -450,7 +465,9 @@ export type Database = {
           id: string
           image_url: string | null
           is_verified: boolean
+          latitude: number | null
           location: string | null
+          longitude: number | null
           name: string
           price_range: string | null
           rating: number
@@ -466,7 +483,9 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_verified?: boolean
+          latitude?: number | null
           location?: string | null
+          longitude?: number | null
           name: string
           price_range?: string | null
           rating?: number
@@ -482,7 +501,9 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_verified?: boolean
+          latitude?: number | null
           location?: string | null
+          longitude?: number | null
           name?: string
           price_range?: string | null
           rating?: number
@@ -717,6 +738,29 @@ export type Database = {
         }
         Returns: boolean
       }
+      nearby_salons: {
+        Args: {
+          _lat: number
+          _limit?: number
+          _lng: number
+          _radius_km?: number
+        }
+        Returns: {
+          category: string
+          discount: string
+          distance_km: number
+          id: string
+          image_url: string
+          latitude: number
+          location: string
+          longitude: number
+          name: string
+          price_range: string
+          rating: number
+          reviews_count: number
+        }[]
+      }
+      release_expired_bookings: { Args: never; Returns: number }
     }
     Enums: {
       app_role:
