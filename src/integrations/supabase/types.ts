@@ -346,6 +346,78 @@ export type Database = {
           },
         ]
       }
+      payments: {
+        Row: {
+          amount: number
+          booking_id: string | null
+          created_at: string | null
+          currency: string | null
+          customer_id: string | null
+          failure_reason: string | null
+          gateway_response: Json | null
+          id: string
+          payment_method: string | null
+          payment_type: string | null
+          processed_at: string | null
+          razorpay_order_id: string | null
+          razorpay_payment_id: string | null
+          salon_id: string | null
+          status: string | null
+          transaction_id: string
+        }
+        Insert: {
+          amount: number
+          booking_id?: string | null
+          created_at?: string | null
+          currency?: string | null
+          customer_id?: string | null
+          failure_reason?: string | null
+          gateway_response?: Json | null
+          id?: string
+          payment_method?: string | null
+          payment_type?: string | null
+          processed_at?: string | null
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          salon_id?: string | null
+          status?: string | null
+          transaction_id?: string
+        }
+        Update: {
+          amount?: number
+          booking_id?: string | null
+          created_at?: string | null
+          currency?: string | null
+          customer_id?: string | null
+          failure_reason?: string | null
+          gateway_response?: Json | null
+          id?: string
+          payment_method?: string | null
+          payment_type?: string | null
+          processed_at?: string | null
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          salon_id?: string | null
+          status?: string | null
+          transaction_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pending_payments: {
         Row: {
           booking_id: string | null
@@ -466,6 +538,57 @@ export type Database = {
         }
         Relationships: []
       }
+      qr_payments: {
+        Row: {
+          amount: number | null
+          created_at: string | null
+          customer_id: string | null
+          expires_at: string | null
+          id: string
+          payment_id: string | null
+          qr_code: string
+          salon_id: string | null
+          status: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string | null
+          customer_id?: string | null
+          expires_at?: string | null
+          id?: string
+          payment_id?: string | null
+          qr_code: string
+          salon_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string | null
+          customer_id?: string | null
+          expires_at?: string | null
+          id?: string
+          payment_id?: string | null
+          qr_code?: string
+          salon_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qr_payments_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "qr_payments_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       referrals: {
         Row: {
           created_at: string
@@ -555,6 +678,50 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rewards_ledger: {
+        Row: {
+          amount: number
+          created_at: string | null
+          customer_id: string | null
+          expires_at: string | null
+          id: string
+          payment_id: string | null
+          percentage: number | null
+          reward_type: string
+          status: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          customer_id?: string | null
+          expires_at?: string | null
+          id?: string
+          payment_id?: string | null
+          percentage?: number | null
+          reward_type: string
+          status?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          customer_id?: string | null
+          expires_at?: string | null
+          id?: string
+          payment_id?: string | null
+          percentage?: number | null
+          reward_type?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rewards_ledger_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
             referencedColumns: ["id"]
           },
         ]
