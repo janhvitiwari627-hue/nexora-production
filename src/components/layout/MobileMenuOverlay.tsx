@@ -1,12 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Briefcase, Building2, Crown, Handshake, Sparkles, X } from "lucide-react";
+import { ArrowRight, Briefcase, Building2, Handshake, Sparkles, X } from "lucide-react";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
 const NAV = [
   { label: "Explore", to: "/search", icon: Sparkles, desc: "Salons, spas & barbers near you" },
-  { label: "Membership", to: "/", icon: Crown, desc: "Unlock rewards & exclusive perks" },
   { label: "For Owners", to: "/", icon: Building2, desc: "Run your salon on Nexora" },
   { label: "Partners", to: "/", icon: Handshake, desc: "Grow with our partner network" },
   { label: "Jobs", to: "/", icon: Briefcase, desc: "Find your next role in beauty" },
