@@ -27,6 +27,8 @@ import {
   INITIAL_OFFERS, INITIAL_CAMPAIGNS, INITIAL_AUTOMATIONS, AI_SUGGESTIONS,
   type Offer, type Campaign,
 } from "./marketing/mockMarketing";
+import { RetentionPanel } from "./marketing/RetentionPanel";
+
 
 export function OwnerMarketingPage() {
   return (
@@ -394,7 +396,9 @@ function AITab() {
 
   return (
     <div className="space-y-4">
+      {activeSalonId && <RetentionPanel salonId={activeSalonId} />}
       <Card className="bg-gradient-to-br from-primary/5 to-pink-500/5 border-primary/20">
+
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" /> AI Campaign Generator

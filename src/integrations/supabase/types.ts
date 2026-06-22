@@ -1547,6 +1547,18 @@ export type Database = {
       auto_release_escrow: { Args: never; Returns: number }
       generate_booking_reference: { Args: never; Returns: string }
       generate_referral_code: { Args: never; Returns: string }
+      get_at_risk_customers: {
+        Args: { _limit?: number; _salon_id: string }
+        Returns: {
+          churn_risk_score: number
+          customer_id: string
+          full_name: string
+          last_booking_date: string
+          lifetime_value: number
+          mobile: string
+          preferred_services: string[]
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1595,6 +1607,7 @@ export type Database = {
           reviews_count: number
         }[]
       }
+      recompute_customer_insights: { Args: never; Returns: number }
       recompute_nexora_scores: { Args: never; Returns: number }
       release_expired_bookings: { Args: never; Returns: number }
       release_payment_to_wallet: {
