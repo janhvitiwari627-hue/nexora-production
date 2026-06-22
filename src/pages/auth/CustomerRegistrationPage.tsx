@@ -39,8 +39,20 @@ const dbpSchema = baseSchema.extend({
 export default function CustomerRegistrationPage() {
   const navigate = useNavigate();
   const search = useSearch({ strict: false }) as { ref?: string; role?: AccountType };
-  const [accountType, setAccountType] = useState<AccountType>(search?.role === "owner" ? "owner" : "customer");
+  const initialRole: AccountType =
+    search?.role === "owner" || search?.role === "district_partner" ? search.role : "customer";
+  const [accountType, setAccountType] = useState<AccountType>(initialRole);
   const [form, setForm] = useState({
+    full_name: "",
+    email: "",
+    mobile: "",
+    password: "",
+    referred_by: "",
+    business_name: "",
+    business_city: "",
+    district: "",
+    state: "",
+  });
     full_name: "",
     email: "",
     mobile: "",
