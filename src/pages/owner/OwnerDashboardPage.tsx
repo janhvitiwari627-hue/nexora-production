@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Bell, Settings, Upload, ArrowUpRight, ArrowDownRight, Check, X,
   Plus, UserPlus, Tag, Share2, QrCode, BarChart3, Star, Reply, Trophy,
