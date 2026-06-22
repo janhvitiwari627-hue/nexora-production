@@ -1621,6 +1621,7 @@ export type Database = {
       }
       recompute_customer_insights: { Args: never; Returns: number }
       recompute_nexora_scores: { Args: never; Returns: number }
+      refresh_salon_stats: { Args: never; Returns: undefined }
       release_expired_bookings: { Args: never; Returns: number }
       release_payment_to_wallet: {
         Args: { _payment_id: string }
