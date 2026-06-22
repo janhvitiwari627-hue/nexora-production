@@ -151,8 +151,24 @@ export default function CustomerRegistrationPage() {
             },
           });
         } catch (err) {
-          // Don't block signup — just log; admin can re-add salon later.
           console.error("Salon registration failed:", err);
+        }
+      }
+
+      // If district partner: create DBP application after session.
+      if (accountType === "district_partner" && data.session) {
+        try {
+          await registerDbpFn({
+            data: {
+              full_name: form.full_name,
+              mobile: form.mobile,
+              email: form.email,
+              district: form.district,
+              state: form.state || undefined,
+            },
+          });
+        } catch (err) {
+          console.error("DBP registration failed:", err);
         }
       }
 
@@ -162,7 +178,14 @@ export default function CustomerRegistrationPage() {
         return;
       }
 
-      navigate({ to: accountType === "owner" ? "/owner/pending" : "/" });
+      navigate({
+        to:
+          accountType === "owner"
+            ? "/owner/pending"
+            : accountType === "district_partner"
+              ? "/partner/district"
+              : "/",
+      });
     } catch (err) {
       setServerError(err instanceof Error ? err.message : "Sign up failed");
     } finally {
