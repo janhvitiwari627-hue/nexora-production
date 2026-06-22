@@ -2,23 +2,44 @@ import { useMemo, useState } from "react";
 import {
   Bell, Settings, Upload, ArrowUpRight, ArrowDownRight, Check, X,
   Plus, UserPlus, Tag, Share2, QrCode, BarChart3, Star, Reply, Trophy,
+  Sparkles,
 } from "lucide-react";
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
   Area, AreaChart, BarChart, Bar, Legend,
 } from "recharts";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { useOwnerContext } from "@/hooks/use-owner-context";
 import {
-  ownerBusiness, kpis, revenueDaily, revenueWeekly, revenueMonthly,
+  ownerDashboardMetricsQuery, ownerAnalyticsQuery, ownerBookingsQuery,
+} from "@/lib/owner.queries";
+import { updateOwnerBookingStatus } from "@/lib/owner.functions";
+import {
+  ownerBusiness, kpis as mockKpis, revenueDaily, revenueWeekly, revenueMonthly,
   calendarDensity, calendarFirstWeekday, calendarMonthLabel,
-  recentBookings, pendingApprovals, customerInsights,
-  topPerformer, recentReviews, type BookingStatus,
+  recentBookings as mockRecentBookings, pendingApprovals as mockPending,
+  customerInsights, topPerformer, recentReviews, type BookingStatus,
 } from "./mockOwner";
+
+const fmtINR = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
+const initials = (s: string) =>
+  s.split(" ").map((p) => p[0]).join("").slice(0, 2).toUpperCase() || "GU";
+const fmtTime = (t: string | null | undefined) => {
+  if (!t) return "";
+  const [h, m] = t.split(":");
+  const hh = Number(h);
+  const ampm = hh >= 12 ? "PM" : "AM";
+  const h12 = ((hh + 11) % 12) + 1;
+  return `${h12}:${m} ${ampm}`;
+};
 
 const BRAND = "#635BFF";
 
@@ -55,20 +76,31 @@ function TopBar({ open, onToggle }: { open: boolean; onToggle: (v: boolean) => v
 }
 
 function KPICards() {
+  const { activeSalonId } = useOwnerContext();
+  const { data: m } = useQuery(ownerDashboardMetricsQuery(activeSalonId ?? ""));
+  const liveKpis = m && activeSalonId ? [
+    { label: "Today's Revenue", value: fmtINR(m.today.revenue), delta: 0, positive: true, suffix: `${m.today.count} bookings today` },
+    { label: "Today's Bookings", value: String(m.today.count), delta: 0, positive: true, suffix: "scheduled today" },
+    { label: "Pending Approvals", value: String(m.pendingCount), delta: 0, positive: m.pendingCount === 0, suffix: "awaiting confirmation" },
+    { label: "30-day Revenue", value: fmtINR(m.month.revenue), delta: 0, positive: true, suffix: `${m.month.count} bookings` },
+  ] : null;
+  const data = liveKpis ?? mockKpis;
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {kpis.map((k) => (
+      {data.map((k) => (
         <Card key={k.label} className="p-5">
           <div className="text-xs font-medium text-muted-foreground">{k.label}</div>
           <div className="mt-2 flex items-baseline justify-between gap-3">
             <div className="text-2xl font-bold text-heading">{k.value}</div>
-            <span className={cn(
-              "inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-semibold",
-              k.positive ? "bg-success/10 text-success" : "bg-danger/10 text-danger",
-            )}>
-              {k.positive ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-              {Math.abs(k.delta)}%
-            </span>
+            {k.delta !== 0 && (
+              <span className={cn(
+                "inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-semibold",
+                k.positive ? "bg-success/10 text-success" : "bg-danger/10 text-danger",
+              )}>
+                {k.positive ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+                {Math.abs(k.delta)}%
+              </span>
+            )}
           </div>
           <div className="mt-1 text-[11px] text-muted-foreground">{k.suffix}</div>
         </Card>
@@ -79,7 +111,36 @@ function KPICards() {
 
 function RevenueChart() {
   const [range, setRange] = useState<"daily" | "weekly" | "monthly">("daily");
-  const data = range === "daily" ? revenueDaily : range === "weekly" ? revenueWeekly : revenueMonthly;
+  const { activeSalonId } = useOwnerContext();
+  const days = range === "daily" ? 14 : range === "weekly" ? 56 : 180;
+  const { data: series } = useQuery(ownerAnalyticsQuery(activeSalonId ?? "", days));
+  const liveData = useMemo(() => {
+    if (!series || !activeSalonId) return null;
+    if (range === "daily") {
+      return series.slice(-14).map((d) => ({
+        label: new Date(d.date).toLocaleDateString("en-IN", { day: "numeric", month: "short" }),
+        revenue: d.revenue,
+      }));
+    }
+    if (range === "weekly") {
+      const out: { label: string; revenue: number }[] = [];
+      for (let i = 0; i < series.length; i += 7) {
+        const chunk = series.slice(i, i + 7);
+        out.push({ label: `W${Math.floor(i / 7) + 1}`, revenue: chunk.reduce((a, c) => a + c.revenue, 0) });
+      }
+      return out;
+    }
+    const byMonth = new Map<string, number>();
+    for (const d of series) {
+      const k = d.date.slice(0, 7);
+      byMonth.set(k, (byMonth.get(k) ?? 0) + d.revenue);
+    }
+    return Array.from(byMonth.entries()).map(([k, v]) => ({
+      label: new Date(k + "-01").toLocaleDateString("en-IN", { month: "short" }),
+      revenue: v,
+    }));
+  }, [series, range, activeSalonId]);
+  const data = liveData ?? (range === "daily" ? revenueDaily : range === "weekly" ? revenueWeekly : revenueMonthly);
   return (
     <Card className="p-5">
       <div className="flex items-center justify-between">
@@ -177,6 +238,31 @@ function statusChip(s: BookingStatus) {
 }
 
 function RecentBookingsList() {
+  const { activeSalonId } = useOwnerContext();
+  const qc = useQueryClient();
+  const updateStatus = useServerFn(updateOwnerBookingStatus);
+  const { data: bookings } = useQuery(ownerBookingsQuery(activeSalonId ?? ""));
+  const mutate = useMutation({
+    mutationFn: (vars: { booking_id: string; status: "confirmed" | "cancelled" }) =>
+      updateStatus({ data: vars }),
+    onSuccess: (_d, v) => {
+      toast.success(v.status === "confirmed" ? "Booking confirmed" : "Booking rejected");
+      if (activeSalonId) {
+        qc.invalidateQueries({ queryKey: ["owner", "bookings", activeSalonId] });
+        qc.invalidateQueries({ queryKey: ["owner", "metrics", activeSalonId] });
+      }
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const liveList = bookings && activeSalonId ? bookings.slice(0, 5).map((b) => ({
+    id: b.id,
+    customer: `Customer ${b.user_id.slice(0, 4)}`,
+    avatar: initials(b.user_id),
+    service: b.service_name,
+    time: `${b.booking_date} · ${fmtTime(b.booking_time)}`,
+    status: b.status as BookingStatus,
+  })) : null;
+  const list = liveList ?? mockRecentBookings;
   return (
     <Card className="p-5">
       <div className="flex items-center justify-between">
@@ -187,7 +273,12 @@ function RecentBookingsList() {
         <Button variant="ghost" size="sm" className="text-primary">View all</Button>
       </div>
       <div className="mt-4 space-y-2">
-        {recentBookings.map((b) => (
+        {list.length === 0 && (
+          <div className="rounded-xl border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
+            No bookings yet.
+          </div>
+        )}
+        {list.map((b) => (
           <div key={b.id} className="flex items-center gap-3 rounded-xl border border-border p-3">
             <Avatar className="h-9 w-9"><AvatarFallback className="bg-primary/10 text-primary text-xs">{b.avatar}</AvatarFallback></Avatar>
             <div className="min-w-0 flex-1">
@@ -195,10 +286,18 @@ function RecentBookingsList() {
               <div className="truncate text-xs text-muted-foreground">{b.service} · {b.time}</div>
             </div>
             {statusChip(b.status)}
-            {b.status === "pending" && (
+            {b.status === "pending" && liveList && (
               <div className="flex gap-1">
-                <Button size="icon" variant="outline" className="h-8 w-8 text-success"><Check className="h-4 w-4" /></Button>
-                <Button size="icon" variant="outline" className="h-8 w-8 text-danger"><X className="h-4 w-4" /></Button>
+                <Button size="icon" variant="outline" className="h-8 w-8 text-success"
+                  disabled={mutate.isPending}
+                  onClick={() => mutate.mutate({ booking_id: b.id, status: "confirmed" })}>
+                  <Check className="h-4 w-4" />
+                </Button>
+                <Button size="icon" variant="outline" className="h-8 w-8 text-danger"
+                  disabled={mutate.isPending}
+                  onClick={() => mutate.mutate({ booking_id: b.id, status: "cancelled" })}>
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
             )}
           </div>
@@ -209,24 +308,58 @@ function RecentBookingsList() {
 }
 
 function PendingApprovalsWidget() {
+  const { activeSalonId } = useOwnerContext();
+  const qc = useQueryClient();
+  const updateStatus = useServerFn(updateOwnerBookingStatus);
+  const { data: bookings } = useQuery(ownerBookingsQuery(activeSalonId ?? ""));
+  const mutate = useMutation({
+    mutationFn: (vars: { booking_id: string; status: "confirmed" | "cancelled" }) =>
+      updateStatus({ data: vars }),
+    onSuccess: (_d, v) => {
+      toast.success(v.status === "confirmed" ? "Accepted" : "Rejected");
+      if (activeSalonId) {
+        qc.invalidateQueries({ queryKey: ["owner", "bookings", activeSalonId] });
+        qc.invalidateQueries({ queryKey: ["owner", "metrics", activeSalonId] });
+      }
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const livePending = bookings && activeSalonId
+    ? bookings.filter((b) => b.status === "pending").slice(0, 5).map((b) => ({
+        id: b.id,
+        customer: `Customer ${b.user_id.slice(0, 4)}`,
+        service: b.service_name,
+        time: `${b.booking_date} · ${fmtTime(b.booking_time)}`,
+      }))
+    : null;
+  const list = livePending ?? mockPending;
   return (
     <Card className="p-5">
       <div className="flex items-center justify-between">
         <div className="text-sm font-semibold text-heading">Pending Approvals</div>
-        <Badge className="border-0 bg-warning/10 text-warning">{pendingApprovals.length} waiting</Badge>
+        <Badge className="border-0 bg-warning/10 text-warning">{list.length} waiting</Badge>
       </div>
       <div className="mt-3 space-y-2">
-        {pendingApprovals.map((p) => (
+        {list.length === 0 && (
+          <div className="rounded-xl border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
+            All caught up — no pending requests.
+          </div>
+        )}
+        {list.map((p) => (
           <div key={p.id} className="flex items-center justify-between gap-3 rounded-xl border border-border p-3">
             <div className="min-w-0">
               <div className="truncate text-sm font-medium text-heading">{p.customer}</div>
               <div className="truncate text-xs text-muted-foreground">{p.service} · {p.time}</div>
             </div>
             <div className="flex gap-1.5">
-              <Button size="sm" className="h-8 gap-1 bg-success text-white hover:bg-success/90">
+              <Button size="sm" className="h-8 gap-1 bg-success text-white hover:bg-success/90"
+                disabled={!livePending || mutate.isPending}
+                onClick={() => livePending && mutate.mutate({ booking_id: p.id, status: "confirmed" })}>
                 <Check className="h-4 w-4" />Accept
               </Button>
-              <Button size="sm" variant="outline" className="h-8 gap-1 text-danger">
+              <Button size="sm" variant="outline" className="h-8 gap-1 text-danger"
+                disabled={!livePending || mutate.isPending}
+                onClick={() => livePending && mutate.mutate({ booking_id: p.id, status: "cancelled" })}>
                 <X className="h-4 w-4" />Reject
               </Button>
             </div>
@@ -349,18 +482,34 @@ function QuickActionsRow() {
 
 export function OwnerDashboardPage() {
   const [open, setOpen] = useState(ownerBusiness.isOpen);
+  const { activeSalon, isLoading: ctxLoading } = useOwnerContext();
   const greeting = useMemo(() => {
     const h = new Date().getHours();
     return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
   }, []);
+  const displayName = activeSalon?.name ?? ownerBusiness.name;
   return (
     <div className="min-h-screen bg-background">
       <TopBar open={open} onToggle={setOpen} />
       <main className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6">
-        <div>
-          <h1 className="text-2xl font-bold text-heading">{greeting}, {ownerBusiness.name.split(" ")[0]} 👋</h1>
-          <p className="text-sm text-muted-foreground">Here's what's happening at your business today.</p>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-bold text-heading">{greeting}, {displayName.split(" ")[0]} 👋</h1>
+            <p className="text-sm text-muted-foreground">Here's what's happening at your business today.</p>
+          </div>
+          {!ctxLoading && (
+            activeSalon ? (
+              <Badge className="border-0 bg-success/10 text-success gap-1.5">
+                <Sparkles className="h-3 w-3" /> Live data · {activeSalon.name}
+              </Badge>
+            ) : (
+              <Badge className="border-0 bg-warning/10 text-warning">
+                Demo data — no salon linked yet
+              </Badge>
+            )
+          )}
         </div>
+
 
         <KPICards />
         <QuickActionsRow />
