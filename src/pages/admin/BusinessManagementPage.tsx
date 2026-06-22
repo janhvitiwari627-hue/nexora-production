@@ -98,6 +98,9 @@ export function BusinessManagementPage() {
         <p className="text-sm text-muted-foreground">Approve, review and moderate businesses across the platform.</p>
       </div>
 
+      <PendingOwnersPanel />
+
+
       <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
         <TabsList>
           {TABS.map((t) => (
