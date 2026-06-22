@@ -1,0 +1,55 @@
+import { createServerFn } from "@tanstack/react-start";
+import { createClient } from "@supabase/supabase-js";
+import { z } from "zod";
+
+function publicClient() {
+  return createClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_PUBLISHABLE_KEY!,
+    { auth: { persistSession: false, autoRefreshToken: false } },
+  );
+}
+
+const SlugInput = z.object({ slug: z.string().trim().min(1).max(200) });
+
+export const getSalonBySlug = createServerFn({ method: "GET" })
+  .inputValidator((d: unknown) => SlugInput.parse(d))
+  .handler(async ({ data }) => {
+    const supabase = publicClient();
+    const { data: salon, error } = await supabase
+      .from("salons")
+      .select(
+        "id, slug, name, category, rating, reviews_count, image_url, gallery_images, location, address, phone, price_range, discount, description, is_verified, latitude, longitude",
+      )
+      .eq("slug", data.slug)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!salon) throw new Error("Salon not found");
+
+    const [{ data: services }, { data: staff }, { data: reviews }] = await Promise.all([
+      supabase
+        .from("services")
+        .select("id, name, description, category, duration_minutes, price, image_url")
+        .eq("salon_id", salon.id)
+        .eq("is_active", true)
+        .order("price", { ascending: true }),
+      supabase
+        .from("staff")
+        .select("id, name, role, bio, avatar_url, rating")
+        .eq("salon_id", salon.id)
+        .eq("is_active", true),
+      supabase
+        .from("reviews")
+        .select("id, rating, comment, created_at, user_id")
+        .eq("salon_id", salon.id)
+        .order("created_at", { ascending: false })
+        .limit(20),
+    ]);
+
+    return {
+      salon,
+      services: services ?? [],
+      staff: staff ?? [],
+      reviews: reviews ?? [],
+    };
+  });
