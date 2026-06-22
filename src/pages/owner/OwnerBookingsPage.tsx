@@ -30,7 +30,13 @@ const TABS: { key: FilterTab; label: string }[] = [
 type ViewMode = "cards" | "calendar" | "list";
 
 export function OwnerBookingsPage() {
-  const [bookings, setBookings] = useState<OwnerBooking[]>(initialBookings);
+  const [mockBookings, setMockBookings] = useState<OwnerBooking[]>(initialBookings);
+  const { activeSalon, isLive } = (() => {
+    const ctx = useOwnerContext();
+    return { activeSalon: ctx.activeSalon, isLive: ctx.hasSalon };
+  })();
+  const live = useOwnerLiveBookings(mockBookings);
+  const bookings = live.bookings;
   const [tab, setTab] = useState<FilterTab>("all");
   const [query, setQuery] = useState("");
   const [view, setView] = useState<ViewMode>("cards");
@@ -57,7 +63,11 @@ export function OwnerBookingsPage() {
   }, [bookings]);
 
   const updateStatus = (id: string, next: OwnerBookingStatus) => {
-    setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, status: next } : b)));
+    if (isLive) {
+      live.setStatus(id, next);
+    } else {
+      setMockBookings((prev) => prev.map((b) => (b.id === id ? { ...b, status: next } : b)));
+    }
   };
 
   const handleSelect = (id: string, checked: boolean) => {
