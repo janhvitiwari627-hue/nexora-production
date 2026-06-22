@@ -55,6 +55,7 @@ import { Route as OwnerAnalyticsRouteImport } from './routes/owner.analytics'
 import { Route as JobsSearchRouteImport } from './routes/jobs.search'
 import { Route as JobsProfileRouteImport } from './routes/jobs.profile'
 import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
+import { Route as DistrictBusinessPartnerSlugRouteImport } from './routes/district-business-partner.$slug'
 import { Route as DashboardWalletRouteImport } from './routes/dashboard.wallet'
 import { Route as DashboardSupportRouteImport } from './routes/dashboard.support'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
@@ -319,6 +320,12 @@ const JobsJobIdRoute = JobsJobIdRouteImport.update({
   path: '/$jobId',
   getParentRoute: () => JobsRoute,
 } as any)
+const DistrictBusinessPartnerSlugRoute =
+  DistrictBusinessPartnerSlugRouteImport.update({
+    id: '/$slug',
+    path: '/$slug',
+    getParentRoute: () => DistrictBusinessPartnerRoute,
+  } as any)
 const DashboardWalletRoute = DashboardWalletRouteImport.update({
   id: '/wallet',
   path: '/wallet',
@@ -495,7 +502,7 @@ export interface FileRoutesByFullPath {
   '/academy': typeof AcademyRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
-  '/district-business-partner': typeof DistrictBusinessPartnerRoute
+  '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/help': typeof HelpRoute
@@ -537,6 +544,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/support': typeof DashboardSupportRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
+  '/district-business-partner/$slug': typeof DistrictBusinessPartnerSlugRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs/profile': typeof JobsProfileRoute
   '/jobs/search': typeof JobsSearchRoute
@@ -575,7 +583,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/academy': typeof AcademyRoute
   '/contact': typeof ContactRoute
-  '/district-business-partner': typeof DistrictBusinessPartnerRoute
+  '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/help': typeof HelpRoute
@@ -617,6 +625,7 @@ export interface FileRoutesByTo {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/support': typeof DashboardSupportRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
+  '/district-business-partner/$slug': typeof DistrictBusinessPartnerSlugRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs/profile': typeof JobsProfileRoute
   '/jobs/search': typeof JobsSearchRoute
@@ -657,7 +666,7 @@ export interface FileRoutesById {
   '/academy': typeof AcademyRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
-  '/district-business-partner': typeof DistrictBusinessPartnerRoute
+  '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/help': typeof HelpRoute
@@ -699,6 +708,7 @@ export interface FileRoutesById {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/support': typeof DashboardSupportRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
+  '/district-business-partner/$slug': typeof DistrictBusinessPartnerSlugRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs/profile': typeof JobsProfileRoute
   '/jobs/search': typeof JobsSearchRoute
@@ -782,6 +792,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/support'
     | '/dashboard/wallet'
+    | '/district-business-partner/$slug'
     | '/jobs/$jobId'
     | '/jobs/profile'
     | '/jobs/search'
@@ -862,6 +873,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/support'
     | '/dashboard/wallet'
+    | '/district-business-partner/$slug'
     | '/jobs/$jobId'
     | '/jobs/profile'
     | '/jobs/search'
@@ -943,6 +955,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/support'
     | '/dashboard/wallet'
+    | '/district-business-partner/$slug'
     | '/jobs/$jobId'
     | '/jobs/profile'
     | '/jobs/search'
@@ -983,7 +996,7 @@ export interface RootRouteChildren {
   AcademyRoute: typeof AcademyRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
-  DistrictBusinessPartnerRoute: typeof DistrictBusinessPartnerRoute
+  DistrictBusinessPartnerRoute: typeof DistrictBusinessPartnerRouteWithChildren
   ForOwnersRoute: typeof ForOwnersRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   HelpRoute: typeof HelpRoute
@@ -1364,6 +1377,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JobsJobIdRouteImport
       parentRoute: typeof JobsRoute
     }
+    '/district-business-partner/$slug': {
+      id: '/district-business-partner/$slug'
+      path: '/$slug'
+      fullPath: '/district-business-partner/$slug'
+      preLoaderRoute: typeof DistrictBusinessPartnerSlugRouteImport
+      parentRoute: typeof DistrictBusinessPartnerRoute
+    }
     '/dashboard/wallet': {
       id: '/dashboard/wallet'
       path: '/wallet'
@@ -1647,6 +1667,20 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
   DashboardRouteChildren,
 )
 
+interface DistrictBusinessPartnerRouteChildren {
+  DistrictBusinessPartnerSlugRoute: typeof DistrictBusinessPartnerSlugRoute
+}
+
+const DistrictBusinessPartnerRouteChildren: DistrictBusinessPartnerRouteChildren =
+  {
+    DistrictBusinessPartnerSlugRoute: DistrictBusinessPartnerSlugRoute,
+  }
+
+const DistrictBusinessPartnerRouteWithChildren =
+  DistrictBusinessPartnerRoute._addFileChildren(
+    DistrictBusinessPartnerRouteChildren,
+  )
+
 interface JobsRouteChildren {
   JobsJobIdRoute: typeof JobsJobIdRoute
   JobsProfileRoute: typeof JobsProfileRoute
@@ -1679,7 +1713,7 @@ const rootRouteChildren: RootRouteChildren = {
   AcademyRoute: AcademyRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
-  DistrictBusinessPartnerRoute: DistrictBusinessPartnerRoute,
+  DistrictBusinessPartnerRoute: DistrictBusinessPartnerRouteWithChildren,
   ForOwnersRoute: ForOwnersRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   HelpRoute: HelpRoute,

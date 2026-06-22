@@ -513,17 +513,25 @@ export default function DistrictBusinessPartnerPage() {
       {/* FINAL CTA */}
       <section className="px-6 pb-24">
         <div className="mx-auto max-w-4xl rounded-3xl bg-gradient-to-r from-amber-600 via-orange-600 to-rose-600 p-10 text-center text-white shadow-2xl md:p-14">
-          <h2 className="text-3xl font-extrabold md:text-5xl">Ready To Lead Your District?</h2>
+          <h2 className="text-3xl font-extrabold md:text-5xl">Become The Growth Leader Of Your District</h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg opacity-95">
-            No joining fee. No investment. Sirf aapka network aur Nexora ka platform.
+            Connect Businesses. Build Network. Create Impact. Grow With Nexora.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link to="/register" className="rounded-full bg-white px-8 py-3 text-base font-bold text-amber-700 shadow-lg transition hover:scale-105">
-              Apply Now
+            <Link to="/register" className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-base font-bold text-amber-700 shadow-lg transition hover:scale-105">
+              <Rocket className="h-4 w-4" /> Apply Now
             </Link>
-            <Link to="/contact" className="rounded-full border-2 border-white bg-transparent px-8 py-3 text-base font-bold text-white transition hover:bg-white/10">
-              Talk to Team
+            <Link to="/register" className="inline-flex items-center gap-2 rounded-full bg-amber-900/40 px-7 py-3 text-base font-bold text-white ring-2 ring-white/70 transition hover:bg-amber-900/60">
+              <Building2 className="h-4 w-4" /> Become District Business Partner
             </Link>
+            <Link to="/contact" className="inline-flex items-center gap-2 rounded-full border-2 border-white bg-transparent px-7 py-3 text-base font-bold text-white transition hover:bg-white/10">
+              <Handshake className="h-4 w-4" /> Talk To Team
+            </Link>
+          </div>
+          <div className="mt-6 inline-flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs opacity-90">
+            <span>No Joining Fee</span><span>•</span>
+            <span>No Investment</span><span>•</span>
+            <span>Performance Based Growth</span>
           </div>
         </div>
       </section>
