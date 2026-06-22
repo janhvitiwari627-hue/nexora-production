@@ -19,6 +19,14 @@ export function MobileMenuOverlay({
   open: boolean;
   onClose: () => void;
 }) {
+  const [mounted, setMounted] = useState(false);
+  const user = useAuthStore((s) => s.user);
+  const signOut = useAuthStore((s) => s.signOut);
+  const navigate = useNavigate();
+  const isAuthed = mounted && !!user;
+
+  useEffect(() => setMounted(true), []);
+
   // Lock body scroll while open
   useEffect(() => {
     if (!open) return;
@@ -28,6 +36,12 @@ export function MobileMenuOverlay({
       document.body.style.overflow = prev;
     };
   }, [open]);
+
+  const handleLogout = async () => {
+    onClose();
+    await signOut();
+    navigate({ to: "/" });
+  };
 
   return (
     <AnimatePresence>
