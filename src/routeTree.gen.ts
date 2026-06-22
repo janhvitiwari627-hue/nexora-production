@@ -16,7 +16,6 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ReferralsRouteImport } from './routes/referrals'
 import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as PartnerRouteImport } from './routes/partner'
 import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as LoginRouteImport } from './routes/login'
@@ -30,6 +29,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AcademyRouteImport } from './routes/academy'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PartnerIndexRouteImport } from './routes/partner.index'
 import { Route as OwnerIndexRouteImport } from './routes/owner.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as SiteBusinessSlugRouteImport } from './routes/site.$businessSlug'
@@ -124,11 +124,6 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PartnerRoute = PartnerRouteImport.update({
-  id: '/partner',
-  path: '/partner',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const OfflineRoute = OfflineRouteImport.update({
   id: '/offline',
   path: '/offline',
@@ -194,6 +189,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartnerIndexRoute = PartnerIndexRouteImport.update({
+  id: '/partner/',
+  path: '/partner/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OwnerIndexRoute = OwnerIndexRouteImport.update({
   id: '/owner/',
   path: '/owner/',
@@ -220,19 +220,19 @@ const SSlugRoute = SSlugRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const PartnerGrowthRoute = PartnerGrowthRouteImport.update({
-  id: '/growth',
-  path: '/growth',
-  getParentRoute: () => PartnerRoute,
+  id: '/partner/growth',
+  path: '/partner/growth',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PartnerDistrictRoute = PartnerDistrictRouteImport.update({
-  id: '/district',
-  path: '/district',
-  getParentRoute: () => PartnerRoute,
+  id: '/partner/district',
+  path: '/partner/district',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PartnerDistributorRoute = PartnerDistributorRouteImport.update({
-  id: '/distributor',
-  path: '/distributor',
-  getParentRoute: () => PartnerRoute,
+  id: '/partner/distributor',
+  path: '/partner/distributor',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const OwnerWebsiteRoute = OwnerWebsiteRouteImport.update({
   id: '/owner/website',
@@ -503,7 +503,6 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/membership': typeof MembershipRoute
   '/offline': typeof OfflineRoute
-  '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/referrals': typeof ReferralsRoute
   '/register': typeof RegisterRoute
@@ -563,6 +562,7 @@ export interface FileRoutesByFullPath {
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/owner/': typeof OwnerIndexRoute
+  '/partner/': typeof PartnerIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
   '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
@@ -583,7 +583,6 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/membership': typeof MembershipRoute
   '/offline': typeof OfflineRoute
-  '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/referrals': typeof ReferralsRoute
   '/register': typeof RegisterRoute
@@ -643,6 +642,7 @@ export interface FileRoutesByTo {
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/dashboard': typeof DashboardIndexRoute
   '/owner': typeof OwnerIndexRoute
+  '/partner': typeof PartnerIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
   '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
@@ -665,7 +665,6 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/membership': typeof MembershipRoute
   '/offline': typeof OfflineRoute
-  '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/referrals': typeof ReferralsRoute
   '/register': typeof RegisterRoute
@@ -725,6 +724,7 @@ export interface FileRoutesById {
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/owner/': typeof OwnerIndexRoute
+  '/partner/': typeof PartnerIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
   '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
@@ -748,7 +748,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/membership'
     | '/offline'
-    | '/partner'
     | '/privacy'
     | '/referrals'
     | '/register'
@@ -808,6 +807,7 @@ export interface FileRouteTypes {
     | '/site/$businessSlug'
     | '/dashboard/'
     | '/owner/'
+    | '/partner/'
     | '/dashboard/bookings/$id'
     | '/owner/jobs/new'
     | '/api/public/hooks/process-settlements'
@@ -828,7 +828,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/membership'
     | '/offline'
-    | '/partner'
     | '/privacy'
     | '/referrals'
     | '/register'
@@ -888,6 +887,7 @@ export interface FileRouteTypes {
     | '/site/$businessSlug'
     | '/dashboard'
     | '/owner'
+    | '/partner'
     | '/dashboard/bookings/$id'
     | '/owner/jobs/new'
     | '/api/public/hooks/process-settlements'
@@ -909,7 +909,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/membership'
     | '/offline'
-    | '/partner'
     | '/privacy'
     | '/referrals'
     | '/register'
@@ -969,6 +968,7 @@ export interface FileRouteTypes {
     | '/site/$businessSlug'
     | '/dashboard/'
     | '/owner/'
+    | '/partner/'
     | '/dashboard/bookings/$id'
     | '/owner/jobs/new'
     | '/api/public/hooks/process-settlements'
@@ -991,7 +991,6 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   MembershipRoute: typeof MembershipRoute
   OfflineRoute: typeof OfflineRoute
-  PartnerRoute: typeof PartnerRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   ReferralsRoute: typeof ReferralsRoute
   RegisterRoute: typeof RegisterRoute
@@ -1027,10 +1026,14 @@ export interface RootRouteChildren {
   OwnerStaffRoute: typeof OwnerStaffRoute
   OwnerTemplatesRoute: typeof OwnerTemplatesRoute
   OwnerWebsiteRoute: typeof OwnerWebsiteRoute
+  PartnerDistributorRoute: typeof PartnerDistributorRoute
+  PartnerDistrictRoute: typeof PartnerDistrictRoute
+  PartnerGrowthRoute: typeof PartnerGrowthRoute
   SSlugRoute: typeof SSlugRoute
   ShopSlugRoute: typeof ShopSlugRoute
   SiteBusinessSlugRoute: typeof SiteBusinessSlugRoute
   OwnerIndexRoute: typeof OwnerIndexRoute
+  PartnerIndexRoute: typeof PartnerIndexRoute
   ApiPublicHooksProcessSettlementsRoute: typeof ApiPublicHooksProcessSettlementsRoute
   ApiPublicHooksRecomputeInsightsRoute: typeof ApiPublicHooksRecomputeInsightsRoute
   ApiPublicHooksRecomputeRankingsRoute: typeof ApiPublicHooksRecomputeRankingsRoute
@@ -1086,13 +1089,6 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/partner': {
-      id: '/partner'
-      path: '/partner'
-      fullPath: '/partner'
-      preLoaderRoute: typeof PartnerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/offline': {
@@ -1186,6 +1182,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/partner/': {
+      id: '/partner/'
+      path: '/partner'
+      fullPath: '/partner/'
+      preLoaderRoute: typeof PartnerIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/owner/': {
       id: '/owner/'
       path: '/owner'
@@ -1223,24 +1226,24 @@ declare module '@tanstack/react-router' {
     }
     '/partner/growth': {
       id: '/partner/growth'
-      path: '/growth'
+      path: '/partner/growth'
       fullPath: '/partner/growth'
       preLoaderRoute: typeof PartnerGrowthRouteImport
-      parentRoute: typeof PartnerRoute
+      parentRoute: typeof rootRouteImport
     }
     '/partner/district': {
       id: '/partner/district'
-      path: '/district'
+      path: '/partner/district'
       fullPath: '/partner/district'
       preLoaderRoute: typeof PartnerDistrictRouteImport
-      parentRoute: typeof PartnerRoute
+      parentRoute: typeof rootRouteImport
     }
     '/partner/distributor': {
       id: '/partner/distributor'
-      path: '/distributor'
+      path: '/partner/distributor'
       fullPath: '/partner/distributor'
       preLoaderRoute: typeof PartnerDistributorRouteImport
-      parentRoute: typeof PartnerRoute
+      parentRoute: typeof rootRouteImport
     }
     '/owner/website': {
       id: '/owner/website'
@@ -1658,21 +1661,6 @@ const JobsRouteChildren: JobsRouteChildren = {
 
 const JobsRouteWithChildren = JobsRoute._addFileChildren(JobsRouteChildren)
 
-interface PartnerRouteChildren {
-  PartnerDistributorRoute: typeof PartnerDistributorRoute
-  PartnerDistrictRoute: typeof PartnerDistrictRoute
-  PartnerGrowthRoute: typeof PartnerGrowthRoute
-}
-
-const PartnerRouteChildren: PartnerRouteChildren = {
-  PartnerDistributorRoute: PartnerDistributorRoute,
-  PartnerDistrictRoute: PartnerDistrictRoute,
-  PartnerGrowthRoute: PartnerGrowthRoute,
-}
-
-const PartnerRouteWithChildren =
-  PartnerRoute._addFileChildren(PartnerRouteChildren)
-
 interface OwnerJobsRouteChildren {
   OwnerJobsNewRoute: typeof OwnerJobsNewRoute
 }
@@ -1699,7 +1687,6 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   MembershipRoute: MembershipRoute,
   OfflineRoute: OfflineRoute,
-  PartnerRoute: PartnerRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   ReferralsRoute: ReferralsRoute,
   RegisterRoute: RegisterRoute,
@@ -1735,10 +1722,14 @@ const rootRouteChildren: RootRouteChildren = {
   OwnerStaffRoute: OwnerStaffRoute,
   OwnerTemplatesRoute: OwnerTemplatesRoute,
   OwnerWebsiteRoute: OwnerWebsiteRoute,
+  PartnerDistributorRoute: PartnerDistributorRoute,
+  PartnerDistrictRoute: PartnerDistrictRoute,
+  PartnerGrowthRoute: PartnerGrowthRoute,
   SSlugRoute: SSlugRoute,
   ShopSlugRoute: ShopSlugRoute,
   SiteBusinessSlugRoute: SiteBusinessSlugRoute,
   OwnerIndexRoute: OwnerIndexRoute,
+  PartnerIndexRoute: PartnerIndexRoute,
   ApiPublicHooksProcessSettlementsRoute: ApiPublicHooksProcessSettlementsRoute,
   ApiPublicHooksRecomputeInsightsRoute: ApiPublicHooksRecomputeInsightsRoute,
   ApiPublicHooksRecomputeRankingsRoute: ApiPublicHooksRecomputeRankingsRoute,

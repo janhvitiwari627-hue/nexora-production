@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { BecomePartnerPage } from "@/pages/public/BecomePartnerPage";
 
-export const Route = createFileRoute("/partner")({
+export const Route = createFileRoute("/partner/")({
   head: () => ({
     meta: [
       { title: "Become a Partner — Grow with Nexora" },
