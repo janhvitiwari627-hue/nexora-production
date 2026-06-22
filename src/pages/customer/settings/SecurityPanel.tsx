@@ -4,6 +4,7 @@ import { Switch } from "@/components/ui/switch";
 import { ACTIVE_DEVICES, LOGIN_HISTORY, type ActiveDevice } from "./mockSettings";
 import { Field, inputCls, PanelShell } from "./PersonalInfoPanel";
 import { ModalShell } from "./ContactInfoPanel";
+import { LiveActiveSessionsPanel } from "./LiveActiveSessionsPanel";
 
 function strength(pw: string) {
   let s = 0;
@@ -70,7 +71,10 @@ export function SecurityPanel() {
         </div>
       </PanelShell>
 
+      <LiveActiveSessionsPanel />
+
       <PanelShell title="Active devices" subtitle="Where you're currently signed in.">
+
         <div className="space-y-3">
           {devices.map((d) => (
             <div key={d.id} className="border-border bg-background flex items-center justify-between gap-3 rounded-xl border p-4">

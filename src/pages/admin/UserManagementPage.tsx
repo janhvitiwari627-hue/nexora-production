@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { AlertTriangle, Eye, Search } from "lucide-react";
 import { toast } from "sonner";
+import { LiveUsersPanel } from "@/components/admin/LiveUsersPanel";
 
 type Role = "customer" | "owner" | "staff" | "admin";
 type Status = "active" | "suspended" | "deleted";
@@ -58,6 +59,9 @@ export function UserManagementPage() {
         <h1 className="text-heading text-2xl font-bold">User Management</h1>
         <p className="text-muted-foreground text-sm">Manage all platform users across roles</p>
       </header>
+
+      <LiveUsersPanel />
+
       <Card><CardContent className="flex flex-wrap items-center gap-3 p-4">
         <div className="relative min-w-[240px] flex-1">
           <Search className="text-muted-foreground absolute top-2.5 left-3 h-4 w-4" />
