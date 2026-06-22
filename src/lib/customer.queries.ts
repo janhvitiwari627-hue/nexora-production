@@ -6,9 +6,28 @@ import {
   getRewards,
   getReferrals,
 } from "./customer.functions";
+import { nearbySalons } from "./location.functions";
 
 export const myBookingsQueryOptions = () =>
   queryOptions({ queryKey: ["customer", "bookings"], queryFn: () => listMyBookings() });
+
+export const availableSlotsQueryOptions = (input: { salon_id: string; date: string }) =>
+  queryOptions({
+    queryKey: ["bookings", "slots", input],
+    queryFn: () => getAvailableSlots({ data: input }),
+  });
+
+export const nearbySalonsQueryOptions = (input: {
+  lat: number;
+  lng: number;
+  radius_km?: number;
+  limit?: number;
+}) =>
+  queryOptions({
+    queryKey: ["salons", "nearby", input],
+    queryFn: () => nearbySalons({ data: input }),
+  });
+
 
 export const availableSlotsQueryOptions = (input: { salon_id: string; date: string }) =>
   queryOptions({
