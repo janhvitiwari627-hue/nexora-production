@@ -55,7 +55,7 @@ export const getSalonBySlug = createServerFn({ method: "GET" })
     return {
       salon,
       services: services ?? [],
-      staff: staff ?? [],
+      staff: (staff ?? []) as PublicStaffMember[],
       reviews: reviews ?? [],
     };
   });
