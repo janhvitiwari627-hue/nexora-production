@@ -119,6 +119,56 @@ export type Database = {
           },
         ]
       }
+      marketing_campaigns: {
+        Row: {
+          campaign_type: string
+          created_at: string
+          id: string
+          message: string | null
+          response_count: number
+          salon_id: string
+          sent_count: number
+          status: string
+          target_segment: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          campaign_type: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          response_count?: number
+          salon_id: string
+          sent_count?: number
+          status?: string
+          target_segment?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          campaign_type?: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          response_count?: number
+          salon_id?: string
+          sent_count?: number
+          status?: string
+          target_segment?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketing_campaigns_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       memberships: {
         Row: {
           created_at: string
@@ -487,6 +537,47 @@ export type Database = {
           },
         ]
       }
+      salon_wallets: {
+        Row: {
+          available_balance: number
+          created_at: string
+          id: string
+          last_withdrawal_at: string | null
+          pending_balance: number
+          salon_id: string
+          total_earnings: number
+          updated_at: string
+        }
+        Insert: {
+          available_balance?: number
+          created_at?: string
+          id?: string
+          last_withdrawal_at?: string | null
+          pending_balance?: number
+          salon_id: string
+          total_earnings?: number
+          updated_at?: string
+        }
+        Update: {
+          available_balance?: number
+          created_at?: string
+          id?: string
+          last_withdrawal_at?: string | null
+          pending_balance?: number
+          salon_id?: string
+          total_earnings?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "salon_wallets_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: true
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       salons: {
         Row: {
           address: string | null
@@ -722,37 +813,46 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           created_at: string
+          email: string | null
           id: string
           is_active: boolean
           name: string
+          phone: string | null
           rating: number
           role: string | null
           salon_id: string
           updated_at: string
+          working_hours: Json | null
         }
         Insert: {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          email?: string | null
           id?: string
           is_active?: boolean
           name: string
+          phone?: string | null
           rating?: number
           role?: string | null
           salon_id: string
           updated_at?: string
+          working_hours?: Json | null
         }
         Update: {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          email?: string | null
           id?: string
           is_active?: boolean
           name?: string
+          phone?: string | null
           rating?: number
           role?: string | null
           salon_id?: string
           updated_at?: string
+          working_hours?: Json | null
         }
         Relationships: [
           {
@@ -822,6 +922,47 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      withdrawals: {
+        Row: {
+          amount: number
+          bank_account_details: Json | null
+          created_at: string
+          id: string
+          processed_at: string | null
+          salon_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          bank_account_details?: Json | null
+          created_at?: string
+          id?: string
+          processed_at?: string | null
+          salon_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          bank_account_details?: Json | null
+          created_at?: string
+          id?: string
+          processed_at?: string | null
+          salon_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "withdrawals_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
             referencedColumns: ["id"]
           },
         ]
