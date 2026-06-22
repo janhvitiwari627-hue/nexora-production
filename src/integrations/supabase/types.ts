@@ -170,6 +170,84 @@ export type Database = {
         }
         Relationships: []
       }
+      district_business_partners: {
+        Row: {
+          bank_account: Json | null
+          created_at: string
+          district: string
+          email: string | null
+          full_name: string
+          hall_of_fame: boolean
+          hall_of_fame_rank: number | null
+          id: string
+          metadata: Json
+          mobile: string | null
+          photo_url: string | null
+          pincode: string | null
+          rejection_reason: string | null
+          slug: string
+          state: string | null
+          status: Database["public"]["Enums"]["dbp_status"]
+          success_story: string | null
+          tagline: string | null
+          tier: Database["public"]["Enums"]["dbp_tier"]
+          updated_at: string
+          user_id: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          bank_account?: Json | null
+          created_at?: string
+          district: string
+          email?: string | null
+          full_name: string
+          hall_of_fame?: boolean
+          hall_of_fame_rank?: number | null
+          id?: string
+          metadata?: Json
+          mobile?: string | null
+          photo_url?: string | null
+          pincode?: string | null
+          rejection_reason?: string | null
+          slug: string
+          state?: string | null
+          status?: Database["public"]["Enums"]["dbp_status"]
+          success_story?: string | null
+          tagline?: string | null
+          tier?: Database["public"]["Enums"]["dbp_tier"]
+          updated_at?: string
+          user_id: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          bank_account?: Json | null
+          created_at?: string
+          district?: string
+          email?: string | null
+          full_name?: string
+          hall_of_fame?: boolean
+          hall_of_fame_rank?: number | null
+          id?: string
+          metadata?: Json
+          mobile?: string | null
+          photo_url?: string | null
+          pincode?: string | null
+          rejection_reason?: string | null
+          slug?: string
+          state?: string | null
+          status?: Database["public"]["Enums"]["dbp_status"]
+          success_story?: string | null
+          tagline?: string | null
+          tier?: Database["public"]["Enums"]["dbp_tier"]
+          updated_at?: string
+          user_id?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: []
+      }
       favorites: {
         Row: {
           created_at: string
@@ -450,6 +528,597 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "offers_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_activity_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          details: Json
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          partner_id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          partner_id: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          partner_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_activity_logs_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "district_business_partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_dashboard_metrics: {
+        Row: {
+          active_shops: number
+          current_month_payout: number
+          current_week_payout: number
+          district_rank: number | null
+          hall_of_fame_rank: number | null
+          lifetime_earnings: number
+          nexora_earnings: number
+          next_milestone: string | null
+          next_milestone_shops: number | null
+          partner_earnings: number
+          partner_id: string
+          pending_earnings: number
+          revenue_generated: number
+          total_shops: number
+          updated_at: string
+        }
+        Insert: {
+          active_shops?: number
+          current_month_payout?: number
+          current_week_payout?: number
+          district_rank?: number | null
+          hall_of_fame_rank?: number | null
+          lifetime_earnings?: number
+          nexora_earnings?: number
+          next_milestone?: string | null
+          next_milestone_shops?: number | null
+          partner_earnings?: number
+          partner_id: string
+          pending_earnings?: number
+          revenue_generated?: number
+          total_shops?: number
+          updated_at?: string
+        }
+        Update: {
+          active_shops?: number
+          current_month_payout?: number
+          current_week_payout?: number
+          district_rank?: number | null
+          hall_of_fame_rank?: number | null
+          lifetime_earnings?: number
+          nexora_earnings?: number
+          next_milestone?: string | null
+          next_milestone_shops?: number | null
+          partner_earnings?: number
+          partner_id?: string
+          pending_earnings?: number
+          revenue_generated?: number
+          total_shops?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_dashboard_metrics_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: true
+            referencedRelation: "district_business_partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_earnings: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          metadata: Json
+          notes: string | null
+          partner_id: string
+          payout_id: string | null
+          period_end: string | null
+          period_start: string | null
+          share_rate: number | null
+          shop_id: string | null
+          source_revenue: number | null
+          status: Database["public"]["Enums"]["dbp_earning_status"]
+          type: Database["public"]["Enums"]["dbp_earning_type"]
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          metadata?: Json
+          notes?: string | null
+          partner_id: string
+          payout_id?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          share_rate?: number | null
+          shop_id?: string | null
+          source_revenue?: number | null
+          status?: Database["public"]["Enums"]["dbp_earning_status"]
+          type: Database["public"]["Enums"]["dbp_earning_type"]
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          metadata?: Json
+          notes?: string | null
+          partner_id?: string
+          payout_id?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          share_rate?: number | null
+          shop_id?: string | null
+          source_revenue?: number | null
+          status?: Database["public"]["Enums"]["dbp_earning_status"]
+          type?: Database["public"]["Enums"]["dbp_earning_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_earnings_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "district_business_partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_earnings_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "partner_shop_mapping"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_hall_of_fame: {
+        Row: {
+          achievements: Json
+          active_shops: number
+          badge: string | null
+          category: string
+          created_at: string
+          featured_from: string
+          featured_to: string | null
+          id: string
+          partner_id: string
+          rank: number
+          revenue_generated: number
+          success_story: string | null
+          updated_at: string
+        }
+        Insert: {
+          achievements?: Json
+          active_shops?: number
+          badge?: string | null
+          category?: string
+          created_at?: string
+          featured_from?: string
+          featured_to?: string | null
+          id?: string
+          partner_id: string
+          rank: number
+          revenue_generated?: number
+          success_story?: string | null
+          updated_at?: string
+        }
+        Update: {
+          achievements?: Json
+          active_shops?: number
+          badge?: string | null
+          category?: string
+          created_at?: string
+          featured_from?: string
+          featured_to?: string | null
+          id?: string
+          partner_id?: string
+          rank?: number
+          revenue_generated?: number
+          success_story?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_hall_of_fame_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "district_business_partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_leaderboard: {
+        Row: {
+          active_shops: number
+          computed_at: string
+          created_at: string
+          district: string | null
+          id: string
+          partner_earnings: number
+          partner_id: string
+          period: Database["public"]["Enums"]["dbp_leaderboard_period"]
+          period_end: string | null
+          period_start: string | null
+          rank: number
+          revenue_generated: number
+          scope: string
+          score: number
+          state: string | null
+        }
+        Insert: {
+          active_shops?: number
+          computed_at?: string
+          created_at?: string
+          district?: string | null
+          id?: string
+          partner_earnings?: number
+          partner_id: string
+          period: Database["public"]["Enums"]["dbp_leaderboard_period"]
+          period_end?: string | null
+          period_start?: string | null
+          rank: number
+          revenue_generated?: number
+          scope?: string
+          score?: number
+          state?: string | null
+        }
+        Update: {
+          active_shops?: number
+          computed_at?: string
+          created_at?: string
+          district?: string | null
+          id?: string
+          partner_earnings?: number
+          partner_id?: string
+          period?: Database["public"]["Enums"]["dbp_leaderboard_period"]
+          period_end?: string | null
+          period_start?: string | null
+          rank?: number
+          revenue_generated?: number
+          scope?: string
+          score?: number
+          state?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_leaderboard_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "district_business_partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_milestones: {
+        Row: {
+          created_at: string
+          id: string
+          metadata: Json
+          milestone_code: string
+          partner_id: string
+          reward_id: string | null
+          shops_required: number
+          tier: Database["public"]["Enums"]["dbp_tier"] | null
+          unlocked: boolean
+          unlocked_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metadata?: Json
+          milestone_code: string
+          partner_id: string
+          reward_id?: string | null
+          shops_required: number
+          tier?: Database["public"]["Enums"]["dbp_tier"] | null
+          unlocked?: boolean
+          unlocked_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metadata?: Json
+          milestone_code?: string
+          partner_id?: string
+          reward_id?: string | null
+          shops_required?: number
+          tier?: Database["public"]["Enums"]["dbp_tier"] | null
+          unlocked?: boolean
+          unlocked_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_milestones_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "district_business_partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_milestones_reward_id_fkey"
+            columns: ["reward_id"]
+            isOneToOne: false
+            referencedRelation: "partner_rewards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_payouts: {
+        Row: {
+          amount: number
+          bank_account: Json | null
+          created_at: string
+          cycle_end: string
+          cycle_start: string
+          earnings_count: number
+          failure_reason: string | null
+          id: string
+          metadata: Json
+          partner_id: string
+          processed_at: string | null
+          status: Database["public"]["Enums"]["dbp_payout_status"]
+          updated_at: string
+          utr: string | null
+        }
+        Insert: {
+          amount: number
+          bank_account?: Json | null
+          created_at?: string
+          cycle_end: string
+          cycle_start: string
+          earnings_count?: number
+          failure_reason?: string | null
+          id?: string
+          metadata?: Json
+          partner_id: string
+          processed_at?: string | null
+          status?: Database["public"]["Enums"]["dbp_payout_status"]
+          updated_at?: string
+          utr?: string | null
+        }
+        Update: {
+          amount?: number
+          bank_account?: Json | null
+          created_at?: string
+          cycle_end?: string
+          cycle_start?: string
+          earnings_count?: number
+          failure_reason?: string | null
+          id?: string
+          metadata?: Json
+          partner_id?: string
+          processed_at?: string | null
+          status?: Database["public"]["Enums"]["dbp_payout_status"]
+          updated_at?: string
+          utr?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_payouts_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "district_business_partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_referrals: {
+        Row: {
+          converted_at: string | null
+          created_at: string
+          id: string
+          referred_mobile: string | null
+          referred_name: string | null
+          referred_partner_id: string | null
+          referred_user_id: string | null
+          referrer_partner_id: string
+          reward_amount: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          converted_at?: string | null
+          created_at?: string
+          id?: string
+          referred_mobile?: string | null
+          referred_name?: string | null
+          referred_partner_id?: string | null
+          referred_user_id?: string | null
+          referrer_partner_id: string
+          reward_amount?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          converted_at?: string | null
+          created_at?: string
+          id?: string
+          referred_mobile?: string | null
+          referred_name?: string | null
+          referred_partner_id?: string | null
+          referred_user_id?: string | null
+          referrer_partner_id?: string
+          reward_amount?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_referrals_referred_partner_id_fkey"
+            columns: ["referred_partner_id"]
+            isOneToOne: false
+            referencedRelation: "district_business_partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_referrals_referrer_partner_id_fkey"
+            columns: ["referrer_partner_id"]
+            isOneToOne: false
+            referencedRelation: "district_business_partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_rewards: {
+        Row: {
+          created_at: string
+          delivered_at: string | null
+          dispatched_at: string | null
+          id: string
+          metadata: Json
+          notes: string | null
+          partner_id: string
+          reward_code: string
+          reward_name: string
+          shops_required: number | null
+          status: Database["public"]["Enums"]["dbp_reward_status"]
+          tier: Database["public"]["Enums"]["dbp_tier"] | null
+          tracking_id: string | null
+          unlocked_at: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          delivered_at?: string | null
+          dispatched_at?: string | null
+          id?: string
+          metadata?: Json
+          notes?: string | null
+          partner_id: string
+          reward_code: string
+          reward_name: string
+          shops_required?: number | null
+          status?: Database["public"]["Enums"]["dbp_reward_status"]
+          tier?: Database["public"]["Enums"]["dbp_tier"] | null
+          tracking_id?: string | null
+          unlocked_at?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          delivered_at?: string | null
+          dispatched_at?: string | null
+          id?: string
+          metadata?: Json
+          notes?: string | null
+          partner_id?: string
+          reward_code?: string
+          reward_name?: string
+          shops_required?: number | null
+          status?: Database["public"]["Enums"]["dbp_reward_status"]
+          tier?: Database["public"]["Enums"]["dbp_tier"] | null
+          tracking_id?: string | null
+          unlocked_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_rewards_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "district_business_partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_shop_mapping: {
+        Row: {
+          activated_at: string | null
+          area: string | null
+          city: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          metadata: Json
+          mobile: string | null
+          owner_name: string | null
+          partner_id: string
+          revenue_generated: number
+          salon_id: string | null
+          shop_name: string
+          updated_at: string
+        }
+        Insert: {
+          activated_at?: string | null
+          area?: string | null
+          city?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          metadata?: Json
+          mobile?: string | null
+          owner_name?: string | null
+          partner_id: string
+          revenue_generated?: number
+          salon_id?: string | null
+          shop_name: string
+          updated_at?: string
+        }
+        Update: {
+          activated_at?: string | null
+          area?: string | null
+          city?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          metadata?: Json
+          mobile?: string | null
+          owner_name?: string | null
+          partner_id?: string
+          revenue_generated?: number
+          salon_id?: string | null
+          shop_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_shop_mapping_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "district_business_partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_shop_mapping_salon_id_fkey"
             columns: ["salon_id"]
             isOneToOne: false
             referencedRelation: "salons"
@@ -1566,6 +2235,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_district_partner: {
+        Args: { _partner_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_salon_owner: {
         Args: { _salon_id: string; _user_id: string }
         Returns: boolean
@@ -1621,6 +2294,14 @@ export type Database = {
       }
       recompute_customer_insights: { Args: never; Returns: number }
       recompute_nexora_scores: { Args: never; Returns: number }
+      recompute_partner_dashboard_metrics: {
+        Args: { _partner_id: string }
+        Returns: undefined
+      }
+      recompute_partner_leaderboard: {
+        Args: { _period: Database["public"]["Enums"]["dbp_leaderboard_period"] }
+        Returns: number
+      }
       refresh_salon_stats: { Args: never; Returns: undefined }
       release_expired_bookings: { Args: never; Returns: number }
       release_payment_to_wallet: {
@@ -1658,6 +2339,22 @@ export type Database = {
         | "growth_partner"
         | "district_partner"
         | "distributor"
+      dbp_earning_status: "pending" | "approved" | "paid" | "rejected"
+      dbp_earning_type:
+        | "activation_reward"
+        | "growth_share"
+        | "bonus"
+        | "milestone_bonus"
+      dbp_leaderboard_period: "weekly" | "monthly" | "all_time"
+      dbp_payout_status: "pending" | "processing" | "paid" | "failed"
+      dbp_reward_status: "pending" | "dispatched" | "delivered" | "cancelled"
+      dbp_status: "pending" | "verified" | "suspended" | "rejected"
+      dbp_tier:
+        | "welcome"
+        | "recognition"
+        | "growth_builder"
+        | "platinum"
+        | "leadership_circle"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1792,6 +2489,24 @@ export const Constants = {
         "growth_partner",
         "district_partner",
         "distributor",
+      ],
+      dbp_earning_status: ["pending", "approved", "paid", "rejected"],
+      dbp_earning_type: [
+        "activation_reward",
+        "growth_share",
+        "bonus",
+        "milestone_bonus",
+      ],
+      dbp_leaderboard_period: ["weekly", "monthly", "all_time"],
+      dbp_payout_status: ["pending", "processing", "paid", "failed"],
+      dbp_reward_status: ["pending", "dispatched", "delivered", "cancelled"],
+      dbp_status: ["pending", "verified", "suspended", "rejected"],
+      dbp_tier: [
+        "welcome",
+        "recognition",
+        "growth_builder",
+        "platinum",
+        "leadership_circle",
       ],
     },
   },
