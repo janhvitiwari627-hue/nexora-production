@@ -276,7 +276,8 @@ export const getSalonFinancials = createServerFn({ method: "GET" })
     }
     const byDay: Record<string, number> = {};
     for (const p of success) {
-      const day = p.created_at.slice(0, 10);
+      const day = (p.created_at ?? "").slice(0, 10);
+      if (!day) continue;
       byDay[day] = (byDay[day] ?? 0) + Number(p.amount);
     }
     return {
