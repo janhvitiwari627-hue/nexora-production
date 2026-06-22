@@ -72,7 +72,7 @@ export const logSecurityEvent = createServerFn({ method: "POST" })
     const { error } = await supabase.from("security_events").insert({
       user_id: userId,
       event_type: data.event_type,
-      event_details: (data.event_details ?? {}) as Record<string, unknown>,
+      event_details: (data.event_details ?? {}) as never,
     });
     if (error) throw new Error(error.message);
     return { ok: true };
