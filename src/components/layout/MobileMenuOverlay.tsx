@@ -122,11 +122,41 @@ export function MobileMenuOverlay({
             </nav>
 
             <div className="border-border bg-card flex flex-col gap-2 border-t p-4">
-              {isAuthed ? (
-                <Button variant="outline" className="h-11 font-semibold" onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Logout
-                </Button>
+              {!authResolved ? (
+                <>
+                  <Skeleton className="h-11 w-full rounded-md" />
+                  <Skeleton className="h-11 w-full rounded-md" />
+                </>
+              ) : isAuthed ? (
+                <>
+                  <div className="flex items-center gap-3 rounded-2xl bg-muted px-3 py-2">
+                    <div className="bg-gradient-cta grid h-10 w-10 place-items-center rounded-full text-sm font-bold text-primary-foreground">
+                      {(displayName[0] || "U").toUpperCase()}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-bold text-heading">{displayName}</div>
+                      {email && (
+                        <div className="truncate text-xs text-muted-foreground">{email}</div>
+                      )}
+                    </div>
+                  </div>
+                  <Button variant="outline" className="h-11 justify-start font-semibold" asChild>
+                    <Link to="/dashboard" onClick={onClose}>
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </Link>
+                  </Button>
+                  <Button variant="outline" className="h-11 justify-start font-semibold" asChild>
+                    <Link to="/profile" onClick={onClose}>
+                      <User className="mr-2 h-4 w-4" />
+                      Profile
+                    </Link>
+                  </Button>
+                  <Button variant="outline" className="h-11 justify-start font-semibold text-destructive hover:text-destructive" onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </Button>
+                </>
               ) : (
                 <>
                   <Button variant="outline" className="h-11 font-semibold" asChild>
