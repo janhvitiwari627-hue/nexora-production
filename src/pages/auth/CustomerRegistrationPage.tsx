@@ -250,11 +250,20 @@ export default function CustomerRegistrationPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <Tabs value={accountType} onValueChange={(v) => setAccountType(v as AccountType)}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="customer" className="gap-1.5"><User className="h-3.5 w-3.5" />Customer</TabsTrigger>
-              <TabsTrigger value="owner" className="gap-1.5"><Building2 className="h-3.5 w-3.5" />Salon Owner</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="customer" className="gap-1.5 text-xs sm:text-sm"><User className="h-3.5 w-3.5" />Customer</TabsTrigger>
+              <TabsTrigger value="owner" className="gap-1.5 text-xs sm:text-sm"><Building2 className="h-3.5 w-3.5" />Salon Owner</TabsTrigger>
+              <TabsTrigger value="district_partner" className="gap-1.5 text-xs sm:text-sm"><Crown className="h-3.5 w-3.5" />District Partner</TabsTrigger>
             </TabsList>
           </Tabs>
+
+          {accountType === "district_partner" && (
+            <Alert>
+              <AlertDescription className="text-xs">
+                District Business Partner application. After signup your application goes for verification — no joining fee, no investment, performance-based rewards.
+              </AlertDescription>
+            </Alert>
+          )}
 
           {accountType === "customer" && (
             <Button
