@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { MIN_WITHDRAWAL_AMOUNT } from "./owner.constants";
 
 // ---------- Owner context: list salons I own/manage ----------
 export const getMyOwnedSalons = createServerFn({ method: "GET" })
@@ -339,6 +340,9 @@ export const requestOwnerWithdrawal = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => WithdrawalRequestInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
+    if (data.amount < MIN_WITHDRAWAL_AMOUNT) {
+      throw new Error(`Minimum withdrawal is ₹${MIN_WITHDRAWAL_AMOUNT}`);
+    }
     const { data: wallet } = await supabase
       .from("salon_wallets").select("available_balance").eq("salon_id", data.salon_id).maybeSingle();
     const available = Number(wallet?.available_balance ?? 0);
