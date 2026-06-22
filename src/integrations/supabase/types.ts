@@ -457,11 +457,13 @@ export type Database = {
       }
       salons: {
         Row: {
+          address: string | null
           category: string | null
           created_at: string
           description: string | null
           discount: string | null
           distance: number | null
+          gallery_images: string[] | null
           id: string
           image_url: string | null
           is_verified: boolean
@@ -469,17 +471,21 @@ export type Database = {
           location: string | null
           longitude: number | null
           name: string
+          phone: string | null
           price_range: string | null
           rating: number
           reviews_count: number
+          slug: string
           updated_at: string
         }
         Insert: {
+          address?: string | null
           category?: string | null
           created_at?: string
           description?: string | null
           discount?: string | null
           distance?: number | null
+          gallery_images?: string[] | null
           id?: string
           image_url?: string | null
           is_verified?: boolean
@@ -487,17 +493,21 @@ export type Database = {
           location?: string | null
           longitude?: number | null
           name: string
+          phone?: string | null
           price_range?: string | null
           rating?: number
           reviews_count?: number
+          slug: string
           updated_at?: string
         }
         Update: {
+          address?: string | null
           category?: string | null
           created_at?: string
           description?: string | null
           discount?: string | null
           distance?: number | null
+          gallery_images?: string[] | null
           id?: string
           image_url?: string | null
           is_verified?: boolean
@@ -505,9 +515,11 @@ export type Database = {
           location?: string | null
           longitude?: number | null
           name?: string
+          phone?: string | null
           price_range?: string | null
           rating?: number
           reviews_count?: number
+          slug?: string
           updated_at?: string
         }
         Relationships: []
