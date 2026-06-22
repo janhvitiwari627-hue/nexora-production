@@ -5,9 +5,10 @@ import { mockUpcomingBooking } from "../mockUser";
 
 function formatDate(iso: string) {
   const d = new Date(iso);
-  return d.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" }) +
-    " · " +
-    d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+  const opts = { timeZone: "Asia/Kolkata" } as const;
+  const date = d.toLocaleDateString("en-IN", { ...opts, weekday: "short", day: "numeric", month: "short" });
+  const time = d.toLocaleTimeString("en-IN", { ...opts, hour: "2-digit", minute: "2-digit", hour12: true });
+  return `${date} · ${time}`;
 }
 
 export function UpcomingBookingWidget() {
