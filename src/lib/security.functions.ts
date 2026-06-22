@@ -93,7 +93,10 @@ export const listSecurityEventsAdmin = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false })
       .limit(200);
     if (error) throw new Error(error.message);
-    return data ?? [];
+    return (data ?? []).map((r) => ({
+      ...r,
+      ip_address: r.ip_address == null ? null : String(r.ip_address),
+    }));
   });
 
 // ---------- Admin: user listing + suspension ----------
