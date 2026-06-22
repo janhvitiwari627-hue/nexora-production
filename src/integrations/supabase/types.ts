@@ -853,6 +853,7 @@ export type Database = {
           price_level: number
           rating: number
           review_count: number
+          search_vector: unknown
           slug: string
           tagline: string | null
         }
@@ -870,6 +871,7 @@ export type Database = {
           price_level?: number
           rating?: number
           review_count?: number
+          search_vector?: unknown
           slug: string
           tagline?: string | null
         }
@@ -887,6 +889,7 @@ export type Database = {
           price_level?: number
           rating?: number
           review_count?: number
+          search_vector?: unknown
           slug?: string
           tagline?: string | null
         }
@@ -1091,6 +1094,24 @@ export type Database = {
         }[]
       }
       release_expired_bookings: { Args: never; Returns: number }
+      shops_search: {
+        Args: { _category?: string; _limit?: number; _q?: string }
+        Returns: {
+          area: string
+          category: string
+          city: string
+          cover_image: string
+          id: string
+          is_verified: boolean
+          name: string
+          price_level: string
+          rank: number
+          rating: number
+          review_count: number
+          slug: string
+          tagline: string
+        }[]
+      }
     }
     Enums: {
       app_role:
