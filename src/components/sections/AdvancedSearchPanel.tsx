@@ -163,7 +163,7 @@ function Section({
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-white/80">
+        <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#425466]">
           {icon}
           {title}
         </div>
@@ -178,7 +178,7 @@ function Chip({ label, onClick }: { label: string; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white transition hover:border-[#00D4FF] hover:bg-white/15 hover:shadow-[0_0_18px_rgba(0,212,255,0.4)]"
+      className="rounded-full border border-[#E6EBF1] bg-white px-3 py-1.5 text-xs font-semibold text-[#425466] transition hover:border-[#635BFF] hover:text-[#0A2540] hover:shadow-[0_2px_8px_rgba(99,91,255,0.15)]"
     >
       {label}
     </button>
