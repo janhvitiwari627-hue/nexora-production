@@ -23,6 +23,7 @@ import { FilterBottomSheet } from "./search/FilterBottomSheet";
 import { SortDropdown } from "./search/SortDropdown";
 import { ActiveFiltersBar } from "./search/ActiveFiltersBar";
 import { InstantBookingSection } from "./search/InstantBookingSection";
+import { VoiceSearchButton } from "@/components/search/VoiceSearchButton";
 import {
   DEFAULT_FILTERS,
   isDefault,
@@ -117,8 +118,14 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Search salons, services, areas…"
+                placeholder="Search salons, services, areas… or tap the mic"
                 className="flex-1 bg-transparent text-sm font-medium text-heading outline-none placeholder:text-muted-foreground"
+              />
+              <VoiceSearchButton
+                onTranscript={(text) => {
+                  setQ(text);
+                  onSearchChange({ ...search, q: text });
+                }}
               />
             </div>
             <div className="flex items-center gap-2 rounded-[var(--radius-card)] border border-border bg-background px-4 py-2.5 md:w-56">

@@ -84,6 +84,7 @@ import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising
 import { Route as OwnerJobsNewRouteImport } from './routes/owner.jobs.new'
 import { Route as DashboardBookingsIdRouteImport } from './routes/dashboard.bookings.$id'
 import { Route as ApiPublicHooksReleaseExpiredBookingsRouteImport } from './routes/api/public/hooks/release-expired-bookings'
+import { Route as ApiPublicHooksRecomputeRankingsRouteImport } from './routes/api/public/hooks/recompute-rankings'
 import { Route as ApiPublicHooksRecomputeInsightsRouteImport } from './routes/api/public/hooks/recompute-insights'
 import { Route as ApiPublicHooksProcessSettlementsRouteImport } from './routes/api/public/hooks/process-settlements'
 
@@ -463,6 +464,12 @@ const ApiPublicHooksReleaseExpiredBookingsRoute =
     path: '/api/public/hooks/release-expired-bookings',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksRecomputeRankingsRoute =
+  ApiPublicHooksRecomputeRankingsRouteImport.update({
+    id: '/api/public/hooks/recompute-rankings',
+    path: '/api/public/hooks/recompute-rankings',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksRecomputeInsightsRoute =
   ApiPublicHooksRecomputeInsightsRouteImport.update({
     id: '/api/public/hooks/recompute-insights',
@@ -553,6 +560,7 @@ export interface FileRoutesByFullPath {
   '/owner/jobs/new': typeof OwnerJobsNewRoute
   '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
+  '/api/public/hooks/recompute-rankings': typeof ApiPublicHooksRecomputeRankingsRoute
   '/api/public/hooks/release-expired-bookings': typeof ApiPublicHooksReleaseExpiredBookingsRoute
 }
 export interface FileRoutesByTo {
@@ -631,6 +639,7 @@ export interface FileRoutesByTo {
   '/owner/jobs/new': typeof OwnerJobsNewRoute
   '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
+  '/api/public/hooks/recompute-rankings': typeof ApiPublicHooksRecomputeRankingsRoute
   '/api/public/hooks/release-expired-bookings': typeof ApiPublicHooksReleaseExpiredBookingsRoute
 }
 export interface FileRoutesById {
@@ -711,6 +720,7 @@ export interface FileRoutesById {
   '/owner/jobs/new': typeof OwnerJobsNewRoute
   '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
+  '/api/public/hooks/recompute-rankings': typeof ApiPublicHooksRecomputeRankingsRoute
   '/api/public/hooks/release-expired-bookings': typeof ApiPublicHooksReleaseExpiredBookingsRoute
 }
 export interface FileRouteTypes {
@@ -792,6 +802,7 @@ export interface FileRouteTypes {
     | '/owner/jobs/new'
     | '/api/public/hooks/process-settlements'
     | '/api/public/hooks/recompute-insights'
+    | '/api/public/hooks/recompute-rankings'
     | '/api/public/hooks/release-expired-bookings'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -870,6 +881,7 @@ export interface FileRouteTypes {
     | '/owner/jobs/new'
     | '/api/public/hooks/process-settlements'
     | '/api/public/hooks/recompute-insights'
+    | '/api/public/hooks/recompute-rankings'
     | '/api/public/hooks/release-expired-bookings'
   id:
     | '__root__'
@@ -949,6 +961,7 @@ export interface FileRouteTypes {
     | '/owner/jobs/new'
     | '/api/public/hooks/process-settlements'
     | '/api/public/hooks/recompute-insights'
+    | '/api/public/hooks/recompute-rankings'
     | '/api/public/hooks/release-expired-bookings'
   fileRoutesById: FileRoutesById
 }
@@ -1007,6 +1020,7 @@ export interface RootRouteChildren {
   OwnerIndexRoute: typeof OwnerIndexRoute
   ApiPublicHooksProcessSettlementsRoute: typeof ApiPublicHooksProcessSettlementsRoute
   ApiPublicHooksRecomputeInsightsRoute: typeof ApiPublicHooksRecomputeInsightsRoute
+  ApiPublicHooksRecomputeRankingsRoute: typeof ApiPublicHooksRecomputeRankingsRoute
   ApiPublicHooksReleaseExpiredBookingsRoute: typeof ApiPublicHooksReleaseExpiredBookingsRoute
 }
 
@@ -1537,6 +1551,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksReleaseExpiredBookingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/recompute-rankings': {
+      id: '/api/public/hooks/recompute-rankings'
+      path: '/api/public/hooks/recompute-rankings'
+      fullPath: '/api/public/hooks/recompute-rankings'
+      preLoaderRoute: typeof ApiPublicHooksRecomputeRankingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/recompute-insights': {
       id: '/api/public/hooks/recompute-insights'
       path: '/api/public/hooks/recompute-insights'
@@ -1699,6 +1720,7 @@ const rootRouteChildren: RootRouteChildren = {
   OwnerIndexRoute: OwnerIndexRoute,
   ApiPublicHooksProcessSettlementsRoute: ApiPublicHooksProcessSettlementsRoute,
   ApiPublicHooksRecomputeInsightsRoute: ApiPublicHooksRecomputeInsightsRoute,
+  ApiPublicHooksRecomputeRankingsRoute: ApiPublicHooksRecomputeRankingsRoute,
   ApiPublicHooksReleaseExpiredBookingsRoute:
     ApiPublicHooksReleaseExpiredBookingsRoute,
 }
