@@ -64,12 +64,6 @@ export function PublicHeader() {
             <Link to="/dashboard/notifications"><Bell className="h-5 w-5" /></Link>
           </Button>
           <LocationChip className="mr-1 hidden lg:inline-flex" />
-          <Button variant="ghost" className="gap-1.5 font-semibold" asChild>
-            <Link to="/membership">
-              <Crown className="h-4 w-4 text-primary" />
-              Membership
-            </Link>
-          </Button>
           <Button variant="ghost" className="font-semibold" asChild>
             <Link to="/login">Login</Link>
           </Button>
