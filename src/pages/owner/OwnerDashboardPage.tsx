@@ -238,6 +238,31 @@ function statusChip(s: BookingStatus) {
 }
 
 function RecentBookingsList() {
+  const { activeSalonId } = useOwnerContext();
+  const qc = useQueryClient();
+  const updateStatus = useServerFn(updateOwnerBookingStatus);
+  const { data: bookings } = useQuery(ownerBookingsQuery(activeSalonId ?? ""));
+  const mutate = useMutation({
+    mutationFn: (vars: { booking_id: string; status: "confirmed" | "cancelled" }) =>
+      updateStatus({ data: vars }),
+    onSuccess: (_d, v) => {
+      toast.success(v.status === "confirmed" ? "Booking confirmed" : "Booking rejected");
+      if (activeSalonId) {
+        qc.invalidateQueries({ queryKey: ["owner", "bookings", activeSalonId] });
+        qc.invalidateQueries({ queryKey: ["owner", "metrics", activeSalonId] });
+      }
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const liveList = bookings && activeSalonId ? bookings.slice(0, 5).map((b) => ({
+    id: b.id,
+    customer: `Customer ${b.user_id.slice(0, 4)}`,
+    avatar: initials(b.user_id),
+    service: b.service_name,
+    time: `${b.booking_date} · ${fmtTime(b.booking_time)}`,
+    status: b.status as BookingStatus,
+  })) : null;
+  const list = liveList ?? mockRecentBookings;
   return (
     <Card className="p-5">
       <div className="flex items-center justify-between">
@@ -248,7 +273,12 @@ function RecentBookingsList() {
         <Button variant="ghost" size="sm" className="text-primary">View all</Button>
       </div>
       <div className="mt-4 space-y-2">
-        {recentBookings.map((b) => (
+        {list.length === 0 && (
+          <div className="rounded-xl border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
+            No bookings yet.
+          </div>
+        )}
+        {list.map((b) => (
           <div key={b.id} className="flex items-center gap-3 rounded-xl border border-border p-3">
             <Avatar className="h-9 w-9"><AvatarFallback className="bg-primary/10 text-primary text-xs">{b.avatar}</AvatarFallback></Avatar>
             <div className="min-w-0 flex-1">
@@ -256,10 +286,18 @@ function RecentBookingsList() {
               <div className="truncate text-xs text-muted-foreground">{b.service} · {b.time}</div>
             </div>
             {statusChip(b.status)}
-            {b.status === "pending" && (
+            {b.status === "pending" && liveList && (
               <div className="flex gap-1">
-                <Button size="icon" variant="outline" className="h-8 w-8 text-success"><Check className="h-4 w-4" /></Button>
-                <Button size="icon" variant="outline" className="h-8 w-8 text-danger"><X className="h-4 w-4" /></Button>
+                <Button size="icon" variant="outline" className="h-8 w-8 text-success"
+                  disabled={mutate.isPending}
+                  onClick={() => mutate.mutate({ booking_id: b.id, status: "confirmed" })}>
+                  <Check className="h-4 w-4" />
+                </Button>
+                <Button size="icon" variant="outline" className="h-8 w-8 text-danger"
+                  disabled={mutate.isPending}
+                  onClick={() => mutate.mutate({ booking_id: b.id, status: "cancelled" })}>
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
             )}
           </div>
@@ -270,24 +308,58 @@ function RecentBookingsList() {
 }
 
 function PendingApprovalsWidget() {
+  const { activeSalonId } = useOwnerContext();
+  const qc = useQueryClient();
+  const updateStatus = useServerFn(updateOwnerBookingStatus);
+  const { data: bookings } = useQuery(ownerBookingsQuery(activeSalonId ?? ""));
+  const mutate = useMutation({
+    mutationFn: (vars: { booking_id: string; status: "confirmed" | "cancelled" }) =>
+      updateStatus({ data: vars }),
+    onSuccess: (_d, v) => {
+      toast.success(v.status === "confirmed" ? "Accepted" : "Rejected");
+      if (activeSalonId) {
+        qc.invalidateQueries({ queryKey: ["owner", "bookings", activeSalonId] });
+        qc.invalidateQueries({ queryKey: ["owner", "metrics", activeSalonId] });
+      }
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const livePending = bookings && activeSalonId
+    ? bookings.filter((b) => b.status === "pending").slice(0, 5).map((b) => ({
+        id: b.id,
+        customer: `Customer ${b.user_id.slice(0, 4)}`,
+        service: b.service_name,
+        time: `${b.booking_date} · ${fmtTime(b.booking_time)}`,
+      }))
+    : null;
+  const list = livePending ?? mockPending;
   return (
     <Card className="p-5">
       <div className="flex items-center justify-between">
         <div className="text-sm font-semibold text-heading">Pending Approvals</div>
-        <Badge className="border-0 bg-warning/10 text-warning">{pendingApprovals.length} waiting</Badge>
+        <Badge className="border-0 bg-warning/10 text-warning">{list.length} waiting</Badge>
       </div>
       <div className="mt-3 space-y-2">
-        {pendingApprovals.map((p) => (
+        {list.length === 0 && (
+          <div className="rounded-xl border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
+            All caught up — no pending requests.
+          </div>
+        )}
+        {list.map((p) => (
           <div key={p.id} className="flex items-center justify-between gap-3 rounded-xl border border-border p-3">
             <div className="min-w-0">
               <div className="truncate text-sm font-medium text-heading">{p.customer}</div>
               <div className="truncate text-xs text-muted-foreground">{p.service} · {p.time}</div>
             </div>
             <div className="flex gap-1.5">
-              <Button size="sm" className="h-8 gap-1 bg-success text-white hover:bg-success/90">
+              <Button size="sm" className="h-8 gap-1 bg-success text-white hover:bg-success/90"
+                disabled={!livePending || mutate.isPending}
+                onClick={() => livePending && mutate.mutate({ booking_id: p.id, status: "confirmed" })}>
                 <Check className="h-4 w-4" />Accept
               </Button>
-              <Button size="sm" variant="outline" className="h-8 gap-1 text-danger">
+              <Button size="sm" variant="outline" className="h-8 gap-1 text-danger"
+                disabled={!livePending || mutate.isPending}
+                onClick={() => livePending && mutate.mutate({ booking_id: p.id, status: "cancelled" })}>
                 <X className="h-4 w-4" />Reject
               </Button>
             </div>
