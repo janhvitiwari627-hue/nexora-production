@@ -111,7 +111,36 @@ function KPICards() {
 
 function RevenueChart() {
   const [range, setRange] = useState<"daily" | "weekly" | "monthly">("daily");
-  const data = range === "daily" ? revenueDaily : range === "weekly" ? revenueWeekly : revenueMonthly;
+  const { activeSalonId } = useOwnerContext();
+  const days = range === "daily" ? 14 : range === "weekly" ? 56 : 180;
+  const { data: series } = useQuery(ownerAnalyticsQuery(activeSalonId ?? "", days));
+  const liveData = useMemo(() => {
+    if (!series || !activeSalonId) return null;
+    if (range === "daily") {
+      return series.slice(-14).map((d) => ({
+        label: new Date(d.date).toLocaleDateString("en-IN", { day: "numeric", month: "short" }),
+        revenue: d.revenue,
+      }));
+    }
+    if (range === "weekly") {
+      const out: { label: string; revenue: number }[] = [];
+      for (let i = 0; i < series.length; i += 7) {
+        const chunk = series.slice(i, i + 7);
+        out.push({ label: `W${Math.floor(i / 7) + 1}`, revenue: chunk.reduce((a, c) => a + c.revenue, 0) });
+      }
+      return out;
+    }
+    const byMonth = new Map<string, number>();
+    for (const d of series) {
+      const k = d.date.slice(0, 7);
+      byMonth.set(k, (byMonth.get(k) ?? 0) + d.revenue);
+    }
+    return Array.from(byMonth.entries()).map(([k, v]) => ({
+      label: new Date(k + "-01").toLocaleDateString("en-IN", { month: "short" }),
+      revenue: v,
+    }));
+  }, [series, range, activeSalonId]);
+  const data = liveData ?? (range === "daily" ? revenueDaily : range === "weekly" ? revenueWeekly : revenueMonthly);
   return (
     <Card className="p-5">
       <div className="flex items-center justify-between">
