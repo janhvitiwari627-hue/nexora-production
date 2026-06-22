@@ -1,8 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 import { MIN_WITHDRAWAL_AMOUNT } from "./owner.constants";
 import { DAILY_WITHDRAWAL_LIMIT, MONTHLY_WITHDRAWAL_LIMIT } from "./owner.validation";
+
+type AuthedSupabase = SupabaseClient<Database>;
 
 // ---------- Owner context: list salons I own/manage ----------
 export const getMyOwnedSalons = createServerFn({ method: "GET" })
@@ -558,4 +562,49 @@ export const bulkUpdateServicePricing = createServerFn({ method: "POST" })
       if (upErr) throw new Error(upErr.message);
     }
     return { updated: updates.length };
+  });
+
+// ---------- Salon gallery (live photos) ----------
+const SalonIdInput = z.object({ salon_id: z.string().uuid() });
+
+async function assertOwnsSalon(supabase: AuthedSupabase, userId: string, salonId: string) {
+  const { data } = await supabase.rpc("is_salon_owner", { _user_id: userId, _salon_id: salonId });
+  if (!data) throw new Error("Forbidden");
+}
+
+export const getSalonGallery = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => SalonIdInput.parse(d))
+  .handler(async ({ data, context }) => {
+    await assertOwnsSalon(context.supabase, context.userId, data.salon_id);
+    const { data: salon, error } = await context.supabase
+      .from("salons")
+      .select("gallery_images, cover_image_url")
+      .eq("id", data.salon_id)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return {
+      images: (salon?.gallery_images ?? []) as string[],
+      cover: salon?.cover_image_url ?? null,
+    };
+  });
+
+const SetGalleryInput = z.object({
+  salon_id: z.string().uuid(),
+  images: z.array(z.string().url()).max(20),
+  cover: z.string().url().nullable().optional(),
+});
+export const setSalonGallery = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => SetGalleryInput.parse(d))
+  .handler(async ({ data, context }) => {
+    await assertOwnsSalon(context.supabase, context.userId, data.salon_id);
+    const patch: { gallery_images: string[]; cover_image_url?: string | null } = {
+      gallery_images: data.images,
+    };
+    if (data.cover !== undefined) patch.cover_image_url = data.cover;
+    const { error } = await context.supabase
+      .from("salons").update(patch).eq("id", data.salon_id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
