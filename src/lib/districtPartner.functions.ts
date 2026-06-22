@@ -290,7 +290,7 @@ export const requestPartnerPayout = createServerFn({ method: "POST" })
       .object({
         partner_id: z.string().uuid(),
         amount: z.number().positive().max(10000000),
-        bank_account: z.record(z.string(), z.unknown()).optional(),
+        bank_account: z.any().optional(),
       })
       .parse(input),
   )
