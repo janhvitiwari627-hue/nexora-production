@@ -24,7 +24,7 @@ export function WHero({ shop, template }: { shop: ShopData; template: TemplateCo
       </section>
     );
   }
-  if (variant === "fullBleed") {
+  if (variant === "fullBleed" || variant === "video") {
     return (
       <section className="relative grid h-[70vh] place-items-center overflow-hidden text-white">
         <img src={shop.coverImage} alt={shop.name} className="absolute inset-0 h-full w-full object-cover" />
