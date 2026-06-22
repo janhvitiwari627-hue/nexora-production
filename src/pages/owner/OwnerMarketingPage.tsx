@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,9 +18,11 @@ import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
-  CalendarDays, Edit2, Megaphone, Plus, Sparkles, Trash2, TrendingUp, Wand2,
+  CalendarDays, Copy, Edit2, Megaphone, Plus, Sparkles, Trash2, TrendingUp, Wand2, Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useOwnerContext } from "@/hooks/use-owner-context";
+import { generateMarketingCopy } from "@/lib/owner.functions";
 import {
   INITIAL_OFFERS, INITIAL_CAMPAIGNS, INITIAL_AUTOMATIONS, AI_SUGGESTIONS,
   type Offer, type Campaign,
