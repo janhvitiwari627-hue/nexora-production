@@ -42,6 +42,7 @@ import { Route as OwnerTemplatesRouteImport } from './routes/owner.templates'
 import { Route as OwnerStaffRouteImport } from './routes/owner.staff'
 import { Route as OwnerServicesRouteImport } from './routes/owner.services'
 import { Route as OwnerReviewsRouteImport } from './routes/owner.reviews'
+import { Route as OwnerPendingRouteImport } from './routes/owner.pending'
 import { Route as OwnerPaymentsRouteImport } from './routes/owner.payments'
 import { Route as OwnerOnboardingRouteImport } from './routes/owner.onboarding'
 import { Route as OwnerMarketingRouteImport } from './routes/owner.marketing'
@@ -247,6 +248,11 @@ const OwnerServicesRoute = OwnerServicesRouteImport.update({
 const OwnerReviewsRoute = OwnerReviewsRouteImport.update({
   id: '/owner/reviews',
   path: '/owner/reviews',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OwnerPendingRoute = OwnerPendingRouteImport.update({
+  id: '/owner/pending',
+  path: '/owner/pending',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OwnerPaymentsRoute = OwnerPaymentsRouteImport.update({
@@ -515,6 +521,7 @@ export interface FileRoutesByFullPath {
   '/owner/marketing': typeof OwnerMarketingRoute
   '/owner/onboarding': typeof OwnerOnboardingRoute
   '/owner/payments': typeof OwnerPaymentsRoute
+  '/owner/pending': typeof OwnerPendingRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/owner/staff': typeof OwnerStaffRoute
@@ -590,6 +597,7 @@ export interface FileRoutesByTo {
   '/owner/marketing': typeof OwnerMarketingRoute
   '/owner/onboarding': typeof OwnerOnboardingRoute
   '/owner/payments': typeof OwnerPaymentsRoute
+  '/owner/pending': typeof OwnerPendingRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/owner/staff': typeof OwnerStaffRoute
@@ -667,6 +675,7 @@ export interface FileRoutesById {
   '/owner/marketing': typeof OwnerMarketingRoute
   '/owner/onboarding': typeof OwnerOnboardingRoute
   '/owner/payments': typeof OwnerPaymentsRoute
+  '/owner/pending': typeof OwnerPendingRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/owner/staff': typeof OwnerStaffRoute
@@ -745,6 +754,7 @@ export interface FileRouteTypes {
     | '/owner/marketing'
     | '/owner/onboarding'
     | '/owner/payments'
+    | '/owner/pending'
     | '/owner/reviews'
     | '/owner/services'
     | '/owner/staff'
@@ -820,6 +830,7 @@ export interface FileRouteTypes {
     | '/owner/marketing'
     | '/owner/onboarding'
     | '/owner/payments'
+    | '/owner/pending'
     | '/owner/reviews'
     | '/owner/services'
     | '/owner/staff'
@@ -896,6 +907,7 @@ export interface FileRouteTypes {
     | '/owner/marketing'
     | '/owner/onboarding'
     | '/owner/payments'
+    | '/owner/pending'
     | '/owner/reviews'
     | '/owner/services'
     | '/owner/staff'
@@ -957,6 +969,7 @@ export interface RootRouteChildren {
   OwnerMarketingRoute: typeof OwnerMarketingRoute
   OwnerOnboardingRoute: typeof OwnerOnboardingRoute
   OwnerPaymentsRoute: typeof OwnerPaymentsRoute
+  OwnerPendingRoute: typeof OwnerPendingRoute
   OwnerReviewsRoute: typeof OwnerReviewsRoute
   OwnerServicesRoute: typeof OwnerServicesRoute
   OwnerStaffRoute: typeof OwnerStaffRoute
@@ -1200,6 +1213,13 @@ declare module '@tanstack/react-router' {
       path: '/owner/reviews'
       fullPath: '/owner/reviews'
       preLoaderRoute: typeof OwnerReviewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/owner/pending': {
+      id: '/owner/pending'
+      path: '/owner/pending'
+      fullPath: '/owner/pending'
+      preLoaderRoute: typeof OwnerPendingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/owner/payments': {
@@ -1625,6 +1645,7 @@ const rootRouteChildren: RootRouteChildren = {
   OwnerMarketingRoute: OwnerMarketingRoute,
   OwnerOnboardingRoute: OwnerOnboardingRoute,
   OwnerPaymentsRoute: OwnerPaymentsRoute,
+  OwnerPendingRoute: OwnerPendingRoute,
   OwnerReviewsRoute: OwnerReviewsRoute,
   OwnerServicesRoute: OwnerServicesRoute,
   OwnerStaffRoute: OwnerStaffRoute,

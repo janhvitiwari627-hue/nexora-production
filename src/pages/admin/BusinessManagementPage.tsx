@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import {
   ADMIN_BUSINESSES, STATUS_META, type AdminBusiness, type BusinessStatus,
 } from "./mockBusinesses";
+import { PendingOwnersPanel } from "@/components/admin/PendingOwnersPanel";
 
 type SortKey = "name" | "joinedAt" | "totalBookings" | "revenue" | "rating";
 
@@ -96,6 +97,9 @@ export function BusinessManagementPage() {
         <h1 className="text-2xl font-bold tracking-tight">Business Management</h1>
         <p className="text-sm text-muted-foreground">Approve, review and moderate businesses across the platform.</p>
       </div>
+
+      <PendingOwnersPanel />
+
 
       <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
         <TabsList>

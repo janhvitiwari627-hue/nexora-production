@@ -11,13 +11,146 @@ export const getMyOwnedSalons = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("salon_owners")
-      .select("role, salon:salons(id, name, slug, image_url, location, address, phone, rating, reviews_count)")
-      .eq("user_id", userId);
+      .select("role, is_approved, salon:salons(id, name, slug, image_url, location, address, phone, rating, reviews_count)")
+      .eq("user_id", userId)
+      .eq("is_approved", true);
     if (error) throw new Error(error.message);
     return (data ?? []).map((row) => ({
       role: row.role as "owner" | "manager",
       salon: row.salon,
     })).filter((r) => !!r.salon);
+  });
+
+// ---------- Owner approval status (pending owners) ----------
+export const getMyOwnerApprovalStatus = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data, error } = await supabase
+      .from("salon_owners")
+      .select("id, is_approved, approved_at, salon:salons(id, name, slug)")
+      .eq("user_id", userId)
+      .order("approved_at", { ascending: false, nullsFirst: true });
+    if (error) throw new Error(error.message);
+    const links = data ?? [];
+    return {
+      hasAnyLink: links.length > 0,
+      hasApprovedLink: links.some((l) => l.is_approved),
+      pending: links.filter((l) => !l.is_approved).map((l) => ({
+        id: l.id,
+        salon: l.salon,
+      })),
+    };
+  });
+
+// ---------- Referral code validation (used during signup) ----------
+const ReferralInput = z.object({
+  code: z.string().trim().min(3).max(20),
+});
+export const validateReferralCode = createServerFn({ method: "GET" })
+  .inputValidator((d: unknown) => ReferralInput.parse(d))
+  .handler(async ({ data }) => {
+    // Public read via service-role bypass would be ideal, but we use anon-safe RPC.
+    // Profiles allows public SELECT in this project, so this is fine.
+    const { createClient } = await import("@supabase/supabase-js");
+    const supabase = createClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_PUBLISHABLE_KEY!,
+      { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
+    );
+    const { data: row } = await supabase
+      .from("profiles").select("full_name").eq("referral_code", data.code.toUpperCase()).maybeSingle();
+    return { valid: !!row, referrerName: row?.full_name ?? null };
+  });
+
+// ---------- Salon owner self-registration ----------
+const RegisterSalonInput = z.object({
+  name: z.string().trim().min(2).max(120),
+  phone: z.string().trim().regex(/^[+]?[0-9]{10,15}$/),
+  city: z.string().trim().min(2).max(80).optional(),
+  address: z.string().trim().max(255).optional(),
+});
+export const registerMySalon = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => RegisterSalonInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    // Slug = name kebab + short suffix
+    const base = data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "salon";
+    const suffix = Math.random().toString(36).slice(2, 7);
+    const slug = `${base}-${suffix}`;
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: salon, error: sErr } = await supabaseAdmin
+      .from("salons")
+      .insert({ name: data.name, slug, phone: data.phone, city: data.city, address: data.address, is_active: false })
+      .select().single();
+    if (sErr) throw new Error(sErr.message);
+
+    const { error: lErr } = await supabaseAdmin
+      .from("salon_owners")
+      .insert({ user_id: userId, salon_id: salon.id, role: "owner", is_approved: false });
+    if (lErr) throw new Error(lErr.message);
+
+    return { salon_id: salon.id, slug };
+  });
+
+// ---------- Admin: pending salon-owner approvals ----------
+export const listPendingOwnerApprovals = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: isAdmin } = await context.supabase
+      .rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: links, error } = await supabaseAdmin
+      .from("salon_owners")
+      .select("id, created_at, user_id, salon:salons(id, name, slug, city, phone)")
+      .eq("is_approved", false)
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    const rows = links ?? [];
+    const userIds = Array.from(new Set(rows.map((r) => r.user_id)));
+    if (userIds.length === 0) return rows.map((r) => ({ ...r, user: null }));
+    const { data: profiles } = await supabaseAdmin
+      .from("profiles")
+      .select("id, full_name, email, mobile")
+      .in("id", userIds);
+    const byId = new Map((profiles ?? []).map((p) => [p.id, p]));
+    return rows.map((r) => ({ ...r, user: byId.get(r.user_id) ?? null }));
+  });
+
+const ApprovalActionInput = z.object({
+  salon_owner_id: z.string().uuid(),
+  approve: z.boolean(),
+});
+export const setOwnerApproval = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => ApprovalActionInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { data: isAdmin } = await context.supabase
+      .rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    if (data.approve) {
+      const { error } = await supabaseAdmin
+        .from("salon_owners")
+        .update({ is_approved: true, approved_at: new Date().toISOString(), approved_by: context.userId })
+        .eq("id", data.salon_owner_id);
+      if (error) throw new Error(error.message);
+      // Activate salon when first owner is approved.
+      const { data: link } = await supabaseAdmin
+        .from("salon_owners").select("salon_id").eq("id", data.salon_owner_id).maybeSingle();
+      if (link?.salon_id) {
+        await supabaseAdmin.from("salons").update({ is_active: true }).eq("id", link.salon_id);
+      }
+    } else {
+      // Reject = delete the link (admin can re-add later).
+      const { error } = await supabaseAdmin
+        .from("salon_owners").delete().eq("id", data.salon_owner_id);
+      if (error) throw new Error(error.message);
+    }
+    return { ok: true };
   });
 
 // ---------- Dashboard metrics ----------

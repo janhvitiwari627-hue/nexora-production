@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -21,7 +22,7 @@ import { useOwnerContext } from "@/hooks/use-owner-context";
 import {
   ownerDashboardMetricsQuery, ownerAnalyticsQuery, ownerBookingsQuery,
 } from "@/lib/owner.queries";
-import { updateOwnerBookingStatus } from "@/lib/owner.functions";
+import { updateOwnerBookingStatus, getMyOwnerApprovalStatus } from "@/lib/owner.functions";
 import {
   ownerBusiness, kpis as mockKpis, revenueDaily, revenueWeekly, revenueMonthly,
   calendarDensity, calendarFirstWeekday, calendarMonthLabel,
@@ -483,8 +484,22 @@ function QuickActionsRow() {
 }
 
 export function OwnerDashboardPage() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(ownerBusiness.isOpen);
   const { activeSalon, isLoading: ctxLoading } = useOwnerContext();
+  const fetchApprovalStatus = useServerFn(getMyOwnerApprovalStatus);
+  const { data: approvalStatus } = useQuery({
+    queryKey: ["owner", "approval-status"],
+    queryFn: () => fetchApprovalStatus(),
+    enabled: !ctxLoading && !activeSalon, // only check when there's no approved salon
+  });
+  // Pending owner (has a salon link but not yet approved) → redirect.
+  useEffect(() => {
+    if (approvalStatus?.hasAnyLink && !approvalStatus.hasApprovedLink) {
+      navigate({ to: "/owner/pending" });
+    }
+  }, [approvalStatus, navigate]);
+
   // Compute greeting on the client only to avoid SSR/CSR hydration mismatch
   // (server's hour can differ from the user's local hour).
   const [greeting, setGreeting] = useState("Welcome");
