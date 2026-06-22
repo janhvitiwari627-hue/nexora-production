@@ -241,14 +241,14 @@ export const releaseBookingEscrow = createServerFn({ method: "POST" })
       .eq("status", "SUCCESS")
       .eq("released_to_wallet", false);
 
-    const results: Array<Record<string, unknown>> = [];
+    let released = 0;
     for (const p of payments ?? []) {
-      const { data: r, error } = await supabaseAdmin.rpc("release_payment_to_wallet", {
+      const { error } = await supabaseAdmin.rpc("release_payment_to_wallet", {
         _payment_id: p.id,
       });
-      if (!error) results.push(r);
+      if (!error) released += 1;
     }
-    return { released: results.length, results };
+    return { released };
   });
 
 // ---------- Financial analytics ----------
