@@ -59,3 +59,17 @@ export const ownerSalonFullQuery = (salonId: string) =>
     queryFn: () => getOwnerSalonFull({ data: { salon_id: salonId } }),
     enabled: !!salonId,
   });
+
+export const ownerWalletQuery = (salonId: string) =>
+  queryOptions({
+    queryKey: ["owner", "wallet", salonId],
+    queryFn: () => getOwnerWallet({ data: { salon_id: salonId } }),
+    enabled: !!salonId,
+  });
+
+export const ownerWithdrawalsQuery = (salonId: string) =>
+  queryOptions({
+    queryKey: ["owner", "withdrawals", salonId],
+    queryFn: () => listOwnerWithdrawals({ data: { salon_id: salonId } }),
+    enabled: !!salonId,
+  });
