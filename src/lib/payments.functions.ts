@@ -241,7 +241,7 @@ export const releaseBookingEscrow = createServerFn({ method: "POST" })
       .eq("status", "SUCCESS")
       .eq("released_to_wallet", false);
 
-    const results: unknown[] = [];
+    const results: Array<Record<string, unknown>> = [];
     for (const p of payments ?? []) {
       const { data: r, error } = await supabaseAdmin.rpc("release_payment_to_wallet", {
         _payment_id: p.id,
