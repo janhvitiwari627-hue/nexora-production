@@ -66,9 +66,9 @@ export function MembershipPage() {
               <div className={cn("absolute inset-0 bg-gradient-to-br opacity-100", p.color)} />
               <div className="relative">
                 {p.featured && <span className="bg-card text-primary mb-3 inline-block rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wider">Most Popular</span>}
-                <h3 className="text-3xl font-black">{p.name}</h3>
+                <h3 className="text-2xl font-black sm:text-3xl">{p.name}</h3>
                 <div className="mt-3 flex items-baseline gap-1">
-                  <span className="text-4xl font-black">₹{billing === "month" ? Math.round(p.price / 10) : p.price}</span>
+                  <span className="text-3xl font-black sm:text-4xl">₹{billing === "month" ? Math.round(p.price / 10) : p.price}</span>
                   <span className="text-sm opacity-80">/{billing === "month" ? "mo" : "yr"}</span>
                 </div>
                 <ul className="mt-6 space-y-2.5 text-sm">
