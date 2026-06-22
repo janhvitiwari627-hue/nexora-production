@@ -3,16 +3,23 @@ import {
   Award,
   BadgeCheck,
   Building2,
+  Car,
   CheckCircle2,
   Crown,
+  FileText,
   Gift,
   Handshake,
   IndianRupee,
+  Laptop,
+  Medal,
   Network,
   Rocket,
   ShieldCheck,
+  Shirt,
   Sparkles,
+  Star,
   Store,
+  Tablet,
   Target,
   TrendingUp,
   Trophy,
@@ -20,6 +27,75 @@ import {
   Wallet,
   Zap,
 } from "lucide-react";
+
+const dbpBenefits = [
+  { icon: Trophy, label: "Hall Of Fame Recognition" },
+  { icon: Crown, label: "Leadership Status" },
+  { icon: Building2, label: "District Level Visibility" },
+  { icon: Users, label: "Community Influence" },
+  { icon: Network, label: "Business Network Expansion" },
+  { icon: IndianRupee, label: "Revenue Based Rewards" },
+  { icon: Medal, label: "Milestone Recognition" },
+  { icon: Rocket, label: "Growth Leadership Identity" },
+  { icon: Star, label: "Premium Partner Recognition" },
+  { icon: Sparkles, label: "Future Leadership Opportunities" },
+];
+
+const milestones = [
+  {
+    shops: "25",
+    title: "Welcome Tier",
+    rewards: [
+      { icon: Gift, label: "Welcome Kit" },
+      { icon: FileText, label: "Certificate" },
+    ],
+    color: "from-slate-500 to-slate-700",
+    ring: "border-slate-300 dark:border-slate-700",
+  },
+  {
+    shops: "50",
+    title: "Recognition Tier",
+    rewards: [
+      { icon: Shirt, label: "Official Nexora T-Shirt" },
+      { icon: BadgeCheck, label: "Recognition Badge" },
+    ],
+    color: "from-blue-500 to-indigo-600",
+    ring: "border-blue-300 dark:border-blue-800",
+  },
+  {
+    shops: "100",
+    title: "Growth Builder",
+    rewards: [
+      { icon: Tablet, label: "Tablet" },
+      { icon: BadgeCheck, label: "Growth Builder Badge" },
+    ],
+    color: "from-emerald-500 to-teal-600",
+    ring: "border-emerald-300 dark:border-emerald-800",
+  },
+  {
+    shops: "500",
+    title: "Platinum Growth Partner",
+    rewards: [
+      { icon: Laptop, label: "Branded Laptop" },
+      { icon: Crown, label: "Platinum Status" },
+    ],
+    color: "from-purple-500 to-fuchsia-600",
+    ring: "border-purple-300 dark:border-purple-800",
+  },
+  {
+    shops: "1000+",
+    title: "District Business Partner",
+    rewards: [
+      { icon: Car, label: "Car Reward Eligibility" },
+      { icon: Trophy, label: "Hall Of Fame Entry" },
+      { icon: Crown, label: "Leadership Circle" },
+      { icon: ShieldCheck, label: "District Authority Status" },
+    ],
+    color: "from-amber-500 via-orange-500 to-rose-600",
+    ring: "border-amber-400 dark:border-amber-600",
+    featured: true,
+  },
+];
 
 const trustBadges = [
   { icon: ShieldCheck, label: "No Joining Fee" },
@@ -339,8 +415,89 @@ export default function DistrictBusinessPartnerPage() {
         </div>
       </section>
 
+      {/* DBP BENEFITS */}
+      <section className="px-6 py-20">
+        <div className="mx-auto max-w-6xl">
+          <div className="text-center">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-sm font-medium text-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
+              <Crown className="h-4 w-4" /> District Business Partner Benefits
+            </div>
+            <h2 className="text-3xl font-bold md:text-4xl">Leadership. Recognition. Growth.</h2>
+            <p className="mt-3 text-muted-foreground">Sirf earning nahi — pura district leadership package.</p>
+          </div>
+
+          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            {dbpBenefits.map(({ icon: Icon, label }) => (
+              <div
+                key={label}
+                className="group flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-5 text-center transition hover:-translate-y-1 hover:border-amber-300 hover:shadow-lg dark:hover:border-amber-700"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-orange-100 text-amber-700 transition group-hover:from-amber-500 group-hover:to-orange-600 group-hover:text-white dark:from-amber-950/40 dark:to-orange-950/40 dark:text-amber-300">
+                  <Icon className="h-6 w-6" />
+                </div>
+                <span className="text-sm font-semibold leading-snug">{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* MILESTONE REWARDS */}
+      <section className="bg-muted/30 px-6 py-20">
+        <div className="mx-auto max-w-6xl">
+          <div className="text-center">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-sm font-medium text-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-200">
+              <Medal className="h-4 w-4" /> Milestone Reward System
+            </div>
+            <h2 className="text-3xl font-bold md:text-4xl">Active Shops → Real Rewards</h2>
+            <p className="mt-3 text-muted-foreground">Jitne zyada active shops, utna bada milestone.</p>
+          </div>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {milestones.map((m) => (
+              <div
+                key={m.shops}
+                className={`relative overflow-hidden rounded-3xl border-2 ${m.ring} bg-card p-7 transition hover:shadow-xl ${m.featured ? "lg:col-span-3 lg:grid lg:grid-cols-[1fr_2fr] lg:gap-8" : ""}`}
+              >
+                <div className={`absolute -right-12 -top-12 h-40 w-40 rounded-full bg-gradient-to-br ${m.color} opacity-20 blur-2xl`} />
+                <div className="relative">
+                  <div className={`inline-flex items-center gap-2 rounded-full bg-gradient-to-r ${m.color} px-3 py-1 text-xs font-bold uppercase tracking-wide text-white shadow`}>
+                    <Store className="h-3.5 w-3.5" /> {m.shops} Active Shops
+                  </div>
+                  <h3 className="mt-4 text-2xl font-extrabold">{m.title}</h3>
+                  {m.featured && (
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      Founder Recognition · District Authority · Top-Tier Leadership
+                    </p>
+                  )}
+                </div>
+
+                <div className={`relative mt-6 grid gap-3 ${m.featured ? "sm:grid-cols-2 lg:mt-0" : ""}`}>
+                  {m.rewards.map(({ icon: Icon, label }) => (
+                    <div
+                      key={label}
+                      className="flex items-center gap-3 rounded-xl border border-border bg-background/60 p-3 backdrop-blur"
+                    >
+                      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br ${m.color} text-white shadow`}>
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <span className="text-sm font-semibold">{label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <p className="mx-auto mt-10 max-w-3xl text-center text-sm text-muted-foreground">
+            Rewards verified active shops par based hain. Milestones cumulative hain — har tier unlock hote hi reward dispatch hota hai.
+          </p>
+        </div>
+      </section>
+
       {/* HALL OF FAME teaser */}
       <section className="px-6 py-20">
+
         <div className="mx-auto max-w-4xl rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 p-10 text-center dark:border-amber-900/40 dark:from-amber-950/20 dark:via-orange-950/10 dark:to-rose-950/20">
           <Trophy className="mx-auto h-12 w-12 text-amber-600" />
           <h2 className="mt-4 text-3xl font-bold md:text-4xl">Hall of Fame</h2>
