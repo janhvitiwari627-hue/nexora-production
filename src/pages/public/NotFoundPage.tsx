@@ -8,7 +8,7 @@ export function NotFoundPage() {
         <div className="bg-gradient-cta text-primary-foreground mx-auto grid h-24 w-24 place-items-center rounded-3xl shadow-[var(--shadow-glow)]">
           <Compass className="h-10 w-10" />
         </div>
-        <h1 className="text-heading mt-6 text-7xl font-black tracking-tight" style={{ fontFamily: "Inter, sans-serif" }}>404</h1>
+        <h1 className="text-heading mt-6 text-6xl font-black tracking-tight sm:text-7xl" style={{ fontFamily: "Inter, sans-serif" }}>404</h1>
         <h2 className="text-heading mt-2 text-xl font-bold">Page not found</h2>
         <p className="text-muted-foreground mt-2 text-sm">The page you're looking for doesn't exist or has moved. Let's get you back on track.</p>
         <div className="mt-7 flex flex-wrap justify-center gap-2">

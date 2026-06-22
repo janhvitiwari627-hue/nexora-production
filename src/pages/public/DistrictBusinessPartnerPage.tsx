@@ -391,7 +391,7 @@ export default function DistrictBusinessPartnerPage() {
                 <div className="relative">
                   <div className="text-sm font-medium text-white/60">Phase {i + 1}</div>
                   <div className="mt-1 text-xl font-bold">{t.period}</div>
-                  <div className={`mt-6 bg-gradient-to-r ${t.color} bg-clip-text text-6xl font-extrabold text-transparent`}>
+                  <div className={`mt-6 bg-gradient-to-r ${t.color} bg-clip-text text-4xl font-extrabold text-transparent sm:text-5xl md:text-6xl`}>
                     {t.share}
                   </div>
                   <div className="mt-2 text-sm text-white/70">Partner Share</div>

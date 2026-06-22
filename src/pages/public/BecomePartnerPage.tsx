@@ -99,10 +99,10 @@ export function BecomePartnerPage() {
                 <input type="range" min={300} max={5000} step={100} value={avg} onChange={(e) => setAvg(+e.target.value)} className="mt-2 w-full accent-white" />
               </div>
             </div>
-            <div className="border-white/20 mt-6 grid grid-cols-3 gap-3 border-t pt-4 text-center">
-              <div><div className="text-xs text-white/70">Monthly</div><div className="text-lg font-black">₹{(projected.monthly/1000).toFixed(0)}k</div></div>
-              <div><div className="text-xs text-white/70">Platform fee</div><div className="text-lg font-black">₹{(projected.platformFee/1000).toFixed(1)}k</div></div>
-              <div><div className="text-xs text-white/70">Your earnings</div><div className="text-2xl font-black text-amber-300">₹{(projected.earnings/1000).toFixed(0)}k</div></div>
+            <div className="border-white/20 mt-6 grid grid-cols-3 gap-2 border-t pt-4 text-center sm:gap-3">
+              <div><div className="text-[10px] text-white/70 sm:text-xs">Monthly</div><div className="text-base font-black sm:text-lg">₹{(projected.monthly/1000).toFixed(0)}k</div></div>
+              <div><div className="text-[10px] text-white/70 sm:text-xs">Platform fee</div><div className="text-base font-black sm:text-lg">₹{(projected.platformFee/1000).toFixed(1)}k</div></div>
+              <div><div className="text-[10px] text-white/70 sm:text-xs">Your earnings</div><div className="text-xl font-black text-amber-300 sm:text-2xl">₹{(projected.earnings/1000).toFixed(0)}k</div></div>
             </div>
           </div>
         </div>
@@ -208,7 +208,7 @@ export function BecomePartnerPage() {
                 <div key={t.label} className={`relative overflow-hidden rounded-[var(--radius-card)] bg-gradient-to-br ${t.tone} p-6 text-white shadow-[var(--shadow-card)]`}>
                   <TrendingUp className="h-6 w-6 opacity-90" />
                   <div className="mt-3 text-xs font-black uppercase tracking-wider text-white/85">{t.label}</div>
-                  <div className="mt-1 text-5xl font-black">{t.pct}</div>
+                  <div className="mt-1 text-4xl font-black sm:text-5xl">{t.pct}</div>
                   <div className="mt-1 text-sm font-semibold text-white/90">Partner Share</div>
                 </div>
               ))}
