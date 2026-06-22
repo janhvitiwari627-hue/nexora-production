@@ -272,6 +272,118 @@ export function BecomePartnerPage() {
         </div>
       </section>
 
+      {/* 4. Milestone Rewards · 5. Partner Benefits · 6. Program Highlights */}
+      <section className="mx-auto max-w-6xl px-4 py-20 md:px-6">
+        {/* 4. Milestone Rewards */}
+        <div>
+          <div className="flex items-center gap-3">
+            <span className="bg-gradient-cta text-primary-foreground grid h-10 w-10 place-items-center rounded-xl text-sm font-black shadow-[var(--shadow-glow)]">4</span>
+            <h3 className="text-heading text-2xl font-black md:text-3xl">Milestone Rewards</h3>
+            <span className="ml-auto hidden rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary md:inline-block">Unlock as you grow</span>
+          </div>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                count: "25",
+                label: "Active Shops",
+                tone: "from-emerald-400 to-emerald-600",
+                items: ["🎁 Welcome Kit", "🎽 Official Nexora T-Shirt"],
+              },
+              {
+                count: "100",
+                label: "Active Shops",
+                tone: "from-sky-400 to-indigo-600",
+                items: ["🏅 Growth Builder Badge", "📱 Tablet Reward"],
+              },
+              {
+                count: "500",
+                label: "Active Shops",
+                tone: "from-amber-400 to-orange-600",
+                items: ["💻 Branded Laptop", "👑 Platinum Growth Partner Status"],
+              },
+              {
+                count: "1000+",
+                label: "Active Shops",
+                tone: "from-fuchsia-500 via-rose-500 to-amber-500",
+                items: [
+                  "🚘 Car Reward Program Eligibility",
+                  "🏆 District Business Partner",
+                  "🏆 Leadership Circle",
+                  "🏆 Hall Of Fame Entry",
+                ],
+              },
+            ].map((m) => (
+              <article key={m.count} className="border-border bg-card overflow-hidden rounded-[var(--radius-card)] border shadow-[var(--shadow-card)]">
+                <div className={`bg-gradient-to-br ${m.tone} p-5 text-white`}>
+                  <div className="text-xs font-black uppercase tracking-wider text-white/80">{m.label}</div>
+                  <div className="mt-1 text-4xl font-black">{m.count}</div>
+                </div>
+                <ul className="space-y-2.5 p-5">
+                  {m.items.map((it) => (
+                    <li key={it} className="text-heading text-sm font-semibold">{it}</li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        {/* 5 & 6 side-by-side */}
+        <div className="mt-16 grid gap-6 md:grid-cols-2">
+          {/* 5. Partner Benefits */}
+          <div className="border-border bg-card rounded-[var(--radius-card)] border p-7 shadow-[var(--shadow-card)]">
+            <div className="flex items-center gap-3">
+              <span className="bg-gradient-cta text-primary-foreground grid h-10 w-10 place-items-center rounded-xl text-sm font-black shadow-[var(--shadow-glow)]">5</span>
+              <h3 className="text-heading text-xl font-black md:text-2xl">Partner Benefits</h3>
+            </div>
+            <ul className="mt-6 space-y-3">
+              {[
+                "One-Time Activation Reward",
+                "Every 7 Days Growth Share",
+                "Hall Of Fame Recognition",
+                "Leadership Status",
+                "Business Network Building",
+                "Long-Term Opportunity",
+              ].map((b) => (
+                <li key={b} className="flex items-start gap-3 text-sm">
+                  <BadgeCheck className="text-success mt-0.5 h-5 w-5 shrink-0" />
+                  <span className="text-heading font-semibold">{b}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* 6. Program Highlights */}
+          <div className="relative overflow-hidden rounded-[var(--radius-card)] bg-gradient-to-br from-[#0A2540] via-[#1a1060] to-[#635BFF] p-7 text-white shadow-[var(--shadow-card)]">
+            <div className="absolute inset-0 opacity-15 [background-image:radial-gradient(circle_at_2px_2px,white_1px,transparent_0)] [background-size:24px_24px]" />
+            <div className="relative">
+              <div className="flex items-center gap-3">
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-white/15 text-sm font-black backdrop-blur">6</span>
+                <h3 className="text-xl font-black md:text-2xl">Program Highlights</h3>
+              </div>
+              <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+                {[
+                  "No Joining Fee",
+                  "No Investment",
+                  "No Franchise Fee",
+                  "No Hidden Charges",
+                  "100% Transparent System",
+                  "Real Shops",
+                  "Real Growth",
+                  "Real Rewards",
+                ].map((h) => (
+                  <li key={h} className="flex items-start gap-2 text-sm">
+                    <BadgeCheck className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
+                    <span className="font-semibold">{h}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Steps */}
       <section className="mx-auto max-w-6xl px-4 py-20 md:px-6">
         <h2 className="text-heading text-center text-3xl font-black md:text-4xl">How to join in 4 steps</h2>
