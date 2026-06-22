@@ -668,9 +668,11 @@ export type Database = {
           logo_url: string | null
           longitude: number | null
           name: string
+          nexora_score: number
           phone: string | null
           pincode: string | null
           price_range: string | null
+          rank_in_city: number | null
           rating: number
           reviews_count: number
           seo_description: string | null
@@ -708,9 +710,11 @@ export type Database = {
           logo_url?: string | null
           longitude?: number | null
           name: string
+          nexora_score?: number
           phone?: string | null
           pincode?: string | null
           price_range?: string | null
+          rank_in_city?: number | null
           rating?: number
           reviews_count?: number
           seo_description?: string | null
@@ -748,9 +752,11 @@ export type Database = {
           logo_url?: string | null
           longitude?: number | null
           name?: string
+          nexora_score?: number
           phone?: string | null
           pincode?: string | null
           price_range?: string | null
+          rank_in_city?: number | null
           rating?: number
           reviews_count?: number
           seo_description?: string | null
@@ -1155,6 +1161,7 @@ export type Database = {
           reviews_count: number
         }[]
       }
+      recompute_nexora_scores: { Args: never; Returns: number }
       release_expired_bookings: { Args: never; Returns: number }
       shops_search: {
         Args: { _category?: string; _limit?: number; _q?: string }
