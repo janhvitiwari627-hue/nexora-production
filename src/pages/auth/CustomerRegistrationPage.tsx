@@ -10,11 +10,12 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Mail, CheckCircle2, User, Building2, BadgeCheck, XCircle } from "lucide-react";
+import { Loader2, Mail, CheckCircle2, User, Building2, BadgeCheck, XCircle, Crown } from "lucide-react";
 import { PasswordStrengthIndicator, scorePassword } from "@/components/auth/PasswordStrengthIndicator";
 import { validateReferralCode, registerMySalon } from "@/lib/owner.functions";
+import { registerDistrictPartner } from "@/lib/districtPartner.functions";
 
-type AccountType = "customer" | "owner";
+type AccountType = "customer" | "owner" | "district_partner";
 
 const baseSchema = z.object({
   full_name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
@@ -30,11 +31,17 @@ const ownerSchema = baseSchema.extend({
   business_name: z.string().trim().min(2, "Business name is required").max(120),
   business_city: z.string().trim().max(80).optional().or(z.literal("")),
 });
+const dbpSchema = baseSchema.extend({
+  district: z.string().trim().min(2, "District is required").max(80),
+  state: z.string().trim().max(80).optional().or(z.literal("")),
+});
 
 export default function CustomerRegistrationPage() {
   const navigate = useNavigate();
   const search = useSearch({ strict: false }) as { ref?: string; role?: AccountType };
-  const [accountType, setAccountType] = useState<AccountType>(search?.role === "owner" ? "owner" : "customer");
+  const initialRole: AccountType =
+    search?.role === "owner" || search?.role === "district_partner" ? search.role : "customer";
+  const [accountType, setAccountType] = useState<AccountType>(initialRole);
   const [form, setForm] = useState({
     full_name: "",
     email: "",
@@ -43,6 +50,8 @@ export default function CustomerRegistrationPage() {
     referred_by: "",
     business_name: "",
     business_city: "",
+    district: "",
+    state: "",
   });
 
   useEffect(() => {
@@ -77,6 +86,7 @@ export default function CustomerRegistrationPage() {
   }, [form.referred_by, validateRef]);
 
   const registerSalonFn = useServerFn(registerMySalon);
+  const registerDbpFn = useServerFn(registerDistrictPartner);
   const pwStrength = useMemo(() => scorePassword(form.password), [form.password]);
 
   const update = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,7 +98,8 @@ export default function CustomerRegistrationPage() {
     setServerError(null);
     setErrors({});
 
-    const schema = accountType === "owner" ? ownerSchema : baseSchema;
+    const schema =
+      accountType === "owner" ? ownerSchema : accountType === "district_partner" ? dbpSchema : baseSchema;
     const parsed = schema.safeParse(form);
     if (!parsed.success) {
       const flat: Record<string, string> = {};
@@ -140,8 +151,24 @@ export default function CustomerRegistrationPage() {
             },
           });
         } catch (err) {
-          // Don't block signup — just log; admin can re-add salon later.
           console.error("Salon registration failed:", err);
+        }
+      }
+
+      // If district partner: create DBP application after session.
+      if (accountType === "district_partner" && data.session) {
+        try {
+          await registerDbpFn({
+            data: {
+              full_name: form.full_name,
+              mobile: form.mobile,
+              email: form.email,
+              district: form.district,
+              state: form.state || undefined,
+            },
+          });
+        } catch (err) {
+          console.error("DBP registration failed:", err);
         }
       }
 
@@ -151,7 +178,14 @@ export default function CustomerRegistrationPage() {
         return;
       }
 
-      navigate({ to: accountType === "owner" ? "/owner/pending" : "/" });
+      navigate({
+        to:
+          accountType === "owner"
+            ? "/owner/pending"
+            : accountType === "district_partner"
+              ? "/partner/district"
+              : "/",
+      });
     } catch (err) {
       setServerError(err instanceof Error ? err.message : "Sign up failed");
     } finally {
@@ -216,11 +250,20 @@ export default function CustomerRegistrationPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <Tabs value={accountType} onValueChange={(v) => setAccountType(v as AccountType)}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="customer" className="gap-1.5"><User className="h-3.5 w-3.5" />Customer</TabsTrigger>
-              <TabsTrigger value="owner" className="gap-1.5"><Building2 className="h-3.5 w-3.5" />Salon Owner</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="customer" className="gap-1.5 text-xs sm:text-sm"><User className="h-3.5 w-3.5" />Customer</TabsTrigger>
+              <TabsTrigger value="owner" className="gap-1.5 text-xs sm:text-sm"><Building2 className="h-3.5 w-3.5" />Salon Owner</TabsTrigger>
+              <TabsTrigger value="district_partner" className="gap-1.5 text-xs sm:text-sm"><Crown className="h-3.5 w-3.5" />District Partner</TabsTrigger>
             </TabsList>
           </Tabs>
+
+          {accountType === "district_partner" && (
+            <Alert>
+              <AlertDescription className="text-xs">
+                District Business Partner application. After signup your application goes for verification — no joining fee, no investment, performance-based rewards.
+              </AlertDescription>
+            </Alert>
+          )}
 
           {accountType === "customer" && (
             <Button
@@ -268,7 +311,7 @@ export default function CustomerRegistrationPage() {
               <Input
                 id="mobile" type="tel" value={form.mobile} onChange={update("mobile")}
                 autoComplete="tel" placeholder="+91 9876543210"
-                required={accountType === "owner"}
+                required={accountType !== "customer"}
               />
               {errors.mobile && <p className="text-xs text-destructive">{errors.mobile}</p>}
             </div>
@@ -283,6 +326,20 @@ export default function CustomerRegistrationPage() {
                 <div className="space-y-1">
                   <Label htmlFor="business_city">City <span className="text-xs text-muted-foreground">(optional)</span></Label>
                   <Input id="business_city" value={form.business_city} onChange={update("business_city")} placeholder="Mumbai" />
+                </div>
+              </>
+            )}
+
+            {accountType === "district_partner" && (
+              <>
+                <div className="space-y-1">
+                  <Label htmlFor="district">District</Label>
+                  <Input id="district" value={form.district} onChange={update("district")} required placeholder="e.g. Jaipur" />
+                  {errors.district && <p className="text-xs text-destructive">{errors.district}</p>}
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="state">State <span className="text-xs text-muted-foreground">(optional)</span></Label>
+                  <Input id="state" value={form.state} onChange={update("state")} placeholder="Rajasthan" />
                 </div>
               </>
             )}
@@ -315,7 +372,11 @@ export default function CustomerRegistrationPage() {
 
             <Button type="submit" className="w-full" disabled={submitting}>
               {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Mail className="mr-2 h-4 w-4" />}
-              {accountType === "owner" ? "Register business" : "Create account"}
+              {accountType === "owner"
+                ? "Register business"
+                : accountType === "district_partner"
+                  ? "Apply as District Partner"
+                  : "Create account"}
             </Button>
           </form>
 
