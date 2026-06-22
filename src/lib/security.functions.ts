@@ -38,7 +38,10 @@ export const listMyLoginEvents = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false })
       .limit(50);
     if (error) throw new Error(error.message);
-    return data ?? [];
+    return (data ?? []).map((r) => ({
+      ...r,
+      ip_address: r.ip_address == null ? null : String(r.ip_address),
+    }));
   });
 
 export const revokeLoginEvent = createServerFn({ method: "POST" })
