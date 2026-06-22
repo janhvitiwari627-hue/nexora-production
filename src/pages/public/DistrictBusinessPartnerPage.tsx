@@ -3,16 +3,23 @@ import {
   Award,
   BadgeCheck,
   Building2,
+  Car,
   CheckCircle2,
   Crown,
+  FileText,
   Gift,
   Handshake,
   IndianRupee,
+  Laptop,
+  Medal,
   Network,
   Rocket,
   ShieldCheck,
+  Shirt,
   Sparkles,
+  Star,
   Store,
+  Tablet,
   Target,
   TrendingUp,
   Trophy,
@@ -20,6 +27,75 @@ import {
   Wallet,
   Zap,
 } from "lucide-react";
+
+const dbpBenefits = [
+  { icon: Trophy, label: "Hall Of Fame Recognition" },
+  { icon: Crown, label: "Leadership Status" },
+  { icon: Building2, label: "District Level Visibility" },
+  { icon: Users, label: "Community Influence" },
+  { icon: Network, label: "Business Network Expansion" },
+  { icon: IndianRupee, label: "Revenue Based Rewards" },
+  { icon: Medal, label: "Milestone Recognition" },
+  { icon: Rocket, label: "Growth Leadership Identity" },
+  { icon: Star, label: "Premium Partner Recognition" },
+  { icon: Sparkles, label: "Future Leadership Opportunities" },
+];
+
+const milestones = [
+  {
+    shops: "25",
+    title: "Welcome Tier",
+    rewards: [
+      { icon: Gift, label: "Welcome Kit" },
+      { icon: FileText, label: "Certificate" },
+    ],
+    color: "from-slate-500 to-slate-700",
+    ring: "border-slate-300 dark:border-slate-700",
+  },
+  {
+    shops: "50",
+    title: "Recognition Tier",
+    rewards: [
+      { icon: Shirt, label: "Official Nexora T-Shirt" },
+      { icon: BadgeCheck, label: "Recognition Badge" },
+    ],
+    color: "from-blue-500 to-indigo-600",
+    ring: "border-blue-300 dark:border-blue-800",
+  },
+  {
+    shops: "100",
+    title: "Growth Builder",
+    rewards: [
+      { icon: Tablet, label: "Tablet" },
+      { icon: BadgeCheck, label: "Growth Builder Badge" },
+    ],
+    color: "from-emerald-500 to-teal-600",
+    ring: "border-emerald-300 dark:border-emerald-800",
+  },
+  {
+    shops: "500",
+    title: "Platinum Growth Partner",
+    rewards: [
+      { icon: Laptop, label: "Branded Laptop" },
+      { icon: Crown, label: "Platinum Status" },
+    ],
+    color: "from-purple-500 to-fuchsia-600",
+    ring: "border-purple-300 dark:border-purple-800",
+  },
+  {
+    shops: "1000+",
+    title: "District Business Partner",
+    rewards: [
+      { icon: Car, label: "Car Reward Eligibility" },
+      { icon: Trophy, label: "Hall Of Fame Entry" },
+      { icon: Crown, label: "Leadership Circle" },
+      { icon: ShieldCheck, label: "District Authority Status" },
+    ],
+    color: "from-amber-500 via-orange-500 to-rose-600",
+    ring: "border-amber-400 dark:border-amber-600",
+    featured: true,
+  },
+];
 
 const trustBadges = [
   { icon: ShieldCheck, label: "No Joining Fee" },
