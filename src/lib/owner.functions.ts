@@ -91,7 +91,7 @@ export const updateOwnerBookingStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => UpdateBookingStatusInput.parse(d))
   .handler(async ({ data, context }) => {
-    const patch: Record<string, unknown> = { status: data.status };
+    const patch: { status: typeof data.status; cancelled_at?: string; notes?: string } = { status: data.status };
     if (data.status === "cancelled") patch.cancelled_at = new Date().toISOString();
     if (data.notes !== undefined) patch.notes = data.notes;
     const { data: row, error } = await context.supabase
