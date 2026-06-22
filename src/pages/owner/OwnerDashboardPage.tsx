@@ -483,8 +483,22 @@ function QuickActionsRow() {
 }
 
 export function OwnerDashboardPage() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(ownerBusiness.isOpen);
   const { activeSalon, isLoading: ctxLoading } = useOwnerContext();
+  const fetchApprovalStatus = useServerFn(getMyOwnerApprovalStatus);
+  const { data: approvalStatus } = useQuery({
+    queryKey: ["owner", "approval-status"],
+    queryFn: () => fetchApprovalStatus(),
+    enabled: !ctxLoading && !activeSalon, // only check when there's no approved salon
+  });
+  // Pending owner (has a salon link but not yet approved) → redirect.
+  useEffect(() => {
+    if (approvalStatus?.hasAnyLink && !approvalStatus.hasApprovedLink) {
+      navigate({ to: "/owner/pending" });
+    }
+  }, [approvalStatus, navigate]);
+
   // Compute greeting on the client only to avoid SSR/CSR hydration mismatch
   // (server's hour can differ from the user's local hour).
   const [greeting, setGreeting] = useState("Welcome");
