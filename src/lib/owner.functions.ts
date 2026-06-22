@@ -103,13 +103,21 @@ export const listPendingOwnerApprovals = createServerFn({ method: "GET" })
       .rpc("has_role", { _user_id: context.userId, _role: "admin" });
     if (!isAdmin) throw new Error("Forbidden");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data, error } = await supabaseAdmin
+    const { data: links, error } = await supabaseAdmin
       .from("salon_owners")
-      .select("id, created_at, salon:salons(id, name, slug, city, phone), user:profiles!salon_owners_user_id_fkey(id, full_name, email, mobile)")
+      .select("id, created_at, user_id, salon:salons(id, name, slug, city, phone)")
       .eq("is_approved", false)
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
-    return data ?? [];
+    const rows = links ?? [];
+    const userIds = Array.from(new Set(rows.map((r) => r.user_id)));
+    if (userIds.length === 0) return rows.map((r) => ({ ...r, user: null }));
+    const { data: profiles } = await supabaseAdmin
+      .from("profiles")
+      .select("id, full_name, email, mobile")
+      .in("id", userIds);
+    const byId = new Map((profiles ?? []).map((p) => [p.id, p]));
+    return rows.map((r) => ({ ...r, user: byId.get(r.user_id) ?? null }));
   });
 
 const ApprovalActionInput = z.object({
