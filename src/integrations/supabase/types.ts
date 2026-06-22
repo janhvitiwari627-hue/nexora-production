@@ -455,6 +455,38 @@ export type Database = {
           },
         ]
       }
+      salon_owners: {
+        Row: {
+          created_at: string
+          id: string
+          role: string
+          salon_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: string
+          salon_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: string
+          salon_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "salon_owners_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       salons: {
         Row: {
           address: string | null
@@ -748,6 +780,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_salon_owner: {
+        Args: { _salon_id: string; _user_id: string }
         Returns: boolean
       }
       nearby_salons: {
