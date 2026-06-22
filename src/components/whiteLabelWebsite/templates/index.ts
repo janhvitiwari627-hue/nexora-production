@@ -12,9 +12,9 @@ export interface TemplateConfig {
 }
 
 export const TEMPLATES: Record<string, TemplateConfig> = {
-  RoyalLuxe:     { name: "Royal Luxe",     hero: "centered",  header: "elegant", footer: "rich",    font: "Playfair Display", radius: "0.5rem", colors: { primary: "#7C2D12", secondary: "#D4AF37" } },
-  UrbanPro:      { name: "Urban Pro",      hero: "split",     header: "bold",    footer: "compact", font: "Inter",            radius: "0.25rem", colors: { primary: "#1F2937", secondary: "#F97316" } },
-  BeautyBlossom: { name: "Beauty Blossom", hero: "fullBleed", header: "minimal", footer: "rich",    font: "Quicksand",        radius: "1.5rem",  colors: { primary: "#EC4899", secondary: "#F472B6" } },
+  RoyalLuxe:     { name: "Royal Luxe",     hero: "video",     header: "elegant", footer: "rich",    font: "Playfair Display", radius: "0.5rem",  colors: { primary: "#0A0A0A", secondary: "#D4AF37" } },
+  UrbanPro:      { name: "Urban Pro",      hero: "split",     header: "bold",    footer: "compact", font: "Inter",            radius: "0.25rem", colors: { primary: "#E11D2E", secondary: "#1F2937" } },
+  BeautyBlossom: { name: "Beauty Blossom", hero: "fullBleed", header: "minimal", footer: "rich",    font: "Quicksand",        radius: "1.5rem",  colors: { primary: "#F472B6", secondary: "#B76E79" } },
   DarkPrestige:  { name: "Dark Prestige",  hero: "fullBleed", header: "bold",    footer: "compact", font: "Inter",            radius: "0.5rem",  colors: { primary: "#0F172A", secondary: "#D4AF37" } },
   MinimalZen:    { name: "Minimal Zen",    hero: "split",     header: "minimal", footer: "compact", font: "Inter",            radius: "0",       colors: { primary: "#0F172A", secondary: "#64748B" } },
   SpaSerenity:   { name: "Spa Serenity",   hero: "centered",  header: "minimal", footer: "rich",    font: "Lora",             radius: "2rem",    colors: { primary: "#14B8A6", secondary: "#A7F3D0" } },
