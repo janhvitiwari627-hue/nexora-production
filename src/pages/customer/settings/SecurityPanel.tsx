@@ -4,6 +4,7 @@ import { Switch } from "@/components/ui/switch";
 import { ACTIVE_DEVICES, LOGIN_HISTORY, type ActiveDevice } from "./mockSettings";
 import { Field, inputCls, PanelShell } from "./PersonalInfoPanel";
 import { ModalShell } from "./ContactInfoPanel";
+import { LiveActiveSessionsPanel } from "./LiveActiveSessionsPanel";
 
 function strength(pw: string) {
   let s = 0;
