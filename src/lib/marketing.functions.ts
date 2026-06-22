@@ -78,16 +78,17 @@ export const sendRetentionCampaign = createServerFn({ method: "POST" })
       .from("marketing_campaigns")
       .insert({
         salon_id: data.salonId,
-        name: data.campaignName ?? "Retention — Mock WhatsApp",
-        channel: "whatsapp",
+        campaign_type: "retention",
+        title: data.campaignName ?? "Retention — Mock WhatsApp",
+        message: `Mock WhatsApp blast to ${messages.length} at-risk customers`,
+        target_segment: "at_risk",
         status: "sent",
-        audience_size: messages.length,
         sent_count: messages.length,
-        payload: { mock: true, messages },
       })
       .select("id")
       .single();
     if (campErr) throw new Error(campErr.message);
+
 
     // Drop in-app notifications so customers see the offer immediately
     if (messages.length) {
