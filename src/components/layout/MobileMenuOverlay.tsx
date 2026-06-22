@@ -1,8 +1,9 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Briefcase, Building2, Handshake, LogOut, Sparkles, X } from "lucide-react";
+import { ArrowRight, Briefcase, Building2, Handshake, LayoutDashboard, LogOut, Sparkles, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthStore } from "@/stores/authStore";
 
 const NAV = [
@@ -21,9 +22,12 @@ export function MobileMenuOverlay({
 }) {
   const [mounted, setMounted] = useState(false);
   const user = useAuthStore((s) => s.user);
+  const profile = useAuthStore((s) => s.profile);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
   const signOut = useAuthStore((s) => s.signOut);
   const navigate = useNavigate();
-  const isAuthed = mounted && !!user;
+  const authResolved = mounted && isInitialized;
+  const isAuthed = authResolved && !!user;
 
   useEffect(() => setMounted(true), []);
 
@@ -40,8 +44,13 @@ export function MobileMenuOverlay({
   const handleLogout = async () => {
     onClose();
     await signOut();
-    navigate({ to: "/" });
+    navigate({ to: "/", replace: true });
   };
+
+  const displayName =
+    profile?.full_name ||
+    (user?.email ? user.email.split("@")[0] : "Account");
+  const email = user?.email ?? "";
 
   return (
     <AnimatePresence>
