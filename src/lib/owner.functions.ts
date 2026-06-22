@@ -261,3 +261,48 @@ export const generateMarketingCopy = createServerFn({ method: "POST" })
       return { sms: text, whatsapp: text, email_subject: "", email_body: text };
     }
   });
+
+// ---------- Salon (website builder) ----------
+export const getOwnerSalonFull = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => SalonInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase
+      .from("salons").select("*").eq("id", data.salon_id).single();
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+const SalonUpdateInput = z.object({
+  salon_id: z.string().uuid(),
+  patch: z.object({
+    name: z.string().trim().min(1).max(120).optional(),
+    tagline: z.string().max(200).nullable().optional(),
+    description: z.string().max(2000).nullable().optional(),
+    image_url: z.string().url().nullable().optional(),
+    brand_primary: z.string().regex(/^#[0-9a-fA-F]{6}$/).nullable().optional(),
+    brand_secondary: z.string().regex(/^#[0-9a-fA-F]{6}$/).nullable().optional(),
+    theme: z.string().max(40).nullable().optional(),
+    custom_css: z.string().max(20000).nullable().optional(),
+    seo_title: z.string().max(120).nullable().optional(),
+    seo_description: z.string().max(300).nullable().optional(),
+    phone: z.string().max(20).nullable().optional(),
+    email: z.string().email().max(160).nullable().optional(),
+    address: z.string().max(300).nullable().optional(),
+    location: z.string().max(120).nullable().optional(),
+    hours: z.record(z.string(), z.object({
+      open: z.string(), close: z.string(), closed: z.boolean(),
+    })).nullable().optional(),
+    gallery_images: z.array(z.string().url()).max(50).optional(),
+  }),
+});
+
+export const updateOwnerSalon = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => SalonUpdateInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { error, data: row } = await context.supabase
+      .from("salons").update(data.patch).eq("id", data.salon_id).select().single();
+    if (error) throw new Error(error.message);
+    return row;
+  });

@@ -6,6 +6,7 @@ import {
   listOwnerServices,
   listOwnerStaff,
   getOwnerAnalyticsTimeseries,
+  getOwnerSalonFull,
 } from "./owner.functions";
 
 export const myOwnedSalonsQuery = () =>
@@ -46,5 +47,13 @@ export const ownerAnalyticsQuery = (salonId: string, days = 30) =>
   queryOptions({
     queryKey: ["owner", "analytics", salonId, days],
     queryFn: () => getOwnerAnalyticsTimeseries({ data: { salon_id: salonId, days } }),
+    enabled: !!salonId,
+  });
+
+
+export const ownerSalonFullQuery = (salonId: string) =>
+  queryOptions({
+    queryKey: ["owner", "salon-full", salonId],
+    queryFn: () => getOwnerSalonFull({ data: { salon_id: salonId } }),
     enabled: !!salonId,
   });

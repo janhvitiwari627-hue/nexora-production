@@ -490,12 +490,17 @@ export type Database = {
       salons: {
         Row: {
           address: string | null
+          brand_primary: string | null
+          brand_secondary: string | null
           category: string | null
           created_at: string
+          custom_css: string | null
           description: string | null
           discount: string | null
           distance: number | null
+          email: string | null
           gallery_images: string[] | null
+          hours: Json | null
           id: string
           image_url: string | null
           is_verified: boolean
@@ -507,17 +512,26 @@ export type Database = {
           price_range: string | null
           rating: number
           reviews_count: number
+          seo_description: string | null
+          seo_title: string | null
           slug: string
+          tagline: string | null
+          theme: string | null
           updated_at: string
         }
         Insert: {
           address?: string | null
+          brand_primary?: string | null
+          brand_secondary?: string | null
           category?: string | null
           created_at?: string
+          custom_css?: string | null
           description?: string | null
           discount?: string | null
           distance?: number | null
+          email?: string | null
           gallery_images?: string[] | null
+          hours?: Json | null
           id?: string
           image_url?: string | null
           is_verified?: boolean
@@ -529,17 +543,26 @@ export type Database = {
           price_range?: string | null
           rating?: number
           reviews_count?: number
+          seo_description?: string | null
+          seo_title?: string | null
           slug: string
+          tagline?: string | null
+          theme?: string | null
           updated_at?: string
         }
         Update: {
           address?: string | null
+          brand_primary?: string | null
+          brand_secondary?: string | null
           category?: string | null
           created_at?: string
+          custom_css?: string | null
           description?: string | null
           discount?: string | null
           distance?: number | null
+          email?: string | null
           gallery_images?: string[] | null
+          hours?: Json | null
           id?: string
           image_url?: string | null
           is_verified?: boolean
@@ -551,7 +574,11 @@ export type Database = {
           price_range?: string | null
           rating?: number
           reviews_count?: number
+          seo_description?: string | null
+          seo_title?: string | null
           slug?: string
+          tagline?: string | null
+          theme?: string | null
           updated_at?: string
         }
         Relationships: []
