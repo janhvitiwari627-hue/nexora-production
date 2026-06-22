@@ -372,7 +372,11 @@ export default function CustomerRegistrationPage() {
 
             <Button type="submit" className="w-full" disabled={submitting}>
               {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Mail className="mr-2 h-4 w-4" />}
-              {accountType === "owner" ? "Register business" : "Create account"}
+              {accountType === "owner"
+                ? "Register business"
+                : accountType === "district_partner"
+                  ? "Apply as District Partner"
+                  : "Create account"}
             </Button>
           </form>
 
