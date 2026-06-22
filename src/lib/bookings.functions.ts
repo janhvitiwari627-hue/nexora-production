@@ -23,7 +23,8 @@ const SlotsInput = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 });
 
-// POST /api/bookings/create
+// POST /api/bookings/create — creates a PENDING booking with 15-min payment window.
+// DB returns advance_amount (25%) and payment_deadline. Unique index prevents double-booking.
 export const createBooking = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => CreateInput.parse(d))
@@ -31,11 +32,58 @@ export const createBooking = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: row, error } = await supabase
       .from("bookings")
-      .insert({ ...data, user_id: userId, status: "confirmed" })
+      .insert({ ...data, user_id: userId, status: "pending", payment_status: "pending" })
+      .select("*")
+      .single();
+    if (error) {
+      if (error.code === "23505") {
+        throw new Error("This time slot was just taken. Please pick another slot.");
+      }
+      throw new Error(error.message);
+    }
+    return row;
+  });
+
+// POST /api/bookings/{id}/confirm-payment — validates 25% advance + 15-min window, confirms booking
+export const confirmBookingPayment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        amount_paid: z.number().nonnegative(),
+        payment_reference: z.string().max(200).optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: booking, error: fetchErr } = await supabase
+      .from("bookings")
+      .select("id, user_id, advance_amount, payment_deadline, status")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (fetchErr) throw new Error(fetchErr.message);
+    if (!booking || booking.user_id !== userId) throw new Error("Booking not found");
+    if (booking.status === "expired" || booking.status === "cancelled") {
+      throw new Error("This booking is no longer active");
+    }
+    if (booking.payment_deadline && new Date(booking.payment_deadline) < new Date()) {
+      throw new Error("Payment window has expired");
+    }
+    const advance = Number(booking.advance_amount ?? 0);
+    if (Number(data.amount_paid) + 0.001 < advance) {
+      throw new Error(`Payment must be at least ₹${advance.toFixed(2)} (25% advance)`);
+    }
+    const { data: updated, error } = await supabase
+      .from("bookings")
+      .update({ status: "confirmed", payment_status: "paid" })
+      .eq("id", data.id)
+      .eq("user_id", userId)
       .select("*")
       .single();
     if (error) throw new Error(error.message);
-    return row;
+    return updated;
   });
 
 // GET /api/customers/bookings
@@ -53,15 +101,32 @@ export const listMyBookings = createServerFn({ method: "GET" })
     return data ?? [];
   });
 
-// PUT /api/bookings/{id}/cancel
+// PUT /api/bookings/{id}/cancel — full refund if >24h before slot, else partial (advance forfeited)
 export const cancelBooking = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => IdInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    const { data: b, error: fetchErr } = await supabase
+      .from("bookings")
+      .select("id, user_id, status, payment_status, booking_date, booking_time, price, advance_amount")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (fetchErr) throw new Error(fetchErr.message);
+    if (!b || b.user_id !== userId) throw new Error("Booking not found");
+    if (b.status === "cancelled" || b.status === "expired" || b.status === "completed") {
+      throw new Error(`Booking cannot be cancelled (status: ${b.status})`);
+    }
+
+    const slotAt = new Date(`${b.booking_date}T${b.booking_time}`);
+    const hoursToSlot = (slotAt.getTime() - Date.now()) / 3_600_000;
+    const wasPaid = b.payment_status === "paid";
+    let refund_status: string | null = null;
+    if (wasPaid) refund_status = hoursToSlot >= 24 ? "full_refund_pending" : "partial_refund_pending";
+
     const { data: row, error } = await supabase
       .from("bookings")
-      .update({ status: "cancelled" })
+      .update({ status: "cancelled", refund_status })
       .eq("id", data.id)
       .eq("user_id", userId)
       .select("*")
