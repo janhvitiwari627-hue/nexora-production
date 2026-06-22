@@ -314,7 +314,7 @@ export const requestPartnerPayout = createServerFn({ method: "POST" })
         cycle_end: today.toISOString().slice(0, 10),
         amount: data.amount,
         status: "pending",
-        bank_account: data.bank_account ?? null,
+        bank_account: (data.bank_account ?? null) as never,
       })
       .select("*")
       .single();
