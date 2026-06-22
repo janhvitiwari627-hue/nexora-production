@@ -94,6 +94,27 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           const { profile, roles } = await loadProfileAndRoles(userId);
           set({ profile, roles, role: roles[0] ?? null });
         }, 0);
+
+        // Record a login event once per browser session
+        if (event === "SIGNED_IN" && typeof window !== "undefined") {
+          const flagKey = `nx_login_recorded_${nextSession.user.id}`;
+          if (!sessionStorage.getItem(flagKey)) {
+            sessionStorage.setItem(flagKey, "1");
+            setTimeout(async () => {
+              try {
+                const { recordLoginEvent } = await import("@/lib/security.functions");
+                await recordLoginEvent({
+                  data: {
+                    user_agent: navigator.userAgent.slice(0, 500),
+                    device_label: `${navigator.platform || "Browser"}`,
+                  },
+                });
+              } catch {
+                // non-fatal; auditing should never block login
+              }
+            }, 0);
+          }
+        }
       }
     });
 
