@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_recommendations: {
+        Row: {
+          confidence_score: number | null
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          recommendation_data: Json
+          recommendation_type: string
+          status: string
+        }
+        Insert: {
+          confidence_score?: number | null
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          recommendation_data: Json
+          recommendation_type: string
+          status?: string
+        }
+        Update: {
+          confidence_score?: number | null
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          recommendation_data?: Json
+          recommendation_type?: string
+          status?: string
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           advance_amount: number | null
@@ -92,6 +125,51 @@ export type Database = {
           },
         ]
       }
+      customer_insights: {
+        Row: {
+          avg_booking_frequency: number | null
+          churn_risk_score: number | null
+          created_at: string
+          customer_id: string
+          id: string
+          last_booking_date: string | null
+          lifetime_value: number | null
+          loyalty_score: number | null
+          preferred_areas: string[] | null
+          preferred_price_range: Json | null
+          preferred_services: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          avg_booking_frequency?: number | null
+          churn_risk_score?: number | null
+          created_at?: string
+          customer_id: string
+          id?: string
+          last_booking_date?: string | null
+          lifetime_value?: number | null
+          loyalty_score?: number | null
+          preferred_areas?: string[] | null
+          preferred_price_range?: Json | null
+          preferred_services?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          avg_booking_frequency?: number | null
+          churn_risk_score?: number | null
+          created_at?: string
+          customer_id?: string
+          id?: string
+          last_booking_date?: string | null
+          lifetime_value?: number | null
+          loyalty_score?: number | null
+          preferred_areas?: string[] | null
+          preferred_price_range?: Json | null
+          preferred_services?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       favorites: {
         Row: {
           created_at: string
@@ -127,6 +205,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      location_history: {
+        Row: {
+          accuracy_meters: number | null
+          area: string | null
+          city: string | null
+          detected_at: string
+          id: string
+          latitude: number
+          longitude: number
+          user_id: string
+        }
+        Insert: {
+          accuracy_meters?: number | null
+          area?: string | null
+          city?: string | null
+          detected_at?: string
+          id?: string
+          latitude: number
+          longitude: number
+          user_id: string
+        }
+        Update: {
+          accuracy_meters?: number | null
+          area?: string | null
+          city?: string | null
+          detected_at?: string
+          id?: string
+          latitude?: number
+          longitude?: number
+          user_id?: string
+        }
+        Relationships: []
       }
       login_events: {
         Row: {
@@ -770,6 +881,59 @@ export type Database = {
           },
         ]
       }
+      salon_rankings: {
+        Row: {
+          activity_component: number | null
+          booking_component: number | null
+          calculated_at: string
+          category: string | null
+          city: string
+          id: string
+          nexora_score: number
+          previous_ranking: number | null
+          ranking: number
+          rating_component: number | null
+          retention_component: number | null
+          salon_id: string
+        }
+        Insert: {
+          activity_component?: number | null
+          booking_component?: number | null
+          calculated_at?: string
+          category?: string | null
+          city: string
+          id?: string
+          nexora_score: number
+          previous_ranking?: number | null
+          ranking: number
+          rating_component?: number | null
+          retention_component?: number | null
+          salon_id: string
+        }
+        Update: {
+          activity_component?: number | null
+          booking_component?: number | null
+          calculated_at?: string
+          category?: string | null
+          city?: string
+          id?: string
+          nexora_score?: number
+          previous_ranking?: number | null
+          ranking?: number
+          rating_component?: number | null
+          retention_component?: number | null
+          salon_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "salon_rankings_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       salon_wallets: {
         Row: {
           available_balance: number
@@ -946,6 +1110,42 @@ export type Database = {
           updated_at?: string
           website_url?: string | null
           whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      search_analytics: {
+        Row: {
+          clicked_results: Json | null
+          created_at: string
+          id: string
+          processed_intent: Json | null
+          results_count: number | null
+          search_query: string
+          session_id: string | null
+          user_id: string | null
+          user_location: Json | null
+        }
+        Insert: {
+          clicked_results?: Json | null
+          created_at?: string
+          id?: string
+          processed_intent?: Json | null
+          results_count?: number | null
+          search_query: string
+          session_id?: string | null
+          user_id?: string | null
+          user_location?: Json | null
+        }
+        Update: {
+          clicked_results?: Json | null
+          created_at?: string
+          id?: string
+          processed_intent?: Json | null
+          results_count?: number | null
+          search_query?: string
+          session_id?: string | null
+          user_id?: string | null
+          user_location?: Json | null
         }
         Relationships: []
       }
@@ -1201,6 +1401,39 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      voice_searches: {
+        Row: {
+          audio_duration_seconds: number | null
+          confidence_score: number | null
+          created_at: string
+          id: string
+          results_returned: number | null
+          search_intent: Json | null
+          transcribed_text: string | null
+          user_id: string | null
+        }
+        Insert: {
+          audio_duration_seconds?: number | null
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          results_returned?: number | null
+          search_intent?: Json | null
+          transcribed_text?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          audio_duration_seconds?: number | null
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          results_returned?: number | null
+          search_intent?: Json | null
+          transcribed_text?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
