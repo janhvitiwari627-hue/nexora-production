@@ -1,6 +1,10 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { ChevronLeft } from "lucide-react";
+import { toast } from "sonner";
 import { MOCK_SHOP } from "./shop/mockShop";
 import { StepProgressIndicator, type BookingStepIndex } from "./booking/StepProgressIndicator";
 import { Step1Services } from "./booking/Step1Services";
@@ -17,27 +21,44 @@ import {
   type BookingState,
   type PaymentMethod,
 } from "./booking/state";
+import type { Service } from "@/components/shared/ServiceCard";
+import type { Staff } from "@/components/shared/StaffCard";
+import { createBooking, confirmBookingPayment } from "@/lib/bookings.functions";
 
-function genBookingId() {
-  const chars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
-  let id = "NX-";
-  for (let i = 0; i < 8; i++) id += chars[Math.floor(Math.random() * chars.length)];
-  return id;
+export type RealSalonRef = {
+  id: string;
+  name: string;
+  address: string;
+  services: Service[];
+  staff: Staff[];
+};
+
+function isUuid(s: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
 }
 
-export function BookingFlowPage() {
+export function BookingFlowPage({ salon }: { salon?: RealSalonRef } = {}) {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const createFn = useServerFn(createBooking);
+  const confirmFn = useServerFn(confirmBookingPayment);
+
   const shop = MOCK_SHOP;
-  const allServices = useMemo(
-    () => shop.service_categories.flatMap((c) => c.items),
-    [shop.service_categories],
+  const allServices = useMemo<Service[]>(() => {
+    if (salon && salon.services.length > 0) return salon.services;
+    return shop.service_categories.flatMap((c) => c.items);
+  }, [salon, shop.service_categories]);
+  const allStaff = useMemo<Staff[]>(
+    () => (salon && salon.staff.length > 0 ? salon.staff : shop.staff),
+    [salon, shop.staff],
   );
 
   const [booking, setBooking] = useState<BookingState>({
-    shopName: shop.name,
-    shopAddress: shop.address,
+    shopName: salon?.name ?? shop.name,
+    shopAddress: salon?.address ?? shop.address,
     services: allServices,
     selectedServiceIds: [allServices[0]?.id].filter(Boolean) as string[],
-    staff: shop.staff,
+    staff: allStaff,
     selectedStaffId: null,
     date: null,
     time: null,
@@ -49,6 +70,7 @@ export function BookingFlowPage() {
   });
   const [step, setStep] = useState<BookingStepIndex>(0);
   const [confirmed, setConfirmed] = useState<string | null>(null);
+  const [paying, setPaying] = useState(false);
 
   const stepValid: Record<BookingStepIndex, boolean> = {
     0: booking.selectedServiceIds.length > 0,
@@ -72,7 +94,55 @@ export function BookingFlowPage() {
           ? "Continue to payment"
           : `Pay ${formatINR(advancePayable(booking))}`;
 
-  const onPay = () => setConfirmed(genBookingId());
+  const payMutation = useMutation({
+    mutationFn: async () => {
+      if (!salon || !isUuid(salon.id)) {
+        // Mock fallback — no real persistence
+        await new Promise((r) => setTimeout(r, 600));
+        return { id: `NX-${Math.random().toString(36).slice(2, 10).toUpperCase()}` };
+      }
+      if (!booking.date || !booking.time) throw new Error("Pick date & time");
+      const selected = selectedServices(booking);
+      if (selected.length === 0) throw new Error("Pick a service");
+      const primary = selected[0];
+      const totalPrice = selected.reduce(
+        (sum, s) => sum + (s.offer_price ?? s.price),
+        0,
+      );
+      const created = await createFn({
+        data: {
+          salon_id: salon.id,
+          service_name: selected.map((s) => s.name).join(", ").slice(0, 200) || primary.name,
+          price: totalPrice,
+          booking_date: booking.date,
+          booking_time: booking.time,
+        },
+      });
+      const advance = Number((created as { advance_amount?: number }).advance_amount ?? totalPrice * 0.25);
+      const confirmedRow = await confirmFn({
+        data: {
+          id: (created as { id: string }).id,
+          amount_paid: advance,
+          payment_reference: `MOCK-${Date.now()}`,
+        },
+      });
+      return confirmedRow as { id: string };
+    },
+    onSuccess: (row) => {
+      queryClient.invalidateQueries({ queryKey: ["my-bookings"] });
+      setConfirmed(String((row as { id: string }).id));
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || "Payment failed");
+      setPaying(false);
+    },
+  });
+
+  const onPay = () => {
+    if (paying) return;
+    setPaying(true);
+    payMutation.mutate(undefined, { onSettled: () => setPaying(false) });
+  };
 
   if (confirmed) {
     return (
@@ -89,9 +159,8 @@ export function BookingFlowPage() {
         <div className="mx-auto max-w-7xl px-4 py-4 md:px-6">
           <button
             type="button"
-            onClick={goBack}
-            disabled={step === 0}
-            className="text-muted-foreground hover:text-heading mb-3 inline-flex items-center gap-1 text-xs font-semibold disabled:opacity-40"
+            onClick={step === 0 ? () => navigate({ to: "/search" }) : goBack}
+            className="text-muted-foreground hover:text-heading mb-3 inline-flex items-center gap-1 text-xs font-semibold"
           >
             <ChevronLeft className="h-4 w-4" /> Back
           </button>
@@ -186,5 +255,4 @@ export function BookingFlowPage() {
   );
 }
 
-// keep helper exposed for future use
 export { selectedServices };
