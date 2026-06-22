@@ -76,20 +76,31 @@ function TopBar({ open, onToggle }: { open: boolean; onToggle: (v: boolean) => v
 }
 
 function KPICards() {
+  const { activeSalonId } = useOwnerContext();
+  const { data: m } = useQuery(ownerDashboardMetricsQuery(activeSalonId ?? ""));
+  const liveKpis = m && activeSalonId ? [
+    { label: "Today's Revenue", value: fmtINR(m.today.revenue), delta: 0, positive: true, suffix: `${m.today.count} bookings today` },
+    { label: "Today's Bookings", value: String(m.today.count), delta: 0, positive: true, suffix: "scheduled today" },
+    { label: "Pending Approvals", value: String(m.pendingCount), delta: 0, positive: m.pendingCount === 0, suffix: "awaiting confirmation" },
+    { label: "30-day Revenue", value: fmtINR(m.month.revenue), delta: 0, positive: true, suffix: `${m.month.count} bookings` },
+  ] : null;
+  const data = liveKpis ?? mockKpis;
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {kpis.map((k) => (
+      {data.map((k) => (
         <Card key={k.label} className="p-5">
           <div className="text-xs font-medium text-muted-foreground">{k.label}</div>
           <div className="mt-2 flex items-baseline justify-between gap-3">
             <div className="text-2xl font-bold text-heading">{k.value}</div>
-            <span className={cn(
-              "inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-semibold",
-              k.positive ? "bg-success/10 text-success" : "bg-danger/10 text-danger",
-            )}>
-              {k.positive ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-              {Math.abs(k.delta)}%
-            </span>
+            {k.delta !== 0 && (
+              <span className={cn(
+                "inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-semibold",
+                k.positive ? "bg-success/10 text-success" : "bg-danger/10 text-danger",
+              )}>
+                {k.positive ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+                {Math.abs(k.delta)}%
+              </span>
+            )}
           </div>
           <div className="mt-1 text-[11px] text-muted-foreground">{k.suffix}</div>
         </Card>
