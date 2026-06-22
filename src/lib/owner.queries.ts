@@ -48,3 +48,12 @@ export const ownerAnalyticsQuery = (salonId: string, days = 30) =>
     queryFn: () => getOwnerAnalyticsTimeseries({ data: { salon_id: salonId, days } }),
     enabled: !!salonId,
   });
+
+import { getOwnerSalonFull } from "./owner.functions";
+
+export const ownerSalonFullQuery = (salonId: string) =>
+  queryOptions({
+    queryKey: ["owner", "salon-full", salonId],
+    queryFn: () => getOwnerSalonFull({ data: { salon_id: salonId } }),
+    enabled: !!salonId,
+  });
