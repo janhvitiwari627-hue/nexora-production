@@ -490,9 +490,12 @@ export type Database = {
       salons: {
         Row: {
           address: string | null
+          amenities: string[] | null
           brand_primary: string | null
           brand_secondary: string | null
           category: string | null
+          city: string | null
+          cover_image_url: string | null
           created_at: string
           custom_css: string | null
           description: string | null
@@ -503,12 +506,16 @@ export type Database = {
           hours: Json | null
           id: string
           image_url: string | null
+          is_active: boolean
+          is_home_service: boolean
           is_verified: boolean
           latitude: number | null
           location: string | null
+          logo_url: string | null
           longitude: number | null
           name: string
           phone: string | null
+          pincode: string | null
           price_range: string | null
           rating: number
           reviews_count: number
@@ -518,12 +525,17 @@ export type Database = {
           tagline: string | null
           theme: string | null
           updated_at: string
+          website_url: string | null
+          whatsapp: string | null
         }
         Insert: {
           address?: string | null
+          amenities?: string[] | null
           brand_primary?: string | null
           brand_secondary?: string | null
           category?: string | null
+          city?: string | null
+          cover_image_url?: string | null
           created_at?: string
           custom_css?: string | null
           description?: string | null
@@ -534,12 +546,16 @@ export type Database = {
           hours?: Json | null
           id?: string
           image_url?: string | null
+          is_active?: boolean
+          is_home_service?: boolean
           is_verified?: boolean
           latitude?: number | null
           location?: string | null
+          logo_url?: string | null
           longitude?: number | null
           name: string
           phone?: string | null
+          pincode?: string | null
           price_range?: string | null
           rating?: number
           reviews_count?: number
@@ -549,12 +565,17 @@ export type Database = {
           tagline?: string | null
           theme?: string | null
           updated_at?: string
+          website_url?: string | null
+          whatsapp?: string | null
         }
         Update: {
           address?: string | null
+          amenities?: string[] | null
           brand_primary?: string | null
           brand_secondary?: string | null
           category?: string | null
+          city?: string | null
+          cover_image_url?: string | null
           created_at?: string
           custom_css?: string | null
           description?: string | null
@@ -565,12 +586,16 @@ export type Database = {
           hours?: Json | null
           id?: string
           image_url?: string | null
+          is_active?: boolean
+          is_home_service?: boolean
           is_verified?: boolean
           latitude?: number | null
           location?: string | null
+          logo_url?: string | null
           longitude?: number | null
           name?: string
           phone?: string | null
+          pincode?: string | null
           price_range?: string | null
           rating?: number
           reviews_count?: number
@@ -580,6 +605,8 @@ export type Database = {
           tagline?: string | null
           theme?: string | null
           updated_at?: string
+          website_url?: string | null
+          whatsapp?: string | null
         }
         Relationships: []
       }
@@ -592,6 +619,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_active: boolean
+          is_home_service: boolean
           name: string
           price: number
           salon_id: string
@@ -605,6 +633,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
+          is_home_service?: boolean
           name: string
           price?: number
           salon_id: string
@@ -618,6 +647,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
+          is_home_service?: boolean
           name?: string
           price?: number
           salon_id?: string
