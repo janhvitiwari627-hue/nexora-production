@@ -173,7 +173,7 @@ export const activatePartnerShop = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase } = context;
-    const patch: Record<string, unknown> = {
+    const patch: { is_active: true; activated_at: string; revenue_generated?: number } = {
       is_active: true,
       activated_at: new Date().toISOString(),
     };
