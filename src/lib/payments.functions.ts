@@ -58,6 +58,19 @@ export const verifyPayment = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase } = context;
+
+    // Idempotency guard: don't re-verify a payment that is already finalized.
+    // Prevents duplicate cashback credits and double-update races.
+    const { data: existing, error: fetchErr } = await supabase
+      .from("payments")
+      .select("id, status, customer_id, amount")
+      .eq("id", data.paymentId)
+      .single();
+    if (fetchErr) throw new Error(fetchErr.message);
+    if (existing.status === "SUCCESS" || existing.status === "FAILED") {
+      return { success: existing.status === "SUCCESS", payment: existing, alreadyProcessed: true };
+    }
+
     const rzpPaymentId = data.razorpayPaymentId ?? randomId("pay");
     const success = !data.simulateFailure;
     const { data: payment, error } = await supabase
@@ -71,9 +84,11 @@ export const verifyPayment = createServerFn({ method: "POST" })
         failure_reason: success ? null : "Mock failure",
       })
       .eq("id", data.paymentId)
+      .eq("status", "PENDING") // only transition from PENDING — second-layer race guard
       .select()
       .single();
     if (error) throw new Error(error.message);
+
 
     if (success && payment.customer_id) {
       const cashback = Math.round(Number(payment.amount) * 0.02 * 100) / 100;
