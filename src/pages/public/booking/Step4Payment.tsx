@@ -1,5 +1,6 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { PaymentCountdown } from "@/components/shared/PaymentCountdown";
 import {
   Check,
   CreditCard,
@@ -60,14 +61,19 @@ export function Step4Payment({
   const total = grandTotal(booking);
   const advance = advancePayable(booking);
 
+  const deadline = useMemo(() => new Date(Date.now() + 15 * 60_000), []);
+
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
       <div className="space-y-6">
-        <header>
-          <h2 className="text-heading text-2xl font-black md:text-3xl">Review & pay</h2>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Pay {Math.round((advance / Math.max(1, total)) * 100)}% advance to confirm. Rest at the salon.
-          </p>
+        <header className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-heading text-2xl font-black md:text-3xl">Review & pay</h2>
+            <p className="text-muted-foreground mt-1 text-sm">
+              Pay {Math.round((advance / Math.max(1, total)) * 100)}% advance to confirm. Rest at the salon.
+            </p>
+          </div>
+          <PaymentCountdown deadline={deadline} />
         </header>
 
         {/* Summary card */}

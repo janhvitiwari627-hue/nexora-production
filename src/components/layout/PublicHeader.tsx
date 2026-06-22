@@ -3,6 +3,7 @@ import { Bell, Crown, Menu, Search, Sparkles, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MobileMenuOverlay } from "./MobileMenuOverlay";
+import { LocationChip } from "./LocationChip";
 
 const NAV = [
   { to: "/", label: "Home" },
@@ -63,6 +64,7 @@ export function PublicHeader() {
           <Button variant="ghost" size="icon" aria-label="Notifications" asChild>
             <Link to="/dashboard/notifications"><Bell className="h-5 w-5" /></Link>
           </Button>
+          <LocationChip className="mr-1 hidden lg:inline-flex" />
           <Button variant="ghost" className="gap-1.5 font-semibold" asChild>
             <Link to="/membership">
               <Crown className="h-4 w-4 text-primary" />
