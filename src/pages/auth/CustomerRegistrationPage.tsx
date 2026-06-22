@@ -98,7 +98,8 @@ export default function CustomerRegistrationPage() {
     setServerError(null);
     setErrors({});
 
-    const schema = accountType === "owner" ? ownerSchema : baseSchema;
+    const schema =
+      accountType === "owner" ? ownerSchema : accountType === "district_partner" ? dbpSchema : baseSchema;
     const parsed = schema.safeParse(form);
     if (!parsed.success) {
       const flat: Record<string, string> = {};
