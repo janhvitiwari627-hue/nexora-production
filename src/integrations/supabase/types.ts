@@ -1570,6 +1570,18 @@ export type Database = {
         Args: { _salon_id: string; _user_id: string }
         Returns: boolean
       }
+      list_salon_staff: {
+        Args: { _salon_id: string }
+        Returns: {
+          avatar_url: string
+          bio: string
+          id: string
+          name: string
+          rating: number
+          role: string
+          salon_id: string
+        }[]
+      }
       nearby_salons: {
         Args: {
           _lat: number
