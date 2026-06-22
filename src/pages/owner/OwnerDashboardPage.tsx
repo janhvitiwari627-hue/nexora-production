@@ -193,7 +193,9 @@ function densityDots(count: number) {
 
 function BookingCalendarWidget() {
   const blanks = Array.from({ length: calendarFirstWeekday });
-  const today = new Date().getDate();
+  // Compute "today" on the client only — server and user TZ can land on different dates.
+  const [today, setToday] = useState<number | null>(null);
+  useEffect(() => { setToday(new Date().getDate()); }, []);
   return (
     <Card className="p-5">
       <div className="flex items-center justify-between">
