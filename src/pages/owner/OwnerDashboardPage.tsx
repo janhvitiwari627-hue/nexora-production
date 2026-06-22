@@ -482,18 +482,34 @@ function QuickActionsRow() {
 
 export function OwnerDashboardPage() {
   const [open, setOpen] = useState(ownerBusiness.isOpen);
+  const { activeSalon, isLoading: ctxLoading } = useOwnerContext();
   const greeting = useMemo(() => {
     const h = new Date().getHours();
     return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
   }, []);
+  const displayName = activeSalon?.name ?? ownerBusiness.name;
   return (
     <div className="min-h-screen bg-background">
       <TopBar open={open} onToggle={setOpen} />
       <main className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6">
-        <div>
-          <h1 className="text-2xl font-bold text-heading">{greeting}, {ownerBusiness.name.split(" ")[0]} 👋</h1>
-          <p className="text-sm text-muted-foreground">Here's what's happening at your business today.</p>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-bold text-heading">{greeting}, {displayName.split(" ")[0]} 👋</h1>
+            <p className="text-sm text-muted-foreground">Here's what's happening at your business today.</p>
+          </div>
+          {!ctxLoading && (
+            activeSalon ? (
+              <Badge className="border-0 bg-success/10 text-success gap-1.5">
+                <Sparkles className="h-3 w-3" /> Live data · {activeSalon.name}
+              </Badge>
+            ) : (
+              <Badge className="border-0 bg-warning/10 text-warning">
+                Demo data — no salon linked yet
+              </Badge>
+            )
+          )}
         </div>
+
 
         <KPICards />
         <QuickActionsRow />
