@@ -12,7 +12,10 @@ import {
   Banknote, Clock, Download, QrCode, TrendingUp, Upload, Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 import { PAYOUT_SUMMARY, TRANSACTIONS, SETTLEMENTS } from "./payments/mockPayments";
+import { useOwnerContext } from "@/hooks/use-owner-context";
+import { ownerDashboardMetricsQuery } from "@/lib/owner.queries";
 
 const formatINR = (n: number) => `₹${n.toLocaleString("en-IN")}`;
 
@@ -22,14 +25,40 @@ const TXN_CLR: Record<string, string> = {
   processing: "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
 };
 
+const PLATFORM_FEE = 0.1;
+
 export function OwnerPaymentsPage() {
+  const { activeSalonId } = useOwnerContext();
+  const { data: metrics } = useQuery({
+    ...ownerDashboardMetricsQuery(activeSalonId ?? ""),
+    enabled: !!activeSalonId,
+  });
+
+  const live = metrics
+    ? {
+        pending: Math.round(metrics.today.revenue * (1 - PLATFORM_FEE)),
+        thisMonth: Math.round(metrics.month.revenue),
+        settled: Math.round(metrics.month.revenue * (1 - PLATFORM_FEE)),
+      }
+    : null;
+  const summary = live ?? {
+    pending: PAYOUT_SUMMARY.pending,
+    thisMonth: PAYOUT_SUMMARY.thisMonth,
+    settled: PAYOUT_SUMMARY.thisMonth - PAYOUT_SUMMARY.pending,
+  };
+
   return (
     <div className="container mx-auto max-w-6xl px-4 py-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Payments & Payouts</h1>
-        <p className="text-sm text-muted-foreground">
-          Track settlements, manage QR collection and update your bank account.
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Payments & Payouts</h1>
+          <p className="text-sm text-muted-foreground">
+            Track settlements, manage QR collection and update your bank account.
+          </p>
+        </div>
+        <Badge variant={live ? "default" : "outline"}>
+          {live ? "Live data" : "Demo data"}
+        </Badge>
       </div>
 
       {/* Payout summary */}
@@ -39,9 +68,9 @@ export function OwnerPaymentsPage() {
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Wallet className="h-4 w-4" /> Pending settlement
             </div>
-            <div className="text-3xl font-bold mt-2">{formatINR(PAYOUT_SUMMARY.pending)}</div>
+            <div className="text-3xl font-bold mt-2">{formatINR(summary.pending)}</div>
             <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-              <Clock className="h-3 w-3" /> Next settlement {PAYOUT_SUMMARY.nextSettlement}
+              <Clock className="h-3 w-3" /> {live ? "Today's net (after 10% fee)" : `Next settlement ${PAYOUT_SUMMARY.nextSettlement}`}
             </div>
           </CardContent>
         </Card>
@@ -50,9 +79,9 @@ export function OwnerPaymentsPage() {
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <TrendingUp className="h-4 w-4" /> Earned this month
             </div>
-            <div className="text-3xl font-bold mt-2">{formatINR(PAYOUT_SUMMARY.thisMonth)}</div>
-            <div className="text-xs text-emerald-600 mt-1">
-              +{(((PAYOUT_SUMMARY.thisMonth - PAYOUT_SUMMARY.lastMonth) / PAYOUT_SUMMARY.lastMonth) * 100).toFixed(1)}% vs last month
+            <div className="text-3xl font-bold mt-2">{formatINR(summary.thisMonth)}</div>
+            <div className="text-xs text-muted-foreground mt-1">
+              {live ? `${metrics?.month.count ?? 0} completed bookings (30d)` : `+${(((PAYOUT_SUMMARY.thisMonth - PAYOUT_SUMMARY.lastMonth) / PAYOUT_SUMMARY.lastMonth) * 100).toFixed(1)}% vs last month`}
             </div>
           </CardContent>
         </Card>
@@ -61,7 +90,7 @@ export function OwnerPaymentsPage() {
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Banknote className="h-4 w-4" /> Total settled this month
             </div>
-            <div className="text-3xl font-bold mt-2">{formatINR(PAYOUT_SUMMARY.thisMonth - PAYOUT_SUMMARY.pending)}</div>
+            <div className="text-3xl font-bold mt-2">{formatINR(summary.settled)}</div>
             <div className="text-xs text-muted-foreground mt-1">After 10% platform fee</div>
           </CardContent>
         </Card>
