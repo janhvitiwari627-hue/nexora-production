@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Image as ImageIcon, Video } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PhotosTab } from "./gallery/PhotosTab";
+import { LivePhotosTab } from "./gallery/LivePhotosTab";
 import { VideosTab } from "./gallery/VideosTab";
 import {
   initialPhotos,
@@ -9,8 +10,10 @@ import {
   type GalleryPhoto,
   type GalleryVideo,
 } from "./gallery/mockGallery";
+import { useOwnerContext } from "@/hooks/use-owner-context";
 
 export function OwnerGalleryPage() {
+  const { activeSalonId } = useOwnerContext();
   const [photos, setPhotos] = useState<GalleryPhoto[]>(initialPhotos);
   const [videos, setVideos] = useState<GalleryVideo[]>(initialVideos);
 
@@ -34,7 +37,11 @@ export function OwnerGalleryPage() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="photos" className="mt-6">
-            <PhotosTab photos={photos} setPhotos={setPhotos} />
+            {activeSalonId ? (
+              <LivePhotosTab salonId={activeSalonId} />
+            ) : (
+              <PhotosTab photos={photos} setPhotos={setPhotos} />
+            )}
           </TabsContent>
           <TabsContent value="videos" className="mt-6">
             <VideosTab videos={videos} setVideos={setVideos} />
@@ -44,3 +51,4 @@ export function OwnerGalleryPage() {
     </div>
   );
 }
+
