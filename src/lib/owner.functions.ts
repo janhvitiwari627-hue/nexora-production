@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { MIN_WITHDRAWAL_AMOUNT } from "./owner.constants";
+import { DAILY_WITHDRAWAL_LIMIT, MONTHLY_WITHDRAWAL_LIMIT } from "./owner.validation";
 
 // ---------- Owner context: list salons I own/manage ----------
 export const getMyOwnedSalons = createServerFn({ method: "GET" })
@@ -347,6 +348,26 @@ export const requestOwnerWithdrawal = createServerFn({ method: "POST" })
       .from("salon_wallets").select("available_balance").eq("salon_id", data.salon_id).maybeSingle();
     const available = Number(wallet?.available_balance ?? 0);
     if (data.amount > available) throw new Error("Insufficient balance");
+
+    // Daily + monthly withdrawal caps (sum of non-rejected requests).
+    const now = new Date();
+    const startOfDay = new Date(now); startOfDay.setHours(0, 0, 0, 0);
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const { data: recent } = await supabase
+      .from("withdrawals")
+      .select("amount, status, created_at")
+      .eq("salon_id", data.salon_id)
+      .neq("status", "REJECTED")
+      .gte("created_at", startOfMonth.toISOString());
+    const dayTotal = (recent ?? []).filter((w) => new Date(w.created_at) >= startOfDay)
+      .reduce((s, w) => s + Number(w.amount), 0);
+    const monthTotal = (recent ?? []).reduce((s, w) => s + Number(w.amount), 0);
+    if (dayTotal + data.amount > DAILY_WITHDRAWAL_LIMIT) {
+      throw new Error(`Daily withdrawal limit is ₹${DAILY_WITHDRAWAL_LIMIT.toLocaleString("en-IN")}`);
+    }
+    if (monthTotal + data.amount > MONTHLY_WITHDRAWAL_LIMIT) {
+      throw new Error(`Monthly withdrawal limit is ₹${MONTHLY_WITHDRAWAL_LIMIT.toLocaleString("en-IN")}`);
+    }
     const { data: row, error } = await supabase
       .from("withdrawals")
       .insert({
