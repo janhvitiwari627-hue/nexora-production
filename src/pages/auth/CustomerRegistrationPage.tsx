@@ -86,6 +86,7 @@ export default function CustomerRegistrationPage() {
   }, [form.referred_by, validateRef]);
 
   const registerSalonFn = useServerFn(registerMySalon);
+  const registerDbpFn = useServerFn(registerDistrictPartner);
   const pwStrength = useMemo(() => scorePassword(form.password), [form.password]);
 
   const update = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
