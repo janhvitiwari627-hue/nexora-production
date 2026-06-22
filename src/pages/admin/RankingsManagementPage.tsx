@@ -1,114 +1,128 @@
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { GripVertical, RefreshCw } from "lucide-react";
+import { RefreshCw, Trophy, Search, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-
-const CATEGORIES = ["Salon", "Spa", "Tattoo", "Barber", "Bridal"];
-
-type Factor = { id: string; label: string; weight: number };
-const initialFactors: Factor[] = [
-  { id: "rating", label: "Average Rating", weight: 30 },
-  { id: "bookings", label: "Booking Volume", weight: 25 },
-  { id: "reviews", label: "Review Count", weight: 15 },
-  { id: "recency", label: "Recent Activity", weight: 15 },
-  { id: "completion", label: "Completion Rate", weight: 10 },
-  { id: "response", label: "Response Time", weight: 5 },
-];
-
-type Shop = { id: string; name: string; score: number };
-const initialShops = (cat: string): Shop[] => Array.from({ length: 8 }).map((_, i) => ({
-  id: `${cat}-${i}`, name: `${cat} Studio ${i + 1}`, score: 95 - i * 5,
-}));
+import { getRankingLeaderboard, triggerRankingRecompute } from "@/lib/rankings.functions";
 
 export function RankingsManagementPage() {
-  const [tab, setTab] = useState(CATEGORIES[0]);
-  const [factors, setFactors] = useState(initialFactors);
-  const [shops, setShops] = useState<Record<string, Shop[]>>(() =>
-    Object.fromEntries(CATEGORIES.map(c => [c, initialShops(c)]))
-  );
-  const [resetOpen, setResetOpen] = useState(false);
-  const [dragId, setDragId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const fetchLeaderboard = useServerFn(getRankingLeaderboard);
+  const runRecompute = useServerFn(triggerRankingRecompute);
+  const [filter, setFilter] = useState("");
 
-  const total = factors.reduce((a, b) => a + b.weight, 0);
+  const { data: salons, isLoading, error } = useQuery({
+    queryKey: ["admin", "rankings"],
+    queryFn: () => fetchLeaderboard(),
+  });
 
-  const onDrop = (overId: string) => {
-    if (!dragId || dragId === overId) return;
-    const list = [...shops[tab]];
-    const from = list.findIndex(x => x.id === dragId);
-    const to = list.findIndex(x => x.id === overId);
-    const [item] = list.splice(from, 1);
-    list.splice(to, 0, item);
-    setShops({ ...shops, [tab]: list });
-    setDragId(null);
-  };
+  const mutation = useMutation({
+    mutationFn: () => runRecompute(),
+    onSuccess: (res) => {
+      toast.success(`Ranking recomputed — ${res.updated} salon(s) updated`);
+      queryClient.invalidateQueries({ queryKey: ["admin", "rankings"] });
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const list = (salons ?? []).filter((s) => {
+    if (!filter) return true;
+    const q = filter.toLowerCase();
+    return (
+      s.name.toLowerCase().includes(q) ||
+      (s.location ?? "").toLowerCase().includes(q) ||
+      (s.category ?? "").toLowerCase().includes(q)
+    );
+  });
+
+  // Group by city for rank context
+  const byCity = new Map<string, typeof list>();
+  for (const s of list) {
+    const city = s.location ?? "—";
+    const arr = byCity.get(city) ?? [];
+    arr.push(s);
+    byCity.set(city, arr);
+  }
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 p-6">
-      <header className="flex items-center justify-between">
+      <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-heading text-2xl font-bold">Rankings Management</h1>
-          <p className="text-muted-foreground text-sm">Tune ranking factors and manual overrides</p>
+          <p className="text-muted-foreground text-sm">
+            Nexora Score combines rating, monthly bookings, repeat-customer ratio, and recency.
+            Recomputed nightly; you can force a refresh below.
+          </p>
         </div>
-        <Button variant="outline" onClick={() => setResetOpen(true)}><RefreshCw className="h-4 w-4" /> Reset Weekly Trending</Button>
+        <Button onClick={() => mutation.mutate()} disabled={mutation.isPending}>
+          {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+          Recompute now
+        </Button>
       </header>
 
       <Card>
-        <CardHeader><CardTitle>Ranking Factor Weights <Badge variant={total === 100 ? "default" : "destructive"} className="ml-2">{total}%</Badge></CardTitle></CardHeader>
-        <CardContent className="grid gap-5 md:grid-cols-2">
-          {factors.map(f => (
-            <div key={f.id} className="space-y-2">
-              <div className="flex justify-between"><Label>{f.label}</Label><span className="text-sm font-medium">{f.weight}%</span></div>
-              <Slider value={[f.weight]} max={100} step={5} onValueChange={([v]) => setFactors(p => p.map(x => x.id === f.id ? { ...x, weight: v } : x))} />
-            </div>
-          ))}
-          <div className="md:col-span-2 flex justify-end"><Button onClick={() => toast.success("Weights saved")}>Save Weights</Button></div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader><CardTitle>Manual Ranking Override</CardTitle></CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Trophy className="h-4 w-4 text-amber-500" />
+            Leaderboard {salons ? <Badge variant="outline">{salons.length} salons</Badge> : null}
+          </CardTitle>
+          <div className="relative w-64 max-w-full">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              placeholder="Filter by name, city, category"
+              className="pl-8"
+            />
+          </div>
+        </CardHeader>
         <CardContent>
-          <Tabs value={tab} onValueChange={setTab}>
-            <TabsList>{CATEGORIES.map(c => <TabsTrigger key={c} value={c}>{c}</TabsTrigger>)}</TabsList>
-            {CATEGORIES.map(c => (
-              <TabsContent key={c} value={c} className="space-y-2">
-                {shops[c].map((s, idx) => (
-                  <div
-                    key={s.id}
-                    draggable
-                    onDragStart={() => setDragId(s.id)}
-                    onDragOver={e => e.preventDefault()}
-                    onDrop={() => onDrop(s.id)}
-                    className="bg-muted/40 hover:bg-muted flex items-center gap-3 rounded-lg border p-3"
-                  >
-                    <GripVertical className="text-muted-foreground h-4 w-4 cursor-grab" />
-                    <span className="w-8 text-sm font-semibold">#{idx + 1}</span>
-                    <span className="flex-1 font-medium">{s.name}</span>
-                    <Badge variant="outline">Score {s.score}</Badge>
-                  </div>
-                ))}
-              </TabsContent>
-            ))}
-          </Tabs>
+          {error ? (
+            <div className="text-sm text-rose-600">Failed to load: {(error as Error).message}</div>
+          ) : isLoading ? (
+            <div className="space-y-2">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="h-12 animate-pulse rounded-lg bg-muted/40" />
+              ))}
+            </div>
+          ) : list.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No salons match.</p>
+          ) : (
+            <div className="space-y-6">
+              {[...byCity.entries()].map(([city, rows]) => (
+                <div key={city} className="space-y-1.5">
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    {city}
+                  </h3>
+                  {rows.map((s) => (
+                    <div
+                      key={s.id}
+                      className="flex items-center gap-3 rounded-lg border bg-muted/30 p-3 hover:bg-muted/60"
+                    >
+                      <span className="grid h-8 w-10 place-items-center rounded-md bg-background text-sm font-bold text-heading">
+                        #{s.rank_in_city ?? "—"}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-medium text-heading">{s.name}</p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {s.category ?? "Salon"} · ★ {s.rating?.toFixed(1) ?? "—"} ({s.reviews_count ?? 0})
+                        </p>
+                      </div>
+                      <Badge variant="outline" className="font-mono">
+                        Score {s.nexora_score ?? 0}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
-
-      <Dialog open={resetOpen} onOpenChange={setResetOpen}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Reset Weekly Trending?</DialogTitle></DialogHeader>
-          <p className="text-muted-foreground text-sm">This clears the current trending leaderboard and starts a fresh 7-day window across all categories.</p>
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setResetOpen(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={() => { setResetOpen(false); toast.success("Trending reset"); }}>Reset</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
