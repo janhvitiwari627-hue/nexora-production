@@ -50,7 +50,6 @@ export const ownerAnalyticsQuery = (salonId: string, days = 30) =>
     enabled: !!salonId,
   });
 
-import { getOwnerSalonFull } from "./owner.functions";
 
 export const ownerSalonFullQuery = (salonId: string) =>
   queryOptions({
