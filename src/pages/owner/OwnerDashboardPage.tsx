@@ -2,23 +2,44 @@ import { useMemo, useState } from "react";
 import {
   Bell, Settings, Upload, ArrowUpRight, ArrowDownRight, Check, X,
   Plus, UserPlus, Tag, Share2, QrCode, BarChart3, Star, Reply, Trophy,
+  Sparkles,
 } from "lucide-react";
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
   Area, AreaChart, BarChart, Bar, Legend,
 } from "recharts";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { useOwnerContext } from "@/hooks/use-owner-context";
 import {
-  ownerBusiness, kpis, revenueDaily, revenueWeekly, revenueMonthly,
+  ownerDashboardMetricsQuery, ownerAnalyticsQuery, ownerBookingsQuery,
+} from "@/lib/owner.queries";
+import { updateOwnerBookingStatus } from "@/lib/owner.functions";
+import {
+  ownerBusiness, kpis as mockKpis, revenueDaily, revenueWeekly, revenueMonthly,
   calendarDensity, calendarFirstWeekday, calendarMonthLabel,
-  recentBookings, pendingApprovals, customerInsights,
-  topPerformer, recentReviews, type BookingStatus,
+  recentBookings as mockRecentBookings, pendingApprovals as mockPending,
+  customerInsights, topPerformer, recentReviews, type BookingStatus,
 } from "./mockOwner";
+
+const fmtINR = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
+const initials = (s: string) =>
+  s.split(" ").map((p) => p[0]).join("").slice(0, 2).toUpperCase() || "GU";
+const fmtTime = (t: string | null | undefined) => {
+  if (!t) return "";
+  const [h, m] = t.split(":");
+  const hh = Number(h);
+  const ampm = hh >= 12 ? "PM" : "AM";
+  const h12 = ((hh + 11) % 12) + 1;
+  return `${h12}:${m} ${ampm}`;
+};
 
 const BRAND = "#635BFF";
 
