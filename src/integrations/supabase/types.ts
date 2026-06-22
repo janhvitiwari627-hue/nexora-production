@@ -229,7 +229,7 @@ export type Database = {
           expires_at?: string | null
           id?: string
           saved_amount?: number
-          tier: string
+          tier?: string
           updated_at?: string
           user_id: string
         }
@@ -599,7 +599,6 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          referred_email: string | null
           referred_user_id: string | null
           referrer_id: string
           reward_amount: number
@@ -609,7 +608,6 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
-          referred_email?: string | null
           referred_user_id?: string | null
           referrer_id: string
           reward_amount?: number
@@ -619,7 +617,6 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
-          referred_email?: string | null
           referred_user_id?: string | null
           referrer_id?: string
           reward_amount?: number
