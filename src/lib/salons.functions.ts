@@ -10,6 +10,16 @@ function publicClient() {
   );
 }
 
+export type PublicStaffMember = {
+  id: string;
+  salon_id: string;
+  name: string;
+  role: string | null;
+  bio: string | null;
+  avatar_url: string | null;
+  rating: number | null;
+};
+
 const SlugInput = z.object({ slug: z.string().trim().min(1).max(200) });
 
 export const getSalonBySlug = createServerFn({ method: "GET" })
