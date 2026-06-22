@@ -1,8 +1,9 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Briefcase, Building2, Handshake, Sparkles, X } from "lucide-react";
-import { useEffect } from "react";
+import { ArrowRight, Briefcase, Building2, Handshake, LogOut, Sparkles, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/stores/authStore";
 
 const NAV = [
   { label: "Explore", to: "/search", icon: Sparkles, desc: "Salons, spas & barbers near you" },
