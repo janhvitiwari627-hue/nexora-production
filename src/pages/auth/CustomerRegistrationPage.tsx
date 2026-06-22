@@ -10,11 +10,12 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Mail, CheckCircle2, User, Building2, BadgeCheck, XCircle } from "lucide-react";
+import { Loader2, Mail, CheckCircle2, User, Building2, BadgeCheck, XCircle, Crown } from "lucide-react";
 import { PasswordStrengthIndicator, scorePassword } from "@/components/auth/PasswordStrengthIndicator";
 import { validateReferralCode, registerMySalon } from "@/lib/owner.functions";
+import { registerDistrictPartner } from "@/lib/districtPartner.functions";
 
-type AccountType = "customer" | "owner";
+type AccountType = "customer" | "owner" | "district_partner";
 
 const baseSchema = z.object({
   full_name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
