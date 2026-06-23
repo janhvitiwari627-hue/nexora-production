@@ -32,6 +32,7 @@ export function DistributorRegistrationPage() {
           ...f,
           ...Object.fromEntries(Object.entries(d).filter(([_, v]) => v !== null && typeof v !== "object")) as any,
           coverage_states_text: (d.coverage_states ?? []).join(", "),
+          coverage_districts_text: (d.coverage_districts ?? []).join(", "),
           categories_text: (d.categories ?? []).join(", "),
           brands_handled_text: (d.brands_handled ?? []).join(", "),
           years_in_business: (d as any).years_in_business?.toString() ?? "",
