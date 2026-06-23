@@ -3,7 +3,8 @@ import { Building2, LayoutDashboard, Megaphone, Package, Sparkles, Star, Store, 
 import { PublicHeader } from "@/components/layout/PublicHeader";
 import { PublicFooter } from "@/components/layout/PublicFooter";
 
-const NAV = [
+type NavItem = { to: string; label: string; icon: typeof Sparkles; exact?: boolean };
+const NAV: NavItem[] = [
   { to: "/portal", label: "Overview", icon: Sparkles, exact: true },
   { to: "/portal/brands", label: "Brand Directory", icon: Tag },
   { to: "/portal/distributors", label: "Distributor Directory", icon: Truck },
