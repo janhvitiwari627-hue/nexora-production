@@ -17,14 +17,13 @@ import { selectWebsiteTemplate } from "@/lib/owner.functions";
 
 const CATEGORIES = [
   "All",
+  "Premium Salon",
   "Salon",
   "Beauty Parlour",
   "Spa",
-  "Tattoo Studio",
   "Nail Studio",
   "Makeup Studio",
   "Barber Shop",
-  "Multi-Service",
 ];
 
 type ConfirmState = { open: boolean; templateName: string };
@@ -49,7 +48,8 @@ export function CreateWebsitePage() {
     onSuccess: (_d, vars) => {
       const t = templates.find((x) => x.id === vars.template_id);
       qc.invalidateQueries({ queryKey: ["owner", "salons"] });
-      setConfirm({ open: true, templateName: t?.template_name ?? "Your template" });
+      toast.success(`${t?.template_name ?? "Template"} selected. Website created.`);
+      navigate({ to: "/owner-dashboard" });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -127,7 +127,8 @@ export function CreateWebsitePage() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {visible.map((t) => {
             const isCurrent = t.id === selectedId;
-            const previewHref = `/site/${liveSlug}?t=${encodeURIComponent(t.template_slug)}&preview=1`;
+            const templateKey = t.template_key ?? t.template_slug;
+            const previewHref = `/site/${liveSlug}?t=${encodeURIComponent(templateKey)}&preview=1`;
             return (
               <Card key={t.id} className="overflow-hidden group relative flex flex-col">
                 {isCurrent && (
@@ -155,7 +156,7 @@ export function CreateWebsitePage() {
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-1.5 mt-3">
-                    <Badge variant="secondary" className="text-xs">{t.category}</Badge>
+                    <Badge variant="secondary" className="text-xs">{t.theme_type ?? t.category}</Badge>
                     <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
                       <Monitor className="h-3 w-3" /> Desktop
                       <Smartphone className="h-3 w-3 ml-1" /> Mobile
