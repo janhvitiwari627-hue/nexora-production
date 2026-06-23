@@ -39,18 +39,20 @@ export function HeroSection() {
             variants={item}
             className="mx-auto mt-5 text-4xl font-black leading-[1.05] tracking-tight text-heading md:text-5xl lg:text-7xl"
           >
-            India's Smart
+            Book Jaipur's Best
             <br />
-            <span className="text-gradient-brand">Beauty Booking Platform</span>
+            <span className="text-gradient-brand">Beauty Services</span>
           </motion.h1>
 
           <motion.p
             variants={item}
             className="mx-auto mt-5 max-w-2xl text-base text-body md:text-lg lg:text-xl"
           >
-            Book Salons, Beauty Parlours, Spas, Tattoo Studios, Massage Centers and
-            Nail Art Studios in under 60 seconds.
+            <span className="font-semibold text-heading">Salon Ja Rahe Ho? Nexora Kiya Kya?</span>
+            <br className="hidden sm:block" />
+            India's Beauty Industry Operating System — find, book and save in seconds.
           </motion.p>
+
 
           <motion.div
             variants={item}
