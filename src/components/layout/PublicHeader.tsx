@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MobileMenuOverlay } from "./MobileMenuOverlay";
 import { LocationChip } from "./LocationChip";
 import { useAuthStore } from "@/stores/authStore";
