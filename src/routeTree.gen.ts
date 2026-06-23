@@ -96,7 +96,9 @@ import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising
 import { Route as PortalDistributorsIndexRouteImport } from './routes/portal.distributors.index'
 import { Route as PortalBrandsIndexRouteImport } from './routes/portal.brands.index'
 import { Route as PortalDistributorsRegisterRouteImport } from './routes/portal.distributors.register'
+import { Route as PortalDistributorsSlugRouteImport } from './routes/portal.distributors.$slug'
 import { Route as PortalBrandsRegisterRouteImport } from './routes/portal.brands.register'
+import { Route as PortalBrandsSlugRouteImport } from './routes/portal.brands.$slug'
 import { Route as OwnerJobsNewRouteImport } from './routes/owner.jobs.new'
 import { Route as DashboardBookingsIdRouteImport } from './routes/dashboard.bookings.$id'
 import { Route as ApiPublicHooksReleaseExpiredBookingsRouteImport } from './routes/api/public/hooks/release-expired-bookings'
@@ -541,9 +543,19 @@ const PortalDistributorsRegisterRoute =
     path: '/portal/distributors/register',
     getParentRoute: () => rootRouteImport,
   } as any)
+const PortalDistributorsSlugRoute = PortalDistributorsSlugRouteImport.update({
+  id: '/portal/distributors/$slug',
+  path: '/portal/distributors/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PortalBrandsRegisterRoute = PortalBrandsRegisterRouteImport.update({
   id: '/portal/brands/register',
   path: '/portal/brands/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalBrandsSlugRoute = PortalBrandsSlugRouteImport.update({
+  id: '/portal/brands/$slug',
+  path: '/portal/brands/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OwnerJobsNewRoute = OwnerJobsNewRouteImport.update({
@@ -668,7 +680,9 @@ export interface FileRoutesByFullPath {
   '/portal/': typeof PortalIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
+  '/portal/brands/$slug': typeof PortalBrandsSlugRoute
   '/portal/brands/register': typeof PortalBrandsRegisterRoute
+  '/portal/distributors/$slug': typeof PortalDistributorsSlugRoute
   '/portal/distributors/register': typeof PortalDistributorsRegisterRoute
   '/portal/brands/': typeof PortalBrandsIndexRoute
   '/portal/distributors/': typeof PortalDistributorsIndexRoute
@@ -763,7 +777,9 @@ export interface FileRoutesByTo {
   '/portal': typeof PortalIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
+  '/portal/brands/$slug': typeof PortalBrandsSlugRoute
   '/portal/brands/register': typeof PortalBrandsRegisterRoute
+  '/portal/distributors/$slug': typeof PortalDistributorsSlugRoute
   '/portal/distributors/register': typeof PortalDistributorsRegisterRoute
   '/portal/brands': typeof PortalBrandsIndexRoute
   '/portal/distributors': typeof PortalDistributorsIndexRoute
@@ -860,7 +876,9 @@ export interface FileRoutesById {
   '/portal/': typeof PortalIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
+  '/portal/brands/$slug': typeof PortalBrandsSlugRoute
   '/portal/brands/register': typeof PortalBrandsRegisterRoute
+  '/portal/distributors/$slug': typeof PortalDistributorsSlugRoute
   '/portal/distributors/register': typeof PortalDistributorsRegisterRoute
   '/portal/brands/': typeof PortalBrandsIndexRoute
   '/portal/distributors/': typeof PortalDistributorsIndexRoute
@@ -958,7 +976,9 @@ export interface FileRouteTypes {
     | '/portal/'
     | '/dashboard/bookings/$id'
     | '/owner/jobs/new'
+    | '/portal/brands/$slug'
     | '/portal/brands/register'
+    | '/portal/distributors/$slug'
     | '/portal/distributors/register'
     | '/portal/brands/'
     | '/portal/distributors/'
@@ -1053,7 +1073,9 @@ export interface FileRouteTypes {
     | '/portal'
     | '/dashboard/bookings/$id'
     | '/owner/jobs/new'
+    | '/portal/brands/$slug'
     | '/portal/brands/register'
+    | '/portal/distributors/$slug'
     | '/portal/distributors/register'
     | '/portal/brands'
     | '/portal/distributors'
@@ -1149,7 +1171,9 @@ export interface FileRouteTypes {
     | '/portal/'
     | '/dashboard/bookings/$id'
     | '/owner/jobs/new'
+    | '/portal/brands/$slug'
     | '/portal/brands/register'
+    | '/portal/distributors/$slug'
     | '/portal/distributors/register'
     | '/portal/brands/'
     | '/portal/distributors/'
@@ -1226,7 +1250,9 @@ export interface RootRouteChildren {
   OwnerIndexRoute: typeof OwnerIndexRoute
   PartnerIndexRoute: typeof PartnerIndexRoute
   PortalIndexRoute: typeof PortalIndexRoute
+  PortalBrandsSlugRoute: typeof PortalBrandsSlugRoute
   PortalBrandsRegisterRoute: typeof PortalBrandsRegisterRoute
+  PortalDistributorsSlugRoute: typeof PortalDistributorsSlugRoute
   PortalDistributorsRegisterRoute: typeof PortalDistributorsRegisterRoute
   PortalBrandsIndexRoute: typeof PortalBrandsIndexRoute
   PortalDistributorsIndexRoute: typeof PortalDistributorsIndexRoute
@@ -1847,11 +1873,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalDistributorsRegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portal/distributors/$slug': {
+      id: '/portal/distributors/$slug'
+      path: '/portal/distributors/$slug'
+      fullPath: '/portal/distributors/$slug'
+      preLoaderRoute: typeof PortalDistributorsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/portal/brands/register': {
       id: '/portal/brands/register'
       path: '/portal/brands/register'
       fullPath: '/portal/brands/register'
       preLoaderRoute: typeof PortalBrandsRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal/brands/$slug': {
+      id: '/portal/brands/$slug'
+      path: '/portal/brands/$slug'
+      fullPath: '/portal/brands/$slug'
+      preLoaderRoute: typeof PortalBrandsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/owner/jobs/new': {
@@ -2055,7 +2095,9 @@ const rootRouteChildren: RootRouteChildren = {
   OwnerIndexRoute: OwnerIndexRoute,
   PartnerIndexRoute: PartnerIndexRoute,
   PortalIndexRoute: PortalIndexRoute,
+  PortalBrandsSlugRoute: PortalBrandsSlugRoute,
   PortalBrandsRegisterRoute: PortalBrandsRegisterRoute,
+  PortalDistributorsSlugRoute: PortalDistributorsSlugRoute,
   PortalDistributorsRegisterRoute: PortalDistributorsRegisterRoute,
   PortalBrandsIndexRoute: PortalBrandsIndexRoute,
   PortalDistributorsIndexRoute: PortalDistributorsIndexRoute,
