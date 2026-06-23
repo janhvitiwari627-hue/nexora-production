@@ -138,6 +138,7 @@ function RootComponent() {
       <Outlet />
       <PWAInstallPrompt />
       <ServiceWorkerUpdatePrompt />
+      <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );
 }
