@@ -52,12 +52,32 @@ export function TemplateGalleryPage() {
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Template Gallery</h1>
-        <p className="text-sm text-muted-foreground">
-          Choose a design for your booking website. Switch anytime — your content stays intact.
-        </p>
+      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Template Gallery</h1>
+          <p className="text-sm text-muted-foreground">
+            Choose a design for your booking website. Switch anytime — your content stays intact.
+          </p>
+        </div>
+        <Card className="p-3 md:max-w-md w-full">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
+            <Globe className="h-3.5 w-3.5" /> Your live website
+          </div>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 truncate text-xs bg-muted rounded px-2 py-1.5">{liveUrl}</code>
+            <Button size="sm" variant="outline" onClick={copyLive} aria-label="Copy live link">
+              <Copy className="h-3.5 w-3.5" />
+            </Button>
+            <Button size="sm" onClick={shareLive} aria-label="Share live link">
+              <Share2 className="h-3.5 w-3.5" /> Share
+            </Button>
+            <Button size="sm" variant="ghost" asChild aria-label="Open live site">
+              <a href={liveUrl} target="_blank" rel="noreferrer"><ExternalLink className="h-3.5 w-3.5" /></a>
+            </Button>
+          </div>
+        </Card>
       </div>
+
 
       <FilterPills options={TEMPLATE_CATEGORIES} value={filter} onChange={setFilter} />
 
