@@ -125,6 +125,60 @@ export type Database = {
           },
         ]
       }
+      brand_distributor_connections: {
+        Row: {
+          brand_id: string
+          created_at: string
+          distributor_id: string
+          id: string
+          initiated_by: string
+          message: string | null
+          responded_at: string | null
+          status: string
+          territory_notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          brand_id: string
+          created_at?: string
+          distributor_id: string
+          id?: string
+          initiated_by: string
+          message?: string | null
+          responded_at?: string | null
+          status?: string
+          territory_notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          brand_id?: string
+          created_at?: string
+          distributor_id?: string
+          id?: string
+          initiated_by?: string
+          message?: string | null
+          responded_at?: string | null
+          status?: string
+          territory_notes?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_distributor_connections_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_distributor_connections_distributor_id_fkey"
+            columns: ["distributor_id"]
+            isOneToOne: false
+            referencedRelation: "distributors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brand_products: {
         Row: {
           brand_id: string
@@ -316,6 +370,7 @@ export type Database = {
           company_name: string
           contact_person: string | null
           cover_url: string | null
+          coverage_districts: string[]
           coverage_states: string[] | null
           created_at: string
           description: string | null
@@ -344,6 +399,7 @@ export type Database = {
           company_name: string
           contact_person?: string | null
           cover_url?: string | null
+          coverage_districts?: string[]
           coverage_states?: string[] | null
           created_at?: string
           description?: string | null
@@ -372,6 +428,7 @@ export type Database = {
           company_name?: string
           contact_person?: string | null
           cover_url?: string | null
+          coverage_districts?: string[]
           coverage_states?: string[] | null
           created_at?: string
           description?: string | null

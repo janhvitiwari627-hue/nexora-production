@@ -12,17 +12,45 @@ export function DistributorDirectoryPage() {
   const [items, setItems] = useState<Distributor[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
+  const [stateFilter, setStateFilter] = useState("");
+  const [districtFilter, setDistrictFilter] = useState("");
 
   useEffect(() => { listDistributors().then(setItems).finally(() => setLoading(false)); }, []);
 
+  const allStates = useMemo(() => {
+    const set = new Set<string>();
+    items.forEach((d) => {
+      if (d.state) set.add(d.state);
+      (d.coverage_states ?? []).forEach((s) => s && set.add(s));
+    });
+    return Array.from(set).sort();
+  }, [items]);
+
+  const allDistricts = useMemo(() => {
+    const set = new Set<string>();
+    items.forEach((d) => {
+      if (d.district) set.add(d.district);
+      (d.coverage_districts ?? []).forEach((s) => s && set.add(s));
+    });
+    return Array.from(set).sort();
+  }, [items]);
+
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
-    if (!s) return items;
-    return items.filter((d) =>
-      [d.company_name, d.description, d.state, d.district, d.city, ...(d.brands_handled ?? []), ...(d.categories ?? [])]
-        .some((x) => String(x ?? "").toLowerCase().includes(s)),
-    );
-  }, [items, q]);
+    return items.filter((d) => {
+      if (stateFilter) {
+        const states = [d.state, ...(d.coverage_states ?? [])].filter(Boolean) as string[];
+        if (!states.some((x) => x.toLowerCase() === stateFilter.toLowerCase())) return false;
+      }
+      if (districtFilter) {
+        const districts = [d.district, ...(d.coverage_districts ?? [])].filter(Boolean) as string[];
+        if (!districts.some((x) => x.toLowerCase() === districtFilter.toLowerCase())) return false;
+      }
+      if (!s) return true;
+      return [d.company_name, d.description, d.state, d.district, d.city, ...(d.brands_handled ?? []), ...(d.categories ?? [])]
+        .some((x) => String(x ?? "").toLowerCase().includes(s));
+    });
+  }, [items, q, stateFilter, districtFilter]);
 
   return (
     <PortalLayout>
@@ -33,9 +61,27 @@ export function DistributorDirectoryPage() {
         action={<Button asChild className="bg-gradient-cta text-primary-foreground"><Link to="/portal/distributors/register"><Plus className="mr-1 h-4 w-4" /> Register Distributor</Link></Button>}
       />
 
-      <div className="mb-6 flex items-center gap-2 rounded-[var(--radius-button)] border border-border/60 bg-card px-3">
-        <Search className="h-4 w-4 text-muted-foreground" />
-        <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search distributors, brands, states" className="border-0 bg-transparent focus-visible:ring-0" />
+      <div className="mb-4 grid gap-2 md:grid-cols-[1fr_auto_auto]">
+        <div className="flex items-center gap-2 rounded-[var(--radius-button)] border border-border/60 bg-card px-3">
+          <Search className="h-4 w-4 text-muted-foreground" />
+          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search distributors, brands, states" className="border-0 bg-transparent focus-visible:ring-0" />
+        </div>
+        <select
+          value={stateFilter}
+          onChange={(e) => setStateFilter(e.target.value)}
+          className="h-10 rounded-[var(--radius-button)] border border-border/60 bg-card px-3 text-sm"
+        >
+          <option value="">All states</option>
+          {allStates.map((s) => <option key={s} value={s}>{s}</option>)}
+        </select>
+        <select
+          value={districtFilter}
+          onChange={(e) => setDistrictFilter(e.target.value)}
+          className="h-10 rounded-[var(--radius-button)] border border-border/60 bg-card px-3 text-sm"
+        >
+          <option value="">All districts</option>
+          {allDistricts.map((s) => <option key={s} value={s}>{s}</option>)}
+        </select>
       </div>
 
       {loading ? (
@@ -72,7 +118,10 @@ export function DistributorDirectoryPage() {
                   <p className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" /> {[d.city, d.district, d.state].filter(Boolean).join(", ")}</p>
                 )}
                 {d.coverage_states && d.coverage_states.length > 0 && (
-                  <p>Coverage: {d.coverage_states.join(", ")}</p>
+                  <p>States: {d.coverage_states.join(", ")}</p>
+                )}
+                {d.coverage_districts && d.coverage_districts.length > 0 && (
+                  <p>Districts: {d.coverage_districts.slice(0, 8).join(", ")}</p>
                 )}
                 {d.brands_handled && d.brands_handled.length > 0 && (
                   <p>Brands: {d.brands_handled.slice(0, 5).join(", ")}</p>

@@ -19,7 +19,7 @@ export function DistributorRegistrationPage() {
   const [form, setForm] = useState({
     company_name: "", contact_person: "", description: "", email: "", phone: "", website: "",
     gst_number: "", state: "", district: "", city: "", pincode: "", address: "",
-    coverage_states_text: "", categories_text: "", brands_handled_text: "",
+    coverage_states_text: "", coverage_districts_text: "", categories_text: "", brands_handled_text: "",
     logo_url: "", years_in_business: "",
   });
 
@@ -32,6 +32,7 @@ export function DistributorRegistrationPage() {
           ...f,
           ...Object.fromEntries(Object.entries(d).filter(([_, v]) => v !== null && typeof v !== "object")) as any,
           coverage_states_text: (d.coverage_states ?? []).join(", "),
+          coverage_districts_text: (d.coverage_districts ?? []).join(", "),
           categories_text: (d.categories ?? []).join(", "),
           brands_handled_text: (d.brands_handled ?? []).join(", "),
           years_in_business: (d as any).years_in_business?.toString() ?? "",
@@ -61,6 +62,7 @@ export function DistributorRegistrationPage() {
       address: form.address || null,
       logo_url: form.logo_url || null,
       coverage_states: splitCsv(form.coverage_states_text),
+      coverage_districts: splitCsv(form.coverage_districts_text),
       categories: splitCsv(form.categories_text),
       brands_handled: splitCsv(form.brands_handled_text),
       years_in_business: form.years_in_business ? parseInt(form.years_in_business, 10) : null,
@@ -112,12 +114,15 @@ export function DistributorRegistrationPage() {
             <F id="pin" label="Pincode" value={form.pincode} onChange={(v) => setForm({ ...form, pincode: v })} />
           </div>
           <F id="addr" label="Address" value={form.address} onChange={(v) => setForm({ ...form, address: v })} />
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className="grid gap-3 md:grid-cols-2">
             <F id="cov" label="Coverage States (comma separated)" value={form.coverage_states_text} onChange={(v) => setForm({ ...form, coverage_states_text: v })} />
+            <F id="covd" label="Coverage Districts (comma separated)" value={form.coverage_districts_text} onChange={(v) => setForm({ ...form, coverage_districts_text: v })} />
+          </div>
+          <div className="grid gap-3 md:grid-cols-3">
             <F id="cat" label="Categories (comma separated)" value={form.categories_text} onChange={(v) => setForm({ ...form, categories_text: v })} />
             <F id="brh" label="Brands Handled (comma separated)" value={form.brands_handled_text} onChange={(v) => setForm({ ...form, brands_handled_text: v })} />
+            <F id="yib" label="Years in Business" value={form.years_in_business} onChange={(v) => setForm({ ...form, years_in_business: v })} />
           </div>
-          <F id="yib" label="Years in Business" value={form.years_in_business} onChange={(v) => setForm({ ...form, years_in_business: v })} />
 
           <div className="mt-2 flex justify-end gap-2">
             <Button variant="ghost" onClick={() => navigate({ to: "/portal" })}>Cancel</Button>

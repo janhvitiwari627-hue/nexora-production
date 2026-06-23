@@ -31,10 +31,25 @@ export type Distributor = {
   email: string | null;
   phone: string | null;
   coverage_states: string[] | null;
+  coverage_districts: string[] | null;
   categories: string[] | null;
   brands_handled: string[] | null;
   is_featured: boolean;
   is_sponsored: boolean;
+};
+
+export type BrandDistributorConnection = {
+  id: string;
+  brand_id: string;
+  distributor_id: string;
+  initiated_by: "brand" | "distributor";
+  status: "pending" | "accepted" | "rejected" | "cancelled";
+  message: string | null;
+  territory_notes: string | null;
+  responded_at: string | null;
+  created_at: string;
+  brand?: { id: string; name: string; logo_url: string | null } | null;
+  distributor?: { id: string; company_name: string; logo_url: string | null } | null;
 };
 
 export type BrandProduct = {
@@ -118,6 +133,64 @@ export async function getMyLeads(userId: string) {
     .select("*")
     .or(filters.join(","))
     .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+// ---- Brand <-> Distributor connections ----
+
+const BDC = "brand_distributor_connections" as any;
+
+export async function listMyConnections(userId: string): Promise<BrandDistributorConnection[]> {
+  const { data, error } = await (supabase as any)
+    .from(BDC)
+    .select("*, brand:brands(id,name,logo_url), distributor:distributors(id,company_name,logo_url)")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as BrandDistributorConnection[];
+}
+
+export async function createConnection(args: {
+  brand_id: string;
+  distributor_id: string;
+  initiated_by: "brand" | "distributor";
+  message?: string;
+  territory_notes?: string;
+}) {
+  const { error } = await (supabase as any).from(BDC).insert({
+    brand_id: args.brand_id,
+    distributor_id: args.distributor_id,
+    initiated_by: args.initiated_by,
+    message: args.message || null,
+    territory_notes: args.territory_notes || null,
+  });
+  if (error) throw error;
+}
+
+export async function respondConnection(id: string, status: "accepted" | "rejected" | "cancelled") {
+  const { error } = await (supabase as any)
+    .from(BDC)
+    .update({ status, responded_at: new Date().toISOString() })
+    .eq("id", id);
+  if (error) throw error;
+}
+
+export async function listBrandsLite() {
+  const { data, error } = await supabase
+    .from("brands")
+    .select("id,name,logo_url")
+    .eq("status", "active")
+    .order("name");
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function listDistributorsLite() {
+  const { data, error } = await supabase
+    .from("distributors")
+    .select("id,company_name,logo_url,state")
+    .eq("status", "active")
+    .order("company_name");
   if (error) throw error;
   return data ?? [];
 }

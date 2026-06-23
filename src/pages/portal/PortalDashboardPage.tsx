@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAuthStore } from "@/stores/authStore";
 import { getMyBrand, getMyDistributor, getMyLeads, type Brand, type Distributor } from "./lib";
+import { ConnectionsPanel } from "./ConnectionsPanel";
 
 export function PortalDashboardPage() {
   const user = useAuthStore((s) => s.user);
@@ -88,6 +89,9 @@ export function PortalDashboardPage() {
           )}
         </Card>
       </section>
+
+      {(brand || distributor) && <ConnectionsPanel brand={brand} distributor={distributor} />}
+
 
       <section className="mt-10">
         <div className="mb-3 flex items-center gap-2">
