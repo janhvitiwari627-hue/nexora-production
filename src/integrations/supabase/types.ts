@@ -1716,6 +1716,81 @@ export type Database = {
         }
         Relationships: []
       }
+      promotions: {
+        Row: {
+          banner_url: string | null
+          brand_id: string
+          budget: number | null
+          clicks: number
+          created_at: string
+          description: string | null
+          end_date: string
+          id: string
+          impressions: number
+          product_id: string | null
+          start_date: string
+          status: string
+          target_category: string | null
+          target_district: string | null
+          target_state: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          banner_url?: string | null
+          brand_id: string
+          budget?: number | null
+          clicks?: number
+          created_at?: string
+          description?: string | null
+          end_date: string
+          id?: string
+          impressions?: number
+          product_id?: string | null
+          start_date?: string
+          status?: string
+          target_category?: string | null
+          target_district?: string | null
+          target_state?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          banner_url?: string | null
+          brand_id?: string
+          budget?: number | null
+          clicks?: number
+          created_at?: string
+          description?: string | null
+          end_date?: string
+          id?: string
+          impressions?: number
+          product_id?: string | null
+          start_date?: string
+          status?: string
+          target_category?: string | null
+          target_district?: string | null
+          target_state?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promotions_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promotions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "brand_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       qr_payments: {
         Row: {
           amount: number | null
