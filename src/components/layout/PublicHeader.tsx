@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Bell, Building2, ChevronDown, LayoutDashboard, LogOut, Megaphone, Menu, Package, Phone, Search, Settings, Sparkles, Star, Tag, Target, Truck, User, Users } from "lucide-react";
+import { Bell, Briefcase, Building2, ChevronDown, LayoutDashboard, LogOut, Megaphone, Menu, Package, Phone, Search, Settings, Sparkles, Star, Tag, Target, TrendingUp, Truck, User, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,9 +17,11 @@ import { LocationChip } from "./LocationChip";
 import { useAuthStore } from "@/stores/authStore";
 
 const NAV = [
-  { to: "/", label: "Home" },
-  { to: "/search", label: "Explore" },
-  { to: "/for-owners", label: "Become Owner" },
+  { to: "/", label: "Home", icon: null },
+  { to: "/search", label: "Explore", icon: null },
+  { to: "/jobs", label: "Job Portal", icon: Briefcase },
+  { to: "/partner/growth", label: "Partner Growth", icon: TrendingUp },
+  { to: "/for-owners", label: "Become Owner", icon: null },
 ] as const;
 
 const PORTAL_MENU = [
@@ -103,16 +105,20 @@ export function PublicHeader() {
 
         {/* Center nav */}
         <nav className="hidden items-center justify-center gap-1 md:flex">
-          {NAV.map((n) => (
-            <Link
-              key={n.to}
-              to={n.to}
-              activeOptions={{ exact: n.to === "/" }}
-              className="rounded-full px-4 py-2 text-sm font-semibold text-body transition hover:bg-muted hover:text-heading [&.active]:bg-muted [&.active]:text-heading"
-            >
-              {n.label}
-            </Link>
-          ))}
+          {NAV.map((n) => {
+            const Icon = n.icon;
+            return (
+              <Link
+                key={n.to}
+                to={n.to}
+                activeOptions={{ exact: n.to === "/" }}
+                className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-body transition hover:bg-muted hover:text-heading [&.active]:bg-muted [&.active]:text-heading"
+              >
+                {Icon && <Icon className="h-4 w-4" />}
+                {n.label}
+              </Link>
+            );
+          })}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="inline-flex items-center gap-1 rounded-full px-4 py-2 text-sm font-semibold text-body transition hover:bg-muted hover:text-heading">

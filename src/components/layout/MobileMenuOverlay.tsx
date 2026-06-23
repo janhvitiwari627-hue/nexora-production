@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Briefcase, Building2, Handshake, LayoutDashboard, LogOut, Sparkles, User, X } from "lucide-react";
+import { ArrowRight, Briefcase, Building2, LayoutDashboard, LogOut, Sparkles, TrendingUp, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -8,9 +8,9 @@ import { useAuthStore } from "@/stores/authStore";
 
 const NAV = [
   { label: "Explore", to: "/search", icon: Sparkles, desc: "Salons, spas & barbers near you" },
-  { label: "For Owners", to: "/", icon: Building2, desc: "Run your salon on Nexora" },
-  { label: "Partners", to: "/", icon: Handshake, desc: "Grow with our partner network" },
-  { label: "Jobs", to: "/", icon: Briefcase, desc: "Find your next role in beauty" },
+  { label: "Job Portal", to: "/jobs", icon: Briefcase, desc: "Find your next role in beauty" },
+  { label: "Partner Growth", to: "/partner/growth", icon: TrendingUp, desc: "Grow with our partner network" },
+  { label: "Become Owner", to: "/for-owners", icon: Building2, desc: "Run your salon on Nexora" },
 ] as const;
 
 export function MobileMenuOverlay({
