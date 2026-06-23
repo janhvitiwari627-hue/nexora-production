@@ -147,7 +147,7 @@ export function ForOwnersPage() {
         <div className="mx-auto max-w-2xl px-4">
           <h2 className="text-3xl font-black md:text-5xl">Ready to grow with Nexora?</h2>
           <p className="mt-3 text-white/80">Join 12,000+ salons using Nexora to delight their customers and grow faster.</p>
-          <Link to="/partner" className="bg-card text-heading mt-7 inline-flex items-center gap-2 rounded-[var(--radius-button)] px-7 py-3.5 text-sm font-bold shadow-2xl">
+          <Link to="/owner/create-website" className="bg-card text-heading mt-7 inline-flex items-center gap-2 rounded-[var(--radius-button)] px-7 py-3.5 text-sm font-bold shadow-2xl">
             Get started free <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
