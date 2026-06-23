@@ -258,3 +258,133 @@
   to { opacity: 1; transform: translateY(0); }
 }
 .tpl-royal .royal-rise { animation: royal-rise 0.9s cubic-bezier(0.22,1,0.36,1) both; }
+
+/* ---- Royal Luxe: universal section/card/badge consistency ---- */
+
+/* Neutralize light grays/whites used by section components */
+.tpl-royal [class*="bg-gray-"],
+.tpl-royal [class*="bg-slate-"],
+.tpl-royal [class*="bg-zinc-"],
+.tpl-royal [class*="bg-neutral-"],
+.tpl-royal [class*="bg-stone-"],
+.tpl-royal .bg-popover,
+.tpl-royal .bg-secondary,
+.tpl-royal .bg-accent {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* Section alt backgrounds → subtle dark panel */
+.tpl-royal section:nth-of-type(even) {
+  background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(0,0,0,0.25)) !important;
+}
+.tpl-royal section { border-color: var(--royal-line) !important; }
+
+/* Headings & accents in gold */
+.tpl-royal h1, .tpl-royal h2, .tpl-royal h3 {
+  color: #f5e6c8;
+}
+.tpl-royal h2 > span, .tpl-royal h1 > span {
+  background: linear-gradient(135deg, #f5e6c8 0%, #d4af37 50%, #b8932f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Universal card skin — anything that looks like a card */
+.tpl-royal .card,
+.tpl-royal [class*="rounded-xl"],
+.tpl-royal [class*="rounded-2xl"],
+.tpl-royal [class*="rounded-3xl"],
+.tpl-royal [class*="rounded-lg"] {
+  background: linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01)) !important;
+  border: 1px solid var(--royal-line) !important;
+  color: #f5f1e8;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.04) inset,
+    0 20px 50px -25px rgba(0,0,0,0.8) !important;
+  backdrop-filter: blur(10px) saturate(140%);
+}
+.tpl-royal .card:hover,
+.tpl-royal [class*="rounded-xl"]:hover,
+.tpl-royal [class*="rounded-2xl"]:hover,
+.tpl-royal [class*="rounded-3xl"]:hover {
+  border-color: rgba(212,175,55,0.5) !important;
+}
+
+/* Badges, chips, pills */
+.tpl-royal .badge,
+.tpl-royal [class*="rounded-full"]:where(span, div),
+.tpl-royal [class*="rounded-md"]:where(span) {
+  background: linear-gradient(135deg, rgba(212,175,55,0.18), rgba(212,175,55,0.06)) !important;
+  border: 1px solid rgba(212,175,55,0.4) !important;
+  color: var(--royal-gold-soft) !important;
+  box-shadow: 0 0 12px -4px rgba(212,175,55,0.3);
+}
+
+/* Inputs, textareas, selects */
+.tpl-royal input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+.tpl-royal textarea,
+.tpl-royal select {
+  background: rgba(0,0,0,0.4) !important;
+  border: 1px solid var(--royal-line) !important;
+  color: #f5f1e8 !important;
+}
+.tpl-royal input::placeholder,
+.tpl-royal textarea::placeholder {
+  color: rgba(245,230,200,0.4) !important;
+}
+.tpl-royal input:focus,
+.tpl-royal textarea:focus,
+.tpl-royal select:focus {
+  border-color: var(--royal-gold) !important;
+  box-shadow: 0 0 0 3px rgba(212,175,55,0.18) !important;
+  outline: none !important;
+}
+
+/* Primary / filled buttons → gold gradient */
+.tpl-royal button[class*="bg-primary"],
+.tpl-royal a[class*="bg-primary"],
+.tpl-royal button[class*="bg-black"],
+.tpl-royal a[class*="bg-black"] {
+  background: linear-gradient(135deg, #d4af37 0%, #b8932f 100%) !important;
+  color: #0a0a0a !important;
+  border: 1px solid rgba(212,175,55,0.6) !important;
+  box-shadow: 0 8px 24px -8px rgba(212,175,55,0.5) !important;
+}
+.tpl-royal button[class*="bg-primary"]:hover,
+.tpl-royal a[class*="bg-primary"]:hover {
+  filter: brightness(1.08);
+}
+
+/* Outline buttons */
+.tpl-royal button:not([class*="bg-"]):not([class*="rounded-full"]) {
+  color: var(--royal-gold-soft);
+}
+
+/* Images framed in gold */
+.tpl-royal img:not([class*="rounded-full"]):not(.royal-no-skin) {
+  border: 1px solid var(--royal-line);
+}
+
+/* Tables, dividers */
+.tpl-royal hr,
+.tpl-royal [class*="border-b"],
+.tpl-royal [class*="border-t"] {
+  border-color: var(--royal-line) !important;
+}
+.tpl-royal table th { color: var(--royal-gold-soft) !important; }
+.tpl-royal table td { border-color: var(--royal-line) !important; }
+
+/* SVG icons get a subtle gold tone where they inherit color */
+.tpl-royal svg { color: inherit; }
+.tpl-royal [class*="text-primary"] { color: var(--royal-gold) !important; }
+
+/* Star ratings → gold */
+.tpl-royal [class*="text-yellow"],
+.tpl-royal [class*="text-amber"],
+.tpl-royal [class*="fill-yellow"],
+.tpl-royal [class*="fill-amber"] {
+  color: var(--royal-gold) !important;
+  fill: var(--royal-gold) !important;
+}
