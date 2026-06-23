@@ -124,9 +124,6 @@ export function PublicHeader() {
                   className="ml-1 flex items-center gap-2 rounded-full bg-muted px-2 py-1 pr-3 text-heading ring-1 ring-border transition hover:bg-card hover:shadow-[var(--shadow-card)]"
                   aria-label="Open account menu"
                 >
-                  <span className="bg-gradient-cta grid h-7 w-7 place-items-center rounded-full text-[11px] font-bold text-primary-foreground">
-                    {initials}
-                  </span>
                   <Avatar className="h-7 w-7">
                     {avatarUrl ? <AvatarImage src={avatarUrl} alt={displayName} /> : null}
                     <AvatarFallback className="bg-gradient-cta text-[11px] font-bold text-primary-foreground">
