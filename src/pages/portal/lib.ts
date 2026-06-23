@@ -31,10 +31,25 @@ export type Distributor = {
   email: string | null;
   phone: string | null;
   coverage_states: string[] | null;
+  coverage_districts: string[] | null;
   categories: string[] | null;
   brands_handled: string[] | null;
   is_featured: boolean;
   is_sponsored: boolean;
+};
+
+export type BrandDistributorConnection = {
+  id: string;
+  brand_id: string;
+  distributor_id: string;
+  initiated_by: "brand" | "distributor";
+  status: "pending" | "accepted" | "rejected" | "cancelled";
+  message: string | null;
+  territory_notes: string | null;
+  responded_at: string | null;
+  created_at: string;
+  brand?: { id: string; name: string; logo_url: string | null } | null;
+  distributor?: { id: string; company_name: string; logo_url: string | null } | null;
 };
 
 export type BrandProduct = {
