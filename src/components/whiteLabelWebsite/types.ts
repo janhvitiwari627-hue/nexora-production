@@ -6,7 +6,7 @@ export type SectionId =
   | "beforeAfter" | "awards" | "brands";
 
 export interface WebsiteConfig {
-  template: "RoyalLuxe" | "UrbanPro" | "BeautyBlossom";
+  template: "royal-luxe" | "modern-salon" | "professional-beauty";
   branding: { logo?: string; primaryColor: string; secondaryColor: string; font: string };
   sections: { id: SectionId; enabled: boolean; order: number }[];
   seoMeta: { title: string; description: string; keywords: string[] };
@@ -187,7 +187,7 @@ export const DEFAULT_SECTIONS: WebsiteConfig["sections"] = [
 ];
 
 export const MOCK_CONFIG: WebsiteConfig = {
-  template: "RoyalLuxe",
+  template: "royal-luxe",
   branding: { primaryColor: "#0A0A0A", secondaryColor: "#D4AF37", font: "Playfair Display" },
   sections: DEFAULT_SECTIONS,
   seoMeta: {
