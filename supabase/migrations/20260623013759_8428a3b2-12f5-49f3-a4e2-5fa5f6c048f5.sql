@@ -1,0 +1,14 @@
+CREATE INDEX IF NOT EXISTS brand_products_brand_idx ON public.brand_products (brand_id);
+CREATE INDEX IF NOT EXISTS brand_products_category_idx ON public.brand_products (category);
+CREATE INDEX IF NOT EXISTS brand_products_active_idx ON public.brand_products (is_active) WHERE is_active = true;
+CREATE INDEX IF NOT EXISTS brand_products_created_idx ON public.brand_products (created_at DESC);
+CREATE INDEX IF NOT EXISTS brands_status_idx ON public.brands (status);
+CREATE INDEX IF NOT EXISTS brands_featured_idx ON public.brands (is_featured) WHERE is_featured = true;
+CREATE INDEX IF NOT EXISTS distributors_status_idx ON public.distributors (status);
+CREATE INDEX IF NOT EXISTS distributors_featured_idx ON public.distributors (is_featured) WHERE is_featured = true;
+CREATE INDEX IF NOT EXISTS distributors_district_idx ON public.distributors (district);
+CREATE INDEX IF NOT EXISTS portal_leads_status_idx ON public.portal_leads (status);
+CREATE INDEX IF NOT EXISTS portal_leads_created_idx ON public.portal_leads (created_at DESC);
+CREATE INDEX IF NOT EXISTS promotions_dates_idx ON public.promotions (start_date, end_date);
+CREATE INDEX IF NOT EXISTS promotions_category_idx ON public.promotions (target_category);
+CREATE INDEX IF NOT EXISTS promotions_state_idx ON public.promotions (target_state);
