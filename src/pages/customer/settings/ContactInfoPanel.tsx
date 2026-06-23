@@ -39,14 +39,14 @@ export function ContactInfoPanel() {
           icon={Mail}
           label="Email address"
           value={email}
-          verified={PROFILE.emailVerified}
+          verified={emailVerified}
           onChange={() => setEmailModal(true)}
         />
         <ContactRow
           icon={Phone}
           label="Mobile number"
           value={phone}
-          verified={PROFILE.phoneVerified}
+          verified={phoneVerified}
           onChange={() => setPhoneModal(true)}
         />
       </div>
