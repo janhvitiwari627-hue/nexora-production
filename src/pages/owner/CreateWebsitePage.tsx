@@ -48,8 +48,8 @@ export function CreateWebsitePage() {
     onSuccess: (_d, vars) => {
       const t = templates.find((x) => x.id === vars.template_id);
       qc.invalidateQueries({ queryKey: ["owner", "salons"] });
-      toast.success(`${t?.template_name ?? "Template"} selected. Website created.`);
-      navigate({ to: "/owner-dashboard" });
+      toast.success(`${t?.template_name ?? "Template"} applied. Edit your content & go live.`);
+      navigate({ to: "/owner/website" });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -178,13 +178,14 @@ export function CreateWebsitePage() {
                     </Button>
                     <Button
                       size="sm"
-                      disabled={isCurrent || mutate.isPending || !activeSalonId}
+                      disabled={mutate.isPending || !activeSalonId}
                       onClick={() => {
+                        if (isCurrent) { navigate({ to: "/owner/website" }); return; }
                         setPendingId(t.id);
                         mutate.mutate({ template_id: t.id });
                       }}
                     >
-                      {isCurrent ? "Selected" : (mutate.isPending && pendingId === t.id ? "Saving…" : "Use This Template")}
+                      {isCurrent ? "Edit & Go Live" : (mutate.isPending && pendingId === t.id ? "Applying…" : "Use & Edit")}
                     </Button>
                   </div>
                 </div>
