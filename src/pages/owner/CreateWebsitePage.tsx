@@ -48,8 +48,8 @@ export function CreateWebsitePage() {
     onSuccess: (_d, vars) => {
       const t = templates.find((x) => x.id === vars.template_id);
       qc.invalidateQueries({ queryKey: ["owner", "salons"] });
-      toast.success(`${t?.template_name ?? "Template"} selected. Website created.`);
-      navigate({ to: "/owner-dashboard" });
+      toast.success(`${t?.template_name ?? "Template"} applied. Edit your content & go live.`);
+      navigate({ to: "/owner/website" });
     },
     onError: (e: Error) => toast.error(e.message),
   });
