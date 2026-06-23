@@ -1,26 +1,94 @@
 import type { ShopData } from "./types";
 import type { TemplateConfig } from "./templates";
 import { Button } from "@/components/ui/button";
+import { Menu, X } from "lucide-react";
+import { useState } from "react";
+
+const LINKS = [
+  { href: "#about", label: "About" },
+  { href: "#services", label: "Services" },
+  { href: "#rate-card", label: "Rate Card" },
+  { href: "#packages", label: "Packages" },
+  { href: "#staff", label: "Staff" },
+  { href: "#membership", label: "Membership" },
+  { href: "#blog", label: "Blog" },
+  { href: "#contact", label: "Contact" },
+];
 
 export function WhiteLabelHeader({ shop, template }: { shop: ShopData; template: TemplateConfig }) {
   const variant = template.header;
-  const links = [
-    { href: "#services", label: "Services" },
-    { href: "#appointment", label: "Book" },
-    { href: "#contact", label: "Contact" },
-  ];
+  const [open, setOpen] = useState(false);
+
+  const headerClass =
+    variant === "elegant"
+      ? "border-b border-amber-200/40 bg-white/90 backdrop-blur"
+      : variant === "bold"
+      ? "border-b-2 bg-white"
+      : "bg-white/70 backdrop-blur-lg";
+
   return (
-    <header className={`sticky top-0 z-30 flex items-center justify-between gap-4 border-b bg-white/80 px-6 py-3 backdrop-blur md:px-12 ${variant === "bold" ? "py-5" : ""}`}>
-      <a href="#" className="flex items-center gap-2 font-bold" style={{ fontFamily: template.font }}>
-        <span className="grid h-8 w-8 place-items-center rounded-full text-white" style={{ backgroundColor: template.colors.primary }}>{shop.name[0]}</span>
-        <span className={variant === "elegant" ? "text-xl tracking-wide" : "text-base"}>{shop.name}</span>
-      </a>
-      <nav className="hidden items-center gap-6 text-sm md:flex">
-        {links.map(l => <a key={l.href} href={l.href} className="hover:underline">{l.label}</a>)}
-      </nav>
-      <Button size="sm" style={{ backgroundColor: template.colors.primary, borderRadius: template.radius }} asChild>
-        <a href="#appointment">Book Now</a>
-      </Button>
+    <header className={`sticky top-0 z-30 ${headerClass}`} style={variant === "bold" ? { borderColor: template.colors.primary } : undefined}>
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-3 md:px-10">
+        <a href="#" className="flex items-center gap-2 font-bold" style={{ fontFamily: template.headingFont }}>
+          <span
+            className="grid h-9 w-9 place-items-center rounded-full text-white shadow"
+            style={{ backgroundColor: template.colors.primary }}
+          >
+            {shop.name[0]}
+          </span>
+          <span className={variant === "elegant" ? "text-xl tracking-wide" : "text-base font-extrabold uppercase tracking-wide"}>
+            {shop.name}
+          </span>
+        </a>
+        <nav className="hidden items-center gap-5 text-sm md:flex">
+          {LINKS.map((l) => (
+            <a key={l.href} href={l.href} className="hover:underline" style={{ color: template.colors.text }}>
+              {l.label}
+            </a>
+          ))}
+        </nav>
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            className="hidden md:inline-flex"
+            style={{ backgroundColor: template.colors.primary, color: "white", borderRadius: template.radius }}
+            asChild
+          >
+            <a href="#appointment">Book Now</a>
+          </Button>
+          <button
+            type="button"
+            className="md:hidden"
+            aria-label="Open menu"
+            onClick={() => setOpen((v) => !v)}
+          >
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
+      </div>
+      {open && (
+        <div className="border-t bg-white md:hidden">
+          <nav className="grid gap-1 px-6 py-3">
+            {LINKS.map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                className="rounded-md px-2 py-2 text-sm hover:bg-muted"
+                onClick={() => setOpen(false)}
+              >
+                {l.label}
+              </a>
+            ))}
+            <Button
+              className="mt-2"
+              style={{ backgroundColor: template.colors.primary, color: "white", borderRadius: template.radius }}
+              asChild
+            >
+              <a href="#appointment" onClick={() => setOpen(false)}>Book Now</a>
+            </Button>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }
