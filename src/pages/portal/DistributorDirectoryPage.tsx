@@ -118,7 +118,10 @@ export function DistributorDirectoryPage() {
                   <p className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" /> {[d.city, d.district, d.state].filter(Boolean).join(", ")}</p>
                 )}
                 {d.coverage_states && d.coverage_states.length > 0 && (
-                  <p>Coverage: {d.coverage_states.join(", ")}</p>
+                  <p>States: {d.coverage_states.join(", ")}</p>
+                )}
+                {d.coverage_districts && d.coverage_districts.length > 0 && (
+                  <p>Districts: {d.coverage_districts.slice(0, 8).join(", ")}</p>
                 )}
                 {d.brands_handled && d.brands_handled.length > 0 && (
                   <p>Brands: {d.brands_handled.slice(0, 5).join(", ")}</p>
