@@ -1,19 +1,27 @@
 import { useState } from "react";
 import { useSearch, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { WebsiteRenderer } from "@/components/whiteLabelWebsite/WebsiteRenderer";
 import { WhiteLabelHeader } from "@/components/whiteLabelWebsite/WhiteLabelHeader";
 import { WhiteLabelFooter } from "@/components/whiteLabelWebsite/WhiteLabelFooter";
 import { ViralGrowthWidget } from "@/components/whiteLabelWebsite/ViralGrowthWidget";
-import { MOCK_SHOP, MOCK_CONFIG, type WebsiteConfig } from "@/components/whiteLabelWebsite/types";
+import { MOCK_SHOP, MOCK_CONFIG, type ShopData, type WebsiteConfig } from "@/components/whiteLabelWebsite/types";
 import { getTemplate, normalizeTemplateKey, TEMPLATE_KEYS, TEMPLATES, type TemplateKey } from "@/components/whiteLabelWebsite/templates";
+import { getSalonBySlug } from "@/lib/salons.functions";
 import { Paintbrush } from "lucide-react";
 
 export function WhiteLabelWebsitePage({ slug: _slug }: { slug?: string }) {
-  const shop = MOCK_SHOP;
+  const { data } = useQuery({
+    queryKey: ["white-label-site", _slug],
+    queryFn: () => (_slug ? getSalonBySlug({ data: { slug: _slug } }) : Promise.resolve(null)),
+    enabled: !!_slug,
+  });
+  const shop = toShopData(data);
   const search = useSearchSafe();
   const navigate = useNavigateSafe();
 
-  const templateKey = normalizeTemplateKey(typeof search?.t === "string" ? search.t : MOCK_CONFIG.template);
+  const savedTemplateKey = data?.salon?.selected_template_key ?? MOCK_CONFIG.template;
+  const templateKey = normalizeTemplateKey(typeof search?.t === "string" ? search.t : savedTemplateKey);
 
   const config: WebsiteConfig = { ...MOCK_CONFIG, template: templateKey };
   const template = getTemplate(templateKey);
@@ -53,13 +61,62 @@ export function WhiteLabelWebsitePage({ slug: _slug }: { slug?: string }) {
       )}
       <WhiteLabelHeader shop={shop} template={template} />
       <main className="pb-20 md:pb-0">
-        <TemplateSwitcher current={templateKey} onChange={setTemplate} />
+        {isPreview && <TemplateSwitcher current={templateKey} onChange={setTemplate} />}
         <WebsiteRenderer shop={shop} config={config} />
       </main>
       <WhiteLabelFooter shop={shop} config={config} template={template} />
       <ViralGrowthWidget />
     </div>
   );
+}
+
+function toShopData(data: Awaited<ReturnType<typeof getSalonBySlug>> | null | undefined): ShopData {
+  const salon = data?.salon;
+  if (!salon) return MOCK_SHOP;
+  const cover = salon.cover_image_url ?? salon.image_url ?? MOCK_SHOP.coverImage;
+  return {
+    ...MOCK_SHOP,
+    slug: salon.slug,
+    name: salon.name,
+    tagline: salon.tagline ?? salon.description ?? MOCK_SHOP.tagline,
+    category: salon.category ?? MOCK_SHOP.category,
+    city: salon.location ?? MOCK_SHOP.city,
+    address: salon.address ?? salon.location ?? MOCK_SHOP.address,
+    whatsapp: salon.whatsapp ?? salon.phone ?? MOCK_SHOP.whatsapp,
+    phone: salon.phone ?? MOCK_SHOP.phone,
+    email: salon.email ?? MOCK_SHOP.email,
+    coverImage: cover,
+    rating: salon.rating ?? MOCK_SHOP.rating,
+    reviewCount: salon.reviews_count ?? MOCK_SHOP.reviewCount,
+    about: salon.description ?? MOCK_SHOP.about,
+    services: (data.services?.length ? data.services : []).map((s) => ({
+      id: s.id,
+      name: s.name,
+      price: Number(s.price ?? 0),
+      duration: s.duration_minutes ?? 30,
+      desc: s.description ?? "Professional beauty service.",
+      image: s.image_url ?? undefined,
+      category: s.category ?? undefined,
+      popular: false,
+    })).concat(data.services?.length ? [] : MOCK_SHOP.services),
+    staff: (data.staff?.length ? data.staff : []).map((s) => ({
+      id: s.id,
+      name: s.name,
+      designation: s.role ?? "Beauty Specialist",
+      image: s.avatar_url ?? MOCK_SHOP.coverImage,
+      experience: 5,
+      specialization: s.bio ?? undefined,
+      rating: s.rating ?? undefined,
+      available: true,
+    })).concat(data.staff?.length ? [] : MOCK_SHOP.staff),
+    gallery: salon.gallery_images?.length
+      ? salon.gallery_images.map((url, i) => ({ url, type: "photo" as const, category: i % 2 ? "Work" : "Interior" }))
+      : MOCK_SHOP.gallery,
+    reviews: data.reviews?.length
+      ? data.reviews.map((r) => ({ id: r.id, author: "Guest", rating: r.rating, text: r.comment ?? "Great service.", date: new Date(r.created_at).toLocaleDateString("en-IN"), source: "site" as const }))
+      : MOCK_SHOP.reviews,
+    location: { lat: salon.latitude ?? MOCK_SHOP.location.lat, lng: salon.longitude ?? MOCK_SHOP.location.lng },
+  };
 }
 
 
