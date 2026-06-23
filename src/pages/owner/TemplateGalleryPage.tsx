@@ -112,21 +112,26 @@ export function TemplateGalleryPage() {
                     <Badge key={c} variant="secondary" className="text-xs">{c}</Badge>
                   ))}
                 </div>
-                <div className="flex gap-2 mt-5 pt-4 border-t">
-                  <Button variant="outline" size="sm" asChild className="flex-1">
-                    <a href={t.demoUrl} target="_blank" rel="noreferrer">
-                      <ExternalLink className="h-3.5 w-3.5" /> Live Demo
+                <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t">
+                  <Button variant="outline" size="sm" asChild>
+                    <a
+                      href={`/site/${liveSlug}?t=${encodeURIComponent(t.id)}&preview=1`}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`Preview ${t.name} on your live site`}
+                    >
+                      <Eye className="h-3.5 w-3.5" /> Preview
                     </a>
                   </Button>
                   <Button
                     size="sm"
-                    className="flex-1"
                     disabled={isActive}
                     onClick={() => setPending(t)}
                   >
                     {isActive ? "Selected" : "Select Template"}
                   </Button>
                 </div>
+
               </div>
             </Card>
           );
