@@ -6,7 +6,7 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import { FilterPills } from "@/components/shared/FilterPills";
-import { Check, ExternalLink, ShieldCheck, Sparkles, Share2, Copy, Globe } from "lucide-react";
+import { Check, ExternalLink, ShieldCheck, Sparkles, Share2, Copy, Globe, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { useOwnerContext } from "@/hooks/use-owner-context";
 import { TEMPLATES, TEMPLATE_CATEGORIES, CURRENT_TEMPLATE_ID, type Template } from "./templates/mockTemplates";
