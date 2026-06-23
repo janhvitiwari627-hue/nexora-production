@@ -409,6 +409,47 @@
 }
 
 /* =====================================================================
+ * Template: Modern Salon — White + Purple/Pink professional booking UI
+ * ===================================================================*/
+.tpl-modern {
+  --modern-primary: #8b5cf6;
+  --modern-secondary: #ec4899;
+  --modern-bg: #ffffff;
+  --modern-card: #f8fafc;
+  --modern-text: #111827;
+  --modern-line: rgba(139, 92, 246, 0.16);
+  background: var(--modern-bg) !important;
+  color: var(--modern-text) !important;
+}
+.tpl-modern section:nth-of-type(even) {
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%) !important;
+}
+.tpl-modern h1, .tpl-modern h2, .tpl-modern h3 {
+  color: var(--modern-text);
+  letter-spacing: 0;
+}
+.tpl-modern .bg-white,
+.tpl-modern .bg-card,
+.tpl-modern .bg-muted,
+.tpl-modern .bg-muted\/30 {
+  background-color: var(--modern-card) !important;
+}
+.tpl-modern [class*="rounded-xl"],
+.tpl-modern [class*="rounded-2xl"],
+.tpl-modern [class*="rounded-lg"],
+.tpl-modern .card {
+  border-color: var(--modern-line) !important;
+  box-shadow: 0 16px 40px -28px rgba(17, 24, 39, 0.42) !important;
+}
+.tpl-modern a[style*="background"],
+.tpl-modern button[style*="background"] {
+  box-shadow: 0 14px 30px -16px rgba(139, 92, 246, 0.8);
+}
+.tpl-modern img:not([class*="rounded-full"]) {
+  border: 1px solid var(--modern-line);
+}
+
+/* =====================================================================
  * TEMPLATE 03 — BEAUTY BLOSSOM
  * Soft Pink + Rose Gold + White • Instagram-style visual portfolio
  * Look & feel: Nykaa + Sephora + Lakmé
