@@ -396,6 +396,7 @@
  * ===================================================================*/
 
 .tpl-blossom {
+  /* ===== Core color tokens ===== */
   --blossom-pink: #ffd1dc;
   --blossom-pink-soft: #ffe4ec;
   --blossom-pink-deep: #ff7aa2;
@@ -403,23 +404,53 @@
   --blossom-rose-gold-deep: #b76e79;
   --blossom-cream: #fff8f5;
   --blossom-ink: #4a2c36;
+  --blossom-ink-soft: rgba(74, 44, 54, 0.7);
+  --blossom-ink-muted: rgba(74, 44, 54, 0.45);
+
+  /* ===== Surface & line tokens ===== */
+  --blossom-surface: #ffffff;
+  --blossom-surface-soft: #fff5f7;
+  --blossom-surface-gradient: linear-gradient(145deg, #ffffff 0%, #fff5f7 100%);
   --blossom-line: rgba(183, 110, 121, 0.18);
+  --blossom-line-strong: rgba(183, 110, 121, 0.35);
+
+  /* ===== Gradient tokens ===== */
+  --blossom-gradient-primary: linear-gradient(135deg, #ff7aa2 0%, #b76e79 100%);
+  --blossom-gradient-soft: linear-gradient(135deg, #ffe4ec 0%, #ffd1dc 100%);
+  --blossom-gradient-text: linear-gradient(135deg, #b76e79 0%, #ff7aa2 50%, #d4a5a5 100%);
+
+  /* ===== Shadow tokens ===== */
+  --blossom-shadow-sm: 0 2px 8px -2px rgba(255, 122, 162, 0.3);
+  --blossom-shadow-md: 0 1px 0 rgba(255, 255, 255, 0.8) inset, 0 18px 40px -22px rgba(183, 110, 121, 0.35);
+  --blossom-shadow-lg: 0 10px 24px -10px rgba(255, 122, 162, 0.6);
+  --blossom-shadow-focus: 0 0 0 4px rgba(255, 122, 162, 0.18);
+
+  /* ===== Radius tokens ===== */
+  --blossom-radius-sm: 12px;
+  --blossom-radius-md: 18px;
+  --blossom-radius-lg: 24px;
+  --blossom-radius-pill: 9999px;
+
+  /* ===== Typography tokens ===== */
+  --blossom-font-display: "Playfair Display", "Cormorant Garamond", Georgia, serif;
+  --blossom-font-body: "Lora", "Cormorant Garamond", Georgia, serif;
+  --blossom-font-script: "Dancing Script", "Great Vibes", cursive;
 
   background:
-    radial-gradient(1200px 800px at 0% 0%, #ffe4ec 0%, transparent 55%),
+    radial-gradient(1200px 800px at 0% 0%, var(--blossom-pink-soft) 0%, transparent 55%),
     radial-gradient(900px 700px at 100% 30%, #fff0f5 0%, transparent 60%),
-    linear-gradient(180deg, #fff5f7 0%, #fff8f5 100%) !important;
+    linear-gradient(180deg, #fff5f7 0%, var(--blossom-cream) 100%) !important;
   color: var(--blossom-ink) !important;
-  font-family: "Playfair Display", "Cormorant Garamond", Georgia, serif;
+  font-family: var(--blossom-font-body);
 }
 
 .tpl-blossom .blossom-script {
-  font-family: "Dancing Script", "Great Vibes", cursive;
+  font-family: var(--blossom-font-script);
   color: var(--blossom-rose-gold-deep);
 }
 
 .tpl-blossom .blossom-rose-text {
-  background: linear-gradient(135deg, #b76e79 0%, #d4a5a5 50%, #ff7aa2 100%);
+  background: var(--blossom-gradient-text);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -440,18 +471,18 @@
 
 /* Section alternating soft blush */
 .tpl-blossom section:nth-of-type(even) {
-  background: linear-gradient(180deg, rgba(255,228,236,0.45), rgba(255,248,245,0.6)) !important;
+  background: linear-gradient(180deg, rgba(255, 228, 236, 0.45), rgba(255, 248, 245, 0.6)) !important;
 }
 .tpl-blossom section { border-color: var(--blossom-line) !important; }
 
 /* Headings */
-.tpl-blossom h1, .tpl-blossom h2, .tpl-blossom h3, .tpl-blossom h4 {
+.tpl-blossom h1, .tpl-blossom h2, .tpl-blossom h3, .tpl-blossom h4, .tpl-blossom h5, .tpl-blossom h6 {
   color: var(--blossom-rose-gold-deep);
-  font-family: "Playfair Display", "Cormorant Garamond", Georgia, serif;
+  font-family: var(--blossom-font-display);
   letter-spacing: -0.01em;
 }
 .tpl-blossom h1 > span, .tpl-blossom h2 > span {
-  background: linear-gradient(135deg, #b76e79 0%, #ff7aa2 50%, #d4a5a5 100%);
+  background: var(--blossom-gradient-text);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -463,13 +494,11 @@
 .tpl-blossom [class*="rounded-2xl"],
 .tpl-blossom [class*="rounded-3xl"],
 .tpl-blossom [class*="rounded-lg"] {
-  background: linear-gradient(145deg, #ffffff 0%, #fff5f7 100%) !important;
+  background: var(--blossom-surface-gradient) !important;
   border: 1px solid var(--blossom-line) !important;
   color: var(--blossom-ink) !important;
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.8) inset,
-    0 18px 40px -22px rgba(183, 110, 121, 0.35) !important;
-  border-radius: 24px !important;
+  box-shadow: var(--blossom-shadow-md) !important;
+  border-radius: var(--blossom-radius-lg) !important;
 }
 .tpl-blossom .card:hover,
 .tpl-blossom [class*="rounded-xl"]:hover,
@@ -483,37 +512,39 @@
 /* Gallery / images get soft rose frame */
 .tpl-blossom img:not([class*="rounded-full"]):not(.blossom-no-skin) {
   border: 1px solid var(--blossom-line);
-  border-radius: 18px;
+  border-radius: var(--blossom-radius-md);
 }
 
 /* Badges & pills — rose gold */
 .tpl-blossom .badge,
 .tpl-blossom [class*="rounded-full"]:where(span, div),
 .tpl-blossom [class*="rounded-md"]:where(span) {
-  background: linear-gradient(135deg, #ffe4ec 0%, #ffd1dc 100%) !important;
+  background: var(--blossom-gradient-soft) !important;
   border: 1px solid rgba(183, 110, 121, 0.3) !important;
   color: var(--blossom-rose-gold-deep) !important;
-  box-shadow: 0 2px 8px -2px rgba(255, 122, 162, 0.3);
+  box-shadow: var(--blossom-shadow-sm);
+  font-family: var(--blossom-font-body);
 }
 
 /* Inputs */
 .tpl-blossom input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
 .tpl-blossom textarea,
 .tpl-blossom select {
-  background: #ffffff !important;
+  background: var(--blossom-surface) !important;
   border: 1px solid var(--blossom-line) !important;
   color: var(--blossom-ink) !important;
-  border-radius: 14px !important;
+  border-radius: var(--blossom-radius-sm) !important;
+  font-family: var(--blossom-font-body);
 }
 .tpl-blossom input::placeholder,
 .tpl-blossom textarea::placeholder {
-  color: rgba(74, 44, 54, 0.45) !important;
+  color: var(--blossom-ink-muted) !important;
 }
 .tpl-blossom input:focus,
 .tpl-blossom textarea:focus,
 .tpl-blossom select:focus {
   border-color: var(--blossom-rose-gold-deep) !important;
-  box-shadow: 0 0 0 4px rgba(255, 122, 162, 0.18) !important;
+  box-shadow: var(--blossom-shadow-focus) !important;
   outline: none !important;
 }
 
@@ -522,11 +553,14 @@
 .tpl-blossom a[class*="bg-primary"],
 .tpl-blossom button[class*="bg-black"],
 .tpl-blossom a[class*="bg-black"] {
-  background: linear-gradient(135deg, #ff7aa2 0%, #b76e79 100%) !important;
+  background: var(--blossom-gradient-primary) !important;
   color: #ffffff !important;
   border: 1px solid rgba(183, 110, 121, 0.4) !important;
-  box-shadow: 0 10px 24px -10px rgba(255, 122, 162, 0.6) !important;
-  border-radius: 9999px !important;
+  box-shadow: var(--blossom-shadow-lg) !important;
+  border-radius: var(--blossom-radius-pill) !important;
+  font-family: var(--blossom-font-body);
+  letter-spacing: 0.02em;
+  transition: all 0.25s ease;
 }
 .tpl-blossom button[class*="bg-primary"]:hover,
 .tpl-blossom a[class*="bg-primary"]:hover {
@@ -538,7 +572,13 @@
 .tpl-blossom button[class*="border"]:not([style*="background"]) {
   border-color: var(--blossom-rose-gold) !important;
   color: var(--blossom-rose-gold-deep) !important;
-  border-radius: 9999px !important;
+  border-radius: var(--blossom-radius-pill) !important;
+  font-family: var(--blossom-font-body);
+  transition: all 0.25s ease;
+}
+.tpl-blossom button[class*="border"]:not([style*="background"]):hover {
+  background: var(--blossom-gradient-soft) !important;
+  border-color: var(--blossom-rose-gold-deep) !important;
 }
 
 /* Dividers / borders */
@@ -548,18 +588,65 @@
   border-color: var(--blossom-line) !important;
 }
 
+/* Tables — soft rose grid */
+.tpl-blossom table {
+  border-collapse: separate !important;
+  border-spacing: 0;
+  width: 100%;
+  background: var(--blossom-surface-gradient) !important;
+  border: 1px solid var(--blossom-line) !important;
+  border-radius: var(--blossom-radius-md) !important;
+  overflow: hidden;
+  box-shadow: var(--blossom-shadow-sm);
+  font-family: var(--blossom-font-body);
+}
+.tpl-blossom thead {
+  background: var(--blossom-gradient-soft) !important;
+}
+.tpl-blossom th {
+  color: var(--blossom-rose-gold-deep) !important;
+  font-family: var(--blossom-font-display);
+  font-weight: 600;
+  text-align: left;
+  padding: 14px 18px !important;
+  border-bottom: 1px solid var(--blossom-line) !important;
+}
+.tpl-blossom td {
+  color: var(--blossom-ink) !important;
+  padding: 12px 18px !important;
+  border-bottom: 1px solid var(--blossom-line) !important;
+}
+.tpl-blossom tbody tr:last-child td { border-bottom: none !important; }
+.tpl-blossom tbody tr:nth-child(even) {
+  background: rgba(255, 228, 236, 0.25) !important;
+}
+.tpl-blossom tbody tr:hover {
+  background: rgba(255, 209, 220, 0.35) !important;
+}
+
 /* Icons & accents */
 .tpl-blossom svg { color: inherit; }
 .tpl-blossom [class*="text-primary"] { color: var(--blossom-rose-gold-deep) !important; }
+.tpl-blossom [class*="text-muted"] { color: var(--blossom-ink-soft) !important; }
 .tpl-blossom a:not([style*="background"]):hover { color: var(--blossom-pink-deep); }
 
-/* Star ratings — rose */
+/* Star ratings — rose gold */
 .tpl-blossom [class*="text-yellow"],
 .tpl-blossom [class*="text-amber"],
 .tpl-blossom [class*="fill-yellow"],
-.tpl-blossom [class*="fill-amber"] {
+.tpl-blossom [class*="fill-amber"],
+.tpl-blossom [data-star],
+.tpl-blossom .star-filled {
   color: var(--blossom-rose-gold-deep) !important;
   fill: var(--blossom-rose-gold-deep) !important;
+  stroke: var(--blossom-rose-gold-deep) !important;
+}
+.tpl-blossom .star-empty,
+.tpl-blossom [data-star="empty"] {
+  color: var(--blossom-rose-gold) !important;
+  fill: transparent !important;
+  stroke: var(--blossom-rose-gold) !important;
+  opacity: 0.5;
 }
 
 /* Gallery section — Instagram-style grid emphasis */
