@@ -54,6 +54,11 @@ export function PublicHeader() {
     profile?.full_name ||
     (user?.email ? user.email.split("@")[0] : "Account");
   const email = user?.email ?? "";
+  const avatarUrl =
+    profile?.avatar_url ||
+    (user?.user_metadata?.avatar_url as string | undefined) ||
+    (user?.user_metadata?.picture as string | undefined) ||
+    "";
   const initials = displayName
     .split(" ")
     .map((s) => s[0])
