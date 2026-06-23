@@ -31,7 +31,10 @@ import { WBrands } from "./sections/WBrands";
 
 export function WebsiteRenderer({ shop, config }: { shop: ShopData; config: WebsiteConfig }) {
   const template = getTemplate(config.template);
-  const ordered = [...config.sections].filter((s) => s.enabled).sort((a, b) => a.order - b.order);
+  const enabled = new Set(config.sections.filter((s) => s.enabled).map((s) => s.id));
+  const ordered = template.sectionOrder
+    .filter((id) => enabled.has(id))
+    .map((id, index) => ({ id, enabled: true, order: index + 1 }));
 
   const map: Record<SectionId, ReactNode> = {
     hero: <WHero shop={shop} template={template} />,
@@ -63,5 +66,5 @@ export function WebsiteRenderer({ shop, config }: { shop: ShopData; config: Webs
     brands: <WBrands shop={shop} template={template} />,
   };
 
-  return <>{ordered.map((s) => <div key={s.id}>{map[s.id]}</div>)}</>;
+  return <>{ordered.map((s) => <div key={s.id} data-section={s.id}>{map[s.id]}</div>)}</>;
 }
