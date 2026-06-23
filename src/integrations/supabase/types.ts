@@ -237,13 +237,19 @@ export type Database = {
       }
       brands: {
         Row: {
+          address: string | null
+          business_type: string | null
           category: string | null
+          company_name: string | null
           country: string | null
           cover_url: string | null
           created_at: string
           description: string | null
+          document_urls: string[] | null
           email: string | null
           founded_year: number | null
+          gallery_urls: string[] | null
+          gst_number: string | null
           hq_city: string | null
           hq_state: string | null
           id: string
@@ -251,7 +257,10 @@ export type Database = {
           is_sponsored: boolean
           logo_url: string | null
           name: string
+          owner_name: string | null
+          pan_number: string | null
           phone: string | null
+          pincode: string | null
           slug: string
           social_facebook: string | null
           social_instagram: string | null
@@ -263,13 +272,19 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          address?: string | null
+          business_type?: string | null
           category?: string | null
+          company_name?: string | null
           country?: string | null
           cover_url?: string | null
           created_at?: string
           description?: string | null
+          document_urls?: string[] | null
           email?: string | null
           founded_year?: number | null
+          gallery_urls?: string[] | null
+          gst_number?: string | null
           hq_city?: string | null
           hq_state?: string | null
           id?: string
@@ -277,7 +292,10 @@ export type Database = {
           is_sponsored?: boolean
           logo_url?: string | null
           name: string
+          owner_name?: string | null
+          pan_number?: string | null
           phone?: string | null
+          pincode?: string | null
           slug: string
           social_facebook?: string | null
           social_instagram?: string | null
@@ -289,13 +307,19 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          address?: string | null
+          business_type?: string | null
           category?: string | null
+          company_name?: string | null
           country?: string | null
           cover_url?: string | null
           created_at?: string
           description?: string | null
+          document_urls?: string[] | null
           email?: string | null
           founded_year?: number | null
+          gallery_urls?: string[] | null
+          gst_number?: string | null
           hq_city?: string | null
           hq_state?: string | null
           id?: string
@@ -303,7 +327,10 @@ export type Database = {
           is_sponsored?: boolean
           logo_url?: string | null
           name?: string
+          owner_name?: string | null
+          pan_number?: string | null
           phone?: string | null
+          pincode?: string | null
           slug?: string
           social_facebook?: string | null
           social_instagram?: string | null
@@ -365,6 +392,7 @@ export type Database = {
         Row: {
           address: string | null
           brands_handled: string[] | null
+          business_type: string | null
           categories: string[] | null
           city: string | null
           company_name: string
@@ -375,12 +403,16 @@ export type Database = {
           created_at: string
           description: string | null
           district: string | null
+          document_urls: string[] | null
           email: string | null
+          gallery_urls: string[] | null
           gst_number: string | null
           id: string
           is_featured: boolean
           is_sponsored: boolean
           logo_url: string | null
+          owner_name: string | null
+          pan_number: string | null
           phone: string | null
           pincode: string | null
           slug: string
@@ -394,6 +426,7 @@ export type Database = {
         Insert: {
           address?: string | null
           brands_handled?: string[] | null
+          business_type?: string | null
           categories?: string[] | null
           city?: string | null
           company_name: string
@@ -404,12 +437,16 @@ export type Database = {
           created_at?: string
           description?: string | null
           district?: string | null
+          document_urls?: string[] | null
           email?: string | null
+          gallery_urls?: string[] | null
           gst_number?: string | null
           id?: string
           is_featured?: boolean
           is_sponsored?: boolean
           logo_url?: string | null
+          owner_name?: string | null
+          pan_number?: string | null
           phone?: string | null
           pincode?: string | null
           slug: string
@@ -423,6 +460,7 @@ export type Database = {
         Update: {
           address?: string | null
           brands_handled?: string[] | null
+          business_type?: string | null
           categories?: string[] | null
           city?: string | null
           company_name?: string
@@ -433,12 +471,16 @@ export type Database = {
           created_at?: string
           description?: string | null
           district?: string | null
+          document_urls?: string[] | null
           email?: string | null
+          gallery_urls?: string[] | null
           gst_number?: string | null
           id?: string
           is_featured?: boolean
           is_sponsored?: boolean
           logo_url?: string | null
+          owner_name?: string | null
+          pan_number?: string | null
           phone?: string | null
           pincode?: string | null
           slug?: string
