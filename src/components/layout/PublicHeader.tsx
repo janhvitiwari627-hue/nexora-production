@@ -105,16 +105,20 @@ export function PublicHeader() {
 
         {/* Center nav */}
         <nav className="hidden items-center justify-center gap-1 md:flex">
-          {NAV.map((n) => (
-            <Link
-              key={n.to}
-              to={n.to}
-              activeOptions={{ exact: n.to === "/" }}
-              className="rounded-full px-4 py-2 text-sm font-semibold text-body transition hover:bg-muted hover:text-heading [&.active]:bg-muted [&.active]:text-heading"
-            >
-              {n.label}
-            </Link>
-          ))}
+          {NAV.map((n) => {
+            const Icon = n.icon;
+            return (
+              <Link
+                key={n.to}
+                to={n.to}
+                activeOptions={{ exact: n.to === "/" }}
+                className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-body transition hover:bg-muted hover:text-heading [&.active]:bg-muted [&.active]:text-heading"
+              >
+                {Icon && <Icon className="h-4 w-4" />}
+                {n.label}
+              </Link>
+            );
+          })}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="inline-flex items-center gap-1 rounded-full px-4 py-2 text-sm font-semibold text-body transition hover:bg-muted hover:text-heading">
