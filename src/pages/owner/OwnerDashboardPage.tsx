@@ -504,6 +504,12 @@ export function OwnerDashboardPage() {
     }
   }, [approvalStatus, navigate]);
 
+  // Mandatory onboarding: redirect approved owners with no website yet to template gallery.
+  const needsWebsite = !!activeSalon && activeSalon.website_created === false;
+  useEffect(() => {
+    if (needsWebsite) navigate({ to: "/owner/create-website" });
+  }, [needsWebsite, navigate]);
+
   // Compute greeting on the client only to avoid SSR/CSR hydration mismatch
   // (server's hour can differ from the user's local hour).
   const [greeting, setGreeting] = useState("Welcome");
@@ -516,6 +522,27 @@ export function OwnerDashboardPage() {
     <div className="min-h-screen bg-background">
       <TopBar open={open} onToggle={setOpen} />
       <main className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6">
+        {needsWebsite && (
+          <Card className="p-5 border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="flex items-start gap-3">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground">
+                  <Sparkles className="h-5 w-5" />
+                </span>
+                <div>
+                  <div className="text-base font-semibold text-heading">🚀 Create Your Website</div>
+                  <div className="text-sm text-muted-foreground">
+                    Choose a template and launch your online booking website in minutes.
+                  </div>
+                </div>
+              </div>
+              <Button onClick={() => navigate({ to: "/owner/create-website" })}>
+                Create Website
+              </Button>
+            </div>
+          </Card>
+        )}
+
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold text-heading">{greeting}, {displayName.split(" ")[0]} 👋</h1>
@@ -533,6 +560,7 @@ export function OwnerDashboardPage() {
             )
           )}
         </div>
+
 
 
         <KPICards />

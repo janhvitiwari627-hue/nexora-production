@@ -60,6 +60,7 @@ import { Route as OwnerMarketingRouteImport } from './routes/owner.marketing'
 import { Route as OwnerJobsRouteImport } from './routes/owner.jobs'
 import { Route as OwnerGalleryRouteImport } from './routes/owner.gallery'
 import { Route as OwnerCrmRouteImport } from './routes/owner.crm'
+import { Route as OwnerCreateWebsiteRouteImport } from './routes/owner.create-website'
 import { Route as OwnerBookingsRouteImport } from './routes/owner.bookings'
 import { Route as OwnerAnalyticsRouteImport } from './routes/owner.analytics'
 import { Route as JobsSearchRouteImport } from './routes/jobs.search'
@@ -363,6 +364,11 @@ const OwnerCrmRoute = OwnerCrmRouteImport.update({
   path: '/owner/crm',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OwnerCreateWebsiteRoute = OwnerCreateWebsiteRouteImport.update({
+  id: '/owner/create-website',
+  path: '/owner/create-website',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OwnerBookingsRoute = OwnerBookingsRouteImport.update({
   id: '/owner/bookings',
   path: '/owner/bookings',
@@ -662,6 +668,7 @@ export interface FileRoutesByFullPath {
   '/jobs/search': typeof JobsSearchRoute
   '/owner/analytics': typeof OwnerAnalyticsRoute
   '/owner/bookings': typeof OwnerBookingsRoute
+  '/owner/create-website': typeof OwnerCreateWebsiteRoute
   '/owner/crm': typeof OwnerCrmRoute
   '/owner/gallery': typeof OwnerGalleryRoute
   '/owner/jobs': typeof OwnerJobsRouteWithChildren
@@ -761,6 +768,7 @@ export interface FileRoutesByTo {
   '/jobs/search': typeof JobsSearchRoute
   '/owner/analytics': typeof OwnerAnalyticsRoute
   '/owner/bookings': typeof OwnerBookingsRoute
+  '/owner/create-website': typeof OwnerCreateWebsiteRoute
   '/owner/crm': typeof OwnerCrmRoute
   '/owner/gallery': typeof OwnerGalleryRoute
   '/owner/jobs': typeof OwnerJobsRouteWithChildren
@@ -862,6 +870,7 @@ export interface FileRoutesById {
   '/jobs/search': typeof JobsSearchRoute
   '/owner/analytics': typeof OwnerAnalyticsRoute
   '/owner/bookings': typeof OwnerBookingsRoute
+  '/owner/create-website': typeof OwnerCreateWebsiteRoute
   '/owner/crm': typeof OwnerCrmRoute
   '/owner/gallery': typeof OwnerGalleryRoute
   '/owner/jobs': typeof OwnerJobsRouteWithChildren
@@ -964,6 +973,7 @@ export interface FileRouteTypes {
     | '/jobs/search'
     | '/owner/analytics'
     | '/owner/bookings'
+    | '/owner/create-website'
     | '/owner/crm'
     | '/owner/gallery'
     | '/owner/jobs'
@@ -1063,6 +1073,7 @@ export interface FileRouteTypes {
     | '/jobs/search'
     | '/owner/analytics'
     | '/owner/bookings'
+    | '/owner/create-website'
     | '/owner/crm'
     | '/owner/gallery'
     | '/owner/jobs'
@@ -1163,6 +1174,7 @@ export interface FileRouteTypes {
     | '/jobs/search'
     | '/owner/analytics'
     | '/owner/bookings'
+    | '/owner/create-website'
     | '/owner/crm'
     | '/owner/gallery'
     | '/owner/jobs'
@@ -1247,6 +1259,7 @@ export interface RootRouteChildren {
   DistributorSlugRoute: typeof DistributorSlugRoute
   OwnerAnalyticsRoute: typeof OwnerAnalyticsRoute
   OwnerBookingsRoute: typeof OwnerBookingsRoute
+  OwnerCreateWebsiteRoute: typeof OwnerCreateWebsiteRoute
   OwnerCrmRoute: typeof OwnerCrmRoute
   OwnerGalleryRoute: typeof OwnerGalleryRoute
   OwnerJobsRoute: typeof OwnerJobsRouteWithChildren
@@ -1645,6 +1658,13 @@ declare module '@tanstack/react-router' {
       path: '/owner/crm'
       fullPath: '/owner/crm'
       preLoaderRoute: typeof OwnerCrmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/owner/create-website': {
+      id: '/owner/create-website'
+      path: '/owner/create-website'
+      fullPath: '/owner/create-website'
+      preLoaderRoute: typeof OwnerCreateWebsiteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/owner/bookings': {
@@ -2108,6 +2128,7 @@ const rootRouteChildren: RootRouteChildren = {
   DistributorSlugRoute: DistributorSlugRoute,
   OwnerAnalyticsRoute: OwnerAnalyticsRoute,
   OwnerBookingsRoute: OwnerBookingsRoute,
+  OwnerCreateWebsiteRoute: OwnerCreateWebsiteRoute,
   OwnerCrmRoute: OwnerCrmRoute,
   OwnerGalleryRoute: OwnerGalleryRoute,
   OwnerJobsRoute: OwnerJobsRouteWithChildren,
