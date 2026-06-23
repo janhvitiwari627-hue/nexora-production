@@ -94,11 +94,17 @@ export function TemplateGalleryPage() {
                 </div>
               )}
               <div className="aspect-[4/3] overflow-hidden bg-muted">
-                <img
-                  src={t.screenshot}
-                  alt={t.name}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+                {t.screenshot ? (
+                  <img
+                    src={t.screenshot}
+                    alt={t.name}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="grid h-full place-items-center text-sm font-semibold text-muted-foreground">
+                    {t.name}
+                  </div>
+                )}
               </div>
               <div className="p-5 flex-1 flex flex-col">
                 <div className="flex items-start justify-between gap-2">
