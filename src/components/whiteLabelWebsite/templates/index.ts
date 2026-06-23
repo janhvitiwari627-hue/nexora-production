@@ -1,10 +1,13 @@
 import type { SectionId } from "../types";
 
+export type TemplateKey = "royal-luxe" | "modern-salon" | "professional-beauty";
+
 export interface TemplateConfig {
-  key: "RoyalLuxe" | "UrbanPro" | "BeautyBlossom";
+  key: TemplateKey;
   name: string;
   tagline: string;
-  hero: "video" | "split" | "fullBleed";
+  themeType: string;
+  hero: "video" | "split" | "beautyBanner";
   header: "elegant" | "bold" | "minimal";
   footer: "rich" | "compact";
   font: string;
@@ -12,16 +15,19 @@ export interface TemplateConfig {
   radius: string;
   cardStyle: "ornate" | "sharp" | "soft";
   animation: "fade" | "slide" | "scale";
-  gallery: "masonry" | "grid" | "carousel";
-  colors: { primary: string; secondary: string; accent: string; bg: string; text: string };
-  sectionOrder?: SectionId[];
+  gallery: "masonry" | "grid" | "portfolio";
+  colors: { primary: string; secondary: string; accent: string; bg: string; card: string; text: string };
+  sectionOrder: SectionId[];
+  bestFor: string[];
+  features: string[];
 }
 
-export const TEMPLATES: Record<string, TemplateConfig> = {
-  RoyalLuxe: {
-    key: "RoyalLuxe",
+export const TEMPLATES: Record<TemplateKey, TemplateConfig> = {
+  "royal-luxe": {
+    key: "royal-luxe",
     name: "Royal Luxe",
-    tagline: "Elegant · Premium · Timeless",
+    tagline: "Luxury Black Gold · Premium Salon · High-End Spa",
+    themeType: "Luxury Black Gold",
     hero: "video",
     header: "elegant",
     footer: "rich",
@@ -31,41 +37,64 @@ export const TEMPLATES: Record<string, TemplateConfig> = {
     cardStyle: "ornate",
     animation: "fade",
     gallery: "masonry",
-    colors: { primary: "#0A0A0A", secondary: "#D4AF37", accent: "#F5E6C8", bg: "#FAF7F2", text: "#1A1A1A" },
+    colors: { primary: "#D4AF37", secondary: "#F5E6C8", accent: "#B8932F", bg: "#0B0B0B", card: "#161616", text: "#FFFFFF" },
+    sectionOrder: ["hero", "services", "staff", "beforeAfter", "packages", "membership", "reviews", "offers", "blog", "contact", "appointment", "whatsapp", "bookingBar"],
+    bestFor: ["Premium Salon", "Luxury Spa", "High-End Beauty Parlour"],
+    features: ["Glassmorphism", "Luxury Animations", "Premium Feel", "Video Background"],
   },
-  UrbanPro: {
-    key: "UrbanPro",
-    name: "Urban Pro",
-    tagline: "Bold · Modern · Energetic",
+  "modern-salon": {
+    key: "modern-salon",
+    name: "Modern Salon",
+    tagline: "Modern Professional · Clean UI · Fast Booking",
+    themeType: "Modern Professional",
     hero: "split",
     header: "bold",
     footer: "compact",
     font: "'Inter', system-ui, sans-serif",
-    headingFont: "'Oswald', 'Inter', sans-serif",
-    radius: "0.25rem",
+    headingFont: "'Inter', system-ui, sans-serif",
+    radius: "0.75rem",
     cardStyle: "sharp",
     animation: "slide",
     gallery: "grid",
-    colors: { primary: "#E11D2E", secondary: "#0F172A", accent: "#FACC15", bg: "#FFFFFF", text: "#0F172A" },
+    colors: { primary: "#8B5CF6", secondary: "#EC4899", accent: "#F5D0FE", bg: "#FFFFFF", card: "#F8FAFC", text: "#111827" },
+    sectionOrder: ["hero", "services", "staff", "gallery", "reviews", "offers", "contact", "appointment", "whatsapp", "bookingBar"],
+    bestFor: ["Salon", "Barber Shop", "Beauty Parlour"],
+    features: ["Modern Cards", "Clean UI", "Fast Booking CTA", "Mobile First"],
   },
-  BeautyBlossom: {
-    key: "BeautyBlossom",
-    name: "Beauty Blossom",
-    tagline: "Soft · Feminine · Joyful",
-    hero: "fullBleed",
+  "professional-beauty": {
+    key: "professional-beauty",
+    name: "Professional Beauty",
+    tagline: "Elegant Beauty · Portfolio Showcase · Specialist Led",
+    themeType: "Elegant Beauty",
+    hero: "beautyBanner",
     header: "minimal",
     footer: "rich",
-    font: "'Quicksand', 'Nunito', sans-serif",
-    headingFont: "'Quicksand', sans-serif",
+    font: "'Lora', Georgia, serif",
+    headingFont: "'Playfair Display', 'Lora', serif",
     radius: "1.5rem",
     cardStyle: "soft",
     animation: "scale",
-    gallery: "carousel",
-    colors: { primary: "#F472B6", secondary: "#B76E79", accent: "#FCE7F3", bg: "#FFF7FB", text: "#3F1E2E" },
+    gallery: "portfolio",
+    colors: { primary: "#E11D48", secondary: "#F9A8D4", accent: "#FFE4EC", bg: "#FFFDFD", card: "#FFFFFF", text: "#1F2937" },
+    sectionOrder: ["hero", "services", "staff", "gallery", "packages", "reviews", "faq", "contact", "appointment", "whatsapp", "bookingBar"],
+    bestFor: ["Makeup Artist", "Nail Studio", "Beauty Experts"],
+    features: ["Elegant Design", "Beauty Industry Focused", "Portfolio Showcase"],
   },
 };
 
-export const TEMPLATE_KEYS = ["RoyalLuxe", "UrbanPro", "BeautyBlossom"] as const;
+export const TEMPLATE_KEYS = ["royal-luxe", "modern-salon", "professional-beauty"] as const;
 
-export const getTemplate = (key?: string): TemplateConfig =>
-  (key && TEMPLATES[key]) || TEMPLATES.RoyalLuxe;
+export const TEMPLATE_ALIASES: Record<string, TemplateKey> = {
+  RoyalLuxe: "royal-luxe",
+  UrbanPro: "modern-salon",
+  BeautyBlossom: "professional-beauty",
+  "luxury-spa": "royal-luxe",
+};
+
+export const normalizeTemplateKey = (key?: string | null): TemplateKey => {
+  if (!key) return "royal-luxe";
+  if ((TEMPLATE_KEYS as readonly string[]).includes(key)) return key as TemplateKey;
+  return TEMPLATE_ALIASES[key] ?? "royal-luxe";
+};
+
+export const getTemplate = (key?: string | null): TemplateConfig => TEMPLATES[normalizeTemplateKey(key)];

@@ -17,14 +17,13 @@ import { selectWebsiteTemplate } from "@/lib/owner.functions";
 
 const CATEGORIES = [
   "All",
+  "Premium Salon",
   "Salon",
   "Beauty Parlour",
   "Spa",
-  "Tattoo Studio",
   "Nail Studio",
   "Makeup Studio",
   "Barber Shop",
-  "Multi-Service",
 ];
 
 type ConfirmState = { open: boolean; templateName: string };
@@ -49,7 +48,8 @@ export function CreateWebsitePage() {
     onSuccess: (_d, vars) => {
       const t = templates.find((x) => x.id === vars.template_id);
       qc.invalidateQueries({ queryKey: ["owner", "salons"] });
-      setConfirm({ open: true, templateName: t?.template_name ?? "Your template" });
+      toast.success(`${t?.template_name ?? "Template"} selected. Website created.`);
+      navigate({ to: "/owner-dashboard" });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -127,7 +127,8 @@ export function CreateWebsitePage() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {visible.map((t) => {
             const isCurrent = t.id === selectedId;
-            const previewHref = `/site/${liveSlug}?t=${encodeURIComponent(t.template_slug)}&preview=1`;
+            const templateKey = t.template_key ?? t.template_slug;
+            const previewHref = `/site/${liveSlug}?t=${encodeURIComponent(templateKey)}&preview=1`;
             return (
               <Card key={t.id} className="overflow-hidden group relative flex flex-col">
                 {isCurrent && (
@@ -138,12 +139,20 @@ export function CreateWebsitePage() {
                   </div>
                 )}
                 <div className="aspect-[4/3] overflow-hidden bg-muted">
-                  {t.preview_image && (
+                  {t.preview_image ? (
                     <img
                       src={t.preview_image}
                       alt={t.template_name}
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       loading="lazy"
+                    />
+                  ) : (
+                    <TemplatePreviewCard
+                      name={t.template_name}
+                      primary={t.primary_color ?? "#8B5CF6"}
+                      secondary={t.secondary_color ?? "#EC4899"}
+                      background={t.background_color ?? "#FFFFFF"}
+                      card={t.card_color ?? "#F8FAFC"}
                     />
                   )}
                 </div>
@@ -155,7 +164,7 @@ export function CreateWebsitePage() {
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-1.5 mt-3">
-                    <Badge variant="secondary" className="text-xs">{t.category}</Badge>
+                    <Badge variant="secondary" className="text-xs">{t.theme_type ?? t.category}</Badge>
                     <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
                       <Monitor className="h-3 w-3" /> Desktop
                       <Smartphone className="h-3 w-3 ml-1" /> Mobile
@@ -217,6 +226,33 @@ export function CreateWebsitePage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+function TemplatePreviewCard({
+  name, primary, secondary, background, card,
+}: { name: string; primary: string; secondary: string; background: string; card: string }) {
+  return (
+    <div className="h-full w-full p-4" style={{ background }} aria-label={`${name} visual preview`}>
+      <div className="flex h-full flex-col gap-3 rounded-xl border p-3 shadow-sm" style={{ backgroundColor: card, borderColor: primary }}>
+        <div className="flex items-center justify-between gap-2">
+          <span className="h-2 w-16 rounded-full" style={{ backgroundColor: primary }} />
+          <span className="h-7 w-16 rounded-full" style={{ backgroundColor: secondary }} />
+        </div>
+        <div className="grid flex-1 grid-cols-[1.2fr_0.8fr] gap-3">
+          <div className="space-y-2 self-center">
+            <span className="block h-3 w-20 rounded-full" style={{ backgroundColor: secondary }} />
+            <span className="block h-6 w-full rounded-md" style={{ backgroundColor: primary }} />
+            <span className="block h-3 w-3/4 rounded-full opacity-50" style={{ backgroundColor: primary }} />
+            <span className="block h-8 w-24 rounded-full" style={{ backgroundColor: primary }} />
+          </div>
+          <div className="rounded-2xl" style={{ background: `linear-gradient(135deg, ${primary}, ${secondary})` }} />
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {[0, 1, 2].map((i) => <span key={i} className="h-10 rounded-lg" style={{ backgroundColor: i === 1 ? secondary : primary, opacity: 0.28 }} />)}
+        </div>
+      </div>
     </div>
   );
 }

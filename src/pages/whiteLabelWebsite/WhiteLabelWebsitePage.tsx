@@ -1,24 +1,27 @@
 import { useState } from "react";
-import { useSearch, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { WebsiteRenderer } from "@/components/whiteLabelWebsite/WebsiteRenderer";
 import { WhiteLabelHeader } from "@/components/whiteLabelWebsite/WhiteLabelHeader";
 import { WhiteLabelFooter } from "@/components/whiteLabelWebsite/WhiteLabelFooter";
 import { ViralGrowthWidget } from "@/components/whiteLabelWebsite/ViralGrowthWidget";
-import { MOCK_SHOP, MOCK_CONFIG, type WebsiteConfig } from "@/components/whiteLabelWebsite/types";
-import { getTemplate, TEMPLATE_KEYS, TEMPLATES } from "@/components/whiteLabelWebsite/templates";
+import { MOCK_SHOP, MOCK_CONFIG, type ShopData, type WebsiteConfig } from "@/components/whiteLabelWebsite/types";
+import { getTemplate, normalizeTemplateKey, TEMPLATE_KEYS, TEMPLATES, type TemplateKey } from "@/components/whiteLabelWebsite/templates";
+import { getSalonBySlug } from "@/lib/salons.functions";
 import { Paintbrush } from "lucide-react";
 
-type TemplateKey = (typeof TEMPLATE_KEYS)[number];
-
-export function WhiteLabelWebsitePage({ slug: _slug }: { slug?: string }) {
-  const shop = MOCK_SHOP;
-  const search = useSearchSafe();
+export function WhiteLabelWebsitePage({ slug: _slug, routeSearch }: { slug?: string; routeSearch?: { t?: string; preview?: 1 } }) {
+  const { data } = useQuery({
+    queryKey: ["white-label-site", _slug],
+    queryFn: () => (_slug ? getSalonBySlug({ data: { slug: _slug } }) : Promise.resolve(null)),
+    enabled: !!_slug,
+  });
+  const shop = toShopData(data);
   const navigate = useNavigateSafe();
 
-  const requested = (search?.t as TemplateKey | undefined) ?? MOCK_CONFIG.template;
-  const templateKey: TemplateKey = (TEMPLATE_KEYS as readonly string[]).includes(requested)
-    ? (requested as TemplateKey)
-    : "RoyalLuxe";
+  const savedTemplateKey = data?.salon?.selected_template_key ?? MOCK_CONFIG.template;
+  const browserSearch = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const templateKey = normalizeTemplateKey(routeSearch?.t ?? browserSearch?.get("t") ?? savedTemplateKey);
 
   const config: WebsiteConfig = { ...MOCK_CONFIG, template: templateKey };
   const template = getTemplate(templateKey);
@@ -28,15 +31,15 @@ export function WhiteLabelWebsitePage({ slug: _slug }: { slug?: string }) {
   };
 
   const wrapperClass =
-    templateKey === "RoyalLuxe" ? "tpl-royal" :
-    templateKey === "BeautyBlossom" ? "tpl-blossom" : "";
+    templateKey === "royal-luxe" ? "tpl-royal" :
+    templateKey === "professional-beauty" ? "tpl-blossom" : "tpl-modern";
 
   const bgColor =
-    templateKey === "RoyalLuxe" ? "#0a0a0a" :
-    templateKey === "BeautyBlossom" ? "#fff5f7" :
+    templateKey === "royal-luxe" ? "#0B0B0B" :
+    templateKey === "professional-beauty" ? "#FFFDFD" :
     template.colors.bg;
 
-  const isPreview = search?.preview === 1 || search?.preview === "1";
+  const isPreview = routeSearch?.preview === 1 || browserSearch?.get("preview") === "1";
 
   return (
     <div className={wrapperClass} style={{ fontFamily: template.font, backgroundColor: bgColor, color: template.colors.text }}>
@@ -58,7 +61,7 @@ export function WhiteLabelWebsitePage({ slug: _slug }: { slug?: string }) {
       )}
       <WhiteLabelHeader shop={shop} template={template} />
       <main className="pb-20 md:pb-0">
-        <TemplateSwitcher current={templateKey} onChange={setTemplate} />
+        {isPreview && <TemplateSwitcher current={templateKey} onChange={setTemplate} />}
         <WebsiteRenderer shop={shop} config={config} />
       </main>
       <WhiteLabelFooter shop={shop} config={config} template={template} />
@@ -67,10 +70,62 @@ export function WhiteLabelWebsitePage({ slug: _slug }: { slug?: string }) {
   );
 }
 
-
-function useSearchSafe() {
-  try { return useSearch({ strict: false }) as Record<string, unknown>; } catch { return undefined; }
+function toShopData(data: Awaited<ReturnType<typeof getSalonBySlug>> | null | undefined): ShopData {
+  const salon = data?.salon;
+  if (!salon) return MOCK_SHOP;
+  const cover = salon.cover_image_url ?? salon.image_url ?? MOCK_SHOP.coverImage;
+  const services: ShopData["services"] = data.services?.length
+    ? data.services.map((s) => ({
+      id: s.id,
+      name: s.name,
+      price: Number(s.price ?? 0),
+      duration: s.duration_minutes ?? 30,
+      desc: s.description ?? "Professional beauty service.",
+      image: s.image_url ?? undefined,
+      category: s.category ?? undefined,
+      popular: false,
+    }))
+    : MOCK_SHOP.services;
+  const staff: ShopData["staff"] = data.staff?.length
+    ? data.staff.map((s) => ({
+      id: s.id,
+      name: s.name,
+      designation: s.role ?? "Beauty Specialist",
+      image: s.avatar_url ?? MOCK_SHOP.coverImage,
+      experience: 5,
+      specialization: s.bio ?? undefined,
+      rating: s.rating ?? undefined,
+      available: true,
+    }))
+    : MOCK_SHOP.staff;
+  return {
+    ...MOCK_SHOP,
+    slug: salon.slug,
+    name: salon.name,
+    tagline: salon.tagline ?? salon.description ?? MOCK_SHOP.tagline,
+    category: salon.category ?? MOCK_SHOP.category,
+    city: salon.location ?? MOCK_SHOP.city,
+    address: salon.address ?? salon.location ?? MOCK_SHOP.address,
+    whatsapp: salon.whatsapp ?? salon.phone ?? MOCK_SHOP.whatsapp,
+    phone: salon.phone ?? MOCK_SHOP.phone,
+    email: salon.email ?? MOCK_SHOP.email,
+    coverImage: cover,
+    rating: salon.rating ?? MOCK_SHOP.rating,
+    reviewCount: salon.reviews_count ?? MOCK_SHOP.reviewCount,
+    about: salon.description ?? MOCK_SHOP.about,
+    services,
+    staff,
+    gallery: salon.gallery_images?.length
+      ? salon.gallery_images.map((url: string, i: number) => ({ url, type: "photo" as const, category: i % 2 ? "Work" : "Interior" }))
+      : MOCK_SHOP.gallery,
+    reviews: data.reviews?.length
+      ? data.reviews.map((r) => ({ id: r.id, author: "Guest", rating: r.rating, text: r.comment ?? "Great service.", date: new Date(r.created_at).toLocaleDateString("en-IN"), source: "site" as const }))
+      : MOCK_SHOP.reviews,
+    location: { lat: salon.latitude ?? MOCK_SHOP.location.lat, lng: salon.longitude ?? MOCK_SHOP.location.lng },
+  };
 }
+
+
 function useNavigateSafe() {
   try { return useNavigate(); } catch { return undefined; }
 }

@@ -29,7 +29,7 @@ export const getSalonBySlug = createServerFn({ method: "GET" })
     const { data: salon, error } = await supabase
       .from("salons")
       .select(
-        "id, slug, name, category, rating, reviews_count, image_url, gallery_images, location, address, phone, price_range, discount, description, is_verified, latitude, longitude",
+        "id, slug, name, category, rating, reviews_count, image_url, cover_image_url, gallery_images, location, address, phone, whatsapp, email, price_range, discount, description, tagline, is_verified, latitude, longitude, website_created, selected_template_id, selected_template_key",
       )
       .eq("slug", data.slug)
       .maybeSingle();

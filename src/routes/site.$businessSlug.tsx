@@ -51,5 +51,6 @@ export const Route = createFileRoute("/site/$businessSlug")({
 
 function WhiteLabelRouteComponent() {
   const { businessSlug } = useParams({ from: "/site/$businessSlug" });
-  return <WhiteLabelWebsitePage slug={businessSlug} />;
+  const search = Route.useSearch();
+  return <WhiteLabelWebsitePage slug={businessSlug} routeSearch={search} />;
 }

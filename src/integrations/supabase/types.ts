@@ -1985,6 +1985,8 @@ export type Database = {
           is_approved: boolean
           role: string
           salon_id: string
+          selected_template_id: string | null
+          selected_template_key: string | null
           user_id: string
         }
         Insert: {
@@ -1995,6 +1997,8 @@ export type Database = {
           is_approved?: boolean
           role?: string
           salon_id: string
+          selected_template_id?: string | null
+          selected_template_key?: string | null
           user_id: string
         }
         Update: {
@@ -2005,6 +2009,8 @@ export type Database = {
           is_approved?: boolean
           role?: string
           salon_id?: string
+          selected_template_id?: string | null
+          selected_template_key?: string | null
           user_id?: string
         }
         Relationships: [
@@ -2013,6 +2019,13 @@ export type Database = {
             columns: ["salon_id"]
             isOneToOne: false
             referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "salon_owners_selected_template_id_fkey"
+            columns: ["selected_template_id"]
+            isOneToOne: false
+            referencedRelation: "website_templates"
             referencedColumns: ["id"]
           },
         ]
@@ -2155,6 +2168,7 @@ export type Database = {
           rating: number
           reviews_count: number
           selected_template_id: string | null
+          selected_template_key: string | null
           seo_description: string | null
           seo_title: string | null
           slug: string
@@ -2199,6 +2213,7 @@ export type Database = {
           rating?: number
           reviews_count?: number
           selected_template_id?: string | null
+          selected_template_key?: string | null
           seo_description?: string | null
           seo_title?: string | null
           slug: string
@@ -2243,6 +2258,7 @@ export type Database = {
           rating?: number
           reviews_count?: number
           selected_template_id?: string | null
+          selected_template_key?: string | null
           seo_description?: string | null
           seo_title?: string | null
           slug?: string
@@ -2650,39 +2666,66 @@ export type Database = {
       }
       website_templates: {
         Row: {
+          background_color: string | null
+          card_color: string | null
           category: string
           created_at: string
           description: string | null
+          hero_type: string | null
           id: string
           is_active: boolean
           preview_image: string | null
+          primary_color: string | null
+          secondary_color: string | null
           sort_order: number
+          template_config_json: Json
+          template_key: string
           template_name: string
           template_slug: string
+          text_color: string | null
+          theme_type: string | null
           updated_at: string
         }
         Insert: {
+          background_color?: string | null
+          card_color?: string | null
           category: string
           created_at?: string
           description?: string | null
+          hero_type?: string | null
           id?: string
           is_active?: boolean
           preview_image?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
           sort_order?: number
+          template_config_json?: Json
+          template_key: string
           template_name: string
           template_slug: string
+          text_color?: string | null
+          theme_type?: string | null
           updated_at?: string
         }
         Update: {
+          background_color?: string | null
+          card_color?: string | null
           category?: string
           created_at?: string
           description?: string | null
+          hero_type?: string | null
           id?: string
           is_active?: boolean
           preview_image?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
           sort_order?: number
+          template_config_json?: Json
+          template_key?: string
           template_name?: string
           template_slug?: string
+          text_color?: string | null
+          theme_type?: string | null
           updated_at?: string
         }
         Relationships: []

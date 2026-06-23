@@ -15,7 +15,7 @@ export const getMyOwnedSalons = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("salon_owners")
-      .select("role, is_approved, salon:salons(id, name, slug, image_url, location, address, phone, rating, reviews_count, website_created, selected_template_id)")
+      .select("role, is_approved, selected_template_id, selected_template_key, salon:salons(id, name, slug, image_url, location, address, phone, rating, reviews_count, website_created, selected_template_id, selected_template_key)")
       .eq("user_id", userId)
       .eq("is_approved", true);
     if (error) throw new Error(error.message);
@@ -36,7 +36,7 @@ export const listWebsiteTemplates = createServerFn({ method: "GET" })
     );
     const { data, error } = await supabase
       .from("website_templates")
-      .select("id, template_name, category, preview_image, template_slug, description, sort_order")
+      .select("id, template_key, template_name, theme_type, category, preview_image, template_slug, description, primary_color, secondary_color, background_color, card_color, text_color, hero_type, template_config_json, sort_order")
       .eq("is_active", true)
       .order("sort_order", { ascending: true });
     if (error) throw new Error(error.message);
@@ -61,9 +61,23 @@ export const selectWebsiteTemplate = createServerFn({ method: "POST" })
       .eq("is_approved", true)
       .maybeSingle();
     if (!link) throw new Error("Not authorized for this salon");
-    const { error } = await supabase
+    const { data: template, error: templateError } = await supabase
+      .from("website_templates")
+      .select("id, template_key")
+      .eq("id", data.template_id)
+      .eq("is_active", true)
+      .maybeSingle();
+    if (templateError) throw new Error(templateError.message);
+    if (!template) throw new Error("Template not found");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error: ownerError } = await supabaseAdmin
+      .from("salon_owners")
+      .update({ selected_template_id: template.id, selected_template_key: template.template_key })
+      .eq("id", link.id);
+    if (ownerError) throw new Error(ownerError.message);
+    const { error } = await supabaseAdmin
       .from("salons")
-      .update({ selected_template_id: data.template_id, website_created: true })
+      .update({ selected_template_id: template.id, selected_template_key: template.template_key, website_created: true })
       .eq("id", data.salon_id);
     if (error) throw new Error(error.message);
     return { ok: true };
