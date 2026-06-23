@@ -19,7 +19,7 @@ export function DistributorRegistrationPage() {
   const [form, setForm] = useState({
     company_name: "", contact_person: "", description: "", email: "", phone: "", website: "",
     gst_number: "", state: "", district: "", city: "", pincode: "", address: "",
-    coverage_states_text: "", categories_text: "", brands_handled_text: "",
+    coverage_states_text: "", coverage_districts_text: "", categories_text: "", brands_handled_text: "",
     logo_url: "", years_in_business: "",
   });
 
