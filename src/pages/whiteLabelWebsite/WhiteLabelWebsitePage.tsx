@@ -24,7 +24,7 @@ export function WhiteLabelWebsitePage({ slug: _slug }: { slug?: string }) {
   const template = getTemplate(templateKey);
 
   const setTemplate = (key: TemplateKey) => {
-    if (navigate) navigate({ search: (prev: Record<string, unknown>) => ({ ...prev, t: key }), replace: true });
+    if (navigate) navigate({ to: ".", search: (prev) => ({ ...(prev as Record<string, unknown>), t: key }), replace: true } as never);
   };
 
   return (
