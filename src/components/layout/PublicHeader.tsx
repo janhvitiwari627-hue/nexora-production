@@ -22,6 +22,21 @@ const NAV = [
   { to: "/for-owners", label: "Become Owner" },
 ] as const;
 
+const PORTAL_MENU = [
+  { to: "/portal/brands/register", label: "Brand Registration", icon: Tag },
+  { to: "/portal/distributors/register", label: "Distributor Registration", icon: Truck },
+  { to: "/portal/brands", label: "Brand Directory", icon: Tag },
+  { to: "/portal/distributors", label: "Distributor Directory", icon: Truck },
+  { to: "/portal/products", label: "Product Showcase", icon: Package },
+  { to: "/portal/sponsored", label: "Sponsored Listings", icon: Star },
+  { to: "/portal/business-pages", label: "Business Pages", icon: Building2 },
+  { to: "/portal/promotions", label: "Promotion Center", icon: Megaphone },
+  { to: "/portal/leads", label: "Lead Opportunities", icon: Target },
+  { to: "/portal/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/portal/pricing", label: "Pricing", icon: Users },
+  { to: "/portal/contact", label: "Contact Us", icon: Phone },
+] as const;
+
 export function PublicHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
