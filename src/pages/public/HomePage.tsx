@@ -48,6 +48,9 @@ export function HomePage() {
         <RecommendedSection />
       </Reveal>
       <Reveal>
+        <MembershipSection />
+      </Reveal>
+      <Reveal>
         <OffersSection />
       </Reveal>
       <Reveal>
