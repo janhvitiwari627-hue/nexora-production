@@ -131,8 +131,9 @@ export function DistributorDirectoryPage() {
               {d.description && <p className="mt-3 line-clamp-2 text-sm text-body">{d.description}</p>}
 
               <div className="mt-4 flex flex-wrap gap-2">
+                <Button asChild size="sm" variant="outline"><Link to="/portal/distributors/$slug" params={{ slug: d.slug }}>View Profile</Link></Button>
                 <LeadDialog trigger={<Button size="sm" className="bg-gradient-cta text-primary-foreground">Contact</Button>} target={{ type: "distributor", id: d.id, name: d.company_name }} />
-                {d.phone && <Button size="sm" variant="outline" asChild><a href={`tel:${d.phone}`}><Phone className="mr-1 h-3 w-3" />Call</a></Button>}
+                {d.phone && <Button size="sm" variant="ghost" asChild><a href={`tel:${d.phone}`}><Phone className="mr-1 h-3 w-3" />Call</a></Button>}
                 {d.email && <Button size="sm" variant="ghost" asChild><a href={`mailto:${d.email}`}><Mail className="mr-1 h-3 w-3" />Email</a></Button>}
               </div>
             </article>
