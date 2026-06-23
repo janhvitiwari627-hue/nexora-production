@@ -6,14 +6,37 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import { FilterPills } from "@/components/shared/FilterPills";
-import { Check, ExternalLink, ShieldCheck, Sparkles } from "lucide-react";
+import { Check, ExternalLink, ShieldCheck, Sparkles, Share2, Copy, Globe } from "lucide-react";
 import { toast } from "sonner";
+import { useOwnerContext } from "@/hooks/use-owner-context";
 import { TEMPLATES, TEMPLATE_CATEGORIES, CURRENT_TEMPLATE_ID, type Template } from "./templates/mockTemplates";
 
 export function TemplateGalleryPage() {
   const [filter, setFilter] = useState("All");
   const [active, setActive] = useState(CURRENT_TEMPLATE_ID);
   const [pending, setPending] = useState<Template | null>(null);
+  const { activeSalon } = useOwnerContext();
+  const liveSlug = activeSalon?.slug ?? "your-salon";
+  const liveUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/site/${liveSlug}`
+    : `/site/${liveSlug}`;
+
+  const copyLive = async () => {
+    try {
+      await navigator.clipboard.writeText(liveUrl);
+      toast.success("Live site link copied", { description: liveUrl });
+    } catch {
+      toast.error("Copy failed", { description: liveUrl });
+    }
+  };
+
+  const shareLive = async () => {
+    const shareData = { title: activeSalon?.name ?? "My Salon", text: "Book with us on Nexora", url: liveUrl };
+    if (typeof navigator !== "undefined" && (navigator as Navigator & { share?: unknown }).share) {
+      try { await (navigator as Navigator & { share: (d: typeof shareData) => Promise<void> }).share(shareData); return; } catch { /* fallthrough */ }
+    }
+    void copyLive();
+  };
 
   const visible = useMemo(
     () => filter === "All" ? TEMPLATES : TEMPLATES.filter((t) => t.category.includes(filter)),
@@ -29,12 +52,32 @@ export function TemplateGalleryPage() {
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Template Gallery</h1>
-        <p className="text-sm text-muted-foreground">
-          Choose a design for your booking website. Switch anytime — your content stays intact.
-        </p>
+      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Template Gallery</h1>
+          <p className="text-sm text-muted-foreground">
+            Choose a design for your booking website. Switch anytime — your content stays intact.
+          </p>
+        </div>
+        <Card className="p-3 md:max-w-md w-full">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
+            <Globe className="h-3.5 w-3.5" /> Your live website
+          </div>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 truncate text-xs bg-muted rounded px-2 py-1.5">{liveUrl}</code>
+            <Button size="sm" variant="outline" onClick={copyLive} aria-label="Copy live link">
+              <Copy className="h-3.5 w-3.5" />
+            </Button>
+            <Button size="sm" onClick={shareLive} aria-label="Share live link">
+              <Share2 className="h-3.5 w-3.5" /> Share
+            </Button>
+            <Button size="sm" variant="ghost" asChild aria-label="Open live site">
+              <a href={liveUrl} target="_blank" rel="noreferrer"><ExternalLink className="h-3.5 w-3.5" /></a>
+            </Button>
+          </div>
+        </Card>
       </div>
+
 
       <FilterPills options={TEMPLATE_CATEGORIES} value={filter} onChange={setFilter} />
 
