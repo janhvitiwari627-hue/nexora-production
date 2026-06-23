@@ -17,6 +17,7 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ReferralsRouteImport } from './routes/referrals'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as OwnerDashboardRouteImport } from './routes/owner-dashboard'
 import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as LoginRouteImport } from './routes/login'
@@ -147,6 +148,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OwnerDashboardRoute = OwnerDashboardRouteImport.update({
+  id: '/owner-dashboard',
+  path: '/owner-dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OfflineRoute = OfflineRouteImport.update({
@@ -625,6 +631,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/membership': typeof MembershipRoute
   '/offline': typeof OfflineRoute
+  '/owner-dashboard': typeof OwnerDashboardRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
@@ -725,6 +732,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/membership': typeof MembershipRoute
   '/offline': typeof OfflineRoute
+  '/owner-dashboard': typeof OwnerDashboardRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
@@ -827,6 +835,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/membership': typeof MembershipRoute
   '/offline': typeof OfflineRoute
+  '/owner-dashboard': typeof OwnerDashboardRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
@@ -930,6 +939,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/membership'
     | '/offline'
+    | '/owner-dashboard'
     | '/privacy'
     | '/profile'
     | '/referrals'
@@ -1030,6 +1040,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/membership'
     | '/offline'
+    | '/owner-dashboard'
     | '/privacy'
     | '/profile'
     | '/referrals'
@@ -1131,6 +1142,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/membership'
     | '/offline'
+    | '/owner-dashboard'
     | '/privacy'
     | '/profile'
     | '/referrals'
@@ -1233,6 +1245,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   MembershipRoute: typeof MembershipRoute
   OfflineRoute: typeof OfflineRoute
+  OwnerDashboardRoute: typeof OwnerDashboardRoute
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   ReferralsRoute: typeof ReferralsRoute
@@ -1357,6 +1370,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/owner-dashboard': {
+      id: '/owner-dashboard'
+      path: '/owner-dashboard'
+      fullPath: '/owner-dashboard'
+      preLoaderRoute: typeof OwnerDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/offline': {
@@ -2102,6 +2122,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   MembershipRoute: MembershipRoute,
   OfflineRoute: OfflineRoute,
+  OwnerDashboardRoute: OwnerDashboardRoute,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   ReferralsRoute: ReferralsRoute,
