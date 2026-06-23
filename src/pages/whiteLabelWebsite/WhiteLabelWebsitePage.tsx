@@ -27,8 +27,10 @@ export function WhiteLabelWebsitePage({ slug: _slug }: { slug?: string }) {
     if (navigate) navigate({ to: ".", search: (prev: Record<string, unknown>) => ({ ...prev, t: key }), replace: true } as never);
   };
 
+  const wrapperClass = templateKey === "RoyalLuxe" ? "tpl-royal" : "";
+
   return (
-    <div style={{ fontFamily: template.font, backgroundColor: template.colors.bg, color: template.colors.text }}>
+    <div className={wrapperClass} style={{ fontFamily: template.font, backgroundColor: templateKey === "RoyalLuxe" ? "#0a0a0a" : template.colors.bg, color: template.colors.text }}>
       <WhiteLabelHeader shop={shop} template={template} />
       <main className="pb-20 md:pb-0">
         <TemplateSwitcher current={templateKey} onChange={setTemplate} />
