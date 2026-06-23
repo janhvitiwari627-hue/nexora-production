@@ -12,6 +12,7 @@ import { SponsoredVideosSection } from "@/components/sections/SponsoredVideosSec
 import { OffersSection } from "@/components/sections/OffersSection";
 import { NearbyShopsSection } from "@/components/sections/NearbyShopsSection";
 import { TrendingSection } from "@/components/sections/TrendingSection";
+import { MembershipSection } from "@/components/sections/MembershipSection";
 
 import { AppDownloadSection } from "@/components/sections/AppDownloadSection";
 import { PortalSection } from "@/components/sections/PortalSection";
