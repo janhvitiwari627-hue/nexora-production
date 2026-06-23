@@ -125,6 +125,143 @@ export type Database = {
           },
         ]
       }
+      brand_products: {
+        Row: {
+          brand_id: string
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          is_featured: boolean
+          mrp: number | null
+          name: string
+          price: number | null
+          sku: string | null
+          updated_at: string
+        }
+        Insert: {
+          brand_id: string
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          is_featured?: boolean
+          mrp?: number | null
+          name: string
+          price?: number | null
+          sku?: string | null
+          updated_at?: string
+        }
+        Update: {
+          brand_id?: string
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          is_featured?: boolean
+          mrp?: number | null
+          name?: string
+          price?: number | null
+          sku?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_products_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brands: {
+        Row: {
+          category: string | null
+          country: string | null
+          cover_url: string | null
+          created_at: string
+          description: string | null
+          email: string | null
+          founded_year: number | null
+          hq_city: string | null
+          hq_state: string | null
+          id: string
+          is_featured: boolean
+          is_sponsored: boolean
+          logo_url: string | null
+          name: string
+          phone: string | null
+          slug: string
+          social_facebook: string | null
+          social_instagram: string | null
+          social_youtube: string | null
+          status: string
+          tagline: string | null
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          category?: string | null
+          country?: string | null
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          founded_year?: number | null
+          hq_city?: string | null
+          hq_state?: string | null
+          id?: string
+          is_featured?: boolean
+          is_sponsored?: boolean
+          logo_url?: string | null
+          name: string
+          phone?: string | null
+          slug: string
+          social_facebook?: string | null
+          social_instagram?: string | null
+          social_youtube?: string | null
+          status?: string
+          tagline?: string | null
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          category?: string | null
+          country?: string | null
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          founded_year?: number | null
+          hq_city?: string | null
+          hq_state?: string | null
+          id?: string
+          is_featured?: boolean
+          is_sponsored?: boolean
+          logo_url?: string | null
+          name?: string
+          phone?: string | null
+          slug?: string
+          social_facebook?: string | null
+          social_instagram?: string | null
+          social_youtube?: string | null
+          status?: string
+          tagline?: string | null
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       customer_insights: {
         Row: {
           avg_booking_frequency: number | null
@@ -167,6 +304,93 @@ export type Database = {
           preferred_price_range?: Json | null
           preferred_services?: string[] | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      distributors: {
+        Row: {
+          address: string | null
+          brands_handled: string[] | null
+          categories: string[] | null
+          city: string | null
+          company_name: string
+          contact_person: string | null
+          cover_url: string | null
+          coverage_states: string[] | null
+          created_at: string
+          description: string | null
+          district: string | null
+          email: string | null
+          gst_number: string | null
+          id: string
+          is_featured: boolean
+          is_sponsored: boolean
+          logo_url: string | null
+          phone: string | null
+          pincode: string | null
+          slug: string
+          state: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          website: string | null
+          years_in_business: number | null
+        }
+        Insert: {
+          address?: string | null
+          brands_handled?: string[] | null
+          categories?: string[] | null
+          city?: string | null
+          company_name: string
+          contact_person?: string | null
+          cover_url?: string | null
+          coverage_states?: string[] | null
+          created_at?: string
+          description?: string | null
+          district?: string | null
+          email?: string | null
+          gst_number?: string | null
+          id?: string
+          is_featured?: boolean
+          is_sponsored?: boolean
+          logo_url?: string | null
+          phone?: string | null
+          pincode?: string | null
+          slug: string
+          state?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          website?: string | null
+          years_in_business?: number | null
+        }
+        Update: {
+          address?: string | null
+          brands_handled?: string[] | null
+          categories?: string[] | null
+          city?: string | null
+          company_name?: string
+          contact_person?: string | null
+          cover_url?: string | null
+          coverage_states?: string[] | null
+          created_at?: string
+          description?: string | null
+          district?: string | null
+          email?: string | null
+          gst_number?: string | null
+          id?: string
+          is_featured?: boolean
+          is_sponsored?: boolean
+          logo_url?: string | null
+          phone?: string | null
+          pincode?: string | null
+          slug?: string
+          state?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+          years_in_business?: number | null
         }
         Relationships: []
       }
@@ -1248,6 +1472,66 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      portal_leads: {
+        Row: {
+          brand_id: string | null
+          city: string | null
+          created_at: string
+          distributor_id: string | null
+          email: string | null
+          from_user_id: string | null
+          id: string
+          message: string
+          name: string
+          phone: string | null
+          status: string
+          target_type: string
+        }
+        Insert: {
+          brand_id?: string | null
+          city?: string | null
+          created_at?: string
+          distributor_id?: string | null
+          email?: string | null
+          from_user_id?: string | null
+          id?: string
+          message: string
+          name: string
+          phone?: string | null
+          status?: string
+          target_type: string
+        }
+        Update: {
+          brand_id?: string | null
+          city?: string | null
+          created_at?: string
+          distributor_id?: string | null
+          email?: string | null
+          from_user_id?: string | null
+          id?: string
+          message?: string
+          name?: string
+          phone?: string | null
+          status?: string
+          target_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portal_leads_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_leads_distributor_id_fkey"
+            columns: ["distributor_id"]
+            isOneToOne: false
+            referencedRelation: "distributors"
             referencedColumns: ["id"]
           },
         ]

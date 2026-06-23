@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Bell, LayoutDashboard, LogOut, Menu, Search, Settings, Sparkles, User } from "lucide-react";
+import { Bell, Building2, ChevronDown, LayoutDashboard, LogOut, Megaphone, Menu, Package, Phone, Search, Settings, Sparkles, Star, Tag, Target, Truck, User, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +20,21 @@ const NAV = [
   { to: "/", label: "Home" },
   { to: "/search", label: "Explore" },
   { to: "/for-owners", label: "Become Owner" },
+] as const;
+
+const PORTAL_MENU = [
+  { to: "/portal/brands/register", label: "Brand Registration", icon: Tag },
+  { to: "/portal/distributors/register", label: "Distributor Registration", icon: Truck },
+  { to: "/portal/brands", label: "Brand Directory", icon: Tag },
+  { to: "/portal/distributors", label: "Distributor Directory", icon: Truck },
+  { to: "/portal/products", label: "Product Showcase", icon: Package },
+  { to: "/portal/sponsored", label: "Sponsored Listings", icon: Star },
+  { to: "/portal/business-pages", label: "Business Pages", icon: Building2 },
+  { to: "/portal/promotions", label: "Promotion Center", icon: Megaphone },
+  { to: "/portal/leads", label: "Lead Opportunities", icon: Target },
+  { to: "/portal/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/portal/pricing", label: "Pricing", icon: Users },
+  { to: "/portal/contact", label: "Contact Us", icon: Phone },
 ] as const;
 
 export function PublicHeader() {
@@ -98,6 +113,28 @@ export function PublicHeader() {
               {n.label}
             </Link>
           ))}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="inline-flex items-center gap-1 rounded-full px-4 py-2 text-sm font-semibold text-body transition hover:bg-muted hover:text-heading">
+                Distributor & Brand Portal
+                <ChevronDown className="h-3.5 w-3.5" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="center" className="w-64">
+              <DropdownMenuLabel className="text-xs uppercase tracking-wider text-muted-foreground">
+                Distributor & Brand Portal
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {PORTAL_MENU.map((m) => (
+                <DropdownMenuItem key={m.to} asChild>
+                  <Link to={m.to} className="cursor-pointer">
+                    <m.icon className="mr-2 h-4 w-4" />
+                    {m.label}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </nav>
 
         {/* Right actions */}

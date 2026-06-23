@@ -30,12 +30,23 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AcademyRouteImport } from './routes/academy'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as PartnerIndexRouteImport } from './routes/partner.index'
 import { Route as OwnerIndexRouteImport } from './routes/owner.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as SiteBusinessSlugRouteImport } from './routes/site.$businessSlug'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
 import { Route as SSlugRouteImport } from './routes/s.$slug'
+import { Route as PortalSponsoredRouteImport } from './routes/portal.sponsored'
+import { Route as PortalPromotionsRouteImport } from './routes/portal.promotions'
+import { Route as PortalProductsRouteImport } from './routes/portal.products'
+import { Route as PortalPricingRouteImport } from './routes/portal.pricing'
+import { Route as PortalLeadsRouteImport } from './routes/portal.leads'
+import { Route as PortalDistributorsRouteImport } from './routes/portal.distributors'
+import { Route as PortalDashboardRouteImport } from './routes/portal.dashboard'
+import { Route as PortalContactRouteImport } from './routes/portal.contact'
+import { Route as PortalBusinessPagesRouteImport } from './routes/portal.business-pages'
+import { Route as PortalBrandsRouteImport } from './routes/portal.brands'
 import { Route as PartnerGrowthRouteImport } from './routes/partner.growth'
 import { Route as PartnerDistrictRouteImport } from './routes/partner.district'
 import { Route as PartnerDistributorRouteImport } from './routes/partner.distributor'
@@ -84,6 +95,8 @@ import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising'
+import { Route as PortalDistributorsRegisterRouteImport } from './routes/portal.distributors.register'
+import { Route as PortalBrandsRegisterRouteImport } from './routes/portal.brands.register'
 import { Route as OwnerJobsNewRouteImport } from './routes/owner.jobs.new'
 import { Route as DashboardBookingsIdRouteImport } from './routes/dashboard.bookings.$id'
 import { Route as ApiPublicHooksReleaseExpiredBookingsRouteImport } from './routes/api/public/hooks/release-expired-bookings'
@@ -196,6 +209,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortalIndexRoute = PortalIndexRouteImport.update({
+  id: '/portal/',
+  path: '/portal/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PartnerIndexRoute = PartnerIndexRouteImport.update({
   id: '/partner/',
   path: '/partner/',
@@ -224,6 +242,56 @@ const ShopSlugRoute = ShopSlugRouteImport.update({
 const SSlugRoute = SSlugRouteImport.update({
   id: '/s/$slug',
   path: '/s/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalSponsoredRoute = PortalSponsoredRouteImport.update({
+  id: '/portal/sponsored',
+  path: '/portal/sponsored',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalPromotionsRoute = PortalPromotionsRouteImport.update({
+  id: '/portal/promotions',
+  path: '/portal/promotions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalProductsRoute = PortalProductsRouteImport.update({
+  id: '/portal/products',
+  path: '/portal/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalPricingRoute = PortalPricingRouteImport.update({
+  id: '/portal/pricing',
+  path: '/portal/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalLeadsRoute = PortalLeadsRouteImport.update({
+  id: '/portal/leads',
+  path: '/portal/leads',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalDistributorsRoute = PortalDistributorsRouteImport.update({
+  id: '/portal/distributors',
+  path: '/portal/distributors',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalDashboardRoute = PortalDashboardRouteImport.update({
+  id: '/portal/dashboard',
+  path: '/portal/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalContactRoute = PortalContactRouteImport.update({
+  id: '/portal/contact',
+  path: '/portal/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalBusinessPagesRoute = PortalBusinessPagesRouteImport.update({
+  id: '/portal/business-pages',
+  path: '/portal/business-pages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalBrandsRoute = PortalBrandsRouteImport.update({
+  id: '/portal/brands',
+  path: '/portal/brands',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PartnerGrowthRoute = PartnerGrowthRouteImport.update({
@@ -467,6 +535,17 @@ const AdminAdvertisingRoute = AdminAdvertisingRouteImport.update({
   path: '/admin/advertising',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortalDistributorsRegisterRoute =
+  PortalDistributorsRegisterRouteImport.update({
+    id: '/register',
+    path: '/register',
+    getParentRoute: () => PortalDistributorsRoute,
+  } as any)
+const PortalBrandsRegisterRoute = PortalBrandsRegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => PortalBrandsRoute,
+} as any)
 const OwnerJobsNewRoute = OwnerJobsNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -572,14 +651,27 @@ export interface FileRoutesByFullPath {
   '/partner/distributor': typeof PartnerDistributorRoute
   '/partner/district': typeof PartnerDistrictRoute
   '/partner/growth': typeof PartnerGrowthRoute
+  '/portal/brands': typeof PortalBrandsRouteWithChildren
+  '/portal/business-pages': typeof PortalBusinessPagesRoute
+  '/portal/contact': typeof PortalContactRoute
+  '/portal/dashboard': typeof PortalDashboardRoute
+  '/portal/distributors': typeof PortalDistributorsRouteWithChildren
+  '/portal/leads': typeof PortalLeadsRoute
+  '/portal/pricing': typeof PortalPricingRoute
+  '/portal/products': typeof PortalProductsRoute
+  '/portal/promotions': typeof PortalPromotionsRoute
+  '/portal/sponsored': typeof PortalSponsoredRoute
   '/s/$slug': typeof SSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/owner/': typeof OwnerIndexRoute
   '/partner/': typeof PartnerIndexRoute
+  '/portal/': typeof PortalIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
+  '/portal/brands/register': typeof PortalBrandsRegisterRoute
+  '/portal/distributors/register': typeof PortalDistributorsRegisterRoute
   '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
   '/api/public/hooks/recompute-rankings': typeof ApiPublicHooksRecomputeRankingsRoute
@@ -654,14 +746,27 @@ export interface FileRoutesByTo {
   '/partner/distributor': typeof PartnerDistributorRoute
   '/partner/district': typeof PartnerDistrictRoute
   '/partner/growth': typeof PartnerGrowthRoute
+  '/portal/brands': typeof PortalBrandsRouteWithChildren
+  '/portal/business-pages': typeof PortalBusinessPagesRoute
+  '/portal/contact': typeof PortalContactRoute
+  '/portal/dashboard': typeof PortalDashboardRoute
+  '/portal/distributors': typeof PortalDistributorsRouteWithChildren
+  '/portal/leads': typeof PortalLeadsRoute
+  '/portal/pricing': typeof PortalPricingRoute
+  '/portal/products': typeof PortalProductsRoute
+  '/portal/promotions': typeof PortalPromotionsRoute
+  '/portal/sponsored': typeof PortalSponsoredRoute
   '/s/$slug': typeof SSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/dashboard': typeof DashboardIndexRoute
   '/owner': typeof OwnerIndexRoute
   '/partner': typeof PartnerIndexRoute
+  '/portal': typeof PortalIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
+  '/portal/brands/register': typeof PortalBrandsRegisterRoute
+  '/portal/distributors/register': typeof PortalDistributorsRegisterRoute
   '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
   '/api/public/hooks/recompute-rankings': typeof ApiPublicHooksRecomputeRankingsRoute
@@ -738,14 +843,27 @@ export interface FileRoutesById {
   '/partner/distributor': typeof PartnerDistributorRoute
   '/partner/district': typeof PartnerDistrictRoute
   '/partner/growth': typeof PartnerGrowthRoute
+  '/portal/brands': typeof PortalBrandsRouteWithChildren
+  '/portal/business-pages': typeof PortalBusinessPagesRoute
+  '/portal/contact': typeof PortalContactRoute
+  '/portal/dashboard': typeof PortalDashboardRoute
+  '/portal/distributors': typeof PortalDistributorsRouteWithChildren
+  '/portal/leads': typeof PortalLeadsRoute
+  '/portal/pricing': typeof PortalPricingRoute
+  '/portal/products': typeof PortalProductsRoute
+  '/portal/promotions': typeof PortalPromotionsRoute
+  '/portal/sponsored': typeof PortalSponsoredRoute
   '/s/$slug': typeof SSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/owner/': typeof OwnerIndexRoute
   '/partner/': typeof PartnerIndexRoute
+  '/portal/': typeof PortalIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
+  '/portal/brands/register': typeof PortalBrandsRegisterRoute
+  '/portal/distributors/register': typeof PortalDistributorsRegisterRoute
   '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
   '/api/public/hooks/recompute-rankings': typeof ApiPublicHooksRecomputeRankingsRoute
@@ -823,14 +941,27 @@ export interface FileRouteTypes {
     | '/partner/distributor'
     | '/partner/district'
     | '/partner/growth'
+    | '/portal/brands'
+    | '/portal/business-pages'
+    | '/portal/contact'
+    | '/portal/dashboard'
+    | '/portal/distributors'
+    | '/portal/leads'
+    | '/portal/pricing'
+    | '/portal/products'
+    | '/portal/promotions'
+    | '/portal/sponsored'
     | '/s/$slug'
     | '/shop/$slug'
     | '/site/$businessSlug'
     | '/dashboard/'
     | '/owner/'
     | '/partner/'
+    | '/portal/'
     | '/dashboard/bookings/$id'
     | '/owner/jobs/new'
+    | '/portal/brands/register'
+    | '/portal/distributors/register'
     | '/api/public/hooks/process-settlements'
     | '/api/public/hooks/recompute-insights'
     | '/api/public/hooks/recompute-rankings'
@@ -905,14 +1036,27 @@ export interface FileRouteTypes {
     | '/partner/distributor'
     | '/partner/district'
     | '/partner/growth'
+    | '/portal/brands'
+    | '/portal/business-pages'
+    | '/portal/contact'
+    | '/portal/dashboard'
+    | '/portal/distributors'
+    | '/portal/leads'
+    | '/portal/pricing'
+    | '/portal/products'
+    | '/portal/promotions'
+    | '/portal/sponsored'
     | '/s/$slug'
     | '/shop/$slug'
     | '/site/$businessSlug'
     | '/dashboard'
     | '/owner'
     | '/partner'
+    | '/portal'
     | '/dashboard/bookings/$id'
     | '/owner/jobs/new'
+    | '/portal/brands/register'
+    | '/portal/distributors/register'
     | '/api/public/hooks/process-settlements'
     | '/api/public/hooks/recompute-insights'
     | '/api/public/hooks/recompute-rankings'
@@ -988,14 +1132,27 @@ export interface FileRouteTypes {
     | '/partner/distributor'
     | '/partner/district'
     | '/partner/growth'
+    | '/portal/brands'
+    | '/portal/business-pages'
+    | '/portal/contact'
+    | '/portal/dashboard'
+    | '/portal/distributors'
+    | '/portal/leads'
+    | '/portal/pricing'
+    | '/portal/products'
+    | '/portal/promotions'
+    | '/portal/sponsored'
     | '/s/$slug'
     | '/shop/$slug'
     | '/site/$businessSlug'
     | '/dashboard/'
     | '/owner/'
     | '/partner/'
+    | '/portal/'
     | '/dashboard/bookings/$id'
     | '/owner/jobs/new'
+    | '/portal/brands/register'
+    | '/portal/distributors/register'
     | '/api/public/hooks/process-settlements'
     | '/api/public/hooks/recompute-insights'
     | '/api/public/hooks/recompute-rankings'
@@ -1055,11 +1212,22 @@ export interface RootRouteChildren {
   PartnerDistributorRoute: typeof PartnerDistributorRoute
   PartnerDistrictRoute: typeof PartnerDistrictRoute
   PartnerGrowthRoute: typeof PartnerGrowthRoute
+  PortalBrandsRoute: typeof PortalBrandsRouteWithChildren
+  PortalBusinessPagesRoute: typeof PortalBusinessPagesRoute
+  PortalContactRoute: typeof PortalContactRoute
+  PortalDashboardRoute: typeof PortalDashboardRoute
+  PortalDistributorsRoute: typeof PortalDistributorsRouteWithChildren
+  PortalLeadsRoute: typeof PortalLeadsRoute
+  PortalPricingRoute: typeof PortalPricingRoute
+  PortalProductsRoute: typeof PortalProductsRoute
+  PortalPromotionsRoute: typeof PortalPromotionsRoute
+  PortalSponsoredRoute: typeof PortalSponsoredRoute
   SSlugRoute: typeof SSlugRoute
   ShopSlugRoute: typeof ShopSlugRoute
   SiteBusinessSlugRoute: typeof SiteBusinessSlugRoute
   OwnerIndexRoute: typeof OwnerIndexRoute
   PartnerIndexRoute: typeof PartnerIndexRoute
+  PortalIndexRoute: typeof PortalIndexRoute
   ApiPublicHooksProcessSettlementsRoute: typeof ApiPublicHooksProcessSettlementsRoute
   ApiPublicHooksRecomputeInsightsRoute: typeof ApiPublicHooksRecomputeInsightsRoute
   ApiPublicHooksRecomputeRankingsRoute: typeof ApiPublicHooksRecomputeRankingsRoute
@@ -1215,6 +1383,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portal/': {
+      id: '/portal/'
+      path: '/portal'
+      fullPath: '/portal/'
+      preLoaderRoute: typeof PortalIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/partner/': {
       id: '/partner/'
       path: '/partner'
@@ -1255,6 +1430,76 @@ declare module '@tanstack/react-router' {
       path: '/s/$slug'
       fullPath: '/s/$slug'
       preLoaderRoute: typeof SSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal/sponsored': {
+      id: '/portal/sponsored'
+      path: '/portal/sponsored'
+      fullPath: '/portal/sponsored'
+      preLoaderRoute: typeof PortalSponsoredRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal/promotions': {
+      id: '/portal/promotions'
+      path: '/portal/promotions'
+      fullPath: '/portal/promotions'
+      preLoaderRoute: typeof PortalPromotionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal/products': {
+      id: '/portal/products'
+      path: '/portal/products'
+      fullPath: '/portal/products'
+      preLoaderRoute: typeof PortalProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal/pricing': {
+      id: '/portal/pricing'
+      path: '/portal/pricing'
+      fullPath: '/portal/pricing'
+      preLoaderRoute: typeof PortalPricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal/leads': {
+      id: '/portal/leads'
+      path: '/portal/leads'
+      fullPath: '/portal/leads'
+      preLoaderRoute: typeof PortalLeadsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal/distributors': {
+      id: '/portal/distributors'
+      path: '/portal/distributors'
+      fullPath: '/portal/distributors'
+      preLoaderRoute: typeof PortalDistributorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal/dashboard': {
+      id: '/portal/dashboard'
+      path: '/portal/dashboard'
+      fullPath: '/portal/dashboard'
+      preLoaderRoute: typeof PortalDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal/contact': {
+      id: '/portal/contact'
+      path: '/portal/contact'
+      fullPath: '/portal/contact'
+      preLoaderRoute: typeof PortalContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal/business-pages': {
+      id: '/portal/business-pages'
+      path: '/portal/business-pages'
+      fullPath: '/portal/business-pages'
+      preLoaderRoute: typeof PortalBusinessPagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal/brands': {
+      id: '/portal/brands'
+      path: '/portal/brands'
+      fullPath: '/portal/brands'
+      preLoaderRoute: typeof PortalBrandsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/partner/growth': {
@@ -1593,6 +1838,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdvertisingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portal/distributors/register': {
+      id: '/portal/distributors/register'
+      path: '/register'
+      fullPath: '/portal/distributors/register'
+      preLoaderRoute: typeof PortalDistributorsRegisterRouteImport
+      parentRoute: typeof PortalDistributorsRoute
+    }
+    '/portal/brands/register': {
+      id: '/portal/brands/register'
+      path: '/register'
+      fullPath: '/portal/brands/register'
+      preLoaderRoute: typeof PortalBrandsRegisterRouteImport
+      parentRoute: typeof PortalBrandsRoute
+    }
     '/owner/jobs/new': {
       id: '/owner/jobs/new'
       path: '/new'
@@ -1727,6 +1986,29 @@ const OwnerJobsRouteWithChildren = OwnerJobsRoute._addFileChildren(
   OwnerJobsRouteChildren,
 )
 
+interface PortalBrandsRouteChildren {
+  PortalBrandsRegisterRoute: typeof PortalBrandsRegisterRoute
+}
+
+const PortalBrandsRouteChildren: PortalBrandsRouteChildren = {
+  PortalBrandsRegisterRoute: PortalBrandsRegisterRoute,
+}
+
+const PortalBrandsRouteWithChildren = PortalBrandsRoute._addFileChildren(
+  PortalBrandsRouteChildren,
+)
+
+interface PortalDistributorsRouteChildren {
+  PortalDistributorsRegisterRoute: typeof PortalDistributorsRegisterRoute
+}
+
+const PortalDistributorsRouteChildren: PortalDistributorsRouteChildren = {
+  PortalDistributorsRegisterRoute: PortalDistributorsRegisterRoute,
+}
+
+const PortalDistributorsRouteWithChildren =
+  PortalDistributorsRoute._addFileChildren(PortalDistributorsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -1780,11 +2062,22 @@ const rootRouteChildren: RootRouteChildren = {
   PartnerDistributorRoute: PartnerDistributorRoute,
   PartnerDistrictRoute: PartnerDistrictRoute,
   PartnerGrowthRoute: PartnerGrowthRoute,
+  PortalBrandsRoute: PortalBrandsRouteWithChildren,
+  PortalBusinessPagesRoute: PortalBusinessPagesRoute,
+  PortalContactRoute: PortalContactRoute,
+  PortalDashboardRoute: PortalDashboardRoute,
+  PortalDistributorsRoute: PortalDistributorsRouteWithChildren,
+  PortalLeadsRoute: PortalLeadsRoute,
+  PortalPricingRoute: PortalPricingRoute,
+  PortalProductsRoute: PortalProductsRoute,
+  PortalPromotionsRoute: PortalPromotionsRoute,
+  PortalSponsoredRoute: PortalSponsoredRoute,
   SSlugRoute: SSlugRoute,
   ShopSlugRoute: ShopSlugRoute,
   SiteBusinessSlugRoute: SiteBusinessSlugRoute,
   OwnerIndexRoute: OwnerIndexRoute,
   PartnerIndexRoute: PartnerIndexRoute,
+  PortalIndexRoute: PortalIndexRoute,
   ApiPublicHooksProcessSettlementsRoute: ApiPublicHooksProcessSettlementsRoute,
   ApiPublicHooksRecomputeInsightsRoute: ApiPublicHooksRecomputeInsightsRoute,
   ApiPublicHooksRecomputeRankingsRoute: ApiPublicHooksRecomputeRankingsRoute,

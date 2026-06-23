@@ -14,6 +14,7 @@ import { NearbyShopsSection } from "@/components/sections/NearbyShopsSection";
 import { TrendingSection } from "@/components/sections/TrendingSection";
 
 import { AppDownloadSection } from "@/components/sections/AppDownloadSection";
+import { PortalSection } from "@/components/sections/PortalSection";
 import { Button } from "@/components/ui/button";
 
 function Reveal({ children }: { children: ReactNode }) {
@@ -61,8 +62,12 @@ export function HomePage() {
         <TrendingSection />
       </Reveal>
       <Reveal>
+        <PortalSection />
+      </Reveal>
+      <Reveal>
         <AppDownloadSection />
       </Reveal>
+
 
       {/* Owner CTA */}
       <Reveal>
