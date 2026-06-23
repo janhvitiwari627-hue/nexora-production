@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MobileMenuOverlay } from "./MobileMenuOverlay";
 import { LocationChip } from "./LocationChip";
 import { useAuthStore } from "@/stores/authStore";
@@ -53,6 +54,11 @@ export function PublicHeader() {
     profile?.full_name ||
     (user?.email ? user.email.split("@")[0] : "Account");
   const email = user?.email ?? "";
+  const avatarUrl =
+    profile?.avatar_url ||
+    (user?.user_metadata?.avatar_url as string | undefined) ||
+    (user?.user_metadata?.picture as string | undefined) ||
+    "";
   const initials = displayName
     .split(" ")
     .map((s) => s[0])
@@ -118,9 +124,12 @@ export function PublicHeader() {
                   className="ml-1 flex items-center gap-2 rounded-full bg-muted px-2 py-1 pr-3 text-heading ring-1 ring-border transition hover:bg-card hover:shadow-[var(--shadow-card)]"
                   aria-label="Open account menu"
                 >
-                  <span className="bg-gradient-cta grid h-7 w-7 place-items-center rounded-full text-[11px] font-bold text-primary-foreground">
-                    {initials}
-                  </span>
+                  <Avatar className="h-7 w-7">
+                    {avatarUrl ? <AvatarImage src={avatarUrl} alt={displayName} /> : null}
+                    <AvatarFallback className="bg-gradient-cta text-[11px] font-bold text-primary-foreground">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
                   <span className="max-w-[120px] truncate text-sm font-semibold">
                     {displayName}
                   </span>
