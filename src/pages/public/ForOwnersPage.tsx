@@ -13,9 +13,9 @@ const FEATURES = [
 ];
 
 const PLANS = [
+  { name: "Free", price: 0, body: "Try Nexora at zero cost.", perks: ["1 staff account", "Up to 20 bookings/mo", "Booking website", "Community support"] },
   { name: "Starter", price: 999, body: "For new salons getting started.", perks: ["Up to 3 staff", "Bookings & reminders", "Basic analytics", "Customer support"] },
   { name: "Growth", price: 2499, popular: true, body: "Most loved by growing salons.", perks: ["Unlimited staff", "WhatsApp marketing", "Memberships & loyalty", "Advanced analytics", "Priority support"] },
-  { name: "Enterprise", price: 4999, body: "For chains & franchises.", perks: ["Multi-location", "Centralised analytics", "API access", "Dedicated manager", "Custom integrations"] },
 ];
 
 const SHOTS = [
@@ -111,7 +111,7 @@ export function ForOwnersPage() {
               {p.popular && <span className="bg-gradient-cta text-primary-foreground absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wider">Most popular</span>}
               <h3 className="text-heading text-xl font-bold">{p.name}</h3>
               <p className="text-muted-foreground mt-1 text-sm">{p.body}</p>
-              <div className="text-heading mt-5 text-3xl font-black sm:text-4xl">₹{p.price}<span className="text-muted-foreground text-base font-medium">/mo</span></div>
+              <div className="text-heading mt-5 text-3xl font-black sm:text-4xl">{p.price === 0 ? "Free" : <>₹{p.price}</>}{p.price !== 0 && <span className="text-muted-foreground text-base font-medium">/mo</span>}</div>
               <ul className="text-heading mt-5 space-y-2 text-sm">
                 {p.perks.map((perk) => <li key={perk} className="flex items-start gap-2"><Check className="text-success mt-0.5 h-4 w-4 shrink-0" />{perk}</li>)}
               </ul>
