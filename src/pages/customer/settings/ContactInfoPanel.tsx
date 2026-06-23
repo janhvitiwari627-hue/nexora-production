@@ -1,16 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckCircle2, Mail, MapPin, Pencil, Phone, Plus, Trash2, X } from "lucide-react";
 import { PROFILE, ADDRESSES, type Address } from "./mockSettings";
 import { PanelShell, Field, inputCls } from "./PersonalInfoPanel";
+import { useAuthStore } from "@/stores/authStore";
 
 export function ContactInfoPanel() {
-  const [email, setEmail] = useState(PROFILE.email);
-  const [phone, setPhone] = useState(PROFILE.phone);
+  const { user, profile } = useAuthStore();
+  const [email, setEmail] = useState(profile?.email || user?.email || PROFILE.email);
+  const [phone, setPhone] = useState(profile?.mobile || PROFILE.phone);
   const [addresses, setAddresses] = useState<Address[]>(ADDRESSES);
   const [emailModal, setEmailModal] = useState(false);
   const [phoneModal, setPhoneModal] = useState(false);
   const [editAddr, setEditAddr] = useState<Address | null>(null);
   const [addingAddr, setAddingAddr] = useState(false);
+
+  useEffect(() => {
+    setEmail(profile?.email || user?.email || "");
+    if (profile?.mobile) setPhone(profile.mobile);
+  }, [profile, user]);
+
+  const emailVerified = !!user?.email_confirmed_at;
+  const phoneVerified = !!profile?.mobile;
+
 
   function saveAddress(a: Address) {
     setAddresses((prev) => {
