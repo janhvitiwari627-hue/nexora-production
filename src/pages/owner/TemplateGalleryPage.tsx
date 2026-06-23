@@ -161,10 +161,22 @@ export function TemplateGalleryPage() {
               </p>
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="gap-2 sm:gap-2">
             <Button variant="outline" onClick={() => setPending(null)}>Cancel</Button>
-            <Button onClick={confirm}>Confirm Switch</Button>
+            {pending && (
+              <Button variant="secondary" asChild>
+                <a
+                  href={`/site/${liveSlug}?t=${encodeURIComponent(pending.id)}&preview=1`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <Eye className="h-3.5 w-3.5" /> Preview first
+                </a>
+              </Button>
+            )}
+            <Button onClick={confirm}>Publish as live</Button>
           </DialogFooter>
+
         </DialogContent>
       </Dialog>
     </div>
