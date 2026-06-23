@@ -5,6 +5,7 @@ import { MOCK_SHOP, MOCK_CONFIG } from "@/components/whiteLabelWebsite/types";
 export const Route = createFileRoute("/site/$businessSlug")({
   validateSearch: (search: Record<string, unknown>) => ({
     t: typeof search.t === "string" ? (search.t as string) : undefined,
+    preview: search.preview === "1" || search.preview === 1 || search.preview === true ? 1 : undefined,
   }),
   head: ({ params }) => {
     const shop = MOCK_SHOP;

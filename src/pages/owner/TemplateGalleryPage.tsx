@@ -6,7 +6,7 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import { FilterPills } from "@/components/shared/FilterPills";
-import { Check, ExternalLink, ShieldCheck, Sparkles, Share2, Copy, Globe } from "lucide-react";
+import { Check, ExternalLink, ShieldCheck, Sparkles, Share2, Copy, Globe, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { useOwnerContext } from "@/hooks/use-owner-context";
 import { TEMPLATES, TEMPLATE_CATEGORIES, CURRENT_TEMPLATE_ID, type Template } from "./templates/mockTemplates";
@@ -112,21 +112,26 @@ export function TemplateGalleryPage() {
                     <Badge key={c} variant="secondary" className="text-xs">{c}</Badge>
                   ))}
                 </div>
-                <div className="flex gap-2 mt-5 pt-4 border-t">
-                  <Button variant="outline" size="sm" asChild className="flex-1">
-                    <a href={t.demoUrl} target="_blank" rel="noreferrer">
-                      <ExternalLink className="h-3.5 w-3.5" /> Live Demo
+                <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t">
+                  <Button variant="outline" size="sm" asChild>
+                    <a
+                      href={`/site/${liveSlug}?t=${encodeURIComponent(t.id)}&preview=1`}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`Preview ${t.name} on your live site`}
+                    >
+                      <Eye className="h-3.5 w-3.5" /> Preview
                     </a>
                   </Button>
                   <Button
                     size="sm"
-                    className="flex-1"
                     disabled={isActive}
                     onClick={() => setPending(t)}
                   >
                     {isActive ? "Selected" : "Select Template"}
                   </Button>
                 </div>
+
               </div>
             </Card>
           );
@@ -156,10 +161,22 @@ export function TemplateGalleryPage() {
               </p>
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="gap-2 sm:gap-2">
             <Button variant="outline" onClick={() => setPending(null)}>Cancel</Button>
-            <Button onClick={confirm}>Confirm Switch</Button>
+            {pending && (
+              <Button variant="secondary" asChild>
+                <a
+                  href={`/site/${liveSlug}?t=${encodeURIComponent(pending.id)}&preview=1`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <Eye className="h-3.5 w-3.5" /> Preview first
+                </a>
+              </Button>
+            )}
+            <Button onClick={confirm}>Publish as live</Button>
           </DialogFooter>
+
         </DialogContent>
       </Dialog>
     </div>
