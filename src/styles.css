@@ -388,3 +388,221 @@
   color: var(--royal-gold) !important;
   fill: var(--royal-gold) !important;
 }
+
+/* =====================================================================
+ * TEMPLATE 03 — BEAUTY BLOSSOM
+ * Soft Pink + Rose Gold + White • Instagram-style visual portfolio
+ * Look & feel: Nykaa + Sephora + Lakmé
+ * ===================================================================*/
+
+.tpl-blossom {
+  --blossom-pink: #ffd1dc;
+  --blossom-pink-soft: #ffe4ec;
+  --blossom-pink-deep: #ff7aa2;
+  --blossom-rose-gold: #d4a5a5;
+  --blossom-rose-gold-deep: #b76e79;
+  --blossom-cream: #fff8f5;
+  --blossom-ink: #4a2c36;
+  --blossom-line: rgba(183, 110, 121, 0.18);
+
+  background:
+    radial-gradient(1200px 800px at 0% 0%, #ffe4ec 0%, transparent 55%),
+    radial-gradient(900px 700px at 100% 30%, #fff0f5 0%, transparent 60%),
+    linear-gradient(180deg, #fff5f7 0%, #fff8f5 100%) !important;
+  color: var(--blossom-ink) !important;
+  font-family: "Playfair Display", "Cormorant Garamond", Georgia, serif;
+}
+
+.tpl-blossom .blossom-script {
+  font-family: "Dancing Script", "Great Vibes", cursive;
+  color: var(--blossom-rose-gold-deep);
+}
+
+.tpl-blossom .blossom-rose-text {
+  background: linear-gradient(135deg, #b76e79 0%, #d4a5a5 50%, #ff7aa2 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Neutralize gray surfaces */
+.tpl-blossom [class*="bg-gray-"],
+.tpl-blossom [class*="bg-slate-"],
+.tpl-blossom [class*="bg-zinc-"],
+.tpl-blossom [class*="bg-neutral-"],
+.tpl-blossom [class*="bg-stone-"],
+.tpl-blossom .bg-popover,
+.tpl-blossom .bg-secondary,
+.tpl-blossom .bg-accent {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* Section alternating soft blush */
+.tpl-blossom section:nth-of-type(even) {
+  background: linear-gradient(180deg, rgba(255,228,236,0.45), rgba(255,248,245,0.6)) !important;
+}
+.tpl-blossom section { border-color: var(--blossom-line) !important; }
+
+/* Headings */
+.tpl-blossom h1, .tpl-blossom h2, .tpl-blossom h3, .tpl-blossom h4 {
+  color: var(--blossom-rose-gold-deep);
+  font-family: "Playfair Display", "Cormorant Garamond", Georgia, serif;
+  letter-spacing: -0.01em;
+}
+.tpl-blossom h1 > span, .tpl-blossom h2 > span {
+  background: linear-gradient(135deg, #b76e79 0%, #ff7aa2 50%, #d4a5a5 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Universal soft card — Instagram tile feel */
+.tpl-blossom .card,
+.tpl-blossom [class*="rounded-xl"],
+.tpl-blossom [class*="rounded-2xl"],
+.tpl-blossom [class*="rounded-3xl"],
+.tpl-blossom [class*="rounded-lg"] {
+  background: linear-gradient(145deg, #ffffff 0%, #fff5f7 100%) !important;
+  border: 1px solid var(--blossom-line) !important;
+  color: var(--blossom-ink) !important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.8) inset,
+    0 18px 40px -22px rgba(183, 110, 121, 0.35) !important;
+  border-radius: 24px !important;
+}
+.tpl-blossom .card:hover,
+.tpl-blossom [class*="rounded-xl"]:hover,
+.tpl-blossom [class*="rounded-2xl"]:hover,
+.tpl-blossom [class*="rounded-3xl"]:hover {
+  border-color: var(--blossom-rose-gold) !important;
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+/* Gallery / images get soft rose frame */
+.tpl-blossom img:not([class*="rounded-full"]):not(.blossom-no-skin) {
+  border: 1px solid var(--blossom-line);
+  border-radius: 18px;
+}
+
+/* Badges & pills — rose gold */
+.tpl-blossom .badge,
+.tpl-blossom [class*="rounded-full"]:where(span, div),
+.tpl-blossom [class*="rounded-md"]:where(span) {
+  background: linear-gradient(135deg, #ffe4ec 0%, #ffd1dc 100%) !important;
+  border: 1px solid rgba(183, 110, 121, 0.3) !important;
+  color: var(--blossom-rose-gold-deep) !important;
+  box-shadow: 0 2px 8px -2px rgba(255, 122, 162, 0.3);
+}
+
+/* Inputs */
+.tpl-blossom input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+.tpl-blossom textarea,
+.tpl-blossom select {
+  background: #ffffff !important;
+  border: 1px solid var(--blossom-line) !important;
+  color: var(--blossom-ink) !important;
+  border-radius: 14px !important;
+}
+.tpl-blossom input::placeholder,
+.tpl-blossom textarea::placeholder {
+  color: rgba(74, 44, 54, 0.45) !important;
+}
+.tpl-blossom input:focus,
+.tpl-blossom textarea:focus,
+.tpl-blossom select:focus {
+  border-color: var(--blossom-rose-gold-deep) !important;
+  box-shadow: 0 0 0 4px rgba(255, 122, 162, 0.18) !important;
+  outline: none !important;
+}
+
+/* Primary buttons — rose gold gradient */
+.tpl-blossom button[class*="bg-primary"],
+.tpl-blossom a[class*="bg-primary"],
+.tpl-blossom button[class*="bg-black"],
+.tpl-blossom a[class*="bg-black"] {
+  background: linear-gradient(135deg, #ff7aa2 0%, #b76e79 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(183, 110, 121, 0.4) !important;
+  box-shadow: 0 10px 24px -10px rgba(255, 122, 162, 0.6) !important;
+  border-radius: 9999px !important;
+}
+.tpl-blossom button[class*="bg-primary"]:hover,
+.tpl-blossom a[class*="bg-primary"]:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+/* Outline buttons */
+.tpl-blossom button[class*="border"]:not([style*="background"]) {
+  border-color: var(--blossom-rose-gold) !important;
+  color: var(--blossom-rose-gold-deep) !important;
+  border-radius: 9999px !important;
+}
+
+/* Dividers / borders */
+.tpl-blossom hr,
+.tpl-blossom [class*="border-b"],
+.tpl-blossom [class*="border-t"] {
+  border-color: var(--blossom-line) !important;
+}
+
+/* Icons & accents */
+.tpl-blossom svg { color: inherit; }
+.tpl-blossom [class*="text-primary"] { color: var(--blossom-rose-gold-deep) !important; }
+.tpl-blossom a:not([style*="background"]):hover { color: var(--blossom-pink-deep); }
+
+/* Star ratings — rose */
+.tpl-blossom [class*="text-yellow"],
+.tpl-blossom [class*="text-amber"],
+.tpl-blossom [class*="fill-yellow"],
+.tpl-blossom [class*="fill-amber"] {
+  color: var(--blossom-rose-gold-deep) !important;
+  fill: var(--blossom-rose-gold-deep) !important;
+}
+
+/* Gallery section — Instagram-style grid emphasis */
+.tpl-blossom [data-section="gallery"] [class*="grid"] {
+  gap: 6px !important;
+}
+.tpl-blossom [data-section="gallery"] img {
+  border-radius: 8px !important;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.tpl-blossom [data-section="gallery"] img:hover {
+  transform: scale(1.03);
+}
+
+/* Hero floral bloom animation */
+@keyframes blossom-bloom {
+  from { opacity: 0; transform: scale(0.96) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.tpl-blossom .blossom-bloom { animation: blossom-bloom 1.1s cubic-bezier(0.22,1,0.36,1) both; }
+
+@keyframes blossom-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.tpl-blossom .blossom-float { animation: blossom-float 4s ease-in-out infinite; }
+
+/* Decorative rose divider */
+.tpl-blossom .blossom-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--blossom-rose-gold), transparent);
+  position: relative;
+}
+.tpl-blossom .blossom-divider::after {
+  content: "❀";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--blossom-rose-gold-deep);
+  background: var(--blossom-cream);
+  padding: 0 12px;
+  font-size: 14px;
+}
