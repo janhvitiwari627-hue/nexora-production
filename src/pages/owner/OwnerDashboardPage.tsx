@@ -2,8 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Bell, Settings, Upload, ArrowUpRight, ArrowDownRight, Check, X,
   Plus, UserPlus, Tag, Share2, QrCode, BarChart3, Star, Reply, Trophy,
-  Sparkles,
+  Sparkles, Globe,
 } from "lucide-react";
+
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
   Area, AreaChart, BarChart, Bar, Legend,
@@ -65,11 +66,16 @@ function TopBar({ open, onToggle }: { open: boolean; onToggle: (v: boolean) => v
             {open ? "Open" : "Closed"}
             <Switch checked={open} onCheckedChange={onToggle} className="ml-1" />
           </div>
+          <Button variant="ghost" size="sm" className="hidden md:inline-flex gap-1.5" asChild>
+            <a href="/owner/create-website"><Globe className="h-4 w-4" /> Website</a>
+          </Button>
           <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
             <Bell className="h-5 w-5" />
             <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary" />
           </Button>
           <Button variant="ghost" size="icon" aria-label="Settings"><Settings className="h-5 w-5" /></Button>
+
+
 
         </div>
       </div>
@@ -504,6 +510,12 @@ export function OwnerDashboardPage() {
     }
   }, [approvalStatus, navigate]);
 
+  // Mandatory onboarding: redirect approved owners with no website yet to template gallery.
+  const needsWebsite = !!activeSalon && activeSalon.website_created === false;
+  useEffect(() => {
+    if (needsWebsite) navigate({ to: "/owner/create-website" });
+  }, [needsWebsite, navigate]);
+
   // Compute greeting on the client only to avoid SSR/CSR hydration mismatch
   // (server's hour can differ from the user's local hour).
   const [greeting, setGreeting] = useState("Welcome");
@@ -516,6 +528,27 @@ export function OwnerDashboardPage() {
     <div className="min-h-screen bg-background">
       <TopBar open={open} onToggle={setOpen} />
       <main className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6">
+        {needsWebsite && (
+          <Card className="p-5 border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="flex items-start gap-3">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground">
+                  <Sparkles className="h-5 w-5" />
+                </span>
+                <div>
+                  <div className="text-base font-semibold text-heading">🚀 Create Your Website</div>
+                  <div className="text-sm text-muted-foreground">
+                    Choose a template and launch your online booking website in minutes.
+                  </div>
+                </div>
+              </div>
+              <Button onClick={() => navigate({ to: "/owner/create-website" })}>
+                Create Website
+              </Button>
+            </div>
+          </Card>
+        )}
+
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold text-heading">{greeting}, {displayName.split(" ")[0]} 👋</h1>
@@ -533,6 +566,7 @@ export function OwnerDashboardPage() {
             )
           )}
         </div>
+
 
 
         <KPICards />

@@ -2154,12 +2154,14 @@ export type Database = {
           rank_in_city: number | null
           rating: number
           reviews_count: number
+          selected_template_id: string | null
           seo_description: string | null
           seo_title: string | null
           slug: string
           tagline: string | null
           theme: string | null
           updated_at: string
+          website_created: boolean
           website_url: string | null
           whatsapp: string | null
         }
@@ -2196,12 +2198,14 @@ export type Database = {
           rank_in_city?: number | null
           rating?: number
           reviews_count?: number
+          selected_template_id?: string | null
           seo_description?: string | null
           seo_title?: string | null
           slug: string
           tagline?: string | null
           theme?: string | null
           updated_at?: string
+          website_created?: boolean
           website_url?: string | null
           whatsapp?: string | null
         }
@@ -2238,16 +2242,26 @@ export type Database = {
           rank_in_city?: number | null
           rating?: number
           reviews_count?: number
+          selected_template_id?: string | null
           seo_description?: string | null
           seo_title?: string | null
           slug?: string
           tagline?: string | null
           theme?: string | null
           updated_at?: string
+          website_created?: boolean
           website_url?: string | null
           whatsapp?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "salons_selected_template_id_fkey"
+            columns: ["selected_template_id"]
+            isOneToOne: false
+            referencedRelation: "website_templates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       search_analytics: {
         Row: {
@@ -2633,6 +2647,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      website_templates: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          preview_image: string | null
+          sort_order: number
+          template_name: string
+          template_slug: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          preview_image?: string | null
+          sort_order?: number
+          template_name: string
+          template_slug: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          preview_image?: string | null
+          sort_order?: number
+          template_name?: string
+          template_slug?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       withdrawals: {
         Row: {

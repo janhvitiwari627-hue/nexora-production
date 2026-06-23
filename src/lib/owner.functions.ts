@@ -15,7 +15,7 @@ export const getMyOwnedSalons = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("salon_owners")
-      .select("role, is_approved, salon:salons(id, name, slug, image_url, location, address, phone, rating, reviews_count)")
+      .select("role, is_approved, salon:salons(id, name, slug, image_url, location, address, phone, rating, reviews_count, website_created, selected_template_id)")
       .eq("user_id", userId)
       .eq("is_approved", true);
     if (error) throw new Error(error.message);
@@ -23,6 +23,50 @@ export const getMyOwnedSalons = createServerFn({ method: "GET" })
       role: row.role as "owner" | "manager",
       salon: row.salon,
     })).filter((r) => !!r.salon);
+  });
+
+// ---------- Website templates: list active ones (public) ----------
+export const listWebsiteTemplates = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const { createClient } = await import("@supabase/supabase-js");
+    const supabase = createClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_PUBLISHABLE_KEY!,
+      { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
+    );
+    const { data, error } = await supabase
+      .from("website_templates")
+      .select("id, template_name, category, preview_image, template_slug, description, sort_order")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true });
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
+// ---------- Owner selects a website template ----------
+const SelectTemplateInput = z.object({
+  salon_id: z.string().uuid(),
+  template_id: z.string().uuid(),
+});
+export const selectWebsiteTemplate = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => SelectTemplateInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: link } = await supabase
+      .from("salon_owners")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("salon_id", data.salon_id)
+      .eq("is_approved", true)
+      .maybeSingle();
+    if (!link) throw new Error("Not authorized for this salon");
+    const { error } = await supabase
+      .from("salons")
+      .update({ selected_template_id: data.template_id, website_created: true })
+      .eq("id", data.salon_id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
 
 // ---------- Owner approval status (pending owners) ----------
