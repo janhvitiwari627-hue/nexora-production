@@ -17,9 +17,11 @@ import { LocationChip } from "./LocationChip";
 import { useAuthStore } from "@/stores/authStore";
 
 const NAV = [
-  { to: "/", label: "Home" },
-  { to: "/search", label: "Explore" },
-  { to: "/for-owners", label: "Become Owner" },
+  { to: "/", label: "Home", icon: null },
+  { to: "/search", label: "Explore", icon: null },
+  { to: "/jobs", label: "Job Portal", icon: Briefcase },
+  { to: "/partner/growth", label: "Partner Growth", icon: TrendingUp },
+  { to: "/for-owners", label: "Become Owner", icon: null },
 ] as const;
 
 const PORTAL_MENU = [
