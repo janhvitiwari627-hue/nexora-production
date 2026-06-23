@@ -15,6 +15,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { NotFoundPage } from "@/pages/public/NotFoundPage";
 import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
 import { ServiceWorkerUpdatePrompt } from "@/components/pwa/ServiceWorkerUpdatePrompt";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return <NotFoundPage />;
@@ -137,6 +138,7 @@ function RootComponent() {
       <Outlet />
       <PWAInstallPrompt />
       <ServiceWorkerUpdatePrompt />
+      <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );
 }

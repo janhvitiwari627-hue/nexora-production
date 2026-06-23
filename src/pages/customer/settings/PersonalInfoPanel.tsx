@@ -1,34 +1,113 @@
-import { useMemo, useRef, useState } from "react";
-import { Camera, Check, ChevronsUpDown, Upload } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Camera, Check, ChevronsUpDown, Loader2, Upload } from "lucide-react";
+import { toast } from "sonner";
 import { PROFILE } from "./mockSettings";
 import { INDIAN_STATES, getDistricts, getBlocks } from "./indiaGeo";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/stores/authStore";
+import { supabase } from "@/integrations/supabase/client";
+
+function slugifyUsername(name: string) {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9.\s_-]/g, "")
+    .replace(/\s+/g, ".")
+    .replace(/\.+/g, ".")
+    .slice(0, 30);
+}
 
 export function PersonalInfoPanel() {
+  const { user, profile, refreshProfile } = useAuthStore();
   const fileRef = useRef<HTMLInputElement>(null);
-  const [avatar, setAvatar] = useState<string>(PROFILE.avatarUrl);
+  const [avatar, setAvatar] = useState<string>(profile?.avatar_url || "");
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [usernameTouched, setUsernameTouched] = useState(false);
+
   const [form, setForm] = useState({
-    fullName: PROFILE.fullName,
-    username: PROFILE.username,
-    gender: PROFILE.gender as string,
-    dob: PROFILE.dob,
-    state: "",
-    district: "",
-    block: "",
-    pincode: "",
+    fullName: profile?.full_name || "",
+    username: profile?.username || "",
+    gender: (profile?.gender || "prefer_not") as string,
+    dob: profile?.date_of_birth || "",
+    state: profile?.state || "",
+    district: profile?.district || "",
+    block: profile?.block || "",
+    pincode: profile?.pincode || "",
   });
   const [pincodeError, setPincodeError] = useState<string | null>(null);
+
+  // Hydrate when profile arrives
+  useEffect(() => {
+    if (!profile) return;
+    setForm({
+      fullName: profile.full_name || "",
+      username: profile.username || "",
+      gender: (profile.gender || "prefer_not") as string,
+      dob: profile.date_of_birth || "",
+      state: profile.state || "",
+      district: profile.district || "",
+      block: profile.block || "",
+      pincode: profile.pincode || "",
+    });
+    setAvatar(profile.avatar_url || "");
+    setUsernameTouched(!!profile.username);
+  }, [profile]);
 
   const districts = useMemo(() => getDistricts(form.state), [form.state]);
   const blocks = useMemo(() => getBlocks(form.state, form.district), [form.state, form.district]);
 
-  function handleAvatar(e: React.ChangeEvent<HTMLInputElement>) {
+  function onFullNameChange(v: string) {
+    setForm((f) => ({
+      ...f,
+      fullName: v,
+      username: usernameTouched ? f.username : slugifyUsername(v),
+    }));
+  }
+
+  async function handleAvatar(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
     if (!f) return;
-    const url = URL.createObjectURL(f);
-    setAvatar(url);
+    if (!user) {
+      toast.error("Please sign in to upload a photo");
+      return;
+    }
+    if (f.size > 5 * 1024 * 1024) {
+      toast.error("Image must be under 5 MB");
+      return;
+    }
+    setUploading(true);
+    const preview = URL.createObjectURL(f);
+    setAvatar(preview);
+    try {
+      const ext = f.name.split(".").pop()?.toLowerCase() || "jpg";
+      const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("avatars")
+        .upload(path, f, { upsert: true, contentType: f.type });
+      if (upErr) throw upErr;
+      // Bucket is private — generate a long-lived signed URL (1 year)
+      const { data: signed, error: signErr } = await supabase.storage
+        .from("avatars")
+        .createSignedUrl(path, 60 * 60 * 24 * 365);
+      if (signErr) throw signErr;
+      const url = signed.signedUrl;
+      const { error: updErr } = await supabase
+        .from("profiles")
+        .update({ avatar_url: url })
+        .eq("id", user.id);
+      if (updErr) throw updErr;
+      setAvatar(url);
+      await refreshProfile();
+      toast.success("Profile photo updated");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to upload photo");
+      setAvatar(profile?.avatar_url || "");
+    } finally {
+      setUploading(false);
+    }
   }
 
   function handlePincode(e: React.ChangeEvent<HTMLInputElement>) {
@@ -40,6 +119,47 @@ export function PersonalInfoPanel() {
     else setPincodeError(null);
   }
 
+  async function handleSave() {
+    if (!user) {
+      toast.error("Please sign in to save changes");
+      return;
+    }
+    if (form.pincode && pincodeError) {
+      toast.error(pincodeError);
+      return;
+    }
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          full_name: form.fullName || null,
+          username: form.username || null,
+          gender: form.gender || null,
+          date_of_birth: form.dob || null,
+          state: form.state || null,
+          district: form.district || null,
+          block: form.block || null,
+          pincode: form.pincode || null,
+        })
+        .eq("id", user.id);
+      if (error) throw error;
+      await refreshProfile();
+      toast.success("Personal information saved");
+    } catch (err: any) {
+      toast.error(err?.message || "Could not save changes");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const initials = (form.fullName || PROFILE.fullName)
+    .split(" ")
+    .map((s) => s[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("");
+
   return (
     <PanelShell title="Personal information" subtitle="How you appear across Nexora.">
       <div className="flex items-start gap-4">
@@ -48,15 +168,19 @@ export function PersonalInfoPanel() {
             {avatar ? (
               <img src={avatar} alt="Avatar" className="h-full w-full object-cover" />
             ) : (
-              <span className="text-heading text-2xl font-black">
-                {form.fullName.split(" ").map((s) => s[0]).slice(0, 2).join("")}
-              </span>
+              <span className="text-heading text-2xl font-black">{initials}</span>
+            )}
+            {uploading && (
+              <div className="absolute inset-0 grid place-items-center rounded-full bg-black/40">
+                <Loader2 className="h-5 w-5 animate-spin text-white" />
+              </div>
             )}
           </div>
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
-            className="bg-primary text-primary-foreground absolute -bottom-1 -right-1 grid h-8 w-8 place-items-center rounded-full shadow-md"
+            disabled={uploading}
+            className="bg-primary text-primary-foreground absolute -bottom-1 -right-1 grid h-8 w-8 place-items-center rounded-full shadow-md disabled:opacity-60"
             aria-label="Upload avatar"
           >
             <Camera className="h-4 w-4" />
@@ -69,19 +193,28 @@ export function PersonalInfoPanel() {
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
-            className="border-border hover:bg-accent mt-2 inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-semibold"
+            disabled={uploading}
+            className="border-border hover:bg-accent mt-2 inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-semibold disabled:opacity-60"
           >
-            <Upload className="h-3.5 w-3.5" /> Upload new
+            <Upload className="h-3.5 w-3.5" /> {uploading ? "Uploading…" : "Upload new"}
           </button>
         </div>
       </div>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <Field label="Full name">
-          <input value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} className={inputCls} />
+          <input value={form.fullName} onChange={(e) => onFullNameChange(e.target.value)} className={inputCls} />
         </Field>
         <Field label="Username">
-          <input value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} className={inputCls} />
+          <input
+            value={form.username}
+            onChange={(e) => {
+              setUsernameTouched(true);
+              setForm({ ...form, username: slugifyUsername(e.target.value) });
+            }}
+            placeholder="auto-suggested from name"
+            className={inputCls}
+          />
         </Field>
         <Field label="Gender">
           <div className="flex flex-wrap gap-3 pt-1">
@@ -151,7 +284,7 @@ export function PersonalInfoPanel() {
         </Field>
       </div>
 
-      <SaveBar />
+      <SaveBar onSave={handleSave} saving={saving} />
     </PanelShell>
   );
 }
@@ -241,16 +374,18 @@ export function PanelShell({ title, subtitle, children }: { title: string; subti
   );
 }
 
-export function SaveBar({ onSave }: { onSave?: () => void }) {
+export function SaveBar({ onSave, saving }: { onSave?: () => void; saving?: boolean }) {
   return (
     <div className="border-border mt-6 flex justify-end gap-2 border-t pt-4">
       <button type="button" className="border-border hover:bg-accent rounded-md border px-4 py-2 text-sm font-semibold">Cancel</button>
       <button
         type="button"
         onClick={onSave}
-        className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-bold shadow-sm"
+        disabled={saving}
+        className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-bold shadow-sm disabled:opacity-60"
       >
-        Save changes
+        {saving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+        {saving ? "Saving…" : "Save changes"}
       </button>
     </div>
   );
