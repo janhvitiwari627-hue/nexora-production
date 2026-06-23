@@ -93,6 +93,11 @@ export function PortalDashboardPage() {
 
       {(brand || distributor) && <ConnectionsPanel brand={brand} distributor={distributor} />}
 
+      {brand && <BrandDashboardMetrics brand={brand} leads={leads as any} />}
+      {distributor && <DistributorDashboardMetrics distributor={distributor} leads={leads as any} />}
+
+
+
 
       <section className="mt-10">
         <div className="mb-3 flex items-center gap-2">
