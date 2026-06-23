@@ -113,6 +113,28 @@ export function PublicHeader() {
               {n.label}
             </Link>
           ))}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="inline-flex items-center gap-1 rounded-full px-4 py-2 text-sm font-semibold text-body transition hover:bg-muted hover:text-heading">
+                Distributor & Brand Portal
+                <ChevronDown className="h-3.5 w-3.5" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="center" className="w-64">
+              <DropdownMenuLabel className="text-xs uppercase tracking-wider text-muted-foreground">
+                Distributor & Brand Portal
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {PORTAL_MENU.map((m) => (
+                <DropdownMenuItem key={m.to} asChild>
+                  <Link to={m.to} className="cursor-pointer">
+                    <m.icon className="mr-2 h-4 w-4" />
+                    {m.label}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </nav>
 
         {/* Right actions */}
