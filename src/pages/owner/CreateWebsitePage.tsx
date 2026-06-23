@@ -178,8 +178,13 @@ export function CreateWebsitePage() {
                     </Button>
                     <Button
                       size="sm"
-                      disabled={mutate.isPending || !activeSalonId}
+                      disabled={mutate.isPending}
                       onClick={() => {
+                        if (!activeSalonId) {
+                          toast.error("Please complete salon setup first.");
+                          navigate({ to: "/owner/onboarding" });
+                          return;
+                        }
                         if (isCurrent) { navigate({ to: "/owner/website" }); return; }
                         setPendingId(t.id);
                         mutate.mutate({ template_id: t.id });
