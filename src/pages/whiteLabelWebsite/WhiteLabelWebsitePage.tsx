@@ -20,7 +20,8 @@ export function WhiteLabelWebsitePage({ slug: _slug, routeSearch }: { slug?: str
   const navigate = useNavigateSafe();
 
   const savedTemplateKey = data?.salon?.selected_template_key ?? MOCK_CONFIG.template;
-  const templateKey = normalizeTemplateKey(routeSearch?.t ?? savedTemplateKey);
+  const browserSearch = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const templateKey = normalizeTemplateKey(routeSearch?.t ?? browserSearch?.get("t") ?? savedTemplateKey);
 
   const config: WebsiteConfig = { ...MOCK_CONFIG, template: templateKey };
   const template = getTemplate(templateKey);
@@ -38,7 +39,7 @@ export function WhiteLabelWebsitePage({ slug: _slug, routeSearch }: { slug?: str
     templateKey === "professional-beauty" ? "#FFFDFD" :
     template.colors.bg;
 
-  const isPreview = routeSearch?.preview === 1;
+  const isPreview = routeSearch?.preview === 1 || browserSearch?.get("preview") === "1";
 
   return (
     <div className={wrapperClass} style={{ fontFamily: template.font, backgroundColor: bgColor, color: template.colors.text }}>
