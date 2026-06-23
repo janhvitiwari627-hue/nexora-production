@@ -31,7 +31,7 @@ type ConfirmState = { open: boolean; templateName: string };
 export function CreateWebsitePage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const { activeSalon, activeSalonId } = useOwnerContext();
+  const { activeSalon, activeSalonId, isLoading: ownerLoading } = useOwnerContext();
   const { data: templates = [], isLoading } = useQuery(websiteTemplatesQuery());
   const [filter, setFilter] = useState("All");
   const [pendingId, setPendingId] = useState<string | null>(null);
@@ -179,7 +179,7 @@ export function CreateWebsitePage() {
                     </Button>
                     <Button
                       size="sm"
-                      disabled={pendingId !== null}
+                      disabled={ownerLoading || pendingId !== null}
                       onClick={() => {
                         if (pendingId) return;
                         if (!activeSalonId) {
@@ -192,7 +192,7 @@ export function CreateWebsitePage() {
                         mutate.mutate({ template_id: t.id });
                       }}
                     >
-                      {isCurrent ? "Edit & Go Live" : (mutate.isPending && pendingId === t.id ? "Applying…" : "Use & Edit")}
+                      {ownerLoading ? "Loading…" : isCurrent ? "Edit & Go Live" : (pendingId === t.id ? "Applying…" : "Use & Edit")}
                     </Button>
                   </div>
                 </div>
