@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuthStore } from "@/stores/authStore";
 import { getMyBrand, getMyDistributor, getMyLeads, type Brand, type Distributor } from "./lib";
 import { ConnectionsPanel } from "./ConnectionsPanel";
+import { BrandDashboardMetrics, DistributorDashboardMetrics } from "./DashboardMetrics";
 
 export function PortalDashboardPage() {
   const user = useAuthStore((s) => s.user);
@@ -91,6 +92,11 @@ export function PortalDashboardPage() {
       </section>
 
       {(brand || distributor) && <ConnectionsPanel brand={brand} distributor={distributor} />}
+
+      {brand && <BrandDashboardMetrics brand={brand} leads={leads as any} />}
+      {distributor && <DistributorDashboardMetrics distributor={distributor} leads={leads as any} />}
+
+
 
 
       <section className="mt-10">

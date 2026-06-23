@@ -66,6 +66,7 @@ import { Route as JobsSearchRouteImport } from './routes/jobs.search'
 import { Route as JobsProfileRouteImport } from './routes/jobs.profile'
 import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
 import { Route as DistrictBusinessPartnerSlugRouteImport } from './routes/district-business-partner.$slug'
+import { Route as DistributorSlugRouteImport } from './routes/distributor.$slug'
 import { Route as DashboardWalletRouteImport } from './routes/dashboard.wallet'
 import { Route as DashboardSupportRouteImport } from './routes/dashboard.support'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
@@ -80,6 +81,7 @@ import { Route as DashboardFavoritesRouteImport } from './routes/dashboard.favor
 import { Route as DashboardBookingsRouteImport } from './routes/dashboard.bookings'
 import { Route as DashboardActivityRouteImport } from './routes/dashboard.activity'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
+import { Route as BrandSlugRouteImport } from './routes/brand.$slug'
 import { Route as BookSlugRouteImport } from './routes/book.$slug'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
@@ -392,6 +394,11 @@ const DistrictBusinessPartnerSlugRoute =
     path: '/$slug',
     getParentRoute: () => DistrictBusinessPartnerRoute,
   } as any)
+const DistributorSlugRoute = DistributorSlugRouteImport.update({
+  id: '/distributor/$slug',
+  path: '/distributor/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardWalletRoute = DashboardWalletRouteImport.update({
   id: '/wallet',
   path: '/wallet',
@@ -460,6 +467,11 @@ const DashboardActivityRoute = DashboardActivityRouteImport.update({
 const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/category/$slug',
   path: '/category/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BrandSlugRoute = BrandSlugRouteImport.update({
+  id: '/brand/$slug',
+  path: '/brand/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BookSlugRoute = BookSlugRouteImport.update({
@@ -628,6 +640,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/book/$slug': typeof BookSlugRoute
+  '/brand/$slug': typeof BrandSlugRoute
   '/category/$slug': typeof CategorySlugRoute
   '/dashboard/activity': typeof DashboardActivityRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
@@ -642,6 +655,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/support': typeof DashboardSupportRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
+  '/distributor/$slug': typeof DistributorSlugRoute
   '/district-business-partner/$slug': typeof DistrictBusinessPartnerSlugRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs/profile': typeof JobsProfileRoute
@@ -725,6 +739,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/book/$slug': typeof BookSlugRoute
+  '/brand/$slug': typeof BrandSlugRoute
   '/category/$slug': typeof CategorySlugRoute
   '/dashboard/activity': typeof DashboardActivityRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
@@ -739,6 +754,7 @@ export interface FileRoutesByTo {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/support': typeof DashboardSupportRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
+  '/distributor/$slug': typeof DistributorSlugRoute
   '/district-business-partner/$slug': typeof DistrictBusinessPartnerSlugRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs/profile': typeof JobsProfileRoute
@@ -824,6 +840,7 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/book/$slug': typeof BookSlugRoute
+  '/brand/$slug': typeof BrandSlugRoute
   '/category/$slug': typeof CategorySlugRoute
   '/dashboard/activity': typeof DashboardActivityRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
@@ -838,6 +855,7 @@ export interface FileRoutesById {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/support': typeof DashboardSupportRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
+  '/distributor/$slug': typeof DistributorSlugRoute
   '/district-business-partner/$slug': typeof DistrictBusinessPartnerSlugRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs/profile': typeof JobsProfileRoute
@@ -924,6 +942,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/users'
     | '/book/$slug'
+    | '/brand/$slug'
     | '/category/$slug'
     | '/dashboard/activity'
     | '/dashboard/bookings'
@@ -938,6 +957,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/support'
     | '/dashboard/wallet'
+    | '/distributor/$slug'
     | '/district-business-partner/$slug'
     | '/jobs/$jobId'
     | '/jobs/profile'
@@ -1021,6 +1041,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/users'
     | '/book/$slug'
+    | '/brand/$slug'
     | '/category/$slug'
     | '/dashboard/activity'
     | '/dashboard/bookings'
@@ -1035,6 +1056,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/support'
     | '/dashboard/wallet'
+    | '/distributor/$slug'
     | '/district-business-partner/$slug'
     | '/jobs/$jobId'
     | '/jobs/profile'
@@ -1119,6 +1141,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/users'
     | '/book/$slug'
+    | '/brand/$slug'
     | '/category/$slug'
     | '/dashboard/activity'
     | '/dashboard/bookings'
@@ -1133,6 +1156,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/support'
     | '/dashboard/wallet'
+    | '/distributor/$slug'
     | '/district-business-partner/$slug'
     | '/jobs/$jobId'
     | '/jobs/profile'
@@ -1218,7 +1242,9 @@ export interface RootRouteChildren {
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   BookSlugRoute: typeof BookSlugRoute
+  BrandSlugRoute: typeof BrandSlugRoute
   CategorySlugRoute: typeof CategorySlugRoute
+  DistributorSlugRoute: typeof DistributorSlugRoute
   OwnerAnalyticsRoute: typeof OwnerAnalyticsRoute
   OwnerBookingsRoute: typeof OwnerBookingsRoute
   OwnerCrmRoute: typeof OwnerCrmRoute
@@ -1663,6 +1689,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DistrictBusinessPartnerSlugRouteImport
       parentRoute: typeof DistrictBusinessPartnerRoute
     }
+    '/distributor/$slug': {
+      id: '/distributor/$slug'
+      path: '/distributor/$slug'
+      fullPath: '/distributor/$slug'
+      preLoaderRoute: typeof DistributorSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/wallet': {
       id: '/dashboard/wallet'
       path: '/wallet'
@@ -1759,6 +1792,13 @@ declare module '@tanstack/react-router' {
       path: '/category/$slug'
       fullPath: '/category/$slug'
       preLoaderRoute: typeof CategorySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/brand/$slug': {
+      id: '/brand/$slug'
+      path: '/brand/$slug'
+      fullPath: '/brand/$slug'
+      preLoaderRoute: typeof BrandSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/book/$slug': {
@@ -2063,7 +2103,9 @@ const rootRouteChildren: RootRouteChildren = {
   AdminSettingsRoute: AdminSettingsRoute,
   AdminUsersRoute: AdminUsersRoute,
   BookSlugRoute: BookSlugRoute,
+  BrandSlugRoute: BrandSlugRoute,
   CategorySlugRoute: CategorySlugRoute,
+  DistributorSlugRoute: DistributorSlugRoute,
   OwnerAnalyticsRoute: OwnerAnalyticsRoute,
   OwnerBookingsRoute: OwnerBookingsRoute,
   OwnerCrmRoute: OwnerCrmRoute,
