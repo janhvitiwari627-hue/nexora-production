@@ -2,7 +2,10 @@ import type { ReactNode } from "react";
 import type { ShopData, WebsiteConfig, SectionId } from "./types";
 import { getTemplate } from "./templates";
 import { WHero } from "./sections/WHero";
+import { WAbout } from "./sections/WAbout";
 import { WServices } from "./sections/WServices";
+import { WRateCard } from "./sections/WRateCard";
+import { WPackages } from "./sections/WPackages";
 import { WGallery } from "./sections/WGallery";
 import { WStaff } from "./sections/WStaff";
 import { WReviews } from "./sections/WReviews";
@@ -13,7 +16,11 @@ import { WContact } from "./sections/WContact";
 import { WMap } from "./sections/WMap";
 import { WAppointmentForm } from "./sections/WAppointmentForm";
 import { WMembership } from "./sections/WMembership";
+import { WLoyalty } from "./sections/WLoyalty";
+import { WReferral } from "./sections/WReferral";
+import { WBlog } from "./sections/WBlog";
 import { WCoupons } from "./sections/WCoupons";
+import { WSocialMedia } from "./sections/WSocialMedia";
 import { WInstagramFeed } from "./sections/WInstagramFeed";
 import { WYouTubeFeed } from "./sections/WYouTubeFeed";
 import { WWhatsAppCTA } from "./sections/WWhatsAppCTA";
@@ -24,11 +31,14 @@ import { WBrands } from "./sections/WBrands";
 
 export function WebsiteRenderer({ shop, config }: { shop: ShopData; config: WebsiteConfig }) {
   const template = getTemplate(config.template);
-  const ordered = [...config.sections].filter(s => s.enabled).sort((a, b) => a.order - b.order);
+  const ordered = [...config.sections].filter((s) => s.enabled).sort((a, b) => a.order - b.order);
 
   const map: Record<SectionId, ReactNode> = {
     hero: <WHero shop={shop} template={template} />,
+    about: <WAbout shop={shop} template={template} />,
     services: <section id="services"><WServices shop={shop} template={template} /></section>,
+    rateCard: <WRateCard shop={shop} template={template} />,
+    packages: <WPackages shop={shop} template={template} />,
     gallery: <WGallery shop={shop} template={template} />,
     staff: <WStaff shop={shop} template={template} />,
     reviews: <WReviews shop={shop} template={template} />,
@@ -39,7 +49,11 @@ export function WebsiteRenderer({ shop, config }: { shop: ShopData; config: Webs
     map: <WMap shop={shop} template={template} />,
     appointment: <section id="appointment"><WAppointmentForm shop={shop} template={template} /></section>,
     membership: <WMembership shop={shop} template={template} />,
+    loyalty: <WLoyalty shop={shop} template={template} />,
+    referral: <WReferral shop={shop} template={template} />,
+    blog: <WBlog shop={shop} template={template} />,
     coupons: <WCoupons shop={shop} template={template} />,
+    socialMedia: <WSocialMedia shop={shop} template={template} />,
     instagram: <WInstagramFeed shop={shop} />,
     youtube: <WYouTubeFeed shop={shop} />,
     whatsapp: <WWhatsAppCTA shop={shop} />,
@@ -49,9 +63,5 @@ export function WebsiteRenderer({ shop, config }: { shop: ShopData; config: Webs
     brands: <WBrands shop={shop} template={template} />,
   };
 
-  return (
-    <>
-      {ordered.map(s => <div key={s.id}>{map[s.id]}</div>)}
-    </>
-  );
+  return <>{ordered.map((s) => <div key={s.id}>{map[s.id]}</div>)}</>;
 }
