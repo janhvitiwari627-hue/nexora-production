@@ -36,8 +36,26 @@ export function WhiteLabelWebsitePage({ slug: _slug }: { slug?: string }) {
     templateKey === "BeautyBlossom" ? "#fff5f7" :
     template.colors.bg;
 
+  const isPreview = search?.preview === 1 || search?.preview === "1";
+
   return (
     <div className={wrapperClass} style={{ fontFamily: template.font, backgroundColor: bgColor, color: template.colors.text }}>
+      {isPreview && (
+        <div className="sticky top-0 z-40 w-full bg-amber-500 text-amber-950 shadow-md">
+          <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-2 text-sm font-medium sm:flex-row">
+            <span className="flex items-center gap-2">
+              <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-amber-900" />
+              Preview mode — {TEMPLATES[templateKey].name}. Not published yet.
+            </span>
+            <a
+              href="/owner/templates"
+              className="rounded-full bg-amber-950 px-3 py-1 text-xs font-semibold text-amber-50 hover:bg-amber-900"
+            >
+              Back to gallery
+            </a>
+          </div>
+        </div>
+      )}
       <WhiteLabelHeader shop={shop} template={template} />
       <main className="pb-20 md:pb-0">
         <TemplateSwitcher current={templateKey} onChange={setTemplate} />
@@ -48,6 +66,7 @@ export function WhiteLabelWebsitePage({ slug: _slug }: { slug?: string }) {
     </div>
   );
 }
+
 
 function useSearchSafe() {
   try { return useSearch({ strict: false }) as Record<string, unknown>; } catch { return undefined; }
