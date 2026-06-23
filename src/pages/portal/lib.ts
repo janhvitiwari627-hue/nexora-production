@@ -217,3 +217,35 @@ export async function listDistributorsLite() {
   if (error) throw error;
   return data ?? [];
 }
+
+export async function getBrandBySlug(slug: string) {
+  const { data, error } = await supabase
+    .from("brands")
+    .select("*")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as Brand | null) ?? null;
+}
+
+export async function getDistributorBySlug(slug: string) {
+  const { data, error } = await supabase
+    .from("distributors")
+    .select("*")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as Distributor | null) ?? null;
+}
+
+export async function listProductsByBrand(brandId: string) {
+  const { data, error } = await supabase
+    .from("brand_products")
+    .select("*")
+    .eq("brand_id", brandId)
+    .eq("is_active", true)
+    .order("is_featured", { ascending: false })
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as BrandProduct[];
+}
