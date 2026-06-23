@@ -52,6 +52,7 @@ export function CreateWebsitePage() {
       navigate({ to: "/owner/website" });
     },
     onError: (e: Error) => toast.error(e.message),
+    onSettled: () => setPendingId(null),
   });
 
   const visible = useMemo(
@@ -178,8 +179,9 @@ export function CreateWebsitePage() {
                     </Button>
                     <Button
                       size="sm"
-                      disabled={mutate.isPending}
+                      disabled={pendingId !== null}
                       onClick={() => {
+                        if (pendingId) return;
                         if (!activeSalonId) {
                           toast.error("Please complete salon setup first.");
                           navigate({ to: "/owner/onboarding" });
