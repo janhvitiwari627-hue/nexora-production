@@ -244,8 +244,7 @@ export function PromotionCenterPage() {
             </div>
 
             <div>
-              <Label>Banner image</Label>
-              <SingleFileUpload value={form.banner_url} onChange={(url) => setForm({ ...form, banner_url: url || "" })} folder={`promotions/${brand.id}`} />
+              <SingleFileUpload label="Banner image" value={form.banner_url} onChange={(url) => setForm({ ...form, banner_url: url || "" })} userId={user.id} folder={`promotions/${brand.id}`} />
               <p className="mt-1 text-xs text-muted-foreground">Recommended 1200×400, under 2 MB.</p>
             </div>
 
