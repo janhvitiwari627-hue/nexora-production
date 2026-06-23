@@ -13,9 +13,9 @@ const FEATURES = [
 ];
 
 const PLANS = [
+  { name: "Free", price: 0, body: "Try Nexora at zero cost.", perks: ["1 staff account", "Up to 20 bookings/mo", "Booking website", "Community support"] },
   { name: "Starter", price: 999, body: "For new salons getting started.", perks: ["Up to 3 staff", "Bookings & reminders", "Basic analytics", "Customer support"] },
   { name: "Growth", price: 2499, popular: true, body: "Most loved by growing salons.", perks: ["Unlimited staff", "WhatsApp marketing", "Memberships & loyalty", "Advanced analytics", "Priority support"] },
-  { name: "Enterprise", price: 4999, body: "For chains & franchises.", perks: ["Multi-location", "Centralised analytics", "API access", "Dedicated manager", "Custom integrations"] },
 ];
 
 const SHOTS = [
