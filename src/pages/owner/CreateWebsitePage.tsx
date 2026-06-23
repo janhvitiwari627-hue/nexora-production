@@ -31,7 +31,7 @@ type ConfirmState = { open: boolean; templateName: string };
 export function CreateWebsitePage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const { activeSalon, activeSalonId } = useOwnerContext();
+  const { activeSalon, activeSalonId, isLoading: ownerLoading } = useOwnerContext();
   const { data: templates = [], isLoading } = useQuery(websiteTemplatesQuery());
   const [filter, setFilter] = useState("All");
   const [pendingId, setPendingId] = useState<string | null>(null);
@@ -52,6 +52,7 @@ export function CreateWebsitePage() {
       navigate({ to: "/owner/website" });
     },
     onError: (e: Error) => toast.error(e.message),
+    onSettled: () => setPendingId(null),
   });
 
   const visible = useMemo(
@@ -178,14 +179,20 @@ export function CreateWebsitePage() {
                     </Button>
                     <Button
                       size="sm"
-                      disabled={mutate.isPending || !activeSalonId}
+                      disabled={ownerLoading || pendingId !== null}
                       onClick={() => {
+                        if (pendingId) return;
+                        if (!activeSalonId) {
+                          toast.error("Please complete salon setup first.");
+                          navigate({ to: "/owner/onboarding" });
+                          return;
+                        }
                         if (isCurrent) { navigate({ to: "/owner/website" }); return; }
                         setPendingId(t.id);
                         mutate.mutate({ template_id: t.id });
                       }}
                     >
-                      {isCurrent ? "Edit & Go Live" : (mutate.isPending && pendingId === t.id ? "Applying…" : "Use & Edit")}
+                      {ownerLoading ? "Loading…" : isCurrent ? "Edit & Go Live" : (pendingId === t.id ? "Applying…" : "Use & Edit")}
                     </Button>
                   </div>
                 </div>
