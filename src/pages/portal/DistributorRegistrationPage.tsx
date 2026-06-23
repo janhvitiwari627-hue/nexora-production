@@ -62,6 +62,7 @@ export function DistributorRegistrationPage() {
       address: form.address || null,
       logo_url: form.logo_url || null,
       coverage_states: splitCsv(form.coverage_states_text),
+      coverage_districts: splitCsv(form.coverage_districts_text),
       categories: splitCsv(form.categories_text),
       brands_handled: splitCsv(form.brands_handled_text),
       years_in_business: form.years_in_business ? parseInt(form.years_in_business, 10) : null,
