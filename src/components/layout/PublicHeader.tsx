@@ -127,6 +127,12 @@ export function PublicHeader() {
                   <span className="bg-gradient-cta grid h-7 w-7 place-items-center rounded-full text-[11px] font-bold text-primary-foreground">
                     {initials}
                   </span>
+                  <Avatar className="h-7 w-7">
+                    {avatarUrl ? <AvatarImage src={avatarUrl} alt={displayName} /> : null}
+                    <AvatarFallback className="bg-gradient-cta text-[11px] font-bold text-primary-foreground">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
                   <span className="max-w-[120px] truncate text-sm font-semibold">
                     {displayName}
                   </span>
