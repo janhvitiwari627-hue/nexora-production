@@ -90,6 +90,9 @@ export function PortalDashboardPage() {
         </Card>
       </section>
 
+      {(brand || distributor) && <ConnectionsPanel brand={brand} distributor={distributor} />}
+
+
       <section className="mt-10">
         <div className="mb-3 flex items-center gap-2">
           <Target className="h-5 w-5 text-primary" />
