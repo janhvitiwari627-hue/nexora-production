@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSearch, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { WebsiteRenderer } from "@/components/whiteLabelWebsite/WebsiteRenderer";
 import { WhiteLabelHeader } from "@/components/whiteLabelWebsite/WhiteLabelHeader";
@@ -10,18 +10,17 @@ import { getTemplate, normalizeTemplateKey, TEMPLATE_KEYS, TEMPLATES, type Templ
 import { getSalonBySlug } from "@/lib/salons.functions";
 import { Paintbrush } from "lucide-react";
 
-export function WhiteLabelWebsitePage({ slug: _slug }: { slug?: string }) {
+export function WhiteLabelWebsitePage({ slug: _slug, routeSearch }: { slug?: string; routeSearch?: { t?: string; preview?: 1 } }) {
   const { data } = useQuery({
     queryKey: ["white-label-site", _slug],
     queryFn: () => (_slug ? getSalonBySlug({ data: { slug: _slug } }) : Promise.resolve(null)),
     enabled: !!_slug,
   });
   const shop = toShopData(data);
-  const search = useSearchSafe();
   const navigate = useNavigateSafe();
 
   const savedTemplateKey = data?.salon?.selected_template_key ?? MOCK_CONFIG.template;
-  const templateKey = normalizeTemplateKey(typeof search?.t === "string" ? search.t : savedTemplateKey);
+  const templateKey = normalizeTemplateKey(routeSearch?.t ?? savedTemplateKey);
 
   const config: WebsiteConfig = { ...MOCK_CONFIG, template: templateKey };
   const template = getTemplate(templateKey);
@@ -39,7 +38,7 @@ export function WhiteLabelWebsitePage({ slug: _slug }: { slug?: string }) {
     templateKey === "professional-beauty" ? "#FFFDFD" :
     template.colors.bg;
 
-  const isPreview = search?.preview === 1 || search?.preview === "1";
+  const isPreview = routeSearch?.preview === 1;
 
   return (
     <div className={wrapperClass} style={{ fontFamily: template.font, backgroundColor: bgColor, color: template.colors.text }}>
@@ -126,9 +125,6 @@ function toShopData(data: Awaited<ReturnType<typeof getSalonBySlug>> | null | un
 }
 
 
-function useSearchSafe() {
-  try { return useSearch({ strict: false }) as Record<string, unknown>; } catch { return undefined; }
-}
 function useNavigateSafe() {
   try { return useNavigate(); } catch { return undefined; }
 }
