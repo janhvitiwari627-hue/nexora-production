@@ -45,24 +45,35 @@ export function WHero({ shop, template }: { shop: ShopData; template: TemplateCo
     );
   }
 
-  if (template.hero === "fullBleed") {
+  if (template.hero === "beautyBanner") {
     return (
-      <section className={`relative grid h-[70vh] place-items-center overflow-hidden text-white ${animClass}`}>
-        <img src={shop.coverImage} alt={shop.name} loading="eager" className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-black/30" />
-        <div className="relative z-10 max-w-2xl space-y-4 px-6 text-center">
-          <div className="text-xs font-semibold uppercase tracking-widest" style={{ color: template.colors.accent }}>
-            {shop.category} · {shop.city}
+      <section className={`relative overflow-hidden px-6 py-16 md:px-12 md:py-24 ${animClass}`} style={{ backgroundColor: template.colors.bg, color: template.colors.text }}>
+        <div className="mx-auto grid max-w-7xl items-center gap-10 md:grid-cols-[0.9fr_1.1fr]">
+          <div className="blossom-bloom relative z-10 space-y-5">
+            <div className="blossom-script text-2xl">Beauty specialists</div>
+            <h1 className="max-w-xl text-5xl font-semibold leading-tight md:text-7xl" style={{ fontFamily: template.headingFont }}>
+              <span className="blossom-rose-text">{shop.name}</span>
+            </h1>
+            <p className="max-w-lg text-lg leading-relaxed text-muted-foreground">{shop.tagline}</p>
+            <div className="blossom-divider max-w-xs" />
+            <div className="flex flex-wrap items-center gap-3">
+              <Button size="lg" className="rounded-full px-7" style={{ backgroundColor: template.colors.primary, color: "white" }} asChild>
+                <a href="#appointment">Book Beauty Session</a>
+              </Button>
+              <ShareButton title={`${shop.name} — ${shop.tagline}`} label="Share Portfolio" />
+            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Star className="h-4 w-4 fill-rose-500 text-rose-500" />
+              <span><strong>{shop.rating}</strong> from {shop.reviewCount} beauty clients</span>
+            </div>
           </div>
-          <h1 className="text-5xl font-bold md:text-7xl" style={{ fontFamily: template.headingFont }}>
-            {shop.name}
-          </h1>
-          <p className="text-xl">{shop.tagline}</p>
-          <div className="flex flex-wrap justify-center gap-3">
-            <Button size="lg" style={{ backgroundColor: template.colors.primary, borderRadius: template.radius }} asChild>
-              <a href="#appointment">Book Appointment</a>
-            </Button>
-            <ShareButton title={`${shop.name} — ${shop.tagline}`} label="Share Website" />
+          <div className="blossom-float relative">
+            <div className="absolute -left-6 top-10 hidden h-28 w-28 rounded-full md:block" style={{ backgroundColor: template.colors.secondary, opacity: 0.35 }} />
+            <img src={shop.coverImage} alt={shop.name} loading="eager" className="relative aspect-[4/5] w-full object-cover shadow-2xl" style={{ borderRadius: "2rem" }} />
+            <div className="absolute -bottom-6 right-6 max-w-xs rounded-3xl p-5 shadow-xl" style={{ backgroundColor: template.colors.card }}>
+              <div className="text-xs uppercase tracking-widest text-muted-foreground">Portfolio ready</div>
+              <div className="mt-1 text-xl font-semibold" style={{ fontFamily: template.headingFont }}>Makeup · Nails · Beauty</div>
+            </div>
           </div>
         </div>
       </section>
