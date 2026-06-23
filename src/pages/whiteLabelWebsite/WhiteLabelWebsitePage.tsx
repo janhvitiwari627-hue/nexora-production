@@ -5,20 +5,15 @@ import { WhiteLabelHeader } from "@/components/whiteLabelWebsite/WhiteLabelHeade
 import { WhiteLabelFooter } from "@/components/whiteLabelWebsite/WhiteLabelFooter";
 import { ViralGrowthWidget } from "@/components/whiteLabelWebsite/ViralGrowthWidget";
 import { MOCK_SHOP, MOCK_CONFIG, type WebsiteConfig } from "@/components/whiteLabelWebsite/types";
-import { getTemplate, TEMPLATE_KEYS, TEMPLATES } from "@/components/whiteLabelWebsite/templates";
+import { getTemplate, normalizeTemplateKey, TEMPLATE_KEYS, TEMPLATES, type TemplateKey } from "@/components/whiteLabelWebsite/templates";
 import { Paintbrush } from "lucide-react";
-
-type TemplateKey = (typeof TEMPLATE_KEYS)[number];
 
 export function WhiteLabelWebsitePage({ slug: _slug }: { slug?: string }) {
   const shop = MOCK_SHOP;
   const search = useSearchSafe();
   const navigate = useNavigateSafe();
 
-  const requested = (search?.t as TemplateKey | undefined) ?? MOCK_CONFIG.template;
-  const templateKey: TemplateKey = (TEMPLATE_KEYS as readonly string[]).includes(requested)
-    ? (requested as TemplateKey)
-    : "RoyalLuxe";
+  const templateKey = normalizeTemplateKey(typeof search?.t === "string" ? search.t : MOCK_CONFIG.template);
 
   const config: WebsiteConfig = { ...MOCK_CONFIG, template: templateKey };
   const template = getTemplate(templateKey);
@@ -28,12 +23,12 @@ export function WhiteLabelWebsitePage({ slug: _slug }: { slug?: string }) {
   };
 
   const wrapperClass =
-    templateKey === "RoyalLuxe" ? "tpl-royal" :
-    templateKey === "BeautyBlossom" ? "tpl-blossom" : "";
+    templateKey === "royal-luxe" ? "tpl-royal" :
+    templateKey === "professional-beauty" ? "tpl-blossom" : "tpl-modern";
 
   const bgColor =
-    templateKey === "RoyalLuxe" ? "#0a0a0a" :
-    templateKey === "BeautyBlossom" ? "#fff5f7" :
+    templateKey === "royal-luxe" ? "#0B0B0B" :
+    templateKey === "professional-beauty" ? "#FFFDFD" :
     template.colors.bg;
 
   const isPreview = search?.preview === 1 || search?.preview === "1";
