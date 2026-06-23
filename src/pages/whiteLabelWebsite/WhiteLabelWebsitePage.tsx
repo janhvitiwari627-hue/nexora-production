@@ -51,7 +51,7 @@ export function WhiteLabelWebsitePage({ slug: _slug, routeSearch }: { slug?: str
               Preview mode — {TEMPLATES[templateKey].name}. Not published yet.
             </span>
             <a
-              href="/owner/templates"
+              href="/owner/create-website"
               className="rounded-full bg-amber-950 px-3 py-1 text-xs font-semibold text-amber-50 hover:bg-amber-900"
             >
               Back to gallery

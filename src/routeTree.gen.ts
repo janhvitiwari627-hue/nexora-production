@@ -50,7 +50,6 @@ import { Route as PartnerGrowthRouteImport } from './routes/partner.growth'
 import { Route as PartnerDistrictRouteImport } from './routes/partner.district'
 import { Route as PartnerDistributorRouteImport } from './routes/partner.distributor'
 import { Route as OwnerWebsiteRouteImport } from './routes/owner.website'
-import { Route as OwnerTemplatesRouteImport } from './routes/owner.templates'
 import { Route as OwnerStaffRouteImport } from './routes/owner.staff'
 import { Route as OwnerServicesRouteImport } from './routes/owner.services'
 import { Route as OwnerReviewsRouteImport } from './routes/owner.reviews'
@@ -313,11 +312,6 @@ const PartnerDistributorRoute = PartnerDistributorRouteImport.update({
 const OwnerWebsiteRoute = OwnerWebsiteRouteImport.update({
   id: '/owner/website',
   path: '/owner/website',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OwnerTemplatesRoute = OwnerTemplatesRouteImport.update({
-  id: '/owner/templates',
-  path: '/owner/templates',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OwnerStaffRoute = OwnerStaffRouteImport.update({
@@ -686,7 +680,6 @@ export interface FileRoutesByFullPath {
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/owner/staff': typeof OwnerStaffRoute
-  '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
   '/partner/distributor': typeof PartnerDistributorRoute
   '/partner/district': typeof PartnerDistrictRoute
@@ -787,7 +780,6 @@ export interface FileRoutesByTo {
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/owner/staff': typeof OwnerStaffRoute
-  '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
   '/partner/distributor': typeof PartnerDistributorRoute
   '/partner/district': typeof PartnerDistrictRoute
@@ -890,7 +882,6 @@ export interface FileRoutesById {
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/owner/staff': typeof OwnerStaffRoute
-  '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
   '/partner/distributor': typeof PartnerDistributorRoute
   '/partner/district': typeof PartnerDistrictRoute
@@ -994,7 +985,6 @@ export interface FileRouteTypes {
     | '/owner/reviews'
     | '/owner/services'
     | '/owner/staff'
-    | '/owner/templates'
     | '/owner/website'
     | '/partner/distributor'
     | '/partner/district'
@@ -1095,7 +1085,6 @@ export interface FileRouteTypes {
     | '/owner/reviews'
     | '/owner/services'
     | '/owner/staff'
-    | '/owner/templates'
     | '/owner/website'
     | '/partner/distributor'
     | '/partner/district'
@@ -1197,7 +1186,6 @@ export interface FileRouteTypes {
     | '/owner/reviews'
     | '/owner/services'
     | '/owner/staff'
-    | '/owner/templates'
     | '/owner/website'
     | '/partner/distributor'
     | '/partner/district'
@@ -1283,7 +1271,6 @@ export interface RootRouteChildren {
   OwnerReviewsRoute: typeof OwnerReviewsRoute
   OwnerServicesRoute: typeof OwnerServicesRoute
   OwnerStaffRoute: typeof OwnerStaffRoute
-  OwnerTemplatesRoute: typeof OwnerTemplatesRoute
   OwnerWebsiteRoute: typeof OwnerWebsiteRoute
   PartnerDistributorRoute: typeof PartnerDistributorRoute
   PartnerDistrictRoute: typeof PartnerDistrictRoute
@@ -1601,13 +1588,6 @@ declare module '@tanstack/react-router' {
       path: '/owner/website'
       fullPath: '/owner/website'
       preLoaderRoute: typeof OwnerWebsiteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/owner/templates': {
-      id: '/owner/templates'
-      path: '/owner/templates'
-      fullPath: '/owner/templates'
-      preLoaderRoute: typeof OwnerTemplatesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/owner/staff': {
@@ -2160,7 +2140,6 @@ const rootRouteChildren: RootRouteChildren = {
   OwnerReviewsRoute: OwnerReviewsRoute,
   OwnerServicesRoute: OwnerServicesRoute,
   OwnerStaffRoute: OwnerStaffRoute,
-  OwnerTemplatesRoute: OwnerTemplatesRoute,
   OwnerWebsiteRoute: OwnerWebsiteRoute,
   PartnerDistributorRoute: PartnerDistributorRoute,
   PartnerDistrictRoute: PartnerDistrictRoute,
