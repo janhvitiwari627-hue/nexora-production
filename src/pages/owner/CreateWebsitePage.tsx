@@ -184,7 +184,7 @@ export function CreateWebsitePage() {
                         mutate.mutate({ template_id: t.id });
                       }}
                     >
-                      {isCurrent ? "Selected" : (mutate.isPending && pendingId === t.id ? "Saving…" : "Use This Template")}
+                      {isCurrent ? "Edit & Go Live" : (mutate.isPending && pendingId === t.id ? "Applying…" : "Use & Edit")}
                     </Button>
                   </div>
                 </div>
