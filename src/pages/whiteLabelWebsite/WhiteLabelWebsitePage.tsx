@@ -74,6 +74,30 @@ function toShopData(data: Awaited<ReturnType<typeof getSalonBySlug>> | null | un
   const salon = data?.salon;
   if (!salon) return MOCK_SHOP;
   const cover = salon.cover_image_url ?? salon.image_url ?? MOCK_SHOP.coverImage;
+  const services: ShopData["services"] = data.services?.length
+    ? data.services.map((s) => ({
+      id: s.id,
+      name: s.name,
+      price: Number(s.price ?? 0),
+      duration: s.duration_minutes ?? 30,
+      desc: s.description ?? "Professional beauty service.",
+      image: s.image_url ?? undefined,
+      category: s.category ?? undefined,
+      popular: false,
+    }))
+    : MOCK_SHOP.services;
+  const staff: ShopData["staff"] = data.staff?.length
+    ? data.staff.map((s) => ({
+      id: s.id,
+      name: s.name,
+      designation: s.role ?? "Beauty Specialist",
+      image: s.avatar_url ?? MOCK_SHOP.coverImage,
+      experience: 5,
+      specialization: s.bio ?? undefined,
+      rating: s.rating ?? undefined,
+      available: true,
+    }))
+    : MOCK_SHOP.staff;
   return {
     ...MOCK_SHOP,
     slug: salon.slug,
@@ -89,28 +113,10 @@ function toShopData(data: Awaited<ReturnType<typeof getSalonBySlug>> | null | un
     rating: salon.rating ?? MOCK_SHOP.rating,
     reviewCount: salon.reviews_count ?? MOCK_SHOP.reviewCount,
     about: salon.description ?? MOCK_SHOP.about,
-    services: (data.services?.length ? data.services : []).map((s) => ({
-      id: s.id,
-      name: s.name,
-      price: Number(s.price ?? 0),
-      duration: s.duration_minutes ?? 30,
-      desc: s.description ?? "Professional beauty service.",
-      image: s.image_url ?? undefined,
-      category: s.category ?? undefined,
-      popular: false,
-    })).concat(data.services?.length ? [] : MOCK_SHOP.services),
-    staff: (data.staff?.length ? data.staff : []).map((s) => ({
-      id: s.id,
-      name: s.name,
-      designation: s.role ?? "Beauty Specialist",
-      image: s.avatar_url ?? MOCK_SHOP.coverImage,
-      experience: 5,
-      specialization: s.bio ?? undefined,
-      rating: s.rating ?? undefined,
-      available: true,
-    })).concat(data.staff?.length ? [] : MOCK_SHOP.staff),
+    services,
+    staff,
     gallery: salon.gallery_images?.length
-      ? salon.gallery_images.map((url, i) => ({ url, type: "photo" as const, category: i % 2 ? "Work" : "Interior" }))
+      ? salon.gallery_images.map((url: string, i: number) => ({ url, type: "photo" as const, category: i % 2 ? "Work" : "Interior" }))
       : MOCK_SHOP.gallery,
     reviews: data.reviews?.length
       ? data.reviews.map((r) => ({ id: r.id, author: "Guest", rating: r.rating, text: r.comment ?? "Great service.", date: new Date(r.created_at).toLocaleDateString("en-IN"), source: "site" as const }))
