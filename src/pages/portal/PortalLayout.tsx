@@ -1,4 +1,5 @@
-import { Link, Outlet } from "@tanstack/react-router";
+import type { ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
 import { Building2, LayoutDashboard, Megaphone, Package, Sparkles, Star, Store, Tag, Target, Truck, Users, HelpCircle, Phone } from "lucide-react";
 import { PublicHeader } from "@/components/layout/PublicHeader";
 import { PublicFooter } from "@/components/layout/PublicFooter";
