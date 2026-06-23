@@ -69,12 +69,13 @@ export const selectWebsiteTemplate = createServerFn({ method: "POST" })
       .maybeSingle();
     if (templateError) throw new Error(templateError.message);
     if (!template) throw new Error("Template not found");
-    const { error: ownerError } = await supabase
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error: ownerError } = await supabaseAdmin
       .from("salon_owners")
       .update({ selected_template_id: template.id, selected_template_key: template.template_key })
       .eq("id", link.id);
     if (ownerError) throw new Error(ownerError.message);
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from("salons")
       .update({ selected_template_id: template.id, selected_template_key: template.template_key, website_created: true })
       .eq("id", data.salon_id);
