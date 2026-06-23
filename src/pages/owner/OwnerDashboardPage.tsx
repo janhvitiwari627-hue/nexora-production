@@ -69,6 +69,9 @@ function TopBar({ open, onToggle }: { open: boolean; onToggle: (v: boolean) => v
           <Button variant="ghost" size="sm" className="hidden md:inline-flex gap-1.5" asChild>
             <a href="/owner/create-website"><Globe className="h-4 w-4" /> Website</a>
           </Button>
+          <Button variant="outline" size="sm" className="hidden md:inline-flex gap-1.5" asChild>
+            <a href="/owner/website"><Settings className="h-4 w-4" /> Edit Website</a>
+          </Button>
           <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
             <Bell className="h-5 w-5" />
             <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary" />
