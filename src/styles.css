@@ -172,3 +172,89 @@
   transform: scale(0);
   animation: ripple 0.6s ease-out;
 }
+
+/* =====================================================================
+ * Template: Royal Luxe — Luxury Black + Gold (Rolex × Mercedes × Taj)
+ * Scoped via .tpl-royal wrapper. Only visual; features unchanged.
+ * ===================================================================*/
+.tpl-royal {
+  --royal-bg: #0a0a0a;
+  --royal-bg-soft: #121212;
+  --royal-gold: #d4af37;
+  --royal-gold-soft: #f5e6c8;
+  --royal-gold-deep: #b8932f;
+  --royal-line: rgba(212, 175, 55, 0.25);
+  background: radial-gradient(ellipse at top, #1a1410 0%, #050505 60%) !important;
+  color: #f5f1e8 !important;
+}
+.tpl-royal .text-muted-foreground { color: rgba(245, 230, 200, 0.65) !important; }
+.tpl-royal h1, .tpl-royal h2, .tpl-royal h3, .tpl-royal h4 {
+  letter-spacing: 0.01em;
+}
+.tpl-royal .royal-gold-text {
+  background: linear-gradient(135deg, #f5e6c8 0%, #d4af37 45%, #b8932f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.tpl-royal .royal-divider {
+  height: 1px;
+  width: 80px;
+  margin: 1rem auto;
+  background: linear-gradient(90deg, transparent, #d4af37, transparent);
+}
+.tpl-royal .royal-glass {
+  background: linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+  backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid var(--royal-line);
+  border-radius: 14px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.05) inset,
+    0 30px 60px -20px rgba(0,0,0,0.8),
+    0 0 0 1px rgba(212,175,55,0.08);
+  transition: transform 0.5s cubic-bezier(0.22,1,0.36,1), border-color 0.4s, box-shadow 0.5s;
+}
+.tpl-royal .royal-glass:hover {
+  transform: translateY(-4px);
+  border-color: rgba(212, 175, 55, 0.55);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.08) inset,
+    0 40px 80px -20px rgba(0,0,0,0.9),
+    0 0 30px -5px rgba(212,175,55,0.25);
+}
+.tpl-royal section { color: inherit; }
+.tpl-royal .bg-white,
+.tpl-royal .bg-card,
+.tpl-royal .bg-background,
+.tpl-royal .bg-muted,
+.tpl-royal .bg-muted\/30,
+.tpl-royal .bg-muted\/40,
+.tpl-royal .bg-muted\/50 {
+  background-color: transparent !important;
+}
+.tpl-royal [class*="rounded"]:not(button):not(.royal-no-skin):where(.border, .shadow, .shadow-sm, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl) {
+  background: linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01)) !important;
+  border-color: var(--royal-line) !important;
+  color: #f5f1e8;
+}
+.tpl-royal button[class*="border"]:not([style*="background"]) {
+  border-color: var(--royal-line);
+  color: var(--royal-gold-soft);
+}
+.tpl-royal a:not([style*="background"]):hover { color: var(--royal-gold); }
+
+@keyframes royal-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.tpl-royal .royal-shimmer {
+  background: linear-gradient(110deg, transparent 40%, rgba(212,175,55,0.15) 50%, transparent 60%);
+  background-size: 200% 100%;
+  animation: royal-shimmer 3s ease-in-out infinite;
+}
+
+@keyframes royal-rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.tpl-royal .royal-rise { animation: royal-rise 0.9s cubic-bezier(0.22,1,0.36,1) both; }
