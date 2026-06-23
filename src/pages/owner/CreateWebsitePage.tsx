@@ -178,8 +178,9 @@ export function CreateWebsitePage() {
                     </Button>
                     <Button
                       size="sm"
-                      disabled={isCurrent || mutate.isPending || !activeSalonId}
+                      disabled={mutate.isPending || !activeSalonId}
                       onClick={() => {
+                        if (isCurrent) { navigate({ to: "/owner/website" }); return; }
                         setPendingId(t.id);
                         mutate.mutate({ template_id: t.id });
                       }}
