@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAuthStore } from "@/stores/authStore";
 import { getMyBrand, getMyDistributor, getMyLeads, type Brand, type Distributor } from "./lib";
+import { ConnectionsPanel } from "./ConnectionsPanel";
 
 export function PortalDashboardPage() {
   const user = useAuthStore((s) => s.user);
