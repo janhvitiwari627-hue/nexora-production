@@ -76,6 +76,7 @@ export function BrandDirectoryPage() {
                 </div>
                 {b.description && <p className="mt-3 line-clamp-2 text-sm text-body">{b.description}</p>}
                 <div className="mt-4 flex gap-2">
+                  <Button asChild size="sm" variant="outline"><Link to="/portal/brands/$slug" params={{ slug: b.slug }}>View Profile</Link></Button>
                   <LeadDialog trigger={<Button size="sm" className="bg-gradient-cta text-primary-foreground">Contact</Button>} target={{ type: "brand", id: b.id, name: b.name }} />
                 </div>
               </div>

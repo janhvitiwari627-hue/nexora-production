@@ -4,6 +4,8 @@ export type Brand = {
   id: string;
   slug: string;
   name: string;
+  company_name: string | null;
+  owner_name: string | null;
   tagline: string | null;
   description: string | null;
   logo_url: string | null;
@@ -11,9 +13,19 @@ export type Brand = {
   category: string | null;
   hq_city: string | null;
   hq_state: string | null;
+  address: string | null;
+  pincode: string | null;
   website: string | null;
   email: string | null;
   phone: string | null;
+  gst_number: string | null;
+  pan_number: string | null;
+  business_type: string | null;
+  social_instagram: string | null;
+  social_facebook: string | null;
+  social_youtube: string | null;
+  document_urls: string[] | null;
+  gallery_urls: string[] | null;
   is_featured: boolean;
   is_sponsored: boolean;
 };
@@ -22,18 +34,29 @@ export type Distributor = {
   id: string;
   slug: string;
   company_name: string;
+  owner_name: string | null;
   contact_person: string | null;
   description: string | null;
   logo_url: string | null;
+  cover_url: string | null;
   state: string | null;
   district: string | null;
   city: string | null;
+  address: string | null;
+  pincode: string | null;
   email: string | null;
   phone: string | null;
+  website: string | null;
+  gst_number: string | null;
+  pan_number: string | null;
+  business_type: string | null;
+  years_in_business: number | null;
   coverage_states: string[] | null;
   coverage_districts: string[] | null;
   categories: string[] | null;
   brands_handled: string[] | null;
+  document_urls: string[] | null;
+  gallery_urls: string[] | null;
   is_featured: boolean;
   is_sponsored: boolean;
 };
@@ -193,4 +216,36 @@ export async function listDistributorsLite() {
     .order("company_name");
   if (error) throw error;
   return data ?? [];
+}
+
+export async function getBrandBySlug(slug: string) {
+  const { data, error } = await supabase
+    .from("brands")
+    .select("*")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as Brand | null) ?? null;
+}
+
+export async function getDistributorBySlug(slug: string) {
+  const { data, error } = await supabase
+    .from("distributors")
+    .select("*")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as Distributor | null) ?? null;
+}
+
+export async function listProductsByBrand(brandId: string) {
+  const { data, error } = await supabase
+    .from("brand_products")
+    .select("*")
+    .eq("brand_id", brandId)
+    .eq("is_active", true)
+    .order("is_featured", { ascending: false })
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as BrandProduct[];
 }
