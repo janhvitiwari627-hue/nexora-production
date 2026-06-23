@@ -114,12 +114,15 @@ export function DistributorRegistrationPage() {
             <F id="pin" label="Pincode" value={form.pincode} onChange={(v) => setForm({ ...form, pincode: v })} />
           </div>
           <F id="addr" label="Address" value={form.address} onChange={(v) => setForm({ ...form, address: v })} />
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className="grid gap-3 md:grid-cols-2">
             <F id="cov" label="Coverage States (comma separated)" value={form.coverage_states_text} onChange={(v) => setForm({ ...form, coverage_states_text: v })} />
+            <F id="covd" label="Coverage Districts (comma separated)" value={form.coverage_districts_text} onChange={(v) => setForm({ ...form, coverage_districts_text: v })} />
+          </div>
+          <div className="grid gap-3 md:grid-cols-3">
             <F id="cat" label="Categories (comma separated)" value={form.categories_text} onChange={(v) => setForm({ ...form, categories_text: v })} />
             <F id="brh" label="Brands Handled (comma separated)" value={form.brands_handled_text} onChange={(v) => setForm({ ...form, brands_handled_text: v })} />
+            <F id="yib" label="Years in Business" value={form.years_in_business} onChange={(v) => setForm({ ...form, years_in_business: v })} />
           </div>
-          <F id="yib" label="Years in Business" value={form.years_in_business} onChange={(v) => setForm({ ...form, years_in_business: v })} />
 
           <div className="mt-2 flex justify-end gap-2">
             <Button variant="ghost" onClick={() => navigate({ to: "/portal" })}>Cancel</Button>
