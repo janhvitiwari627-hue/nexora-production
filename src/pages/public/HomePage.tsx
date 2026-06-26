@@ -9,6 +9,8 @@ import AppDownload from "@/components/nexora-design/sections/AppDownload";
 import WhiteLabelBuilder from "@/components/nexora-design/sections/WhiteLabelBuilder";
 import ShopOwnerDashboard from "@/components/nexora-design/sections/ShopOwnerDashboard";
 import AdminPanel from "@/components/nexora-design/sections/AdminPanel";
+import SponsoredBrands from "@/components/nexora-design/sections/SponsoredBrands";
+import SponsoredVideos from "@/components/nexora-design/sections/SponsoredVideos";
 import Footer from "@/components/nexora-design/sections/Footer";
 
 export function HomePage() {
@@ -20,8 +22,10 @@ export function HomePage() {
         <SmartSearch />
         <Categories />
         <ShopListings />
-        <Membership />
+        <SponsoredBrands />
+        <SponsoredVideos />
         <Offers />
+        <Membership />
         <AppDownload />
         <WhiteLabelBuilder />
         <ShopOwnerDashboard />
