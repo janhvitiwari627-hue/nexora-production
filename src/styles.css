@@ -753,3 +753,32 @@
   padding: 0 12px;
   font-size: 14px;
 }
+
+/* ===== Nexora Design Spec utilities ===== */
+.gradient-mesh {
+  background:
+    radial-gradient(at 20% 20%, rgba(99, 102, 241, 0.22) 0px, transparent 50%),
+    radial-gradient(at 80% 10%, rgba(139, 92, 246, 0.18) 0px, transparent 45%),
+    radial-gradient(at 40% 80%, rgba(59, 130, 246, 0.16) 0px, transparent 45%),
+    radial-gradient(at 90% 70%, rgba(99, 102, 241, 0.12) 0px, transparent 40%),
+    linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+}
+.card-metal-silver {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 40%, #cbd5e1 55%, #f8fafc 100%);
+}
+.card-metal-gold {
+  background: linear-gradient(135deg, #fff7ed 0%, #fde68a 35%, #d97706 55%, #fffbeb 100%);
+}
+.card-metal-platinum {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 40%, #94a3b8 55%, #f1f5f9 100%);
+}
+.glass-sheen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(125deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.05) 45%, transparent 55%);
+  pointer-events: none;
+}
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
