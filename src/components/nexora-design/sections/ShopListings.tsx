@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Star, MapPin, BadgeCheck, Heart } from "lucide-react";
-import FadeIn from "../components/FadeIn";
+import FadeIn from "../FadeIn";
 
 const shops = [
   {

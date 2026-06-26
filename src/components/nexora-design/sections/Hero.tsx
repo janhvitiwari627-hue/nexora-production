@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Play, Star, MapPin } from "lucide-react";
-import FadeIn from "../components/FadeIn";
+import FadeIn from "../FadeIn";
 
 export default function Hero() {
   return (

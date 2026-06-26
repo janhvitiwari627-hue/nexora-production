@@ -1,5 +1,5 @@
 import { Apple, Play, QrCode, ShieldCheck, Zap, Gift } from "lucide-react";
-import FadeIn from "../components/FadeIn";
+import FadeIn from "../FadeIn";
 
 const benefits = [
   { icon: Zap, text: "Book in under 60 seconds" },

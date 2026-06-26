@@ -1,5 +1,5 @@
 import { Gift, Percent, ArrowRight } from "lucide-react";
-import FadeIn from "../components/FadeIn";
+import FadeIn from "../FadeIn";
 
 const offers = [
   {

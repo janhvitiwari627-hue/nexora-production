@@ -1,5 +1,5 @@
 import { ArrowRight, Check, Globe, Paintbrush, Rocket } from "lucide-react";
-import FadeIn from "../components/FadeIn";
+import FadeIn from "../FadeIn";
 
 const templates = [
   {

@@ -8,7 +8,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from "lucide-react";
-import FadeIn from "../components/FadeIn";
+import FadeIn from "../FadeIn";
 
 const kpis = [
   { label: "Revenue", value: "₹2,84,000", change: "+12.5%", up: true, icon: IndianRupee },

@@ -1,5 +1,5 @@
 import { Scissors, Sparkles, Droplets, PenTool, Heart, Palette, Crown, Gem } from "lucide-react";
-import FadeIn from "../components/FadeIn";
+import FadeIn from "../FadeIn";
 
 const categories = [
   {

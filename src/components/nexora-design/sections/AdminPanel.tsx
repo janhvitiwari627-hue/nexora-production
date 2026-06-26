@@ -13,7 +13,7 @@ import {
   ShieldCheck,
   BarChart3,
 } from "lucide-react";
-import FadeIn from "../components/FadeIn";
+import FadeIn from "../FadeIn";
 
 const sidebarItems = [
   { icon: LayoutDashboard, label: "Dashboard", active: true },

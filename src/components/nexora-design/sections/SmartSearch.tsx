@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Search, SlidersHorizontal, MapPin, Clock, Star, Wallet, User } from "lucide-react";
-import FadeIn from "../components/FadeIn";
+import FadeIn from "../FadeIn";
 
 const suggestions = ["Salon", "Spa", "Facial", "Tattoo", "Massage", "Nail Art"];
 
