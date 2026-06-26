@@ -171,10 +171,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "brand_distributor_connections_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "brand_distributor_connections_distributor_id_fkey"
             columns: ["distributor_id"]
             isOneToOne: false
             referencedRelation: "distributors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_distributor_connections_distributor_id_fkey"
+            columns: ["distributor_id"]
+            isOneToOne: false
+            referencedRelation: "distributors_public"
             referencedColumns: ["id"]
           },
         ]
@@ -231,6 +245,13 @@ export type Database = {
             columns: ["brand_id"]
             isOneToOne: false
             referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_products_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1627,10 +1648,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "portal_leads_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "portal_leads_distributor_id_fkey"
             columns: ["distributor_id"]
             isOneToOne: false
             referencedRelation: "distributors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_leads_distributor_id_fkey"
+            columns: ["distributor_id"]
+            isOneToOne: false
+            referencedRelation: "distributors_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1780,6 +1815,13 @@ export type Database = {
             columns: ["brand_id"]
             isOneToOne: false
             referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promotions_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands_public"
             referencedColumns: ["id"]
           },
           {
@@ -2773,7 +2815,259 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      brands_public: {
+        Row: {
+          category: string | null
+          company_name: string | null
+          country: string | null
+          cover_url: string | null
+          created_at: string | null
+          description: string | null
+          founded_year: number | null
+          gallery_urls: string[] | null
+          hq_city: string | null
+          hq_state: string | null
+          id: string | null
+          is_featured: boolean | null
+          is_sponsored: boolean | null
+          logo_url: string | null
+          name: string | null
+          slug: string | null
+          social_facebook: string | null
+          social_instagram: string | null
+          social_youtube: string | null
+          status: string | null
+          tagline: string | null
+          website: string | null
+        }
+        Insert: {
+          category?: string | null
+          company_name?: string | null
+          country?: string | null
+          cover_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          founded_year?: number | null
+          gallery_urls?: string[] | null
+          hq_city?: string | null
+          hq_state?: string | null
+          id?: string | null
+          is_featured?: boolean | null
+          is_sponsored?: boolean | null
+          logo_url?: string | null
+          name?: string | null
+          slug?: string | null
+          social_facebook?: string | null
+          social_instagram?: string | null
+          social_youtube?: string | null
+          status?: string | null
+          tagline?: string | null
+          website?: string | null
+        }
+        Update: {
+          category?: string | null
+          company_name?: string | null
+          country?: string | null
+          cover_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          founded_year?: number | null
+          gallery_urls?: string[] | null
+          hq_city?: string | null
+          hq_state?: string | null
+          id?: string | null
+          is_featured?: boolean | null
+          is_sponsored?: boolean | null
+          logo_url?: string | null
+          name?: string | null
+          slug?: string | null
+          social_facebook?: string | null
+          social_instagram?: string | null
+          social_youtube?: string | null
+          status?: string | null
+          tagline?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
+      distributors_public: {
+        Row: {
+          brands_handled: string[] | null
+          categories: string[] | null
+          city: string | null
+          company_name: string | null
+          cover_url: string | null
+          coverage_districts: string[] | null
+          coverage_states: string[] | null
+          created_at: string | null
+          description: string | null
+          district: string | null
+          gallery_urls: string[] | null
+          id: string | null
+          is_featured: boolean | null
+          is_sponsored: boolean | null
+          logo_url: string | null
+          slug: string | null
+          state: string | null
+          status: string | null
+          website: string | null
+          years_in_business: number | null
+        }
+        Insert: {
+          brands_handled?: string[] | null
+          categories?: string[] | null
+          city?: string | null
+          company_name?: string | null
+          cover_url?: string | null
+          coverage_districts?: string[] | null
+          coverage_states?: string[] | null
+          created_at?: string | null
+          description?: string | null
+          district?: string | null
+          gallery_urls?: string[] | null
+          id?: string | null
+          is_featured?: boolean | null
+          is_sponsored?: boolean | null
+          logo_url?: string | null
+          slug?: string | null
+          state?: string | null
+          status?: string | null
+          website?: string | null
+          years_in_business?: number | null
+        }
+        Update: {
+          brands_handled?: string[] | null
+          categories?: string[] | null
+          city?: string | null
+          company_name?: string | null
+          cover_url?: string | null
+          coverage_districts?: string[] | null
+          coverage_states?: string[] | null
+          created_at?: string | null
+          description?: string | null
+          district?: string | null
+          gallery_urls?: string[] | null
+          id?: string | null
+          is_featured?: boolean | null
+          is_sponsored?: boolean | null
+          logo_url?: string | null
+          slug?: string | null
+          state?: string | null
+          status?: string | null
+          website?: string | null
+          years_in_business?: number | null
+        }
+        Relationships: []
+      }
+      partner_hall_of_fame_public: {
+        Row: {
+          achievements: Json | null
+          active_shops: number | null
+          badge: string | null
+          category: string | null
+          created_at: string | null
+          featured_from: string | null
+          featured_to: string | null
+          id: string | null
+          partner_id: string | null
+          rank: number | null
+          success_story: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          achievements?: Json | null
+          active_shops?: number | null
+          badge?: string | null
+          category?: string | null
+          created_at?: string | null
+          featured_from?: string | null
+          featured_to?: string | null
+          id?: string | null
+          partner_id?: string | null
+          rank?: number | null
+          success_story?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          achievements?: Json | null
+          active_shops?: number | null
+          badge?: string | null
+          category?: string | null
+          created_at?: string | null
+          featured_from?: string | null
+          featured_to?: string | null
+          id?: string | null
+          partner_id?: string | null
+          rank?: number | null
+          success_story?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_hall_of_fame_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "district_business_partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_leaderboard_public: {
+        Row: {
+          active_shops: number | null
+          computed_at: string | null
+          created_at: string | null
+          district: string | null
+          id: string | null
+          partner_id: string | null
+          period: Database["public"]["Enums"]["dbp_leaderboard_period"] | null
+          period_end: string | null
+          period_start: string | null
+          rank: number | null
+          scope: string | null
+          score: number | null
+          state: string | null
+        }
+        Insert: {
+          active_shops?: number | null
+          computed_at?: string | null
+          created_at?: string | null
+          district?: string | null
+          id?: string | null
+          partner_id?: string | null
+          period?: Database["public"]["Enums"]["dbp_leaderboard_period"] | null
+          period_end?: string | null
+          period_start?: string | null
+          rank?: number | null
+          scope?: string | null
+          score?: number | null
+          state?: string | null
+        }
+        Update: {
+          active_shops?: number | null
+          computed_at?: string | null
+          created_at?: string | null
+          district?: string | null
+          id?: string | null
+          partner_id?: string | null
+          period?: Database["public"]["Enums"]["dbp_leaderboard_period"] | null
+          period_end?: string | null
+          period_start?: string | null
+          rank?: number | null
+          scope?: string | null
+          score?: number | null
+          state?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_leaderboard_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "district_business_partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       auto_release_escrow: { Args: never; Returns: number }
