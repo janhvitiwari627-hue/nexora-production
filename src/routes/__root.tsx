@@ -122,6 +122,9 @@ function RootComponent() {
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
+    if (window.location.pathname === "/auth/callback") {
+      return () => undefined;
+    }
     void import("@/stores/authStore").then(({ useAuthStore }) => {
       useAuthStore.getState().initialize().then((unsub) => {
         unsubscribe = unsub;

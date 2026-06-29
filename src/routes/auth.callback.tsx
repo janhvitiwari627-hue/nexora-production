@@ -91,10 +91,10 @@ async function resolveCallbackResult(): Promise<CallbackResult> {
 
   const code = url.searchParams.get("code");
   if (code) {
+    cleanCallbackUrl(next);
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (error) return friendlyFailure(recovery, error.message);
 
-    cleanCallbackUrl(next);
     const session = await waitForSession();
     if (!session) return friendlyFailure(recovery);
 
@@ -105,6 +105,7 @@ async function resolveCallbackResult(): Promise<CallbackResult> {
   const tokenHash = url.searchParams.get("token_hash");
   const otpType = url.searchParams.get("type");
   if (tokenHash && otpType) {
+    cleanCallbackUrl(next);
     const { error } = await supabase.auth.verifyOtp({
       token_hash: tokenHash,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -112,7 +113,6 @@ async function resolveCallbackResult(): Promise<CallbackResult> {
     });
     if (error) return friendlyFailure(recovery, error.message);
 
-    cleanCallbackUrl(next);
     const session = await waitForSession();
     if (!session) return friendlyFailure(recovery);
 
