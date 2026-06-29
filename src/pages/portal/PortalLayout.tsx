@@ -26,6 +26,7 @@ export function PortalLayout({ children }: { children: ReactNode }) {
       <PublicHeader />
       <div className="border-b border-border/60 bg-card/40 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto px-4 py-3 md:px-6">
+          <BackButton size="icon" className="shrink-0" />
           {NAV.map((n) => (
             <Link
               key={n.to}
