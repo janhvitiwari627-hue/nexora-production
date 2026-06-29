@@ -18,7 +18,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { BackButton } from "@/components/shared/BackButton";
+import { cn } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { useOwnerContext } from "@/hooks/use-owner-context";
 import {
