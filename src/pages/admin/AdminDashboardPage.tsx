@@ -2,7 +2,6 @@ import { Link } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BackButton } from "@/components/shared/BackButton";
 import {
   AlertCircle, ArrowRight, Ban, Building2, CalendarCheck, CheckCircle2, Crown,
   IndianRupee, MapPin, MessageSquare, UserPlus, Users, XCircle, type LucideIcon,
