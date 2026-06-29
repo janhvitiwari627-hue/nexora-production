@@ -136,6 +136,7 @@ export default function CustomerRegistrationPage() {
   const [googleSubmitting, setGoogleSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
   const [showEligibility, setShowEligibility] = useState(false);
 
   // Referral code live validation
@@ -634,6 +635,8 @@ export default function CustomerRegistrationPage() {
                   type={showPassword ? "text" : "password"}
                   value={form.password}
                   onChange={update("password")}
+                  onFocus={() => setPasswordFocused(true)}
+                  onBlur={() => setPasswordFocused(false)}
                   autoComplete="new-password"
                   required
                   minLength={8}
@@ -651,6 +654,24 @@ export default function CustomerRegistrationPage() {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
+              {passwordFocused && !form.password && (
+                <div className="rounded-md border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
+                  <p className="mb-1.5 flex items-center gap-1.5 font-medium text-foreground">
+                    <Info className="h-3.5 w-3.5 text-primary" />
+                    Create a strong password:
+                  </p>
+                  <ul className="space-y-1 pl-1">
+                    <li className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-success" />Mix of letters, numbers &amp; symbols</li>
+                    <li className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-success" />Minimum 8 characters</li>
+                    <li className="flex items-center gap-2 text-success/90">Example: <span className="font-mono">Nexora@123</span></li>
+                    <li className="flex items-center gap-2 text-success/90">Example: <span className="font-mono">MySalon#2024</span></li>
+                    <li className="flex items-center gap-2 text-success/90">Example: <span className="font-mono">Jaipur@567</span></li>
+                    <li className="flex items-center gap-2 text-destructive/80"><XCircle className="h-3.5 w-3.5" />Avoid: <span className="font-mono">12345678</span></li>
+                    <li className="flex items-center gap-2 text-destructive/80"><XCircle className="h-3.5 w-3.5" />Avoid: <span className="font-mono">password</span></li>
+                    <li className="flex items-center gap-2 text-destructive/80"><XCircle className="h-3.5 w-3.5" />Avoid: your name or email</li>
+                  </ul>
+                </div>
+              )}
               <PasswordStrengthIndicator password={form.password} />
               {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
             </div>
