@@ -16,6 +16,7 @@ import { MobileMenuOverlay } from "./MobileMenuOverlay";
 import { LocationChip } from "./LocationChip";
 import { useAuthStore } from "@/stores/authStore";
 import { pickPrimaryRole, routeForRole } from "@/lib/auth-redirect";
+import { BackButton } from "@/components/shared/BackButton";
 
 const ROLE_DASH_LABEL: Record<string, string> = {
   admin: "Admin Panel",
