@@ -12,6 +12,8 @@ import { Loader2, Eye, EyeOff } from "lucide-react";
 import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
 import { useAuthStore } from "@/stores/authStore";
 
+const normalizeEmail = (value: string) => value.trim().toLowerCase();
+
 const loginSchema = z.object({
   email: z.string().trim().email("Invalid email address").max(255),
   password: z.string().min(1, "Password is required").max(72),
@@ -26,7 +28,10 @@ export default function CustomerLoginPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [googleSubmitting, setGoogleSubmitting] = useState(false);
+  const [resetSubmitting, setResetSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [loginFailedForEmail, setLoginFailedForEmail] = useState<string | null>(null);
+  const [resetSent, setResetSent] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
@@ -45,7 +50,37 @@ export default function CustomerLoginPage() {
     setForm((f) => ({ ...f, [key]: value }));
     // Clear server error and field error when user starts typing
     if (serverError) setServerError(null);
+    if (key === "email") {
+      setLoginFailedForEmail(null);
+      setResetSent(false);
+    }
     if (errors[key]) setErrors((prev) => ({ ...prev, [key]: "" }));
+  };
+
+  const sendResetLink = async () => {
+    const email = normalizeEmail(loginFailedForEmail || form.email);
+    const parsed = loginSchema.shape.email.safeParse(email);
+    if (!parsed.success) {
+      setServerError("Please enter the registered email address first.");
+      return;
+    }
+
+    setResetSubmitting(true);
+    setServerError(null);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) {
+        setServerError(error.message);
+        return;
+      }
+      setResetSent(true);
+    } catch (err) {
+      setServerError(err instanceof Error ? err.message : "Could not send reset link. Please try again.");
+    } finally {
+      setResetSubmitting(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -70,11 +105,13 @@ export default function CustomerLoginPage() {
       return;
     }
 
+    const email = normalizeEmail(parsed.data.email);
+
     setSubmitting(true);
-    console.log("[Login] Attempting sign in with email:", parsed.data.email);
+    console.log("[Login] Attempting sign in with email:", email);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: parsed.data.email.trim(),
+        email,
         password: parsed.data.password,
       });
 
@@ -86,7 +123,9 @@ export default function CustomerLoginPage() {
         if (error.message.includes("Email not confirmed")) {
           errorMessage = "Please verify your email before signing in. Check your inbox for the confirmation link.";
         } else if (error.message.includes("Invalid login credentials") || error.message.includes("Invalid email or password")) {
-          errorMessage = "Invalid email or password";
+          errorMessage = "Email/password match nahi ho raha. Agar account already registered hai, password reset karke new password set karein.";
+          setLoginFailedForEmail(email);
+          setResetSent(false);
         } else if (error.message.includes("User not found") || error.message.includes("signup")) {
           errorMessage = "No account found with this email. Please sign up first.";
         } else if (error.message.includes("network") || error.message.includes("fetch") || error.message.includes("connection")) {
@@ -294,6 +333,31 @@ export default function CustomerLoginPage() {
                 "Sign in"
               )}
             </Button>
+
+            {loginFailedForEmail && (
+              <Alert className="border-primary/20 bg-primary/5">
+                <AlertDescription className="space-y-2 text-sm">
+                  <p>
+                    Ye email backend me registered ho sakta hai, lekin entered password match nahi ho raha.
+                  </p>
+                  {resetSent ? (
+                    <p className="font-medium text-primary">Reset link sent. Inbox/spam check karke new password set karein.</p>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={sendResetLink}
+                      disabled={resetSubmitting || submitting}
+                    >
+                      {resetSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                      Send password reset link
+                    </Button>
+                  )}
+                </AlertDescription>
+              </Alert>
+            )}
           </form>
 
           <p className="text-center text-sm text-muted-foreground">
