@@ -86,14 +86,15 @@ async function resolveCallbackResult(): Promise<CallbackResult> {
 
   const urlError = url.searchParams.get("error_description") || hash.get("error_description");
   if (urlError || url.searchParams.get("error") || hash.get("error")) {
+    cleanCallbackUrl(next);
     return friendlyFailure(recovery, urlError ?? undefined);
   }
 
   const code = url.searchParams.get("code");
   if (code) {
-    cleanCallbackUrl(next);
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (error) return friendlyFailure(recovery, error.message);
+    cleanCallbackUrl(next);
 
     const session = await waitForSession();
     if (!session) return friendlyFailure(recovery);
