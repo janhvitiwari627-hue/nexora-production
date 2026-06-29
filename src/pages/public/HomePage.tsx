@@ -30,9 +30,13 @@ import {
   User2,
   TrendingUp,
   Layers,
+  LogOut,
 } from "lucide-react";
 import Footer from "@/components/nexora-design/sections/Footer";
 import { shopsQueryOptions } from "@/lib/shops.queries";
+import { useAuthStore } from "@/stores/authStore";
+import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
+
 
 /* =========================================================
  * NEXORA SALONOS — PREMIUM HOMEPAGE (Stripe × Apple × Airbnb)
