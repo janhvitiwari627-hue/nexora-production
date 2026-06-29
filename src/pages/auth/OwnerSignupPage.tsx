@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -68,6 +68,8 @@ function parseErr(error: unknown): string {
 
 export default function OwnerSignupPage() {
   const navigate = useNavigate();
+  const search = useSearch({ strict: false }) as { ref?: string };
+  const referredBy = (search?.ref ?? "").trim().slice(0, 20);
   const [form, setForm] = useState({
     full_name: "",
     email: "",
@@ -127,6 +129,7 @@ export default function OwnerSignupPage() {
           data: {
             full_name: parsed.data.full_name,
             mobile: parsed.data.mobile,
+            referred_by: referredBy || null,
             role: "customer",
             owner_request: {
               business_name: parsed.data.business_name,
@@ -236,6 +239,15 @@ export default function OwnerSignupPage() {
           {serverError && (
             <Alert variant="destructive" className="mb-4">
               <AlertDescription>{serverError}</AlertDescription>
+            </Alert>
+          )}
+
+          {referredBy && (
+            <Alert className="mb-4 border-primary/20 bg-primary/5">
+              <AlertDescription className="text-sm">
+                Joining with referral code <strong className="font-mono">{referredBy}</strong>.
+                <span className="block text-xs text-muted-foreground mt-0.5">Referral rewards will be activated soon.</span>
+              </AlertDescription>
             </Alert>
           )}
 

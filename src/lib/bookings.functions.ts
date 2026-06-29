@@ -142,12 +142,24 @@ export const rescheduleBooking = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => RescheduleInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    // Do NOT change status here — only allow reschedule of already-paid bookings.
+    // The validate_booking trigger blocks status='confirmed' without payment_status='paid'.
+    const { data: existing, error: fetchErr } = await supabase
+      .from("bookings")
+      .select("payment_status, status")
+      .eq("id", data.id)
+      .eq("user_id", userId)
+      .single();
+    if (fetchErr) throw new Error(fetchErr.message);
+    if (!existing) throw new Error("Booking not found");
+    if (existing.payment_status !== "paid") {
+      throw new Error("Pay the advance before rescheduling this booking");
+    }
     const { data: row, error } = await supabase
       .from("bookings")
       .update({
         booking_date: data.booking_date,
         booking_time: data.booking_time,
-        status: "confirmed",
       })
       .eq("id", data.id)
       .eq("user_id", userId)

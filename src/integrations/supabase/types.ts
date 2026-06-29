@@ -1770,6 +1770,7 @@ export type Database = {
           pincode: string | null
           referral_code: string | null
           referred_by: string | null
+          referred_by_user_id: string | null
           state: string | null
           updated_at: string
           username: string | null
@@ -1796,6 +1797,7 @@ export type Database = {
           pincode?: string | null
           referral_code?: string | null
           referred_by?: string | null
+          referred_by_user_id?: string | null
           state?: string | null
           updated_at?: string
           username?: string | null
@@ -1822,11 +1824,20 @@ export type Database = {
           pincode?: string | null
           referral_code?: string | null
           referred_by?: string | null
+          referred_by_user_id?: string | null
           state?: string | null
           updated_at?: string
           username?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_referred_by_user_id_fkey"
+            columns: ["referred_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       promotions: {
         Row: {

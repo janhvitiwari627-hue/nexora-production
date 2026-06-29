@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -51,6 +51,7 @@ function parseErr(error: unknown): string {
 
 export default function SignupPage() {
   const navigate = useNavigate();
+  const search = useSearch({ strict: false }) as { ref?: string };
   const user = useAuthStore((s) => s.user);
   const isInitialized = useAuthStore((s) => s.isInitialized);
   const [form, setForm] = useState({
@@ -60,6 +61,7 @@ export default function SignupPage() {
     password: "",
     confirm_password: "",
   });
+  const referredBy = (search?.ref ?? "").trim().slice(0, 20);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [resetSubmitting, setResetSubmitting] = useState(false);
@@ -153,6 +155,7 @@ export default function SignupPage() {
           data: {
             full_name: parsed.data.full_name,
             mobile: parsed.data.mobile,
+            referred_by: referredBy || null,
             // Force customer role — trigger ignores unknown/disallowed roles
             role: "customer",
           },
@@ -280,6 +283,15 @@ export default function SignupPage() {
                     </Button>
                   </div>
                 )}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {referredBy && (
+            <Alert className="mb-4 border-primary/20 bg-primary/5">
+              <AlertDescription className="text-sm">
+                Joining with referral code <strong className="font-mono">{referredBy}</strong>.
+                <span className="block text-xs text-muted-foreground mt-0.5">Referral rewards will be activated soon.</span>
               </AlertDescription>
             </Alert>
           )}
