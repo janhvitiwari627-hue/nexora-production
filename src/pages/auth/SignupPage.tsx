@@ -214,16 +214,19 @@ export default function SignupPage() {
 
   if (success === "signed_in") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-              <CheckCircle2 className="h-6 w-6 text-primary" />
-            </div>
-            <CardTitle>Welcome to Nexora!</CardTitle>
-            <CardDescription>Your account has been created. Redirecting…</CardDescription>
-          </CardHeader>
-        </Card>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12">
+        <div className="w-full max-w-md">
+          <BackButton className="mb-3" />
+          <Card className="w-full">
+            <CardHeader className="text-center">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                <CheckCircle2 className="h-6 w-6 text-primary" />
+              </div>
+              <CardTitle>Welcome to Nexora!</CardTitle>
+              <CardDescription>Your account has been created. Redirecting…</CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
       </div>
     );
   }
