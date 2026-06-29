@@ -2,9 +2,10 @@
 // Fails build if forbidden symbol references appear in source code.
 // Migrations under supabase/migrations/ are historical and excluded.
 import { execSync } from "node:child_process";
+import { existsSync } from "node:fs";
 
 const FORBIDDEN = ["public_salons_search"];
-const INCLUDE_GLOBS = ["src", "app", "scripts"];
+const INCLUDE_GLOBS = ["src", "app", "scripts"].filter((d) => existsSync(d));
 const EXCLUDES = [
   "--glob=!**/node_modules/**",
   "--glob=!**/dist/**",
