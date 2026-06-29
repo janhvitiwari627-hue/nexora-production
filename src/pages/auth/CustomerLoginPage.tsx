@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Eye, EyeOff } from "lucide-react";
+import { BackButton } from "@/components/shared/BackButton";
 import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
 import { useAuthStore } from "@/stores/authStore";
 
