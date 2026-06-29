@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { z } from "zod";
 import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 const schema = z.object({
   name: z.string().trim().min(2, "Please enter your name").max(80),
@@ -26,6 +27,7 @@ export function ContactPage() {
   };
 
   return (
+    <PublicPageHeader />
     <div className="min-h-screen bg-background">
       <section className="from-primary/10 to-accent/10 border-border border-b bg-gradient-to-br py-16 text-center md:py-20">
         <div className="mx-auto max-w-3xl px-4">

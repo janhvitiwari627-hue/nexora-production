@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Search, MessageCircle, Mail, Phone } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 const TOPICS = [
   { name: "Bookings", icon: "📅" },
@@ -26,6 +27,7 @@ export function HelpPage() {
   const filtered = FAQ.filter((f) => f.q.toLowerCase().includes(q.toLowerCase()) || f.a.toLowerCase().includes(q.toLowerCase()));
 
   return (
+    <PublicPageHeader />
     <div className="min-h-screen bg-background">
       <section className="from-primary/10 to-accent/10 border-border border-b bg-gradient-to-br py-16 text-center md:py-20">
         <div className="mx-auto max-w-3xl px-4">

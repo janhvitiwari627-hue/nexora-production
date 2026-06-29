@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Check, Plus, Trash2, Upload, Video } from "lucide-react";
 import { toast } from "sonner";
+import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 const STEPS = ["Personal", "Skills", "Experience", "Education", "Certifications", "Portfolio", "Video", "Resume"];
 
@@ -26,7 +27,9 @@ export function CandidateProfilePage() {
   const back = () => setStep(s => Math.max(0, s - 1));
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6 p-6">
+    <>
+      <PublicPageHeader />
+      <div className="mx-auto max-w-3xl space-y-6 p-6">
       <header>
         <h1 className="text-heading text-2xl font-bold">Your Candidate Profile</h1>
         <p className="text-muted-foreground text-sm">Step {step + 1} of {STEPS.length}: {STEPS[step]}</p>
@@ -127,6 +130,7 @@ export function CandidateProfilePage() {
         </div>
       </CardContent></Card>
     </div>
+    </>
   );
 }
 

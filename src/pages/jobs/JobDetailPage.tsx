@@ -5,12 +5,15 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Bookmark, Briefcase, Building2, Check, Clock, MapPin, Share2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { MOCK_JOBS } from "./mockJobs";
+import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 export function JobDetailPage({ jobId }: { jobId: string }) {
   const job = MOCK_JOBS.find(j => j.id === jobId) ?? MOCK_JOBS[0];
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6 p-6">
+    <>
+      <PublicPageHeader />
+      <div className="mx-auto max-w-5xl space-y-6 p-6">
       <Card>
         <CardContent className="space-y-4 p-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
@@ -68,6 +71,7 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
         <Button className="w-full" size="lg" onClick={() => toast.success("Application submitted")}>Apply Now</Button>
       </div>
     </div>
+    </>
   );
 }
 
