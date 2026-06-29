@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { BackButton } from "@/components/shared/BackButton";
 import {
   AlertCircle, ArrowRight, Ban, Building2, CalendarCheck, CheckCircle2, Crown,
   IndianRupee, MapPin, MessageSquare, UserPlus, Users, XCircle, type LucideIcon,
@@ -24,7 +25,8 @@ export function AdminDashboardPage() {
   return (
     <div className="container mx-auto max-w-7xl px-4 py-6 space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
+        <div className="space-y-2">
+          <BackButton />
           <h1 className="text-2xl font-bold tracking-tight">Platform Overview</h1>
           <p className="text-sm text-muted-foreground">Live snapshot across all businesses and users.</p>
         </div>

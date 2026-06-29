@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Bookmark, Briefcase, MapPin, Search, SlidersHorizontal, Users } from "lucide-react";
+import { BackButton } from "@/components/shared/BackButton";
 import { MOCK_JOBS, type JobCategory, type JobType } from "./mockJobs";
 
 const CATEGORIES: JobCategory[] = ["Stylist", "Barber", "Beautician", "Spa Therapist", "Nail Artist", "Manager", "Receptionist"];
@@ -35,7 +36,8 @@ export function JobSearchPage() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 p-6">
-      <header>
+      <header className="space-y-3">
+        <BackButton />
         <h1 className="text-heading text-3xl font-bold">Find Your Next Job</h1>
         <p className="text-muted-foreground">Discover opportunities at top salons, spas & studios</p>
       </header>

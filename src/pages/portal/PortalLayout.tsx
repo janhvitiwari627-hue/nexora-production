@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Building2, LayoutDashboard, Megaphone, Package, Sparkles, Star, Store, Tag, Target, Truck, Users, HelpCircle, Phone } from "lucide-react";
 import { PublicHeader } from "@/components/layout/PublicHeader";
 import { PublicFooter } from "@/components/layout/PublicFooter";
+import { BackButton } from "@/components/shared/BackButton";
 
 type NavItem = { to: string; label: string; icon: typeof Sparkles; exact?: boolean };
 const NAV: NavItem[] = [
@@ -25,6 +26,7 @@ export function PortalLayout({ children }: { children: ReactNode }) {
       <PublicHeader />
       <div className="border-b border-border/60 bg-card/40 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto px-4 py-3 md:px-6">
+          <BackButton size="icon" className="shrink-0" />
           {NAV.map((n) => (
             <Link
               key={n.to}
