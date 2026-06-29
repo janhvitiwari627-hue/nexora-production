@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   Bell,
   CreditCard,
+  Gift,
   Globe2,
   Home,
   Link2,
@@ -23,11 +24,13 @@ import { NotificationsPanel } from "./settings/NotificationsPanel";
 import { PrivacyPanel } from "./settings/PrivacyPanel";
 import { ConnectedAccountsPanel } from "./settings/ConnectedAccountsPanel";
 import { PaymentMethodsPanel } from "./settings/PaymentMethodsPanel";
+import { ReferralPanel } from "./settings/ReferralPanel";
 import { DangerZonePanel } from "./settings/DangerZonePanel";
 
 const SECTIONS = [
   { id: "personal", label: "Personal info", icon: User, Comp: PersonalInfoPanel },
   { id: "contact", label: "Contact info", icon: Mail, Comp: ContactInfoPanel },
+  { id: "referral", label: "My referral", icon: Gift, Comp: ReferralPanel },
   { id: "security", label: "Security", icon: Lock, Comp: SecurityPanel },
   { id: "language", label: "Language & region", icon: Globe2, Comp: LanguagePanel },
   { id: "notifications", label: "Notifications", icon: Bell, Comp: NotificationsPanel },
