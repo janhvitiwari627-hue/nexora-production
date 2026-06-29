@@ -120,7 +120,7 @@ export default function ResetPasswordPage() {
             <div className="space-y-3">
               <Alert variant="destructive">
                 <AlertDescription>
-                  This password reset link is invalid or expired. Please request a new one.
+                  {RECOVERY_ERROR_MESSAGE}
                 </AlertDescription>
               </Alert>
               <Button className="w-full" onClick={() => navigate({ to: "/forgot-password" })}>
