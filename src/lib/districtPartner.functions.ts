@@ -373,13 +373,9 @@ export const getHallOfFame = createServerFn({ method: "GET" })
       .limit(data.limit);
     if (error) throw new Error(error.message);
     if (!hof?.length) return [];
-    const ids = hof.map((h) => h.partner_id).filter((id): id is string => !!id);
-    const { data: partners } = await sb
-      .from("public_dbp_profiles")
-      .select("id, slug, full_name, district, state, photo_url, tagline, tier")
-      .in("id", ids);
-    const byId = new Map((partners ?? []).map((p) => [p.id, p]));
-    return hof.map((h) => ({ ...h, partner: byId.get(h.partner_id) ?? null }));
+    // V1: public_dbp_profiles view is locked until V2. Return HoF entries
+    // without joined partner profile data.
+    return hof.map((h) => ({ ...h, partner: null }));
   });
 
 // =============================================================
@@ -430,25 +426,8 @@ export const getPartnerAnalytics = createServerFn({ method: "GET" })
 // =============================================================
 export const getPublicPartnerProfile = createServerFn({ method: "GET" })
   .inputValidator((input) => z.object({ slug: z.string().min(2).max(80) }).parse(input))
-  .handler(async ({ data }) => {
-    const sb = publicClient();
-    const { data: partner, error } = await sb
-      .from("public_dbp_profiles")
-      .select(
-        "id, slug, full_name, district, state, photo_url, tagline, success_story, tier, hall_of_fame, hall_of_fame_rank, verified_at",
-      )
-      .eq("slug", data.slug)
-      .maybeSingle();
-    if (error) throw new Error(error.message);
-    if (!partner) return null;
-    if (!partner.id) return { partner, hall_of_fame: null };
-    const { data: hof } = await sb
-      .from("partner_hall_of_fame_public")
-      .select("rank, category, active_shops, achievements, success_story, badge")
-      .eq("partner_id", partner.id)
-      .order("rank", { ascending: true })
-      .limit(1)
-      .maybeSingle();
-
-    return { partner, hall_of_fame: hof ?? null };
+  .handler(async () => {
+    // V1: public partner profile is locked until V2. The
+    // public_dbp_profiles view was removed to prevent anon PII leakage.
+    return null;
   });
