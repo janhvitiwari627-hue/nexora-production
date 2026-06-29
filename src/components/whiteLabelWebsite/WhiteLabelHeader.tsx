@@ -30,7 +30,12 @@ export function WhiteLabelHeader({ shop, template }: { shop: ShopData; template:
   return (
     <header className={`sticky top-0 z-30 ${headerClass}`} style={variant === "bold" ? { borderColor: template.colors.primary } : undefined}>
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-3 md:px-10">
-        <a href="#" className="flex items-center gap-2 font-bold" style={{ fontFamily: template.headingFont }}>
+        <Link
+          to="/site/$businessSlug"
+          params={{ businessSlug: shop.slug }}
+          className="flex items-center gap-2 font-bold"
+          style={{ fontFamily: template.headingFont }}
+        >
           <span
             className="grid h-9 w-9 place-items-center rounded-full text-white shadow"
             style={{ backgroundColor: template.colors.primary }}
@@ -40,7 +45,7 @@ export function WhiteLabelHeader({ shop, template }: { shop: ShopData; template:
           <span className={variant === "elegant" ? "text-xl tracking-wide" : "text-base font-extrabold uppercase tracking-wide"}>
             {shop.name}
           </span>
-        </a>
+        </Link>
         <nav className="hidden items-center gap-5 text-sm md:flex">
           {LINKS.map((l) => (
             <a key={l.href} href={l.href} className="hover:underline" style={{ color: template.colors.text }}>

@@ -26,11 +26,23 @@ export function ContactPage() {
           <Button className="w-full bg-emerald-500 hover:bg-emerald-600" asChild>
             <a href="https://wa.me/918040001234" target="_blank" rel="noopener noreferrer"><MessageCircle className="h-4 w-4" /> WhatsApp Support</a>
           </Button>
-          <div className="flex justify-center gap-3">
-            <a href="#" aria-label="Instagram"><Instagram className="text-muted-foreground hover:text-primary h-5 w-5" /></a>
-            <a href="#" aria-label="Facebook"><Facebook className="text-muted-foreground hover:text-primary h-5 w-5" /></a>
-            <a href="#" aria-label="LinkedIn"><Linkedin className="text-muted-foreground hover:text-primary h-5 w-5" /></a>
-          </div>
+          {(() => {
+            const socials = [
+              { url: import.meta.env.VITE_SOCIAL_INSTAGRAM as string | undefined, label: "Instagram", Icon: Instagram },
+              { url: import.meta.env.VITE_SOCIAL_FACEBOOK as string | undefined, label: "Facebook", Icon: Facebook },
+              { url: import.meta.env.VITE_SOCIAL_LINKEDIN as string | undefined, label: "LinkedIn", Icon: Linkedin },
+            ].filter((s) => s.url);
+            if (socials.length === 0) return null;
+            return (
+              <div className="flex justify-center gap-3">
+                {socials.map(({ url, label, Icon }) => (
+                  <a key={label} href={url} target="_blank" rel="noopener noreferrer" aria-label={label}>
+                    <Icon className="text-muted-foreground hover:text-primary h-5 w-5" />
+                  </a>
+                ))}
+              </div>
+            );
+          })()}
           <div className="bg-muted h-40 overflow-hidden rounded-lg">
             <iframe title="Office map" className="h-full w-full" src="https://www.openstreetmap.org/export/embed.html?bbox=77.62%2C12.97%2C77.65%2C12.99&layer=mapnik" loading="lazy" />
           </div>
