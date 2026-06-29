@@ -114,8 +114,8 @@ export function OwnerBookingsPage() {
             <h1 className="text-heading text-2xl font-bold">Bookings</h1>
             <p className="text-muted-foreground text-sm">
               {isLive && activeSalon
-                ? `Live data for ${activeSalon.name}.`
-                : "Demo data — link a salon to your account to see live bookings."}
+                ? `Live bookings for ${activeSalon.name}.`
+                : "No salon linked yet — create your shop website to start receiving bookings."}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
