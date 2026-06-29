@@ -26,6 +26,16 @@ import {
   Users,
   Wallet,
   Zap,
+  CreditCard,
+  IdCard,
+  BookOpen,
+  Monitor,
+  ClipboardCheck,
+  Key,
+  Timer,
+  Calendar,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 
 const dbpBenefits = [
