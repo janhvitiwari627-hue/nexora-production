@@ -15,6 +15,7 @@ import {
 import { salonBySlugQueryOptions } from "@/lib/salons.queries";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 const route = getRouteApi("/s/$slug");
 
@@ -37,15 +38,13 @@ export function SalonProfileRealPage() {
   const [lightbox, setLightbox] = useState<number | null>(null);
 
   const close = () => setLightbox(null);
-  const next = () =>
-    setLightbox((i) => (i === null ? null : (i + 1) % gallery.length));
+  const next = () => setLightbox((i) => (i === null ? null : (i + 1) % gallery.length));
   const prev = () =>
-    setLightbox((i) =>
-      i === null ? null : (i - 1 + gallery.length) % gallery.length,
-    );
+    setLightbox((i) => (i === null ? null : (i - 1 + gallery.length) % gallery.length));
 
   return (
     <div className="min-h-screen bg-background pb-24">
+      <PublicPageHeader />
       {/* Hero */}
       <div className="relative h-72 w-full overflow-hidden md:h-96">
         {salon.image_url ? (
@@ -169,7 +168,11 @@ export function SalonProfileRealPage() {
                   >
                     <div className="mx-auto mb-3 h-16 w-16 overflow-hidden rounded-full bg-muted">
                       {m.avatar_url ? (
-                        <img src={m.avatar_url} alt={m.name} className="h-full w-full object-cover" />
+                        <img
+                          src={m.avatar_url}
+                          alt={m.name}
+                          className="h-full w-full object-cover"
+                        />
                       ) : (
                         <div className="grid h-full w-full place-items-center text-lg font-black text-muted-foreground">
                           {m.name?.[0] ?? "?"}
@@ -177,7 +180,9 @@ export function SalonProfileRealPage() {
                       )}
                     </div>
                     <div className="text-heading text-sm font-bold">{m.name}</div>
-                    {m.role && <div className="mt-0.5 text-[11px] text-muted-foreground">{m.role}</div>}
+                    {m.role && (
+                      <div className="mt-0.5 text-[11px] text-muted-foreground">{m.role}</div>
+                    )}
                     {m.rating != null && (
                       <div className="mt-1 inline-flex items-center gap-1 text-[11px] font-semibold text-warning">
                         <Star className="h-3 w-3 fill-warning" /> {Number(m.rating).toFixed(1)}

@@ -18,6 +18,7 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ReferralsRouteImport } from './routes/referrals'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PartnerRouteImport } from './routes/partner'
 import { Route as OwnerSignupRouteImport } from './routes/owner-signup'
 import { Route as OwnerDashboardRouteImport } from './routes/owner-dashboard'
 import { Route as OwnerRouteImport } from './routes/owner'
@@ -31,6 +32,7 @@ import { Route as ForOwnersRouteImport } from './routes/for-owners'
 import { Route as DistrictBusinessPartnerRouteImport } from './routes/district-business-partner'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AcademyRouteImport } from './routes/academy'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -159,6 +161,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartnerRoute = PartnerRouteImport.update({
+  id: '/partner',
+  path: '/partner',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OwnerSignupRoute = OwnerSignupRouteImport.update({
   id: '/owner-signup',
   path: '/owner-signup',
@@ -224,6 +231,11 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AcademyRoute = AcademyRouteImport.update({
   id: '/academy',
   path: '/academy',
@@ -245,9 +257,9 @@ const PortalIndexRoute = PortalIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const PartnerIndexRoute = PartnerIndexRouteImport.update({
-  id: '/partner/',
-  path: '/partner/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => PartnerRoute,
 } as any)
 const OwnerIndexRoute = OwnerIndexRouteImport.update({
   id: '/',
@@ -320,19 +332,19 @@ const PortalBusinessPagesRoute = PortalBusinessPagesRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const PartnerGrowthRoute = PartnerGrowthRouteImport.update({
-  id: '/partner/growth',
-  path: '/partner/growth',
-  getParentRoute: () => rootRouteImport,
+  id: '/growth',
+  path: '/growth',
+  getParentRoute: () => PartnerRoute,
 } as any)
 const PartnerDistrictRoute = PartnerDistrictRouteImport.update({
-  id: '/partner/district',
-  path: '/partner/district',
-  getParentRoute: () => rootRouteImport,
+  id: '/district',
+  path: '/district',
+  getParentRoute: () => PartnerRoute,
 } as any)
 const PartnerDistributorRoute = PartnerDistributorRouteImport.update({
-  id: '/partner/distributor',
-  path: '/partner/distributor',
-  getParentRoute: () => rootRouteImport,
+  id: '/distributor',
+  path: '/distributor',
+  getParentRoute: () => PartnerRoute,
 } as any)
 const OwnerWebsiteRoute = OwnerWebsiteRouteImport.update({
   id: '/website',
@@ -516,64 +528,64 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
-  id: '/admin/users',
-  path: '/admin/users',
-  getParentRoute: () => rootRouteImport,
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
-  id: '/admin/settings',
-  path: '/admin/settings',
-  getParentRoute: () => rootRouteImport,
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminRewardsRoute = AdminRewardsRouteImport.update({
-  id: '/admin/rewards',
-  path: '/admin/rewards',
-  getParentRoute: () => rootRouteImport,
+  id: '/rewards',
+  path: '/rewards',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminReviewsRoute = AdminReviewsRouteImport.update({
-  id: '/admin/reviews',
-  path: '/admin/reviews',
-  getParentRoute: () => rootRouteImport,
+  id: '/reviews',
+  path: '/reviews',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminRankingsRoute = AdminRankingsRouteImport.update({
-  id: '/admin/rankings',
-  path: '/admin/rankings',
-  getParentRoute: () => rootRouteImport,
+  id: '/rankings',
+  path: '/rankings',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
-  id: '/admin/payments',
-  path: '/admin/payments',
-  getParentRoute: () => rootRouteImport,
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminPartnersRoute = AdminPartnersRouteImport.update({
-  id: '/admin/partners',
-  path: '/admin/partners',
-  getParentRoute: () => rootRouteImport,
+  id: '/partners',
+  path: '/partners',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: '/admin/login',
-  path: '/admin/login',
-  getParentRoute: () => rootRouteImport,
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
-  id: '/admin/dashboard',
-  path: '/admin/dashboard',
-  getParentRoute: () => rootRouteImport,
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminBusinessesRoute = AdminBusinessesRouteImport.update({
-  id: '/admin/businesses',
-  path: '/admin/businesses',
-  getParentRoute: () => rootRouteImport,
+  id: '/businesses',
+  path: '/businesses',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
-  id: '/admin/analytics',
-  path: '/admin/analytics',
-  getParentRoute: () => rootRouteImport,
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminAdvertisingRoute = AdminAdvertisingRouteImport.update({
-  id: '/admin/advertising',
-  path: '/admin/advertising',
-  getParentRoute: () => rootRouteImport,
+  id: '/advertising',
+  path: '/advertising',
+  getParentRoute: () => AdminRoute,
 } as any)
 const PortalDistributorsIndexRoute = PortalDistributorsIndexRouteImport.update({
   id: '/portal/distributors/',
@@ -645,6 +657,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/academy': typeof AcademyRoute
+  '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
@@ -658,6 +671,7 @@ export interface FileRoutesByFullPath {
   '/owner': typeof OwnerRouteWithChildren
   '/owner-dashboard': typeof OwnerDashboardRoute
   '/owner-signup': typeof OwnerSignupRoute
+  '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
@@ -751,6 +765,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/academy': typeof AcademyRoute
+  '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
   '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
   '/for-owners': typeof ForOwnersRoute
@@ -856,6 +871,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/academy': typeof AcademyRoute
+  '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
@@ -869,6 +885,7 @@ export interface FileRoutesById {
   '/owner': typeof OwnerRouteWithChildren
   '/owner-dashboard': typeof OwnerDashboardRoute
   '/owner-signup': typeof OwnerSignupRoute
+  '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
@@ -964,6 +981,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/academy'
+    | '/admin'
     | '/contact'
     | '/dashboard'
     | '/district-business-partner'
@@ -977,6 +995,7 @@ export interface FileRouteTypes {
     | '/owner'
     | '/owner-dashboard'
     | '/owner-signup'
+    | '/partner'
     | '/privacy'
     | '/profile'
     | '/referrals'
@@ -1070,6 +1089,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/academy'
+    | '/admin'
     | '/contact'
     | '/district-business-partner'
     | '/for-owners'
@@ -1174,6 +1194,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/academy'
+    | '/admin'
     | '/contact'
     | '/dashboard'
     | '/district-business-partner'
@@ -1187,6 +1208,7 @@ export interface FileRouteTypes {
     | '/owner'
     | '/owner-dashboard'
     | '/owner-signup'
+    | '/partner'
     | '/privacy'
     | '/profile'
     | '/referrals'
@@ -1281,6 +1303,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AcademyRoute: typeof AcademyRoute
+  AdminRoute: typeof AdminRouteWithChildren
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   DistrictBusinessPartnerRoute: typeof DistrictBusinessPartnerRouteWithChildren
@@ -1294,6 +1317,7 @@ export interface RootRouteChildren {
   OwnerRoute: typeof OwnerRouteWithChildren
   OwnerDashboardRoute: typeof OwnerDashboardRoute
   OwnerSignupRoute: typeof OwnerSignupRoute
+  PartnerRoute: typeof PartnerRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   ReferralsRoute: typeof ReferralsRoute
@@ -1303,26 +1327,11 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
-  AdminAdvertisingRoute: typeof AdminAdvertisingRoute
-  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
-  AdminBusinessesRoute: typeof AdminBusinessesRoute
-  AdminDashboardRoute: typeof AdminDashboardRoute
-  AdminLoginRoute: typeof AdminLoginRoute
-  AdminPartnersRoute: typeof AdminPartnersRoute
-  AdminPaymentsRoute: typeof AdminPaymentsRoute
-  AdminRankingsRoute: typeof AdminRankingsRoute
-  AdminReviewsRoute: typeof AdminReviewsRoute
-  AdminRewardsRoute: typeof AdminRewardsRoute
-  AdminSettingsRoute: typeof AdminSettingsRoute
-  AdminUsersRoute: typeof AdminUsersRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   BookSlugRoute: typeof BookSlugRoute
   BrandSlugRoute: typeof BrandSlugRoute
   CategorySlugRoute: typeof CategorySlugRoute
   DistributorSlugRoute: typeof DistributorSlugRoute
-  PartnerDistributorRoute: typeof PartnerDistributorRoute
-  PartnerDistrictRoute: typeof PartnerDistrictRoute
-  PartnerGrowthRoute: typeof PartnerGrowthRoute
   PortalBusinessPagesRoute: typeof PortalBusinessPagesRoute
   PortalContactRoute: typeof PortalContactRoute
   PortalDashboardRoute: typeof PortalDashboardRoute
@@ -1335,7 +1344,6 @@ export interface RootRouteChildren {
   ShopSlugRoute: typeof ShopSlugRoute
   SiteBusinessSlugRoute: typeof SiteBusinessSlugRoute
   StaffDashboardRoute: typeof StaffDashboardRoute
-  PartnerIndexRoute: typeof PartnerIndexRoute
   PortalIndexRoute: typeof PortalIndexRoute
   PortalBrandsSlugRoute: typeof PortalBrandsSlugRoute
   PortalBrandsRegisterRoute: typeof PortalBrandsRegisterRoute
@@ -1412,6 +1420,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partner': {
+      id: '/partner'
+      path: '/partner'
+      fullPath: '/partner'
+      preLoaderRoute: typeof PartnerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/owner-signup': {
@@ -1505,6 +1520,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/academy': {
       id: '/academy'
       path: '/academy'
@@ -1535,10 +1557,10 @@ declare module '@tanstack/react-router' {
     }
     '/partner/': {
       id: '/partner/'
-      path: '/partner'
+      path: '/'
       fullPath: '/partner/'
       preLoaderRoute: typeof PartnerIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PartnerRoute
     }
     '/owner/': {
       id: '/owner/'
@@ -1640,24 +1662,24 @@ declare module '@tanstack/react-router' {
     }
     '/partner/growth': {
       id: '/partner/growth'
-      path: '/partner/growth'
+      path: '/growth'
       fullPath: '/partner/growth'
       preLoaderRoute: typeof PartnerGrowthRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PartnerRoute
     }
     '/partner/district': {
       id: '/partner/district'
-      path: '/partner/district'
+      path: '/district'
       fullPath: '/partner/district'
       preLoaderRoute: typeof PartnerDistrictRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PartnerRoute
     }
     '/partner/distributor': {
       id: '/partner/distributor'
-      path: '/partner/distributor'
+      path: '/distributor'
       fullPath: '/partner/distributor'
       preLoaderRoute: typeof PartnerDistributorRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PartnerRoute
     }
     '/owner/website': {
       id: '/owner/website'
@@ -1913,87 +1935,87 @@ declare module '@tanstack/react-router' {
     }
     '/admin/users': {
       id: '/admin/users'
-      path: '/admin/users'
+      path: '/users'
       fullPath: '/admin/users'
       preLoaderRoute: typeof AdminUsersRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/settings': {
       id: '/admin/settings'
-      path: '/admin/settings'
+      path: '/settings'
       fullPath: '/admin/settings'
       preLoaderRoute: typeof AdminSettingsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/rewards': {
       id: '/admin/rewards'
-      path: '/admin/rewards'
+      path: '/rewards'
       fullPath: '/admin/rewards'
       preLoaderRoute: typeof AdminRewardsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/reviews': {
       id: '/admin/reviews'
-      path: '/admin/reviews'
+      path: '/reviews'
       fullPath: '/admin/reviews'
       preLoaderRoute: typeof AdminReviewsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/rankings': {
       id: '/admin/rankings'
-      path: '/admin/rankings'
+      path: '/rankings'
       fullPath: '/admin/rankings'
       preLoaderRoute: typeof AdminRankingsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/payments': {
       id: '/admin/payments'
-      path: '/admin/payments'
+      path: '/payments'
       fullPath: '/admin/payments'
       preLoaderRoute: typeof AdminPaymentsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/partners': {
       id: '/admin/partners'
-      path: '/admin/partners'
+      path: '/partners'
       fullPath: '/admin/partners'
       preLoaderRoute: typeof AdminPartnersRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/login': {
       id: '/admin/login'
-      path: '/admin/login'
+      path: '/login'
       fullPath: '/admin/login'
       preLoaderRoute: typeof AdminLoginRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/dashboard': {
       id: '/admin/dashboard'
-      path: '/admin/dashboard'
+      path: '/dashboard'
       fullPath: '/admin/dashboard'
       preLoaderRoute: typeof AdminDashboardRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/businesses': {
       id: '/admin/businesses'
-      path: '/admin/businesses'
+      path: '/businesses'
       fullPath: '/admin/businesses'
       preLoaderRoute: typeof AdminBusinessesRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/analytics': {
       id: '/admin/analytics'
-      path: '/admin/analytics'
+      path: '/analytics'
       fullPath: '/admin/analytics'
       preLoaderRoute: typeof AdminAnalyticsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/advertising': {
       id: '/admin/advertising'
-      path: '/admin/advertising'
+      path: '/advertising'
       fullPath: '/admin/advertising'
       preLoaderRoute: typeof AdminAdvertisingRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/portal/distributors/': {
       id: '/portal/distributors/'
@@ -2081,6 +2103,38 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AdminRouteChildren {
+  AdminAdvertisingRoute: typeof AdminAdvertisingRoute
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminBusinessesRoute: typeof AdminBusinessesRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminLoginRoute: typeof AdminLoginRoute
+  AdminPartnersRoute: typeof AdminPartnersRoute
+  AdminPaymentsRoute: typeof AdminPaymentsRoute
+  AdminRankingsRoute: typeof AdminRankingsRoute
+  AdminReviewsRoute: typeof AdminReviewsRoute
+  AdminRewardsRoute: typeof AdminRewardsRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAdvertisingRoute: AdminAdvertisingRoute,
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminBusinessesRoute: AdminBusinessesRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
+  AdminLoginRoute: AdminLoginRoute,
+  AdminPartnersRoute: AdminPartnersRoute,
+  AdminPaymentsRoute: AdminPaymentsRoute,
+  AdminRankingsRoute: AdminRankingsRoute,
+  AdminReviewsRoute: AdminReviewsRoute,
+  AdminRewardsRoute: AdminRewardsRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminUsersRoute: AdminUsersRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface DashboardBookingsRouteChildren {
   DashboardBookingsIdRoute: typeof DashboardBookingsIdRoute
@@ -2209,10 +2263,28 @@ const OwnerRouteChildren: OwnerRouteChildren = {
 
 const OwnerRouteWithChildren = OwnerRoute._addFileChildren(OwnerRouteChildren)
 
+interface PartnerRouteChildren {
+  PartnerDistributorRoute: typeof PartnerDistributorRoute
+  PartnerDistrictRoute: typeof PartnerDistrictRoute
+  PartnerGrowthRoute: typeof PartnerGrowthRoute
+  PartnerIndexRoute: typeof PartnerIndexRoute
+}
+
+const PartnerRouteChildren: PartnerRouteChildren = {
+  PartnerDistributorRoute: PartnerDistributorRoute,
+  PartnerDistrictRoute: PartnerDistrictRoute,
+  PartnerGrowthRoute: PartnerGrowthRoute,
+  PartnerIndexRoute: PartnerIndexRoute,
+}
+
+const PartnerRouteWithChildren =
+  PartnerRoute._addFileChildren(PartnerRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AcademyRoute: AcademyRoute,
+  AdminRoute: AdminRouteWithChildren,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
   DistrictBusinessPartnerRoute: DistrictBusinessPartnerRouteWithChildren,
@@ -2226,6 +2298,7 @@ const rootRouteChildren: RootRouteChildren = {
   OwnerRoute: OwnerRouteWithChildren,
   OwnerDashboardRoute: OwnerDashboardRoute,
   OwnerSignupRoute: OwnerSignupRoute,
+  PartnerRoute: PartnerRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   ReferralsRoute: ReferralsRoute,
@@ -2235,26 +2308,11 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
-  AdminAdvertisingRoute: AdminAdvertisingRoute,
-  AdminAnalyticsRoute: AdminAnalyticsRoute,
-  AdminBusinessesRoute: AdminBusinessesRoute,
-  AdminDashboardRoute: AdminDashboardRoute,
-  AdminLoginRoute: AdminLoginRoute,
-  AdminPartnersRoute: AdminPartnersRoute,
-  AdminPaymentsRoute: AdminPaymentsRoute,
-  AdminRankingsRoute: AdminRankingsRoute,
-  AdminReviewsRoute: AdminReviewsRoute,
-  AdminRewardsRoute: AdminRewardsRoute,
-  AdminSettingsRoute: AdminSettingsRoute,
-  AdminUsersRoute: AdminUsersRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   BookSlugRoute: BookSlugRoute,
   BrandSlugRoute: BrandSlugRoute,
   CategorySlugRoute: CategorySlugRoute,
   DistributorSlugRoute: DistributorSlugRoute,
-  PartnerDistributorRoute: PartnerDistributorRoute,
-  PartnerDistrictRoute: PartnerDistrictRoute,
-  PartnerGrowthRoute: PartnerGrowthRoute,
   PortalBusinessPagesRoute: PortalBusinessPagesRoute,
   PortalContactRoute: PortalContactRoute,
   PortalDashboardRoute: PortalDashboardRoute,
@@ -2267,7 +2325,6 @@ const rootRouteChildren: RootRouteChildren = {
   ShopSlugRoute: ShopSlugRoute,
   SiteBusinessSlugRoute: SiteBusinessSlugRoute,
   StaffDashboardRoute: StaffDashboardRoute,
-  PartnerIndexRoute: PartnerIndexRoute,
   PortalIndexRoute: PortalIndexRoute,
   PortalBrandsSlugRoute: PortalBrandsSlugRoute,
   PortalBrandsRegisterRoute: PortalBrandsRegisterRoute,

@@ -1,17 +1,13 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { requireRole } from "@/lib/route-guards";
-import { BackButton } from "@/components/shared/BackButton";
+import { createFileRoute, Outlet, Link } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { BackButton } from "@/components/shared/BackButton";
 
-export const Route = createFileRoute("/staff/dashboard")({
+export const Route = createFileRoute("/partner")({
   ssr: false,
-  beforeLoad: () => requireRole(["staff", "shop_manager", "shop_owner"], "/staff/dashboard"),
-  head: () => ({ meta: [{ title: "Staff Dashboard — Nexora" }] }),
-  component: StaffDashboard,
+  component: PartnerLayout,
 });
 
-function StaffDashboard() {
+function PartnerLayout() {
   return (
     <div className="min-h-screen bg-background">
       <div className="sticky top-0 z-30 border-b border-border/60 bg-card/90 backdrop-blur">
@@ -27,12 +23,7 @@ function StaffDashboard() {
           </Link>
         </div>
       </div>
-      <div className="container mx-auto px-4 py-10">
-        <h1 className="text-2xl font-semibold">Staff Dashboard</h1>
-        <p className="mt-2 text-muted-foreground">
-          Today's bookings and assigned tasks will appear here.
-        </p>
-      </div>
+      <Outlet />
     </div>
   );
 }

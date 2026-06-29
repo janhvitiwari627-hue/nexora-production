@@ -24,6 +24,7 @@ import {
 import type { Service } from "@/components/shared/ServiceCard";
 import type { Staff } from "@/components/shared/StaffCard";
 import { createBooking, confirmBookingPayment } from "@/lib/bookings.functions";
+import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 export type RealSalonRef = {
   id: string;
@@ -105,20 +106,23 @@ export function BookingFlowPage({ salon }: { salon?: RealSalonRef } = {}) {
       const selected = selectedServices(booking);
       if (selected.length === 0) throw new Error("Pick a service");
       const primary = selected[0];
-      const totalPrice = selected.reduce(
-        (sum, s) => sum + (s.offer_price ?? s.price),
-        0,
-      );
+      const totalPrice = selected.reduce((sum, s) => sum + (s.offer_price ?? s.price), 0);
       const created = await createFn({
         data: {
           salon_id: salon.id,
-          service_name: selected.map((s) => s.name).join(", ").slice(0, 200) || primary.name,
+          service_name:
+            selected
+              .map((s) => s.name)
+              .join(", ")
+              .slice(0, 200) || primary.name,
           price: totalPrice,
           booking_date: booking.date,
           booking_time: booking.time,
         },
       });
-      const advance = Number((created as { advance_amount?: number }).advance_amount ?? totalPrice * 0.25);
+      const advance = Number(
+        (created as { advance_amount?: number }).advance_amount ?? totalPrice * 0.25,
+      );
       const confirmedRow = await confirmFn({
         data: {
           id: (created as { id: string }).id,
@@ -154,6 +158,7 @@ export function BookingFlowPage({ salon }: { salon?: RealSalonRef } = {}) {
 
   return (
     <div className="min-h-screen bg-background pb-32 lg:pb-12">
+      <PublicPageHeader />
       {/* Header */}
       <div className="border-border bg-card/95 sticky top-0 z-30 border-b backdrop-blur">
         <div className="mx-auto max-w-7xl px-4 py-4 md:px-6">

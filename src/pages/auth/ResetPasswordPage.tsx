@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, CheckCircle2 } from "lucide-react";
+import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 function scorePassword(pw: string): { score: number; label: string; color: string } {
   let score = 0;
@@ -84,6 +85,7 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
+      <PublicPageHeader />
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Set a new password</CardTitle>
