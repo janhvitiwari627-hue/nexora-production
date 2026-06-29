@@ -115,29 +115,41 @@ function parseErrorMessage(error: unknown): string {
   return "Something went wrong. Please try again.";
 }
 
-const baseSchema = z.object({
-  full_name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
-  email: z.string().trim().email("Invalid email address").max(255),
-  mobile: z
-    .string()
-    .trim()
-    .min(1, "Mobile number is required")
-    .transform((v) => v.replace(/[\s-]/g, ""))
-    .pipe(
-      z
-        .string()
-        .regex(/^(\+91)?[6-9]\d{9}$/, "Enter a valid 10-digit mobile number"),
-    ),
-  password: z.string().min(8, "Password must be at least 8 characters").max(72),
-  referred_by: z.string().trim().max(20).optional().or(z.literal("")),
-});
-const ownerSchema = baseSchema.extend({
+const baseSchema = z
+  .object({
+    full_name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
+    email: z.string().trim().email("Invalid email address").max(255),
+    mobile: z
+      .string()
+      .trim()
+      .min(1, "Mobile number is required")
+      .transform((v) => v.replace(/[\s-]/g, ""))
+      .pipe(
+        z
+          .string()
+          .regex(/^(\+91)?[6-9]\d{9}$/, "Enter a valid 10-digit mobile number"),
+      ),
+    password: z.string().min(8, "Password must be at least 8 characters").max(72),
+    confirm_password: z.string().min(1, "Confirm your password"),
+    referred_by: z.string().trim().max(20).optional().or(z.literal("")),
+  })
+  .refine((d) => d.password === d.confirm_password, {
+    path: ["confirm_password"],
+    message: "Passwords do not match",
+  });
+const ownerSchema = baseSchema.innerType().extend({
   business_name: z.string().trim().min(2, "Business name is required").max(120),
   business_city: z.string().trim().max(80).optional().or(z.literal("")),
+}).refine((d) => d.password === d.confirm_password, {
+  path: ["confirm_password"],
+  message: "Passwords do not match",
 });
-const dbpSchema = baseSchema.extend({
+const dbpSchema = baseSchema.innerType().extend({
   district: z.string().trim().min(2, "District is required").max(80),
   state: z.string().trim().max(80).optional().or(z.literal("")),
+}).refine((d) => d.password === d.confirm_password, {
+  path: ["confirm_password"],
+  message: "Passwords do not match",
 });
 
 export default function CustomerRegistrationPage() {
@@ -153,6 +165,7 @@ export default function CustomerRegistrationPage() {
     email: "",
     mobile: "",
     password: "",
+    confirm_password: "",
     referred_by: "",
     business_name: "",
     business_city: "",
@@ -234,7 +247,7 @@ export default function CustomerRegistrationPage() {
 
   const sendResetLink = async () => {
     const email = normalizeEmail(alreadyRegisteredEmail || form.email);
-    const parsed = baseSchema.shape.email.safeParse(email);
+    const parsed = baseSchema.innerType().shape.email.safeParse(email);
     if (!parsed.success) {
       setServerError("Please enter the registered email address first.");
       return;
@@ -972,6 +985,24 @@ export default function CustomerRegistrationPage() {
               <PasswordStrengthIndicator password={form.password} />
               {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
             </div>
+
+            <div className="space-y-1">
+              <Label htmlFor="confirm_password">Confirm password</Label>
+              <Input
+                id="confirm_password"
+                type={showPassword ? "text" : "password"}
+                value={form.confirm_password}
+                onChange={update("confirm_password")}
+                autoComplete="new-password"
+                required
+                minLength={8}
+                disabled={submitting}
+              />
+              {errors.confirm_password && (
+                <p className="text-xs text-destructive">{errors.confirm_password}</p>
+              )}
+            </div>
+
 
             <div className="space-y-1">
               <Label htmlFor="referred_by">

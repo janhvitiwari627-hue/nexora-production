@@ -40,6 +40,7 @@ const schema = z.object({
     .transform((v) => v.replace(/[\s-]/g, ""))
     .pipe(z.string().regex(/^(\+91)?[6-9]\d{9}$/, "Enter a valid 10-digit mobile number")),
   password: z.string().min(8, "Password must be at least 8 characters").max(72),
+  confirm_password: z.string().min(1, "Confirm your password"),
   business_name: z.string().trim().min(2, "Business name is required").max(120),
   business_category: z.string().min(1, "Select a category"),
   city: z.string().trim().min(2, "City is required").max(80),
@@ -50,6 +51,9 @@ const schema = z.object({
     .min(1, "WhatsApp number is required")
     .transform((v) => v.replace(/[\s-]/g, ""))
     .pipe(z.string().regex(/^(\+91)?[6-9]\d{9}$/, "Enter a valid 10-digit WhatsApp number")),
+}).refine((d) => d.password === d.confirm_password, {
+  path: ["confirm_password"],
+  message: "Passwords do not match",
 });
 
 function parseErr(error: unknown): string {
@@ -69,6 +73,7 @@ export default function OwnerSignupPage() {
     email: "",
     mobile: "",
     password: "",
+    confirm_password: "",
     business_name: "",
     business_category: "",
     city: "",
@@ -275,6 +280,19 @@ export default function OwnerSignupPage() {
               </div>
               {form.password && <PasswordStrengthIndicator password={form.password} />}
               {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
+            </div>
+
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="confirm_password">Confirm password</Label>
+              <Input
+                id="confirm_password"
+                type={showPw ? "text" : "password"}
+                autoComplete="new-password"
+                value={form.confirm_password}
+                onChange={update("confirm_password")}
+                disabled={submitting}
+              />
+              {errors.confirm_password && <p className="text-xs text-destructive">{errors.confirm_password}</p>}
             </div>
 
             <div className="space-y-1.5 sm:col-span-2">
