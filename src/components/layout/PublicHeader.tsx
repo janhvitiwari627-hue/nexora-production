@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Bell, Briefcase, Building2, ChevronDown, LayoutDashboard, LogOut, Megaphone, Menu, Package, Phone, Search, Settings, Sparkles, Star, Tag, Target, TrendingUp, Truck, User, Users } from "lucide-react";
+import { ArrowLeft, Bell, Briefcase, Building2, ChevronDown, LayoutDashboard, LogOut, Megaphone, Menu, Package, Phone, Search, Settings, Sparkles, Star, Tag, Target, TrendingUp, Truck, User, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
