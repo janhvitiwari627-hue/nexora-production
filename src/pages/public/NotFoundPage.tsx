@@ -4,8 +4,8 @@ import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 export function NotFoundPage() {
   return (
+  <div className="min-h-screen bg-background grid place-items-center px-4">
     <PublicPageHeader />
-    <div className="min-h-screen bg-background grid place-items-center px-4">
       <div className="mx-auto max-w-md text-center">
         <div className="bg-gradient-cta text-primary-foreground mx-auto grid h-24 w-24 place-items-center rounded-3xl shadow-[var(--shadow-glow)]">
           <Compass className="h-10 w-10" />

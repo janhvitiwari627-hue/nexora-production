@@ -46,8 +46,8 @@ export function SalonProfileRealPage() {
     );
 
   return (
+  <div className="min-h-screen bg-background pb-24">
     <PublicPageHeader />
-    <div className="min-h-screen bg-background pb-24">
       {/* Hero */}
       <div className="relative h-72 w-full overflow-hidden md:h-96">
         {salon.image_url ? (

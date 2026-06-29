@@ -27,8 +27,8 @@ const INSTRUCTORS = [
 
 export function AcademyPage() {
   return (
+  <div className="min-h-screen bg-background">
     <PublicPageHeader />
-    <div className="min-h-screen bg-background">
       <section className="relative overflow-hidden bg-gradient-to-br from-[#0A2540] via-[#1a1060] to-[#635BFF] py-20 md:py-28">
         <div className="absolute inset-0 opacity-20 [background-image:radial-gradient(circle_at_2px_2px,white_1px,transparent_0)] [background-size:32px_32px]" />
         <div className="relative mx-auto max-w-3xl px-4 text-center md:px-6">

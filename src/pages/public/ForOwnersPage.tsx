@@ -28,8 +28,8 @@ const SHOTS = [
 export function ForOwnersPage() {
   const [shot, setShot] = useState(0);
   return (
+  <div className="min-h-screen bg-background">
     <PublicPageHeader />
-    <div className="min-h-screen bg-background">
       {/* Hero */}
       <section className="relative overflow-hidden bg-[#0A2540] py-24 md:py-32">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(99,91,255,0.35),transparent_60%)]" />

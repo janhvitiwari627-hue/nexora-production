@@ -2,8 +2,8 @@ import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 export function PrivacyPage() {
   const updated = "January 2026";
   return (
+  <div className="min-h-screen bg-background">
     <PublicPageHeader />
-    <div className="min-h-screen bg-background">
       <section className="border-border border-b bg-muted/30 py-12">
         <div className="mx-auto max-w-3xl px-4 md:px-6">
           <h1 className="text-heading text-4xl font-black md:text-5xl" style={{ fontFamily: "Inter, sans-serif" }}>Privacy Policy</h1>

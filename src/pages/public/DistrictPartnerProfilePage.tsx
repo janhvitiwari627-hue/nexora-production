@@ -1,6 +1,6 @@
 import { Link, useParams } from "@tanstack/react-router";
-import {
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
+import {
   Award,
   BadgeCheck,
   Building2,
@@ -96,8 +96,8 @@ export default function DistrictPartnerProfilePage() {
   const publicUrl = `nexora.app/dbp/${slug}`;
 
   return (
+  <div className="min-h-screen bg-background text-foreground">
     <PublicPageHeader />
-    <div className="min-h-screen bg-background text-foreground">
       {/* HERO */}
       <section className="relative overflow-hidden bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 px-6 py-20 dark:from-amber-950/20 dark:via-orange-950/10 dark:to-rose-950/20">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(245,158,11,0.15),transparent_60%)]" />

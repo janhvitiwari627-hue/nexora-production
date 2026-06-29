@@ -37,8 +37,8 @@ const FAQS = [
 export function MembershipPage() {
   const [billing, setBilling] = useState<"year" | "month">("year");
   return (
+  <div className="min-h-screen bg-background">
     <PublicPageHeader />
-    <div className="min-h-screen bg-background">
       <section className="from-primary/10 to-accent/10 border-border relative overflow-hidden border-b bg-gradient-to-br py-20 text-center md:py-28">
         <div className="absolute inset-0 opacity-30 [background-image:radial-gradient(circle_at_2px_2px,#635BFF_1px,transparent_0)] [background-size:32px_32px]" />
         <div className="relative mx-auto max-w-3xl px-4">

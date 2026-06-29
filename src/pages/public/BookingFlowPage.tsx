@@ -154,8 +154,8 @@ export function BookingFlowPage({ salon }: { salon?: RealSalonRef } = {}) {
   }
 
   return (
+  <div className="min-h-screen bg-background pb-32 lg:pb-12">
     <PublicPageHeader />
-    <div className="min-h-screen bg-background pb-32 lg:pb-12">
       {/* Header */}
       <div className="border-border bg-card/95 sticky top-0 z-30 border-b backdrop-blur">
         <div className="mx-auto max-w-7xl px-4 py-4 md:px-6">

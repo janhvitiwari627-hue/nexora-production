@@ -184,8 +184,8 @@ export function OwnerOnboardingPage() {
   if (published) return <SuccessScreen business={account.businessName || "Your Business"} />;
 
   return (
+  <div className="bg-muted/30 min-h-screen p-4 md:p-8">
     <PublicPageHeader />
-    <div className="bg-muted/30 min-h-screen p-4 md:p-8">
       <div className="mx-auto max-w-3xl space-y-6">
         <header className="text-center">
           <h1 className="text-heading text-2xl font-bold md:text-3xl">Create Your Business</h1>

@@ -27,8 +27,8 @@ export function ContactPage() {
   };
 
   return (
+  <div className="min-h-screen bg-background">
     <PublicPageHeader />
-    <div className="min-h-screen bg-background">
       <section className="from-primary/10 to-accent/10 border-border border-b bg-gradient-to-br py-16 text-center md:py-20">
         <div className="mx-auto max-w-3xl px-4">
           <h1 className="text-heading text-4xl font-black md:text-6xl" style={{ fontFamily: "Inter, sans-serif" }}>Get in touch</h1>

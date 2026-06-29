@@ -53,8 +53,8 @@ export function CategoryBrowsePage() {
   }, [area, sort]);
 
   return (
+  <div className="min-h-screen bg-background">
     <PublicPageHeader />
-    <div className="min-h-screen bg-background">
       <section className={cn("relative overflow-hidden bg-gradient-to-br py-16 md:py-24", cat.gradient)}>
         <div className="absolute inset-0 opacity-20 [background-image:radial-gradient(circle_at_2px_2px,white_1px,transparent_0)] [background-size:24px_24px]" />
         <div className="relative mx-auto max-w-7xl px-4 md:px-6">

@@ -4,8 +4,8 @@ import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 export function AboutPage() {
   return (
+  <div className="min-h-screen bg-background">
     <PublicPageHeader />
-    <div className="min-h-screen bg-background">
       <section className="from-primary/10 to-accent/10 border-border border-b bg-gradient-to-br py-20 text-center md:py-28">
         <div className="mx-auto max-w-3xl px-4">
           <span className="bg-card border-border inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-bold uppercase tracking-wider"><Sparkles className="text-primary h-3 w-3" /> Our story</span>
