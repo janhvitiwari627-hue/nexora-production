@@ -37,23 +37,40 @@ export default function ResetPasswordPage() {
   const [done, setDone] = useState(false);
   const [hasRecovery, setHasRecovery] = useState<boolean | null>(null);
 
-  // Supabase puts the recovery token in the URL hash; the JS client picks it up
-  // automatically on load. We listen for the PASSWORD_RECOVERY event.
+  // A valid recovery session can arrive via:
+  //  - PASSWORD_RECOVERY auth event (implicit hash flow)
+  //  - an existing session after /auth/callback exchanged the code
+  //  - hash containing type=recovery
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") setHasRecovery(true);
+    let cancelled = false;
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
+        setHasRecovery(true);
+      }
     });
-    // Fallback: if session already exists with recovery hash present
-    if (typeof window !== "undefined" && window.location.hash.includes("type=recovery")) {
-      setHasRecovery(true);
-    } else {
-      // Allow updateUser even outside the event if a session is present
-      supabase.auth.getSession().then(({ data }) => {
-        if (data.session) setHasRecovery((v) => v ?? true);
-        else setHasRecovery((v) => v ?? false);
-      });
-    }
-    return () => sub.subscription.unsubscribe();
+
+    const check = async () => {
+      if (typeof window !== "undefined" && window.location.hash.includes("type=recovery")) {
+        if (!cancelled) setHasRecovery(true);
+        return;
+      }
+      // Allow a brief moment for implicit/PKCE session to land
+      for (let i = 0; i < 6; i++) {
+        const { data } = await supabase.auth.getSession();
+        if (data.session) {
+          if (!cancelled) setHasRecovery(true);
+          return;
+        }
+        await new Promise((r) => setTimeout(r, 250));
+      }
+      if (!cancelled) setHasRecovery(false);
+    };
+    check();
+
+    return () => {
+      cancelled = true;
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
   const strength = useMemo(() => scorePassword(password), [password]);
