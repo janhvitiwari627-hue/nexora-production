@@ -37,6 +37,7 @@ import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as PartnerIndexRouteImport } from './routes/partner.index'
 import { Route as OwnerIndexRouteImport } from './routes/owner.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
+import { Route as StaffDashboardRouteImport } from './routes/staff.dashboard'
 import { Route as SiteBusinessSlugRouteImport } from './routes/site.$businessSlug'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
 import { Route as SSlugRouteImport } from './routes/s.$slug'
@@ -251,6 +252,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardRoute,
+} as any)
+const StaffDashboardRoute = StaffDashboardRouteImport.update({
+  id: '/staff/dashboard',
+  path: '/staff/dashboard',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const SiteBusinessSlugRoute = SiteBusinessSlugRouteImport.update({
   id: '/site/$businessSlug',
@@ -716,6 +722,7 @@ export interface FileRoutesByFullPath {
   '/s/$slug': typeof SSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
+  '/staff/dashboard': typeof StaffDashboardRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/owner/': typeof OwnerIndexRoute
   '/partner/': typeof PartnerIndexRoute
@@ -819,6 +826,7 @@ export interface FileRoutesByTo {
   '/s/$slug': typeof SSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
+  '/staff/dashboard': typeof StaffDashboardRoute
   '/dashboard': typeof DashboardIndexRoute
   '/owner': typeof OwnerIndexRoute
   '/partner': typeof PartnerIndexRoute
@@ -924,6 +932,7 @@ export interface FileRoutesById {
   '/s/$slug': typeof SSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
+  '/staff/dashboard': typeof StaffDashboardRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/owner/': typeof OwnerIndexRoute
   '/partner/': typeof PartnerIndexRoute
@@ -1030,6 +1039,7 @@ export interface FileRouteTypes {
     | '/s/$slug'
     | '/shop/$slug'
     | '/site/$businessSlug'
+    | '/staff/dashboard'
     | '/dashboard/'
     | '/owner/'
     | '/partner/'
@@ -1133,6 +1143,7 @@ export interface FileRouteTypes {
     | '/s/$slug'
     | '/shop/$slug'
     | '/site/$businessSlug'
+    | '/staff/dashboard'
     | '/dashboard'
     | '/owner'
     | '/partner'
@@ -1237,6 +1248,7 @@ export interface FileRouteTypes {
     | '/s/$slug'
     | '/shop/$slug'
     | '/site/$businessSlug'
+    | '/staff/dashboard'
     | '/dashboard/'
     | '/owner/'
     | '/partner/'
@@ -1325,6 +1337,7 @@ export interface RootRouteChildren {
   SSlugRoute: typeof SSlugRoute
   ShopSlugRoute: typeof ShopSlugRoute
   SiteBusinessSlugRoute: typeof SiteBusinessSlugRoute
+  StaffDashboardRoute: typeof StaffDashboardRoute
   OwnerIndexRoute: typeof OwnerIndexRoute
   PartnerIndexRoute: typeof PartnerIndexRoute
   PortalIndexRoute: typeof PortalIndexRoute
@@ -1537,6 +1550,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/staff/dashboard': {
+      id: '/staff/dashboard'
+      path: '/staff/dashboard'
+      fullPath: '/staff/dashboard'
+      preLoaderRoute: typeof StaffDashboardRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/site/$businessSlug': {
       id: '/site/$businessSlug'
@@ -2218,6 +2238,7 @@ const rootRouteChildren: RootRouteChildren = {
   SSlugRoute: SSlugRoute,
   ShopSlugRoute: ShopSlugRoute,
   SiteBusinessSlugRoute: SiteBusinessSlugRoute,
+  StaffDashboardRoute: StaffDashboardRoute,
   OwnerIndexRoute: OwnerIndexRoute,
   PartnerIndexRoute: PartnerIndexRoute,
   PortalIndexRoute: PortalIndexRoute,
