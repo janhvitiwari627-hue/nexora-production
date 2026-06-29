@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PasswordStrengthIndicator, scorePassword } from "@/components/auth/PasswordStrengthIndicator";
+import { BackButton } from "@/components/shared/BackButton";
 
 const CATEGORIES = [
   "Salon",
