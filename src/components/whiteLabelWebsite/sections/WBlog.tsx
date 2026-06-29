@@ -5,6 +5,7 @@ import { ShareButton } from "./ShareButton";
 import { Calendar } from "lucide-react";
 
 export function WBlog({ shop, template }: { shop: ShopData; template: TemplateConfig }) {
+  if (!shop.blog || shop.blog.length === 0) return null;
   return (
     <section id="blog" className="px-6 py-16 md:px-12">
       <SectionTitle font={template.headingFont}>Latest from the Blog</SectionTitle>
@@ -19,8 +20,7 @@ export function WBlog({ shop, template }: { shop: ShopData; template: TemplateCo
               </div>
               <h3 className="line-clamp-2 text-lg font-semibold leading-tight">{post.title}</h3>
               <p className="text-muted-foreground line-clamp-2 text-sm">{post.excerpt}</p>
-              <div className="flex items-center justify-between pt-2">
-                <a href="#" className="text-sm font-semibold" style={{ color: template.colors.primary }}>Read more →</a>
+              <div className="flex items-center justify-end pt-2">
                 <ShareButton title={`${post.title} — ${shop.name}`} label="" />
               </div>
             </div>
