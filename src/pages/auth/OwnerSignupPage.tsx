@@ -283,6 +283,19 @@ export default function OwnerSignupPage() {
             </div>
 
             <div className="space-y-1.5 sm:col-span-2">
+              <Label htmlFor="confirm_password">Confirm password</Label>
+              <Input
+                id="confirm_password"
+                type={showPw ? "text" : "password"}
+                autoComplete="new-password"
+                value={form.confirm_password}
+                onChange={update("confirm_password")}
+                disabled={submitting}
+              />
+              {errors.confirm_password && <p className="text-xs text-destructive">{errors.confirm_password}</p>}
+            </div>
+
+            <div className="space-y-1.5 sm:col-span-2">
               <Label htmlFor="business_name">Business name</Label>
               <Input id="business_name" value={form.business_name} onChange={update("business_name")} disabled={submitting} />
               {errors.business_name && <p className="text-xs text-destructive">{errors.business_name}</p>}
