@@ -926,7 +926,7 @@ function Section({
 export function HomePage() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] font-sans text-slate-900 antialiased">
-      <PublicHeader />
+      <PublicHeader showBackButton={false} />
       <main className="pb-24 md:pb-0">
         <Hero />
         <SearchPanel />
