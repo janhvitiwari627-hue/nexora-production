@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
+import { useAuthStore } from "@/stores/authStore";
 
 const loginSchema = z.object({
   email: z.string().trim().email("Invalid email address").max(255),
@@ -18,6 +19,8 @@ const loginSchema = z.object({
 
 export default function CustomerLoginPage() {
   const navigate = useNavigate();
+  const user = useAuthStore((s) => s.user);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
   const [form, setForm] = useState({ email: "", password: "" });
   const [rememberMe, setRememberMe] = useState(true);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -25,6 +28,17 @@ export default function CustomerLoginPage() {
   const [googleSubmitting, setGoogleSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    if (!isInitialized || !user) return;
+    let cancelled = false;
+    void resolvePostLoginRedirect(user.id).then((redirectTo) => {
+      if (!cancelled) navigate({ to: redirectTo, replace: true });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isInitialized, navigate, user]);
 
   const update = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;

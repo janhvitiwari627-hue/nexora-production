@@ -74,8 +74,9 @@ function PremiumHeader() {
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const profile = useAuthStore((s) => s.profile);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
   const signOut = useAuthStore((s) => s.signOut);
-  const isAuthed = !!user;
+  const isAuthed = isInitialized && !!user;
 
   const initials = (() => {
     const name = profile?.full_name || user?.email || "U";
@@ -138,7 +139,12 @@ function PremiumHeader() {
             <Bell className="h-[18px] w-[18px]" />
           </button>
 
-          {!isAuthed ? (
+          {!isInitialized ? (
+            <div className="hidden items-center gap-2 sm:flex" aria-label="Loading account">
+              <span className="h-9 w-20 animate-pulse rounded-full bg-slate-100" />
+              <span className="h-9 w-9 animate-pulse rounded-full bg-slate-100" />
+            </div>
+          ) : !isAuthed ? (
             <>
               <Link to="/login" className="hidden text-sm font-medium text-slate-700 hover:text-slate-900 sm:inline-block">
                 Login
@@ -206,7 +212,12 @@ function PremiumHeader() {
                 {l.label}
               </Link>
             ))}
-            {!isAuthed ? (
+            {!isInitialized ? (
+              <div className="mt-2 flex gap-2">
+                <span className="h-11 flex-1 animate-pulse rounded-full bg-slate-100" />
+                <span className="h-11 flex-1 animate-pulse rounded-full bg-slate-100" />
+              </div>
+            ) : !isAuthed ? (
               <div className="mt-2 flex gap-2">
                 <Link to="/login" className="flex-1 rounded-full border border-slate-200 px-4 py-3 text-center text-sm font-semibold text-slate-800">Login</Link>
                 <Link to="/register" className="flex-1 rounded-full bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white">Sign up</Link>
