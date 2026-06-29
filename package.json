@@ -5,10 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
+    "prebuild": "node scripts/check-forbidden-refs.mjs",
     "build": "vite build",
+    "prebuild:dev": "node scripts/check-forbidden-refs.mjs",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
+    "check:forbidden": "node scripts/check-forbidden-refs.mjs",
     "format": "prettier --write .",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed"
