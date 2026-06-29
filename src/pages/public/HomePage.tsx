@@ -1,12 +1,9 @@
 import { useMemo, useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
   Search,
   MapPin,
-  Bell,
-  Menu,
-  X,
   Sparkles,
   ShieldCheck,
   Star,
@@ -26,18 +23,13 @@ import {
   ChevronRight,
   Home as HomeIcon,
   Compass,
-  CalendarCheck,
-  User2,
   TrendingUp,
   Layers,
-  LogOut,
 } from "lucide-react";
 import Footer from "@/components/nexora-design/sections/Footer";
 import { PublicHeader } from "@/components/layout/PublicHeader";
 import { shopsQueryOptions } from "@/lib/shops.queries";
 import { useAuthStore } from "@/stores/authStore";
-import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
-import { BackButton } from "@/components/shared/BackButton";
 
 /* =========================================================
  * NEXORA SALONOS — PREMIUM HOMEPAGE (Stripe × Apple × Airbnb)
