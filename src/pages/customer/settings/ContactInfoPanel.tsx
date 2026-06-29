@@ -257,3 +257,75 @@ export function ModalShell({ title, onClose, children }: { title: string; onClos
     </div>
   );
 }
+
+function PhoneEditModal({
+  currentValue,
+  onClose,
+  onSaved,
+}: {
+  currentValue: string;
+  onClose: () => void;
+  onSaved: (v: string) => void;
+}) {
+  const { user } = useAuthStore();
+  const [val, setVal] = useState(currentValue || "");
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    setError(null);
+    const clean = val.replace(/[\s-]/g, "");
+    if (!clean) {
+      setError("Mobile number is required.");
+      return;
+    }
+    if (!/^(\+91)?[6-9]\d{9}$/.test(clean)) {
+      setError("Enter a valid 10-digit mobile number.");
+      return;
+    }
+    if (!user?.id) {
+      setError("You must be signed in.");
+      return;
+    }
+    setSaving(true);
+    try {
+      const { error: err } = await supabase
+        .from("profiles")
+        .update({ mobile: clean })
+        .eq("id", user.id);
+      if (err) {
+        setError(err.message);
+        return;
+      }
+      onSaved(clean);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <ModalShell title="Change mobile number" onClose={onClose}>
+      <p className="text-muted-foreground text-xs">
+        Current: <span className="font-semibold">{currentValue || "Not set"}</span>
+      </p>
+      <Field label="New mobile">
+        <input
+          type="tel"
+          value={val}
+          onChange={(e) => setVal(e.target.value)}
+          placeholder="+91 9876543210"
+          className={inputCls}
+        />
+      </Field>
+      {error && <p className="text-destructive text-xs">{error}</p>}
+      <button
+        disabled={saving || !val}
+        onClick={handleSave}
+        className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 mt-2 inline-flex w-full items-center justify-center rounded-md py-2 text-sm font-bold"
+      >
+        {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        Save mobile number
+      </button>
+    </ModalShell>
+  );
+}
