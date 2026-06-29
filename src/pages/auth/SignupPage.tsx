@@ -51,6 +51,7 @@ function parseErr(error: unknown): string {
 
 export default function SignupPage() {
   const navigate = useNavigate();
+  const search = useSearch({ strict: false }) as { ref?: string };
   const user = useAuthStore((s) => s.user);
   const isInitialized = useAuthStore((s) => s.isInitialized);
   const [form, setForm] = useState({
@@ -60,6 +61,7 @@ export default function SignupPage() {
     password: "",
     confirm_password: "",
   });
+  const referredBy = (search?.ref ?? "").trim().slice(0, 20);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [resetSubmitting, setResetSubmitting] = useState(false);
