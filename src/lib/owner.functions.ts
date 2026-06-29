@@ -280,7 +280,7 @@ export const listOwnerBookings = createServerFn({ method: "GET" })
 
 const UpdateBookingStatusInput = z.object({
   booking_id: z.string().uuid(),
-  status: z.enum(["confirmed", "completed", "cancelled"]),
+  status: z.enum(["pending", "confirmed", "completed", "cancelled", "no_show"]),
 });
 
 export const updateOwnerBookingStatus = createServerFn({ method: "POST" })
