@@ -1,4 +1,4 @@
-import { Phone, MessageCircle, Eye, Check, Play, X as XIcon } from "lucide-react";
+import { Phone, MessageCircle, Eye, Check, UserX, X as XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { STATUS_META, type OwnerBooking, type OwnerBookingStatus } from "./mockOwnerBookings";
@@ -34,11 +34,12 @@ export function BookingCard({
   onAction: (id: string, next: OwnerBookingStatus) => void;
 }) {
   const wa = `https://wa.me/91${booking.mobile}?text=Hi%20${encodeURIComponent(booking.customer)}`;
+  const isFinal = booking.status === "completed" || booking.status === "cancelled" || booking.status === "no_show";
   const can = {
-    accept: booking.status === "pending" || booking.status === "confirmed",
-    start: booking.status === "accepted",
-    complete: booking.status === "in_progress",
-    cancel: booking.status !== "completed" && booking.status !== "cancelled",
+    confirm: booking.status === "pending",
+    complete: booking.status === "confirmed",
+    noShow: booking.status === "confirmed" || booking.status === "pending",
+    cancel: !isFinal,
   };
 
   return (
@@ -77,31 +78,31 @@ export function BookingCard({
             <span className="text-muted-foreground">/ Total:</span> ₹{booking.total.toLocaleString()}
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
-            {can.accept && (
-              <Button
-                size="sm"
-                className="bg-success hover:bg-success/90 text-white"
-                onClick={() => onAction(booking.id, "accepted")}
-              >
-                <Check className="h-4 w-4" /> Accept
-              </Button>
-            )}
-            {can.start && (
+            {can.confirm && (
               <Button
                 size="sm"
                 className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                onClick={() => onAction(booking.id, "in_progress")}
+                onClick={() => onAction(booking.id, "confirmed")}
               >
-                <Play className="h-4 w-4" /> In Progress
+                <Check className="h-4 w-4" /> Confirm
               </Button>
             )}
             {can.complete && (
               <Button
                 size="sm"
-                variant="outline"
+                className="bg-success hover:bg-success/90 text-white"
                 onClick={() => onAction(booking.id, "completed")}
               >
                 <Check className="h-4 w-4" /> Complete
+              </Button>
+            )}
+            {can.noShow && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => onAction(booking.id, "no_show")}
+              >
+                <UserX className="h-4 w-4" /> No Show
               </Button>
             )}
             {can.cancel && (

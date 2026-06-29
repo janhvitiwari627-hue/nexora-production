@@ -20,10 +20,9 @@ const TABS: { key: FilterTab; label: string }[] = [
   { key: "all", label: "All" },
   { key: "pending", label: "Pending" },
   { key: "confirmed", label: "Confirmed" },
-  { key: "accepted", label: "Accepted" },
-  { key: "in_progress", label: "In Progress" },
   { key: "completed", label: "Completed" },
   { key: "cancelled", label: "Cancelled" },
+  { key: "no_show", label: "No Show" },
 ];
 
 type ViewMode = "cards" | "calendar" | "list";
@@ -78,8 +77,8 @@ export function OwnerBookingsPage() {
     const ids = Array.from(selectedIds);
     ids.forEach((id) => {
       const b = bookings.find((x) => x.id === id);
-      if (b && (b.status === "pending" || b.status === "confirmed")) {
-        live.setStatus(id, "accepted");
+      if (b && b.status === "pending") {
+        live.setStatus(id, "confirmed");
       }
     });
     setSelectedIds(new Set());
@@ -166,10 +165,10 @@ export function OwnerBookingsPage() {
           <Button
             size="sm"
             disabled={selectedIds.size === 0}
-            className="bg-success hover:bg-success/90 text-white"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground"
             onClick={acceptSelected}
           >
-            <Check className="h-4 w-4" /> Accept Selected ({selectedIds.size})
+            <Check className="h-4 w-4" /> Confirm Selected ({selectedIds.size})
           </Button>
         </div>
 

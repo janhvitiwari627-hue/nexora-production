@@ -12,9 +12,10 @@ import type {
 } from "@/pages/owner/bookings/mockOwnerBookings";
 
 function mapStatus(s: string): OwnerBookingStatus {
-  if (s === "confirmed") return "accepted";
-  if (s === "expired") return "cancelled";
-  return (s as OwnerBookingStatus);
+  if (s === "pending" || s === "confirmed" || s === "completed" || s === "cancelled" || s === "no_show") {
+    return s;
+  }
+  return "pending";
 }
 
 /**
@@ -30,7 +31,7 @@ export function useOwnerLiveBookings() {
   const updateFn = useServerFn(updateOwnerBookingStatus);
 
   const mutation = useMutation({
-    mutationFn: (vars: { booking_id: string; status: "confirmed" | "completed" | "cancelled" }) =>
+    mutationFn: (vars: { booking_id: string; status: OwnerBookingStatus }) =>
       updateFn({ data: vars }),
     onSuccess: () => {
       if (activeSalonId) {
@@ -62,17 +63,8 @@ export function useOwnerLiveBookings() {
 
 
   const setStatus = (id: string, next: OwnerBookingStatus) => {
-    if (!hasSalon) return; // mock mode handled by parent setState
-    const mapped =
-      next === "accepted" || next === "in_progress"
-        ? "confirmed"
-        : next === "completed"
-        ? "completed"
-        : next === "cancelled"
-        ? "cancelled"
-        : null;
-    if (!mapped) return;
-    mutation.mutate({ booking_id: id, status: mapped });
+    if (!hasSalon) return;
+    mutation.mutate({ booking_id: id, status: next });
   };
 
   return { bookings, setStatus, isLive: hasSalon, loading: liveQ.isLoading };

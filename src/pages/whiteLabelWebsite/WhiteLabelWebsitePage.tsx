@@ -5,7 +5,7 @@ import { WebsiteRenderer } from "@/components/whiteLabelWebsite/WebsiteRenderer"
 import { WhiteLabelHeader } from "@/components/whiteLabelWebsite/WhiteLabelHeader";
 import { WhiteLabelFooter } from "@/components/whiteLabelWebsite/WhiteLabelFooter";
 import { ViralGrowthWidget } from "@/components/whiteLabelWebsite/ViralGrowthWidget";
-import { MOCK_CONFIG, type ShopData, type WebsiteConfig } from "@/components/whiteLabelWebsite/types";
+import { DEFAULT_SECTIONS, type ShopData, type WebsiteConfig } from "@/components/whiteLabelWebsite/types";
 import { getTemplate, normalizeTemplateKey, TEMPLATE_KEYS, TEMPLATES, type TemplateKey } from "@/components/whiteLabelWebsite/templates";
 import { getSalonBySlug } from "@/lib/salons.functions";
 import { Paintbrush } from "lucide-react";
@@ -53,7 +53,21 @@ export function WhiteLabelWebsitePage({ slug: _slug, routeSearch }: { slug?: str
   const savedTemplateKey = data.salon.selected_template_key ?? "modern-salon";
   const templateKey = normalizeTemplateKey(routeSearch?.t ?? browserSearch?.get("t") ?? savedTemplateKey);
 
-  const config: WebsiteConfig = { ...MOCK_CONFIG, template: templateKey };
+  const config: WebsiteConfig = {
+    template: templateKey,
+    branding: {
+      primaryColor: getTemplate(templateKey).colors.primary,
+      secondaryColor: getTemplate(templateKey).colors.secondary,
+      font: getTemplate(templateKey).font,
+    },
+    sections: DEFAULT_SECTIONS,
+    seoMeta: {
+      title: data.salon.name,
+      description: data.salon.description ?? data.salon.tagline ?? "",
+      keywords: [],
+    },
+    socialLinks: {},
+  };
   const template = getTemplate(templateKey);
 
   const setTemplate = (key: TemplateKey) => {
