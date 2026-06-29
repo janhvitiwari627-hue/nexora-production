@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,7 +27,11 @@ export default function CustomerLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   const update = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm((f) => ({ ...f, [key]: e.target.value }));
+    const value = e.target.value;
+    setForm((f) => ({ ...f, [key]: value }));
+    // Clear server error and field error when user starts typing
+    if (serverError) setServerError(null);
+    if (errors[key]) setErrors((prev) => ({ ...prev, [key]: "" }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -47,18 +50,46 @@ export default function CustomerLoginPage() {
       return;
     }
 
+    // Additional validation for empty fields
+    if (!parsed.data.email.trim() || !parsed.data.password) {
+      setServerError("Please enter both email and password");
+      return;
+    }
+
     setSubmitting(true);
+    console.log("[Login] Attempting sign in with email:", parsed.data.email);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: parsed.data.email,
+        email: parsed.data.email.trim(),
         password: parsed.data.password,
       });
 
-      if (error || !data.user) {
-        // Generic message to avoid account enumeration
-        setServerError("Invalid email or password");
+      console.log("[Login] Supabase response:", { data: !!data.user, error: error?.message });
+
+      if (error) {
+        // Provide specific error messages based on Supabase error codes
+        let errorMessage = "Invalid email or password";
+        if (error.message.includes("Email not confirmed")) {
+          errorMessage = "Please verify your email before signing in. Check your inbox for the confirmation link.";
+        } else if (error.message.includes("Invalid login credentials") || error.message.includes("Invalid email or password")) {
+          errorMessage = "Invalid email or password";
+        } else if (error.message.includes("User not found") || error.message.includes("signup")) {
+          errorMessage = "No account found with this email. Please sign up first.";
+        } else if (error.message.includes("network") || error.message.includes("fetch") || error.message.includes("connection")) {
+          errorMessage = "Network error. Please check your connection and try again.";
+        }
+        console.error("[Login] Auth error:", error.message);
+        setServerError(errorMessage);
         return;
       }
+
+      if (!data.user) {
+        console.error("[Login] No user returned from Supabase");
+        setServerError("Sign in failed. Please try again.");
+        return;
+      }
+
+      console.log("[Login] Successfully signed in user:", data.user.id);
 
       // "Remember Me" off → clear persisted session on tab close.
       // Supabase persists by default; we move the token to sessionStorage instead.
@@ -74,6 +105,7 @@ export default function CustomerLoginPage() {
       const redirectTo = await resolvePostLoginRedirect(data.user.id);
       navigate({ to: redirectTo });
     } catch (err) {
+      console.error("[Login] Unexpected error:", err);
       setServerError(err instanceof Error ? err.message : "Sign in failed");
     } finally {
       setSubmitting(false);
@@ -84,21 +116,25 @@ export default function CustomerLoginPage() {
     setServerError(null);
     setGoogleSubmitting(true);
     try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+      console.log("[Login] Initiating Google OAuth...");
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
       });
-      if (result.error) {
+
+      if (error) {
+        console.error("[Login] Google OAuth error:", error.message);
         setServerError("Google sign-in failed. Please try again.");
         return;
       }
-      if (result.redirected) return;
-      // Token-flow path: session is set, derive redirect.
-      const { data } = await supabase.auth.getUser();
-      if (data.user) {
-        const redirectTo = await resolvePostLoginRedirect(data.user.id);
-        navigate({ to: redirectTo });
-      }
+
+      console.log("[Login] Google OAuth initiated, redirecting...");
+      // Supabase will redirect to the OAuth provider, then to /auth/callback
+      // The callback page will handle the session and redirect
     } catch (err) {
+      console.error("[Login] Google OAuth unexpected error:", err);
       setServerError(err instanceof Error ? err.message : "Google sign-in failed");
     } finally {
       setGoogleSubmitting(false);
@@ -118,7 +154,7 @@ export default function CustomerLoginPage() {
             variant="outline"
             className="w-full"
             onClick={handleGoogle}
-            disabled={googleSubmitting}
+            disabled={googleSubmitting || submitting}
           >
             {googleSubmitting ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -158,6 +194,7 @@ export default function CustomerLoginPage() {
                 onChange={update("email")}
                 autoComplete="email"
                 required
+                disabled={submitting}
               />
               {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
             </div>
@@ -174,6 +211,7 @@ export default function CustomerLoginPage() {
                   required
                   minLength={8}
                   className="pr-10"
+                  disabled={submitting}
                 />
                 <button
                   type="button"
@@ -181,6 +219,7 @@ export default function CustomerLoginPage() {
                   className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                   tabIndex={-1}
+                  disabled={submitting}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -193,6 +232,7 @@ export default function CustomerLoginPage() {
                 <Checkbox
                   checked={rememberMe}
                   onCheckedChange={(v) => setRememberMe(Boolean(v))}
+                  disabled={submitting}
                 />
                 Remember me
               </label>
@@ -205,8 +245,14 @@ export default function CustomerLoginPage() {
             </div>
 
             <Button type="submit" className="w-full" disabled={submitting}>
-              {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Sign in
+              {submitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                "Sign in"
+              )}
             </Button>
           </form>
 

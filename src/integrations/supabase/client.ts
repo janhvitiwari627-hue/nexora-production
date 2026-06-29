@@ -18,6 +18,8 @@ function createSupabaseClient() {
     throw new Error(message);
   }
 
+  console.log("[Supabase] Client initialized with URL:", SUPABASE_URL);
+
   return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     auth: {
       storage: typeof window !== 'undefined' ? localStorage : undefined,
@@ -33,8 +35,10 @@ let _supabase: ReturnType<typeof createSupabaseClient> | undefined;
 // import { supabase } from "@/integrations/supabase/client";
 export const supabase = new Proxy({} as ReturnType<typeof createSupabaseClient>, {
   get(_, prop, receiver) {
-    if (!_supabase) _supabase = createSupabaseClient();
+    if (!_supabase) {
+      console.log("[Supabase] Creating client instance...");
+      _supabase = createSupabaseClient();
+    }
     return Reflect.get(_supabase, prop, receiver);
   },
 });
-

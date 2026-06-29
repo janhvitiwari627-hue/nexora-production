@@ -3,7 +3,6 @@ import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { z } from "zod";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -90,7 +89,11 @@ export default function CustomerRegistrationPage() {
   const pwStrength = useMemo(() => scorePassword(form.password), [form.password]);
 
   const update = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm((f) => ({ ...f, [key]: e.target.value }));
+    const value = e.target.value;
+    setForm((f) => ({ ...f, [key]: value }));
+    // Clear server error and field error when user starts typing
+    if (serverError) setServerError(null);
+    if (errors[key]) setErrors((prev) => ({ ...prev, [key]: "" }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -120,12 +123,13 @@ export default function CustomerRegistrationPage() {
     }
 
     setSubmitting(true);
+    console.log("[Register] Attempting sign up with email:", parsed.data.email, "accountType:", accountType);
     try {
       const { data, error } = await supabase.auth.signUp({
-        email: parsed.data.email,
+        email: parsed.data.email.trim(),
         password: parsed.data.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
             full_name: parsed.data.full_name,
             mobile: parsed.data.mobile,
@@ -135,8 +139,23 @@ export default function CustomerRegistrationPage() {
         },
       });
 
+      console.log("[Register] Supabase response:", { user: !!data.user, session: !!data.session, error: error?.message });
+
       if (error) {
-        setServerError(error.message?.trim() || "Sign up failed. Please try again.");
+        let errorMessage = "Sign up failed. Please try again.";
+        if (error.message.includes("User already registered") || error.message.includes("already exists")) {
+          errorMessage = "An account with this email already exists. Please sign in instead.";
+        } else if (error.message.includes("invalid email")) {
+          errorMessage = "Invalid email address.";
+        } else if (error.message.includes("weak password")) {
+          errorMessage = "Password is too weak. Please choose a stronger password.";
+        } else if (error.message.includes("network") || error.message.includes("fetch") || error.message.includes("connection")) {
+          errorMessage = "Network error. Please check your connection and try again.";
+        } else {
+          errorMessage = error.message?.trim() || errorMessage;
+        }
+        console.error("[Register] Auth error:", error.message);
+        setServerError(errorMessage);
         return;
       }
 
@@ -172,21 +191,32 @@ export default function CustomerRegistrationPage() {
         }
       }
 
-      // Auto-confirm is enabled; if no session for any reason, send to login.
-      if (!data.session) {
-        navigate({ to: "/login" });
+      // Handle email confirmation flow
+      if (!data.session && data.user) {
+        // Email confirmation required - show message to user
+        console.log("[Register] Email confirmation required for user:", data.user.id);
+        setServerError("Please verify your email before signing in. Check your inbox for the confirmation link.");
+        setSubmitting(false);
         return;
       }
 
-      navigate({
-        to:
-          accountType === "owner"
-            ? "/owner/pending"
-            : accountType === "district_partner"
-              ? "/partner/district"
-              : "/",
-      });
+      // Session exists - user is signed in
+      if (data.session) {
+        console.log("[Register] Successfully signed up and signed in user:", data.session.user.id);
+        
+        if (accountType === "owner") {
+          navigate({ to: "/owner/pending" });
+        } else if (accountType === "district_partner") {
+          navigate({ to: "/partner/district" });
+        } else {
+          // For customers, redirect based on role
+          const { resolvePostLoginRedirect } = await import("@/lib/auth-redirect");
+          const redirectTo = await resolvePostLoginRedirect(data.session.user.id);
+          navigate({ to: redirectTo });
+        }
+      }
     } catch (err) {
+      console.error("[Register] Unexpected error:", err);
       setServerError(err instanceof Error ? err.message : "Sign up failed");
     } finally {
       setSubmitting(false);
@@ -197,22 +227,29 @@ export default function CustomerRegistrationPage() {
     setServerError(null);
     setGoogleSubmitting(true);
     try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+      console.log("[Register] Initiating Google OAuth...");
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
       });
-      if (result.error) {
-        setServerError("Google sign-in failed. Please try again.");
+
+      if (error) {
+        console.error("[Register] Google OAuth error:", error.message);
+        setServerError("Google sign-up failed. Please try again.");
         return;
       }
-      if (result.redirected) return;
-      navigate({ to: "/" });
+
+      console.log("[Register] Google OAuth initiated, redirecting...");
+      // Supabase will redirect to the OAuth provider, then to /auth/callback
     } catch (err) {
-      setServerError(err instanceof Error ? err.message : "Google sign-in failed");
+      console.error("[Register] Google OAuth unexpected error:", err);
+      setServerError(err instanceof Error ? err.message : "Google sign-up failed");
     } finally {
       setGoogleSubmitting(false);
     }
   };
-
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
@@ -241,7 +278,7 @@ export default function CustomerRegistrationPage() {
           {accountType === "customer" && (
             <Button
               type="button" variant="outline" className="w-full"
-              onClick={handleGoogle} disabled={googleSubmitting}
+              onClick={handleGoogle} disabled={googleSubmitting || submitting}
             >
               {googleSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (
                 <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
@@ -269,13 +306,13 @@ export default function CustomerRegistrationPage() {
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="space-y-1">
               <Label htmlFor="full_name">Full name</Label>
-              <Input id="full_name" value={form.full_name} onChange={update("full_name")} autoComplete="name" required />
+              <Input id="full_name" value={form.full_name} onChange={update("full_name")} autoComplete="name" required disabled={submitting} />
               {errors.full_name && <p className="text-xs text-destructive">{errors.full_name}</p>}
             </div>
 
             <div className="space-y-1">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" value={form.email} onChange={update("email")} autoComplete="email" required />
+              <Input id="email" type="email" value={form.email} onChange={update("email")} autoComplete="email" required disabled={submitting} />
               {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
             </div>
 
@@ -285,6 +322,7 @@ export default function CustomerRegistrationPage() {
                 id="mobile" type="tel" value={form.mobile} onChange={update("mobile")}
                 autoComplete="tel" placeholder="+91 9876543210"
                 required
+                disabled={submitting}
               />
               {errors.mobile && <p className="text-xs text-destructive">{errors.mobile}</p>}
             </div>
@@ -293,12 +331,12 @@ export default function CustomerRegistrationPage() {
               <>
                 <div className="space-y-1">
                   <Label htmlFor="business_name">Business name</Label>
-                  <Input id="business_name" value={form.business_name} onChange={update("business_name")} required placeholder="e.g. Luxe Hair & Spa" />
+                  <Input id="business_name" value={form.business_name} onChange={update("business_name")} required placeholder="e.g. Luxe Hair & Spa" disabled={submitting} />
                   {errors.business_name && <p className="text-xs text-destructive">{errors.business_name}</p>}
                 </div>
                 <div className="space-y-1">
                   <Label htmlFor="business_city">City <span className="text-xs text-muted-foreground">(optional)</span></Label>
-                  <Input id="business_city" value={form.business_city} onChange={update("business_city")} placeholder="Mumbai" />
+                  <Input id="business_city" value={form.business_city} onChange={update("business_city")} placeholder="Mumbai" disabled={submitting} />
                 </div>
               </>
             )}
@@ -307,12 +345,12 @@ export default function CustomerRegistrationPage() {
               <>
                 <div className="space-y-1">
                   <Label htmlFor="district">District</Label>
-                  <Input id="district" value={form.district} onChange={update("district")} required placeholder="e.g. Jaipur" />
+                  <Input id="district" value={form.district} onChange={update("district")} required placeholder="e.g. Jaipur" disabled={submitting} />
                   {errors.district && <p className="text-xs text-destructive">{errors.district}</p>}
                 </div>
                 <div className="space-y-1">
                   <Label htmlFor="state">State <span className="text-xs text-muted-foreground">(optional)</span></Label>
-                  <Input id="state" value={form.state} onChange={update("state")} placeholder="Rajasthan" />
+                  <Input id="state" value={form.state} onChange={update("state")} placeholder="Rajasthan" disabled={submitting} />
                 </div>
               </>
             )}
@@ -329,6 +367,7 @@ export default function CustomerRegistrationPage() {
                   required
                   minLength={8}
                   className="pr-10"
+                  disabled={submitting}
                 />
                 <button
                   type="button"
@@ -336,6 +375,7 @@ export default function CustomerRegistrationPage() {
                   className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                   tabIndex={-1}
+                  disabled={submitting}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -351,6 +391,7 @@ export default function CustomerRegistrationPage() {
                   id="referred_by" value={form.referred_by}
                   onChange={(e) => setForm((f) => ({ ...f, referred_by: e.target.value.toUpperCase() }))}
                   autoComplete="off" placeholder="e.g. ABC123" className="pr-9"
+                  disabled={submitting}
                 />
                 <div className="absolute right-2 top-1/2 -translate-y-1/2">
                   {refStatus === "checking" && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}

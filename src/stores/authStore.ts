@@ -34,6 +34,36 @@ async function loadProfileAndRoles(userId: string) {
   return { profile: profile ?? null, roles };
 }
 
+async function ensureProfileExists(user: User) {
+  // Check if profile exists
+  const { data: existingProfile } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (!existingProfile) {
+    console.log("[Auth Store] Creating missing profile for user:", user.id);
+    const { error } = await supabase.from("profiles").insert({
+      id: user.id,
+      email: user.email,
+      full_name: user.user_metadata?.full_name ?? null,
+      mobile: user.user_metadata?.mobile ?? null,
+      referred_by: user.user_metadata?.referred_by ?? null,
+      is_active: true,
+      is_verified: false,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    });
+    if (error) {
+      console.error("[Auth Store] Failed to create profile:", error);
+    } else {
+      console.log("[Auth Store] Profile created successfully for user:", user.id);
+    }
+  }
+  return loadProfileAndRoles(user.id);
+}
+
 export const useAuthStore = create<AuthStore>((set, get) => ({
   user: null,
   profile: null,
@@ -56,10 +86,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     set({ user: null, profile: null, session: null, role: null, roles: [] });
     if (typeof window !== "undefined") {
       try {
-        // Clear cached profile/session helpers but preserve Supabase's own keys
-        // (signOut already cleared those). Wipe sessionStorage entirely.
         sessionStorage.clear();
-        // Notify other tabs
         localStorage.setItem("nx_auth_event", `signout:${Date.now()}`);
         try {
           const bc = new BroadcastChannel("nx_auth");
@@ -85,12 +112,17 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   hasAnyRole: (roles) => roles.some((r) => get().roles.includes(r)),
 
   initialize: async () => {
+    console.log("[Auth Store] Initializing auth store...");
     set({ isLoading: true });
 
     // Bootstrap from current session
     const { data: { session } } = await supabase.auth.getSession();
+    console.log("[Auth Store] Initial session:", session ? "found" : "none");
+
     if (session?.user) {
-      const { profile, roles } = await loadProfileAndRoles(session.user.id);
+      console.log("[Auth Store] Loading profile and roles for user:", session.user.id);
+      // Ensure profile exists, then load profile and roles
+      const { profile, roles } = await ensureProfileExists(session.user);
       set({
         session,
         user: session.user,
@@ -100,9 +132,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       });
     }
     set({ isLoading: false, isInitialized: true });
+    console.log("[Auth Store] Initialization complete");
 
     // Subscribe to future auth changes — defer Supabase calls to avoid deadlocks
     const { data: sub } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      console.log("[Auth Store] Auth state changed:", event, nextSession ? "session exists" : "no session");
       set({ session: nextSession, user: nextSession?.user ?? null });
 
       if (event === "SIGNED_OUT" || !nextSession?.user) {
@@ -113,7 +147,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
         const userId = nextSession.user.id;
         setTimeout(async () => {
-          const { profile, roles } = await loadProfileAndRoles(userId);
+          console.log("[Auth Store] Loading profile and roles for user:", userId);
+          // Ensure profile exists on sign in, then load
+          const { profile, roles } = await ensureProfileExists(nextSession.user);
           set({ profile, roles, role: roles[0] ?? null });
         }, 0);
 
