@@ -25,7 +25,6 @@ export function AdminDashboardPage() {
     <div className="container mx-auto max-w-7xl px-4 py-6 space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-2">
-          <BackButton />
           <h1 className="text-2xl font-bold tracking-tight">Platform Overview</h1>
           <p className="text-sm text-muted-foreground">Live snapshot across all businesses and users.</p>
         </div>
