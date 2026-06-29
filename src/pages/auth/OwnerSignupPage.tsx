@@ -242,6 +242,15 @@ export default function OwnerSignupPage() {
             </Alert>
           )}
 
+          {referredBy && (
+            <Alert className="mb-4 border-primary/20 bg-primary/5">
+              <AlertDescription className="text-sm">
+                Joining with referral code <strong className="font-mono">{referredBy}</strong>.
+                <span className="block text-xs text-muted-foreground mt-0.5">Referral rewards will be activated soon.</span>
+              </AlertDescription>
+            </Alert>
+          )}
+
           <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5 sm:col-span-2">
               <Label htmlFor="full_name">Owner full name</Label>
