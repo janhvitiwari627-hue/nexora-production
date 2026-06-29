@@ -19,7 +19,6 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { cn } from "@/lib/utils";
 import { useOwnerContext } from "@/hooks/use-owner-context";
 import {
   ownerDashboardMetricsQuery, ownerAnalyticsQuery, ownerBookingsQuery,
