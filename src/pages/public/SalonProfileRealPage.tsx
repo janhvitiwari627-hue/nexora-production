@@ -15,6 +15,7 @@ import {
 import { salonBySlugQueryOptions } from "@/lib/salons.queries";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 const route = getRouteApi("/s/$slug");
 
@@ -45,6 +46,7 @@ export function SalonProfileRealPage() {
     );
 
   return (
+    <PublicPageHeader />
     <div className="min-h-screen bg-background pb-24">
       {/* Hero */}
       <div className="relative h-72 w-full overflow-hidden md:h-96">

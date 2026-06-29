@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Copy, Check, Coins, Gift, Share2, Trophy, UserPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 const STEPS = [
   { icon: Share2, title: "Share your code", body: "Send your unique referral code to friends via WhatsApp or social." },
@@ -23,6 +24,7 @@ export function ReferralPage() {
   const [copied, setCopied] = useState(false);
 
   return (
+    <PublicPageHeader />
     <div className="min-h-screen bg-background">
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[#0A2540] via-[#1a1060] to-[#635BFF] py-20 text-center md:py-28">

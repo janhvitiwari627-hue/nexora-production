@@ -24,6 +24,7 @@ import {
 import type { Service } from "@/components/shared/ServiceCard";
 import type { Staff } from "@/components/shared/StaffCard";
 import { createBooking, confirmBookingPayment } from "@/lib/bookings.functions";
+import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 export type RealSalonRef = {
   id: string;
@@ -153,6 +154,7 @@ export function BookingFlowPage({ salon }: { salon?: RealSalonRef } = {}) {
   }
 
   return (
+    <PublicPageHeader />
     <div className="min-h-screen bg-background pb-32 lg:pb-12">
       {/* Header */}
       <div className="border-border bg-card/95 sticky top-0 z-30 border-b backdrop-blur">

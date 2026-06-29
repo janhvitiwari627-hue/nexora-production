@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Mail, CheckCircle2 } from "lucide-react";
+import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 const schema = z.object({
   email: z.string().trim().email("Invalid email address").max(255),
@@ -45,6 +46,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
+    <PublicPageHeader />
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <Card className="w-full max-w-md">
         <CardHeader>

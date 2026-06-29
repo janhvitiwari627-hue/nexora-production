@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import {
+import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
   Award,
   BadgeCheck,
   Building2,
@@ -287,6 +288,7 @@ const idealFor = [
 
 export default function DistrictBusinessPartnerPage() {
   return (
+    <PublicPageHeader />
     <div className="min-h-screen bg-background text-foreground">
       {/* HERO */}
       <section className="relative overflow-hidden bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 dark:from-amber-950/30 dark:via-orange-950/20 dark:to-rose-950/30 px-6 py-20 md:py-28">

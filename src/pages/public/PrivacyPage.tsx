@@ -1,6 +1,8 @@
+import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 export function PrivacyPage() {
   const updated = "January 2026";
   return (
+    <PublicPageHeader />
     <div className="min-h-screen bg-background">
       <section className="border-border border-b bg-muted/30 py-12">
         <div className="mx-auto max-w-3xl px-4 md:px-6">

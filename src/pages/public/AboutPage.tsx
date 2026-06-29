@@ -1,8 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { Heart, Sparkles, Users } from "lucide-react";
+import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 export function AboutPage() {
   return (
+    <PublicPageHeader />
     <div className="min-h-screen bg-background">
       <section className="from-primary/10 to-accent/10 border-border border-b bg-gradient-to-br py-20 text-center md:py-28">
         <div className="mx-auto max-w-3xl px-4">

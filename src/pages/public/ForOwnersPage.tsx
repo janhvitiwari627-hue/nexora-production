@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, BarChart3, CalendarCheck, Check, MessageSquare, ShieldCheck, Sparkles, Star, Users, Zap } from "lucide-react";
 import { useState } from "react";
+import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 const FEATURES = [
   { icon: CalendarCheck, title: "Smart bookings", body: "AI-optimised calendar that minimises gaps and maximises stylist utilisation." },
@@ -27,6 +28,7 @@ const SHOTS = [
 export function ForOwnersPage() {
   const [shot, setShot] = useState(0);
   return (
+    <PublicPageHeader />
     <div className="min-h-screen bg-background">
       {/* Hero */}
       <section className="relative overflow-hidden bg-[#0A2540] py-24 md:py-32">

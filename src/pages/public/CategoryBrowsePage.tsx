@@ -5,6 +5,7 @@ import { ChevronRight, Filter, Sparkles, TrendingUp, Users } from "lucide-react"
 import { ShopCard, type Shop } from "@/components/shared/ShopCard";
 import { FilterPills } from "@/components/shared/FilterPills";
 import { cn } from "@/lib/utils";
+import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 const CATEGORIES: Record<string, { name: string; tagline: string; gradient: string; subs: string[] }> = {
   salon: { name: "Salons", tagline: "Cuts, colour, styling — all the great hair days", gradient: "from-[#635BFF] via-[#8B5CF6] to-[#EC4899]", subs: ["Unisex", "Men's", "Women's", "Kids"] },
@@ -52,6 +53,7 @@ export function CategoryBrowsePage() {
   }, [area, sort]);
 
   return (
+    <PublicPageHeader />
     <div className="min-h-screen bg-background">
       <section className={cn("relative overflow-hidden bg-gradient-to-br py-16 md:py-24", cat.gradient)}>
         <div className="absolute inset-0 opacity-20 [background-image:radial-gradient(circle_at_2px_2px,white_1px,transparent_0)] [background-size:24px_24px]" />

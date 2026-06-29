@@ -12,6 +12,7 @@ import { Check, MapPin, Plus, Share2, Sparkles, Trash2, Upload, Loader2 } from "
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/stores/authStore";
+import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 const STEPS = ["Account", "Business", "Services", "Staff", "Gallery", "Payment", "Review"];
 const CATEGORIES = ["Salon", "Spa", "Tattoo", "Barber", "Bridal", "Nail Art"];
@@ -183,6 +184,7 @@ export function OwnerOnboardingPage() {
   if (published) return <SuccessScreen business={account.businessName || "Your Business"} />;
 
   return (
+    <PublicPageHeader />
     <div className="bg-muted/30 min-h-screen p-4 md:p-8">
       <div className="mx-auto max-w-3xl space-y-6">
         <header className="text-center">

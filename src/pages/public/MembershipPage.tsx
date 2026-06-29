@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Check, Sparkles, Star, X } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
+import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 const PLANS = [
   { name: "Silver", price: 999, period: "year", color: "from-slate-200 to-slate-400 text-slate-900", featured: false, perks: ["10% off all services", "Member-only offers", "Priority customer support"] },
@@ -36,6 +37,7 @@ const FAQS = [
 export function MembershipPage() {
   const [billing, setBilling] = useState<"year" | "month">("year");
   return (
+    <PublicPageHeader />
     <div className="min-h-screen bg-background">
       <section className="from-primary/10 to-accent/10 border-border relative overflow-hidden border-b bg-gradient-to-br py-20 text-center md:py-28">
         <div className="absolute inset-0 opacity-30 [background-image:radial-gradient(circle_at_2px_2px,#635BFF_1px,transparent_0)] [background-size:32px_32px]" />

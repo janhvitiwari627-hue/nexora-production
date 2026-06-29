@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Award, BadgeCheck, Clock, GraduationCap, PlayCircle, Sparkles, Star, Users } from "lucide-react";
+import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 const CATEGORIES = [
   { name: "Hair", count: 24, color: "from-rose-400 to-fuchsia-500" },
@@ -26,6 +27,7 @@ const INSTRUCTORS = [
 
 export function AcademyPage() {
   return (
+    <PublicPageHeader />
     <div className="min-h-screen bg-background">
       <section className="relative overflow-hidden bg-gradient-to-br from-[#0A2540] via-[#1a1060] to-[#635BFF] py-20 md:py-28">
         <div className="absolute inset-0 opacity-20 [background-image:radial-gradient(circle_at_2px_2px,white_1px,transparent_0)] [background-size:32px_32px]" />

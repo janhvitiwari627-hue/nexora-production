@@ -17,6 +17,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useAuthStore } from "@/stores/authStore";
 import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
+import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 type AccountType = "customer" | "owner" | "district_partner";
 
@@ -399,6 +400,7 @@ export default function CustomerRegistrationPage() {
   };
 
   return (
+    <PublicPageHeader />
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <Card className="w-full max-w-md">
         <CardHeader>
