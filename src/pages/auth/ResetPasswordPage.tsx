@@ -112,11 +112,16 @@ export default function ResetPasswordPage() {
         </CardHeader>
         <CardContent>
           {hasRecovery === false ? (
-            <Alert variant="destructive">
-              <AlertDescription>
-                This password reset link is invalid or has expired. Please request a new one.
-              </AlertDescription>
-            </Alert>
+            <div className="space-y-3">
+              <Alert variant="destructive">
+                <AlertDescription>
+                  This password reset link is invalid or expired. Please request a new one.
+                </AlertDescription>
+              </Alert>
+              <Button className="w-full" onClick={() => navigate({ to: "/forgot-password" })}>
+                Request new link
+              </Button>
+            </div>
           ) : done ? (
             <Alert>
               <CheckCircle2 className="h-4 w-4" />
