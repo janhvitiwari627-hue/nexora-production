@@ -227,7 +227,7 @@ export default function CustomerLoginPage() {
 
     } catch (err) {
       console.error("[Login] Google OAuth unexpected error:", err);
-      setServerError(err instanceof Error ? err.message : "Google sign-in failed");
+      setServerError(safeAuthErrorMessage(err, "Google sign-in failed"));
     } finally {
       setGoogleSubmitting(false);
     }
