@@ -51,12 +51,9 @@ export const Route = createFileRoute("/api/public/auth/forgot-password")({
         if (!parsed.success) return Response.json(GENERIC_OK);
 
         const { email } = parsed.data;
-        const origin =
-          parsed.data.redirectTo ||
-          request.headers.get("origin") ||
-          process.env.SITE_URL ||
-          "";
-        const redirectTo = `${origin.replace(/\/$/, "")}/auth/callback?next=/reset-password`;
+        // Always send users to the production domain — never a Lovable preview URL.
+        const origin = PRODUCTION_ORIGIN;
+        const redirectTo = `${origin}/auth/callback?next=/reset-password`;
 
         try {
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
