@@ -99,7 +99,7 @@ export function slugify(s: string) {
 
 export async function listBrands() {
   const { data, error } = await supabase
-    .from("brands")
+    .from("brands_public")
     .select("*")
     .eq("status", "active")
     .order("is_sponsored", { ascending: false })
@@ -111,7 +111,7 @@ export async function listBrands() {
 
 export async function listDistributors() {
   const { data, error } = await supabase
-    .from("distributors")
+    .from("distributors_public")
     .select("*")
     .eq("status", "active")
     .order("is_sponsored", { ascending: false })
@@ -132,6 +132,7 @@ export async function listProducts() {
   return (data ?? []) as BrandProduct[];
 }
 
+// Private queries for authenticated user's own data - these remain on private tables
 export async function getMyBrand(userId: string) {
   const { data } = await supabase.from("brands").select("*").eq("user_id", userId).maybeSingle();
   return data as Brand | null;
@@ -145,7 +146,6 @@ export async function getMyDistributor(userId: string) {
 export async function getMyLeads(userId: string) {
   const { data: brand } = await supabase.from("brands").select("id").eq("user_id", userId).maybeSingle();
   const { data: dist } = await supabase.from("distributors").select("id").eq("user_id", userId).maybeSingle();
-  const ids: string[] = [];
   const brandId = brand?.id; const distId = dist?.id;
   if (!brandId && !distId) return [];
   const filters: string[] = [];
@@ -198,9 +198,10 @@ export async function respondConnection(id: string, status: "accepted" | "reject
   if (error) throw error;
 }
 
+// Public discovery queries - use public views
 export async function listBrandsLite() {
   const { data, error } = await supabase
-    .from("brands")
+    .from("brands_public")
     .select("id,name,logo_url")
     .eq("status", "active")
     .order("name");
@@ -210,7 +211,7 @@ export async function listBrandsLite() {
 
 export async function listDistributorsLite() {
   const { data, error } = await supabase
-    .from("distributors")
+    .from("distributors_public")
     .select("id,company_name,logo_url,state")
     .eq("status", "active")
     .order("company_name");
@@ -220,7 +221,7 @@ export async function listDistributorsLite() {
 
 export async function getBrandBySlug(slug: string) {
   const { data, error } = await supabase
-    .from("brands")
+    .from("brands_public")
     .select("*")
     .eq("slug", slug)
     .maybeSingle();
@@ -230,7 +231,7 @@ export async function getBrandBySlug(slug: string) {
 
 export async function getDistributorBySlug(slug: string) {
   const { data, error } = await supabase
-    .from("distributors")
+    .from("distributors_public")
     .select("*")
     .eq("slug", slug)
     .maybeSingle();

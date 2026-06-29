@@ -22,7 +22,7 @@ export const listShops = createServerFn({ method: "GET" })
   .inputValidator((data: unknown) => ListInput.parse(data))
   .handler(async ({ data }) => {
     const supabase = publicClient();
-    const { data: rows, error } = await supabase.rpc("shops_search", {
+    const { data: rows, error } = await supabase.rpc("public_salons_search", {
       _q: data?.q ?? null,
       _category: data?.category ?? null,
       _limit: data?.limit ?? 50,
@@ -30,4 +30,3 @@ export const listShops = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return rows ?? [];
   });
-

@@ -27,10 +27,10 @@ export function PortalLandingPage() {
   useEffect(() => {
     (async () => {
       const [b, d, p, s, l] = await Promise.all([
-        supabase.from("brands").select("id", { count: "exact", head: true }).eq("status", "active"),
-        supabase.from("distributors").select("id", { count: "exact", head: true }).eq("status", "active"),
+        supabase.from("brands_public").select("id", { count: "exact", head: true }).eq("status", "active"),
+        supabase.from("distributors_public").select("id", { count: "exact", head: true }).eq("status", "active"),
         supabase.from("brand_products").select("id", { count: "exact", head: true }).eq("is_active", true),
-        supabase.from("salons").select("id", { count: "exact", head: true }),
+        supabase.from("public_salon_cards").select("id", { count: "exact", head: true }),
         supabase.from("portal_leads").select("id", { count: "exact", head: true }),
       ]);
       setStats({
