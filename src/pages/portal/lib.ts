@@ -106,7 +106,7 @@ export async function listBrands() {
     .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false });
   if (error) throw error;
-  return (data ?? []) as Brand[];
+  return (data ?? []) as unknown as Brand[];
 }
 
 export async function listDistributors() {
@@ -118,7 +118,7 @@ export async function listDistributors() {
     .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false });
   if (error) throw error;
-  return (data ?? []) as Distributor[];
+  return (data ?? []) as unknown as Distributor[];
 }
 
 export async function listProducts() {
