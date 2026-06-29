@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import type { ShopData } from "./types";
 import type { TemplateConfig } from "./templates";
 import { Button } from "@/components/ui/button";
@@ -54,7 +55,7 @@ export function WhiteLabelHeader({ shop, template }: { shop: ShopData; template:
             style={{ backgroundColor: template.colors.primary, color: "white", borderRadius: template.radius }}
             asChild
           >
-            <a href="#appointment">Book Now</a>
+            <Link to="/book/$slug" params={{ slug: shop.slug }}>Book Now</Link>
           </Button>
           <button
             type="button"
@@ -84,7 +85,7 @@ export function WhiteLabelHeader({ shop, template }: { shop: ShopData; template:
               style={{ backgroundColor: template.colors.primary, color: "white", borderRadius: template.radius }}
               asChild
             >
-              <a href="#appointment" onClick={() => setOpen(false)}>Book Now</a>
+              <Link to="/book/$slug" params={{ slug: shop.slug }} onClick={() => setOpen(false)}>Book Now</Link>
             </Button>
           </nav>
         </div>

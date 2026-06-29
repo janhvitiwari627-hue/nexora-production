@@ -19,10 +19,10 @@ function mapStatus(s: string): OwnerBookingStatus {
 
 /**
  * Returns live bookings for the owner's active salon, mapped to the
- * UI's OwnerBooking shape. Falls back to `mockFallback` when the user
- * has no linked salon yet.
+ * UI's OwnerBooking shape. Returns an empty list when the user has no
+ * linked salon yet (no fake fallback).
  */
-export function useOwnerLiveBookings(mockFallback: OwnerBooking[]) {
+export function useOwnerLiveBookings() {
   const { activeSalonId, hasSalon } = useOwnerContext();
   const qc = useQueryClient();
   const liveQ = useQuery(ownerBookingsQuery(activeSalonId ?? ""));
@@ -43,10 +43,10 @@ export function useOwnerLiveBookings(mockFallback: OwnerBooking[]) {
   });
 
   const bookings = useMemo<OwnerBooking[]>(() => {
-    if (!hasSalon || !liveQ.data) return mockFallback;
+    if (!hasSalon || !liveQ.data) return [];
     return liveQ.data.map((b) => ({
       id: b.id,
-      customer: "Customer", // profile join can be added later
+      customer: "Customer",
       mobile: "",
       avatar: "",
       service: b.service_name,
@@ -58,7 +58,8 @@ export function useOwnerLiveBookings(mockFallback: OwnerBooking[]) {
       total: Number(b.price),
       status: mapStatus(b.status),
     }));
-  }, [hasSalon, liveQ.data, mockFallback]);
+  }, [hasSalon, liveQ.data]);
+
 
   const setStatus = (id: string, next: OwnerBookingStatus) => {
     if (!hasSalon) return; // mock mode handled by parent setState
