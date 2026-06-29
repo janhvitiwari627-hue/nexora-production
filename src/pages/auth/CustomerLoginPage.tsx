@@ -278,8 +278,14 @@ export default function CustomerLoginPage() {
 
           <p className="text-center text-sm text-muted-foreground">
             New to Nexora?{" "}
-            <Link to="/register" className="text-primary underline-offset-4 hover:underline">
+            <Link to="/signup" className="text-primary underline-offset-4 hover:underline">
               Create an account
+            </Link>
+          </p>
+          <p className="text-center text-sm text-muted-foreground">
+            Salon or shop owner?{" "}
+            <Link to="/owner-signup" className="text-primary underline-offset-4 hover:underline">
+              Register your business
             </Link>
           </p>
         </CardContent>
