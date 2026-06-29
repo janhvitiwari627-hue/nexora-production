@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Briefcase, GraduationCap, MapPin, Search, Star, TrendingUp } from "lucide-react";
+import { Briefcase, GraduationCap, MapPin, Search, Sparkles, Star, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { BackButton } from "@/components/shared/BackButton";
 
 const JOBS = [
   { id: "j1", title: "Senior Hair Stylist", salon: "Looks Unisex Salon", area: "Malviya Nagar", city: "Jaipur", salary: "₹35k–55k", type: "Full-time", featured: true, posted: "2d ago", tags: ["Balayage", "Bridal"] },
