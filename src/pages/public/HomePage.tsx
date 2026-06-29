@@ -30,9 +30,13 @@ import {
   User2,
   TrendingUp,
   Layers,
+  LogOut,
 } from "lucide-react";
 import Footer from "@/components/nexora-design/sections/Footer";
 import { shopsQueryOptions } from "@/lib/shops.queries";
+import { useAuthStore } from "@/stores/authStore";
+import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
+
 
 /* =========================================================
  * NEXORA SALONOS — PREMIUM HOMEPAGE (Stripe × Apple × Airbnb)
@@ -66,6 +70,38 @@ const CATEGORIES = [
 /* ============= HEADER ============= */
 function PremiumHeader() {
   const [open, setOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const user = useAuthStore((s) => s.user);
+  const profile = useAuthStore((s) => s.profile);
+  const signOut = useAuthStore((s) => s.signOut);
+  const isAuthed = !!user;
+
+  const initials = (() => {
+    const name = profile?.full_name || user?.email || "U";
+    return name
+      .split(/\s+/)
+      .map((p) => p[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+  })();
+
+  const avatarUrl = (profile as any)?.avatar_url as string | undefined;
+
+  const handleDashboard = async () => {
+    setMenuOpen(false);
+    if (!user) return;
+    const dest = await resolvePostLoginRedirect(user.id);
+    navigate({ to: dest });
+  };
+
+  const handleSignOut = async () => {
+    setMenuOpen(false);
+    await signOut();
+    navigate({ to: "/" });
+  };
+
   const links = [
     { label: "Explore", href: "/search" },
     { label: "Membership", href: "/membership" },
@@ -101,15 +137,55 @@ function PremiumHeader() {
           <button className="hidden h-10 w-10 place-items-center rounded-full text-slate-600 hover:bg-slate-100 sm:grid" aria-label="Notifications">
             <Bell className="h-[18px] w-[18px]" />
           </button>
-          <Link to="/login" className="hidden text-sm font-medium text-slate-700 hover:text-slate-900 sm:inline-block">
-            Login
-          </Link>
-          <Link
-            to="/register"
-            className="hidden h-10 items-center rounded-full bg-slate-900 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 sm:inline-flex"
-          >
-            Create Account
-          </Link>
+
+          {!isAuthed ? (
+            <>
+              <Link to="/login" className="hidden text-sm font-medium text-slate-700 hover:text-slate-900 sm:inline-block">
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className="hidden h-10 items-center rounded-full bg-slate-900 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 sm:inline-flex"
+              >
+                Create Account
+              </Link>
+            </>
+          ) : (
+            <div className="relative hidden sm:block">
+              <button
+                onClick={() => setMenuOpen((v) => !v)}
+                className="flex items-center gap-2 rounded-full border border-slate-200 bg-white py-1 pl-1 pr-3 text-sm font-semibold text-slate-800 shadow-sm hover:bg-slate-50"
+                aria-label="Account"
+              >
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="" className="h-8 w-8 rounded-full object-cover" />
+                ) : (
+                  <span className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-[#2563EB] to-[#6D28D9] text-xs font-bold text-white">
+                    {initials}
+                  </span>
+                )}
+                <span className="max-w-[120px] truncate">{profile?.full_name || user?.email?.split("@")[0]}</span>
+              </button>
+              {menuOpen && (
+                <div className="absolute right-0 mt-2 w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+                  <div className="border-b border-slate-100 px-4 py-3">
+                    <p className="truncate text-sm font-semibold text-slate-900">{profile?.full_name || "Account"}</p>
+                    <p className="truncate text-xs text-slate-500">{user?.email}</p>
+                  </div>
+                  <button onClick={handleDashboard} className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    <User2 className="h-4 w-4" /> Dashboard
+                  </button>
+                  <Link to="/bookings" onClick={() => setMenuOpen(false)} className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    <CalendarCheck className="h-4 w-4" /> My Bookings
+                  </Link>
+                  <button onClick={handleSignOut} className="flex w-full items-center gap-2 border-t border-slate-100 px-4 py-2.5 text-left text-sm font-medium text-rose-600 hover:bg-rose-50">
+                    <LogOut className="h-4 w-4" /> Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           <button
             onClick={() => setOpen((v) => !v)}
             className="grid h-10 w-10 place-items-center rounded-full text-slate-700 hover:bg-slate-100 md:hidden"
@@ -129,16 +205,28 @@ function PremiumHeader() {
                 {l.label}
               </Link>
             ))}
-            <div className="mt-2 flex gap-2">
-              <Link to="/login" className="flex-1 rounded-full border border-slate-200 px-4 py-3 text-center text-sm font-semibold text-slate-800">Login</Link>
-              <Link to="/register" className="flex-1 rounded-full bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white">Sign up</Link>
-            </div>
+            {!isAuthed ? (
+              <div className="mt-2 flex gap-2">
+                <Link to="/login" className="flex-1 rounded-full border border-slate-200 px-4 py-3 text-center text-sm font-semibold text-slate-800">Login</Link>
+                <Link to="/register" className="flex-1 rounded-full bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white">Sign up</Link>
+              </div>
+            ) : (
+              <div className="mt-2 flex flex-col gap-2">
+                <button onClick={() => { setOpen(false); handleDashboard(); }} className="rounded-full border border-slate-200 px-4 py-3 text-center text-sm font-semibold text-slate-800">
+                  Dashboard
+                </button>
+                <button onClick={() => { setOpen(false); handleSignOut(); }} className="rounded-full bg-rose-600 px-4 py-3 text-center text-sm font-semibold text-white">
+                  Logout
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
     </header>
   );
 }
+
 
 /* ============= HERO ============= */
 function Hero() {
