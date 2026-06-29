@@ -338,9 +338,9 @@ export const getPartnerLeaderboard = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const sb = publicClient();
     let q = sb
-      .from("partner_leaderboard")
+      .from("partner_leaderboard_public")
       .select(
-        "id, partner_id, period, rank, active_shops, revenue_generated, partner_earnings, score, district, state",
+        "id, partner_id, period, rank, active_shops, score, district, state, scope",
       )
       .eq("period", data.period)
       .order("rank", { ascending: true })
