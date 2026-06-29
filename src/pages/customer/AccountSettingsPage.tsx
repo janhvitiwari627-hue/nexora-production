@@ -1,7 +1,9 @@
 import { useState } from "react";
 import {
-  Bell, CreditCard, Globe2, Link2, Lock, Mail, ShieldAlert, ShieldCheck, User, UserCircle,
+  ArrowLeft, Bell, CreditCard, Globe2, Home, Link2, Lock, Mail, ShieldAlert, ShieldCheck, User, UserCircle,
 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
 import { PersonalInfoPanel } from "./settings/PersonalInfoPanel";
 import { ContactInfoPanel } from "./settings/ContactInfoPanel";
 import { SecurityPanel } from "./settings/SecurityPanel";
