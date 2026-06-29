@@ -50,7 +50,7 @@ const PORTAL_MENU = [
   { to: "/portal/contact", label: "Contact Us", icon: Phone },
 ] as const;
 
-export function PublicHeader() {
+export function PublicHeader({ showBackButton = true }: { showBackButton?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -110,7 +110,9 @@ export function PublicHeader() {
       <div className="mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-4 px-4 py-3 md:px-6">
         {/* Back + Logo */}
         <div className="flex items-center gap-2">
-          <BackButton size="icon" className="shrink-0" aria-label="Go back" />
+          {showBackButton && (
+            <BackButton size="icon" className="shrink-0" aria-label="Go back" />
+          )}
           <Link to="/" className="flex items-center gap-2">
             <div className="bg-gradient-cta grid h-9 w-9 place-items-center rounded-xl text-primary-foreground shadow-[var(--shadow-glow)]">
               <Sparkles className="h-4 w-4" />
