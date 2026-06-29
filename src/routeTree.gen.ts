@@ -18,6 +18,7 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ReferralsRouteImport } from './routes/referrals'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PartnerRouteImport } from './routes/partner'
 import { Route as OwnerSignupRouteImport } from './routes/owner-signup'
 import { Route as OwnerDashboardRouteImport } from './routes/owner-dashboard'
 import { Route as OwnerRouteImport } from './routes/owner'
@@ -160,6 +161,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartnerRoute = PartnerRouteImport.update({
+  id: '/partner',
+  path: '/partner',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OwnerSignupRoute = OwnerSignupRouteImport.update({
   id: '/owner-signup',
   path: '/owner-signup',
@@ -251,9 +257,9 @@ const PortalIndexRoute = PortalIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const PartnerIndexRoute = PartnerIndexRouteImport.update({
-  id: '/partner/',
-  path: '/partner/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => PartnerRoute,
 } as any)
 const OwnerIndexRoute = OwnerIndexRouteImport.update({
   id: '/',
@@ -326,19 +332,19 @@ const PortalBusinessPagesRoute = PortalBusinessPagesRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const PartnerGrowthRoute = PartnerGrowthRouteImport.update({
-  id: '/partner/growth',
-  path: '/partner/growth',
-  getParentRoute: () => rootRouteImport,
+  id: '/growth',
+  path: '/growth',
+  getParentRoute: () => PartnerRoute,
 } as any)
 const PartnerDistrictRoute = PartnerDistrictRouteImport.update({
-  id: '/partner/district',
-  path: '/partner/district',
-  getParentRoute: () => rootRouteImport,
+  id: '/district',
+  path: '/district',
+  getParentRoute: () => PartnerRoute,
 } as any)
 const PartnerDistributorRoute = PartnerDistributorRouteImport.update({
-  id: '/partner/distributor',
-  path: '/partner/distributor',
-  getParentRoute: () => rootRouteImport,
+  id: '/distributor',
+  path: '/distributor',
+  getParentRoute: () => PartnerRoute,
 } as any)
 const OwnerWebsiteRoute = OwnerWebsiteRouteImport.update({
   id: '/website',
@@ -665,6 +671,7 @@ export interface FileRoutesByFullPath {
   '/owner': typeof OwnerRouteWithChildren
   '/owner-dashboard': typeof OwnerDashboardRoute
   '/owner-signup': typeof OwnerSignupRoute
+  '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
@@ -878,6 +885,7 @@ export interface FileRoutesById {
   '/owner': typeof OwnerRouteWithChildren
   '/owner-dashboard': typeof OwnerDashboardRoute
   '/owner-signup': typeof OwnerSignupRoute
+  '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
@@ -987,6 +995,7 @@ export interface FileRouteTypes {
     | '/owner'
     | '/owner-dashboard'
     | '/owner-signup'
+    | '/partner'
     | '/privacy'
     | '/profile'
     | '/referrals'
@@ -1199,6 +1208,7 @@ export interface FileRouteTypes {
     | '/owner'
     | '/owner-dashboard'
     | '/owner-signup'
+    | '/partner'
     | '/privacy'
     | '/profile'
     | '/referrals'
@@ -1307,6 +1317,7 @@ export interface RootRouteChildren {
   OwnerRoute: typeof OwnerRouteWithChildren
   OwnerDashboardRoute: typeof OwnerDashboardRoute
   OwnerSignupRoute: typeof OwnerSignupRoute
+  PartnerRoute: typeof PartnerRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   ReferralsRoute: typeof ReferralsRoute
@@ -1321,9 +1332,6 @@ export interface RootRouteChildren {
   BrandSlugRoute: typeof BrandSlugRoute
   CategorySlugRoute: typeof CategorySlugRoute
   DistributorSlugRoute: typeof DistributorSlugRoute
-  PartnerDistributorRoute: typeof PartnerDistributorRoute
-  PartnerDistrictRoute: typeof PartnerDistrictRoute
-  PartnerGrowthRoute: typeof PartnerGrowthRoute
   PortalBusinessPagesRoute: typeof PortalBusinessPagesRoute
   PortalContactRoute: typeof PortalContactRoute
   PortalDashboardRoute: typeof PortalDashboardRoute
@@ -1336,7 +1344,6 @@ export interface RootRouteChildren {
   ShopSlugRoute: typeof ShopSlugRoute
   SiteBusinessSlugRoute: typeof SiteBusinessSlugRoute
   StaffDashboardRoute: typeof StaffDashboardRoute
-  PartnerIndexRoute: typeof PartnerIndexRoute
   PortalIndexRoute: typeof PortalIndexRoute
   PortalBrandsSlugRoute: typeof PortalBrandsSlugRoute
   PortalBrandsRegisterRoute: typeof PortalBrandsRegisterRoute
@@ -1413,6 +1420,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partner': {
+      id: '/partner'
+      path: '/partner'
+      fullPath: '/partner'
+      preLoaderRoute: typeof PartnerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/owner-signup': {
@@ -1543,10 +1557,10 @@ declare module '@tanstack/react-router' {
     }
     '/partner/': {
       id: '/partner/'
-      path: '/partner'
+      path: '/'
       fullPath: '/partner/'
       preLoaderRoute: typeof PartnerIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PartnerRoute
     }
     '/owner/': {
       id: '/owner/'
@@ -1648,24 +1662,24 @@ declare module '@tanstack/react-router' {
     }
     '/partner/growth': {
       id: '/partner/growth'
-      path: '/partner/growth'
+      path: '/growth'
       fullPath: '/partner/growth'
       preLoaderRoute: typeof PartnerGrowthRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PartnerRoute
     }
     '/partner/district': {
       id: '/partner/district'
-      path: '/partner/district'
+      path: '/district'
       fullPath: '/partner/district'
       preLoaderRoute: typeof PartnerDistrictRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PartnerRoute
     }
     '/partner/distributor': {
       id: '/partner/distributor'
-      path: '/partner/distributor'
+      path: '/distributor'
       fullPath: '/partner/distributor'
       preLoaderRoute: typeof PartnerDistributorRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PartnerRoute
     }
     '/owner/website': {
       id: '/owner/website'
@@ -2249,6 +2263,23 @@ const OwnerRouteChildren: OwnerRouteChildren = {
 
 const OwnerRouteWithChildren = OwnerRoute._addFileChildren(OwnerRouteChildren)
 
+interface PartnerRouteChildren {
+  PartnerDistributorRoute: typeof PartnerDistributorRoute
+  PartnerDistrictRoute: typeof PartnerDistrictRoute
+  PartnerGrowthRoute: typeof PartnerGrowthRoute
+  PartnerIndexRoute: typeof PartnerIndexRoute
+}
+
+const PartnerRouteChildren: PartnerRouteChildren = {
+  PartnerDistributorRoute: PartnerDistributorRoute,
+  PartnerDistrictRoute: PartnerDistrictRoute,
+  PartnerGrowthRoute: PartnerGrowthRoute,
+  PartnerIndexRoute: PartnerIndexRoute,
+}
+
+const PartnerRouteWithChildren =
+  PartnerRoute._addFileChildren(PartnerRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -2267,6 +2298,7 @@ const rootRouteChildren: RootRouteChildren = {
   OwnerRoute: OwnerRouteWithChildren,
   OwnerDashboardRoute: OwnerDashboardRoute,
   OwnerSignupRoute: OwnerSignupRoute,
+  PartnerRoute: PartnerRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   ReferralsRoute: ReferralsRoute,
@@ -2281,9 +2313,6 @@ const rootRouteChildren: RootRouteChildren = {
   BrandSlugRoute: BrandSlugRoute,
   CategorySlugRoute: CategorySlugRoute,
   DistributorSlugRoute: DistributorSlugRoute,
-  PartnerDistributorRoute: PartnerDistributorRoute,
-  PartnerDistrictRoute: PartnerDistrictRoute,
-  PartnerGrowthRoute: PartnerGrowthRoute,
   PortalBusinessPagesRoute: PortalBusinessPagesRoute,
   PortalContactRoute: PortalContactRoute,
   PortalDashboardRoute: PortalDashboardRoute,
@@ -2296,7 +2325,6 @@ const rootRouteChildren: RootRouteChildren = {
   ShopSlugRoute: ShopSlugRoute,
   SiteBusinessSlugRoute: SiteBusinessSlugRoute,
   StaffDashboardRoute: StaffDashboardRoute,
-  PartnerIndexRoute: PartnerIndexRoute,
   PortalIndexRoute: PortalIndexRoute,
   PortalBrandsSlugRoute: PortalBrandsSlugRoute,
   PortalBrandsRegisterRoute: PortalBrandsRegisterRoute,
