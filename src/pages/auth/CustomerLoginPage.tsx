@@ -14,6 +14,7 @@ import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
 import { useAuthStore } from "@/stores/authStore";
 
 const normalizeEmail = (value: string) => value.trim().toLowerCase();
+const RESET_REDIRECT_TO = "https://meripahalfasthelp.online/auth/callback?next=/reset-password";
 
 const loginSchema = z.object({
   email: z.string().trim().email("Invalid email address").max(255),
@@ -70,10 +71,10 @@ export default function CustomerLoginPage() {
     setServerError(null);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: RESET_REDIRECT_TO,
       });
       if (error) {
-        setServerError(error.message);
+        setResetSent(true);
         return;
       }
       setResetSent(true);

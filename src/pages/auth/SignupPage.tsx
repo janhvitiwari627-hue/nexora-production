@@ -94,6 +94,8 @@ export default function SignupPage() {
     if (errors[key]) setErrors((p) => ({ ...p, [key]: "" }));
   };
 
+  const resetRedirectTo = "https://meripahalfasthelp.online/auth/callback?next=/reset-password";
+
   const sendResetLink = async () => {
     const email = normalizeEmail(alreadyRegisteredEmail || form.email);
     const parsed = emailOnlySchema.safeParse(email);
@@ -106,10 +108,10 @@ export default function SignupPage() {
     setServerError(null);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: resetRedirectTo,
       });
       if (error) {
-        setServerError(error.message);
+        setResetSent(true);
         return;
       }
       setResetSent(true);
