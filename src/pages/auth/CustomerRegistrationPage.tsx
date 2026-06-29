@@ -246,7 +246,7 @@ export default function CustomerRegistrationPage() {
 
   const sendResetLink = async () => {
     const email = normalizeEmail(alreadyRegisteredEmail || form.email);
-    const parsed = baseSchema.shape.email.safeParse(email);
+    const parsed = baseSchema.innerType().shape.email.safeParse(email);
     if (!parsed.success) {
       setServerError("Please enter the registered email address first.");
       return;
