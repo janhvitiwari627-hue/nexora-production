@@ -27,9 +27,9 @@ export const getSalonBySlug = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const supabase = publicClient();
     const { data: salon, error } = await supabase
-      .from("salons")
+      .from("public_salon_cards")
       .select(
-        "id, slug, name, category, rating, reviews_count, image_url, cover_image_url, gallery_images, location, address, phone, whatsapp, email, price_range, discount, description, tagline, is_verified, latitude, longitude, website_created, selected_template_id, selected_template_key",
+        "id, slug, name, category, rating, reviews_count, image_url, cover_image_url, gallery_images, location, address, phone, whatsapp, price_range, discount, description, tagline, is_verified, latitude, longitude, website_created, selected_template_id, selected_template_key",
       )
       .eq("slug", data.slug)
       .maybeSingle();
