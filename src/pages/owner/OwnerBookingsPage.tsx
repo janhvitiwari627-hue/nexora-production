@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { CalendarDays, Check, Download, LayoutGrid, List as ListIcon, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { BackButton } from "@/components/shared/BackButton";
 import { cn } from "@/lib/utils";
 import {
   ownerBookings as initialBookings,
