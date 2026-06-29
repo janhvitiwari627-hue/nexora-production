@@ -113,6 +113,13 @@ export type Database = {
             foreignKeyName: "bookings_salon_id_fkey"
             columns: ["salon_id"]
             isOneToOne: false
+            referencedRelation: "public_salon_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
             referencedRelation: "salons"
             referencedColumns: ["id"]
           },
@@ -613,6 +620,13 @@ export type Database = {
             foreignKeyName: "favorites_salon_id_fkey"
             columns: ["salon_id"]
             isOneToOne: false
+            referencedRelation: "public_salon_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
             referencedRelation: "salons"
             referencedColumns: ["id"]
           },
@@ -735,6 +749,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "marketing_campaigns_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "public_salon_cards"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "marketing_campaigns_salon_id_fkey"
             columns: ["salon_id"]
@@ -871,6 +892,13 @@ export type Database = {
             foreignKeyName: "offers_salon_id_fkey"
             columns: ["salon_id"]
             isOneToOne: false
+            referencedRelation: "public_salon_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "offers_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
             referencedRelation: "salons"
             referencedColumns: ["id"]
           },
@@ -913,6 +941,13 @@ export type Database = {
             columns: ["partner_id"]
             isOneToOne: false
             referencedRelation: "district_business_partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_activity_logs_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "public_dbp_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -975,6 +1010,13 @@ export type Database = {
             columns: ["partner_id"]
             isOneToOne: true
             referencedRelation: "district_business_partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_dashboard_metrics_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: true
+            referencedRelation: "public_dbp_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1040,6 +1082,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "partner_earnings_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "public_dbp_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "partner_earnings_shop_id_fkey"
             columns: ["shop_id"]
             isOneToOne: false
@@ -1100,6 +1149,13 @@ export type Database = {
             columns: ["partner_id"]
             isOneToOne: false
             referencedRelation: "district_business_partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_hall_of_fame_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "public_dbp_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1164,6 +1220,13 @@ export type Database = {
             referencedRelation: "district_business_partners"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "partner_leaderboard_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "public_dbp_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       partner_milestones: {
@@ -1212,6 +1275,13 @@ export type Database = {
             columns: ["partner_id"]
             isOneToOne: false
             referencedRelation: "district_business_partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_milestones_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "public_dbp_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -1280,6 +1350,13 @@ export type Database = {
             referencedRelation: "district_business_partners"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "partner_payouts_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "public_dbp_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       partner_referrals: {
@@ -1331,10 +1408,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "partner_referrals_referred_partner_id_fkey"
+            columns: ["referred_partner_id"]
+            isOneToOne: false
+            referencedRelation: "public_dbp_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "partner_referrals_referrer_partner_id_fkey"
             columns: ["referrer_partner_id"]
             isOneToOne: false
             referencedRelation: "district_business_partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_referrals_referrer_partner_id_fkey"
+            columns: ["referrer_partner_id"]
+            isOneToOne: false
+            referencedRelation: "public_dbp_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1399,6 +1490,13 @@ export type Database = {
             referencedRelation: "district_business_partners"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "partner_rewards_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "public_dbp_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       partner_shop_mapping: {
@@ -1456,6 +1554,20 @@ export type Database = {
             columns: ["partner_id"]
             isOneToOne: false
             referencedRelation: "district_business_partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_shop_mapping_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "public_dbp_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_shop_mapping_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "public_salon_cards"
             referencedColumns: ["id"]
           },
           {
@@ -1534,6 +1646,13 @@ export type Database = {
             columns: ["booking_id"]
             isOneToOne: false
             referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "public_salon_cards"
             referencedColumns: ["id"]
           },
           {
@@ -1876,6 +1995,13 @@ export type Database = {
             foreignKeyName: "qr_payments_salon_id_fkey"
             columns: ["salon_id"]
             isOneToOne: false
+            referencedRelation: "public_salon_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "qr_payments_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
             referencedRelation: "salons"
             referencedColumns: ["id"]
           },
@@ -1955,6 +2081,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "reviews_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "public_salon_cards"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "reviews_salon_id_fkey"
             columns: ["salon_id"]
@@ -2057,6 +2190,13 @@ export type Database = {
             foreignKeyName: "salon_owners_salon_id_fkey"
             columns: ["salon_id"]
             isOneToOne: false
+            referencedRelation: "public_salon_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "salon_owners_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
             referencedRelation: "salons"
             referencedColumns: ["id"]
           },
@@ -2117,6 +2257,13 @@ export type Database = {
             foreignKeyName: "salon_rankings_salon_id_fkey"
             columns: ["salon_id"]
             isOneToOne: false
+            referencedRelation: "public_salon_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "salon_rankings_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
             referencedRelation: "salons"
             referencedColumns: ["id"]
           },
@@ -2167,6 +2314,13 @@ export type Database = {
             foreignKeyName: "salon_wallets_salon_id_fkey"
             columns: ["salon_id"]
             isOneToOne: true
+            referencedRelation: "public_salon_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "salon_wallets_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: true
             referencedRelation: "salons"
             referencedColumns: ["id"]
           },
@@ -2178,6 +2332,8 @@ export type Database = {
           amenities: string[] | null
           brand_primary: string | null
           brand_secondary: string | null
+          business_public_phone: string | null
+          business_public_whatsapp: string | null
           category: string | null
           city: string | null
           cover_image_url: string | null
@@ -2210,6 +2366,7 @@ export type Database = {
           selected_template_key: string | null
           seo_description: string | null
           seo_title: string | null
+          show_public_contact: boolean
           slug: string
           tagline: string | null
           theme: string | null
@@ -2223,6 +2380,8 @@ export type Database = {
           amenities?: string[] | null
           brand_primary?: string | null
           brand_secondary?: string | null
+          business_public_phone?: string | null
+          business_public_whatsapp?: string | null
           category?: string | null
           city?: string | null
           cover_image_url?: string | null
@@ -2255,6 +2414,7 @@ export type Database = {
           selected_template_key?: string | null
           seo_description?: string | null
           seo_title?: string | null
+          show_public_contact?: boolean
           slug: string
           tagline?: string | null
           theme?: string | null
@@ -2268,6 +2428,8 @@ export type Database = {
           amenities?: string[] | null
           brand_primary?: string | null
           brand_secondary?: string | null
+          business_public_phone?: string | null
+          business_public_whatsapp?: string | null
           category?: string | null
           city?: string | null
           cover_image_url?: string | null
@@ -2300,6 +2462,7 @@ export type Database = {
           selected_template_key?: string | null
           seo_description?: string | null
           seo_title?: string | null
+          show_public_contact?: boolean
           slug?: string
           tagline?: string | null
           theme?: string | null
@@ -2387,6 +2550,13 @@ export type Database = {
             foreignKeyName: "search_history_clicked_salon_id_fkey"
             columns: ["clicked_salon_id"]
             isOneToOne: false
+            referencedRelation: "public_salon_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "search_history_clicked_salon_id_fkey"
+            columns: ["clicked_salon_id"]
+            isOneToOne: false
             referencedRelation: "salons"
             referencedColumns: ["id"]
           },
@@ -2466,6 +2636,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "services_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "public_salon_cards"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "services_salon_id_fkey"
             columns: ["salon_id"]
@@ -2583,6 +2760,13 @@ export type Database = {
             foreignKeyName: "staff_salon_id_fkey"
             columns: ["salon_id"]
             isOneToOne: false
+            referencedRelation: "public_salon_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
             referencedRelation: "salons"
             referencedColumns: ["id"]
           },
@@ -2680,6 +2864,13 @@ export type Database = {
           wallet_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "wallet_transactions_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "public_salon_cards"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "wallet_transactions_salon_id_fkey"
             columns: ["salon_id"]
@@ -2801,6 +2992,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "withdrawals_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "public_salon_cards"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "withdrawals_salon_id_fkey"
             columns: ["salon_id"]
@@ -3007,6 +3205,13 @@ export type Database = {
             referencedRelation: "district_business_partners"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "partner_hall_of_fame_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "public_dbp_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       partner_leaderboard_public: {
@@ -3061,6 +3266,189 @@ export type Database = {
             columns: ["partner_id"]
             isOneToOne: false
             referencedRelation: "district_business_partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_leaderboard_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "public_dbp_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      public_dbp_profiles: {
+        Row: {
+          district: string | null
+          full_name: string | null
+          hall_of_fame: boolean | null
+          hall_of_fame_rank: number | null
+          id: string | null
+          photo_url: string | null
+          slug: string | null
+          state: string | null
+          status: Database["public"]["Enums"]["dbp_status"] | null
+          success_story: string | null
+          tagline: string | null
+          tier: Database["public"]["Enums"]["dbp_tier"] | null
+          verified_at: string | null
+        }
+        Insert: {
+          district?: string | null
+          full_name?: string | null
+          hall_of_fame?: boolean | null
+          hall_of_fame_rank?: number | null
+          id?: string | null
+          photo_url?: string | null
+          slug?: string | null
+          state?: string | null
+          status?: Database["public"]["Enums"]["dbp_status"] | null
+          success_story?: string | null
+          tagline?: string | null
+          tier?: Database["public"]["Enums"]["dbp_tier"] | null
+          verified_at?: string | null
+        }
+        Update: {
+          district?: string | null
+          full_name?: string | null
+          hall_of_fame?: boolean | null
+          hall_of_fame_rank?: number | null
+          id?: string | null
+          photo_url?: string | null
+          slug?: string | null
+          state?: string | null
+          status?: Database["public"]["Enums"]["dbp_status"] | null
+          success_story?: string | null
+          tagline?: string | null
+          tier?: Database["public"]["Enums"]["dbp_tier"] | null
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
+      public_salon_cards: {
+        Row: {
+          address: string | null
+          amenities: string[] | null
+          brand_primary: string | null
+          brand_secondary: string | null
+          category: string | null
+          city: string | null
+          cover_image_url: string | null
+          created_at: string | null
+          description: string | null
+          discount: string | null
+          gallery_images: string[] | null
+          hours: Json | null
+          id: string | null
+          image_url: string | null
+          is_active: boolean | null
+          is_home_service: boolean | null
+          is_verified: boolean | null
+          latitude: number | null
+          location: string | null
+          logo_url: string | null
+          longitude: number | null
+          name: string | null
+          nexora_score: number | null
+          phone: string | null
+          pincode: string | null
+          price_range: string | null
+          rank_in_city: number | null
+          rating: number | null
+          reviews_count: number | null
+          selected_template_id: string | null
+          selected_template_key: string | null
+          slug: string | null
+          tagline: string | null
+          theme: string | null
+          website_created: boolean | null
+          website_url: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          address?: string | null
+          amenities?: string[] | null
+          brand_primary?: string | null
+          brand_secondary?: string | null
+          category?: string | null
+          city?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          discount?: string | null
+          gallery_images?: string[] | null
+          hours?: Json | null
+          id?: string | null
+          image_url?: string | null
+          is_active?: boolean | null
+          is_home_service?: boolean | null
+          is_verified?: boolean | null
+          latitude?: number | null
+          location?: string | null
+          logo_url?: string | null
+          longitude?: number | null
+          name?: string | null
+          nexora_score?: number | null
+          phone?: never
+          pincode?: string | null
+          price_range?: string | null
+          rank_in_city?: number | null
+          rating?: number | null
+          reviews_count?: number | null
+          selected_template_id?: string | null
+          selected_template_key?: string | null
+          slug?: string | null
+          tagline?: string | null
+          theme?: string | null
+          website_created?: boolean | null
+          website_url?: string | null
+          whatsapp?: never
+        }
+        Update: {
+          address?: string | null
+          amenities?: string[] | null
+          brand_primary?: string | null
+          brand_secondary?: string | null
+          category?: string | null
+          city?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          discount?: string | null
+          gallery_images?: string[] | null
+          hours?: Json | null
+          id?: string | null
+          image_url?: string | null
+          is_active?: boolean | null
+          is_home_service?: boolean | null
+          is_verified?: boolean | null
+          latitude?: number | null
+          location?: string | null
+          logo_url?: string | null
+          longitude?: number | null
+          name?: string | null
+          nexora_score?: number | null
+          phone?: never
+          pincode?: string | null
+          price_range?: string | null
+          rank_in_city?: number | null
+          rating?: number | null
+          reviews_count?: number | null
+          selected_template_id?: string | null
+          selected_template_key?: string | null
+          slug?: string | null
+          tagline?: string | null
+          theme?: string | null
+          website_created?: boolean | null
+          website_url?: string | null
+          whatsapp?: never
+        }
+        Relationships: [
+          {
+            foreignKeyName: "salons_selected_template_id_fkey"
+            columns: ["selected_template_id"]
+            isOneToOne: false
+            referencedRelation: "website_templates"
             referencedColumns: ["id"]
           },
         ]
