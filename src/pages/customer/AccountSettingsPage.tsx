@@ -37,6 +37,14 @@ export function AccountSettingsPage() {
     <div className="bg-background min-h-screen">
       <div className="mx-auto max-w-6xl px-4 py-8 md:px-6 md:py-10">
         <header className="mb-6">
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => window.history.back()} className="gap-1.5">
+              <ArrowLeft className="h-4 w-4" /> Back
+            </Button>
+            <Button asChild variant="outline" size="sm" className="gap-1.5">
+              <Link to="/dashboard"><Home className="h-4 w-4" /> Home</Link>
+            </Button>
+          </div>
           <h1 className="text-heading text-3xl font-black md:text-4xl">Account settings</h1>
           <p className="text-muted-foreground mt-1 text-sm">Manage your profile, security, payments and preferences.</p>
         </header>
