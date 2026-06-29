@@ -13,12 +13,12 @@ const ROLE_PRIORITY: UserRole[] = [
 ];
 
 const ROLE_ROUTES: Record<UserRole, string> = {
-  admin: "/admin/dashboard",
+  admin: "/admin",
   owner: "/owner/dashboard",
   distributor: "/partner/dashboard",
   district_partner: "/partner/dashboard",
   growth_partner: "/partner/dashboard",
-  customer: "/dashboard",
+  customer: "/",
 };
 
 export async function fetchUserRoles(userId: string): Promise<UserRole[]> {
