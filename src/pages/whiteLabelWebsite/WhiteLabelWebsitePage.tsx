@@ -5,7 +5,7 @@ import { WebsiteRenderer } from "@/components/whiteLabelWebsite/WebsiteRenderer"
 import { WhiteLabelHeader } from "@/components/whiteLabelWebsite/WhiteLabelHeader";
 import { WhiteLabelFooter } from "@/components/whiteLabelWebsite/WhiteLabelFooter";
 import { ViralGrowthWidget } from "@/components/whiteLabelWebsite/ViralGrowthWidget";
-import { type ShopData, type WebsiteConfig } from "@/components/whiteLabelWebsite/types";
+import { MOCK_CONFIG, type ShopData, type WebsiteConfig } from "@/components/whiteLabelWebsite/types";
 import { getTemplate, normalizeTemplateKey, TEMPLATE_KEYS, TEMPLATES, type TemplateKey } from "@/components/whiteLabelWebsite/templates";
 import { getSalonBySlug } from "@/lib/salons.functions";
 import { Paintbrush } from "lucide-react";
@@ -53,12 +53,7 @@ export function WhiteLabelWebsitePage({ slug: _slug, routeSearch }: { slug?: str
   const savedTemplateKey = data.salon.selected_template_key ?? "modern-salon";
   const templateKey = normalizeTemplateKey(routeSearch?.t ?? browserSearch?.get("t") ?? savedTemplateKey);
 
-  const config: WebsiteConfig = {
-    template: templateKey,
-    sections: ["hero", "services", "staff", "gallery", "reviews", "appointment", "contact"],
-    showBlog: false,
-    showMembership: false,
-  };
+  const config: WebsiteConfig = { ...MOCK_CONFIG, template: templateKey };
   const template = getTemplate(templateKey);
 
   const setTemplate = (key: TemplateKey) => {
