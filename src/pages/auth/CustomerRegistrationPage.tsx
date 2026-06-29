@@ -15,6 +15,8 @@ import { validateReferralCode, registerMySalon } from "@/lib/owner.functions";
 import { registerDistrictPartner } from "@/lib/districtPartner.functions";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { useAuthStore } from "@/stores/authStore";
+import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
 
 type AccountType = "customer" | "owner" | "district_partner";
 
@@ -112,6 +114,8 @@ const dbpSchema = baseSchema.extend({
 export default function CustomerRegistrationPage() {
   const navigate = useNavigate();
   const search = useSearch({ strict: false }) as { ref?: string; role?: AccountType };
+  const user = useAuthStore((s) => s.user);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
   const initialRole: AccountType =
     search?.role === "owner" || search?.role === "district_partner" ? search.role : "customer";
   const [accountType, setAccountType] = useState<AccountType>(initialRole);
@@ -130,6 +134,17 @@ export default function CustomerRegistrationPage() {
   useEffect(() => {
     if (search?.ref) setForm((f) => (f.referred_by ? f : { ...f, referred_by: search.ref! }));
   }, [search?.ref]);
+
+  useEffect(() => {
+    if (!isInitialized || !user) return;
+    let cancelled = false;
+    void resolvePostLoginRedirect(user.id).then((redirectTo) => {
+      if (!cancelled) navigate({ to: redirectTo, replace: true });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isInitialized, navigate, user]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -284,6 +299,8 @@ export default function CustomerRegistrationPage() {
       // Session exists - user is signed in
       if (data.session) {
         console.log("[Register] Successfully signed up and signed in user:", data.session.user.id);
+        useAuthStore.getState().setSession(data.session);
+        await useAuthStore.getState().refreshProfile();
         
         if (accountType === "owner") {
           navigate({ to: "/owner/pending" });
@@ -291,7 +308,6 @@ export default function CustomerRegistrationPage() {
           navigate({ to: "/partner/district" });
         } else {
           // For customers, redirect based on role
-          const { resolvePostLoginRedirect } = await import("@/lib/auth-redirect");
           const redirectTo = await resolvePostLoginRedirect(data.session.user.id);
           navigate({ to: redirectTo });
         }
@@ -325,7 +341,15 @@ export default function CustomerRegistrationPage() {
         return;
       }
 
-      window.location.href = "/";
+      const { data } = await supabase.auth.getSession();
+      if (data.session?.user) {
+        useAuthStore.getState().setSession(data.session);
+        await useAuthStore.getState().refreshProfile();
+        const redirectTo = await resolvePostLoginRedirect(data.session.user.id);
+        navigate({ to: redirectTo, replace: true });
+      } else {
+        navigate({ to: "/", replace: true });
+      }
 
     } catch (err) {
       console.error("[Register] Google OAuth unexpected error:", err);

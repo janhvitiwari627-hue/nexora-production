@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import { PasswordStrengthIndicator, scorePassword } from "@/components/auth/PasswordStrengthIndicator";
+import { useAuthStore } from "@/stores/authStore";
+import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
 
 const schema = z
   .object({
@@ -38,6 +40,8 @@ function parseErr(error: unknown): string {
 
 export default function SignupPage() {
   const navigate = useNavigate();
+  const user = useAuthStore((s) => s.user);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
   const [form, setForm] = useState({
     full_name: "",
     email: "",
@@ -53,6 +57,17 @@ export default function SignupPage() {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const pwStrength = useMemo(() => scorePassword(form.password), [form.password]);
+
+  useEffect(() => {
+    if (!isInitialized || !user) return;
+    let cancelled = false;
+    void resolvePostLoginRedirect(user.id).then((redirectTo) => {
+      if (!cancelled) navigate({ to: redirectTo, replace: true });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isInitialized, navigate, user]);
 
   const update = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
@@ -119,8 +134,11 @@ export default function SignupPage() {
 
       // Auto-confirm enabled → signed in
       if (data.session) {
+        useAuthStore.getState().setSession(data.session);
+        await useAuthStore.getState().refreshProfile();
         setSuccess("signed_in");
-        setTimeout(() => navigate({ to: "/" }), 800);
+        const redirectTo = await resolvePostLoginRedirect(data.session.user.id);
+        setTimeout(() => navigate({ to: redirectTo, replace: true }), 800);
       }
     } catch (err) {
       setServerError(parseErr(err));

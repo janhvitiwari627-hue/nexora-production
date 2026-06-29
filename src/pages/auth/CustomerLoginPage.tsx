@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
+import { useAuthStore } from "@/stores/authStore";
 
 const loginSchema = z.object({
   email: z.string().trim().email("Invalid email address").max(255),
@@ -18,6 +19,8 @@ const loginSchema = z.object({
 
 export default function CustomerLoginPage() {
   const navigate = useNavigate();
+  const user = useAuthStore((s) => s.user);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
   const [form, setForm] = useState({ email: "", password: "" });
   const [rememberMe, setRememberMe] = useState(true);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -25,6 +28,17 @@ export default function CustomerLoginPage() {
   const [googleSubmitting, setGoogleSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    if (!isInitialized || !user) return;
+    let cancelled = false;
+    void resolvePostLoginRedirect(user.id).then((redirectTo) => {
+      if (!cancelled) navigate({ to: redirectTo, replace: true });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isInitialized, navigate, user]);
 
   const update = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -90,8 +104,11 @@ export default function CustomerLoginPage() {
       }
 
       console.log("[Login] Successfully signed in user:", data.user.id);
+      if (data.session) {
+        useAuthStore.getState().setSession(data.session);
+      }
 
-      // Verify profile exists in public.profiles before redirecting
+      // Profile is useful for personalization, but it must not invalidate a valid auth session.
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("id")
@@ -100,17 +117,10 @@ export default function CustomerLoginPage() {
 
       if (profileError) {
         console.error("[Login] Profile fetch error:", profileError.message);
-        setServerError("Session expired. Please sign in again.");
-        await supabase.auth.signOut();
-        return;
-      }
-
-      if (!profile) {
+      } else if (!profile) {
         console.error("[Login] Profile not found for user:", data.user.id);
-        setServerError("Profile not found. Please contact support or sign up again.");
-        await supabase.auth.signOut();
-        return;
       }
+      await useAuthStore.getState().refreshProfile();
 
       // "Remember Me" off → clear persisted session on tab close.
       if (!rememberMe && typeof window !== "undefined") {
@@ -153,8 +163,15 @@ export default function CustomerLoginPage() {
         return;
       }
 
-      // Session set inline (preview iframe flow) — navigate to home
-      window.location.href = "/";
+      const { data } = await supabase.auth.getSession();
+      if (data.session?.user) {
+        useAuthStore.getState().setSession(data.session);
+        await useAuthStore.getState().refreshProfile();
+        const redirectTo = await resolvePostLoginRedirect(data.session.user.id);
+        navigate({ to: redirectTo, replace: true });
+      } else {
+        navigate({ to: "/", replace: true });
+      }
 
     } catch (err) {
       console.error("[Login] Google OAuth unexpected error:", err);
