@@ -104,8 +104,11 @@ export default function CustomerLoginPage() {
       }
 
       console.log("[Login] Successfully signed in user:", data.user.id);
+      if (data.session) {
+        useAuthStore.getState().setSession(data.session);
+      }
 
-      // Verify profile exists in public.profiles before redirecting
+      // Profile is useful for personalization, but it must not invalidate a valid auth session.
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("id")
@@ -114,17 +117,10 @@ export default function CustomerLoginPage() {
 
       if (profileError) {
         console.error("[Login] Profile fetch error:", profileError.message);
-        setServerError("Session expired. Please sign in again.");
-        await supabase.auth.signOut();
-        return;
-      }
-
-      if (!profile) {
+      } else if (!profile) {
         console.error("[Login] Profile not found for user:", data.user.id);
-        setServerError("Profile not found. Please contact support or sign up again.");
-        await supabase.auth.signOut();
-        return;
       }
+      await useAuthStore.getState().refreshProfile();
 
       // "Remember Me" off → clear persisted session on tab close.
       if (!rememberMe && typeof window !== "undefined") {
@@ -167,8 +163,15 @@ export default function CustomerLoginPage() {
         return;
       }
 
-      // Session set inline (preview iframe flow) — navigate to home
-      window.location.href = "/";
+      const { data } = await supabase.auth.getSession();
+      if (data.session?.user) {
+        useAuthStore.getState().setSession(data.session);
+        await useAuthStore.getState().refreshProfile();
+        const redirectTo = await resolvePostLoginRedirect(data.session.user.id);
+        navigate({ to: redirectTo, replace: true });
+      } else {
+        navigate({ to: "/", replace: true });
+      }
 
     } catch (err) {
       console.error("[Login] Google OAuth unexpected error:", err);

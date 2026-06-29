@@ -299,6 +299,8 @@ export default function CustomerRegistrationPage() {
       // Session exists - user is signed in
       if (data.session) {
         console.log("[Register] Successfully signed up and signed in user:", data.session.user.id);
+        useAuthStore.getState().setSession(data.session);
+        await useAuthStore.getState().refreshProfile();
         
         if (accountType === "owner") {
           navigate({ to: "/owner/pending" });
@@ -339,7 +341,15 @@ export default function CustomerRegistrationPage() {
         return;
       }
 
-      window.location.href = "/";
+      const { data } = await supabase.auth.getSession();
+      if (data.session?.user) {
+        useAuthStore.getState().setSession(data.session);
+        await useAuthStore.getState().refreshProfile();
+        const redirectTo = await resolvePostLoginRedirect(data.session.user.id);
+        navigate({ to: redirectTo, replace: true });
+      } else {
+        navigate({ to: "/", replace: true });
+      }
 
     } catch (err) {
       console.error("[Register] Google OAuth unexpected error:", err);

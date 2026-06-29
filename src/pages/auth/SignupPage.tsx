@@ -134,6 +134,8 @@ export default function SignupPage() {
 
       // Auto-confirm enabled → signed in
       if (data.session) {
+        useAuthStore.getState().setSession(data.session);
+        await useAuthStore.getState().refreshProfile();
         setSuccess("signed_in");
         const redirectTo = await resolvePostLoginRedirect(data.session.user.id);
         setTimeout(() => navigate({ to: redirectTo, replace: true }), 800);
