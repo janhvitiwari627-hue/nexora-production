@@ -333,6 +333,7 @@ export default function OwnerSignupPage() {
           </form>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }
