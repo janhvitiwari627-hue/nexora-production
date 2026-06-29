@@ -15,6 +15,17 @@ import { useAuthStore } from "@/stores/authStore";
 
 const normalizeEmail = (value: string) => value.trim().toLowerCase();
 const RESET_REDIRECT_TO = "https://meripahalfasthelp.online/auth/callback?next=/reset-password";
+const RECOVERY_ERROR_MESSAGE =
+  "Reset link expired or already used. Please request a new password reset link.";
+
+const safeAuthErrorMessage = (err: unknown, fallback: string) => {
+  const message = err instanceof Error ? err.message : fallback;
+  const lower = message.toLowerCase();
+  if (lower.includes("refresh token") || lower.includes("token not found")) {
+    return RECOVERY_ERROR_MESSAGE;
+  }
+  return message;
+};
 
 const loginSchema = z.object({
   email: z.string().trim().email("Invalid email address").max(255),
@@ -177,7 +188,7 @@ export default function CustomerLoginPage() {
       navigate({ to: redirectTo });
     } catch (err) {
       console.error("[Login] Unexpected error:", err);
-      setServerError(err instanceof Error ? err.message : "Sign in failed");
+      setServerError(safeAuthErrorMessage(err, "Sign in failed"));
     } finally {
       setSubmitting(false);
     }
