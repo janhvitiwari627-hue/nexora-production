@@ -18,8 +18,9 @@ const ROLE_ROUTES: Record<UserRole, string> = {
   distributor: "/partner/dashboard",
   district_partner: "/partner/dashboard",
   growth_partner: "/partner/dashboard",
-  customer: "/",
+  customer: "/dashboard",
 };
+
 
 export async function fetchUserRoles(userId: string): Promise<UserRole[]> {
   const { data, error } = await supabase
