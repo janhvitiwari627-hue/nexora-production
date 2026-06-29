@@ -981,13 +981,6 @@ export type Database = {
             referencedRelation: "district_business_partners"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "partner_activity_logs_partner_id_fkey"
-            columns: ["partner_id"]
-            isOneToOne: false
-            referencedRelation: "public_dbp_profiles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       partner_dashboard_metrics: {
@@ -1048,13 +1041,6 @@ export type Database = {
             columns: ["partner_id"]
             isOneToOne: true
             referencedRelation: "district_business_partners"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "partner_dashboard_metrics_partner_id_fkey"
-            columns: ["partner_id"]
-            isOneToOne: true
-            referencedRelation: "public_dbp_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1120,13 +1106,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "partner_earnings_partner_id_fkey"
-            columns: ["partner_id"]
-            isOneToOne: false
-            referencedRelation: "public_dbp_profiles"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "partner_earnings_shop_id_fkey"
             columns: ["shop_id"]
             isOneToOne: false
@@ -1187,13 +1166,6 @@ export type Database = {
             columns: ["partner_id"]
             isOneToOne: false
             referencedRelation: "district_business_partners"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "partner_hall_of_fame_partner_id_fkey"
-            columns: ["partner_id"]
-            isOneToOne: false
-            referencedRelation: "public_dbp_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1258,13 +1230,6 @@ export type Database = {
             referencedRelation: "district_business_partners"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "partner_leaderboard_partner_id_fkey"
-            columns: ["partner_id"]
-            isOneToOne: false
-            referencedRelation: "public_dbp_profiles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       partner_milestones: {
@@ -1313,13 +1278,6 @@ export type Database = {
             columns: ["partner_id"]
             isOneToOne: false
             referencedRelation: "district_business_partners"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "partner_milestones_partner_id_fkey"
-            columns: ["partner_id"]
-            isOneToOne: false
-            referencedRelation: "public_dbp_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -1388,13 +1346,6 @@ export type Database = {
             referencedRelation: "district_business_partners"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "partner_payouts_partner_id_fkey"
-            columns: ["partner_id"]
-            isOneToOne: false
-            referencedRelation: "public_dbp_profiles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       partner_referrals: {
@@ -1446,24 +1397,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "partner_referrals_referred_partner_id_fkey"
-            columns: ["referred_partner_id"]
-            isOneToOne: false
-            referencedRelation: "public_dbp_profiles"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "partner_referrals_referrer_partner_id_fkey"
             columns: ["referrer_partner_id"]
             isOneToOne: false
             referencedRelation: "district_business_partners"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "partner_referrals_referrer_partner_id_fkey"
-            columns: ["referrer_partner_id"]
-            isOneToOne: false
-            referencedRelation: "public_dbp_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1528,13 +1465,6 @@ export type Database = {
             referencedRelation: "district_business_partners"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "partner_rewards_partner_id_fkey"
-            columns: ["partner_id"]
-            isOneToOne: false
-            referencedRelation: "public_dbp_profiles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       partner_shop_mapping: {
@@ -1592,13 +1522,6 @@ export type Database = {
             columns: ["partner_id"]
             isOneToOne: false
             referencedRelation: "district_business_partners"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "partner_shop_mapping_partner_id_fkey"
-            columns: ["partner_id"]
-            isOneToOne: false
-            referencedRelation: "public_dbp_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -3527,13 +3450,6 @@ export type Database = {
             referencedRelation: "district_business_partners"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "partner_hall_of_fame_partner_id_fkey"
-            columns: ["partner_id"]
-            isOneToOne: false
-            referencedRelation: "public_dbp_profiles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       partner_leaderboard_public: {
@@ -3590,62 +3506,7 @@ export type Database = {
             referencedRelation: "district_business_partners"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "partner_leaderboard_partner_id_fkey"
-            columns: ["partner_id"]
-            isOneToOne: false
-            referencedRelation: "public_dbp_profiles"
-            referencedColumns: ["id"]
-          },
         ]
-      }
-      public_dbp_profiles: {
-        Row: {
-          district: string | null
-          full_name: string | null
-          hall_of_fame: boolean | null
-          hall_of_fame_rank: number | null
-          id: string | null
-          photo_url: string | null
-          slug: string | null
-          state: string | null
-          status: Database["public"]["Enums"]["dbp_status"] | null
-          success_story: string | null
-          tagline: string | null
-          tier: Database["public"]["Enums"]["dbp_tier"] | null
-          verified_at: string | null
-        }
-        Insert: {
-          district?: string | null
-          full_name?: string | null
-          hall_of_fame?: boolean | null
-          hall_of_fame_rank?: number | null
-          id?: string | null
-          photo_url?: string | null
-          slug?: string | null
-          state?: string | null
-          status?: Database["public"]["Enums"]["dbp_status"] | null
-          success_story?: string | null
-          tagline?: string | null
-          tier?: Database["public"]["Enums"]["dbp_tier"] | null
-          verified_at?: string | null
-        }
-        Update: {
-          district?: string | null
-          full_name?: string | null
-          hall_of_fame?: boolean | null
-          hall_of_fame_rank?: number | null
-          id?: string | null
-          photo_url?: string | null
-          slug?: string | null
-          state?: string | null
-          status?: Database["public"]["Enums"]["dbp_status"] | null
-          success_story?: string | null
-          tagline?: string | null
-          tier?: Database["public"]["Enums"]["dbp_tier"] | null
-          verified_at?: string | null
-        }
-        Relationships: []
       }
       public_salon_cards: {
         Row: {
