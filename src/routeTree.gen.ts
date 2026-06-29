@@ -84,6 +84,7 @@ import { Route as DashboardActivityRouteImport } from './routes/dashboard.activi
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as BrandSlugRouteImport } from './routes/brand.$slug'
 import { Route as BookSlugRouteImport } from './routes/book.$slug'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminRewardsRouteImport } from './routes/admin.rewards'
@@ -485,6 +486,11 @@ const BookSlugRoute = BookSlugRouteImport.update({
   path: '/book/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/admin/users',
   path: '/admin/users',
@@ -646,6 +652,7 @@ export interface FileRoutesByFullPath {
   '/admin/rewards': typeof AdminRewardsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/book/$slug': typeof BookSlugRoute
   '/brand/$slug': typeof BrandSlugRoute
   '/category/$slug': typeof CategorySlugRoute
@@ -746,6 +753,7 @@ export interface FileRoutesByTo {
   '/admin/rewards': typeof AdminRewardsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/book/$slug': typeof BookSlugRoute
   '/brand/$slug': typeof BrandSlugRoute
   '/category/$slug': typeof CategorySlugRoute
@@ -848,6 +856,7 @@ export interface FileRoutesById {
   '/admin/rewards': typeof AdminRewardsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/book/$slug': typeof BookSlugRoute
   '/brand/$slug': typeof BrandSlugRoute
   '/category/$slug': typeof CategorySlugRoute
@@ -951,6 +960,7 @@ export interface FileRouteTypes {
     | '/admin/rewards'
     | '/admin/settings'
     | '/admin/users'
+    | '/auth/callback'
     | '/book/$slug'
     | '/brand/$slug'
     | '/category/$slug'
@@ -1051,6 +1061,7 @@ export interface FileRouteTypes {
     | '/admin/rewards'
     | '/admin/settings'
     | '/admin/users'
+    | '/auth/callback'
     | '/book/$slug'
     | '/brand/$slug'
     | '/category/$slug'
@@ -1152,6 +1163,7 @@ export interface FileRouteTypes {
     | '/admin/rewards'
     | '/admin/settings'
     | '/admin/users'
+    | '/auth/callback'
     | '/book/$slug'
     | '/brand/$slug'
     | '/category/$slug'
@@ -1254,6 +1266,7 @@ export interface RootRouteChildren {
   AdminRewardsRoute: typeof AdminRewardsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminUsersRoute: typeof AdminUsersRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
   BookSlugRoute: typeof BookSlugRoute
   BrandSlugRoute: typeof BrandSlugRoute
   CategorySlugRoute: typeof CategorySlugRoute
@@ -1828,6 +1841,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BookSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/users': {
       id: '/admin/users'
       path: '/admin/users'
@@ -2123,6 +2143,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRewardsRoute: AdminRewardsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminUsersRoute: AdminUsersRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
   BookSlugRoute: BookSlugRoute,
   BrandSlugRoute: BrandSlugRoute,
   CategorySlugRoute: CategorySlugRoute,
@@ -2173,3 +2194,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

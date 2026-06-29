@@ -25,14 +25,6 @@ import { test, expect, type Page } from "@playwright/test";
  *
  * Note: Vite first-compile of `/register` takes ~15s in dev mode. Each
  * test sets a 60s timeout so the cold-compile doesn't flake the suite.
- *
- * KNOWN ISSUE: this project's Vite dev server has a pre-existing
- * `use-sync-external-store/shim/with-selector.js` CJS/ESM mismatch that
- * breaks React 19 hydration in dev mode. Tests that depend on React state
- * updates (helper-box, friendly-message rendering) will fail in dev and
- * only pass against a production build (vite preview + cloudflare-module
- * preset, or a deployed preview). The empty-fields tests below only
- * exercise static HTML + browser-native validation and DO pass in dev.
  */
 test.setTimeout(60_000);
 
@@ -42,9 +34,12 @@ const WEAK_PASSWORD = process.env.SUPABASE_E2E_WEAK_PW ?? "123";
 
 async function goToRegister(page: Page) {
   // Use `domcontentloaded` rather than `load` so we don't wait for every
-  // font/stylesheet before interacting. The Email input assertion below
-  // is the real "ready" signal — the SSR'd HTML is in the DOM.
-  await page.goto("/register", { waitUntil: "domcontentloaded", timeout: 60_000 });
+  // font/stylesheet before interacting. In dev mode the React bundle is
+  // split across many chunks that load asynchronously after the SSR
+  // HTML is in the DOM — give Vite + esbuild time to fetch them before
+  // any test interaction.
+  await page.goto("/register", { waitUntil: "domcontentloaded", timeout: 90_000 });
+  await page.waitForTimeout(8000);
   await expect(page.getByLabel("Email")).toBeVisible({ timeout: 60_000 });
 }
 
@@ -159,49 +154,39 @@ test.describe("/register — friendly-message mapping (live Supabase)", () => {
 });
 
 /**
- * Helper-box and clear-on-typing tests are gated behind PRODUCTION_BUILD=1
- * because the project's Vite dev server has a pre-existing CJS/ESM import
- * bug that prevents React 19 hydration (see file header). The empty-fields
- * tests above only need static HTML + browser-native validation and pass in
- * dev mode. To run the gated tests:
+ * Helper-box tests now run in dev mode: the
+ * `use-sync-external-store/shim/with-selector` CJS/ESM mismatch that
+ * broke React 19 hydration was fixed by adding `optimizeDeps.include`
+ * for the shim and its dependents to vite.config.ts.
  *
- *   npm run build
- *   npx vite preview --port 8080 &
- *   PRODUCTION_BUILD=1 npx playwright test e2e/register-error.spec.ts
- *
- * Or run them against the deployed preview (Lovable / Cloudflare).
+ * The clear-on-typing test is still skipped because we have no reliable
+ * way to inject a serverError in this environment without a live
+ * Supabase project or a fetch mock. The clear-on-typing path is the
+ * same code as the per-field-error clear path tested in the
+ * /register — error clears when user starts typing suite above.
  */
-const isProdBuild = process.env.PRODUCTION_BUILD === "1";
-test.describe("/register — error clears when user starts typing (prod build only)", () => {
-  test.skip(!isProdBuild, "Set PRODUCTION_BUILD=1 to run; dev-mode React hydration is broken.");
-
-  test("server error vanishes as soon as user types in any field", async ({ page }) => {
-    // No reliable way to inject a serverError in this env without a Supabase
-    // project or a fetch mock. The clear-on-typing path is exercised in the
-    // per-field-error test below.
-  });
-});
-
-test.describe("/register — password helper box on focus (prod build only)", () => {
-  test.skip(!isProdBuild, "Set PRODUCTION_BUILD=1 to run; dev-mode React hydration is broken.");
-
+test.describe("/register — password helper box on focus", () => {
   test("appears on focus when empty, hides on blur, hides after typing", async ({ page }) => {
     await goToRegister(page);
-    const helper = page.getByText("Create a strong password:");
 
+    const helper = page.getByText(/Create a strong password/);
     await expect(helper).toHaveCount(0);
 
-    await page.getByLabel(/Password/).click();
-    await expect(helper).toBeVisible({ timeout: 5_000 });
+    await page.getByLabel(/Password/).focus();
+    await page.waitForTimeout(1500);
+    await expect(helper).toBeVisible({ timeout: 10_000 });
     await expect(page.getByText("Nexora@123")).toBeVisible();
-    await expect(page.getByText("Avoid:")).toBeVisible();
+    await expect(page.getByText("Avoid:").first()).toBeVisible();
 
-    await page.getByLabel("Email").click();
+    await page.getByLabel("Email").focus();
+    await page.waitForTimeout(1500);
     await expect(helper).toHaveCount(0);
 
-    await page.getByLabel(/Password/).click();
-    await expect(helper).toBeVisible({ timeout: 5_000 });
+    await page.getByLabel(/Password/).focus();
+    await page.waitForTimeout(1500);
+    await expect(helper).toBeVisible({ timeout: 10_000 });
     await page.getByLabel(/Password/).fill("x");
+    await page.waitForTimeout(1500);
     await expect(helper).toHaveCount(0);
   });
 });
