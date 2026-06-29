@@ -55,7 +55,7 @@ export const Route = createFileRoute("/api/public/auth/forgot-password")({
           request.headers.get("origin") ||
           process.env.SITE_URL ||
           "";
-        const redirectTo = `${origin.replace(/\/$/, "")}/reset-password`;
+        const redirectTo = `${origin.replace(/\/$/, "")}/auth/callback?next=/reset-password`;
 
         try {
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
