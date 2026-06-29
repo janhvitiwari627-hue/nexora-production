@@ -190,12 +190,6 @@ function PremiumHeader() {
         <div className="flex items-center gap-2 sm:gap-3">
           <button
             className="hidden h-10 w-10 place-items-center rounded-full text-slate-600 hover:bg-slate-100 sm:grid"
-            aria-label="Search"
-          >
-            <Search className="h-[18px] w-[18px]" />
-          </button>
-          <button
-            className="hidden h-10 w-10 place-items-center rounded-full text-slate-600 hover:bg-slate-100 sm:grid"
             aria-label="Notifications"
           >
             <Bell className="h-[18px] w-[18px]" />

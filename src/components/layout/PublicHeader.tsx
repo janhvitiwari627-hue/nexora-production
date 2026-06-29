@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Bell, Briefcase, Building2, ChevronDown, LayoutDashboard, LogOut, Megaphone, Menu, Package, Phone, Search, Settings, Sparkles, Star, Tag, Target, TrendingUp, Truck, User, Users } from "lucide-react";
+import { ArrowLeft, Bell, Briefcase, Building2, ChevronDown, LayoutDashboard, LogOut, Megaphone, Menu, Package, Phone, Settings, Sparkles, Star, Tag, Target, TrendingUp, Truck, User, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -163,9 +163,6 @@ export function PublicHeader() {
 
         {/* Right actions */}
         <div className="hidden items-center gap-1 md:flex">
-          <Button variant="ghost" size="icon" aria-label="Search" asChild>
-            <Link to="/search"><Search className="h-5 w-5" /></Link>
-          </Button>
           {isAuthed && (
             <Button variant="ghost" size="icon" aria-label="Notifications" asChild>
               <Link to="/dashboard/notifications"><Bell className="h-5 w-5" /></Link>
@@ -248,9 +245,6 @@ export function PublicHeader() {
 
         {/* Mobile */}
         <div className="flex items-center gap-2 md:hidden">
-          <Button variant="ghost" size="icon" aria-label="Search" asChild>
-            <Link to="/search"><Search className="h-5 w-5" /></Link>
-          </Button>
           {isAuthed && (
             <Button variant="ghost" size="icon" aria-label="Notifications" asChild>
               <Link to="/dashboard/notifications"><Bell className="h-5 w-5" /></Link>
