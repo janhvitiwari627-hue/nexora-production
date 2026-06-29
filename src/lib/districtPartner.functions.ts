@@ -441,7 +441,7 @@ export const getPublicPartnerProfile = createServerFn({ method: "GET" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!partner) return null;
-
+    if (!partner.id) return { partner, hall_of_fame: null };
     const { data: hof } = await sb
       .from("partner_hall_of_fame_public")
       .select("rank, category, active_shops, achievements, success_story, badge")
