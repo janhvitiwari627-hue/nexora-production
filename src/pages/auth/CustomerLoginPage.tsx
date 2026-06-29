@@ -91,8 +91,28 @@ export default function CustomerLoginPage() {
 
       console.log("[Login] Successfully signed in user:", data.user.id);
 
+      // Verify profile exists in public.profiles before redirecting
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("id", data.user.id)
+        .maybeSingle();
+
+      if (profileError) {
+        console.error("[Login] Profile fetch error:", profileError.message);
+        setServerError("Session expired. Please sign in again.");
+        await supabase.auth.signOut();
+        return;
+      }
+
+      if (!profile) {
+        console.error("[Login] Profile not found for user:", data.user.id);
+        setServerError("Profile not found. Please contact support or sign up again.");
+        await supabase.auth.signOut();
+        return;
+      }
+
       // "Remember Me" off → clear persisted session on tab close.
-      // Supabase persists by default; we move the token to sessionStorage instead.
       if (!rememberMe && typeof window !== "undefined") {
         const keys = Object.keys(localStorage).filter((k) => k.startsWith("sb-"));
         for (const k of keys) {
