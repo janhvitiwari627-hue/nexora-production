@@ -11,12 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ReferralsRouteImport } from './routes/referrals'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as OwnerSignupRouteImport } from './routes/owner-signup'
 import { Route as OwnerDashboardRouteImport } from './routes/owner-dashboard'
 import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as MembershipRouteImport } from './routes/membership'
@@ -120,6 +122,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
@@ -148,6 +155,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OwnerSignupRoute = OwnerSignupRouteImport.update({
+  id: '/owner-signup',
+  path: '/owner-signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OwnerDashboardRoute = OwnerDashboardRouteImport.update({
@@ -632,12 +644,14 @@ export interface FileRoutesByFullPath {
   '/membership': typeof MembershipRoute
   '/offline': typeof OfflineRoute
   '/owner-dashboard': typeof OwnerDashboardRoute
+  '/owner-signup': typeof OwnerSignupRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
@@ -733,12 +747,14 @@ export interface FileRoutesByTo {
   '/membership': typeof MembershipRoute
   '/offline': typeof OfflineRoute
   '/owner-dashboard': typeof OwnerDashboardRoute
+  '/owner-signup': typeof OwnerSignupRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
@@ -836,12 +852,14 @@ export interface FileRoutesById {
   '/membership': typeof MembershipRoute
   '/offline': typeof OfflineRoute
   '/owner-dashboard': typeof OwnerDashboardRoute
+  '/owner-signup': typeof OwnerSignupRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
+  '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
@@ -940,12 +958,14 @@ export interface FileRouteTypes {
     | '/membership'
     | '/offline'
     | '/owner-dashboard'
+    | '/owner-signup'
     | '/privacy'
     | '/profile'
     | '/referrals'
     | '/register'
     | '/reset-password'
     | '/search'
+    | '/signup'
     | '/sitemap.xml'
     | '/terms'
     | '/admin/advertising'
@@ -1041,12 +1061,14 @@ export interface FileRouteTypes {
     | '/membership'
     | '/offline'
     | '/owner-dashboard'
+    | '/owner-signup'
     | '/privacy'
     | '/profile'
     | '/referrals'
     | '/register'
     | '/reset-password'
     | '/search'
+    | '/signup'
     | '/sitemap.xml'
     | '/terms'
     | '/admin/advertising'
@@ -1143,12 +1165,14 @@ export interface FileRouteTypes {
     | '/membership'
     | '/offline'
     | '/owner-dashboard'
+    | '/owner-signup'
     | '/privacy'
     | '/profile'
     | '/referrals'
     | '/register'
     | '/reset-password'
     | '/search'
+    | '/signup'
     | '/sitemap.xml'
     | '/terms'
     | '/admin/advertising'
@@ -1246,12 +1270,14 @@ export interface RootRouteChildren {
   MembershipRoute: typeof MembershipRoute
   OfflineRoute: typeof OfflineRoute
   OwnerDashboardRoute: typeof OwnerDashboardRoute
+  OwnerSignupRoute: typeof OwnerSignupRoute
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   ReferralsRoute: typeof ReferralsRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SearchRoute: typeof SearchRoute
+  SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   AdminAdvertisingRoute: typeof AdminAdvertisingRoute
@@ -1330,6 +1356,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/search': {
       id: '/search'
       path: '/search'
@@ -1370,6 +1403,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/owner-signup': {
+      id: '/owner-signup'
+      path: '/owner-signup'
+      fullPath: '/owner-signup'
+      preLoaderRoute: typeof OwnerSignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/owner-dashboard': {
@@ -2123,12 +2163,14 @@ const rootRouteChildren: RootRouteChildren = {
   MembershipRoute: MembershipRoute,
   OfflineRoute: OfflineRoute,
   OwnerDashboardRoute: OwnerDashboardRoute,
+  OwnerSignupRoute: OwnerSignupRoute,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   ReferralsRoute: ReferralsRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SearchRoute: SearchRoute,
+  SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   AdminAdvertisingRoute: AdminAdvertisingRoute,
