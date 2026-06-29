@@ -164,12 +164,6 @@ function PremiumHeader() {
     <header className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/80 backdrop-blur-xl">
       <div className="mx-auto flex h-[72px] max-w-[1400px] items-center justify-between px-5 sm:px-8">
         <div className="flex items-center gap-2">
-          <BackButton
-            variant="ghost"
-            size="icon"
-            className="hidden sm:inline-flex text-slate-600 hover:bg-slate-100"
-            aria-label="Go back"
-          />
           <Link to="/" className="flex items-center gap-2.5">
             <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-[#2563EB] to-[#6D28D9] text-white shadow-lg shadow-blue-200/60">
               <Sparkles className="h-5 w-5" />
