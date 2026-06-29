@@ -155,6 +155,7 @@ export default function SignupPage() {
           data: {
             full_name: parsed.data.full_name,
             mobile: parsed.data.mobile,
+            referred_by: referredBy || null,
             // Force customer role — trigger ignores unknown/disallowed roles
             role: "customer",
           },
