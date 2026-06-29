@@ -50,7 +50,7 @@ const PORTAL_MENU = [
   { to: "/portal/contact", label: "Contact Us", icon: Phone },
 ] as const;
 
-export function PublicHeader() {
+export function PublicHeader({ showBackButton = true }: { showBackButton?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
