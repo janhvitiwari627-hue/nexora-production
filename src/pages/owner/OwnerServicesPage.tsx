@@ -148,6 +148,7 @@ export function OwnerServicesPage() {
       <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
         <header className="flex flex-wrap items-end justify-between gap-3">
           <div>
+            <BackButton className="mb-1" />
             <h1 className="text-heading text-2xl font-bold">Services</h1>
             <p className="text-muted-foreground text-sm">
               {activeSalon?.name ?? "Your salon"} · {stats.total} services across {stats.cats} categor{stats.cats === 1 ? "y" : "ies"} · {stats.active} active

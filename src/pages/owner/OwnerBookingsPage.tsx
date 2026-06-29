@@ -130,6 +130,7 @@ export function OwnerBookingsPage() {
       <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
         <header className="flex flex-wrap items-end justify-between gap-3">
           <div>
+            <BackButton className="mb-1" />
             <h1 className="text-heading text-2xl font-bold">Bookings</h1>
             <p className="text-muted-foreground text-sm">
               {isLive && activeSalon
