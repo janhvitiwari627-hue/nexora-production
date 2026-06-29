@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Bookmark, Briefcase, MapPin, Search, SlidersHorizontal, Users } from "lucide-react";
+import { BackButton } from "@/components/shared/BackButton";
 import { MOCK_JOBS, type JobCategory, type JobType } from "./mockJobs";
 
 const CATEGORIES: JobCategory[] = ["Stylist", "Barber", "Beautician", "Spa Therapist", "Nail Artist", "Manager", "Receptionist"];
