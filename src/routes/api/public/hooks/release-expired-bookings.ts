@@ -1,18 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
+import { timingSafeEqual } from "crypto";
 
 /**
  * Auto-release expired (unpaid 15-min window) bookings.
  * Called every minute by pg_cron. Bypasses edge auth (/api/public/*),
- * so we verify the Supabase publishable apikey header before doing anything.
+ * so we verify a server-only CRON_WEBHOOK_SECRET via x-cron-secret header.
+ * Never authenticate with the publishable/anon key — it ships in the
+ * browser bundle.
  */
 export const Route = createFileRoute("/api/public/hooks/release-expired-bookings")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = request.headers.get("apikey") ?? request.headers.get("x-api-key");
-        const expected = process.env.SUPABASE_PUBLISHABLE_KEY;
-        if (!expected || apiKey !== expected) {
+        const provided = request.headers.get("x-cron-secret") ?? "";
+        const expected = process.env.CRON_WEBHOOK_SECRET ?? "";
+        const a = Buffer.from(provided);
+        const b = Buffer.from(expected);
+        if (!expected || a.length !== b.length || !timingSafeEqual(a, b)) {
           return new Response(JSON.stringify({ error: "Unauthorized" }), {
             status: 401,
             headers: { "Content-Type": "application/json" },
