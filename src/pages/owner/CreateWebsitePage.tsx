@@ -10,6 +10,7 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import { FilterPills } from "@/components/shared/FilterPills";
+import { BackButton } from "@/components/shared/BackButton";
 import { Check, Eye, Sparkles, ShieldCheck, Monitor, Smartphone } from "lucide-react";
 import { useOwnerContext } from "@/hooks/use-owner-context";
 import { websiteTemplatesQuery } from "@/lib/website-templates.queries";
@@ -64,7 +65,8 @@ export function CreateWebsitePage() {
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8 space-y-8">
-      <div className="space-y-2">
+      <div className="space-y-3">
+        <BackButton to="/owner/dashboard" label="Back to Dashboard" variant="ghost" size="sm" />
         <Badge className="border-0 bg-primary/10 text-primary gap-1.5">
           <Sparkles className="h-3 w-3" /> Step 1 of setup
         </Badge>
