@@ -73,6 +73,7 @@ export default function OwnerSignupPage() {
     email: "",
     mobile: "",
     password: "",
+    confirm_password: "",
     business_name: "",
     business_category: "",
     city: "",
