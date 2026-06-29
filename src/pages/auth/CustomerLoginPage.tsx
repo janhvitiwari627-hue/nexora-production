@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Eye, EyeOff } from "lucide-react";
+import { BackButton } from "@/components/shared/BackButton";
 import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -221,13 +222,15 @@ export default function CustomerLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl">Welcome back</CardTitle>
-          <CardDescription>Sign in to manage bookings, rewards and more.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12">
+      <div className="w-full max-w-md">
+        <BackButton className="mb-3" />
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle className="text-2xl">Welcome back</CardTitle>
+            <CardDescription>Sign in to manage bookings, rewards and more.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
           <Button
             type="button"
             variant="outline"
@@ -374,6 +377,7 @@ export default function CustomerLoginPage() {
           </p>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

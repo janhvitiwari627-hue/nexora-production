@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PasswordStrengthIndicator, scorePassword } from "@/components/auth/PasswordStrengthIndicator";
+import { BackButton } from "@/components/shared/BackButton";
 
 const CATEGORIES = [
   "Salon",
@@ -174,44 +175,49 @@ export default function OwnerSignupPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-              <CheckCircle2 className="h-6 w-6 text-primary" />
-            </div>
-            <CardTitle>Request received</CardTitle>
-            <CardDescription className="mt-2">
-              Your owner account request has been received. Nexora team will verify and activate your shop
-              owner access.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Button className="w-full" onClick={() => navigate({ to: "/" })}>
-              Back to home
-            </Button>
-            <Button variant="outline" className="w-full" onClick={() => navigate({ to: "/login" })}>
-              Go to Sign in
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12">
+        <div className="w-full max-w-md">
+          <BackButton className="mb-3" />
+          <Card className="w-full">
+            <CardHeader className="text-center">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                <CheckCircle2 className="h-6 w-6 text-primary" />
+              </div>
+              <CardTitle>Request received</CardTitle>
+              <CardDescription className="mt-2">
+                Your owner account request has been received. Nexora team will verify and activate your shop
+                owner access.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <Button className="w-full" onClick={() => navigate({ to: "/" })}>
+                Back to home
+              </Button>
+              <Button variant="outline" className="w-full" onClick={() => navigate({ to: "/login" })}>
+                Go to Sign in
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
-      <Card className="w-full max-w-xl">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-primary" />
-            <CardTitle className="text-2xl">Become a Shop Owner</CardTitle>
-          </div>
-          <CardDescription>
-            Fill in your details. Our team will verify your shop and activate owner access.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12">
+      <div className="w-full max-w-xl">
+        <BackButton className="mb-3" />
+        <Card className="w-full">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Building2 className="h-5 w-5 text-primary" />
+              <CardTitle className="text-2xl">Become a Shop Owner</CardTitle>
+            </div>
+            <CardDescription>
+              Fill in your details. Our team will verify your shop and activate owner access.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
           {serverError && (
             <Alert variant="destructive" className="mb-4">
               <AlertDescription>{serverError}</AlertDescription>
@@ -327,6 +333,7 @@ export default function OwnerSignupPage() {
           </form>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

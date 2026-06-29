@@ -11,7 +11,6 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Modal } from "@/components/shared/Modal";
-import { BackButton } from "@/components/shared/BackButton";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -126,7 +125,7 @@ export function OwnerStaffPage() {
       <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
         <header className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <BackButton className="mb-1" />
+            
             <h1 className="text-heading text-2xl font-bold">Staff</h1>
             <p className="text-muted-foreground text-sm">
               {activeSalon?.name ?? "Your salon"} · {list.length} team member{list.length === 1 ? "" : "s"}
