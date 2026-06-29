@@ -28,6 +28,7 @@ type CallbackResult =
 
 type AuthCallbackWindow = Window & {
   __nxAuthCallbackPromise?: Promise<CallbackResult>;
+  __nxAuthCallbackKey?: string;
 };
 
 function getHashParams(url: URL) {
@@ -40,6 +41,22 @@ function isRecoveryCallback(url: URL, next: string | null, hash: URLSearchParams
     url.searchParams.get("type") === "recovery" ||
     hash.get("type") === "recovery"
   );
+}
+
+function hasCallbackPayload(url: URL, hash: URLSearchParams) {
+  return Boolean(
+    url.searchParams.get("code") ||
+      url.searchParams.get("token_hash") ||
+      url.searchParams.get("error") ||
+      url.searchParams.get("error_description") ||
+      hash.get("access_token") ||
+      hash.get("error") ||
+      hash.get("error_description"),
+  );
+}
+
+function callbackKey(url: URL) {
+  return `${url.pathname}${url.search}${url.hash}`;
 }
 
 function friendlyFailure(recovery: boolean, message?: string): CallbackResult {
@@ -147,7 +164,13 @@ function AuthCallbackPage() {
     const run = async () => {
       try {
         const win = window as AuthCallbackWindow;
-        win.__nxAuthCallbackPromise ??= resolveCallbackResult();
+        const url = new URL(window.location.href);
+        const hash = getHashParams(url);
+        const key = callbackKey(url);
+        if (!win.__nxAuthCallbackPromise || (hasCallbackPayload(url, hash) && win.__nxAuthCallbackKey !== key)) {
+          win.__nxAuthCallbackKey = key;
+          win.__nxAuthCallbackPromise = resolveCallbackResult();
+        }
         const result = await win.__nxAuthCallbackPromise;
         if (result.ok) {
           navigate({ to: result.redirectTo });
