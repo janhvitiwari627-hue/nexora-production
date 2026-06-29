@@ -123,7 +123,7 @@ export default function CustomerLoginPage() {
         if (error.message.includes("Email not confirmed")) {
           errorMessage = "Please verify your email before signing in. Check your inbox for the confirmation link.";
         } else if (error.message.includes("Invalid login credentials") || error.message.includes("Invalid email or password")) {
-          errorMessage = "Email/password match nahi ho raha. Agar account already registered hai, password reset karke new password set karein.";
+          errorMessage = "Email/password match nahi ho raha. Registered email exactly use karein (jaise forcallertune11@gmail.com), ya password reset karein.";
           setLoginFailedForEmail(email);
           setResetSent(false);
         } else if (error.message.includes("User not found") || error.message.includes("signup")) {
@@ -338,7 +338,7 @@ export default function CustomerLoginPage() {
               <Alert className="border-primary/20 bg-primary/5">
                 <AlertDescription className="space-y-2 text-sm">
                   <p>
-                    Ye email backend me registered ho sakta hai, lekin entered password match nahi ho raha.
+                    Ye email/password match nahi ho raha. Account list me jo exact email hai wahi enter karein, phir bhi issue ho to reset link bhejein.
                   </p>
                   {resetSent ? (
                     <p className="font-medium text-primary">Reset link sent. Inbox/spam check karke new password set karein.</p>
