@@ -155,9 +155,7 @@ function AuthCallbackPage() {
         setErrorMessage(result.message);
         setStatus("error");
       } catch (err) {
-        setErrorMessage(
-          friendlyFailure(true, err instanceof Error ? err.message : undefined).message,
-        );
+        setErrorMessage(RECOVERY_ERROR_MESSAGE);
         setStatus("error");
       }
     };
