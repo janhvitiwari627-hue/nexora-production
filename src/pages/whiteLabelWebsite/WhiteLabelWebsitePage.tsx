@@ -108,7 +108,7 @@ function toShopData(data: Awaited<ReturnType<typeof getSalonBySlug>> | null | un
     address: salon.address ?? salon.location ?? MOCK_SHOP.address,
     whatsapp: salon.whatsapp ?? salon.phone ?? MOCK_SHOP.whatsapp,
     phone: salon.phone ?? MOCK_SHOP.phone,
-    email: salon.email ?? MOCK_SHOP.email,
+    email: MOCK_SHOP.email,
     coverImage: cover,
     rating: salon.rating ?? MOCK_SHOP.rating,
     reviewCount: salon.reviews_count ?? MOCK_SHOP.reviewCount,

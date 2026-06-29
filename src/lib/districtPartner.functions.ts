@@ -338,9 +338,9 @@ export const getPartnerLeaderboard = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const sb = publicClient();
     let q = sb
-      .from("partner_leaderboard")
+      .from("partner_leaderboard_public")
       .select(
-        "id, partner_id, period, rank, active_shops, revenue_generated, partner_earnings, score, district, state",
+        "id, partner_id, period, rank, active_shops, score, district, state, scope",
       )
       .eq("period", data.period)
       .order("rank", { ascending: true })
@@ -366,19 +366,18 @@ export const getHallOfFame = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const sb = publicClient();
     const { data: hof, error } = await sb
-      .from("partner_hall_of_fame")
+      .from("partner_hall_of_fame_public")
       .select("*")
       .eq("category", data.category)
       .order("rank", { ascending: true })
       .limit(data.limit);
     if (error) throw new Error(error.message);
     if (!hof?.length) return [];
-    const ids = hof.map((h) => h.partner_id);
+    const ids = hof.map((h) => h.partner_id).filter((id): id is string => !!id);
     const { data: partners } = await sb
-      .from("district_business_partners")
+      .from("public_dbp_profiles")
       .select("id, slug, full_name, district, state, photo_url, tagline, tier")
-      .in("id", ids)
-      .eq("status", "verified");
+      .in("id", ids);
     const byId = new Map((partners ?? []).map((p) => [p.id, p]));
     return hof.map((h) => ({ ...h, partner: byId.get(h.partner_id) ?? null }));
   });
@@ -434,19 +433,18 @@ export const getPublicPartnerProfile = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const sb = publicClient();
     const { data: partner, error } = await sb
-      .from("district_business_partners")
+      .from("public_dbp_profiles")
       .select(
         "id, slug, full_name, district, state, photo_url, tagline, success_story, tier, hall_of_fame, hall_of_fame_rank, verified_at",
       )
       .eq("slug", data.slug)
-      .eq("status", "verified")
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!partner) return null;
-
+    if (!partner.id) return { partner, hall_of_fame: null };
     const { data: hof } = await sb
-      .from("partner_hall_of_fame")
-      .select("rank, category, active_shops, revenue_generated, achievements, success_story, badge")
+      .from("partner_hall_of_fame_public")
+      .select("rank, category, active_shops, achievements, success_story, badge")
       .eq("partner_id", partner.id)
       .order("rank", { ascending: true })
       .limit(1)
