@@ -287,6 +287,15 @@ export default function SignupPage() {
             </Alert>
           )}
 
+          {referredBy && (
+            <Alert className="mb-4 border-primary/20 bg-primary/5">
+              <AlertDescription className="text-sm">
+                Joining with referral code <strong className="font-mono">{referredBy}</strong>.
+                <span className="block text-xs text-muted-foreground mt-0.5">Referral rewards will be activated soon.</span>
+              </AlertDescription>
+            </Alert>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="full_name">Full name</Label>
