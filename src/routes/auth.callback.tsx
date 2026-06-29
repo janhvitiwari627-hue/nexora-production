@@ -11,44 +11,88 @@ export const Route = createFileRoute("/auth/callback")({
   component: AuthCallbackPage,
 });
 
+function sanitizeNext(next: string | null): string | null {
+  if (!next) return null;
+  // only allow same-origin relative paths
+  if (!next.startsWith("/") || next.startsWith("//")) return null;
+  return next;
+}
+
 function AuthCallbackPage() {
   const navigate = useNavigate();
-  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
+  const [status, setStatus] = useState<"loading" | "error">("loading");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    const handleCallback = async () => {
+    const run = async () => {
       try {
-        console.log("[Auth Callback] Processing OAuth callback...");
-        const { data, error } = await supabase.auth.getSession();
+        const url = new URL(window.location.href);
+        const next = sanitizeNext(url.searchParams.get("next"));
 
-        if (error) {
-          console.error("[Auth Callback] Error getting session:", error);
-          setErrorMessage(error.message);
+        // Surface explicit errors from Supabase (query OR hash)
+        const hash = new URLSearchParams(url.hash.replace(/^#/, ""));
+        const errDesc =
+          url.searchParams.get("error_description") || hash.get("error_description");
+        if (errDesc) {
+          setErrorMessage(errDesc);
           setStatus("error");
           return;
         }
 
+        // PKCE flow: ?code=...
+        const code = url.searchParams.get("code");
+        if (code) {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) {
+            setErrorMessage(error.message);
+            setStatus("error");
+            return;
+          }
+        }
+
+        // Email link OTP flow: ?token_hash=...&type=recovery|signup|magiclink|...
+        const tokenHash = url.searchParams.get("token_hash");
+        const otpType = url.searchParams.get("type");
+        if (tokenHash && otpType) {
+          const { error } = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            type: otpType as any,
+          });
+          if (error) {
+            setErrorMessage(error.message);
+            setStatus("error");
+            return;
+          }
+        }
+
+        // Implicit flow (#access_token=...&type=recovery) — supabase-js picks it up automatically.
+        // Just wait briefly for session to materialize.
+        const { data } = await supabase.auth.getSession();
         if (!data.session?.user) {
-          console.error("[Auth Callback] No session found after OAuth callback");
+          // Try one short retry — implicit hash parse is async.
+          await new Promise((r) => setTimeout(r, 300));
+        }
+
+        const { data: data2 } = await supabase.auth.getSession();
+        if (!data2.session?.user) {
           setErrorMessage("Authentication failed. No session found.");
           setStatus("error");
           return;
         }
 
-        console.log("[Auth Callback] Session established for user:", data.session.user.id);
-
-        const redirectTo = await resolvePostLoginRedirect(data.session.user.id);
-        setStatus("success");
+        if (next) {
+          navigate({ to: next });
+          return;
+        }
+        const redirectTo = await resolvePostLoginRedirect(data2.session.user.id);
         navigate({ to: redirectTo });
       } catch (err) {
-        console.error("[Auth Callback] Unexpected error:", err);
         setErrorMessage(err instanceof Error ? err.message : "Authentication failed");
         setStatus("error");
       }
     };
-
-    handleCallback();
+    run();
   }, [navigate]);
 
   if (status === "loading") {
@@ -64,21 +108,22 @@ function AuthCallbackPage() {
     );
   }
 
-  if (status === "error") {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
-        <Card className="w-full max-w-md">
-          <CardContent className="flex flex-col items-center py-12 space-y-4 text-center">
-            <p className="text-destructive font-medium">Sign in failed</p>
-            <p className="text-sm text-muted-foreground">{errorMessage}</p>
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
+      <Card className="w-full max-w-md">
+        <CardContent className="flex flex-col items-center py-12 space-y-4 text-center">
+          <p className="text-destructive font-medium">Sign in failed</p>
+          <p className="text-sm text-muted-foreground">{errorMessage}</p>
+          <div className="flex gap-2">
             <Button variant="outline" onClick={() => navigate({ to: "/login" })}>
-              Try again
+              Back to login
             </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  return null;
+            <Button onClick={() => navigate({ to: "/forgot-password" })}>
+              Request new link
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
