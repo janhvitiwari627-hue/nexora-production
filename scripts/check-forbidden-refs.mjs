@@ -13,6 +13,7 @@ const EXCLUDES = [
   "--glob=!**/.vinxi/**",
   "--glob=!**/routeTree.gen.ts",
   "--glob=!supabase/migrations/**",
+  "--glob=!scripts/check-forbidden-refs.mjs",
 ];
 
 let failed = false;
