@@ -115,6 +115,7 @@ import { Route as ApiPublicHooksReleaseExpiredBookingsRouteImport } from './rout
 import { Route as ApiPublicHooksRecomputeRankingsRouteImport } from './routes/api/public/hooks/recompute-rankings'
 import { Route as ApiPublicHooksRecomputeInsightsRouteImport } from './routes/api/public/hooks/recompute-insights'
 import { Route as ApiPublicHooksProcessSettlementsRouteImport } from './routes/api/public/hooks/process-settlements'
+import { Route as ApiPublicAuthForgotPasswordRouteImport } from './routes/api/public/auth/forgot-password'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -652,6 +653,12 @@ const ApiPublicHooksProcessSettlementsRoute =
     path: '/api/public/hooks/process-settlements',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicAuthForgotPasswordRoute =
+  ApiPublicAuthForgotPasswordRouteImport.update({
+    id: '/api/public/auth/forgot-password',
+    path: '/api/public/auth/forgot-password',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -756,6 +763,7 @@ export interface FileRoutesByFullPath {
   '/portal/distributors/register': typeof PortalDistributorsRegisterRoute
   '/portal/brands/': typeof PortalBrandsIndexRoute
   '/portal/distributors/': typeof PortalDistributorsIndexRoute
+  '/api/public/auth/forgot-password': typeof ApiPublicAuthForgotPasswordRoute
   '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
   '/api/public/hooks/recompute-rankings': typeof ApiPublicHooksRecomputeRankingsRoute
@@ -861,6 +869,7 @@ export interface FileRoutesByTo {
   '/portal/distributors/register': typeof PortalDistributorsRegisterRoute
   '/portal/brands': typeof PortalBrandsIndexRoute
   '/portal/distributors': typeof PortalDistributorsIndexRoute
+  '/api/public/auth/forgot-password': typeof ApiPublicAuthForgotPasswordRoute
   '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
   '/api/public/hooks/recompute-rankings': typeof ApiPublicHooksRecomputeRankingsRoute
@@ -970,6 +979,7 @@ export interface FileRoutesById {
   '/portal/distributors/register': typeof PortalDistributorsRegisterRoute
   '/portal/brands/': typeof PortalBrandsIndexRoute
   '/portal/distributors/': typeof PortalDistributorsIndexRoute
+  '/api/public/auth/forgot-password': typeof ApiPublicAuthForgotPasswordRoute
   '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
   '/api/public/hooks/recompute-rankings': typeof ApiPublicHooksRecomputeRankingsRoute
@@ -1080,6 +1090,7 @@ export interface FileRouteTypes {
     | '/portal/distributors/register'
     | '/portal/brands/'
     | '/portal/distributors/'
+    | '/api/public/auth/forgot-password'
     | '/api/public/hooks/process-settlements'
     | '/api/public/hooks/recompute-insights'
     | '/api/public/hooks/recompute-rankings'
@@ -1185,6 +1196,7 @@ export interface FileRouteTypes {
     | '/portal/distributors/register'
     | '/portal/brands'
     | '/portal/distributors'
+    | '/api/public/auth/forgot-password'
     | '/api/public/hooks/process-settlements'
     | '/api/public/hooks/recompute-insights'
     | '/api/public/hooks/recompute-rankings'
@@ -1293,6 +1305,7 @@ export interface FileRouteTypes {
     | '/portal/distributors/register'
     | '/portal/brands/'
     | '/portal/distributors/'
+    | '/api/public/auth/forgot-password'
     | '/api/public/hooks/process-settlements'
     | '/api/public/hooks/recompute-insights'
     | '/api/public/hooks/recompute-rankings'
@@ -1351,6 +1364,7 @@ export interface RootRouteChildren {
   PortalDistributorsRegisterRoute: typeof PortalDistributorsRegisterRoute
   PortalBrandsIndexRoute: typeof PortalBrandsIndexRoute
   PortalDistributorsIndexRoute: typeof PortalDistributorsIndexRoute
+  ApiPublicAuthForgotPasswordRoute: typeof ApiPublicAuthForgotPasswordRoute
   ApiPublicHooksProcessSettlementsRoute: typeof ApiPublicHooksProcessSettlementsRoute
   ApiPublicHooksRecomputeInsightsRoute: typeof ApiPublicHooksRecomputeInsightsRoute
   ApiPublicHooksRecomputeRankingsRoute: typeof ApiPublicHooksRecomputeRankingsRoute
@@ -2101,6 +2115,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksProcessSettlementsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/auth/forgot-password': {
+      id: '/api/public/auth/forgot-password'
+      path: '/api/public/auth/forgot-password'
+      fullPath: '/api/public/auth/forgot-password'
+      preLoaderRoute: typeof ApiPublicAuthForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -2332,6 +2353,7 @@ const rootRouteChildren: RootRouteChildren = {
   PortalDistributorsRegisterRoute: PortalDistributorsRegisterRoute,
   PortalBrandsIndexRoute: PortalBrandsIndexRoute,
   PortalDistributorsIndexRoute: PortalDistributorsIndexRoute,
+  ApiPublicAuthForgotPasswordRoute: ApiPublicAuthForgotPasswordRoute,
   ApiPublicHooksProcessSettlementsRoute: ApiPublicHooksProcessSettlementsRoute,
   ApiPublicHooksRecomputeInsightsRoute: ApiPublicHooksRecomputeInsightsRoute,
   ApiPublicHooksRecomputeRankingsRoute: ApiPublicHooksRecomputeRankingsRoute,
@@ -2341,13 +2363,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

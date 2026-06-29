@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { CheckCircle2, Mail, MapPin, Pencil, Phone, Plus, Trash2, X } from "lucide-react";
+import { CheckCircle2, Loader2, Mail, MapPin, Pencil, Phone, Plus, Trash2, X } from "lucide-react";
 import { PROFILE, ADDRESSES, type Address } from "./mockSettings";
 import { PanelShell, Field, inputCls } from "./PersonalInfoPanel";
 import { useAuthStore } from "@/stores/authStore";
+import { supabase } from "@/integrations/supabase/client";
 
 export function ContactInfoPanel() {
   const { user, profile } = useAuthStore();
@@ -108,13 +109,14 @@ export function ContactInfoPanel() {
         />
       )}
       {phoneModal && (
-        <OtpFlowModal
-          title="Change mobile number"
-          fieldLabel="New mobile"
+        <PhoneEditModal
           currentValue={phone}
-          type="tel"
           onClose={() => setPhoneModal(false)}
-          onConfirm={(v) => { setPhone(v); setPhoneModal(false); }}
+          onSaved={(v) => {
+            setPhone(v);
+            void useAuthStore.getState().refreshProfile();
+            setPhoneModal(false);
+          }}
         />
       )}
       {(editAddr || addingAddr) && (
