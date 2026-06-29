@@ -1,10 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { OwnerDashboardPage } from "@/pages/owner/OwnerDashboardPage";
-import { requireRole } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/owner/")({
   ssr: false,
-  beforeLoad: () => requireRole(["owner", "admin"], "/owner"),
   head: () => ({
     meta: [
       { title: "Owner Dashboard — Nexora" },
