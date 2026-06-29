@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          permissions: Json | null
+          profile_id: string | null
+          role_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          permissions?: Json | null
+          profile_id?: string | null
+          role_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          permissions?: Json | null
+          profile_id?: string | null
+          role_name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_roles_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_recommendations: {
         Row: {
           confidence_score: number | null
@@ -2104,6 +2142,76 @@ export type Database = {
           },
         ]
       }
+      rewards: {
+        Row: {
+          amount: number | null
+          booking_id: string | null
+          created_at: string | null
+          customer_id: string | null
+          description: string | null
+          expires_at: string | null
+          id: string
+          is_used: boolean | null
+          points: number | null
+          reward_type: Database["public"]["Enums"]["reward_type"] | null
+          shop_id: string | null
+          updated_at: string | null
+          used_at: string | null
+        }
+        Insert: {
+          amount?: number | null
+          booking_id?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          is_used?: boolean | null
+          points?: number | null
+          reward_type?: Database["public"]["Enums"]["reward_type"] | null
+          shop_id?: string | null
+          updated_at?: string | null
+          used_at?: string | null
+        }
+        Update: {
+          amount?: number | null
+          booking_id?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          is_used?: boolean | null
+          points?: number | null
+          reward_type?: Database["public"]["Enums"]["reward_type"] | null
+          shop_id?: string | null
+          updated_at?: string | null
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rewards_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rewards_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rewards_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rewards_ledger: {
         Row: {
           amount: number
@@ -2652,6 +2760,60 @@ export type Database = {
           },
         ]
       }
+      shop_staff: {
+        Row: {
+          created_at: string | null
+          full_name: string
+          id: string
+          is_active: boolean | null
+          job_title: string | null
+          phone: string | null
+          photo_url: string | null
+          profile_id: string | null
+          shop_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          full_name: string
+          id?: string
+          is_active?: boolean | null
+          job_title?: string | null
+          phone?: string | null
+          photo_url?: string | null
+          profile_id?: string | null
+          shop_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          full_name?: string
+          id?: string
+          is_active?: boolean | null
+          job_title?: string | null
+          phone?: string | null
+          photo_url?: string | null
+          profile_id?: string | null
+          shop_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_staff_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_staff_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shops: {
         Row: {
           address: string | null
@@ -2768,6 +2930,122 @@ export type Database = {
             columns: ["salon_id"]
             isOneToOne: false
             referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      templates: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          template_key: string
+          theme_config: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          template_key: string
+          theme_config?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          template_key?: string
+          theme_config?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number | null
+          booking_id: string | null
+          created_at: string | null
+          customer_id: string | null
+          gateway_reference: string | null
+          id: string
+          metadata: Json | null
+          net_amount: number | null
+          notes: string | null
+          platform_fee: number | null
+          shop_id: string | null
+          status: Database["public"]["Enums"]["transaction_status"] | null
+          type: Database["public"]["Enums"]["transaction_type"]
+          updated_at: string | null
+          wallet_id: string | null
+        }
+        Insert: {
+          amount?: number | null
+          booking_id?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          gateway_reference?: string | null
+          id?: string
+          metadata?: Json | null
+          net_amount?: number | null
+          notes?: string | null
+          platform_fee?: number | null
+          shop_id?: string | null
+          status?: Database["public"]["Enums"]["transaction_status"] | null
+          type: Database["public"]["Enums"]["transaction_type"]
+          updated_at?: string | null
+          wallet_id?: string | null
+        }
+        Update: {
+          amount?: number | null
+          booking_id?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          gateway_reference?: string | null
+          id?: string
+          metadata?: Json | null
+          net_amount?: number | null
+          notes?: string | null
+          platform_fee?: number | null
+          shop_id?: string | null
+          status?: Database["public"]["Enums"]["transaction_status"] | null
+          type?: Database["public"]["Enums"]["transaction_type"]
+          updated_at?: string | null
+          wallet_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
             referencedColumns: ["id"]
           },
         ]
@@ -2890,6 +3168,50 @@ export type Database = {
             columns: ["wallet_id"]
             isOneToOne: false
             referencedRelation: "salon_wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wallets: {
+        Row: {
+          available_balance: number | null
+          created_at: string | null
+          currency: string | null
+          id: string
+          lifetime_earned: number | null
+          pending_balance: number | null
+          reserve_amount: number | null
+          shop_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          available_balance?: number | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          lifetime_earned?: number | null
+          pending_balance?: number | null
+          reserve_amount?: number | null
+          shop_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          available_balance?: number | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          lifetime_earned?: number | null
+          pending_balance?: number | null
+          reserve_amount?: number | null
+          shop_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallets_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: true
+            referencedRelation: "shops"
             referencedColumns: ["id"]
           },
         ]
@@ -3581,6 +3903,12 @@ export type Database = {
         | "growth_partner"
         | "district_partner"
         | "distributor"
+      booking_status:
+        | "pending"
+        | "confirmed"
+        | "completed"
+        | "cancelled"
+        | "no_show"
       dbp_earning_status: "pending" | "approved" | "paid" | "rejected"
       dbp_earning_type:
         | "activation_reward"
@@ -3597,6 +3925,27 @@ export type Database = {
         | "growth_builder"
         | "platinum"
         | "leadership_circle"
+      reward_type:
+        | "points"
+        | "cashback"
+        | "referral"
+        | "membership"
+        | "admin_bonus"
+      transaction_status: "pending" | "success" | "failed" | "refunded"
+      transaction_type:
+        | "qr_payment"
+        | "booking_payment"
+        | "platform_commission"
+        | "owner_payout"
+        | "refund"
+        | "reward_credit"
+        | "referral_bonus"
+      user_role:
+        | "super_admin"
+        | "shop_owner"
+        | "shop_manager"
+        | "staff"
+        | "customer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3732,6 +4081,13 @@ export const Constants = {
         "district_partner",
         "distributor",
       ],
+      booking_status: [
+        "pending",
+        "confirmed",
+        "completed",
+        "cancelled",
+        "no_show",
+      ],
       dbp_earning_status: ["pending", "approved", "paid", "rejected"],
       dbp_earning_type: [
         "activation_reward",
@@ -3749,6 +4105,30 @@ export const Constants = {
         "growth_builder",
         "platinum",
         "leadership_circle",
+      ],
+      reward_type: [
+        "points",
+        "cashback",
+        "referral",
+        "membership",
+        "admin_bonus",
+      ],
+      transaction_status: ["pending", "success", "failed", "refunded"],
+      transaction_type: [
+        "qr_payment",
+        "booking_payment",
+        "platform_commission",
+        "owner_payout",
+        "refund",
+        "reward_credit",
+        "referral_bonus",
+      ],
+      user_role: [
+        "super_admin",
+        "shop_owner",
+        "shop_manager",
+        "staff",
+        "customer",
       ],
     },
   },
