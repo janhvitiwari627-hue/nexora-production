@@ -309,21 +309,24 @@ export default function CustomerRegistrationPage() {
     setGoogleSubmitting(true);
     try {
       console.log("[Register] Initiating Google OAuth...");
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
+      const { lovable } = await import("@/integrations/lovable/index");
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
       });
 
-      if (error) {
-        console.error("[Register] Google OAuth error:", error);
-        setServerError(parseErrorMessage(error));
+      if (result.error) {
+        console.error("[Register] Google OAuth error:", result.error);
+        setServerError(parseErrorMessage(result.error));
         return;
       }
 
-      console.log("[Register] Google OAuth initiated, redirecting...");
-      // Supabase will redirect to the OAuth provider, then to /auth/callback
+      if (result.redirected) {
+        console.log("[Register] Google OAuth initiated, redirecting...");
+        return;
+      }
+
+      window.location.href = "/";
+
     } catch (err) {
       console.error("[Register] Google OAuth unexpected error:", err);
       setServerError(parseErrorMessage(err));
