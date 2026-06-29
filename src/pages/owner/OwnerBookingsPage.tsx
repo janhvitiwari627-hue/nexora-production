@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import {
-  ownerBookings as initialBookings,
   STATUS_META,
   type OwnerBooking,
   type OwnerBookingStatus,
@@ -30,12 +29,8 @@ const TABS: { key: FilterTab; label: string }[] = [
 type ViewMode = "cards" | "calendar" | "list";
 
 export function OwnerBookingsPage() {
-  const [mockBookings, setMockBookings] = useState<OwnerBooking[]>(initialBookings);
-  const { activeSalon, isLive } = (() => {
-    const ctx = useOwnerContext();
-    return { activeSalon: ctx.activeSalon, isLive: ctx.hasSalon };
-  })();
-  const live = useOwnerLiveBookings(mockBookings);
+  const { activeSalon, hasSalon: isLive } = useOwnerContext();
+  const live = useOwnerLiveBookings();
   const bookings = live.bookings;
   const [tab, setTab] = useState<FilterTab>("all");
   const [query, setQuery] = useState("");
@@ -63,11 +58,7 @@ export function OwnerBookingsPage() {
   }, [bookings]);
 
   const updateStatus = (id: string, next: OwnerBookingStatus) => {
-    if (isLive) {
-      live.setStatus(id, next);
-    } else {
-      setMockBookings((prev) => prev.map((b) => (b.id === id ? { ...b, status: next } : b)));
-    }
+    live.setStatus(id, next);
   };
 
   const handleSelect = (id: string, checked: boolean) => {
@@ -85,22 +76,12 @@ export function OwnerBookingsPage() {
 
   const acceptSelected = () => {
     const ids = Array.from(selectedIds);
-    if (isLive) {
-      ids.forEach((id) => {
-        const b = bookings.find((x) => x.id === id);
-        if (b && (b.status === "pending" || b.status === "confirmed")) {
-          live.setStatus(id, "accepted");
-        }
-      });
-    } else {
-      setMockBookings((prev) =>
-        prev.map((b) =>
-          selectedIds.has(b.id) && (b.status === "pending" || b.status === "confirmed")
-            ? { ...b, status: "accepted" }
-            : b,
-        ),
-      );
-    }
+    ids.forEach((id) => {
+      const b = bookings.find((x) => x.id === id);
+      if (b && (b.status === "pending" || b.status === "confirmed")) {
+        live.setStatus(id, "accepted");
+      }
+    });
     setSelectedIds(new Set());
   };
 
