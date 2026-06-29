@@ -122,15 +122,23 @@ function RootComponent() {
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
-    if (window.location.pathname === "/auth/callback") {
-      return () => undefined;
-    }
-    void import("@/stores/authStore").then(({ useAuthStore }) => {
-      useAuthStore.getState().initialize().then((unsub) => {
-        unsubscribe = unsub;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const initializeAuthStore = () => {
+      void import("@/stores/authStore").then(({ useAuthStore }) => {
+        useAuthStore.getState().initialize().then((unsub) => {
+          unsubscribe = unsub;
+        });
       });
-    });
+    };
+
+    if (window.location.pathname === "/auth/callback") {
+      timer = setTimeout(initializeAuthStore, 3000);
+    } else {
+      initializeAuthStore();
+    }
+
     return () => {
+      if (timer) clearTimeout(timer);
       unsubscribe?.();
     };
   }, []);
