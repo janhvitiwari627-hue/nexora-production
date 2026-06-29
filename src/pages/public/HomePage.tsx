@@ -31,7 +31,6 @@ import {
   TrendingUp,
   Layers,
   LogOut,
-  ArrowLeft,
 } from "lucide-react";
 import Footer from "@/components/nexora-design/sections/Footer";
 import { shopsQueryOptions } from "@/lib/shops.queries";
