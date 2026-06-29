@@ -13,12 +13,12 @@ const ROLE_PRIORITY: UserRole[] = [
 ];
 
 const ROLE_ROUTES: Record<UserRole, string> = {
-  admin: "/admin/dashboard",
+  admin: "/admin",
   owner: "/owner/dashboard",
   distributor: "/partner/dashboard",
   district_partner: "/partner/dashboard",
   growth_partner: "/partner/dashboard",
-  customer: "/dashboard",
+  customer: "/",
 };
 
 export async function fetchUserRoles(userId: string): Promise<UserRole[]> {
@@ -37,8 +37,12 @@ export function pickPrimaryRole(roles: UserRole[]): UserRole {
   return "customer";
 }
 
-export function routeForRole(role: UserRole): string {
-  return ROLE_ROUTES[role] ?? "/dashboard";
+export function routeForRole(role: UserRole | "staff" | "shop_owner" | "shop_manager" | "super_admin"): string {
+  // Map spec role names to existing app_role enum
+  if (role === "super_admin") return "/admin";
+  if (role === "shop_owner" || role === "shop_manager") return "/owner/dashboard";
+  if (role === "staff") return "/staff/dashboard";
+  return ROLE_ROUTES[role as UserRole] ?? "/";
 }
 
 export async function resolvePostLoginRedirect(userId: string): Promise<string> {
