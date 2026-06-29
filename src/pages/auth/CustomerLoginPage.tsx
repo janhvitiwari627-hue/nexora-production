@@ -137,22 +137,25 @@ export default function CustomerLoginPage() {
     setGoogleSubmitting(true);
     try {
       console.log("[Login] Initiating Google OAuth...");
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
+      const { lovable } = await import("@/integrations/lovable/index");
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
       });
 
-      if (error) {
-        console.error("[Login] Google OAuth error:", error.message);
+      if (result.error) {
+        console.error("[Login] Google OAuth error:", result.error.message ?? result.error);
         setServerError("Google sign-in failed. Please try again.");
         return;
       }
 
-      console.log("[Login] Google OAuth initiated, redirecting...");
-      // Supabase will redirect to the OAuth provider, then to /auth/callback
-      // The callback page will handle the session and redirect
+      if (result.redirected) {
+        console.log("[Login] Google OAuth initiated, redirecting...");
+        return;
+      }
+
+      // Session set inline (preview iframe flow) — navigate to home
+      window.location.href = "/";
+
     } catch (err) {
       console.error("[Login] Google OAuth unexpected error:", err);
       setServerError(err instanceof Error ? err.message : "Google sign-in failed");
