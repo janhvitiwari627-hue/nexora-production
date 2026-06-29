@@ -9,8 +9,26 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Mail, User, Building2, BadgeCheck, XCircle, Crown, Eye, EyeOff, ChevronDown, ChevronUp, Check, Info, AlertCircle } from "lucide-react";
-import { PasswordStrengthIndicator, scorePassword } from "@/components/auth/PasswordStrengthIndicator";
+import {
+  Loader2,
+  Mail,
+  User,
+  Building2,
+  BadgeCheck,
+  XCircle,
+  Crown,
+  Eye,
+  EyeOff,
+  ChevronDown,
+  ChevronUp,
+  Check,
+  Info,
+  AlertCircle,
+} from "lucide-react";
+import {
+  PasswordStrengthIndicator,
+  scorePassword,
+} from "@/components/auth/PasswordStrengthIndicator";
 import { validateReferralCode, registerMySalon } from "@/lib/owner.functions";
 import { registerDistrictPartner } from "@/lib/districtPartner.functions";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -28,18 +46,20 @@ const normalizeEmail = (value: string) => value.trim().toLowerCase();
  * Handles Supabase AuthError, plain Error, string, or bare objects (some
  * network / GoTrue failures surface as `{}` with no enumerable props).
  */
-function extractErrorMessage(error: unknown, fallback = "Something went wrong. Please try again."): string {
+function extractErrorMessage(
+  error: unknown,
+  fallback = "Something went wrong. Please try again.",
+): string {
   if (!error) return fallback;
   if (typeof error === "string") return error || fallback;
   if (typeof error === "object") {
-    const e = error as { message?: string; error_description?: string; msg?: string; statusText?: string };
-    return (
-      e.message ||
-      e.error_description ||
-      e.msg ||
-      e.statusText ||
-      fallback
-    );
+    const e = error as {
+      message?: string;
+      error_description?: string;
+      msg?: string;
+      statusText?: string;
+    };
+    return e.message || e.error_description || e.msg || e.statusText || fallback;
   }
   return fallback;
 }
@@ -166,8 +186,15 @@ export default function CustomerRegistrationPage() {
   const validateRef = useServerFn(validateReferralCode);
   useEffect(() => {
     const code = form.referred_by.trim();
-    if (!code) { setRefStatus("idle"); setRefName(null); return; }
-    if (code.length < 3) { setRefStatus("idle"); return; }
+    if (!code) {
+      setRefStatus("idle");
+      setRefName(null);
+      return;
+    }
+    if (code.length < 3) {
+      setRefStatus("idle");
+      return;
+    }
     setRefStatus("checking");
     const t = setTimeout(async () => {
       try {
@@ -229,7 +256,11 @@ export default function CustomerRegistrationPage() {
     setErrors({});
 
     const schema =
-      accountType === "owner" ? ownerSchema : accountType === "district_partner" ? dbpSchema : baseSchema;
+      accountType === "owner"
+        ? ownerSchema
+        : accountType === "district_partner"
+          ? dbpSchema
+          : baseSchema;
     const parsed = schema.safeParse(form);
     if (!parsed.success) {
       const flat: Record<string, string> = {};
@@ -268,13 +299,18 @@ export default function CustomerRegistrationPage() {
         },
       });
 
-      console.log("[Register] Supabase response:", { user: !!data.user, session: !!data.session, error: error?.message });
+      console.log("[Register] Supabase response:", {
+        user: !!data.user,
+        session: !!data.session,
+        error: error?.message,
+      });
 
       if (error) {
         const raw = parseErrorMessage(error);
         let errorMessage = raw;
         if (/user already registered|already registered|already exists/i.test(raw)) {
-          errorMessage = "Email already registered hai. Please sign in karein, ya password bhool gaye hain to reset link bhejein.";
+          errorMessage =
+            "Email already registered hai. Please sign in karein, ya password bhool gaye hain to reset link bhejein.";
           setAlreadyRegisteredEmail(email);
           setResetSent(false);
         } else if (/invalid email|email format/i.test(raw)) {
@@ -284,7 +320,8 @@ export default function CustomerRegistrationPage() {
         } else if (/password.*(at least|minimum|short|chars)/i.test(raw)) {
           errorMessage = "Password must be at least 8 characters.";
         } else if (/weak password|known to be weak|easy to guess|breach|pwned/i.test(raw)) {
-          errorMessage = "Password is too weak or commonly used. Please choose a stronger password.";
+          errorMessage =
+            "Password is too weak or commonly used. Please choose a stronger password.";
         } else if (/rate limit|too many|busy|try again later|server error|5\d\d/i.test(raw)) {
           errorMessage = "Server is busy. Please try again in a moment.";
         } else if (/network|fetch|connection|failed to fetch|timeout|offline/i.test(raw)) {
@@ -331,7 +368,9 @@ export default function CustomerRegistrationPage() {
       if (!data.session && data.user) {
         // Email confirmation required - show message to user
         console.log("[Register] Email confirmation required for user:", data.user.id);
-        setServerError("Please verify your email before signing in. Check your inbox for the confirmation link.");
+        setServerError(
+          "Please verify your email before signing in. Check your inbox for the confirmation link.",
+        );
         setSubmitting(false);
         return;
       }
@@ -341,7 +380,7 @@ export default function CustomerRegistrationPage() {
         console.log("[Register] Successfully signed up and signed in user:", data.session.user.id);
         useAuthStore.getState().setSession(data.session);
         await useAuthStore.getState().refreshProfile();
-        
+
         if (accountType === "owner") {
           navigate({ to: "/owner/pending" });
         } else if (accountType === "district_partner") {
@@ -390,7 +429,6 @@ export default function CustomerRegistrationPage() {
       } else {
         navigate({ to: "/", replace: true });
       }
-
     } catch (err) {
       console.error("[Register] Google OAuth unexpected error:", err);
       setServerError(parseErrorMessage(err));
@@ -400,8 +438,8 @@ export default function CustomerRegistrationPage() {
   };
 
   return (
-  <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
-    <PublicPageHeader />
+    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
+      <PublicPageHeader />
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">Create your account</CardTitle>
@@ -410,9 +448,18 @@ export default function CustomerRegistrationPage() {
         <CardContent className="space-y-4">
           <Tabs value={accountType} onValueChange={(v) => setAccountType(v as AccountType)}>
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="customer" className="gap-1.5 text-xs sm:text-sm"><User className="h-3.5 w-3.5" />Customer</TabsTrigger>
-              <TabsTrigger value="owner" className="gap-1.5 text-xs sm:text-sm"><Building2 className="h-3.5 w-3.5" />Salon Owner</TabsTrigger>
-              <TabsTrigger value="district_partner" className="gap-1.5 text-xs sm:text-sm"><Crown className="h-3.5 w-3.5" />District Partner</TabsTrigger>
+              <TabsTrigger value="customer" className="gap-1.5 text-xs sm:text-sm">
+                <User className="h-3.5 w-3.5" />
+                Customer
+              </TabsTrigger>
+              <TabsTrigger value="owner" className="gap-1.5 text-xs sm:text-sm">
+                <Building2 className="h-3.5 w-3.5" />
+                Salon Owner
+              </TabsTrigger>
+              <TabsTrigger value="district_partner" className="gap-1.5 text-xs sm:text-sm">
+                <Crown className="h-3.5 w-3.5" />
+                District Partner
+              </TabsTrigger>
             </TabsList>
           </Tabs>
 
@@ -420,7 +467,8 @@ export default function CustomerRegistrationPage() {
             <div className="space-y-4">
               <Alert>
                 <AlertDescription className="text-xs">
-                  District Business Partner application. After signup your application goes for verification — no joining fee, no investment, performance-based rewards.
+                  District Business Partner application. After signup your application goes for
+                  verification — no joining fee, no investment, performance-based rewards.
                 </AlertDescription>
               </Alert>
 
@@ -433,7 +481,11 @@ export default function CustomerRegistrationPage() {
               >
                 <Info className="mr-2 h-4 w-4" />
                 <span className="font-medium">Who can become a Nexora Business Partner?</span>
-                {showEligibility ? <ChevronUp className="ml-auto h-4 w-4" /> : <ChevronDown className="ml-auto h-4 w-4" />}
+                {showEligibility ? (
+                  <ChevronUp className="ml-auto h-4 w-4" />
+                ) : (
+                  <ChevronDown className="ml-auto h-4 w-4" />
+                )}
               </Button>
 
               {showEligibility && (
@@ -442,9 +494,12 @@ export default function CustomerRegistrationPage() {
                     <ScrollArea className="max-h-96 pr-2">
                       <div className="space-y-6 text-sm">
                         <div>
-                          <h3 className="font-semibold text-foreground mb-3">WHO IS THIS PROGRAM FOR?</h3>
+                          <h3 className="font-semibold text-foreground mb-3">
+                            WHO IS THIS PROGRAM FOR?
+                          </h3>
                           <p className="text-muted-foreground mb-3">
-                            This opportunity is designed for professionals who already work in or have strong connections with the beauty industry.
+                            This opportunity is designed for professionals who already work in or
+                            have strong connections with the beauty industry.
                           </p>
                           <p className="font-medium mb-2">Eligible categories include:</p>
                           <ul className="list-disc list-inside space-y-1 text-muted-foreground">
@@ -466,7 +521,7 @@ export default function CustomerRegistrationPage() {
 
                         <div>
                           <h3 className="font-semibold text-foreground mb-3">BASIC ELIGIBILITY</h3>
-                          
+
                           <div className="space-y-4">
                             <div>
                               <h4 className="font-medium mb-1">Minimum Age</h4>
@@ -476,44 +531,55 @@ export default function CustomerRegistrationPage() {
                             <div>
                               <h4 className="font-medium mb-1">Education</h4>
                               <p className="text-muted-foreground">
-                                No Minimum Degree Required. Experience, communication skills, professionalism, and industry relationships 
-                                are valued more than formal education.
+                                No Minimum Degree Required. Experience, communication skills,
+                                professionalism, and industry relationships are valued more than
+                                formal education.
                               </p>
                             </div>
 
                             <div>
                               <h4 className="font-medium mb-1">Experience</h4>
                               <p className="text-muted-foreground">
-                                <strong className="text-foreground">Preferred:</strong> Minimum 1 Year of Beauty Industry Experience
+                                <strong className="text-foreground">Preferred:</strong> Minimum 1
+                                Year of Beauty Industry Experience
                               </p>
                               <p className="text-muted-foreground mt-1">
-                                OR Existing Relationships with Salon Owners, Beauty Parlours, Spas, Tattoo Studios, 
-                                Nail Art Studios, Beauty Product Distributors, or Related Businesses.
+                                OR Existing Relationships with Salon Owners, Beauty Parlours, Spas,
+                                Tattoo Studios, Nail Art Studios, Beauty Product Distributors, or
+                                Related Businesses.
                               </p>
                               <p className="text-muted-foreground mt-1 text-xs">
-                                Exceptional candidates with strong local networks may also be considered.
+                                Exceptional candidates with strong local networks may also be
+                                considered.
                               </p>
                             </div>
 
                             <div>
                               <h4 className="font-medium mb-1">Location</h4>
                               <p className="text-muted-foreground">
-                                Currently accepting applications from launch and expansion cities where Nexora is operating.
-                                Applicants should be willing to work within their assigned local area or district.
+                                Currently accepting applications from launch and expansion cities
+                                where Nexora is operating. Applicants should be willing to work
+                                within their assigned local area or district.
                               </p>
                             </div>
 
                             <div>
                               <h4 className="font-medium mb-1">Identity Verification (KYC)</h4>
-                              <p className="text-muted-foreground mb-2">Applicants must complete identity verification before activation.</p>
-                              <p className="text-muted-foreground mb-1">Required documents may include:</p>
+                              <p className="text-muted-foreground mb-2">
+                                Applicants must complete identity verification before activation.
+                              </p>
+                              <p className="text-muted-foreground mb-1">
+                                Required documents may include:
+                              </p>
                               <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                                 <li>Aadhaar Card</li>
                                 <li>PAN Card</li>
                                 <li>Recent Passport-size Photograph</li>
                                 <li>Bank Account Details (for payouts)</li>
                               </ul>
-                              <p className="text-muted-foreground text-xs mt-2">Activation is subject to successful verification.</p>
+                              <p className="text-muted-foreground text-xs mt-2">
+                                Activation is subject to successful verification.
+                              </p>
                             </div>
 
                             <div>
@@ -534,9 +600,11 @@ export default function CustomerRegistrationPage() {
                             <div>
                               <h4 className="font-medium mb-1">Travel Requirement</h4>
                               <p className="text-muted-foreground">
-                                Since the role involves meeting salon owners and supporting onboarding, applicants should be comfortable 
-                                traveling within their assigned city or district. Having a two-wheeler or other reliable local transportation 
-                                is recommended but not mandatory unless specified for a particular region.
+                                Since the role involves meeting salon owners and supporting
+                                onboarding, applicants should be comfortable traveling within their
+                                assigned city or district. Having a two-wheeler or other reliable
+                                local transportation is recommended but not mandatory unless
+                                specified for a particular region.
                               </p>
                             </div>
                           </div>
@@ -545,8 +613,12 @@ export default function CustomerRegistrationPage() {
                         <Separator />
 
                         <div>
-                          <h3 className="font-semibold text-foreground mb-3">IDEAL BUSINESS PARTNER PROFILE</h3>
-                          <p className="text-muted-foreground mb-2">The best Nexora Business Partners are people who:</p>
+                          <h3 className="font-semibold text-foreground mb-3">
+                            IDEAL BUSINESS PARTNER PROFILE
+                          </h3>
+                          <p className="text-muted-foreground mb-2">
+                            The best Nexora Business Partners are people who:
+                          </p>
                           <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                             <li>Already know local salon owners.</li>
                             <li>Enjoy building professional relationships.</li>
@@ -563,7 +635,9 @@ export default function CustomerRegistrationPage() {
                           <h3 className="font-semibold text-destructive mb-3 flex items-center gap-2">
                             <AlertCircle className="h-4 w-4" /> WHO THIS PROGRAM IS NOT FOR
                           </h3>
-                          <p className="text-muted-foreground mb-2">This program may not be suitable for individuals who:</p>
+                          <p className="text-muted-foreground mb-2">
+                            This program may not be suitable for individuals who:
+                          </p>
                           <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                             <li>Are looking only for a fixed salary job.</li>
                             <li>Do not enjoy meeting business owners.</li>
@@ -578,14 +652,33 @@ export default function CustomerRegistrationPage() {
                         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                           <h3 className="font-semibold text-green-800 mb-3">ELIGIBILITY SUMMARY</h3>
                           <ul className="space-y-1 text-green-800">
-                            <li className="flex items-center gap-2"><Check className="h-4 w-4 flex-shrink-0" /> Minimum Age: 18+</li>
-                            <li className="flex items-center gap-2"><Check className="h-4 w-4 flex-shrink-0" /> No Mandatory Degree</li>
-                            <li className="flex items-center gap-2"><Check className="h-4 w-4 flex-shrink-0" /> Beauty Industry Experience Preferred</li>
-                            <li className="flex items-center gap-2"><Check className="h-4 w-4 flex-shrink-0" /> Existing Salon Network Preferred</li>
-                            <li className="flex items-center gap-2"><Check className="h-4 w-4 flex-shrink-0" /> KYC Verification Required</li>
-                            <li className="flex items-center gap-2"><Check className="h-4 w-4 flex-shrink-0" /> Smartphone Required</li>
-                            <li className="flex items-center gap-2"><Check className="h-4 w-4 flex-shrink-0" /> Local Travel Preferred</li>
-                            <li className="flex items-center gap-2"><Check className="h-4 w-4 flex-shrink-0" /> Professional Communication Skills</li>
+                            <li className="flex items-center gap-2">
+                              <Check className="h-4 w-4 flex-shrink-0" /> Minimum Age: 18+
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <Check className="h-4 w-4 flex-shrink-0" /> No Mandatory Degree
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <Check className="h-4 w-4 flex-shrink-0" /> Beauty Industry Experience
+                              Preferred
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <Check className="h-4 w-4 flex-shrink-0" /> Existing Salon Network
+                              Preferred
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <Check className="h-4 w-4 flex-shrink-0" /> KYC Verification Required
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <Check className="h-4 w-4 flex-shrink-0" /> Smartphone Required
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <Check className="h-4 w-4 flex-shrink-0" /> Local Travel Preferred
+                            </li>
+                            <li className="flex items-center gap-2">
+                              <Check className="h-4 w-4 flex-shrink-0" /> Professional Communication
+                              Skills
+                            </li>
                           </ul>
                         </div>
 
@@ -594,11 +687,13 @@ export default function CustomerRegistrationPage() {
                         <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
                           <h3 className="font-semibold text-primary mb-2">FINAL MESSAGE</h3>
                           <p className="text-muted-foreground">
-                            If you already know salon owners, beauty professionals, or distributors, you already have the most valuable 
-                            asset needed to become a Nexora Business Partner.
+                            If you already know salon owners, beauty professionals, or distributors,
+                            you already have the most valuable asset needed to become a Nexora
+                            Business Partner.
                           </p>
                           <p className="text-muted-foreground mt-2">
-                            Your existing relationships can become the foundation of a long-term digital business with Nexora SalonOS.
+                            Your existing relationships can become the foundation of a long-term
+                            digital business with Nexora SalonOS.
                           </p>
                         </div>
                       </div>
@@ -611,15 +706,32 @@ export default function CustomerRegistrationPage() {
 
           {accountType === "customer" && (
             <Button
-              type="button" variant="outline" className="w-full"
-              onClick={handleGoogle} disabled={googleSubmitting || submitting}
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={handleGoogle}
+              disabled={googleSubmitting || submitting}
             >
-              {googleSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (
+              {googleSubmitting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
                 <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                  <path
+                    fill="#4285F4"
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                  />
+                  <path
+                    fill="#EA4335"
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                  />
                 </svg>
               )}
               Continue with Google
@@ -628,7 +740,9 @@ export default function CustomerRegistrationPage() {
 
           {accountType === "customer" && (
             <div className="relative">
-              <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-card px-2 text-muted-foreground">Or with email</span>
               </div>
@@ -647,10 +761,13 @@ export default function CustomerRegistrationPage() {
             <Alert className="border-primary/20 bg-primary/5">
               <AlertDescription className="space-y-2 text-sm">
                 <p>
-                  <strong>{alreadyRegisteredEmail}</strong> already registered hai. Same account use karne ke liye login karein.
+                  <strong>{alreadyRegisteredEmail}</strong> already registered hai. Same account use
+                  karne ke liye login karein.
                 </p>
                 {resetSent ? (
-                  <p className="font-medium text-primary">Reset link sent. Inbox/spam check karke new password set karein.</p>
+                  <p className="font-medium text-primary">
+                    Reset link sent. Inbox/spam check karke new password set karein.
+                  </p>
                 ) : (
                   <div className="grid gap-2 sm:grid-cols-2">
                     <Button type="button" variant="outline" size="sm" asChild>
@@ -675,21 +792,40 @@ export default function CustomerRegistrationPage() {
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="space-y-1">
               <Label htmlFor="full_name">Full name</Label>
-              <Input id="full_name" value={form.full_name} onChange={update("full_name")} autoComplete="name" required disabled={submitting} />
+              <Input
+                id="full_name"
+                value={form.full_name}
+                onChange={update("full_name")}
+                autoComplete="name"
+                required
+                disabled={submitting}
+              />
               {errors.full_name && <p className="text-xs text-destructive">{errors.full_name}</p>}
             </div>
 
             <div className="space-y-1">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" value={form.email} onChange={update("email")} autoComplete="email" required disabled={submitting} />
+              <Input
+                id="email"
+                type="email"
+                value={form.email}
+                onChange={update("email")}
+                autoComplete="email"
+                required
+                disabled={submitting}
+              />
               {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
             </div>
 
             <div className="space-y-1">
               <Label htmlFor="mobile">Mobile</Label>
               <Input
-                id="mobile" type="tel" value={form.mobile} onChange={update("mobile")}
-                autoComplete="tel" placeholder="+91 9876543210"
+                id="mobile"
+                type="tel"
+                value={form.mobile}
+                onChange={update("mobile")}
+                autoComplete="tel"
+                placeholder="+91 9876543210"
                 required
                 disabled={submitting}
               />
@@ -700,12 +836,29 @@ export default function CustomerRegistrationPage() {
               <>
                 <div className="space-y-1">
                   <Label htmlFor="business_name">Business name</Label>
-                  <Input id="business_name" value={form.business_name} onChange={update("business_name")} required placeholder="e.g. Luxe Hair & Spa" disabled={submitting} />
-                  {errors.business_name && <p className="text-xs text-destructive">{errors.business_name}</p>}
+                  <Input
+                    id="business_name"
+                    value={form.business_name}
+                    onChange={update("business_name")}
+                    required
+                    placeholder="e.g. Luxe Hair & Spa"
+                    disabled={submitting}
+                  />
+                  {errors.business_name && (
+                    <p className="text-xs text-destructive">{errors.business_name}</p>
+                  )}
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="business_city">City <span className="text-xs text-muted-foreground">(optional)</span></Label>
-                  <Input id="business_city" value={form.business_city} onChange={update("business_city")} placeholder="Mumbai" disabled={submitting} />
+                  <Label htmlFor="business_city">
+                    City <span className="text-xs text-muted-foreground">(optional)</span>
+                  </Label>
+                  <Input
+                    id="business_city"
+                    value={form.business_city}
+                    onChange={update("business_city")}
+                    placeholder="Mumbai"
+                    disabled={submitting}
+                  />
                 </div>
               </>
             )}
@@ -714,18 +867,36 @@ export default function CustomerRegistrationPage() {
               <>
                 <div className="space-y-1">
                   <Label htmlFor="district">District</Label>
-                  <Input id="district" value={form.district} onChange={update("district")} required placeholder="e.g. Jaipur" disabled={submitting} />
+                  <Input
+                    id="district"
+                    value={form.district}
+                    onChange={update("district")}
+                    required
+                    placeholder="e.g. Jaipur"
+                    disabled={submitting}
+                  />
                   {errors.district && <p className="text-xs text-destructive">{errors.district}</p>}
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="state">State <span className="text-xs text-muted-foreground">(optional)</span></Label>
-                  <Input id="state" value={form.state} onChange={update("state")} placeholder="Rajasthan" disabled={submitting} />
+                  <Label htmlFor="state">
+                    State <span className="text-xs text-muted-foreground">(optional)</span>
+                  </Label>
+                  <Input
+                    id="state"
+                    value={form.state}
+                    onChange={update("state")}
+                    placeholder="Rajasthan"
+                    disabled={submitting}
+                  />
                 </div>
               </>
             )}
 
             <div className="space-y-1.5">
-              <Label htmlFor="password">Password <span className="text-xs text-muted-foreground">(minimum 8 characters)</span></Label>
+              <Label htmlFor="password">
+                Password{" "}
+                <span className="text-xs text-muted-foreground">(minimum 8 characters)</span>
+              </Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -758,14 +929,35 @@ export default function CustomerRegistrationPage() {
                     Create a strong password:
                   </p>
                   <ul className="space-y-1 pl-1">
-                    <li className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-success" />Mix of letters, numbers &amp; symbols</li>
-                    <li className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-success" />Minimum 8 characters</li>
-                    <li className="flex items-center gap-2 text-success/90">Example: <span className="font-mono">Nexora@123</span></li>
-                    <li className="flex items-center gap-2 text-success/90">Example: <span className="font-mono">MySalon#2024</span></li>
-                    <li className="flex items-center gap-2 text-success/90">Example: <span className="font-mono">Jaipur@567</span></li>
-                    <li className="flex items-center gap-2 text-destructive/80"><XCircle className="h-3.5 w-3.5" />Avoid: <span className="font-mono">12345678</span></li>
-                    <li className="flex items-center gap-2 text-destructive/80"><XCircle className="h-3.5 w-3.5" />Avoid: <span className="font-mono">password</span></li>
-                    <li className="flex items-center gap-2 text-destructive/80"><XCircle className="h-3.5 w-3.5" />Avoid: your name or email</li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-3.5 w-3.5 text-success" />
+                      Mix of letters, numbers &amp; symbols
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-3.5 w-3.5 text-success" />
+                      Minimum 8 characters
+                    </li>
+                    <li className="flex items-center gap-2 text-success/90">
+                      Example: <span className="font-mono">Nexora@123</span>
+                    </li>
+                    <li className="flex items-center gap-2 text-success/90">
+                      Example: <span className="font-mono">MySalon#2024</span>
+                    </li>
+                    <li className="flex items-center gap-2 text-success/90">
+                      Example: <span className="font-mono">Jaipur@567</span>
+                    </li>
+                    <li className="flex items-center gap-2 text-destructive/80">
+                      <XCircle className="h-3.5 w-3.5" />
+                      Avoid: <span className="font-mono">12345678</span>
+                    </li>
+                    <li className="flex items-center gap-2 text-destructive/80">
+                      <XCircle className="h-3.5 w-3.5" />
+                      Avoid: <span className="font-mono">password</span>
+                    </li>
+                    <li className="flex items-center gap-2 text-destructive/80">
+                      <XCircle className="h-3.5 w-3.5" />
+                      Avoid: your name or email
+                    </li>
                   </ul>
                 </div>
               )}
@@ -774,27 +966,46 @@ export default function CustomerRegistrationPage() {
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="referred_by">Referral code <span className="text-xs text-muted-foreground">(optional)</span></Label>
+              <Label htmlFor="referred_by">
+                Referral code <span className="text-xs text-muted-foreground">(optional)</span>
+              </Label>
               <div className="relative">
                 <Input
-                  id="referred_by" value={form.referred_by}
-                  onChange={(e) => setForm((f) => ({ ...f, referred_by: e.target.value.toUpperCase() }))}
-                  autoComplete="off" placeholder="e.g. ABC123" className="pr-9"
+                  id="referred_by"
+                  value={form.referred_by}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, referred_by: e.target.value.toUpperCase() }))
+                  }
+                  autoComplete="off"
+                  placeholder="e.g. ABC123"
+                  className="pr-9"
                   disabled={submitting}
                 />
                 <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                  {refStatus === "checking" && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+                  {refStatus === "checking" && (
+                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                  )}
                   {refStatus === "valid" && <BadgeCheck className="h-4 w-4 text-success" />}
                   {refStatus === "invalid" && <XCircle className="h-4 w-4 text-destructive" />}
                 </div>
               </div>
-              {refStatus === "valid" && refName && <p className="text-xs text-success">Referred by {refName}</p>}
-              {refStatus === "invalid" && form.referred_by && <p className="text-xs text-destructive">Referral code not found</p>}
-              {errors.referred_by && <p className="text-xs text-destructive">{errors.referred_by}</p>}
+              {refStatus === "valid" && refName && (
+                <p className="text-xs text-success">Referred by {refName}</p>
+              )}
+              {refStatus === "invalid" && form.referred_by && (
+                <p className="text-xs text-destructive">Referral code not found</p>
+              )}
+              {errors.referred_by && (
+                <p className="text-xs text-destructive">{errors.referred_by}</p>
+              )}
             </div>
 
             <Button type="submit" className="w-full" disabled={submitting}>
-              {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Mail className="mr-2 h-4 w-4" />}
+              {submitting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Mail className="mr-2 h-4 w-4" />
+              )}
               {accountType === "owner"
                 ? "Register business"
                 : accountType === "district_partner"
@@ -805,7 +1016,9 @@ export default function CustomerRegistrationPage() {
 
           <p className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link to="/login" className="text-primary underline-offset-4 hover:underline">Sign in</Link>
+            <Link to="/login" className="text-primary underline-offset-4 hover:underline">
+              Sign in
+            </Link>
           </p>
         </CardContent>
       </Card>

@@ -46,14 +46,12 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-  <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
-    <PublicPageHeader />
+    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
+      <PublicPageHeader />
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Forgot your password?</CardTitle>
-          <CardDescription>
-            Enter your email and we'll send you a link to reset it.
-          </CardDescription>
+          <CardDescription>Enter your email and we'll send you a link to reset it.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {sent ? (
@@ -82,7 +80,11 @@ export default function ForgotPasswordPage() {
                 />
               </div>
               <Button type="submit" className="w-full" disabled={submitting}>
-                {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Mail className="mr-2 h-4 w-4" />}
+                {submitting ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Mail className="mr-2 h-4 w-4" />
+                )}
                 Send reset link
               </Button>
             </form>

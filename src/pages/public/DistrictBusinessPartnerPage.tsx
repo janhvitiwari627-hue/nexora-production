@@ -127,11 +127,30 @@ const ecosystem = [
   "Customers",
 ];
 
-const youKnow = ["Salon Owners", "Barber Shops", "Beauty Parlours", "Distributors", "Beauty Brands"];
-const nexoraGives = ["Technology", "Booking System", "Website", "CRM", "Growth Tools", "Brand Power", "Digital Ecosystem"];
+const youKnow = [
+  "Salon Owners",
+  "Barber Shops",
+  "Beauty Parlours",
+  "Distributors",
+  "Beauty Brands",
+];
+const nexoraGives = [
+  "Technology",
+  "Booking System",
+  "Website",
+  "CRM",
+  "Growth Tools",
+  "Brand Power",
+  "Digital Ecosystem",
+];
 
 const steps = [
-  { n: 1, title: "Salon Connect Karo", desc: "Apne network ke salons se baat karo", icon: Handshake },
+  {
+    n: 1,
+    title: "Salon Connect Karo",
+    desc: "Apne network ke salons se baat karo",
+    icon: Handshake,
+  },
   { n: 2, title: "Salon Onboard Karo", desc: "Nexora platform pe register karwao", icon: Store },
   { n: 3, title: "Revenue Generate", desc: "Salon active bookings le", icon: TrendingUp },
   { n: 4, title: "Partner Share Unlock", desc: "Aapka reward activate", icon: Gift },
@@ -288,8 +307,8 @@ const idealFor = [
 
 export default function DistrictBusinessPartnerPage() {
   return (
-  <div className="min-h-screen bg-background text-foreground">
-    <PublicPageHeader />
+    <div className="min-h-screen bg-background text-foreground">
+      <PublicPageHeader />
       {/* HERO */}
       <section className="relative overflow-hidden bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 dark:from-amber-950/30 dark:via-orange-950/20 dark:to-rose-950/30 px-6 py-20 md:py-28">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-amber-200/40 via-transparent to-transparent dark:from-amber-500/10" />
@@ -305,8 +324,16 @@ export default function DistrictBusinessPartnerPage() {
           </p>
 
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            {["Salary Nahi, Growth Share", "Shop Add Nahi, Business Build Karo", "Apne District Ka Growth Leader Bano", "Nexora Ko Grow Karo, Khud Grow Karo"].map((t) => (
-              <span key={t} className="rounded-full bg-white/80 px-4 py-1.5 text-sm font-medium text-amber-900 shadow-sm backdrop-blur dark:bg-white/10 dark:text-amber-100">
+            {[
+              "Salary Nahi, Growth Share",
+              "Shop Add Nahi, Business Build Karo",
+              "Apne District Ka Growth Leader Bano",
+              "Nexora Ko Grow Karo, Khud Grow Karo",
+            ].map((t) => (
+              <span
+                key={t}
+                className="rounded-full bg-white/80 px-4 py-1.5 text-sm font-medium text-amber-900 shadow-sm backdrop-blur dark:bg-white/10 dark:text-amber-100"
+              >
                 {t}
               </span>
             ))}
@@ -319,14 +346,20 @@ export default function DistrictBusinessPartnerPage() {
             >
               Apply as District Partner
             </Link>
-            <a href="#how-it-works" className="rounded-full border border-amber-300 bg-white/70 px-8 py-3 text-base font-semibold text-amber-900 backdrop-blur transition hover:bg-white dark:bg-white/5 dark:text-amber-100">
+            <a
+              href="#how-it-works"
+              className="rounded-full border border-amber-300 bg-white/70 px-8 py-3 text-base font-semibold text-amber-900 backdrop-blur transition hover:bg-white dark:bg-white/5 dark:text-amber-100"
+            >
               How It Works
             </a>
           </div>
 
           <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
             {trustBadges.map(({ icon: Icon, label }) => (
-              <div key={label} className="flex flex-col items-center gap-2 rounded-2xl border border-amber-200/60 bg-white/60 p-4 backdrop-blur dark:border-white/10 dark:bg-white/5">
+              <div
+                key={label}
+                className="flex flex-col items-center gap-2 rounded-2xl border border-amber-200/60 bg-white/60 p-4 backdrop-blur dark:border-white/10 dark:bg-white/5"
+              >
                 <Icon className="h-5 w-5 text-amber-700 dark:text-amber-300" />
                 <span className="text-center text-xs font-medium text-foreground">{label}</span>
               </div>
@@ -339,17 +372,24 @@ export default function DistrictBusinessPartnerPage() {
       <section className="px-6 py-16">
         <div className="mx-auto max-w-5xl text-center">
           <h2 className="text-3xl font-bold md:text-4xl">Yeh Page Kiske Liye Hai?</h2>
-          <p className="mt-3 text-muted-foreground">Jo log already beauty industry ko jaante hain</p>
+          <p className="mt-3 text-muted-foreground">
+            Jo log already beauty industry ko jaante hain
+          </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             {idealFor.map((role) => (
-              <span key={role} className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium">
+              <span
+                key={role}
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium"
+              >
                 <CheckCircle2 className="h-4 w-4 text-emerald-600" /> {role}
               </span>
             ))}
           </div>
           <p className="mx-auto mt-8 max-w-2xl rounded-2xl bg-amber-50 p-6 text-lg font-semibold text-amber-900 dark:bg-amber-950/30 dark:text-amber-200">
             Not a Job. Not a Franchise. Not MLM. <br />
-            <span className="text-amber-700 dark:text-amber-300">A District Growth Leadership Opportunity.</span>
+            <span className="text-amber-700 dark:text-amber-300">
+              A District Growth Leadership Opportunity.
+            </span>
           </p>
         </div>
       </section>
@@ -358,7 +398,9 @@ export default function DistrictBusinessPartnerPage() {
       <section className="bg-muted/30 px-6 py-20">
         <div className="mx-auto max-w-5xl text-center">
           <h2 className="text-3xl font-bold md:text-4xl">Industry Network</h2>
-          <p className="mt-3 text-muted-foreground">Aap industry ko jaante ho. Ab industry network ko income mein convert karo.</p>
+          <p className="mt-3 text-muted-foreground">
+            Aap industry ko jaante ho. Ab industry network ko income mein convert karo.
+          </p>
 
           <div className="relative mx-auto mt-12 aspect-square max-w-2xl">
             {/* Center */}
@@ -434,12 +476,17 @@ export default function DistrictBusinessPartnerPage() {
         <div className="mx-auto max-w-6xl">
           <div className="text-center">
             <h2 className="text-3xl font-bold md:text-4xl">How It Works</h2>
-            <p className="mt-3 text-muted-foreground">5 simple steps from connect to recurring earnings</p>
+            <p className="mt-3 text-muted-foreground">
+              5 simple steps from connect to recurring earnings
+            </p>
           </div>
 
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
             {steps.map(({ n, title, desc, icon: Icon }) => (
-              <div key={n} className="relative rounded-2xl border border-border bg-card p-6 transition hover:shadow-lg">
+              <div
+                key={n}
+                className="relative rounded-2xl border border-border bg-card p-6 transition hover:shadow-lg"
+              >
                 <div className="absolute -top-3 left-6 rounded-full bg-gradient-to-r from-amber-600 to-orange-600 px-3 py-1 text-xs font-bold text-white shadow">
                   STEP {n}
                 </div>
@@ -457,7 +504,9 @@ export default function DistrictBusinessPartnerPage() {
         <div className="mx-auto max-w-6xl">
           <div className="text-center">
             <h2 className="text-3xl font-bold md:text-4xl">One-Time Activation Reward</h2>
-            <p className="mt-3 text-muted-foreground">Shop activate → 15 day revenue verification → Reward unlock</p>
+            <p className="mt-3 text-muted-foreground">
+              Shop activate → 15 day revenue verification → Reward unlock
+            </p>
           </div>
 
           <div className="mt-12 grid gap-6 md:grid-cols-2">
@@ -470,16 +519,27 @@ export default function DistrictBusinessPartnerPage() {
                 {[
                   { label: "Shop Revenue", value: "₹15,000", tone: "text-foreground" },
                   { label: "Nexora Commission (10%)", value: "₹1,500", tone: "text-blue-600" },
-                  { label: "Partner Activation Share (10%)", value: "₹150", tone: "text-emerald-600" },
+                  {
+                    label: "Partner Activation Share (10%)",
+                    value: "₹150",
+                    tone: "text-emerald-600",
+                  },
                 ].map((r) => (
-                  <div key={r.label} className="flex items-center justify-between border-b border-border pb-3 last:border-0">
+                  <div
+                    key={r.label}
+                    className="flex items-center justify-between border-b border-border pb-3 last:border-0"
+                  >
                     <span className="text-sm text-muted-foreground">{r.label}</span>
                     <span className={`text-lg font-bold ${r.tone}`}>{r.value}</span>
                   </div>
                 ))}
                 <div className="mt-2 rounded-xl bg-emerald-50 p-4 text-center dark:bg-emerald-950/30">
-                  <div className="text-xs uppercase tracking-wide text-emerald-700 dark:text-emerald-300">Partner Earned</div>
-                  <div className="mt-1 text-3xl font-extrabold text-emerald-700 dark:text-emerald-300">₹150</div>
+                  <div className="text-xs uppercase tracking-wide text-emerald-700 dark:text-emerald-300">
+                    Partner Earned
+                  </div>
+                  <div className="mt-1 text-3xl font-extrabold text-emerald-700 dark:text-emerald-300">
+                    ₹150
+                  </div>
                 </div>
               </div>
             </div>
@@ -495,9 +555,16 @@ export default function DistrictBusinessPartnerPage() {
                   { label: "Revenue Generated", value: "₹15,00,000" },
                   { label: "Nexora Revenue", value: "₹1,50,000" },
                 ].map((r) => (
-                  <div key={r.label} className="flex items-center justify-between border-b border-amber-200/60 pb-3 last:border-0 dark:border-amber-800/50">
-                    <span className="text-sm text-amber-900/80 dark:text-amber-200/80">{r.label}</span>
-                    <span className="text-lg font-bold text-amber-900 dark:text-amber-100">{r.value}</span>
+                  <div
+                    key={r.label}
+                    className="flex items-center justify-between border-b border-amber-200/60 pb-3 last:border-0 dark:border-amber-800/50"
+                  >
+                    <span className="text-sm text-amber-900/80 dark:text-amber-200/80">
+                      {r.label}
+                    </span>
+                    <span className="text-lg font-bold text-amber-900 dark:text-amber-100">
+                      {r.value}
+                    </span>
                   </div>
                 ))}
                 <div className="mt-2 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 p-4 text-center text-white shadow-lg">
@@ -522,17 +589,26 @@ export default function DistrictBusinessPartnerPage() {
               <TrendingUp className="h-4 w-4" /> Recurring Growth Share
             </div>
             <h2 className="text-3xl font-bold md:text-4xl">7-Day Payout Cycle</h2>
-            <p className="mt-3 text-white/70">Active shops ke revenue performance par based — transparent tracking</p>
+            <p className="mt-3 text-white/70">
+              Active shops ke revenue performance par based — transparent tracking
+            </p>
           </div>
 
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             {growthShareTiers.map((t, i) => (
-              <div key={t.period} className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur">
-                <div className={`absolute -right-8 -top-8 h-32 w-32 rounded-full bg-gradient-to-br ${t.color} opacity-30 blur-2xl`} />
+              <div
+                key={t.period}
+                className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur"
+              >
+                <div
+                  className={`absolute -right-8 -top-8 h-32 w-32 rounded-full bg-gradient-to-br ${t.color} opacity-30 blur-2xl`}
+                />
                 <div className="relative">
                   <div className="text-sm font-medium text-white/60">Phase {i + 1}</div>
                   <div className="mt-1 text-xl font-bold">{t.period}</div>
-                  <div className={`mt-6 bg-gradient-to-r ${t.color} bg-clip-text text-4xl font-extrabold text-transparent sm:text-5xl md:text-6xl`}>
+                  <div
+                    className={`mt-6 bg-gradient-to-r ${t.color} bg-clip-text text-4xl font-extrabold text-transparent sm:text-5xl md:text-6xl`}
+                  >
                     {t.share}
                   </div>
                   <div className="mt-2 text-sm text-white/70">Partner Share</div>
@@ -547,7 +623,10 @@ export default function DistrictBusinessPartnerPage() {
               { icon: Target, label: "Performance Based" },
               { icon: BadgeCheck, label: "Transparent Dashboard" },
             ].map(({ icon: Icon, label }) => (
-              <div key={label} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
+              <div
+                key={label}
+                className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur"
+              >
                 <Icon className="h-5 w-5 text-amber-300" />
                 <span className="font-medium">{label}</span>
               </div>
@@ -564,7 +643,9 @@ export default function DistrictBusinessPartnerPage() {
               <Crown className="h-4 w-4" /> District Business Partner Benefits
             </div>
             <h2 className="text-3xl font-bold md:text-4xl">Leadership. Recognition. Growth.</h2>
-            <p className="mt-3 text-muted-foreground">Sirf earning nahi — pura district leadership package.</p>
+            <p className="mt-3 text-muted-foreground">
+              Sirf earning nahi — pura district leadership package.
+            </p>
           </div>
 
           <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -591,7 +672,9 @@ export default function DistrictBusinessPartnerPage() {
               <Medal className="h-4 w-4" /> Milestone Reward System
             </div>
             <h2 className="text-3xl font-bold md:text-4xl">Active Shops → Real Rewards</h2>
-            <p className="mt-3 text-muted-foreground">Jitne zyada active shops, utna bada milestone.</p>
+            <p className="mt-3 text-muted-foreground">
+              Jitne zyada active shops, utna bada milestone.
+            </p>
           </div>
 
           <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -600,9 +683,13 @@ export default function DistrictBusinessPartnerPage() {
                 key={m.shops}
                 className={`relative overflow-hidden rounded-3xl border-2 ${m.ring} bg-card p-7 transition hover:shadow-xl ${m.featured ? "lg:col-span-3 lg:grid lg:grid-cols-[1fr_2fr] lg:gap-8" : ""}`}
               >
-                <div className={`absolute -right-12 -top-12 h-40 w-40 rounded-full bg-gradient-to-br ${m.color} opacity-20 blur-2xl`} />
+                <div
+                  className={`absolute -right-12 -top-12 h-40 w-40 rounded-full bg-gradient-to-br ${m.color} opacity-20 blur-2xl`}
+                />
                 <div className="relative">
-                  <div className={`inline-flex items-center gap-2 rounded-full bg-gradient-to-r ${m.color} px-3 py-1 text-xs font-bold uppercase tracking-wide text-white shadow`}>
+                  <div
+                    className={`inline-flex items-center gap-2 rounded-full bg-gradient-to-r ${m.color} px-3 py-1 text-xs font-bold uppercase tracking-wide text-white shadow`}
+                  >
                     <Store className="h-3.5 w-3.5" /> {m.shops} Active Shops
                   </div>
                   <h3 className="mt-4 text-2xl font-extrabold">{m.title}</h3>
@@ -613,13 +700,17 @@ export default function DistrictBusinessPartnerPage() {
                   )}
                 </div>
 
-                <div className={`relative mt-6 grid gap-3 ${m.featured ? "sm:grid-cols-2 lg:mt-0" : ""}`}>
+                <div
+                  className={`relative mt-6 grid gap-3 ${m.featured ? "sm:grid-cols-2 lg:mt-0" : ""}`}
+                >
                   {m.rewards.map(({ icon: Icon, label }) => (
                     <div
                       key={label}
                       className="flex items-center gap-3 rounded-xl border border-border bg-background/60 p-3 backdrop-blur"
                     >
-                      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br ${m.color} text-white shadow`}>
+                      <div
+                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br ${m.color} text-white shadow`}
+                      >
                         <Icon className="h-5 w-5" />
                       </div>
                       <span className="text-sm font-semibold">{label}</span>
@@ -631,7 +722,8 @@ export default function DistrictBusinessPartnerPage() {
           </div>
 
           <p className="mx-auto mt-10 max-w-3xl text-center text-sm text-muted-foreground">
-            Rewards verified active shops par based hain. Milestones cumulative hain — har tier unlock hote hi reward dispatch hota hai.
+            Rewards verified active shops par based hain. Milestones cumulative hain — har tier
+            unlock hote hi reward dispatch hota hai.
           </p>
         </div>
       </section>
@@ -643,9 +735,12 @@ export default function DistrictBusinessPartnerPage() {
             <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-sm font-medium text-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
               <ClipboardCheck className="h-4 w-4" /> Onboarding Journey
             </div>
-            <h2 className="text-3xl font-bold md:text-4xl">How To Become A Nexora Business Partner</h2>
+            <h2 className="text-3xl font-bold md:text-4xl">
+              How To Become A Nexora Business Partner
+            </h2>
             <p className="mt-3 text-muted-foreground">
-              Start your growth journey in 8 simple steps. No complicated paperwork. No hidden charges. A simple onboarding process from application to activation.
+              Start your growth journey in 8 simple steps. No complicated paperwork. No hidden
+              charges. A simple onboarding process from application to activation.
             </p>
           </div>
 
@@ -774,20 +869,25 @@ export default function DistrictBusinessPartnerPage() {
 
           {/* Final message */}
           <p className="mx-auto mt-10 max-w-3xl text-center text-base text-muted-foreground">
-            From your first application to your first salon onboarding, Nexora provides a structured, transparent, and guided process —
-            <span className="font-semibold text-amber-800 dark:text-amber-200"> so you can focus on building relationships, growing your network, and creating long-term business success.</span>
+            From your first application to your first salon onboarding, Nexora provides a
+            structured, transparent, and guided process —
+            <span className="font-semibold text-amber-800 dark:text-amber-200">
+              {" "}
+              so you can focus on building relationships, growing your network, and creating
+              long-term business success.
+            </span>
           </p>
         </div>
       </section>
 
       {/* HALL OF FAME teaser */}
       <section className="px-6 py-20">
-
         <div className="mx-auto max-w-4xl rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 p-10 text-center dark:border-amber-900/40 dark:from-amber-950/20 dark:via-orange-950/10 dark:to-rose-950/20">
           <Trophy className="mx-auto h-12 w-12 text-amber-600" />
           <h2 className="mt-4 text-3xl font-bold md:text-4xl">Hall of Fame</h2>
           <p className="mt-3 text-muted-foreground">
-            Top District Partners ko showcase kiya jata hai — shops added, revenue generated, milestones aur success story.
+            Top District Partners ko showcase kiya jata hai — shops added, revenue generated,
+            milestones aur success story.
           </p>
           <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-2 text-sm font-medium text-amber-900 dark:bg-amber-900/40 dark:text-amber-100">
             <Award className="h-4 w-4" /> Coming soon
@@ -798,24 +898,37 @@ export default function DistrictBusinessPartnerPage() {
       {/* FINAL CTA */}
       <section className="px-6 pb-24">
         <div className="mx-auto max-w-4xl rounded-3xl bg-gradient-to-r from-amber-600 via-orange-600 to-rose-600 p-10 text-center text-white shadow-2xl md:p-14">
-          <h2 className="text-3xl font-extrabold md:text-5xl">Become The Growth Leader Of Your District</h2>
+          <h2 className="text-3xl font-extrabold md:text-5xl">
+            Become The Growth Leader Of Your District
+          </h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg opacity-95">
             Connect Businesses. Build Network. Create Impact. Grow With Nexora.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link to="/register" className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-base font-bold text-amber-700 shadow-lg transition hover:scale-105">
+            <Link
+              to="/register"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-base font-bold text-amber-700 shadow-lg transition hover:scale-105"
+            >
               <Rocket className="h-4 w-4" /> Apply Now
             </Link>
-            <Link to="/register" className="inline-flex items-center gap-2 rounded-full bg-amber-900/40 px-7 py-3 text-base font-bold text-white ring-2 ring-white/70 transition hover:bg-amber-900/60">
+            <Link
+              to="/register"
+              className="inline-flex items-center gap-2 rounded-full bg-amber-900/40 px-7 py-3 text-base font-bold text-white ring-2 ring-white/70 transition hover:bg-amber-900/60"
+            >
               <Building2 className="h-4 w-4" /> Become District Business Partner
             </Link>
-            <Link to="/contact" className="inline-flex items-center gap-2 rounded-full border-2 border-white bg-transparent px-7 py-3 text-base font-bold text-white transition hover:bg-white/10">
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-2 rounded-full border-2 border-white bg-transparent px-7 py-3 text-base font-bold text-white transition hover:bg-white/10"
+            >
               <Handshake className="h-4 w-4" /> Talk To Team
             </Link>
           </div>
           <div className="mt-6 inline-flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs opacity-90">
-            <span>No Joining Fee</span><span>•</span>
-            <span>No Investment</span><span>•</span>
+            <span>No Joining Fee</span>
+            <span>•</span>
+            <span>No Investment</span>
+            <span>•</span>
             <span>Performance Based Growth</span>
           </div>
         </div>
