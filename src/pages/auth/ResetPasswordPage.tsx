@@ -55,9 +55,23 @@ export default function ResetPasswordPage() {
     const check = async () => {
       // Allow a brief moment for implicit/PKCE session to land
       for (let i = 0; i < 6; i++) {
-        const { data } = await supabase.auth.getSession();
-        if (data.session) {
-          if (!cancelled) setHasRecovery(true);
+        try {
+          const { data, error } = await supabase.auth.getSession();
+          if (error) {
+            const lower = error.message.toLowerCase();
+            if (lower.includes("refresh token") || lower.includes("invalid") || lower.includes("expired")) {
+              await supabase.auth.signOut({ scope: "local" }).catch(() => {});
+              break;
+            }
+          }
+          if (data.session) {
+            if (!cancelled) setHasRecovery(true);
+            return;
+          }
+        } catch {
+          break;
+        }
+        if (cancelled) {
           return;
         }
         await new Promise((r) => setTimeout(r, 250));

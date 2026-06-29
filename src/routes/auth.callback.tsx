@@ -88,8 +88,19 @@ function cleanCallbackUrl(next: string | null) {
 
 async function waitForSession(): Promise<Session | null> {
   for (let i = 0; i < 8; i++) {
-    const { data } = await supabase.auth.getSession();
-    if (data.session?.user) return data.session;
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        const lower = error.message.toLowerCase();
+        if (lower.includes("refresh token") || lower.includes("invalid") || lower.includes("expired")) {
+          await supabase.auth.signOut({ scope: "local" }).catch(() => {});
+          return null;
+        }
+      }
+      if (data.session?.user) return data.session;
+    } catch {
+      return null;
+    }
     await new Promise((resolve) => setTimeout(resolve, 250));
   }
   return null;
@@ -110,8 +121,8 @@ async function resolveCallbackResult(): Promise<CallbackResult> {
   const code = url.searchParams.get("code");
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (error) return friendlyFailure(recovery, error.message);
     cleanCallbackUrl(next);
+    if (error) return friendlyFailure(recovery, error.message);
 
     const session = await waitForSession();
     if (!session) return friendlyFailure(recovery);
@@ -123,12 +134,12 @@ async function resolveCallbackResult(): Promise<CallbackResult> {
   const tokenHash = url.searchParams.get("token_hash");
   const otpType = url.searchParams.get("type");
   if (tokenHash && otpType) {
-    cleanCallbackUrl(next);
     const { error } = await supabase.auth.verifyOtp({
       token_hash: tokenHash,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       type: otpType as any,
     });
+    cleanCallbackUrl(next);
     if (error) return friendlyFailure(recovery, error.message);
 
     const session = await waitForSession();
@@ -139,9 +150,22 @@ async function resolveCallbackResult(): Promise<CallbackResult> {
   }
 
   if (hash.get("access_token")) {
+    const accessToken = hash.get("access_token");
+    const refreshToken = hash.get("refresh_token");
+    if (!accessToken || !refreshToken) {
+      cleanCallbackUrl(next);
+      return friendlyFailure(recovery);
+    }
+
+    const { error } = await supabase.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    });
+    cleanCallbackUrl(next);
+    if (error) return friendlyFailure(recovery, error.message);
+
     const session = await waitForSession();
     if (!session) return friendlyFailure(recovery);
-    cleanCallbackUrl(next);
     if (next) return { ok: true, redirectTo: next };
     return { ok: true, redirectTo: await resolvePostLoginRedirect(session.user.id) };
   }

@@ -116,7 +116,19 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     set({ isLoading: true });
 
     // Bootstrap from current session
-    const { data: { session } } = await supabase.auth.getSession();
+    let session: Session | null = null;
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        const lower = error.message.toLowerCase();
+        if (lower.includes("refresh token") || lower.includes("invalid") || lower.includes("expired")) {
+          await supabase.auth.signOut({ scope: "local" }).catch(() => {});
+        }
+      }
+      session = data.session;
+    } catch {
+      session = null;
+    }
     console.log("[Auth Store] Initial session:", session ? "found" : "none");
 
     if (session?.user) {
