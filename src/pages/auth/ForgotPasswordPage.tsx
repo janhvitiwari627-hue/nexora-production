@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,13 +31,18 @@ export default function ForgotPasswordPage() {
     }
     setSubmitting(true);
     try {
-      const { error: err } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+      // Server route sends the branded reset email via Resend and
+      // never reveals whether the address is registered.
+      await fetch("/api/public/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: parsed.data.email,
+          redirectTo: window.location.origin,
+        }),
+      }).catch(() => {
+        /* always show generic success — never leak network state */
       });
-      if (err) {
-        setError(err.message);
-        return;
-      }
       setSent(true);
     } finally {
       setSubmitting(false);
@@ -58,7 +62,8 @@ export default function ForgotPasswordPage() {
             <Alert>
               <CheckCircle2 className="h-4 w-4" />
               <AlertDescription>
-                Reset link sent to <strong>{email}</strong>. Check your inbox.
+                If this email is registered, a reset link has been sent. Please check your inbox
+                (and spam folder).
               </AlertDescription>
             </Alert>
           ) : (

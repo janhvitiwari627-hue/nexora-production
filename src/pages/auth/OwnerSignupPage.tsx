@@ -33,13 +33,23 @@ const CATEGORIES = [
 const schema = z.object({
   full_name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
   email: z.string().trim().email("Invalid email").max(255),
-  mobile: z.string().trim().regex(/^[+]?[0-9]{10,15}$/, "Enter a valid mobile number"),
+  mobile: z
+    .string()
+    .trim()
+    .min(1, "Mobile number is required")
+    .transform((v) => v.replace(/[\s-]/g, ""))
+    .pipe(z.string().regex(/^(\+91)?[6-9]\d{9}$/, "Enter a valid 10-digit mobile number")),
   password: z.string().min(8, "Password must be at least 8 characters").max(72),
   business_name: z.string().trim().min(2, "Business name is required").max(120),
   business_category: z.string().min(1, "Select a category"),
   city: z.string().trim().min(2, "City is required").max(80),
   area: z.string().trim().min(2, "Area is required").max(120),
-  whatsapp: z.string().trim().regex(/^[+]?[0-9]{10,15}$/, "Enter a valid WhatsApp number"),
+  whatsapp: z
+    .string()
+    .trim()
+    .min(1, "WhatsApp number is required")
+    .transform((v) => v.replace(/[\s-]/g, ""))
+    .pipe(z.string().regex(/^(\+91)?[6-9]\d{9}$/, "Enter a valid 10-digit WhatsApp number")),
 });
 
 function parseErr(error: unknown): string {
