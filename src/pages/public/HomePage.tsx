@@ -175,9 +175,10 @@ function PremiumHeader() {
                   <button onClick={handleDashboard} className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50">
                     <User2 className="h-4 w-4" /> Dashboard
                   </button>
-                  <Link to="/bookings" onClick={() => setMenuOpen(false)} className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50">
+                  <Link to="/dashboard/bookings" onClick={() => setMenuOpen(false)} className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50">
                     <CalendarCheck className="h-4 w-4" /> My Bookings
                   </Link>
+
                   <button onClick={handleSignOut} className="flex w-full items-center gap-2 border-t border-slate-100 px-4 py-2.5 text-left text-sm font-medium text-rose-600 hover:bg-rose-50">
                     <LogOut className="h-4 w-4" /> Logout
                   </button>
