@@ -1,6 +1,16 @@
 import { useState } from "react";
 import {
-  Bell, CreditCard, Globe2, Home, Link2, Lock, Mail, ShieldAlert, ShieldCheck, User, UserCircle,
+  Bell,
+  CreditCard,
+  Globe2,
+  Home,
+  Link2,
+  Lock,
+  Mail,
+  ShieldAlert,
+  ShieldCheck,
+  User,
+  UserCircle,
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
@@ -28,7 +38,7 @@ const SECTIONS = [
   { id: "danger", label: "Danger zone", icon: ShieldAlert, Comp: DangerZonePanel },
 ] as const;
 
-type SectionId = typeof SECTIONS[number]["id"];
+type SectionId = (typeof SECTIONS)[number]["id"];
 
 export function AccountSettingsPage() {
   const [active, setActive] = useState<SectionId>("personal");
@@ -41,11 +51,15 @@ export function AccountSettingsPage() {
           <div className="mb-3 flex flex-wrap items-center gap-2">
             <BackButton />
             <Button asChild variant="outline" size="sm" className="gap-1.5">
-              <Link to="/dashboard"><Home className="h-4 w-4" /> Home</Link>
+              <Link to="/dashboard">
+                <Home className="h-4 w-4" /> Home
+              </Link>
             </Button>
           </div>
           <h1 className="text-heading text-3xl font-black md:text-4xl">Account settings</h1>
-          <p className="text-muted-foreground mt-1 text-sm">Manage your profile, security, payments and preferences.</p>
+          <p className="text-muted-foreground mt-1 text-sm">
+            Manage your profile, security, payments and preferences.
+          </p>
         </header>
 
         {/* Mobile scroll tabs */}
@@ -56,7 +70,9 @@ export function AccountSettingsPage() {
                 key={s.id}
                 onClick={() => setActive(s.id)}
                 className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold transition ${
-                  active === s.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/70"
+                  active === s.id
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground hover:bg-muted/70"
                 }`}
               >
                 {s.label}
@@ -110,11 +126,15 @@ function ProfilePreviewPanel() {
       <h2 className="text-heading text-xl font-black">Profile preview</h2>
       <p className="text-muted-foreground mt-1 text-sm">This is how others see you on Nexora.</p>
       <div className="border-border bg-background mt-5 flex items-center gap-4 rounded-xl border p-4">
-        <div className="bg-primary/15 text-primary grid h-16 w-16 place-items-center rounded-full text-xl font-black">AS</div>
+        <div className="bg-primary/15 text-primary grid h-16 w-16 place-items-center rounded-full text-xl font-black">
+          AS
+        </div>
         <div>
           <p className="text-heading text-lg font-black">Aarav Sharma</p>
           <p className="text-muted-foreground text-sm">@aarav.sharma · Bengaluru, IN</p>
-          <p className="text-muted-foreground mt-1 text-xs">Gold member · 24 bookings · 8 reviews</p>
+          <p className="text-muted-foreground mt-1 text-xs">
+            Gold member · 24 bookings · 8 reviews
+          </p>
         </div>
       </div>
     </section>

@@ -21,7 +21,9 @@ function StaffDashboard() {
             <div className="bg-gradient-cta grid h-8 w-8 place-items-center rounded-lg text-primary-foreground shadow-[var(--shadow-glow)]">
               <Sparkles className="h-4 w-4" />
             </div>
-            <span className="text-gradient-brand text-lg font-extrabold tracking-tight">Nexora</span>
+            <span className="text-gradient-brand text-lg font-extrabold tracking-tight">
+              Nexora
+            </span>
           </Link>
         </div>
       </div>
