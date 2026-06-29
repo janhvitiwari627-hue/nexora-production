@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
   Search,
@@ -23,6 +23,8 @@ import {
   ChevronRight,
   Home as HomeIcon,
   Compass,
+  CalendarCheck,
+  User2,
   TrendingUp,
   Layers,
 } from "lucide-react";
