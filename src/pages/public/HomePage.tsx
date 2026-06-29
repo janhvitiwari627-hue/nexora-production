@@ -33,6 +33,7 @@ import {
   LogOut,
 } from "lucide-react";
 import Footer from "@/components/nexora-design/sections/Footer";
+import { PublicHeader } from "@/components/layout/PublicHeader";
 import { shopsQueryOptions } from "@/lib/shops.queries";
 import { useAuthStore } from "@/stores/authStore";
 import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
