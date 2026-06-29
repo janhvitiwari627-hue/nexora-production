@@ -1,8 +1,19 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { LocationPermissionModal } from "@/components/auth/LocationPermissionModal";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/dashboard")({
+  ssr: false,
+  beforeLoad: async ({ location }) => {
+    const { data, error } = await supabase.auth.getUser();
+    if (error || !data.user) {
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("nexora:postLoginRedirect", location.pathname);
+      }
+      throw redirect({ to: "/login" });
+    }
+  },
   component: DashboardLayout,
 });
 
