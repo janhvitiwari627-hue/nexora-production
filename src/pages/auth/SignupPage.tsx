@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
