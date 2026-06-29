@@ -366,7 +366,7 @@ export const getHallOfFame = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const sb = publicClient();
     const { data: hof, error } = await sb
-      .from("partner_hall_of_fame")
+      .from("partner_hall_of_fame_public")
       .select("*")
       .eq("category", data.category)
       .order("rank", { ascending: true })
@@ -375,10 +375,9 @@ export const getHallOfFame = createServerFn({ method: "GET" })
     if (!hof?.length) return [];
     const ids = hof.map((h) => h.partner_id);
     const { data: partners } = await sb
-      .from("district_business_partners")
+      .from("public_dbp_profiles")
       .select("id, slug, full_name, district, state, photo_url, tagline, tier")
-      .in("id", ids)
-      .eq("status", "verified");
+      .in("id", ids);
     const byId = new Map((partners ?? []).map((p) => [p.id, p]));
     return hof.map((h) => ({ ...h, partner: byId.get(h.partner_id) ?? null }));
   });
