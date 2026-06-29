@@ -987,6 +987,24 @@ export default function CustomerRegistrationPage() {
             </div>
 
             <div className="space-y-1">
+              <Label htmlFor="confirm_password">Confirm password</Label>
+              <Input
+                id="confirm_password"
+                type={showPassword ? "text" : "password"}
+                value={form.confirm_password}
+                onChange={update("confirm_password")}
+                autoComplete="new-password"
+                required
+                minLength={8}
+                disabled={submitting}
+              />
+              {errors.confirm_password && (
+                <p className="text-xs text-destructive">{errors.confirm_password}</p>
+              )}
+            </div>
+
+
+            <div className="space-y-1">
               <Label htmlFor="referred_by">
                 Referral code <span className="text-xs text-muted-foreground">(optional)</span>
               </Label>
