@@ -94,6 +94,8 @@ export default function ResetPasswordPage() {
         return;
       }
       setDone(true);
+      // Sign out the recovery session so the user must log in with the new password.
+      await supabase.auth.signOut().catch(() => {});
       setTimeout(() => navigate({ to: "/login" }), 1500);
     } finally {
       setSubmitting(false);
