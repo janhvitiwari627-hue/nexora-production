@@ -433,19 +433,18 @@ export const getPublicPartnerProfile = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const sb = publicClient();
     const { data: partner, error } = await sb
-      .from("district_business_partners")
+      .from("public_dbp_profiles")
       .select(
         "id, slug, full_name, district, state, photo_url, tagline, success_story, tier, hall_of_fame, hall_of_fame_rank, verified_at",
       )
       .eq("slug", data.slug)
-      .eq("status", "verified")
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!partner) return null;
 
     const { data: hof } = await sb
-      .from("partner_hall_of_fame")
-      .select("rank, category, active_shops, revenue_generated, achievements, success_story, badge")
+      .from("partner_hall_of_fame_public")
+      .select("rank, category, active_shops, achievements, success_story, badge")
       .eq("partner_id", partner.id)
       .order("rank", { ascending: true })
       .limit(1)
