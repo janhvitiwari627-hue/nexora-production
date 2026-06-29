@@ -9,6 +9,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, CheckCircle2 } from "lucide-react";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
+const RECOVERY_ERROR_MESSAGE =
+  "Reset link expired or already used. Please request a new password reset link.";
+
 function scorePassword(pw: string): { score: number; label: string; color: string } {
   let score = 0;
   if (pw.length >= 8) score++;
@@ -50,15 +53,25 @@ export default function ResetPasswordPage() {
     });
 
     const check = async () => {
-      if (typeof window !== "undefined" && window.location.hash.includes("type=recovery")) {
-        if (!cancelled) setHasRecovery(true);
-        return;
-      }
       // Allow a brief moment for implicit/PKCE session to land
       for (let i = 0; i < 6; i++) {
-        const { data } = await supabase.auth.getSession();
-        if (data.session) {
-          if (!cancelled) setHasRecovery(true);
+        try {
+          const { data, error } = await supabase.auth.getSession();
+          if (error) {
+            const lower = error.message.toLowerCase();
+            if (lower.includes("refresh token") || lower.includes("invalid") || lower.includes("expired")) {
+              await supabase.auth.signOut({ scope: "local" }).catch(() => {});
+              break;
+            }
+          }
+          if (data.session) {
+            if (!cancelled) setHasRecovery(true);
+            return;
+          }
+        } catch {
+          break;
+        }
+        if (cancelled) {
           return;
         }
         await new Promise((r) => setTimeout(r, 250));
@@ -90,7 +103,13 @@ export default function ResetPasswordPage() {
     try {
       const { error: err } = await supabase.auth.updateUser({ password });
       if (err) {
-        setError(err.message);
+        const lower = err.message.toLowerCase();
+        if (lower.includes("refresh token") || lower.includes("token") || lower.includes("session")) {
+          setHasRecovery(false);
+          setError(null);
+        } else {
+          setError(err.message);
+        }
         return;
       }
       setDone(true);
@@ -115,7 +134,7 @@ export default function ResetPasswordPage() {
             <div className="space-y-3">
               <Alert variant="destructive">
                 <AlertDescription>
-                  This password reset link is invalid or expired. Please request a new one.
+                  {RECOVERY_ERROR_MESSAGE}
                 </AlertDescription>
               </Alert>
               <Button className="w-full" onClick={() => navigate({ to: "/forgot-password" })}>
@@ -125,8 +144,13 @@ export default function ResetPasswordPage() {
           ) : done ? (
             <Alert>
               <CheckCircle2 className="h-4 w-4" />
-              <AlertDescription>Password updated. Redirecting to sign in…</AlertDescription>
+              <AlertDescription>Password updated successfully. Redirecting to sign in…</AlertDescription>
             </Alert>
+          ) : hasRecovery === null ? (
+            <div className="flex flex-col items-center py-8 text-center text-muted-foreground">
+              <Loader2 className="mb-3 h-6 w-6 animate-spin text-primary" />
+              <p className="text-sm">Checking reset link…</p>
+            </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-3">
               {error && (
