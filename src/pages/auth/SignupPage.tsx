@@ -14,6 +14,8 @@ import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
 
 const normalizeEmail = (value: string) => value.trim().toLowerCase();
 
+const emailOnlySchema = z.string().trim().email("Invalid email address").max(255);
+
 const schema = z
   .object({
     full_name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
@@ -87,7 +89,7 @@ export default function SignupPage() {
 
   const sendResetLink = async () => {
     const email = normalizeEmail(alreadyRegisteredEmail || form.email);
-    const parsed = schema.shape.email.safeParse(email);
+    const parsed = emailOnlySchema.safeParse(email);
     if (!parsed.success) {
       setServerError("Please enter the registered email address first.");
       return;
