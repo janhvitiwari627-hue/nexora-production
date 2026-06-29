@@ -40,6 +40,7 @@ const schema = z.object({
     .transform((v) => v.replace(/[\s-]/g, ""))
     .pipe(z.string().regex(/^(\+91)?[6-9]\d{9}$/, "Enter a valid 10-digit mobile number")),
   password: z.string().min(8, "Password must be at least 8 characters").max(72),
+  confirm_password: z.string().min(1, "Confirm your password"),
   business_name: z.string().trim().min(2, "Business name is required").max(120),
   business_category: z.string().min(1, "Select a category"),
   city: z.string().trim().min(2, "City is required").max(80),
@@ -50,6 +51,9 @@ const schema = z.object({
     .min(1, "WhatsApp number is required")
     .transform((v) => v.replace(/[\s-]/g, ""))
     .pipe(z.string().regex(/^(\+91)?[6-9]\d{9}$/, "Enter a valid 10-digit WhatsApp number")),
+}).refine((d) => d.password === d.confirm_password, {
+  path: ["confirm_password"],
+  message: "Passwords do not match",
 });
 
 function parseErr(error: unknown): string {
