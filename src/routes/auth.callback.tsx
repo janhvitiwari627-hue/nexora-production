@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "@tanstack/react-router";
 import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
@@ -18,6 +19,124 @@ function sanitizeNext(next: string | null): string | null {
   return next;
 }
 
+const RECOVERY_ERROR_MESSAGE =
+  "Reset link expired or already used. Please request a new password reset link.";
+
+type CallbackResult =
+  | { ok: true; redirectTo: string }
+  | { ok: false; message: string };
+
+type AuthCallbackWindow = Window & {
+  __nxAuthCallbackPromise?: Promise<CallbackResult>;
+};
+
+function getHashParams(url: URL) {
+  return new URLSearchParams(url.hash.replace(/^#/, ""));
+}
+
+function isRecoveryCallback(url: URL, next: string | null, hash: URLSearchParams) {
+  return (
+    next === "/reset-password" ||
+    url.searchParams.get("type") === "recovery" ||
+    hash.get("type") === "recovery"
+  );
+}
+
+function friendlyFailure(recovery: boolean, message?: string): CallbackResult {
+  const lower = (message ?? "").toLowerCase();
+  if (
+    recovery ||
+    lower.includes("refresh token") ||
+    lower.includes("token") ||
+    lower.includes("expired") ||
+    lower.includes("invalid")
+  ) {
+    return { ok: false, message: RECOVERY_ERROR_MESSAGE };
+  }
+  return { ok: false, message: "Authentication failed. Please try again." };
+}
+
+function cleanCallbackUrl(next: string | null) {
+  const clean = new URL(window.location.href);
+  clean.searchParams.delete("code");
+  clean.searchParams.delete("token_hash");
+  clean.searchParams.delete("type");
+  clean.searchParams.delete("error");
+  clean.searchParams.delete("error_code");
+  clean.searchParams.delete("error_description");
+  if (next) clean.searchParams.set("next", next);
+  clean.hash = "";
+  window.history.replaceState({}, document.title, `${clean.pathname}${clean.search}`);
+}
+
+async function waitForSession(): Promise<Session | null> {
+  for (let i = 0; i < 8; i++) {
+    const { data } = await supabase.auth.getSession();
+    if (data.session?.user) return data.session;
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+  return null;
+}
+
+async function resolveCallbackResult(): Promise<CallbackResult> {
+  const url = new URL(window.location.href);
+  const next = sanitizeNext(url.searchParams.get("next"));
+  const hash = getHashParams(url);
+  const recovery = isRecoveryCallback(url, next, hash);
+
+  const urlError = url.searchParams.get("error_description") || hash.get("error_description");
+  if (urlError || url.searchParams.get("error") || hash.get("error")) {
+    return friendlyFailure(recovery, urlError ?? undefined);
+  }
+
+  const code = url.searchParams.get("code");
+  if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    if (error) return friendlyFailure(recovery, error.message);
+
+    cleanCallbackUrl(next);
+    const session = await waitForSession();
+    if (!session) return friendlyFailure(recovery);
+
+    if (next) return { ok: true, redirectTo: next };
+    return { ok: true, redirectTo: await resolvePostLoginRedirect(session.user.id) };
+  }
+
+  const tokenHash = url.searchParams.get("token_hash");
+  const otpType = url.searchParams.get("type");
+  if (tokenHash && otpType) {
+    const { error } = await supabase.auth.verifyOtp({
+      token_hash: tokenHash,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      type: otpType as any,
+    });
+    if (error) return friendlyFailure(recovery, error.message);
+
+    cleanCallbackUrl(next);
+    const session = await waitForSession();
+    if (!session) return friendlyFailure(recovery);
+
+    if (next) return { ok: true, redirectTo: next };
+    return { ok: true, redirectTo: await resolvePostLoginRedirect(session.user.id) };
+  }
+
+  if (hash.get("access_token")) {
+    const session = await waitForSession();
+    if (!session) return friendlyFailure(recovery);
+    cleanCallbackUrl(next);
+    if (next) return { ok: true, redirectTo: next };
+    return { ok: true, redirectTo: await resolvePostLoginRedirect(session.user.id) };
+  }
+
+  const session = await waitForSession();
+  if (session?.user) {
+    if (next) return { ok: true, redirectTo: next };
+    return { ok: true, redirectTo: await resolvePostLoginRedirect(session.user.id) };
+  }
+
+  return friendlyFailure(recovery);
+}
+
 function AuthCallbackPage() {
   const navigate = useNavigate();
   const [status, setStatus] = useState<"loading" | "error">("loading");
@@ -26,69 +145,19 @@ function AuthCallbackPage() {
   useEffect(() => {
     const run = async () => {
       try {
-        const url = new URL(window.location.href);
-        const next = sanitizeNext(url.searchParams.get("next"));
-
-        // Surface explicit errors from Supabase (query OR hash)
-        const hash = new URLSearchParams(url.hash.replace(/^#/, ""));
-        const errDesc =
-          url.searchParams.get("error_description") || hash.get("error_description");
-        if (errDesc) {
-          setErrorMessage(errDesc);
-          setStatus("error");
+        const win = window as AuthCallbackWindow;
+        win.__nxAuthCallbackPromise ??= resolveCallbackResult();
+        const result = await win.__nxAuthCallbackPromise;
+        if (result.ok) {
+          navigate({ to: result.redirectTo });
           return;
         }
-
-        // PKCE flow: ?code=...
-        const code = url.searchParams.get("code");
-        if (code) {
-          const { error } = await supabase.auth.exchangeCodeForSession(code);
-          if (error) {
-            setErrorMessage(error.message);
-            setStatus("error");
-            return;
-          }
-        }
-
-        // Email link OTP flow: ?token_hash=...&type=recovery|signup|magiclink|...
-        const tokenHash = url.searchParams.get("token_hash");
-        const otpType = url.searchParams.get("type");
-        if (tokenHash && otpType) {
-          const { error } = await supabase.auth.verifyOtp({
-            token_hash: tokenHash,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            type: otpType as any,
-          });
-          if (error) {
-            setErrorMessage(error.message);
-            setStatus("error");
-            return;
-          }
-        }
-
-        // Implicit flow (#access_token=...&type=recovery) — supabase-js picks it up automatically.
-        // Just wait briefly for session to materialize.
-        const { data } = await supabase.auth.getSession();
-        if (!data.session?.user) {
-          // Try one short retry — implicit hash parse is async.
-          await new Promise((r) => setTimeout(r, 300));
-        }
-
-        const { data: data2 } = await supabase.auth.getSession();
-        if (!data2.session?.user) {
-          setErrorMessage("Authentication failed. No session found.");
-          setStatus("error");
-          return;
-        }
-
-        if (next) {
-          navigate({ to: next });
-          return;
-        }
-        const redirectTo = await resolvePostLoginRedirect(data2.session.user.id);
-        navigate({ to: redirectTo });
+        setErrorMessage(result.message);
+        setStatus("error");
       } catch (err) {
-        setErrorMessage(err instanceof Error ? err.message : "Authentication failed");
+        setErrorMessage(
+          friendlyFailure(true, err instanceof Error ? err.message : undefined).message,
+        );
         setStatus("error");
       }
     };
@@ -112,7 +181,7 @@ function AuthCallbackPage() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <Card className="w-full max-w-md">
         <CardContent className="flex flex-col items-center py-12 space-y-4 text-center">
-          <p className="text-destructive font-medium">Sign in failed</p>
+          <p className="text-destructive font-medium">Reset link expired</p>
           <p className="text-sm text-muted-foreground">{errorMessage}</p>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => navigate({ to: "/login" })}>
