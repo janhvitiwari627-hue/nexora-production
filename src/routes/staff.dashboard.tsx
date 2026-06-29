@@ -3,7 +3,7 @@ import { requireRole } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/staff/dashboard")({
   ssr: false,
-  beforeLoad: () => requireRole(["owner", "admin"], "/staff/dashboard"),
+  beforeLoad: () => requireRole(["staff", "shop_manager", "shop_owner"], "/staff/dashboard"),
   head: () => ({ meta: [{ title: "Staff Dashboard — Nexora" }] }),
   component: StaffDashboard,
 });
