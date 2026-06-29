@@ -47,9 +47,8 @@ const BRAND = "#635BFF";
 
 function TopBar({ open, onToggle }: { open: boolean; onToggle: (v: boolean) => void }) {
   return (
-    <header className="sticky top-0 z-30 border-b border-border bg-card/90 backdrop-blur">
+    <header className="border-b border-border bg-card/90">
       <div className="mx-auto flex w-full max-w-7xl items-center gap-3 px-4 py-3">
-        <BackButton size="icon" className="shrink-0" />
         <label className="group relative grid h-11 w-11 cursor-pointer place-items-center overflow-hidden rounded-xl border border-dashed border-border bg-muted text-muted-foreground hover:border-primary hover:text-primary">
           <Upload className="h-4 w-4" />
           <input type="file" accept="image/*" className="absolute inset-0 cursor-pointer opacity-0" />
