@@ -373,7 +373,7 @@ export const getHallOfFame = createServerFn({ method: "GET" })
       .limit(data.limit);
     if (error) throw new Error(error.message);
     if (!hof?.length) return [];
-    const ids = hof.map((h) => h.partner_id);
+    const ids = hof.map((h) => h.partner_id).filter((id): id is string => !!id);
     const { data: partners } = await sb
       .from("public_dbp_profiles")
       .select("id, slug, full_name, district, state, photo_url, tagline, tier")
