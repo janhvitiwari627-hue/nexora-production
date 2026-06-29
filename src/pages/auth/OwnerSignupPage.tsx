@@ -68,6 +68,8 @@ function parseErr(error: unknown): string {
 
 export default function OwnerSignupPage() {
   const navigate = useNavigate();
+  const search = useSearch({ strict: false }) as { ref?: string };
+  const referredBy = (search?.ref ?? "").trim().slice(0, 20);
   const [form, setForm] = useState({
     full_name: "",
     email: "",
