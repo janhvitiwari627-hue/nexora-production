@@ -112,17 +112,25 @@ function PremiumHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/80 backdrop-blur-xl">
       <div className="mx-auto flex h-[72px] max-w-[1400px] items-center justify-between px-5 sm:px-8">
-        <Link to="/" className="flex items-center gap-2.5">
-          <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-[#2563EB] to-[#6D28D9] text-white shadow-lg shadow-blue-200/60">
-            <Sparkles className="h-5 w-5" />
-          </div>
-          <span className="text-[20px] font-bold tracking-tight text-slate-900">
-            Nexora
-          </span>
-          <span className="hidden rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-600 sm:inline-block">
-            SalonOS
-          </span>
-        </Link>
+        <div className="flex items-center gap-2">
+          <BackButton
+            variant="ghost"
+            size="icon"
+            className="hidden sm:inline-flex text-slate-600 hover:bg-slate-100"
+            aria-label="Go back"
+          />
+          <Link to="/" className="flex items-center gap-2.5">
+            <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-[#2563EB] to-[#6D28D9] text-white shadow-lg shadow-blue-200/60">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <span className="text-[20px] font-bold tracking-tight text-slate-900">
+              Nexora
+            </span>
+            <span className="hidden rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-600 sm:inline-block">
+              SalonOS
+            </span>
+          </Link>
+        </div>
 
         <nav className="hidden items-center gap-9 md:flex">
           {links.map((l) => (
