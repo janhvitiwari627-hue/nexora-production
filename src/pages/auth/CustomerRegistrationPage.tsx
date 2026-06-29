@@ -9,10 +9,12 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Mail, User, Building2, BadgeCheck, XCircle, Crown, Eye, EyeOff } from "lucide-react";
+import { Loader2, Mail, User, Building2, BadgeCheck, XCircle, Crown, Eye, EyeOff, ChevronDown, ChevronUp, Check, Info, AlertCircle } from "lucide-react";
 import { PasswordStrengthIndicator, scorePassword } from "@/components/auth/PasswordStrengthIndicator";
 import { validateReferralCode, registerMySalon } from "@/lib/owner.functions";
 import { registerDistrictPartner } from "@/lib/districtPartner.functions";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 
 type AccountType = "customer" | "owner" | "district_partner";
 
@@ -62,6 +64,7 @@ export default function CustomerRegistrationPage() {
   const [googleSubmitting, setGoogleSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [showEligibility, setShowEligibility] = useState(false);
 
   // Referral code live validation
   const [refStatus, setRefStatus] = useState<"idle" | "checking" | "valid" | "invalid">("idle");
@@ -268,11 +271,196 @@ export default function CustomerRegistrationPage() {
           </Tabs>
 
           {accountType === "district_partner" && (
-            <Alert>
-              <AlertDescription className="text-xs">
-                District Business Partner application. After signup your application goes for verification — no joining fee, no investment, performance-based rewards.
-              </AlertDescription>
-            </Alert>
+            <div className="space-y-4">
+              <Alert>
+                <AlertDescription className="text-xs">
+                  District Business Partner application. After signup your application goes for verification — no joining fee, no investment, performance-based rewards.
+                </AlertDescription>
+              </Alert>
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start text-left p-2"
+                onClick={() => setShowEligibility(!showEligibility)}
+              >
+                <Info className="mr-2 h-4 w-4" />
+                <span className="font-medium">Who can become a Nexora Business Partner?</span>
+                {showEligibility ? <ChevronUp className="ml-auto h-4 w-4" /> : <ChevronDown className="ml-auto h-4 w-4" />}
+              </Button>
+
+              {showEligibility && (
+                <Card className="bg-muted/50 border-primary/20">
+                  <CardContent className="pt-0">
+                    <ScrollArea className="max-h-96 pr-2">
+                      <div className="space-y-6 text-sm">
+                        <div>
+                          <h3 className="font-semibold text-foreground mb-3">WHO IS THIS PROGRAM FOR?</h3>
+                          <p className="text-muted-foreground mb-3">
+                            This opportunity is designed for professionals who already work in or have strong connections with the beauty industry.
+                          </p>
+                          <p className="font-medium mb-2">Eligible categories include:</p>
+                          <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                            <li>Beauty Product Sales Executives</li>
+                            <li>Cosmetics Sales Representatives</li>
+                            <li>Salon Product Representatives</li>
+                            <li>Beauty Equipment Sales Professionals</li>
+                            <li>Spa Product Representatives</li>
+                            <li>Tattoo Industry Sales Representatives</li>
+                            <li>Nail Art Product Representatives</li>
+                            <li>Beauty Product Distributor Staff</li>
+                            <li>Beauty Wholesalers</li>
+                            <li>Freelance Beauty Industry Sales Professionals</li>
+                            <li>Individuals with an existing network of salon owners</li>
+                          </ul>
+                        </div>
+
+                        <Separator />
+
+                        <div>
+                          <h3 className="font-semibold text-foreground mb-3">BASIC ELIGIBILITY</h3>
+                          
+                          <div className="space-y-4">
+                            <div>
+                              <h4 className="font-medium mb-1">Minimum Age</h4>
+                              <p className="text-muted-foreground">18 Years or Above</p>
+                            </div>
+
+                            <div>
+                              <h4 className="font-medium mb-1">Education</h4>
+                              <p className="text-muted-foreground">
+                                No Minimum Degree Required. Experience, communication skills, professionalism, and industry relationships 
+                                are valued more than formal education.
+                              </p>
+                            </div>
+
+                            <div>
+                              <h4 className="font-medium mb-1">Experience</h4>
+                              <p className="text-muted-foreground">
+                                <strong className="text-foreground">Preferred:</strong> Minimum 1 Year of Beauty Industry Experience
+                              </p>
+                              <p className="text-muted-foreground mt-1">
+                                OR Existing Relationships with Salon Owners, Beauty Parlours, Spas, Tattoo Studios, 
+                                Nail Art Studios, Beauty Product Distributors, or Related Businesses.
+                              </p>
+                              <p className="text-muted-foreground mt-1 text-xs">
+                                Exceptional candidates with strong local networks may also be considered.
+                              </p>
+                            </div>
+
+                            <div>
+                              <h4 className="font-medium mb-1">Location</h4>
+                              <p className="text-muted-foreground">
+                                Currently accepting applications from launch and expansion cities where Nexora is operating.
+                                Applicants should be willing to work within their assigned local area or district.
+                              </p>
+                            </div>
+
+                            <div>
+                              <h4 className="font-medium mb-1">Identity Verification (KYC)</h4>
+                              <p className="text-muted-foreground mb-2">Applicants must complete identity verification before activation.</p>
+                              <p className="text-muted-foreground mb-1">Required documents may include:</p>
+                              <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                                <li>Aadhaar Card</li>
+                                <li>PAN Card</li>
+                                <li>Recent Passport-size Photograph</li>
+                                <li>Bank Account Details (for payouts)</li>
+                              </ul>
+                              <p className="text-muted-foreground text-xs mt-2">Activation is subject to successful verification.</p>
+                            </div>
+
+                            <div>
+                              <h4 className="font-medium mb-1">Smartphone Requirement</h4>
+                              <p className="text-muted-foreground mb-1">
+                                A personal Android or iPhone with internet access is required to:
+                              </p>
+                              <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                                <li>Use the Partner Dashboard</li>
+                                <li>Track salon onboarding</li>
+                                <li>Manage leads</li>
+                                <li>Receive notifications</li>
+                                <li>Monitor earnings</li>
+                                <li>Access training materials</li>
+                              </ul>
+                            </div>
+
+                            <div>
+                              <h4 className="font-medium mb-1">Travel Requirement</h4>
+                              <p className="text-muted-foreground">
+                                Since the role involves meeting salon owners and supporting onboarding, applicants should be comfortable 
+                                traveling within their assigned city or district. Having a two-wheeler or other reliable local transportation 
+                                is recommended but not mandatory unless specified for a particular region.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <Separator />
+
+                        <div>
+                          <h3 className="font-semibold text-foreground mb-3">IDEAL BUSINESS PARTNER PROFILE</h3>
+                          <p className="text-muted-foreground mb-2">The best Nexora Business Partners are people who:</p>
+                          <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                            <li>Already know local salon owners.</li>
+                            <li>Enjoy building professional relationships.</li>
+                            <li>Can explain products and services confidently.</li>
+                            <li>Want to create long-term recurring income.</li>
+                            <li>Believe in helping the beauty industry become more digital.</li>
+                            <li>Are self-motivated and growth-oriented.</li>
+                          </ul>
+                        </div>
+
+                        <Separator />
+
+                        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+                          <h3 className="font-semibold text-destructive mb-3 flex items-center gap-2">
+                            <AlertCircle className="h-4 w-4" /> WHO THIS PROGRAM IS NOT FOR
+                          </h3>
+                          <p className="text-muted-foreground mb-2">This program may not be suitable for individuals who:</p>
+                          <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                            <li>Are looking only for a fixed salary job.</li>
+                            <li>Do not enjoy meeting business owners.</li>
+                            <li>Are unwilling to travel locally.</li>
+                            <li>Cannot use a smartphone for daily work.</li>
+                            <li>Are unwilling to complete identity verification.</li>
+                          </ul>
+                        </div>
+
+                        <Separator />
+
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                          <h3 className="font-semibold text-green-800 mb-3">ELIGIBILITY SUMMARY</h3>
+                          <ul className="space-y-1 text-green-800">
+                            <li className="flex items-center gap-2"><Check className="h-4 w-4 flex-shrink-0" /> Minimum Age: 18+</li>
+                            <li className="flex items-center gap-2"><Check className="h-4 w-4 flex-shrink-0" /> No Mandatory Degree</li>
+                            <li className="flex items-center gap-2"><Check className="h-4 w-4 flex-shrink-0" /> Beauty Industry Experience Preferred</li>
+                            <li className="flex items-center gap-2"><Check className="h-4 w-4 flex-shrink-0" /> Existing Salon Network Preferred</li>
+                            <li className="flex items-center gap-2"><Check className="h-4 w-4 flex-shrink-0" /> KYC Verification Required</li>
+                            <li className="flex items-center gap-2"><Check className="h-4 w-4 flex-shrink-0" /> Smartphone Required</li>
+                            <li className="flex items-center gap-2"><Check className="h-4 w-4 flex-shrink-0" /> Local Travel Preferred</li>
+                            <li className="flex items-center gap-2"><Check className="h-4 w-4 flex-shrink-0" /> Professional Communication Skills</li>
+                          </ul>
+                        </div>
+
+                        <Separator />
+
+                        <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
+                          <h3 className="font-semibold text-primary mb-2">FINAL MESSAGE</h3>
+                          <p className="text-muted-foreground">
+                            If you already know salon owners, beauty professionals, or distributors, you already have the most valuable 
+                            asset needed to become a Nexora Business Partner.
+                          </p>
+                          <p className="text-muted-foreground mt-2">
+                            Your existing relationships can become the foundation of a long-term digital business with Nexora SalonOS.
+                          </p>
+                        </div>
+                      </div>
+                    </ScrollArea>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           )}
 
           {accountType === "customer" && (
