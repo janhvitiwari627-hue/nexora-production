@@ -24,7 +24,13 @@ const schema = z
     mobile: z
       .string()
       .trim()
-      .regex(/^[+]?[0-9]{10,15}$/, "Enter a valid mobile number"),
+      .min(1, "Mobile number is required")
+      .transform((v) => v.replace(/[\s-]/g, ""))
+      .pipe(
+        z
+          .string()
+          .regex(/^(\+91)?[6-9]\d{9}$/, "Enter a valid 10-digit mobile number"),
+      ),
     password: z.string().min(8, "Password must be at least 8 characters").max(72),
     confirm_password: z.string(),
   })
