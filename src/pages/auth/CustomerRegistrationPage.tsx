@@ -18,6 +18,78 @@ import { Separator } from "@/components/ui/separator";
 
 type AccountType = "customer" | "owner" | "district_partner";
 
+/**
+ * Normalize any thrown or returned error value into a user-facing string.
+ * Handles Supabase AuthError, plain Error, string, or bare objects (some
+ * network / GoTrue failures surface as `{}` with no enumerable props).
+ */
+function extractErrorMessage(error: unknown, fallback = "Something went wrong. Please try again."): string {
+  if (!error) return fallback;
+  if (typeof error === "string") return error || fallback;
+  if (typeof error === "object") {
+    const e = error as { message?: string; error_description?: string; msg?: string; statusText?: string };
+    return (
+      e.message ||
+      e.error_description ||
+      e.msg ||
+      e.statusText ||
+      fallback
+    );
+  }
+  return fallback;
+}
+
+/**
+ * Single source of truth for converting any thrown / returned error value
+ * into a user-facing string. Handles plain strings, Error instances,
+ * Supabase AuthError, nested data.message JSON strings, and bare `{}`
+ * objects (some GoTrue / network failures surface as empty objects).
+ */
+function parseErrorMessage(error: unknown): string {
+  if (error == null) return "Something went wrong. Please try again.";
+  if (typeof error === "string") return error || "Something went wrong. Please try again.";
+
+  if (typeof error === "object") {
+    const e = error as {
+      message?: string;
+      error_description?: string;
+      msg?: string;
+      statusText?: string;
+      data?: { message?: string } | string;
+    };
+
+    if (e.data) {
+      // Supabase sometimes wraps the real message inside data.message as JSON
+      if (typeof e.data === "string") {
+        try {
+          const parsed = JSON.parse(e.data) as { message?: string };
+          if (parsed?.message) return parsed.message;
+        } catch {
+          // not JSON — fall through to e.data as a literal string
+          if (e.data) return e.data;
+        }
+      } else if (typeof e.data === "object" && e.data.message) {
+        try {
+          const parsed = JSON.parse(e.data.message) as { message?: string };
+          if (parsed?.message) return parsed.message;
+        } catch {
+          return e.data.message;
+        }
+      }
+    }
+
+    return (
+      e.message ||
+      e.error_description ||
+      e.msg ||
+      e.statusText ||
+      "Something went wrong. Please try again."
+    );
+  }
+
+  return "Something went wrong. Please try again.";
+}
+
 const baseSchema = z.object({
   full_name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
   email: z.string().trim().email("Invalid email address").max(255),
@@ -145,19 +217,24 @@ export default function CustomerRegistrationPage() {
       console.log("[Register] Supabase response:", { user: !!data.user, session: !!data.session, error: error?.message });
 
       if (error) {
-        let errorMessage = "Sign up failed. Please try again.";
-        if (error.message.includes("User already registered") || error.message.includes("already exists")) {
-          errorMessage = "An account with this email already exists. Please sign in instead.";
-        } else if (error.message.includes("invalid email")) {
-          errorMessage = "Invalid email address.";
-        } else if (error.message.includes("weak password")) {
-          errorMessage = "Password is too weak. Please choose a stronger password.";
-        } else if (error.message.includes("network") || error.message.includes("fetch") || error.message.includes("connection")) {
-          errorMessage = "Network error. Please check your connection and try again.";
-        } else {
-          errorMessage = error.message?.trim() || errorMessage;
+        const raw = parseErrorMessage(error);
+        let errorMessage = raw;
+        if (/user already registered|already registered|already exists/i.test(raw)) {
+          errorMessage = "Email already registered. Please sign in instead.";
+        } else if (/invalid email|email format/i.test(raw)) {
+          errorMessage = "Invalid email format.";
+        } else if (/mobile.*(already|taken|in use|exists)/i.test(raw)) {
+          errorMessage = "Mobile number already in use. Please use a different number.";
+        } else if (/password.*(at least|minimum|short|chars)/i.test(raw)) {
+          errorMessage = "Password must be at least 8 characters.";
+        } else if (/weak password|known to be weak|easy to guess|breach|pwned/i.test(raw)) {
+          errorMessage = "Password is too weak or commonly used. Please choose a stronger password.";
+        } else if (/rate limit|too many|busy|try again later|server error|5\d\d/i.test(raw)) {
+          errorMessage = "Server is busy. Please try again in a moment.";
+        } else if (/network|fetch|connection|failed to fetch|timeout|offline/i.test(raw)) {
+          errorMessage = "Please check your internet connection and try again.";
         }
-        console.error("[Register] Auth error:", error.message);
+        console.error("[Register] Auth error:", raw);
         setServerError(errorMessage);
         return;
       }
@@ -173,7 +250,7 @@ export default function CustomerRegistrationPage() {
             },
           });
         } catch (err) {
-          console.error("Salon registration failed:", err);
+          console.error("Salon registration failed:", parseErrorMessage(err));
         }
       }
 
@@ -190,7 +267,7 @@ export default function CustomerRegistrationPage() {
             },
           });
         } catch (err) {
-          console.error("DBP registration failed:", err);
+          console.error("DBP registration failed:", parseErrorMessage(err));
         }
       }
 
@@ -220,7 +297,7 @@ export default function CustomerRegistrationPage() {
       }
     } catch (err) {
       console.error("[Register] Unexpected error:", err);
-      setServerError(err instanceof Error ? err.message : "Sign up failed");
+      setServerError(parseErrorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -239,8 +316,8 @@ export default function CustomerRegistrationPage() {
       });
 
       if (error) {
-        console.error("[Register] Google OAuth error:", error.message);
-        setServerError("Google sign-up failed. Please try again.");
+        console.error("[Register] Google OAuth error:", error);
+        setServerError(parseErrorMessage(error));
         return;
       }
 
@@ -248,7 +325,7 @@ export default function CustomerRegistrationPage() {
       // Supabase will redirect to the OAuth provider, then to /auth/callback
     } catch (err) {
       console.error("[Register] Google OAuth unexpected error:", err);
-      setServerError(err instanceof Error ? err.message : "Google sign-up failed");
+      setServerError(parseErrorMessage(err));
     } finally {
       setGoogleSubmitting(false);
     }
@@ -489,7 +566,13 @@ export default function CustomerRegistrationPage() {
             </div>
           )}
 
-          {serverError && <Alert variant="destructive"><AlertDescription>{serverError}</AlertDescription></Alert>}
+          {serverError && (
+            <Alert variant="destructive">
+              <AlertDescription>
+                {typeof serverError === "string" ? serverError : String(serverError)}
+              </AlertDescription>
+            </Alert>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="space-y-1">
