@@ -129,6 +129,7 @@ export default function OwnerSignupPage() {
           data: {
             full_name: parsed.data.full_name,
             mobile: parsed.data.mobile,
+            referred_by: referredBy || null,
             role: "customer",
             owner_request: {
               business_name: parsed.data.business_name,
