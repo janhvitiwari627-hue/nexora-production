@@ -165,6 +165,7 @@ export default function CustomerRegistrationPage() {
     email: "",
     mobile: "",
     password: "",
+    confirm_password: "",
     referred_by: "",
     business_name: "",
     business_city: "",
