@@ -516,7 +516,6 @@ export type Database = {
       }
       district_business_partners: {
         Row: {
-          bank_account: Json | null
           created_at: string
           district: string
           email: string | null
@@ -541,7 +540,6 @@ export type Database = {
           verified_by: string | null
         }
         Insert: {
-          bank_account?: Json | null
           created_at?: string
           district: string
           email?: string | null
@@ -566,7 +564,6 @@ export type Database = {
           verified_by?: string | null
         }
         Update: {
-          bank_account?: Json | null
           created_at?: string
           district?: string
           email?: string | null
