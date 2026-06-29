@@ -26,15 +26,12 @@ import {
   Users,
   Wallet,
   Zap,
-  CreditCard,
   IdCard,
   BookOpen,
   Monitor,
   ClipboardCheck,
   Key,
   Timer,
-  Calendar,
-  ChevronDown,
   ChevronRight,
 } from "lucide-react";
 
@@ -144,6 +141,138 @@ const growthShareTiers = [
   { period: "First 6 Months", share: "10%", color: "from-emerald-500 to-teal-600" },
   { period: "Month 7 – 12", share: "5%", color: "from-blue-500 to-indigo-600" },
   { period: "After 12 Months", share: "2%", color: "from-purple-500 to-fuchsia-600" },
+];
+
+type OnboardingStep = {
+  n: number;
+  title: string;
+  icon: typeof ClipboardCheck;
+  body: string;
+  status?: string;
+  bullets?: string[];
+  facts?: { label: string; value: string }[];
+  growthPath?: string[];
+  timeline?: { label: string; value: string }[];
+};
+
+const onboardingSteps: OnboardingStep[] = [
+  {
+    n: 1,
+    title: "Apply Online",
+    icon: FileText,
+    body: 'Click "Join as Business Partner" and complete the online application form.',
+    bullets: [
+      "Full Name",
+      "Mobile Number",
+      "Email Address",
+      "City & District",
+      "Current Company (Optional)",
+      "Beauty Industry Experience",
+      "Existing Salon Network",
+    ],
+    facts: [{ label: "Estimated Time", value: "2–3 Minutes" }],
+  },
+  {
+    n: 2,
+    title: "Verify Your Mobile Number",
+    icon: Key,
+    body: "Enter the OTP sent to your registered mobile number. This verifies your identity and creates your Nexora Partner Account.",
+    status: "Mobile Verified",
+  },
+  {
+    n: 3,
+    title: "Complete Your Profile & KYC",
+    icon: IdCard,
+    body: "Upload the required verification details and review your profile before submission.",
+    bullets: [
+      "Aadhaar Card",
+      "PAN Card",
+      "Passport-size Photo",
+      "Bank Account Details (for payouts)",
+    ],
+    status: "KYC Submitted",
+  },
+  {
+    n: 4,
+    title: "Attend Free Partner Training",
+    icon: BookOpen,
+    body: "Complete Nexora's onboarding program to understand the platform, partner dashboard, and earnings system.",
+    bullets: [
+      "Understanding Nexora SalonOS",
+      "How to introduce the platform",
+      "Salon onboarding process",
+      "Partner dashboard usage",
+      "Earnings & payout system",
+      "Best practices and support",
+    ],
+    facts: [
+      { label: "Format", value: "Online Video Modules" },
+      { label: "Live Sessions", value: "Where Available" },
+      { label: "Cost", value: "100% Free" },
+    ],
+  },
+  {
+    n: 5,
+    title: "Application Review & Approval",
+    icon: ClipboardCheck,
+    body: "The Nexora team reviews your application. Verification includes identity, profile, and document validation.",
+    bullets: ["Pending Review", "Approved", "Rejected (with reason and reapply option)"],
+  },
+  {
+    n: 6,
+    title: "Receive Your Partner ID",
+    icon: BadgeCheck,
+    body: "Once approved, your account is activated and you receive everything you need to get started.",
+    bullets: [
+      "Unique Partner ID",
+      "Verified Partner Badge",
+      "Partner Dashboard Access",
+      "Welcome Kit (Digital)",
+      "Training Completion Certificate (if applicable)",
+    ],
+    status: "Partner Activated",
+  },
+  {
+    n: 7,
+    title: "Access Your Business Partner Dashboard",
+    icon: Monitor,
+    body: "Log in to your dashboard and start managing your business. Track everything that matters from a single screen.",
+    bullets: [
+      "Shops Added",
+      "Active Shops",
+      "Pending Applications",
+      "Weekly Earnings",
+      "Lifetime Earnings",
+      "Payout History",
+      "Performance Reports",
+      "Leaderboard",
+      "Notifications",
+      "Training Resources",
+    ],
+  },
+  {
+    n: 8,
+    title: "Start Onboarding Salons & Grow",
+    icon: Rocket,
+    body: "Begin connecting salon owners to Nexora SalonOS. Track every onboarding directly from your dashboard, monitor progress, rewards, and weekly payouts in real time as salons become active.",
+    growthPath: [
+      "Business Partner",
+      "Senior Business Partner (Future)",
+      "District Business Partner",
+      "Regional Leader (Future)",
+      "State Leader (Future)",
+    ],
+    timeline: [
+      { label: "Application", value: "2–3 Minutes" },
+      { label: "Mobile Verification", value: "Instant" },
+      { label: "Profile & KYC", value: "5–10 Minutes" },
+      { label: "Training", value: "Self-paced (or scheduled)" },
+      { label: "Application Review", value: "After document verification" },
+      { label: "Partner Activation", value: "After approval" },
+      { label: "Dashboard Access", value: "Immediately upon activation" },
+      { label: "Start Onboarding", value: "Same Day After Activation" },
+    ],
+  },
 ];
 
 const idealFor = [
@@ -501,6 +630,150 @@ export default function DistrictBusinessPartnerPage() {
 
           <p className="mx-auto mt-10 max-w-3xl text-center text-sm text-muted-foreground">
             Rewards verified active shops par based hain. Milestones cumulative hain — har tier unlock hote hi reward dispatch hota hai.
+          </p>
+        </div>
+      </section>
+
+      {/* 8-STEP ONBOARDING JOURNEY */}
+      <section id="how-to-become" className="bg-muted/30 px-6 py-20">
+        <div className="mx-auto max-w-6xl">
+          <div className="text-center">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-sm font-medium text-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
+              <ClipboardCheck className="h-4 w-4" /> Onboarding Journey
+            </div>
+            <h2 className="text-3xl font-bold md:text-4xl">How To Become A Nexora Business Partner</h2>
+            <p className="mt-3 text-muted-foreground">
+              Start your growth journey in 8 simple steps. No complicated paperwork. No hidden charges. A simple onboarding process from application to activation.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-2">
+            {onboardingSteps.map((s) => (
+              <div
+                key={s.n}
+                className={`group relative overflow-hidden rounded-3xl border bg-card p-7 transition hover:shadow-xl ${
+                  s.n === 8
+                    ? "border-amber-400 bg-gradient-to-br from-amber-50 to-orange-50 dark:border-amber-700 dark:from-amber-950/30 dark:to-orange-950/30 md:col-span-2"
+                    : "border-border"
+                }`}
+              >
+                <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 opacity-10 blur-2xl" />
+                <div className="relative flex flex-col gap-5">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-lg shadow-amber-500/30">
+                      <s.icon className="h-6 w-6" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="rounded-full bg-gradient-to-r from-amber-600 to-orange-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow">
+                          Step {s.n}
+                        </span>
+                        {s.status && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+                            <CheckCircle2 className="h-3 w-3" /> {s.status}
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="mt-2 text-xl font-bold">{s.title}</h3>
+                    </div>
+                  </div>
+
+                  <p className="text-sm text-muted-foreground">{s.body}</p>
+
+                  {s.bullets && (
+                    <ul className="grid gap-2 sm:grid-cols-2">
+                      {s.bullets.map((b) => (
+                        <li key={b} className="flex items-start gap-2 text-sm">
+                          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                          <span className="text-foreground/90">{b}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  {s.facts && (
+                    <div className="grid gap-2 sm:grid-cols-3">
+                      {s.facts.map((f) => (
+                        <div
+                          key={f.label}
+                          className="rounded-xl border border-border bg-background/60 p-3 backdrop-blur"
+                        >
+                          <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                            {f.label}
+                          </div>
+                          <div className="mt-1 text-sm font-bold text-amber-800 dark:text-amber-200">
+                            {f.value}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {s.growthPath && (
+                    <div className="mt-1 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+                      {s.growthPath.map((g, i) => (
+                        <div
+                          key={g}
+                          className="relative flex items-center gap-2 rounded-xl border border-amber-200/70 bg-white/60 px-3 py-2 text-sm font-medium text-amber-900 backdrop-blur dark:border-amber-800/50 dark:bg-white/5 dark:text-amber-100"
+                        >
+                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-orange-600 text-[10px] font-bold text-white">
+                            {i + 1}
+                          </span>
+                          <span>{g}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {s.timeline && (
+                    <div className="mt-1 overflow-hidden rounded-2xl border border-border bg-background/60">
+                      <div className="grid divide-y divide-border sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
+                        {s.timeline.map((t) => (
+                          <div key={t.label} className="p-4">
+                            <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                              <Timer className="h-3 w-3" /> {t.label}
+                            </div>
+                            <div className="mt-1 text-sm font-bold text-foreground">{t.value}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Journey at a glance */}
+          <div className="mt-12 rounded-3xl border border-border bg-card p-8">
+            <h3 className="text-center text-xl font-bold md:text-2xl">Your Journey At A Glance</h3>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-2 text-sm font-semibold">
+              {[
+                "Apply Online",
+                "Verify Mobile",
+                "Complete KYC",
+                "Free Training",
+                "Application Approval",
+                "Receive Partner ID",
+                "Dashboard Activated",
+                "Onboard Salons",
+                "Weekly Payouts & Rewards",
+                "Grow Into District Business Partner",
+              ].map((step, i, arr) => (
+                <span key={step} className="inline-flex items-center gap-2">
+                  <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-amber-900 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-100">
+                    {step}
+                  </span>
+                  {i < arr.length - 1 && <ChevronRight className="h-4 w-4 text-amber-500" />}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Final message */}
+          <p className="mx-auto mt-10 max-w-3xl text-center text-base text-muted-foreground">
+            From your first application to your first salon onboarding, Nexora provides a structured, transparent, and guided process —
+            <span className="font-semibold text-amber-800 dark:text-amber-200"> so you can focus on building relationships, growing your network, and creating long-term business success.</span>
           </p>
         </div>
       </section>
