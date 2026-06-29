@@ -15,6 +15,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MobileMenuOverlay } from "./MobileMenuOverlay";
 import { LocationChip } from "./LocationChip";
 import { useAuthStore } from "@/stores/authStore";
+import { pickPrimaryRole, routeForRole } from "@/lib/auth-redirect";
+
+const ROLE_DASH_LABEL: Record<string, string> = {
+  admin: "Admin Panel",
+  owner: "Owner Dashboard",
+  distributor: "Partner Dashboard",
+  district_partner: "Partner Dashboard",
+  growth_partner: "Partner Dashboard",
+  customer: "My Bookings",
+};
 
 const NAV = [
   { to: "/", label: "Home", icon: null },
@@ -45,6 +55,10 @@ export function PublicHeader() {
   const [mounted, setMounted] = useState(false);
   const user = useAuthStore((s) => s.user);
   const profile = useAuthStore((s) => s.profile);
+  const roles = useAuthStore((s) => s.roles);
+  const primaryRole = pickPrimaryRole(roles);
+  const dashHref = routeForRole(primaryRole);
+  const dashLabel = ROLE_DASH_LABEL[primaryRole] ?? "Dashboard";
   const isInitialized = useAuthStore((s) => s.isInitialized);
   const signOut = useAuthStore((s) => s.signOut);
   const navigate = useNavigate();
@@ -189,9 +203,9 @@ export function PublicHeader() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link to="/dashboard" className="cursor-pointer">
+                  <Link to={dashHref} className="cursor-pointer">
                     <LayoutDashboard className="mr-2 h-4 w-4" />
-                    Dashboard
+                    {dashLabel}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
