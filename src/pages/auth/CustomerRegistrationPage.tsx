@@ -20,6 +20,8 @@ import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
 
 type AccountType = "customer" | "owner" | "district_partner";
 
+const normalizeEmail = (value: string) => value.trim().toLowerCase();
+
 /**
  * Normalize any thrown or returned error value into a user-facing string.
  * Handles Supabase AuthError, plain Error, string, or bare objects (some
@@ -149,7 +151,10 @@ export default function CustomerRegistrationPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [googleSubmitting, setGoogleSubmitting] = useState(false);
+  const [resetSubmitting, setResetSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [alreadyRegisteredEmail, setAlreadyRegisteredEmail] = useState<string | null>(null);
+  const [resetSent, setResetSent] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [showEligibility, setShowEligibility] = useState(false);
@@ -184,7 +189,37 @@ export default function CustomerRegistrationPage() {
     setForm((f) => ({ ...f, [key]: value }));
     // Clear server error and field error when user starts typing
     if (serverError) setServerError(null);
+    if (key === "email") {
+      setAlreadyRegisteredEmail(null);
+      setResetSent(false);
+    }
     if (errors[key]) setErrors((prev) => ({ ...prev, [key]: "" }));
+  };
+
+  const sendResetLink = async () => {
+    const email = normalizeEmail(alreadyRegisteredEmail || form.email);
+    const parsed = baseSchema.shape.email.safeParse(email);
+    if (!parsed.success) {
+      setServerError("Please enter the registered email address first.");
+      return;
+    }
+
+    setResetSubmitting(true);
+    setServerError(null);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) {
+        setServerError(error.message);
+        return;
+      }
+      setResetSent(true);
+    } catch (err) {
+      setServerError(parseErrorMessage(err));
+    } finally {
+      setResetSubmitting(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -213,11 +248,13 @@ export default function CustomerRegistrationPage() {
       return;
     }
 
+    const email = normalizeEmail(parsed.data.email);
+
     setSubmitting(true);
-    console.log("[Register] Attempting sign up with email:", parsed.data.email, "accountType:", accountType);
+    console.log("[Register] Attempting sign up with email:", email, "accountType:", accountType);
     try {
       const { data, error } = await supabase.auth.signUp({
-        email: parsed.data.email.trim(),
+        email,
         password: parsed.data.password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
@@ -236,7 +273,9 @@ export default function CustomerRegistrationPage() {
         const raw = parseErrorMessage(error);
         let errorMessage = raw;
         if (/user already registered|already registered|already exists/i.test(raw)) {
-          errorMessage = "Email already registered. Please sign in instead.";
+          errorMessage = "Email already registered hai. Please sign in karein, ya password bhool gaye hain to reset link bhejein.";
+          setAlreadyRegisteredEmail(email);
+          setResetSent(false);
         } else if (/invalid email|email format/i.test(raw)) {
           errorMessage = "Invalid email format.";
         } else if (/mobile.*(already|taken|in use|exists)/i.test(raw)) {
@@ -598,6 +637,35 @@ export default function CustomerRegistrationPage() {
             <Alert variant="destructive">
               <AlertDescription>
                 {typeof serverError === "string" ? serverError : String(serverError)}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {alreadyRegisteredEmail && (
+            <Alert className="border-primary/20 bg-primary/5">
+              <AlertDescription className="space-y-2 text-sm">
+                <p>
+                  <strong>{alreadyRegisteredEmail}</strong> already registered hai. Same account use karne ke liye login karein.
+                </p>
+                {resetSent ? (
+                  <p className="font-medium text-primary">Reset link sent. Inbox/spam check karke new password set karein.</p>
+                ) : (
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <Button type="button" variant="outline" size="sm" asChild>
+                      <Link to="/login">Go to login</Link>
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={sendResetLink}
+                      disabled={resetSubmitting || submitting}
+                    >
+                      {resetSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                      Reset password
+                    </Button>
+                  </div>
+                )}
               </AlertDescription>
             </Alert>
           )}

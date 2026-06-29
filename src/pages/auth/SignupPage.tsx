@@ -12,6 +12,10 @@ import { PasswordStrengthIndicator, scorePassword } from "@/components/auth/Pass
 import { useAuthStore } from "@/stores/authStore";
 import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
 
+const normalizeEmail = (value: string) => value.trim().toLowerCase();
+
+const emailOnlySchema = z.string().trim().email("Invalid email address").max(255);
+
 const schema = z
   .object({
     full_name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
@@ -51,7 +55,10 @@ export default function SignupPage() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [resetSubmitting, setResetSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [alreadyRegisteredEmail, setAlreadyRegisteredEmail] = useState<string | null>(null);
+  const [resetSent, setResetSent] = useState(false);
   const [success, setSuccess] = useState<null | "verify" | "signed_in">(null);
   const [showPw, setShowPw] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -73,7 +80,37 @@ export default function SignupPage() {
     const v = e.target.value;
     setForm((f) => ({ ...f, [key]: v }));
     if (serverError) setServerError(null);
+    if (key === "email") {
+      setAlreadyRegisteredEmail(null);
+      setResetSent(false);
+    }
     if (errors[key]) setErrors((p) => ({ ...p, [key]: "" }));
+  };
+
+  const sendResetLink = async () => {
+    const email = normalizeEmail(alreadyRegisteredEmail || form.email);
+    const parsed = emailOnlySchema.safeParse(email);
+    if (!parsed.success) {
+      setServerError("Please enter the registered email address first.");
+      return;
+    }
+
+    setResetSubmitting(true);
+    setServerError(null);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) {
+        setServerError(error.message);
+        return;
+      }
+      setResetSent(true);
+    } catch (err) {
+      setServerError(parseErr(err));
+    } finally {
+      setResetSubmitting(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -98,8 +135,9 @@ export default function SignupPage() {
 
     setSubmitting(true);
     try {
+      const email = normalizeEmail(parsed.data.email);
       const { data, error } = await supabase.auth.signUp({
-        email: parsed.data.email.trim(),
+        email,
         password: parsed.data.password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
@@ -116,7 +154,9 @@ export default function SignupPage() {
         const raw = parseErr(error);
         let msg = raw;
         if (/already registered|already exists/i.test(raw)) {
-          msg = "Email already registered. Please sign in instead.";
+          msg = "Email already registered hai. Please sign in karein, ya password bhool gaye hain to reset link bhejein.";
+          setAlreadyRegisteredEmail(email);
+          setResetSent(false);
         } else if (/weak password|pwned|breach/i.test(raw)) {
           msg = "Password is too weak or commonly used. Choose a stronger one.";
         } else if (/rate limit|too many/i.test(raw)) {
@@ -198,6 +238,35 @@ export default function SignupPage() {
           {serverError && (
             <Alert variant="destructive" className="mb-4">
               <AlertDescription>{serverError}</AlertDescription>
+            </Alert>
+          )}
+
+          {alreadyRegisteredEmail && (
+            <Alert className="mb-4 border-primary/20 bg-primary/5">
+              <AlertDescription className="space-y-2 text-sm">
+                <p>
+                  <strong>{alreadyRegisteredEmail}</strong> already registered hai. Same account use karne ke liye login karein.
+                </p>
+                {resetSent ? (
+                  <p className="font-medium text-primary">Reset link sent. Inbox/spam check karke new password set karein.</p>
+                ) : (
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <Button type="button" variant="outline" size="sm" asChild>
+                      <Link to="/login">Go to login</Link>
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={sendResetLink}
+                      disabled={resetSubmitting || submitting}
+                    >
+                      {resetSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                      Reset password
+                    </Button>
+                  </div>
+                )}
+              </AlertDescription>
             </Alert>
           )}
 

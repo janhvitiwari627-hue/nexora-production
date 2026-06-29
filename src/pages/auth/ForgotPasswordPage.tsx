@@ -13,6 +13,8 @@ const schema = z.object({
   email: z.string().trim().email("Invalid email address").max(255),
 });
 
+const normalizeEmail = (value: string) => value.trim().toLowerCase();
+
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +24,7 @@ export default function ForgotPasswordPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    const parsed = schema.safeParse({ email });
+    const parsed = schema.safeParse({ email: normalizeEmail(email) });
     if (!parsed.success) {
       setError(parsed.error.issues[0]?.message ?? "Invalid email");
       return;
