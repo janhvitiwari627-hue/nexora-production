@@ -28,6 +28,18 @@ export function JobPortalPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <div className="sticky top-0 z-40 border-b border-border/60 bg-card/90 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center gap-2 px-4 py-3">
+          <BackButton size="icon" aria-label="Go back" />
+          <Link to="/" className="flex items-center gap-2">
+            <div className="bg-gradient-cta grid h-8 w-8 place-items-center rounded-lg text-primary-foreground shadow-[var(--shadow-glow)]">
+              <Sparkles className="h-4 w-4" />
+            </div>
+            <span className="text-gradient-brand text-lg font-extrabold tracking-tight">Nexora</span>
+          </Link>
+        </div>
+      </div>
+
       <section className="from-primary/10 to-accent/10 border-border border-b bg-gradient-to-br py-16 md:py-20">
         <div className="mx-auto max-w-6xl px-4 md:px-6">
           <div className="bg-card border-border mx-auto mb-6 inline-flex rounded-full border p-1">
