@@ -8,5 +8,5 @@ export const Route = createFileRoute("/signup")({
       { name: "description", content: "Create your free Nexora account." },
     ],
   }),
-  component: CustomerRegistrationPage,
+  component: SignupPage,
 });
