@@ -66,6 +66,50 @@ type Form = {
   upi_id: string;
 };
 
+function sanitizeSetupPatch(
+  patch: Partial<Form>,
+  options: { omitIncompleteUpi?: boolean } = {},
+) {
+  const cleaned: Record<string, unknown> = {};
+  const omitIncompleteUpi = options.omitIncompleteUpi ?? true;
+
+  for (const [key, value] of Object.entries(patch)) {
+    if (value === undefined) continue;
+    if (typeof value !== "string") {
+      cleaned[key] = value;
+      continue;
+    }
+
+    const trimmed = value.trim();
+    if (URL_FIELDS.has(key)) {
+      if (!trimmed) cleaned[key] = null;
+      else if (/^https?:\/\//i.test(trimmed)) cleaned[key] = trimmed;
+      continue;
+    }
+
+    if (key === "upi_id") {
+      if (!trimmed) cleaned[key] = null;
+      else if (UPI_PATTERN.test(trimmed)) cleaned[key] = trimmed;
+      else if (!omitIncompleteUpi) cleaned[key] = trimmed;
+      continue;
+    }
+
+    if (key === "name" && !trimmed) continue;
+    cleaned[key] = trimmed;
+  }
+
+  return cleaned;
+}
+
+function friendlySetupError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error || "Please check the setup fields.");
+  if (message.includes("upi_id")) return "Please enter a valid UPI ID, for example yourname@okhdfc.";
+  if (message.includes("logo_url") || message.includes("cover_image_url") || message.includes("Invalid url")) {
+    return "Please upload a valid logo or cover image before saving.";
+  }
+  return message;
+}
+
 const STEPS = [
   { id: "basics", label: "Business basics", icon: Building2 },
   { id: "location", label: "Location pin", icon: MapPin },
