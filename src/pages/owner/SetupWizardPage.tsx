@@ -337,6 +337,7 @@ export function SetupWizardPage() {
   const lastServicesJsonRef = useRef<string>("");
   const retryRef = useRef<null | (() => Promise<void>)>(null);
   const [isRetrying, setIsRetrying] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const handleRetry = async () => {
     if (!retryRef.current) return;
