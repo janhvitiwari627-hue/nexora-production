@@ -233,6 +233,75 @@ export function SetupWizardPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  // ---------------- Autosave ----------------
+  const [autosave, setAutosave] = useState<{ status: "idle" | "saving" | "saved" | "error"; at: number | null }>({
+    status: "idle", at: null,
+  });
+  const lastFormJsonRef = useRef<string>("");
+  const lastServicesJsonRef = useRef<string>("");
+
+  // Debounced autosave for salon profile fields.
+  useEffect(() => {
+    if (!activeSalonId || !hydratedRef.current) return;
+    const snapshot = JSON.stringify(form);
+    if (snapshot === lastFormJsonRef.current) return;
+    const handle = window.setTimeout(async () => {
+      try {
+        setAutosave({ status: "saving", at: null });
+        await updateFn({
+          data: {
+            salon_id: activeSalonId,
+            patch: {
+              name: form.name, category: form.category, owner_name: form.owner_name,
+              phone: form.phone, whatsapp: form.whatsapp, address: form.address,
+              city: form.city, pincode: form.pincode,
+              latitude: form.latitude, longitude: form.longitude,
+              logo_url: form.logo_url, cover_image_url: form.cover_image_url,
+              hours: form.hours, upi_id: form.upi_id,
+            },
+          },
+        });
+        lastFormJsonRef.current = snapshot;
+        setAutosave({ status: "saved", at: Date.now() });
+        qc.invalidateQueries({ queryKey: ["owner", "salon-full", activeSalonId] });
+      } catch (e) {
+        setAutosave({ status: "error", at: Date.now() });
+        toast.error(`Autosave failed: ${(e as Error).message}`);
+      }
+    }, 900);
+    return () => window.clearTimeout(handle);
+  }, [form, activeSalonId, updateFn, qc]);
+
+  // Debounced autosave for services (only valid rows).
+  useEffect(() => {
+    if (!activeSalonId || !servicesHydratedRef.current) return;
+    const snapshot = JSON.stringify(services);
+    if (snapshot === lastServicesJsonRef.current) return;
+    const handle = window.setTimeout(async () => {
+      const valid = services.filter((s) => s.name.trim() && s.price > 0);
+      if (valid.length === 0) { lastServicesJsonRef.current = snapshot; return; }
+      try {
+        setAutosave({ status: "saving", at: null });
+        for (const s of valid) {
+          await upsertSvc({
+            data: {
+              id: s.id, salon_id: activeSalonId, name: s.name.trim(),
+              price: Number(s.price), duration_minutes: Number(s.duration_minutes) || 30,
+              is_active: true,
+            },
+          });
+        }
+        lastServicesJsonRef.current = snapshot;
+        setAutosave({ status: "saved", at: Date.now() });
+        qc.invalidateQueries({ queryKey: ["owner", "services", activeSalonId] });
+      } catch (e) {
+        setAutosave({ status: "error", at: Date.now() });
+        toast.error(`Autosave failed: ${(e as Error).message}`);
+      }
+    }, 1200);
+    return () => window.clearTimeout(handle);
+  }, [services, activeSalonId, upsertSvc, qc]);
+
   // ---------------- File upload ----------------
   const uploadImage = async (file: File, kind: "logo" | "cover") => {
     if (!activeSalonId) return null;
@@ -243,8 +312,20 @@ export function SetupWizardPage() {
     });
     if (error) { toast.error(error.message); return null; }
     const { data } = supabase.storage.from("salon-media").getPublicUrl(path);
+    // Persist URL immediately so a refresh keeps the image.
+    try {
+      setAutosave({ status: "saving", at: null });
+      const patch = kind === "logo" ? { logo_url: data.publicUrl } : { cover_image_url: data.publicUrl };
+      await updateFn({ data: { salon_id: activeSalonId, patch } });
+      setAutosave({ status: "saved", at: Date.now() });
+      qc.invalidateQueries({ queryKey: ["owner", "salon-full", activeSalonId] });
+    } catch (e) {
+      setAutosave({ status: "error", at: Date.now() });
+      toast.error(`Image save failed: ${(e as Error).message}`);
+    }
     return data.publicUrl;
   };
+
 
   if (ownerLoading) {
     return (
