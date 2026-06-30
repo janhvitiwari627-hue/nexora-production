@@ -603,10 +603,10 @@ export function SetupWizardPage() {
               <div className="space-y-5">
                 <SectionHeader icon={MapPin} title="Pin your location" subtitle="Customers tap the pin for directions." />
                 <div className="grid gap-4 sm:grid-cols-3">
-                  <Field label="Latitude">
+                  <Field label="Latitude" error={fieldErrors.latitude}>
                     <Input type="number" step="0.000001" value={form.latitude ?? ""} onChange={(e) => setForm({ ...form, latitude: e.target.value ? Number(e.target.value) : null })} />
                   </Field>
-                  <Field label="Longitude">
+                  <Field label="Longitude" error={fieldErrors.longitude}>
                     <Input type="number" step="0.000001" value={form.longitude ?? ""} onChange={(e) => setForm({ ...form, longitude: e.target.value ? Number(e.target.value) : null })} />
                   </Field>
                   <div className="flex items-end">
