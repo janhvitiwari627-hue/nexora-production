@@ -20,15 +20,30 @@ export function WhiteLabelHeader({ shop, template }: { shop: ShopData; template:
   const variant = template.header;
   const [open, setOpen] = useState(false);
 
+  const isDark = template.key === "royal-luxe";
+  const headerBg = isDark
+    ? "rgba(11,11,11,0.92)"
+    : variant === "elegant"
+    ? "rgba(255,255,255,0.9)"
+    : variant === "bold"
+    ? "#ffffff"
+    : "rgba(255,255,255,0.7)";
   const headerClass =
     variant === "elegant"
-      ? "border-b border-amber-200/40 bg-white/90 backdrop-blur"
+      ? `border-b backdrop-blur ${isDark ? "border-amber-500/30" : "border-amber-200/40"}`
       : variant === "bold"
-      ? "border-b-2 bg-white"
-      : "bg-white/70 backdrop-blur-lg";
+      ? "border-b-2"
+      : "backdrop-blur-lg";
 
   return (
-    <header className={`sticky top-0 z-30 ${headerClass}`} style={variant === "bold" ? { borderColor: template.colors.primary } : undefined}>
+    <header
+      className={`sticky top-0 z-30 ${headerClass}`}
+      style={{
+        backgroundColor: headerBg,
+        color: template.colors.text,
+        ...(variant === "bold" ? { borderColor: template.colors.primary } : {}),
+      }}
+    >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-3 md:px-10">
         <Link
           to="/site/$businessSlug"
@@ -73,7 +88,7 @@ export function WhiteLabelHeader({ shop, template }: { shop: ShopData; template:
         </div>
       </div>
       {open && (
-        <div className="border-t bg-white md:hidden">
+        <div className="border-t md:hidden" style={{ backgroundColor: headerBg, color: template.colors.text }}>
           <nav className="grid gap-1 px-6 py-3">
             {LINKS.map((l) => (
               <a
