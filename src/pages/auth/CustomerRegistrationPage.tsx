@@ -238,6 +238,7 @@ export default function CustomerRegistrationPage() {
 
   const registerSalonFn = useServerFn(registerMySalon);
   const registerDbpFn = useServerFn(registerDistrictPartner);
+  const checkEmailRoleFn = useServerFn(getEmailRole);
   const pwStrength = useMemo(() => scorePassword(form.password), [form.password]);
 
   const update = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
