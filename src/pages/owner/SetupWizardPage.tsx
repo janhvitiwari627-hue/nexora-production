@@ -78,7 +78,22 @@ export function SetupWizardPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { activeSalonId, activeSalon, isLoading: ownerLoading, hasSalon } = useOwnerContext();
+  const stepStorageKey = activeSalonId ? `nexora.setup.step.${activeSalonId}` : null;
   const [stepIdx, setStepIdx] = useState(0);
+  const goToStep = (i: number) => {
+    setStepIdx(i);
+    if (stepStorageKey) try { localStorage.setItem(stepStorageKey, String(i)); } catch { /* noop */ }
+  };
+  // Restore last-visited step once we know which salon we're on.
+  useEffect(() => {
+    if (!stepStorageKey) return;
+    try {
+      const raw = localStorage.getItem(stepStorageKey);
+      const n = raw ? Number(raw) : NaN;
+      if (Number.isFinite(n) && n >= 0 && n < STEPS.length) setStepIdx(n);
+    } catch { /* noop */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stepStorageKey]);
 
   const fetchFull = useServerFn(getOwnerSalonFull);
   const updateFn = useServerFn(updateOwnerSalon);
