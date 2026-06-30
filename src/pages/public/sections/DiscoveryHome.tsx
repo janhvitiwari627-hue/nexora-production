@@ -1114,7 +1114,7 @@ function OpenNowCategory({ shops, dest, liveTick }: CategoryProps & { liveTick: 
         badges={["Live Status", "Open Now"]}
         dest={dest}
       />
-      <LiveStatusBadge />
+      <LiveStatusBadge tick={liveTick} />
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {list.map((s) => (
