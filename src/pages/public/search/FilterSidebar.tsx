@@ -1,5 +1,13 @@
 import { Star } from "lucide-react";
-import { CATEGORIES, DEFAULT_FILTERS, type Filters, type Gender } from "./filters";
+import {
+  CATEGORIES,
+  DEFAULT_FILTERS,
+  PRICE_MAX,
+  PRICE_MIN,
+  formatRupees,
+  type Filters,
+  type Gender,
+} from "./filters";
 
 interface Props {
   draft: Filters;
