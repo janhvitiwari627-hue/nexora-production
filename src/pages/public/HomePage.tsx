@@ -364,11 +364,14 @@ function SearchPanel() {
               <option value="">All categories</option>
               {[
                 "Salon",
-                "Spa",
                 "Beauty Parlour",
+                "Spa",
                 "Tattoo Studio",
                 "Massage Center",
                 "Nail Art Studio",
+                "Makeup Artist",
+                "Bridal Services",
+                "Barber Shop",
               ].map((c) => (
                 <option key={c} value={c}>
                   {c}
