@@ -462,7 +462,7 @@ export function DiscoveryHome({
         <MostReviewedCategory shops={shops} dest={{ ...baseDest, sort: "rating" }} />
         <MostRewardedCategory shops={shops} dest={{ ...baseDest }} />
         <MostSavedCategory shops={shops} dest={{ ...baseDest }} />
-        <OpenNowCategory shops={shops} dest={{ ...baseDest, on: 1, sort: "distance" }} />
+        <OpenNowCategory shops={shops} dest={{ ...baseDest, on: 1, sort: "distance" }} liveTick={liveTick} />
       </div>
     </div>
   );
