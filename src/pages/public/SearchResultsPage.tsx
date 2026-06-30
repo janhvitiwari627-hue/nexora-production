@@ -425,7 +425,7 @@ function ResultCard({
     tags.push({ label: "Most Popular", cls: "bg-warning text-heading", icon: TrendingUp });
 
   return (
-    <div className="relative">
+    <div className="relative" data-result-slug={shop.slug}>
       {tags.length > 0 && (
         <div className="pointer-events-none absolute top-5 left-1/2 z-10 flex -translate-x-1/2 flex-wrap justify-center gap-1.5">
           {tags.map((t) => (
