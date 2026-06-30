@@ -56,6 +56,7 @@ import { Route as PartnerGrowthRouteImport } from './routes/partner.growth'
 import { Route as PartnerDistrictRouteImport } from './routes/partner.district'
 import { Route as PartnerDistributorRouteImport } from './routes/partner.distributor'
 import { Route as OwnerWebsiteRouteImport } from './routes/owner.website'
+import { Route as OwnerTemplatesRouteImport } from './routes/owner.templates'
 import { Route as OwnerStaffRouteImport } from './routes/owner.staff'
 import { Route as OwnerSetupWizardRouteImport } from './routes/owner.setup-wizard'
 import { Route as OwnerServicesRouteImport } from './routes/owner.services'
@@ -354,6 +355,11 @@ const PartnerDistributorRoute = PartnerDistributorRouteImport.update({
 const OwnerWebsiteRoute = OwnerWebsiteRouteImport.update({
   id: '/website',
   path: '/website',
+  getParentRoute: () => OwnerRoute,
+} as any)
+const OwnerTemplatesRoute = OwnerTemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
   getParentRoute: () => OwnerRoute,
 } as any)
 const OwnerStaffRoute = OwnerStaffRouteImport.update({
@@ -761,6 +767,7 @@ export interface FileRoutesByFullPath {
   '/owner/services': typeof OwnerServicesRoute
   '/owner/setup-wizard': typeof OwnerSetupWizardRoute
   '/owner/staff': typeof OwnerStaffRoute
+  '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
   '/partner/distributor': typeof PartnerDistributorRoute
   '/partner/district': typeof PartnerDistrictRoute
@@ -871,6 +878,7 @@ export interface FileRoutesByTo {
   '/owner/services': typeof OwnerServicesRoute
   '/owner/setup-wizard': typeof OwnerSetupWizardRoute
   '/owner/staff': typeof OwnerStaffRoute
+  '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
   '/partner/distributor': typeof PartnerDistributorRoute
   '/partner/district': typeof PartnerDistrictRoute
@@ -985,6 +993,7 @@ export interface FileRoutesById {
   '/owner/services': typeof OwnerServicesRoute
   '/owner/setup-wizard': typeof OwnerSetupWizardRoute
   '/owner/staff': typeof OwnerStaffRoute
+  '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
   '/partner/distributor': typeof PartnerDistributorRoute
   '/partner/district': typeof PartnerDistrictRoute
@@ -1100,6 +1109,7 @@ export interface FileRouteTypes {
     | '/owner/services'
     | '/owner/setup-wizard'
     | '/owner/staff'
+    | '/owner/templates'
     | '/owner/website'
     | '/partner/distributor'
     | '/partner/district'
@@ -1210,6 +1220,7 @@ export interface FileRouteTypes {
     | '/owner/services'
     | '/owner/setup-wizard'
     | '/owner/staff'
+    | '/owner/templates'
     | '/owner/website'
     | '/partner/distributor'
     | '/partner/district'
@@ -1323,6 +1334,7 @@ export interface FileRouteTypes {
     | '/owner/services'
     | '/owner/setup-wizard'
     | '/owner/staff'
+    | '/owner/templates'
     | '/owner/website'
     | '/partner/distributor'
     | '/partner/district'
@@ -1752,6 +1764,13 @@ declare module '@tanstack/react-router' {
       path: '/website'
       fullPath: '/owner/website'
       preLoaderRoute: typeof OwnerWebsiteRouteImport
+      parentRoute: typeof OwnerRoute
+    }
+    '/owner/templates': {
+      id: '/owner/templates'
+      path: '/templates'
+      fullPath: '/owner/templates'
+      preLoaderRoute: typeof OwnerTemplatesRouteImport
       parentRoute: typeof OwnerRoute
     }
     '/owner/staff': {
@@ -2341,6 +2360,7 @@ interface OwnerRouteChildren {
   OwnerServicesRoute: typeof OwnerServicesRoute
   OwnerSetupWizardRoute: typeof OwnerSetupWizardRoute
   OwnerStaffRoute: typeof OwnerStaffRoute
+  OwnerTemplatesRoute: typeof OwnerTemplatesRoute
   OwnerWebsiteRoute: typeof OwnerWebsiteRoute
   OwnerIndexRoute: typeof OwnerIndexRoute
 }
@@ -2360,6 +2380,7 @@ const OwnerRouteChildren: OwnerRouteChildren = {
   OwnerServicesRoute: OwnerServicesRoute,
   OwnerSetupWizardRoute: OwnerSetupWizardRoute,
   OwnerStaffRoute: OwnerStaffRoute,
+  OwnerTemplatesRoute: OwnerTemplatesRoute,
   OwnerWebsiteRoute: OwnerWebsiteRoute,
   OwnerIndexRoute: OwnerIndexRoute,
 }

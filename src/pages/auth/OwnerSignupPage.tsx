@@ -212,7 +212,17 @@ export default function OwnerSignupPage() {
         session = signIn.session ?? null;
       }
       setSuccess(true);
-      setTimeout(() => navigate({ to: "/owner/create-website", replace: true }), 500);
+      setTimeout(() => {
+        let dest = "/owner/templates";
+        if (typeof window !== "undefined") {
+          const pending = sessionStorage.getItem("nexora:postLoginRedirect");
+          if (pending) {
+            sessionStorage.removeItem("nexora:postLoginRedirect");
+            dest = pending;
+          }
+        }
+        navigate({ to: dest, replace: true });
+      }, 500);
     } catch (err) {
       setServerError(parseErr(err));
     } finally {

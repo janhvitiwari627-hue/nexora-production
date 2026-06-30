@@ -77,7 +77,7 @@ export function HeroSection() {
 
           <motion.div variants={item} className="mt-4">
             <Link
-              to="/owner/create-website"
+              to="/owner/templates"
               className="inline-flex items-center gap-2 text-sm font-semibold text-body underline-offset-4 transition hover:text-heading hover:underline"
             >
               <Store className="h-4 w-4" />

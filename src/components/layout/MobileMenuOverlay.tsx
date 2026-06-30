@@ -10,7 +10,7 @@ const NAV = [
   { label: "Explore", to: "/search", icon: Sparkles, desc: "Salons, spas & barbers near you" },
   { label: "Job Portal", to: "/jobs", icon: Briefcase, desc: "Find your next role in beauty" },
   { label: "Partner Growth", to: "/partner/growth", icon: TrendingUp, desc: "Grow with our partner network" },
-  { label: "Create Shop Website", to: "/owner/create-website", icon: Building2, desc: "Launch your salon website in minutes" },
+  { label: "Create Shop Website", to: "/owner/templates", icon: Building2, desc: "Launch your salon website in minutes" },
 ] as const;
 
 export function MobileMenuOverlay({
