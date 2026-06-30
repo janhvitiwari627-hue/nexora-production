@@ -117,7 +117,25 @@ const CATEGORIES = [
     Icon: Crown,
     gradient: "from-yellow-500 to-amber-600",
   },
+  {
+    name: "Barber Shop",
+    desc: "Sharp cuts & beard care for men",
+    Icon: Scissors,
+    gradient: "from-zinc-600 to-stone-800",
+  },
 ];
+
+const CATEGORY_IMAGES: Record<string, string> = {
+  "Salon": "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&q=80",
+  "Beauty Parlour": "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=600&q=80",
+  "Spa": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=80",
+  "Tattoo Studio": "https://images.unsplash.com/photo-1611501275019-9b5cda994e8d?w=600&q=80",
+  "Massage Center": "https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=600&q=80",
+  "Nail Art Studio": "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600&q=80",
+  "Makeup Artist": "https://images.unsplash.com/photo-1457972729786-0411a3b2b626?w=600&q=80",
+  "Bridal Services": "https://images.unsplash.com/photo-1583394293214-28ded15ee548?w=600&q=80",
+  "Barber Shop": "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=600&q=80",
+};
 
 /* ============= HERO ============= */
 function Hero() {
