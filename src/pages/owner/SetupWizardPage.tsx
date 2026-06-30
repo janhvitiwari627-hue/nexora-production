@@ -434,10 +434,15 @@ export function SetupWizardPage() {
         ? { logo_url: result.secure_url }
         : { cover_image_url: result.secure_url };
       await updateFn({ data: { salon_id: activeSalonId, patch } });
+      setFieldErrors((prev) => {
+        const { [kind === "logo" ? "logo_url" : "cover_image_url"]: _omit, ...rest } = prev;
+        return rest;
+      });
       setAutosave({ status: "saved", at: Date.now(), error: null });
       qc.invalidateQueries({ queryKey: ["owner", "salon-full", activeSalonId] });
       return result.secure_url;
     } catch (e) {
+      setFieldErrors((prev) => ({ ...prev, ...parseFieldErrors(e) }));
       setAutosave({ status: "error", at: Date.now(), error: friendlySetupError(e) });
       toast.error(`Image upload failed: ${friendlySetupError(e)}`);
       return null;
