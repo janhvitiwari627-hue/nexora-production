@@ -85,6 +85,7 @@ export function formatRupees(n: number): string {
 export type SearchUrlParams = {
   q?: string;
   category?: string;
+  area?: string;
   mr?: number;
   md?: number;
   pmin?: number;
