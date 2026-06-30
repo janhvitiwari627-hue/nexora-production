@@ -202,13 +202,24 @@ export default function OwnerSignupPage() {
         console.warn("[OwnerSignup] Skipping owner_requests insert:", parseErr(err));
       }
 
+      // Ensure session, then redirect to owner onboarding / create-website
+      let session = data.session;
+      if (!session && data.user) {
+        const { data: signIn } = await supabase.auth.signInWithPassword({
+          email,
+          password: parsed.data.password,
+        });
+        session = signIn.session ?? null;
+      }
       setSuccess(true);
+      setTimeout(() => navigate({ to: "/owner/create-website", replace: true }), 500);
     } catch (err) {
       setServerError(parseErr(err));
     } finally {
       setSubmitting(false);
     }
   };
+
 
   if (success) {
     return (
