@@ -91,6 +91,7 @@ export default function OwnerSignupPage() {
   const [showPw, setShowPw] = useState(false);
 
   const pwStrength = useMemo(() => scorePassword(form.password), [form.password]);
+  const checkEmailRoleFn = useServerFn(getEmailRole);
 
   const update = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
