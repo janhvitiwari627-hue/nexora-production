@@ -1093,7 +1093,7 @@ function MostSavedCategory({ shops, dest }: CategoryProps) {
 }
 
 /* ============= CATEGORY: OPEN NOW ============= */
-function OpenNowCategory({ shops, dest }: CategoryProps) {
+function OpenNowCategory({ shops, dest, liveTick }: CategoryProps & { liveTick: number }) {
   const list = useMemo(
     () =>
       shops
