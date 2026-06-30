@@ -18,7 +18,7 @@ import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { BackButton } from "@/components/shared/BackButton";
 import { useOwnerContext } from "@/hooks/use-owner-context";
-import { supabase } from "@/integrations/supabase/client";
+import { uploadToCloudinary, isCloudinaryConfigured } from "@/lib/cloudinary";
 import {
   getOwnerSalonFull,
   updateOwnerSalon,
@@ -302,29 +302,31 @@ export function SetupWizardPage() {
     return () => window.clearTimeout(handle);
   }, [services, activeSalonId, upsertSvc, qc]);
 
-  // ---------------- File upload ----------------
+  // ---------------- File upload (Cloudinary) ----------------
   const uploadImage = async (file: File, kind: "logo" | "cover") => {
     if (!activeSalonId) return null;
-    const ext = file.name.split(".").pop() || "jpg";
-    const path = `${activeSalonId}/${kind}-${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from("salon-media").upload(path, file, {
-      contentType: file.type, upsert: true,
-    });
-    if (error) { toast.error(error.message); return null; }
-    const { data } = supabase.storage.from("salon-media").getPublicUrl(path);
-    // Persist URL immediately so a refresh keeps the image.
+    if (!isCloudinaryConfigured()) {
+      toast.error("Image uploads aren't configured yet. Please contact support.");
+      return null;
+    }
     try {
+      const result = await uploadToCloudinary(file, { folder: `salons/${activeSalonId}/${kind}` });
+      // Persist URL immediately so a refresh keeps the image.
       setAutosave({ status: "saving", at: null });
-      const patch = kind === "logo" ? { logo_url: data.publicUrl } : { cover_image_url: data.publicUrl };
+      const patch = kind === "logo"
+        ? { logo_url: result.secure_url }
+        : { cover_image_url: result.secure_url };
       await updateFn({ data: { salon_id: activeSalonId, patch } });
       setAutosave({ status: "saved", at: Date.now() });
       qc.invalidateQueries({ queryKey: ["owner", "salon-full", activeSalonId] });
+      return result.secure_url;
     } catch (e) {
       setAutosave({ status: "error", at: Date.now() });
-      toast.error(`Image save failed: ${(e as Error).message}`);
+      toast.error(`Image upload failed: ${(e as Error).message}`);
+      return null;
     }
-    return data.publicUrl;
   };
+
 
 
   if (ownerLoading) {

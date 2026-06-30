@@ -66,12 +66,13 @@ export function CreateWebsitePage() {
     onSuccess: (_d, vars) => {
       const t = templates.find((x) => x.id === vars.template_id);
       qc.invalidateQueries({ queryKey: ["owner", "salons"] });
-      toast.success(`${t?.template_name ?? "Template"} applied. Edit your content & go live.`);
-      navigate({ to: "/owner/website" });
+      toast.success(`${t?.template_name ?? "Template"} applied. Now finish your website setup.`);
+      navigate({ to: "/owner/setup-wizard" });
     },
     onError: (e: Error) => toast.error(e.message),
     onSettled: () => setPendingId(null),
   });
+
 
   const visible = useMemo(
     () => filter === "All" ? templates : templates.filter((t) => t.category === filter),
@@ -206,7 +207,7 @@ export function CreateWebsitePage() {
                           navigate({ to: "/owner/onboarding" });
                           return;
                         }
-                        if (isCurrent) { navigate({ to: "/owner/website" }); return; }
+                        if (isCurrent) { navigate({ to: "/owner/setup-wizard" }); return; }
                         setPendingId(t.id);
                         mutate.mutate({ template_id: t.id });
                       }}
