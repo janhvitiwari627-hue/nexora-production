@@ -122,6 +122,7 @@ export function SetupWizardPage() {
   );
 
   // Hydrate form once data lands.
+  const hydratedRef = useRef(false);
   useEffect(() => {
     const s = salonQ.data;
     if (!s) return;
@@ -136,19 +137,25 @@ export function SetupWizardPage() {
       hours: (s.hours as Hours | null) ?? DEFAULT_HOURS,
       upi_id: (s as { upi_id?: string }).upi_id ?? "",
     }));
+    hydratedRef.current = true;
   }, [salonQ.data]);
 
+  const servicesHydratedRef = useRef(false);
   useEffect(() => {
-    const existing = servicesQ.data ?? [];
-    if (existing.length === 0) return;
-    const rows: ServiceRow[] = Array.from({ length: 5 }, (_, i) => {
-      const e = existing[i];
-      return e
-        ? { id: e.id, name: e.name, price: Number(e.price), duration_minutes: e.duration_minutes }
-        : { ...EMPTY_SERVICE };
-    });
-    setServices(rows);
+    const existing = servicesQ.data;
+    if (!existing) return;
+    if (existing.length > 0) {
+      const rows: ServiceRow[] = Array.from({ length: 5 }, (_, i) => {
+        const e = existing[i];
+        return e
+          ? { id: e.id, name: e.name, price: Number(e.price), duration_minutes: e.duration_minutes }
+          : { ...EMPTY_SERVICE };
+      });
+      setServices(rows);
+    }
+    servicesHydratedRef.current = true;
   }, [servicesQ.data]);
+
 
   // ---------------- Checklist ----------------
   const checklist = useMemo(() => {
