@@ -171,7 +171,7 @@ export function AccountSettingsPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={loggingOut}>Cancel</AlertogCancel_REPLACE_ME>
+            <AlertDialogCancel disabled={loggingOut}>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleLogout} disabled={loggingOut}>
               {loggingOut ? "Logging out..." : "Logout"}
             </AlertDialogAction>
