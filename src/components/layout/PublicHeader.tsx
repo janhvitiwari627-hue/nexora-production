@@ -282,6 +282,21 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
       </div>
 
       <MobileMenuOverlay open={menuOpen} onClose={() => setMenuOpen(false)} />
+
+      <AlertDialog open={logoutOpen} onOpenChange={setLogoutOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Logout from Nexora?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You can sign in again anytime with your email and password.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleLogout}>Logout</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </header>
   );
 }
