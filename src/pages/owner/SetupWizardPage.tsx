@@ -437,8 +437,33 @@ export function SetupWizardPage() {
         </div>
       </div>
 
+      {autosave.status === "error" && autosave.error && (
+        <div
+          role="alert"
+          className="mt-4 flex flex-col gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm sm:flex-row sm:items-start sm:justify-between"
+        >
+          <div className="flex-1">
+            <div className="font-medium text-destructive">Couldn't save your changes</div>
+            <div className="mt-1 text-destructive/80">{autosave.error}</div>
+            <div className="mt-1 text-xs text-muted-foreground">
+              Your edits are kept locally. Fix the highlighted field or press Retry.
+            </div>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleRetry}
+            disabled={isRetrying}
+            className="self-start border-destructive/40 text-destructive hover:bg-destructive/10"
+          >
+            {isRetrying ? <Loader2 className="mr-2 h-3 w-3 animate-spin" /> : null}
+            Retry save
+          </Button>
+        </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+
         {/* ============ MAIN STEPS ============ */}
         <div className="space-y-6">
           {/* Stepper bar */}
