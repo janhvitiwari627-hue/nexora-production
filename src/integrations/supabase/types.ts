@@ -4017,7 +4017,7 @@ export type Database = {
           whatsapp: string | null
         }
         Insert: {
-          address?: string | null
+          address?: never
           amenities?: string[] | null
           brand_primary?: string | null
           brand_secondary?: string | null
@@ -4056,7 +4056,7 @@ export type Database = {
           whatsapp?: never
         }
         Update: {
-          address?: string | null
+          address?: never
           amenities?: string[] | null
           brand_primary?: string | null
           brand_secondary?: string | null
