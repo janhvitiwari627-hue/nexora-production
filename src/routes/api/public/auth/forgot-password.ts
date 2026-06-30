@@ -13,7 +13,7 @@ const GENERIC_OK = {
 
 const PRODUCTION_ORIGIN = "https://meripahalfasthelp.online";
 const RESET_REDIRECT_TO = `${PRODUCTION_ORIGIN}/auth/callback?next=/reset-password`;
-const RESEND_ENDPOINT = "https://api.resend.com/emails";
+const RESEND_ENDPOINT = "https://connector-gateway.lovable.dev/resend/emails";
 
 function resetEmailHtml(actionLink: string) {
   return `<!doctype html>
@@ -70,7 +70,8 @@ export const Route = createFileRoute("/api/public/auth/forgot-password")({
 
         try {
           const resendApiKey = process.env.RESEND_API_KEY;
-          if (!resendApiKey) {
+          const lovableApiKey = process.env.LOVABLE_API_KEY;
+          if (!resendApiKey || !lovableApiKey) {
             console.warn("[forgot-password] email environment missing");
             return Response.json(GENERIC_OK);
           }
@@ -97,7 +98,8 @@ export const Route = createFileRoute("/api/public/auth/forgot-password")({
           const emailResponse = await fetch(RESEND_ENDPOINT, {
             method: "POST",
             headers: {
-              Authorization: `Bearer ${resendApiKey}`,
+              Authorization: `Bearer ${lovableApiKey}`,
+              "X-Connection-Api-Key": resendApiKey,
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
