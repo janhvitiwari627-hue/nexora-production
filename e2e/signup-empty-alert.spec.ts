@@ -68,17 +68,37 @@ test.describe("/signup — empty alert + friendly validation", () => {
 test.describe("/owner-signup — empty alert + friendly validation", () => {
   test("submitting an empty form shows inline errors, no empty alert box", async ({ page }) => {
     await gotoForm(page, "/owner-signup", /Owner full name/);
-    await page.getByRole("button", { name: /Create owner account|Create account/ }).click();
+    await page.getByRole("button", { name: "Submit owner request" }).click();
 
     await expect(page).toHaveURL(/\/owner-signup$/);
     await expect(page.locator(destructiveAlertSelector)).toHaveCount(0);
 
     await expect(page.getByText("Name must be at least 2 characters")).toBeVisible();
-    await expect(page.getByText("Invalid email address")).toBeVisible();
+    await expect(page.getByText("Invalid email")).toBeVisible();
     await expect(page.getByText("Mobile number is required")).toBeVisible();
     await expect(page.getByText("Password must be at least 8 characters")).toBeVisible();
     await expect(page.getByText("Business name is required")).toBeVisible();
   });
+
+  test("mismatched passwords shows 'Passwords do not match', no empty alert", async ({ page }) => {
+    await gotoForm(page, "/owner-signup", /Owner full name/);
+    await page.getByLabel("Owner full name").fill("Mismatch Owner");
+    await page.getByLabel("Email").fill(`mismatch-owner-${Date.now()}@example.com`);
+    await page.getByLabel("Phone", { exact: true }).fill("9876543210");
+    await page.getByLabel("Password", { exact: true }).fill("StrongP@ss123");
+    await page.getByLabel("Confirm password").fill("DifferentP@ss123");
+    await page.getByLabel("Business name").fill("Acme Salon");
+    await page.getByLabel("City").fill("Mumbai");
+    await page.getByLabel(/Area/).fill("Andheri");
+    await page.getByLabel("WhatsApp number").fill("9876543210");
+
+    await page.getByRole("button", { name: "Submit owner request" }).click();
+
+    await expect(page.getByText("Passwords do not match")).toBeVisible();
+    await expectNoEmptyDestructiveAlert(page);
+    await expect(page).toHaveURL(/\/owner-signup$/);
+  });
+
 
   test("mismatched passwords shows 'Passwords do not match', no empty alert", async ({ page }) => {
     await gotoForm(page, "/owner-signup", /Owner full name/);
