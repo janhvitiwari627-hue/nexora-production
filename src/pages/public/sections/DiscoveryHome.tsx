@@ -223,6 +223,8 @@ export function DiscoveryHome() {
         <TopRatedCategory shops={shops} />
         <TrendingCategory shops={shops} />
         <NewShopsCategory shops={shops} />
+        <MostBookedCategory shops={shops} />
+        <MostReviewedCategory shops={shops} />
       </div>
     </div>
   );
