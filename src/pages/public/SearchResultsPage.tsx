@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -230,7 +230,7 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
               <FilterSidebar
                 draft={draft}
                 onChange={setDraft}
-                onApply={() => setFilters(draft)}
+                onApply={() => commitFilters(draft)}
                 onReset={resetFilters}
               />
             </div>
@@ -272,8 +272,8 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
               <ActiveFiltersBar
                 filters={filters}
                 onChange={(f) => {
-                  setFilters(f);
                   setDraft(f);
+                  commitFilters(f);
                 }}
                 onResetAll={resetFilters}
               />
@@ -345,7 +345,7 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
         onClose={() => setSheetOpen(false)}
         draft={draft}
         onChange={setDraft}
-        onApply={() => setFilters(draft)}
+        onApply={() => commitFilters(draft)}
         onReset={resetFilters}
       />
     </div>
