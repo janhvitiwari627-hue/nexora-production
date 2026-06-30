@@ -509,7 +509,7 @@ export const updateOwnerSalon = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => SalonUpdateInput.parse(d))
   .handler(async ({ data, context }) => {
     const { error, data: row } = await context.supabase
-      .from("salons").update(data.patch).eq("id", data.salon_id).select().single();
+      .from("salons").update(data.patch as never).eq("id", data.salon_id).select().single();
     if (error) throw new Error(error.message);
     return row;
   });
