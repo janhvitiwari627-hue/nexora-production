@@ -231,10 +231,9 @@ export default function OwnerSignupPage() {
               <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                 <CheckCircle2 className="h-6 w-6 text-primary" />
               </div>
-              <CardTitle>Request received</CardTitle>
+              <CardTitle>Welcome, Shop Owner!</CardTitle>
               <CardDescription className="mt-2">
-                Your owner account request has been received. Nexora team will verify and activate your shop
-                owner access.
+                Your owner account is created. Redirecting to your website setup…
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
