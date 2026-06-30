@@ -107,15 +107,19 @@ export function ForOwnersPage() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
-              to="/owner/templates"
+              to="/contact"
               className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-2 rounded-[var(--radius-button)] px-6 py-3 text-sm font-bold shadow-[var(--shadow-glow)]"
             >
-              Create Shop Website <ArrowRight className="h-4 w-4" />
+              Talk to sales <ArrowRight className="h-4 w-4" />
             </Link>
-            <button className="rounded-[var(--radius-button)] border border-white/30 px-6 py-3 text-sm font-bold text-white hover:bg-white/10">
+            <Link
+              to="/contact"
+              className="rounded-[var(--radius-button)] border border-white/30 px-6 py-3 text-sm font-bold text-white hover:bg-white/10"
+            >
               Book a demo
-            </button>
+            </Link>
           </div>
+
         </div>
       </section>
 
@@ -286,11 +290,12 @@ export function ForOwnersPage() {
             Join 12,000+ salons using Nexora to delight their customers and grow faster.
           </p>
           <Link
-            to="/owner/templates"
+            to="/contact"
             className="bg-card text-heading mt-7 inline-flex items-center gap-2 rounded-[var(--radius-button)] px-7 py-3.5 text-sm font-bold shadow-2xl"
           >
-            Create Shop Website <ArrowRight className="h-4 w-4" />
+            Talk to sales <ArrowRight className="h-4 w-4" />
           </Link>
+
         </div>
       </section>
     </div>
