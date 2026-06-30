@@ -1144,3 +1144,30 @@ function OpenNowCategory({ shops, dest }: CategoryProps) {
     </section>
   );
 }
+
+/* ---------- LIVE STATUS BADGE ---------- */
+function LiveStatusBadge() {
+  const [updatedAt, setUpdatedAt] = useState(() => Date.now());
+  const [, setNow] = useState(Date.now());
+  useEffect(() => {
+    // Reset the "Updated Xs ago" timer whenever this component re-renders due
+    // to fresh shop data (parent recomputes via liveTick → new children).
+    setUpdatedAt(Date.now());
+  }, []);
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+  const seconds = Math.max(0, Math.floor((Date.now() - updatedAt) / 1000));
+  const label =
+    seconds < 5 ? "just now" : seconds < 60 ? `${seconds}s ago` : `${Math.floor(seconds / 60)}m ago`;
+  return (
+    <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold text-emerald-700">
+      <span className="relative flex h-2 w-2">
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+        <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+      </span>
+      Live availability · updated {label}
+    </div>
+  );
+}
