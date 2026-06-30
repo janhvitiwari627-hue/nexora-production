@@ -118,8 +118,8 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
   const { data: rawShops, isFetching } = useSuspenseQuery(shopsQueryOptions(search));
 
   const filtered = useMemo(
-    () => sortShops(applyFilters(rawShops, filters), sort),
-    [rawShops, filters, sort],
+    () => sortShops(applyFilters(rawShops, filters, q), sort),
+    [rawShops, filters, sort, q],
   );
 
   // Comparison badges
