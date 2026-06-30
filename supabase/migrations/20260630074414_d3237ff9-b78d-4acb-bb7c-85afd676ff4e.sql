@@ -1,0 +1,1 @@
+GRANT SELECT ON public.public_salon_cards TO anon, authenticated;
