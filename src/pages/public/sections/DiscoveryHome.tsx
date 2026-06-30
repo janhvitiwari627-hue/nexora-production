@@ -209,6 +209,51 @@ function enrich(b: MockBusiness, i: number, istHour: number, liveTick: number): 
   const slotJitter = (i * 11 + liveTick * 7) % 6;
   const slotsAvailable = isOpen ? Math.max(0, slotsBase - slotJitter + ((liveTick + i) % 3)) : 0;
 
+  // Luxury / pricing tiers — derived deterministically.
+  const priceFromShop = typeof shop.starting_price === "number" ? shop.starting_price : 0;
+  const startingPrice = priceFromShop > 0 ? priceFromShop : 150 + ((i * 53) % 1400);
+  const isLuxury = b.rating >= 4.6 && startingPrice >= 800 && b.isVerified;
+  const priceTier: Enriched["priceTier"] =
+    startingPrice < 200 ? "budget"
+    : startingPrice < 600 ? "mid"
+    : startingPrice < 1200 ? "premium"
+    : "luxury";
+
+  // Suitability + gender focus inferred from category + index spread.
+  const cat = (b.category || "").toLowerCase();
+  const isBarber = cat.includes("barber") || cat.includes("men");
+  const isLadies = cat.includes("ladies") || cat.includes("women") || cat.includes("beauty parlour");
+  const isSpa = cat.includes("spa") || cat.includes("massage");
+  const genderFocus: Enriched["genderFocus"] = isBarber
+    ? "male"
+    : isLadies
+      ? "female"
+      : "unisex";
+  const suitableFor = {
+    kids: i % 5 === 0 || cat.includes("salon"),
+    women: genderFocus !== "male",
+    men: genderFocus !== "female",
+    seniors: i % 4 === 0,
+    family: i % 3 === 0 && !isBarber && !isLadies,
+  };
+
+  const isHomeService = i % 6 === 0;
+  const travelChargeINR = isHomeService ? 50 + (i % 4) * 50 : 0;
+  const arrivalMin = isHomeService ? 30 + (i % 5) * 15 : 0;
+  const allAreas = ["Vaishali Nagar", "Malviya Nagar", "C-Scheme", "Mansarovar", "Raja Park", "Jagatpura"];
+  const serviceAreas = isHomeService ? allAreas.slice(0, 2 + (i % 4)) : [];
+
+  const tiers: Enriched["membershipTier"][] = [null, "silver", "gold", "platinum", "vip"];
+  const membershipTier = tiers[i % tiers.length];
+
+  const aiMatchPct = 60 + ((i * 19 + Math.round(b.rating * 10)) % 40);
+
+  const specialties: Enriched["staffPickSpecialty"][] = ["Hair", "Spa", "Tattoo", "Makeup", "Nails"];
+  const staffPickSpecialty = i % 2 === 0 ? specialties[i % specialties.length] : null;
+
+  const seasons: Enriched["seasonTag"][] = ["Wedding", "Festival", "Summer", "Winter", "Monsoon", "Holiday"];
+  const seasonTag = seasons[i % seasons.length];
+
   return {
     ...shop,
     joinedDaysAgo: joined,
