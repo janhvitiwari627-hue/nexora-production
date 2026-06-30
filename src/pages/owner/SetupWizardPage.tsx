@@ -43,6 +43,9 @@ const DEFAULT_HOURS: Hours = Object.fromEntries(
   DAYS.map((d) => [d.key, { open: "10:00", close: "20:00", closed: d.key === "sun" }]),
 ) as Hours;
 
+const URL_FIELDS = new Set(["logo_url", "cover_image_url"]);
+const UPI_PATTERN = /^[a-zA-Z0-9._-]+@[a-zA-Z]{2,64}$/;
+
 type ServiceRow = { id?: string; name: string; price: number; duration_minutes: number };
 const EMPTY_SERVICE: ServiceRow = { name: "", price: 0, duration_minutes: 30 };
 
@@ -184,15 +187,11 @@ export function SetupWizardPage() {
   const saveStep = useMutation({
     mutationFn: async (patch: Partial<Form>) => {
       if (!activeSalonId) throw new Error("No active salon");
-      const cleaned: Record<string, unknown> = {};
-      for (const [k, v] of Object.entries(patch)) {
-        if (v === "" || v === undefined) continue;
-        cleaned[k] = v;
-      }
+      const cleaned = sanitizeSetupPatch(patch, { omitIncompleteUpi: false });
       return updateFn({ data: { salon_id: activeSalonId, patch: cleaned } });
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["owner", "salon-full", activeSalonId] }),
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(friendlySetupError(e)),
   });
 
   const saveServices = useMutation({
@@ -213,7 +212,7 @@ export function SetupWizardPage() {
       qc.invalidateQueries({ queryKey: ["owner", "services", activeSalonId] });
       toast.success("Services saved");
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(friendlySetupError(e)),
   });
 
   const goLive = useMutation({
@@ -230,7 +229,7 @@ export function SetupWizardPage() {
       toast.success("Your website is live!");
       navigate({ to: "/owner/website" });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toast.error(friendlySetupError(e)),
   });
 
   // ---------------- Autosave ----------------
@@ -251,14 +250,14 @@ export function SetupWizardPage() {
         await updateFn({
           data: {
             salon_id: activeSalonId,
-            patch: {
+            patch: sanitizeSetupPatch({
               name: form.name, category: form.category, owner_name: form.owner_name,
               phone: form.phone, whatsapp: form.whatsapp, address: form.address,
               city: form.city, pincode: form.pincode,
               latitude: form.latitude, longitude: form.longitude,
               logo_url: form.logo_url, cover_image_url: form.cover_image_url,
               hours: form.hours, upi_id: form.upi_id,
-            },
+            }),
           },
         });
         lastFormJsonRef.current = snapshot;
@@ -266,7 +265,7 @@ export function SetupWizardPage() {
         qc.invalidateQueries({ queryKey: ["owner", "salon-full", activeSalonId] });
       } catch (e) {
         setAutosave({ status: "error", at: Date.now() });
-        toast.error(`Autosave failed: ${(e as Error).message}`);
+        toast.error(`Autosave failed: ${friendlySetupError(e)}`);
       }
     }, 900);
     return () => window.clearTimeout(handle);
@@ -296,7 +295,7 @@ export function SetupWizardPage() {
         qc.invalidateQueries({ queryKey: ["owner", "services", activeSalonId] });
       } catch (e) {
         setAutosave({ status: "error", at: Date.now() });
-        toast.error(`Autosave failed: ${(e as Error).message}`);
+        toast.error(`Autosave failed: ${friendlySetupError(e)}`);
       }
     }, 1200);
     return () => window.clearTimeout(handle);
@@ -322,7 +321,7 @@ export function SetupWizardPage() {
       return result.secure_url;
     } catch (e) {
       setAutosave({ status: "error", at: Date.now() });
-      toast.error(`Image upload failed: ${(e as Error).message}`);
+      toast.error(`Image upload failed: ${friendlySetupError(e)}`);
       return null;
     }
   };
