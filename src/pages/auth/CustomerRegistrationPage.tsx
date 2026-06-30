@@ -35,6 +35,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useAuthStore } from "@/stores/authStore";
 import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
+import { getEmailRole, roleConflictMessage } from "@/lib/auth-check.functions";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 type AccountType = "customer" | "owner" | "district_partner";
