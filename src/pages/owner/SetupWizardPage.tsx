@@ -101,11 +101,62 @@ function sanitizeSetupPatch(
   return cleaned;
 }
 
+const FIELD_LABELS: Record<string, string> = {
+  name: "Business name",
+  category: "Category",
+  owner_name: "Owner name",
+  phone: "Mobile",
+  whatsapp: "WhatsApp",
+  address: "Address",
+  city: "City",
+  pincode: "PIN code",
+  latitude: "Latitude",
+  longitude: "Longitude",
+  logo_url: "Logo",
+  cover_image_url: "Cover banner",
+  upi_id: "UPI ID",
+  hours: "Working hours",
+  email: "Email",
+};
+
+const FIELD_HINTS: Record<string, string> = {
+  upi_id: "Enter a valid UPI ID, e.g. yourname@okhdfc.",
+  logo_url: "Please re-upload a valid logo image.",
+  cover_image_url: "Please re-upload a valid cover image.",
+  email: "Enter a valid email address.",
+  latitude: "Latitude must be between -90 and 90.",
+  longitude: "Longitude must be between -180 and 180.",
+  name: "Business name is required.",
+};
+
+// Parse server error message of shape `Invalid setup field(s): foo, bar`
+// into a per-field error map for inline display.
+function parseFieldErrors(error: unknown): Record<string, string> {
+  const message = error instanceof Error ? error.message : String(error || "");
+  const out: Record<string, string> = {};
+  const match = message.match(/Invalid setup fields?:\s*(.+)$/i);
+  if (match) {
+    for (const raw of match[1].split(",")) {
+      const key = raw.trim().split(".")[0];
+      if (!key) continue;
+      out[key] = FIELD_HINTS[key] ?? `Please check this field.`;
+    }
+    return out;
+  }
+  // Fallback: scan for known field names mentioned anywhere in the message.
+  for (const key of Object.keys(FIELD_LABELS)) {
+    if (message.includes(key)) out[key] = FIELD_HINTS[key] ?? "Please check this field.";
+  }
+  return out;
+}
+
 function friendlySetupError(error: unknown) {
   const message = error instanceof Error ? error.message : String(error || "Please check the setup fields.");
-  if (message.includes("upi_id")) return "Please enter a valid UPI ID, for example yourname@okhdfc.";
-  if (message.includes("logo_url") || message.includes("cover_image_url") || message.includes("Invalid url")) {
-    return "Please upload a valid logo or cover image before saving.";
+  const fields = parseFieldErrors(error);
+  const keys = Object.keys(fields);
+  if (keys.length > 0) {
+    const labels = keys.map((k) => FIELD_LABELS[k] ?? k).join(", ");
+    return `Please fix: ${labels}.`;
   }
   return message;
 }
