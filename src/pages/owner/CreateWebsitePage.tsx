@@ -42,7 +42,7 @@ export function CreateWebsitePage() {
         if (cancelled) return;
         if (!data.session) {
           if (typeof window !== "undefined") {
-            sessionStorage.setItem("nexora:postLoginRedirect", "/owner/create-website");
+            sessionStorage.setItem("nexora:postLoginRedirect", "/owner/templates");
           }
           navigate({ to: "/owner-signup" });
         }

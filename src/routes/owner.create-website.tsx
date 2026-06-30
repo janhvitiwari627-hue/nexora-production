@@ -1,16 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { CreateWebsitePage } from "@/pages/owner/CreateWebsitePage";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+// Legacy route — single source of truth is now /owner/templates.
 export const Route = createFileRoute("/owner/create-website")({
-  head: () => ({
-    meta: [
-      { title: "Create Your Website — Nexora Owner" },
-      {
-        name: "description",
-        content:
-          "Choose a design for your booking website. Switch anytime — your content stays intact.",
-      },
-    ],
-  }),
-  component: CreateWebsitePage,
+  beforeLoad: () => {
+    throw redirect({ to: "/owner/templates", replace: true });
+  },
 });

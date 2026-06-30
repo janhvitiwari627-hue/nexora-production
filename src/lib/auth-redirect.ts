@@ -14,7 +14,7 @@ const ROLE_PRIORITY: UserRole[] = [
 
 const ROLE_ROUTES: Record<UserRole, string> = {
   admin: "/admin",
-  owner: "/owner/dashboard",
+  owner: "/owner/templates",
   distributor: "/partner/dashboard",
   district_partner: "/partner/dashboard",
   growth_partner: "/partner/dashboard",
