@@ -32,17 +32,24 @@ type ConfirmState = { open: boolean; templateName: string };
 export function CreateWebsitePage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const { activeSalon, activeSalonId, isLoading: ownerLoading, isAuthed } = useOwnerContext();
+  const { activeSalon, activeSalonId, isLoading: ownerLoading } = useOwnerContext();
 
   // Direct flow: if not signed in, send to owner signup and come straight back here.
   useEffect(() => {
-    if (isAuthed === false && !ownerLoading) {
-      if (typeof window !== "undefined") {
-        sessionStorage.setItem("nexora:postLoginRedirect", "/owner/create-website");
-      }
-      navigate({ to: "/owner-signup" });
-    }
-  }, [isAuthed, ownerLoading, navigate]);
+    let cancelled = false;
+    import("@/integrations/supabase/client").then(({ supabase }) => {
+      supabase.auth.getSession().then(({ data }) => {
+        if (cancelled) return;
+        if (!data.session) {
+          if (typeof window !== "undefined") {
+            sessionStorage.setItem("nexora:postLoginRedirect", "/owner/create-website");
+          }
+          navigate({ to: "/owner-signup" });
+        }
+      });
+    });
+    return () => { cancelled = true; };
+  }, [navigate]);
   const { data: templates = [], isLoading } = useQuery(websiteTemplatesQuery());
   const [filter, setFilter] = useState("All");
   const [pendingId, setPendingId] = useState<string | null>(null);
