@@ -850,14 +850,19 @@ function Grid2({ children }: { children: React.ReactNode }) {
 }
 
 function Field({
-  label, icon: Icon, children,
-}: { label: string; icon?: typeof Building2; children: React.ReactNode }) {
+  label, icon: Icon, children, error,
+}: { label: string; icon?: typeof Building2; children: React.ReactNode; error?: string }) {
   return (
     <div className="space-y-1.5">
       <Label className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
         {Icon && <Icon className="h-3.5 w-3.5" />} {label}
       </Label>
-      {children}
+      <div className={error ? "[&_input]:border-destructive [&_textarea]:border-destructive [&_select]:border-destructive" : ""}>
+        {children}
+      </div>
+      {error && (
+        <p role="alert" className="text-xs text-destructive">{error}</p>
+      )}
     </div>
   );
 }
