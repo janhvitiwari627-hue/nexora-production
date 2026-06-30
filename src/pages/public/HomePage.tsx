@@ -1221,7 +1221,12 @@ export function HomePage() {
         <Hero />
         <SearchPanel />
         <CategoryGrid />
-        <DiscoveryHome />
+        <DiscoveryHome
+          selectedLocation={selectedLocation}
+          selectedCategory={selectedCategory}
+          allAreasLabel={ALL_AREAS_LABEL}
+          allCategoriesLabel={ALL_CATS_LABEL}
+        />
         <ShopListings />
         <SmartPicks />
         <WebsiteBuilder />
