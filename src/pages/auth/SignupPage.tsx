@@ -178,19 +178,22 @@ export default function SignupPage() {
         return;
       }
 
-      // Email confirmation required → no session returned
-      if (!data.session && data.user) {
-        setSuccess("verify");
-        return;
+      // Auto-confirm enabled — ensure a session even if signUp didn't return one
+      let session = data.session;
+      if (!session && data.user) {
+        const { data: signInData } = await supabase.auth.signInWithPassword({
+          email,
+          password: parsed.data.password,
+        });
+        session = signInData.session ?? null;
       }
 
-      // Auto-confirm enabled → signed in
-      if (data.session) {
-        useAuthStore.getState().setSession(data.session);
+      if (session) {
+        useAuthStore.getState().setSession(session);
         await useAuthStore.getState().refreshProfile();
         setSuccess("signed_in");
-        const redirectTo = await resolvePostLoginRedirect(data.session.user.id);
-        setTimeout(() => navigate({ to: redirectTo, replace: true }), 800);
+        const redirectTo = await resolvePostLoginRedirect(session.user.id);
+        setTimeout(() => navigate({ to: redirectTo, replace: true }), 600);
       }
     } catch (err) {
       setServerError(parseErr(err));
