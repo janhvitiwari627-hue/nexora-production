@@ -64,6 +64,7 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [logoutOpen, setLogoutOpen] = useState(false);
   const user = useAuthStore((s) => s.user);
   const profile = useAuthStore((s) => s.profile);
   const roles = useAuthStore((s) => s.roles);
@@ -88,8 +89,9 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
   }, []);
 
   const handleLogout = async () => {
+    setLogoutOpen(false);
     await signOut();
-    navigate({ to: "/", replace: true });
+    navigate({ to: "/login", replace: true });
   };
 
   const displayName =
