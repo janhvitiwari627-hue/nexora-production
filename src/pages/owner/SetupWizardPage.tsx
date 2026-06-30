@@ -277,20 +277,34 @@ export function SetupWizardPage() {
   });
 
   // ---------------- Autosave ----------------
-  const [autosave, setAutosave] = useState<{ status: "idle" | "saving" | "saved" | "error"; at: number | null }>({
-    status: "idle", at: null,
-  });
+  const [autosave, setAutosave] = useState<{
+    status: "idle" | "saving" | "saved" | "error";
+    at: number | null;
+    error: string | null;
+  }>({ status: "idle", at: null, error: null });
   const lastFormJsonRef = useRef<string>("");
   const lastServicesJsonRef = useRef<string>("");
+  const retryRef = useRef<null | (() => Promise<void>)>(null);
+  const [isRetrying, setIsRetrying] = useState(false);
+
+  const handleRetry = async () => {
+    if (!retryRef.current) return;
+    setIsRetrying(true);
+    try {
+      await retryRef.current();
+    } finally {
+      setIsRetrying(false);
+    }
+  };
 
   // Debounced autosave for salon profile fields.
   useEffect(() => {
     if (!activeSalonId || !hydratedRef.current) return;
     const snapshot = JSON.stringify(form);
     if (snapshot === lastFormJsonRef.current) return;
-    const handle = window.setTimeout(async () => {
+    const runSave = async () => {
       try {
-        setAutosave({ status: "saving", at: null });
+        setAutosave({ status: "saving", at: null, error: null });
         await updateFn({
           data: {
             salon_id: activeSalonId,
@@ -305,13 +319,15 @@ export function SetupWizardPage() {
           },
         });
         lastFormJsonRef.current = snapshot;
-        setAutosave({ status: "saved", at: Date.now() });
+        retryRef.current = null;
+        setAutosave({ status: "saved", at: Date.now(), error: null });
         qc.invalidateQueries({ queryKey: ["owner", "salon-full", activeSalonId] });
       } catch (e) {
-        setAutosave({ status: "error", at: Date.now() });
-        toast.error(`Autosave failed: ${friendlySetupError(e)}`);
+        retryRef.current = runSave;
+        setAutosave({ status: "error", at: Date.now(), error: friendlySetupError(e) });
       }
-    }, 900);
+    };
+    const handle = window.setTimeout(runSave, 900);
     return () => window.clearTimeout(handle);
   }, [form, activeSalonId, updateFn, qc]);
 
@@ -320,11 +336,11 @@ export function SetupWizardPage() {
     if (!activeSalonId || !servicesHydratedRef.current) return;
     const snapshot = JSON.stringify(services);
     if (snapshot === lastServicesJsonRef.current) return;
-    const handle = window.setTimeout(async () => {
+    const runSave = async () => {
       const valid = services.filter((s) => s.name.trim() && s.price > 0);
       if (valid.length === 0) { lastServicesJsonRef.current = snapshot; return; }
       try {
-        setAutosave({ status: "saving", at: null });
+        setAutosave({ status: "saving", at: null, error: null });
         for (const s of valid) {
           await upsertSvc({
             data: {
@@ -335,13 +351,15 @@ export function SetupWizardPage() {
           });
         }
         lastServicesJsonRef.current = snapshot;
-        setAutosave({ status: "saved", at: Date.now() });
+        retryRef.current = null;
+        setAutosave({ status: "saved", at: Date.now(), error: null });
         qc.invalidateQueries({ queryKey: ["owner", "services", activeSalonId] });
       } catch (e) {
-        setAutosave({ status: "error", at: Date.now() });
-        toast.error(`Autosave failed: ${friendlySetupError(e)}`);
+        retryRef.current = runSave;
+        setAutosave({ status: "error", at: Date.now(), error: friendlySetupError(e) });
       }
-    }, 1200);
+    };
+    const handle = window.setTimeout(runSave, 1200);
     return () => window.clearTimeout(handle);
   }, [services, activeSalonId, upsertSvc, qc]);
 
