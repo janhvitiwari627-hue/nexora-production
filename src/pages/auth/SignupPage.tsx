@@ -178,19 +178,22 @@ export default function SignupPage() {
         return;
       }
 
-      // Email confirmation required → no session returned
-      if (!data.session && data.user) {
-        setSuccess("verify");
-        return;
+      // Auto-confirm enabled — ensure a session even if signUp didn't return one
+      let session = data.session;
+      if (!session && data.user) {
+        const { data: signInData } = await supabase.auth.signInWithPassword({
+          email,
+          password: parsed.data.password,
+        });
+        session = signInData.session ?? null;
       }
 
-      // Auto-confirm enabled → signed in
-      if (data.session) {
-        useAuthStore.getState().setSession(data.session);
+      if (session) {
+        useAuthStore.getState().setSession(session);
         await useAuthStore.getState().refreshProfile();
         setSuccess("signed_in");
-        const redirectTo = await resolvePostLoginRedirect(data.session.user.id);
-        setTimeout(() => navigate({ to: redirectTo, replace: true }), 800);
+        const redirectTo = await resolvePostLoginRedirect(session.user.id);
+        setTimeout(() => navigate({ to: redirectTo, replace: true }), 600);
       }
     } catch (err) {
       setServerError(parseErr(err));
@@ -199,29 +202,6 @@ export default function SignupPage() {
     }
   };
 
-  if (success === "verify") {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-              <CheckCircle2 className="h-6 w-6 text-primary" />
-            </div>
-            <CardTitle>Check your email</CardTitle>
-            <CardDescription>
-              We've sent a confirmation link to <strong>{form.email}</strong>. Click the link to verify your
-              account, then sign in.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button className="w-full" onClick={() => navigate({ to: "/login" })}>
-              Go to Sign in
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   if (success === "signed_in") {
     return (

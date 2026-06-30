@@ -385,21 +385,19 @@ export default function CustomerRegistrationPage() {
         }
       }
 
-      // Handle email confirmation flow
-      if (!data.session && data.user) {
-        // Email confirmation required - show message to user
-        console.log("[Register] Email confirmation required for user:", data.user.id);
-        setServerError(
-          "Please verify your email before signing in. Check your inbox for the confirmation link.",
-        );
-        setSubmitting(false);
-        return;
+      // Auto-confirm enabled — ensure a session even if signUp didn't return one
+      let session = data.session;
+      if (!session && data.user) {
+        const { data: signInData } = await supabase.auth.signInWithPassword({
+          email: form.email,
+          password: form.password,
+        });
+        session = signInData.session ?? null;
       }
 
-      // Session exists - user is signed in
-      if (data.session) {
-        console.log("[Register] Successfully signed up and signed in user:", data.session.user.id);
-        useAuthStore.getState().setSession(data.session);
+      if (session) {
+        console.log("[Register] Signed in user:", session.user.id);
+        useAuthStore.getState().setSession(session);
         await useAuthStore.getState().refreshProfile();
 
         if (accountType === "owner") {
@@ -407,8 +405,7 @@ export default function CustomerRegistrationPage() {
         } else if (accountType === "district_partner") {
           navigate({ to: "/partner/district" });
         } else {
-          // For customers, redirect based on role
-          const redirectTo = await resolvePostLoginRedirect(data.session.user.id);
+          const redirectTo = await resolvePostLoginRedirect(session.user.id);
           navigate({ to: redirectTo });
         }
       }

@@ -81,7 +81,7 @@ function OwnerPendingPage() {
           <div className="flex items-start gap-3 rounded-lg bg-muted/40 p-3 text-sm text-muted-foreground">
             <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
             <div>
-              While you wait, please verify your email if you haven't already. We'll notify you the moment your account
+              While you wait, you can continue using your customer account. We'll notify you the moment your owner access
               is approved.
             </div>
           </div>
