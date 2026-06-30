@@ -102,6 +102,9 @@ export default function SignupPage() {
       setResetSent(false);
     }
     if (errors[key]) setErrors((p) => ({ ...p, [key]: "" }));
+    if ((key === "password" || key === "confirm_password") && errors.confirm_password) {
+      setErrors((p) => ({ ...p, confirm_password: "" }));
+    }
   };
 
   const sendResetLink = async () => {

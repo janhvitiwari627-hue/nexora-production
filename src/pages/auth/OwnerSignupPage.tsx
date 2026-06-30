@@ -95,6 +95,9 @@ export default function OwnerSignupPage() {
     setForm((f) => ({ ...f, [key]: v }));
     if (serverError) setServerError(null);
     if (errors[key]) setErrors((p) => ({ ...p, [key]: "" }));
+    if ((key === "password" || key === "confirm_password") && errors.confirm_password) {
+      setErrors((p) => ({ ...p, confirm_password: "" }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
