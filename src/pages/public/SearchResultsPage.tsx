@@ -26,14 +26,19 @@ import { InstantBookingSection } from "./search/InstantBookingSection";
 import { VoiceSearchButton } from "@/components/search/VoiceSearchButton";
 import {
   DEFAULT_FILTERS,
+  filtersFromSearch,
+  filtersToSearch,
   isDefault,
   PRICE_MIN,
   PRICE_MAX,
+  sortFromSearch,
+  viewFromSearch,
   type Filters,
+  type SearchUrlParams,
   type SortKey,
 } from "./search/filters";
 
-type SearchParams = { q?: string; category?: string };
+type SearchParams = SearchUrlParams;
 
 interface Props {
   search: SearchParams;
