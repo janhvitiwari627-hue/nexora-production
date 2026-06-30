@@ -333,10 +333,40 @@ function HeroVisual() {
 const ALL_AREAS_LABEL = "Jaipur - All areas";
 const ALL_CATS_LABEL = "All categories";
 
+/* Tiny module-level store so DiscoveryHome reacts to SearchPanel filters
+ * without restructuring the 1200+ line component tree. */
+type HomeFilters = { location: string; category: string };
+const homeFilters: HomeFilters = { location: ALL_AREAS_LABEL, category: ALL_CATS_LABEL };
+const homeFiltersListeners = new Set<() => void>();
+function setHomeFilters(next: Partial<HomeFilters>) {
+  if (next.location !== undefined) homeFilters.location = next.location;
+  if (next.category !== undefined) homeFilters.category = next.category;
+  homeFiltersListeners.forEach((l) => l());
+}
+function useHomeFilters(): HomeFilters {
+  const [, force] = useState(0);
+  useEffect(() => {
+    const cb = () => force((n) => n + 1);
+    homeFiltersListeners.add(cb);
+    return () => {
+      homeFiltersListeners.delete(cb);
+    };
+  }, []);
+  return homeFilters;
+}
+
 function SearchPanel() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState<string>(ALL_AREAS_LABEL);
-  const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATS_LABEL);
+  const [selectedLocation, _setSelectedLocation] = useState<string>(ALL_AREAS_LABEL);
+  const [selectedCategory, _setSelectedCategory] = useState<string>(ALL_CATS_LABEL);
+  const setSelectedLocation = (v: string) => {
+    _setSelectedLocation(v);
+    setHomeFilters({ location: v });
+  };
+  const setSelectedCategory = (v: string) => {
+    _setSelectedCategory(v);
+    setHomeFilters({ category: v });
+  };
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [activeQuickFilter, setActiveQuickFilter] = useState<string>("");
@@ -1214,6 +1244,7 @@ function Section({
 
 /* ============= PAGE ============= */
 export function HomePage() {
+  const filters = useHomeFilters();
   return (
     <div className="min-h-screen bg-[#F8FAFC] font-sans text-slate-900 antialiased">
       <PublicHeader showBackButton={false} />
@@ -1221,7 +1252,12 @@ export function HomePage() {
         <Hero />
         <SearchPanel />
         <CategoryGrid />
-        <DiscoveryHome />
+        <DiscoveryHome
+          selectedLocation={filters.location}
+          selectedCategory={filters.category}
+          allAreasLabel={ALL_AREAS_LABEL}
+          allCategoriesLabel={ALL_CATS_LABEL}
+        />
         <ShopListings />
         <SmartPicks />
         <WebsiteBuilder />

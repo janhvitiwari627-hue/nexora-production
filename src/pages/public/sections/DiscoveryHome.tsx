@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   MapPin,
@@ -16,6 +16,9 @@ import {
   Footprints,
   PartyPopper,
   Plus,
+  RefreshCw,
+  ToggleLeft,
+  ToggleRight,
 } from "lucide-react";
 import {
   getMockBusinesses,
@@ -26,30 +29,25 @@ import type { Shop } from "@/components/shared/ShopCard";
 
 /* ============================================================
  * NEXORA — DISCOVERY HOME
- * Spec sections:
- *   Default rails:
- *     1. Recommended For You    2. Nearby Shops
- *     3. Trending Today         4. Top Rated
- *     5. Newly Joined           6. Open Now
- *     7. Offers Near You        8. Membership Benefits
- *     9. AI Picks              10. Sponsored Picks
- *   Category deep-dives:
- *     A. Nearby (distance, ETA, open status, walkable)
- *     B. Top Rated (40/30/20/10 formula, min 4.5★)
- *     C. Trending (hourly, 🔥 badge)
- *     D. New Shops (≤ 30 days, "New" / "Grand Opening")
+ * - Filterable by area + category (from HomePage)
+ * - Real IST clock for Open Now (uses shop opening_hours when present)
+ * - AI Picks personalization toggle + refresh
+ * - Deep links to /search with area / category / sort / on params
  * ============================================================ */
 
-type Enriched = Shop & {
+/* ---------- TYPES ---------- */
+export type Enriched = Shop & {
   joinedDaysAgo: number;
   isOpenNow: boolean;
+  openHourStart: number;
+  openHourEnd: number;
   etaMin: number;
   hasOffer: boolean;
   offerPct: number;
   membershipPerk: string | null;
   isSponsored: boolean;
-  repeatRate: number; // 0..1
-  ownerActivity: number; // 0..1
+  repeatRate: number;
+  ownerActivity: number;
   verifiedReviews: number;
   trendingScore: number;
   recommendedScore: number;
@@ -58,20 +56,102 @@ type Enriched = Shop & {
   latestReviewDaysAgo: number;
 };
 
+export type DiscoveryHomeProps = {
+  selectedLocation?: string;
+  selectedCategory?: string;
+  /** Sentinels indicating "no filter". Match HomePage labels. */
+  allAreasLabel?: string;
+  allCategoriesLabel?: string;
+};
+
+type SearchDest = {
+  area?: string;
+  category?: string;
+  sort?:
+    | "relevance"
+    | "rating"
+    | "distance"
+    | "price_low"
+    | "price_high"
+    | "popular";
+  on?: 1;
+  vo?: 1;
+  tr?: 1;
+  mp?: 1;
+  oo?: 1;
+};
+
+type CardAccent = "primary" | "ai";
+
+type CardProps = {
+  s: Enriched;
+  accent?: CardAccent;
+  showDistance?: boolean;
+  showEta?: boolean;
+  showOpen?: boolean;
+  showTrending?: boolean;
+  showTopRated?: boolean;
+  showNew?: boolean;
+  showOffer?: boolean;
+  showMembership?: boolean;
+  showSponsored?: boolean;
+};
+
+type RailProps = {
+  title: string;
+  subtitle: string;
+  icon: ReactNode;
+  items: Enriched[];
+  render: (s: Enriched) => ReactNode;
+  dest: SearchDest;
+  rightSlot?: ReactNode;
+};
+
+type CategoryProps = {
+  shops: Enriched[];
+  dest: SearchDest;
+};
+
 const TRENDING_BADGE = "🔥 Trending";
 
-function enrich(b: MockBusiness, i: number): Enriched {
+/* ---------- IST TIME HELPERS ---------- */
+function nowISTHour(): number {
+  // IST = UTC + 5:30 → minutes-precise float hour.
+  const d = new Date();
+  const utcMin = d.getUTCHours() * 60 + d.getUTCMinutes();
+  const istMin = (utcMin + 330) % (24 * 60);
+  return istMin / 60;
+}
+
+function parseHourField(hours: unknown, fallback: number): number {
+  if (typeof hours !== "string") return fallback;
+  const m = hours.match(/(\d{1,2})/);
+  if (!m) return fallback;
+  const n = parseInt(m[1], 10);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+/* ---------- ENRICHMENT ---------- */
+function enrich(b: MockBusiness, i: number, istHour: number): Enriched {
   const shop = mockBusinessToShop(b);
+
+  // Real-ish hours: prefer business-provided opening hours when available.
+  // MockBusiness has loose shape; read with guards.
+  const raw = b as unknown as { opening_hours?: string; openTime?: string; closeTime?: string };
+  const openStart = parseHourField(raw.openTime ?? raw.opening_hours, 9 + (i % 3));
+  const openEnd = parseHourField(raw.closeTime, Math.min(23, openStart + 9 + (i % 3)));
+
+  const isOpen = istHour >= openStart && istHour < openEnd;
   const joined = (i * 7 + b.reviewCount) % 240;
   const eta = Math.max(2, Math.round((shop.distance_km ?? 1) * 3 + (i % 4)));
   const hasOffer = i % 3 === 0;
-  const isOpen = i % 5 !== 0;
   const offerPct = hasOffer ? 10 + (i % 5) * 5 : 0;
   const repeatRate = Math.min(1, 0.4 + ((b.reviewCount % 60) / 100));
   const ownerActivity = ((i * 13) % 100) / 100;
   const verifiedReviews = Math.round(b.reviewCount * (0.5 + ((i % 4) / 10)));
-  const weeklyBookings =
-    Math.round(20 + (b.reviewCount % 80) + (b.rating - 3) * 25 + (i % 11) * 3);
+  const weeklyBookings = Math.round(
+    20 + (b.reviewCount % 80) + (b.rating - 3) * 25 + (i % 11) * 3,
+  );
   const popularityScore = Math.min(
     100,
     Math.round(
@@ -83,10 +163,13 @@ function enrich(b: MockBusiness, i: number): Enriched {
     weeklyBookings * 0.6 + (b.rating - 3) * 30 + (hasOffer ? 15 : 0) + ((i * 11) % 25);
   const recommendedScore =
     b.rating * 20 + (b.isVerified ? 10 : 0) + repeatRate * 25 + (hasOffer ? 8 : 0);
+
   return {
     ...shop,
     joinedDaysAgo: joined,
     isOpenNow: isOpen,
+    openHourStart: openStart,
+    openHourEnd: openEnd,
     etaMin: eta,
     hasOffer,
     offerPct,
@@ -103,17 +186,89 @@ function enrich(b: MockBusiness, i: number): Enriched {
   };
 }
 
-function useEnrichedShops(): Enriched[] {
-  return useMemo(() => getMockBusinesses().map(enrich), []);
+function useEnrichedShops(
+  selectedLocation: string | undefined,
+  selectedCategory: string | undefined,
+  allAreasLabel: string,
+  allCategoriesLabel: string,
+): Enriched[] {
+  return useMemo(() => {
+    const istHour = nowISTHour();
+    const all = getMockBusinesses().map((b, i) => enrich(b, i, istHour));
+    return all.filter((s) => {
+      if (selectedLocation && selectedLocation !== allAreasLabel) {
+        if (s.area !== selectedLocation) return false;
+      }
+      if (selectedCategory && selectedCategory !== allCategoriesLabel) {
+        if (s.category !== selectedCategory) return false;
+      }
+      return true;
+    });
+  }, [selectedLocation, selectedCategory, allAreasLabel, allCategoriesLabel]);
 }
 
 /* ============= TOP-LEVEL ============= */
-export function DiscoveryHome() {
-  const shops = useEnrichedShops();
+export function DiscoveryHome({
+  selectedLocation,
+  selectedCategory,
+  allAreasLabel = "All locations",
+  allCategoriesLabel = "All categories",
+}: DiscoveryHomeProps = {}) {
+  const shops = useEnrichedShops(
+    selectedLocation,
+    selectedCategory,
+    allAreasLabel,
+    allCategoriesLabel,
+  );
+
+  // Base dest carries the user's active home filters into deep links.
+  const baseDest: SearchDest = useMemo(() => {
+    const d: SearchDest = {};
+    if (selectedLocation && selectedLocation !== allAreasLabel) d.area = selectedLocation;
+    if (selectedCategory && selectedCategory !== allCategoriesLabel) d.category = selectedCategory;
+    return d;
+  }, [selectedLocation, selectedCategory, allAreasLabel, allCategoriesLabel]);
+
+  // AI Picks personalization state
+  const [aiPersonalized, setAiPersonalized] = useState(true);
+  const [aiSeed, setAiSeed] = useState(0);
+  const refreshAi = useCallback(() => setAiSeed((n) => n + 1), []);
+
+  if (shops.length === 0) {
+    return (
+      <div className="px-5 py-12 sm:px-8 sm:py-16">
+        <div className="mx-auto max-w-[1400px] rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
+          <p className="text-sm font-semibold text-slate-700">
+            No shops match your current filters.
+          </p>
+          <p className="mt-1 text-xs text-slate-500">
+            Try clearing the location or category to see Discovery results.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const aiSorted = useMemo(() => {
+    const personalWeight = aiPersonalized ? 0.7 : 0.3;
+    const trendingWeight = 1 - personalWeight;
+    // aiSeed mixes the order without breaking determinism within one click.
+    return [...shops].sort((a, b) => {
+      const aScore =
+        a.recommendedScore * personalWeight +
+        a.trendingScore * trendingWeight +
+        ((a.slug.charCodeAt(0) + aiSeed) % 17);
+      const bScore =
+        b.recommendedScore * personalWeight +
+        b.trendingScore * trendingWeight +
+        ((b.slug.charCodeAt(0) + aiSeed) % 17);
+      return bScore - aScore;
+    });
+  }, [shops, aiPersonalized, aiSeed]);
+
   return (
     <div className="space-y-14 px-5 py-12 sm:px-8 sm:py-16">
       <div className="mx-auto max-w-[1400px] space-y-14">
-        {/* Quick chips so the user can jump to a category section */}
         <QuickJumpBar />
 
         <Rail
@@ -124,6 +279,7 @@ export function DiscoveryHome() {
             .sort((a, b) => b.recommendedScore - a.recommendedScore)
             .slice(0, 10)}
           render={(s) => <Card s={s} accent="primary" />}
+          dest={{ ...baseDest, sort: "popular" }}
         />
 
         <Rail
@@ -134,6 +290,7 @@ export function DiscoveryHome() {
             .sort((a, b) => (a.distance_km ?? 99) - (b.distance_km ?? 99))
             .slice(0, 10)}
           render={(s) => <Card s={s} showDistance showEta />}
+          dest={{ ...baseDest, sort: "distance" }}
         />
 
         <Rail
@@ -144,6 +301,7 @@ export function DiscoveryHome() {
             .sort((a, b) => b.trendingScore - a.trendingScore)
             .slice(0, 10)}
           render={(s) => <Card s={s} showTrending />}
+          dest={{ ...baseDest, sort: "popular", tr: 1 }}
         />
 
         <Rail
@@ -155,6 +313,7 @@ export function DiscoveryHome() {
             .sort((a, b) => topRatedScore(b) - topRatedScore(a))
             .slice(0, 10)}
           render={(s) => <Card s={s} showTopRated />}
+          dest={{ ...baseDest, sort: "rating" }}
         />
 
         <Rail
@@ -166,6 +325,7 @@ export function DiscoveryHome() {
             .sort((a, b) => a.joinedDaysAgo - b.joinedDaysAgo)
             .slice(0, 10)}
           render={(s) => <Card s={s} showNew />}
+          dest={{ ...baseDest, sort: "relevance" }}
         />
 
         <Rail
@@ -174,6 +334,7 @@ export function DiscoveryHome() {
           icon={<Clock className="h-4 w-4 text-emerald-500" />}
           items={shops.filter((s) => s.isOpenNow).slice(0, 10)}
           render={(s) => <Card s={s} showEta showOpen />}
+          dest={{ ...baseDest, on: 1, sort: "distance" }}
         />
 
         <Rail
@@ -185,6 +346,7 @@ export function DiscoveryHome() {
             .sort((a, b) => (a.distance_km ?? 99) - (b.distance_km ?? 99))
             .slice(0, 10)}
           render={(s) => <Card s={s} showOffer />}
+          dest={{ ...baseDest, oo: 1, sort: "distance" }}
         />
 
         <Rail
@@ -193,21 +355,47 @@ export function DiscoveryHome() {
           icon={<Gem className="h-4 w-4 text-indigo-500" />}
           items={shops.filter((s) => s.membershipPerk).slice(0, 10)}
           render={(s) => <Card s={s} showMembership />}
+          dest={{ ...baseDest, mp: 1 }}
         />
 
         <Rail
           title="AI Picks"
-          subtitle="Curated by Nexora AI for your profile"
+          subtitle={
+            aiPersonalized
+              ? "Curated by Nexora AI for your profile"
+              : "Curated by Nexora AI · trending mix"
+          }
           icon={<Sparkles className="h-4 w-4 text-violet-500" />}
-          items={[...shops]
-            .sort(
-              (a, b) =>
-                b.recommendedScore * 0.6 +
-                b.trendingScore * 0.4 -
-                (a.recommendedScore * 0.6 + a.trendingScore * 0.4),
-            )
-            .slice(0, 10)}
+          items={aiSorted.slice(0, 10)}
           render={(s) => <Card s={s} accent="ai" />}
+          dest={{ ...baseDest, sort: "popular" }}
+          rightSlot={
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setAiPersonalized((v) => !v)}
+                className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-violet-400 hover:text-violet-700"
+                aria-pressed={aiPersonalized}
+                title="Toggle personalization"
+              >
+                {aiPersonalized ? (
+                  <ToggleRight className="h-3.5 w-3.5 text-violet-600" />
+                ) : (
+                  <ToggleLeft className="h-3.5 w-3.5" />
+                )}
+                Personalize
+              </button>
+              <button
+                type="button"
+                onClick={refreshAi}
+                className="inline-flex items-center gap-1.5 rounded-full bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-700"
+                title="Refresh AI picks"
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+                Refresh
+              </button>
+            </div>
+          }
         />
 
         <Rail
@@ -216,15 +404,16 @@ export function DiscoveryHome() {
           icon={<Megaphone className="h-4 w-4 text-blue-500" />}
           items={shops.filter((s) => s.isSponsored).slice(0, 10)}
           render={(s) => <Card s={s} showSponsored />}
+          dest={{ ...baseDest }}
         />
 
         {/* ───────── Category deep dives ───────── */}
-        <NearbyCategory shops={shops} />
-        <TopRatedCategory shops={shops} />
-        <TrendingCategory shops={shops} />
-        <NewShopsCategory shops={shops} />
-        <MostBookedCategory shops={shops} />
-        <MostReviewedCategory shops={shops} />
+        <NearbyCategory shops={shops} dest={{ ...baseDest, sort: "distance" }} />
+        <TopRatedCategory shops={shops} dest={{ ...baseDest, sort: "rating" }} />
+        <TrendingCategory shops={shops} dest={{ ...baseDest, tr: 1, sort: "popular" }} />
+        <NewShopsCategory shops={shops} dest={{ ...baseDest }} />
+        <MostBookedCategory shops={shops} dest={{ ...baseDest, sort: "popular" }} />
+        <MostReviewedCategory shops={shops} dest={{ ...baseDest, sort: "rating" }} />
       </div>
     </div>
   );
@@ -232,24 +421,22 @@ export function DiscoveryHome() {
 
 /* ===== TOP-RATED RANKING FORMULA =====
  * 40% rating · 30% verified reviews · 20% repeat · 10% owner activity */
-function topRatedScore(s: Enriched) {
+function topRatedScore(s: Enriched): number {
   const ratingPct = (s.rating / 5) * 100;
   const reviewsPct = Math.min(100, (s.verifiedReviews / 500) * 100);
   const repeatPct = s.repeatRate * 100;
   const ownerPct = s.ownerActivity * 100;
-  return (
-    ratingPct * 0.4 + reviewsPct * 0.3 + repeatPct * 0.2 + ownerPct * 0.1
-  );
+  return ratingPct * 0.4 + reviewsPct * 0.3 + repeatPct * 0.2 + ownerPct * 0.1;
 }
 
 /* ============= JUMP BAR ============= */
 function QuickJumpBar() {
   const chips = [
     { label: "Recommended", href: "#recommended-for-you" },
-    { label: "Nearby", href: "#nearby" },
-    { label: "Trending", href: "#trending" },
+    { label: "Nearby", href: "#nearby-shops" },
+    { label: "Trending", href: "#trending-today" },
     { label: "Top Rated", href: "#top-rated" },
-    { label: "New Shops", href: "#new-shops" },
+    { label: "New Shops", href: "#newly-joined" },
     { label: "Open Now", href: "#open-now" },
     { label: "Offers", href: "#offers-near-you" },
     { label: "Membership", href: "#membership-benefits" },
@@ -272,19 +459,7 @@ function QuickJumpBar() {
 }
 
 /* ============= RAIL ============= */
-function Rail({
-  title,
-  subtitle,
-  icon,
-  items,
-  render,
-}: {
-  title: string;
-  subtitle: string;
-  icon: React.ReactNode;
-  items: Enriched[];
-  render: (s: Enriched) => React.ReactNode;
-}) {
+function Rail({ title, subtitle, icon, items, render, dest, rightSlot }: RailProps) {
   if (items.length === 0) return null;
   const anchor = title
     .toLowerCase()
@@ -303,12 +478,16 @@ function Rail({
           </h2>
           <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
         </div>
-        <Link
-          to="/search"
-          className="shrink-0 text-sm font-semibold text-slate-900 hover:underline"
-        >
-          See all →
-        </Link>
+        <div className="flex shrink-0 items-center gap-3">
+          {rightSlot}
+          <Link
+            to="/search"
+            search={dest}
+            className="text-sm font-semibold text-slate-900 hover:underline"
+          >
+            See all →
+          </Link>
+        </div>
       </header>
       <div className="-mx-1 flex snap-x snap-mandatory gap-4 overflow-x-auto px-1 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {items.map((s) => (
@@ -334,19 +513,7 @@ function Card({
   showOffer,
   showMembership,
   showSponsored,
-}: {
-  s: Enriched;
-  accent?: "primary" | "ai";
-  showDistance?: boolean;
-  showEta?: boolean;
-  showOpen?: boolean;
-  showTrending?: boolean;
-  showTopRated?: boolean;
-  showNew?: boolean;
-  showOffer?: boolean;
-  showMembership?: boolean;
-  showSponsored?: boolean;
-}) {
+}: CardProps) {
   const accentRing =
     accent === "ai"
       ? "ring-1 ring-violet-300"
@@ -370,17 +537,41 @@ function Card({
           />
         )}
         <div className="absolute inset-x-0 top-0 flex flex-wrap gap-1 p-2">
-          {showTrending && <Pill icon={<Flame className="h-3 w-3" />} cls="bg-orange-500 text-white">{TRENDING_BADGE}</Pill>}
-          {showTopRated && <Pill icon={<Crown className="h-3 w-3" />} cls="bg-amber-500 text-white">Top Rated</Pill>}
+          {showTrending && (
+            <Pill icon={<Flame className="h-3 w-3" />} cls="bg-orange-500 text-white">
+              {TRENDING_BADGE}
+            </Pill>
+          )}
+          {showTopRated && (
+            <Pill icon={<Crown className="h-3 w-3" />} cls="bg-amber-500 text-white">
+              Top Rated
+            </Pill>
+          )}
           {showNew && (
             <Pill icon={<Plus className="h-3 w-3" />} cls="bg-pink-500 text-white">
               {s.joinedDaysAgo <= 7 ? "Grand Opening" : "New"}
             </Pill>
           )}
-          {showOffer && <Pill icon={<Tag className="h-3 w-3" />} cls="bg-rose-500 text-white">{s.offerPct}% OFF</Pill>}
-          {showMembership && <Pill icon={<Gem className="h-3 w-3" />} cls="bg-indigo-500 text-white">Member Perk</Pill>}
-          {showSponsored && <Pill icon={<Megaphone className="h-3 w-3" />} cls="bg-blue-500 text-white">Sponsored</Pill>}
-          {accent === "ai" && <Pill icon={<Sparkles className="h-3 w-3" />} cls="bg-violet-500 text-white">AI</Pill>}
+          {showOffer && (
+            <Pill icon={<Tag className="h-3 w-3" />} cls="bg-rose-500 text-white">
+              {s.offerPct}% OFF
+            </Pill>
+          )}
+          {showMembership && (
+            <Pill icon={<Gem className="h-3 w-3" />} cls="bg-indigo-500 text-white">
+              Member Perk
+            </Pill>
+          )}
+          {showSponsored && (
+            <Pill icon={<Megaphone className="h-3 w-3" />} cls="bg-blue-500 text-white">
+              Sponsored
+            </Pill>
+          )}
+          {accent === "ai" && (
+            <Pill icon={<Sparkles className="h-3 w-3" />} cls="bg-violet-500 text-white">
+              AI
+            </Pill>
+          )}
         </div>
         <div className="absolute right-2 bottom-2 flex items-center gap-1 rounded-full bg-white/95 px-2 py-1 text-xs font-bold text-slate-900 shadow">
           <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
@@ -412,7 +603,7 @@ function Card({
           {showOpen && (
             <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              Open
+              Open · till {s.openHourEnd}:00
             </span>
           )}
           {showDistance && walkable && (
@@ -437,9 +628,9 @@ function Pill({
   cls,
   children,
 }: {
-  icon?: React.ReactNode;
+  icon?: ReactNode;
   cls: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <span
@@ -451,135 +642,17 @@ function Pill({
   );
 }
 
-/* ============= CATEGORY: NEARBY ============= */
-function NearbyCategory({ shops }: { shops: Enriched[] }) {
-  const list = useMemo(
-    () =>
-      [...shops]
-        .sort((a, b) => (a.distance_km ?? 99) - (b.distance_km ?? 99))
-        .slice(0, 8),
-    [shops],
-  );
-  return (
-    <section id="cat-nearby" className="rounded-3xl bg-white p-6 ring-1 ring-slate-200 sm:p-8">
-      <CategoryHeader
-        title="Nearby"
-        purpose="Closest verified businesses · sorted by distance"
-        badges={["Nearby", "Closest", "Walkable"]}
-      />
-      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {list.map((s, i) => (
-          <Card
-            key={s.slug}
-            s={s}
-            showDistance
-            showEta
-            showOpen={s.isOpenNow}
-          />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/* ============= CATEGORY: TOP RATED ============= */
-function TopRatedCategory({ shops }: { shops: Enriched[] }) {
-  const list = useMemo(
-    () =>
-      shops
-        .filter((s) => s.rating >= 4.5)
-        .sort((a, b) => topRatedScore(b) - topRatedScore(a))
-        .slice(0, 8),
-    [shops],
-  );
-  return (
-    <section id="cat-top-rated" className="rounded-3xl bg-gradient-to-br from-amber-50 via-white to-white p-6 ring-1 ring-amber-200 sm:p-8">
-      <CategoryHeader
-        title="Top Rated"
-        purpose="Minimum 4.5★ · weighted excellence"
-        badges={["Top Rated"]}
-      />
-      <FormulaStrip
-        items={[
-          { pct: 40, label: "Customer Ratings" },
-          { pct: 30, label: "Verified Reviews" },
-          { pct: 20, label: "Repeat Customers" },
-          { pct: 10, label: "Owner Activity" },
-        ]}
-      />
-      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {list.map((s) => (
-          <Card key={s.slug} s={s} showTopRated />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/* ============= CATEGORY: TRENDING ============= */
-function TrendingCategory({ shops }: { shops: Enriched[] }) {
-  const list = useMemo(
-    () => [...shops].sort((a, b) => b.trendingScore - a.trendingScore).slice(0, 8),
-    [shops],
-  );
-  return (
-    <section id="cat-trending" className="rounded-3xl bg-gradient-to-br from-orange-50 via-white to-white p-6 ring-1 ring-orange-200 sm:p-8">
-      <CategoryHeader
-        title="Trending"
-        purpose="Hot right now · updated every hour"
-        badges={[TRENDING_BADGE]}
-      />
-      <div className="mt-3 flex flex-wrap gap-1.5 text-[11px] font-semibold text-slate-600">
-        {["Bookings", "QR Payments", "Reviews", "Saves", "Views"].map((b) => (
-          <span key={b} className="rounded-full bg-white px-2.5 py-1 ring-1 ring-slate-200">
-            {b}
-          </span>
-        ))}
-      </div>
-      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {list.map((s) => (
-          <Card key={s.slug} s={s} showTrending />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/* ============= CATEGORY: NEW SHOPS ============= */
-function NewShopsCategory({ shops }: { shops: Enriched[] }) {
-  const list = useMemo(
-    () =>
-      shops
-        .filter((s) => s.joinedDaysAgo <= 30)
-        .sort((a, b) => a.joinedDaysAgo - b.joinedDaysAgo)
-        .slice(0, 8),
-    [shops],
-  );
-  return (
-    <section id="cat-new-shops" className="rounded-3xl bg-gradient-to-br from-pink-50 via-white to-white p-6 ring-1 ring-pink-200 sm:p-8">
-      <CategoryHeader
-        title="New Shops"
-        purpose="Businesses added in the last 30 days"
-        badges={["New", "Recently Joined", "Grand Opening"]}
-      />
-      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {list.map((s) => (
-          <Card key={s.slug} s={s} showNew />
-        ))}
-      </div>
-    </section>
-  );
-}
-
 /* ============= CATEGORY SHELL ============= */
 function CategoryHeader({
   title,
   purpose,
   badges,
+  dest,
 }: {
   title: string;
   purpose: string;
   badges: string[];
+  dest: SearchDest;
 }) {
   return (
     <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-end">
@@ -589,7 +662,7 @@ function CategoryHeader({
         </h2>
         <p className="mt-1 text-sm text-slate-600">{purpose}</p>
       </div>
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap items-center gap-1.5">
         {badges.map((b) => (
           <span
             key={b}
@@ -598,6 +671,13 @@ function CategoryHeader({
             {b}
           </span>
         ))}
+        <Link
+          to="/search"
+          search={dest}
+          className="ml-2 rounded-full border border-slate-300 px-3 py-1 text-[11px] font-semibold text-slate-700 hover:border-slate-900 hover:text-slate-900"
+        >
+          See all →
+        </Link>
       </div>
     </div>
   );
@@ -623,19 +703,155 @@ function FormulaStrip({
   );
 }
 
+/* ============= CATEGORY: NEARBY ============= */
+function NearbyCategory({ shops, dest }: CategoryProps) {
+  const list = useMemo(
+    () =>
+      [...shops]
+        .sort((a, b) => (a.distance_km ?? 99) - (b.distance_km ?? 99))
+        .slice(0, 8),
+    [shops],
+  );
+  if (list.length === 0) return null;
+  return (
+    <section id="cat-nearby" className="rounded-3xl bg-white p-6 ring-1 ring-slate-200 sm:p-8">
+      <CategoryHeader
+        title="Nearby"
+        purpose="Closest verified businesses · sorted by distance"
+        badges={["Nearby", "Closest", "Walkable"]}
+        dest={dest}
+      />
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {list.map((s) => (
+          <Card key={s.slug} s={s} showDistance showEta showOpen={s.isOpenNow} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ============= CATEGORY: TOP RATED ============= */
+function TopRatedCategory({ shops, dest }: CategoryProps) {
+  const list = useMemo(
+    () =>
+      shops
+        .filter((s) => s.rating >= 4.5)
+        .sort((a, b) => topRatedScore(b) - topRatedScore(a))
+        .slice(0, 8),
+    [shops],
+  );
+  if (list.length === 0) return null;
+  return (
+    <section
+      id="cat-top-rated"
+      className="rounded-3xl bg-gradient-to-br from-amber-50 via-white to-white p-6 ring-1 ring-amber-200 sm:p-8"
+    >
+      <CategoryHeader
+        title="Top Rated"
+        purpose="Minimum 4.5★ · weighted excellence"
+        badges={["Top Rated"]}
+        dest={dest}
+      />
+      <FormulaStrip
+        items={[
+          { pct: 40, label: "Customer Ratings" },
+          { pct: 30, label: "Verified Reviews" },
+          { pct: 20, label: "Repeat Customers" },
+          { pct: 10, label: "Owner Activity" },
+        ]}
+      />
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {list.map((s) => (
+          <Card key={s.slug} s={s} showTopRated />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ============= CATEGORY: TRENDING ============= */
+function TrendingCategory({ shops, dest }: CategoryProps) {
+  const list = useMemo(
+    () => [...shops].sort((a, b) => b.trendingScore - a.trendingScore).slice(0, 8),
+    [shops],
+  );
+  if (list.length === 0) return null;
+  return (
+    <section
+      id="cat-trending"
+      className="rounded-3xl bg-gradient-to-br from-orange-50 via-white to-white p-6 ring-1 ring-orange-200 sm:p-8"
+    >
+      <CategoryHeader
+        title="Trending"
+        purpose="Hot right now · updated every hour"
+        badges={[TRENDING_BADGE]}
+        dest={dest}
+      />
+      <div className="mt-3 flex flex-wrap gap-1.5 text-[11px] font-semibold text-slate-600">
+        {["Bookings", "QR Payments", "Reviews", "Saves", "Views"].map((b) => (
+          <span key={b} className="rounded-full bg-white px-2.5 py-1 ring-1 ring-slate-200">
+            {b}
+          </span>
+        ))}
+      </div>
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {list.map((s) => (
+          <Card key={s.slug} s={s} showTrending />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ============= CATEGORY: NEW SHOPS ============= */
+function NewShopsCategory({ shops, dest }: CategoryProps) {
+  const list = useMemo(
+    () =>
+      shops
+        .filter((s) => s.joinedDaysAgo <= 30)
+        .sort((a, b) => a.joinedDaysAgo - b.joinedDaysAgo)
+        .slice(0, 8),
+    [shops],
+  );
+  if (list.length === 0) return null;
+  return (
+    <section
+      id="cat-new-shops"
+      className="rounded-3xl bg-gradient-to-br from-pink-50 via-white to-white p-6 ring-1 ring-pink-200 sm:p-8"
+    >
+      <CategoryHeader
+        title="New Shops"
+        purpose="Businesses added in the last 30 days"
+        badges={["New", "Recently Joined", "Grand Opening"]}
+        dest={dest}
+      />
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {list.map((s) => (
+          <Card key={s.slug} s={s} showNew />
+        ))}
+      </div>
+    </section>
+  );
+}
+
 /* ============= CATEGORY: MOST BOOKED ============= */
-function MostBookedCategory({ shops }: { shops: Enriched[] }) {
+function MostBookedCategory({ shops, dest }: CategoryProps) {
   const list = useMemo(
     () => [...shops].sort((a, b) => b.weeklyBookings - a.weeklyBookings).slice(0, 8),
     [shops],
   );
+  if (list.length === 0) return null;
   const peak = list[0]?.weeklyBookings ?? 1;
   return (
-    <section id="cat-most-booked" className="rounded-3xl bg-gradient-to-br from-blue-50 via-white to-white p-6 ring-1 ring-blue-200 sm:p-8">
+    <section
+      id="cat-most-booked"
+      className="rounded-3xl bg-gradient-to-br from-blue-50 via-white to-white p-6 ring-1 ring-blue-200 sm:p-8"
+    >
       <CategoryHeader
         title="Most Booked"
         purpose="Highest weekly bookings · sorted by demand"
         badges={["Most Booked", "Hot Demand"]}
+        dest={dest}
       />
       <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {list.map((s) => (
@@ -667,7 +883,7 @@ function MostBookedCategory({ shops }: { shops: Enriched[] }) {
 }
 
 /* ============= CATEGORY: MOST REVIEWED ============= */
-function MostReviewedCategory({ shops }: { shops: Enriched[] }) {
+function MostReviewedCategory({ shops, dest }: CategoryProps) {
   const list = useMemo(
     () =>
       [...shops]
@@ -676,12 +892,17 @@ function MostReviewedCategory({ shops }: { shops: Enriched[] }) {
         .slice(0, 8),
     [shops],
   );
+  if (list.length === 0) return null;
   return (
-    <section id="cat-most-reviewed" className="rounded-3xl bg-gradient-to-br from-emerald-50 via-white to-white p-6 ring-1 ring-emerald-200 sm:p-8">
+    <section
+      id="cat-most-reviewed"
+      className="rounded-3xl bg-gradient-to-br from-emerald-50 via-white to-white p-6 ring-1 ring-emerald-200 sm:p-8"
+    >
       <CategoryHeader
         title="Most Reviewed"
         purpose="Verified reviews only · social proof leaders"
         badges={["Verified Reviews", "Community Favourite"]}
+        dest={dest}
       />
       <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {list.map((s) => (
