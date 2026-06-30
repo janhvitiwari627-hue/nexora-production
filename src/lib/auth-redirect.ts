@@ -57,7 +57,7 @@ export function routeForRole(role: UserRole | "staff" | "shop_owner" | "shop_man
 }
 
 export async function resolvePostLoginRedirect(userId: string): Promise<string> {
-  // 1. Restore booking flow if it was interrupted
+  // 1. Restore booking/post-login flow if it was interrupted
   if (typeof window !== "undefined") {
     const pending = sessionStorage.getItem("nexora:postLoginRedirect");
     if (pending) {
@@ -67,5 +67,19 @@ export async function resolvePostLoginRedirect(userId: string): Promise<string> 
   }
   // 2. Role-based default
   const roles = await fetchUserRoles(userId);
-  return routeForRole(pickPrimaryRole(roles));
+  const primary = pickPrimaryRole(roles);
+
+  // Shop owners: route based on whether they already own a shop
+  if (primary === "shop_owner" || primary === "owner" || primary === "shop_manager") {
+    const { data } = await supabase
+      .from("salon_owners")
+      .select("salon_id")
+      .eq("user_id", userId)
+      .eq("is_approved", true)
+      .limit(1);
+    if (!data || data.length === 0) return "/owner/register-business";
+    return "/owner/templates";
+  }
+
+  return routeForRole(primary);
 }
