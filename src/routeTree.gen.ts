@@ -112,6 +112,8 @@ import { Route as PortalBrandsSlugRouteImport } from './routes/portal.brands.$sl
 import { Route as OwnerJobsNewRouteImport } from './routes/owner.jobs.new'
 import { Route as DashboardBookingsIdRouteImport } from './routes/dashboard.bookings.$id'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
+import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicHooksReleaseExpiredBookingsRouteImport } from './routes/api/public/hooks/release-expired-bookings'
 import { Route as ApiPublicHooksRecomputeRankingsRouteImport } from './routes/api/public/hooks/recompute-rankings'
 import { Route as ApiPublicHooksRecomputeInsightsRouteImport } from './routes/api/public/hooks/recompute-insights'
@@ -636,6 +638,16 @@ const LovableEmailQueueProcessRoute =
     path: '/lovable/email/queue/process',
     getParentRoute: () => rootRouteImport,
   } as any)
+const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
+  id: '/lovable/email/auth/webhook',
+  path: '/lovable/email/auth/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
+  id: '/lovable/email/auth/preview',
+  path: '/lovable/email/auth/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHooksReleaseExpiredBookingsRoute =
   ApiPublicHooksReleaseExpiredBookingsRouteImport.update({
     id: '/api/public/hooks/release-expired-bookings',
@@ -775,6 +787,8 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
   '/api/public/hooks/recompute-rankings': typeof ApiPublicHooksRecomputeRankingsRoute
   '/api/public/hooks/release-expired-bookings': typeof ApiPublicHooksReleaseExpiredBookingsRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
@@ -882,6 +896,8 @@ export interface FileRoutesByTo {
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
   '/api/public/hooks/recompute-rankings': typeof ApiPublicHooksRecomputeRankingsRoute
   '/api/public/hooks/release-expired-bookings': typeof ApiPublicHooksReleaseExpiredBookingsRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesById {
@@ -993,6 +1009,8 @@ export interface FileRoutesById {
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
   '/api/public/hooks/recompute-rankings': typeof ApiPublicHooksRecomputeRankingsRoute
   '/api/public/hooks/release-expired-bookings': typeof ApiPublicHooksReleaseExpiredBookingsRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRouteTypes {
@@ -1105,6 +1123,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/recompute-insights'
     | '/api/public/hooks/recompute-rankings'
     | '/api/public/hooks/release-expired-bookings'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -1212,6 +1232,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/recompute-insights'
     | '/api/public/hooks/recompute-rankings'
     | '/api/public/hooks/release-expired-bookings'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
   id:
     | '__root__'
@@ -1322,6 +1344,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/recompute-insights'
     | '/api/public/hooks/recompute-rankings'
     | '/api/public/hooks/release-expired-bookings'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
 }
@@ -1382,6 +1406,8 @@ export interface RootRouteChildren {
   ApiPublicHooksRecomputeInsightsRoute: typeof ApiPublicHooksRecomputeInsightsRoute
   ApiPublicHooksRecomputeRankingsRoute: typeof ApiPublicHooksRecomputeRankingsRoute
   ApiPublicHooksReleaseExpiredBookingsRoute: typeof ApiPublicHooksReleaseExpiredBookingsRoute
+  LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
+  LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
@@ -2108,6 +2134,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lovable/email/auth/webhook': {
+      id: '/lovable/email/auth/webhook'
+      path: '/lovable/email/auth/webhook'
+      fullPath: '/lovable/email/auth/webhook'
+      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/auth/preview': {
+      id: '/lovable/email/auth/preview'
+      path: '/lovable/email/auth/preview'
+      fullPath: '/lovable/email/auth/preview'
+      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/release-expired-bookings': {
       id: '/api/public/hooks/release-expired-bookings'
       path: '/api/public/hooks/release-expired-bookings'
@@ -2380,18 +2420,10 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksRecomputeRankingsRoute: ApiPublicHooksRecomputeRankingsRoute,
   ApiPublicHooksReleaseExpiredBookingsRoute:
     ApiPublicHooksReleaseExpiredBookingsRoute,
+  LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
+  LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
