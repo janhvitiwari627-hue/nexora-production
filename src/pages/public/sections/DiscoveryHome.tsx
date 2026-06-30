@@ -142,7 +142,7 @@ function parseHourField(hours: unknown, fallback: number): number {
 }
 
 /* ---------- ENRICHMENT ---------- */
-function enrich(b: MockBusiness, i: number, istHour: number): Enriched {
+function enrich(b: MockBusiness, i: number, istHour: number, liveTick: number): Enriched {
   const shop = mockBusinessToShop(b);
 
   // Real-ish hours: prefer business-provided opening hours when available.
