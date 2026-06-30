@@ -134,10 +134,8 @@ export default function CustomerLoginPage() {
       if (error) {
         // Provide specific error messages based on Supabase error codes
         let errorMessage = "Invalid email or password";
-        if (error.message.includes("Email not confirmed")) {
-          errorMessage = "Please verify your email before signing in. Check your inbox for the confirmation link.";
-        } else if (error.message.includes("Invalid login credentials") || error.message.includes("Invalid email or password")) {
-          errorMessage = "Email/password match nahi ho raha. Registered email exactly use karein (jaise forcallertune11@gmail.com), ya password reset karein.";
+        if (error.message.includes("Invalid login credentials") || error.message.includes("Invalid email or password")) {
+          errorMessage = "Invalid email or password.";
           setLoginFailedForEmail(email);
           setResetSent(false);
         } else if (error.message.includes("User not found") || error.message.includes("signup")) {
