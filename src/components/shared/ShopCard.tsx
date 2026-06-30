@@ -18,7 +18,22 @@ export type Shop = {
   is_verified: boolean;
   distance_km?: number | null;
   membership_perk?: string | null;
+  starting_price?: number | null;
+  popularity?: number;
+  gender?: "male" | "female" | "unisex" | null;
+  badges?: Array<"verified" | "top_rated" | "most_popular">;
 };
+
+function formatStartingPrice(shop: Shop): string {
+  if (typeof shop.starting_price === "number" && shop.starting_price > 0) {
+    return `Starting from ₹${shop.starting_price.toLocaleString("en-IN")}`;
+  }
+  if (typeof shop.price_level === "number" && shop.price_level > 0) {
+    const approx = shop.price_level * 250;
+    return `Starting from ₹${approx.toLocaleString("en-IN")}`;
+  }
+  return "Price not added";
+}
 
 type Variant = "carousel" | "grid" | "list";
 
