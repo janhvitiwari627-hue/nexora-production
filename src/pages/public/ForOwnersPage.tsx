@@ -290,11 +290,12 @@ export function ForOwnersPage() {
             Join 12,000+ salons using Nexora to delight their customers and grow faster.
           </p>
           <Link
-            to="/owner/templates"
+            to="/contact"
             className="bg-card text-heading mt-7 inline-flex items-center gap-2 rounded-[var(--radius-button)] px-7 py-3.5 text-sm font-bold shadow-2xl"
           >
-            Create Shop Website <ArrowRight className="h-4 w-4" />
+            Talk to sales <ArrowRight className="h-4 w-4" />
           </Link>
+
         </div>
       </section>
     </div>
