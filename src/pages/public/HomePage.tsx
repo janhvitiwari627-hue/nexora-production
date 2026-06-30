@@ -653,7 +653,7 @@ function FieldShell({
   );
 }
 
-function MockBusinessCard({ biz }: { biz: ReturnType<typeof getMockBusinesses>[number] }) {
+function MockBusinessCard({ biz }: { biz: MockBusiness }) {
   return (
     <article className="group overflow-hidden rounded-[24px] border border-slate-200 bg-white transition hover:-translate-y-1 hover:shadow-xl">
       <div className="relative h-[180px] overflow-hidden">
