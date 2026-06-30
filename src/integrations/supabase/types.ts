@@ -131,6 +131,8 @@ export type Database = {
           cancelled_at: string | null
           cancelled_by: string | null
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           id: string
           payment_deadline: string | null
           payment_status: string
@@ -151,6 +153,8 @@ export type Database = {
           cancelled_at?: string | null
           cancelled_by?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           id?: string
           payment_deadline?: string | null
           payment_status?: string
@@ -171,6 +175,8 @@ export type Database = {
           cancelled_at?: string | null
           cancelled_by?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           id?: string
           payment_deadline?: string | null
           payment_status?: string
@@ -2481,6 +2487,7 @@ export type Database = {
           available_balance: number
           commission_rate: number | null
           created_at: string
+          deleted_at: string | null
           id: string
           last_settlement_at: string | null
           last_withdrawal_at: string | null
@@ -2494,6 +2501,7 @@ export type Database = {
           available_balance?: number
           commission_rate?: number | null
           created_at?: string
+          deleted_at?: string | null
           id?: string
           last_settlement_at?: string | null
           last_withdrawal_at?: string | null
@@ -2507,6 +2515,7 @@ export type Database = {
           available_balance?: number
           commission_rate?: number | null
           created_at?: string
+          deleted_at?: string | null
           id?: string
           last_settlement_at?: string | null
           last_withdrawal_at?: string | null
@@ -2546,6 +2555,8 @@ export type Database = {
           cover_image_url: string | null
           created_at: string
           custom_css: string | null
+          deleted_at: string | null
+          deleted_by: string | null
           description: string | null
           discount: string | null
           distance: number | null
@@ -2598,6 +2609,8 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           custom_css?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           discount?: string | null
           distance?: number | null
@@ -2650,6 +2663,8 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           custom_css?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           discount?: string | null
           distance?: number | null
@@ -2815,6 +2830,8 @@ export type Database = {
         Row: {
           category: string | null
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           description: string | null
           duration_minutes: number
           id: string
@@ -2829,6 +2846,8 @@ export type Database = {
         Insert: {
           category?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           duration_minutes?: number
           id?: string
@@ -2843,6 +2862,8 @@ export type Database = {
         Update: {
           category?: string | null
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           description?: string | null
           duration_minutes?: number
           id?: string
@@ -3268,6 +3289,7 @@ export type Database = {
           amount: number
           balance_after: number | null
           created_at: string
+          deleted_at: string | null
           id: string
           reason: string | null
           reference_id: string | null
@@ -3280,6 +3302,7 @@ export type Database = {
           amount: number
           balance_after?: number | null
           created_at?: string
+          deleted_at?: string | null
           id?: string
           reason?: string | null
           reference_id?: string | null
@@ -3292,6 +3315,7 @@ export type Database = {
           amount?: number
           balance_after?: number | null
           created_at?: string
+          deleted_at?: string | null
           id?: string
           reason?: string | null
           reference_id?: string | null
@@ -3912,6 +3936,11 @@ export type Database = {
         Args: { _salon_id: string; _user_id: string }
         Returns: boolean
       }
+      is_shop_member: {
+        Args: { _salon_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       list_salon_staff: {
         Args: { _salon_id: string }
         Returns: {
