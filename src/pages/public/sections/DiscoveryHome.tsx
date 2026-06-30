@@ -77,6 +77,18 @@ export type Enriched = Shop & {
   staffAvailable: number;
   staffTotal: number;
   slotsAvailable: number;
+  isLuxury: boolean;
+  priceTier: "budget" | "mid" | "premium" | "luxury";
+  suitableFor: { kids: boolean; women: boolean; men: boolean; seniors: boolean; family: boolean };
+  genderFocus: "female" | "male" | "unisex";
+  isHomeService: boolean;
+  travelChargeINR: number;
+  arrivalMin: number;
+  serviceAreas: string[];
+  membershipTier: "silver" | "gold" | "platinum" | "vip" | null;
+  aiMatchPct: number;
+  staffPickSpecialty: "Hair" | "Spa" | "Tattoo" | "Makeup" | "Nails" | null;
+  seasonTag: "Wedding" | "Festival" | "Summer" | "Winter" | "Monsoon" | "Holiday";
 };
 
 export type DiscoveryHomeProps = {
