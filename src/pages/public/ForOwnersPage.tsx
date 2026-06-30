@@ -289,7 +289,7 @@ export function ForOwnersPage() {
             to="/owner/create-website"
             className="bg-card text-heading mt-7 inline-flex items-center gap-2 rounded-[var(--radius-button)] px-7 py-3.5 text-sm font-bold shadow-2xl"
           >
-            Get started free <ArrowRight className="h-4 w-4" />
+            Create Shop Website <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </section>
