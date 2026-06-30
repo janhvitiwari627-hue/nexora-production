@@ -23,6 +23,7 @@ import { FilterBottomSheet } from "./search/FilterBottomSheet";
 import { SortDropdown } from "./search/SortDropdown";
 import { ActiveFiltersBar } from "./search/ActiveFiltersBar";
 import { InstantBookingSection } from "./search/InstantBookingSection";
+import { DiscoveryRails } from "./search/DiscoveryRails";
 import { VoiceSearchButton } from "@/components/search/VoiceSearchButton";
 import {
   DEFAULT_FILTERS,
