@@ -328,76 +328,211 @@ function HeroVisual() {
   );
 }
 
-/* ============= FLOATING SEARCH ============= */
+/* ============= FLOATING SEARCH + INLINE RESULTS ============= */
+const ALL_AREAS_LABEL = "Jaipur - All areas";
+const ALL_CATS_LABEL = "All categories";
+
 function SearchPanel() {
-  const navigate = useNavigate();
-  const [q, setQ] = useState("");
-  const [area, setArea] = useState("");
-  const [cat, setCat] = useState("");
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const params = new URLSearchParams();
-    if (q) params.set("q", q);
-    if (area) params.set("area", area);
-    if (cat) params.set("category", cat);
-    navigate({ to: "/search", search: Object.fromEntries(params) as never });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState<string>(ALL_AREAS_LABEL);
+  const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATS_LABEL);
+  const [isLocationOpen, setIsLocationOpen] = useState(false);
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const [activeQuickFilter, setActiveQuickFilter] = useState<string>("");
+  const [hasSearched, setHasSearched] = useState(false);
+
+  const locationRef = useRef<HTMLDivElement>(null);
+  const categoryRef = useRef<HTMLDivElement>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function onClick(e: MouseEvent) {
+      if (locationRef.current && !locationRef.current.contains(e.target as Node))
+        setIsLocationOpen(false);
+      if (categoryRef.current && !categoryRef.current.contains(e.target as Node))
+        setIsCategoryOpen(false);
+    }
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, []);
+
+  const allBusinesses = useMemo(() => getMockBusinesses(), []);
+
+  const filteredBusinesses = useMemo(() => {
+    let results = allBusinesses;
+    if (selectedLocation && selectedLocation !== ALL_AREAS_LABEL) {
+      results = results.filter((b) => b.area === selectedLocation);
+    }
+    if (selectedCategory && selectedCategory !== ALL_CATS_LABEL) {
+      results = results.filter((b) => b.category === selectedCategory);
+    }
+    const q = searchQuery.trim().toLowerCase();
+    if (q) {
+      results = results.filter((b) => {
+        const hay = `${b.name} ${b.category} ${b.area}`.toLowerCase();
+        return hay.includes(q);
+      });
+    }
+    switch (activeQuickFilter) {
+      case "Open Now":
+      case "Near Me":
+        break;
+      case "Top Rated":
+        results = [...results].sort((a, b) => b.rating - a.rating);
+        break;
+      case "Price Low to High":
+        results = [...results].sort((a, b) => a.startingPrice - b.startingPrice);
+        break;
+      case "Male":
+        results = results.filter((b) => b.gender === "male" || b.gender === "unisex");
+        break;
+      case "Female":
+        results = results.filter((b) => b.gender === "female" || b.gender === "unisex");
+        break;
+      case "Unisex":
+        results = results.filter((b) => b.gender === "unisex");
+        break;
+    }
+    return results;
+  }, [allBusinesses, selectedLocation, selectedCategory, searchQuery, activeQuickFilter]);
+
+  const scrollToResults = () => {
+    setHasSearched(true);
+    setTimeout(() => {
+      resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 60);
   };
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    scrollToResults();
+  };
+
+  const pickLocation = (loc: string) => {
+    setSelectedLocation(loc);
+    setIsLocationOpen(false);
+    scrollToResults();
+  };
+  const pickCategory = (cat: string) => {
+    setSelectedCategory(cat);
+    setIsCategoryOpen(false);
+    scrollToResults();
+  };
+  const pickQuickFilter = (f: string) => {
+    setActiveQuickFilter((prev) => (prev === f ? "" : f));
+    scrollToResults();
+  };
+
+  const resultCountText = (() => {
+    const n = filteredBusinesses.length;
+    const loc = selectedLocation !== ALL_AREAS_LABEL ? ` in ${selectedLocation}` : "";
+    const cat = selectedCategory !== ALL_CATS_LABEL ? `${selectedCategory} ` : "";
+    return `${n} ${cat}${cat ? "businesses" : "businesses"} found${loc}`;
+  })();
+
   return (
     <div className="mx-auto -mt-12 max-w-[1280px] px-5 sm:-mt-16 sm:px-8 lg:-mt-20">
       <form
-        onSubmit={submit}
-        className="overflow-hidden rounded-[28px] border border-slate-200 bg-white p-3 shadow-[0_30px_80px_-30px_rgba(15,23,42,0.30)] sm:p-4"
+        onSubmit={onSubmit}
+        className="overflow-visible rounded-[28px] border border-slate-200 bg-white p-3 shadow-[0_30px_80px_-30px_rgba(15,23,42,0.30)] sm:p-4"
       >
         <div className="grid grid-cols-1 gap-2 sm:gap-3 lg:grid-cols-[1.4fr_1fr_1fr_auto]">
-          <Field
-            label="What are you looking for?"
-            icon={<Search className="h-4 w-4 text-slate-400" />}
-          >
+          {/* Query */}
+          <FieldShell label="What are you looking for?" icon={<Search className="h-4 w-4 text-slate-400" />}>
             <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Salon, Facial, Spa, Tattoo, Massage, Nail Art"
               className="w-full bg-transparent text-[15px] font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
             />
-          </Field>
-          <Field label="Location" icon={<MapPin className="h-4 w-4 text-slate-400" />}>
-            <select
-              value={area}
-              onChange={(e) => setArea(e.target.value)}
-              className="w-full bg-transparent text-[15px] font-medium text-slate-900 focus:outline-none"
+          </FieldShell>
+
+          {/* Location dropdown */}
+          <div ref={locationRef} className="relative">
+            <button
+              type="button"
+              onClick={() => {
+                setIsLocationOpen((v) => !v);
+                setIsCategoryOpen(false);
+              }}
+              className="flex h-[72px] w-full items-center gap-3 rounded-2xl border border-transparent bg-slate-50 px-5 text-left transition hover:border-slate-200 hover:bg-white"
             >
-              <option value="">Jaipur · All areas</option>
-              {AREAS.map((a) => (
-                <option key={a} value={a}>
-                  {a}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Category" icon={<Layers className="h-4 w-4 text-slate-400" />}>
-            <select
-              value={cat}
-              onChange={(e) => setCat(e.target.value)}
-              className="w-full bg-transparent text-[15px] font-medium text-slate-900 focus:outline-none"
+              <span className="grid h-9 w-9 flex-none place-items-center rounded-xl bg-white shadow-sm">
+                <MapPin className="h-4 w-4 text-slate-400" />
+              </span>
+              <span className="flex min-w-0 flex-1 flex-col">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                  Location
+                </span>
+                <span className="truncate text-[15px] font-medium text-slate-900">
+                  {selectedLocation}
+                </span>
+              </span>
+              <ChevronRight
+                className={`h-4 w-4 text-slate-400 transition ${isLocationOpen ? "rotate-90" : ""}`}
+              />
+            </button>
+            {isLocationOpen && (
+              <div className="absolute left-0 right-0 top-full z-30 mt-2 max-h-[320px] overflow-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl">
+                {[ALL_AREAS_LABEL, ...AREAS].map((loc) => (
+                  <button
+                    key={loc}
+                    type="button"
+                    onClick={() => pickLocation(loc)}
+                    className={`block w-full rounded-xl px-4 py-2.5 text-left text-[14px] font-medium transition hover:bg-slate-100 ${
+                      selectedLocation === loc ? "bg-slate-900 text-white hover:bg-slate-800" : "text-slate-800"
+                    }`}
+                  >
+                    {loc}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Category dropdown */}
+          <div ref={categoryRef} className="relative">
+            <button
+              type="button"
+              onClick={() => {
+                setIsCategoryOpen((v) => !v);
+                setIsLocationOpen(false);
+              }}
+              className="flex h-[72px] w-full items-center gap-3 rounded-2xl border border-transparent bg-slate-50 px-5 text-left transition hover:border-slate-200 hover:bg-white"
             >
-              <option value="">All categories</option>
-              {[
-                "Salon",
-                "Beauty Parlour",
-                "Spa",
-                "Tattoo Studio",
-                "Massage Center",
-                "Nail Art Studio",
-                "Makeup Artist",
-                "Bridal Services",
-                "Barber Shop",
-              ].map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </Field>
+              <span className="grid h-9 w-9 flex-none place-items-center rounded-xl bg-white shadow-sm">
+                <Layers className="h-4 w-4 text-slate-400" />
+              </span>
+              <span className="flex min-w-0 flex-1 flex-col">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                  Category
+                </span>
+                <span className="truncate text-[15px] font-medium text-slate-900">
+                  {selectedCategory}
+                </span>
+              </span>
+              <ChevronRight
+                className={`h-4 w-4 text-slate-400 transition ${isCategoryOpen ? "rotate-90" : ""}`}
+              />
+            </button>
+            {isCategoryOpen && (
+              <div className="absolute left-0 right-0 top-full z-30 mt-2 max-h-[320px] overflow-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl">
+                {[ALL_CATS_LABEL, ...CATEGORIES.map((c) => c.name)].map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => pickCategory(c)}
+                    className={`block w-full rounded-xl px-4 py-2.5 text-left text-[14px] font-medium transition hover:bg-slate-100 ${
+                      selectedCategory === c ? "bg-slate-900 text-white hover:bg-slate-800" : "text-slate-800"
+                    }`}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           <button
             type="submit"
             className="inline-flex h-[72px] items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#2563EB] to-[#6D28D9] px-8 text-sm font-bold text-white shadow-lg shadow-blue-200/70 transition hover:-translate-y-0.5"
@@ -407,35 +542,94 @@ function SearchPanel() {
         </div>
       </form>
 
-      {/* Quick chips */}
+      {/* Quick filter chips */}
       <div className="mt-6 flex flex-wrap gap-2.5">
-        {QUICK_FILTERS.map((f) => (
-          <Link
-            key={f}
-            to="/search"
-            className="rounded-full border border-slate-200 bg-white px-4 py-2 text-[13px] font-semibold text-slate-700 shadow-sm transition hover:border-slate-900 hover:text-slate-900"
-          >
-            {f}
-          </Link>
-        ))}
+        {QUICK_FILTERS.map((f) => {
+          const active = activeQuickFilter === f;
+          return (
+            <button
+              key={f}
+              type="button"
+              onClick={() => pickQuickFilter(f)}
+              className={`rounded-full border px-4 py-2 text-[13px] font-semibold shadow-sm transition ${
+                active
+                  ? "border-slate-900 bg-slate-900 text-white"
+                  : "border-slate-200 bg-white text-slate-700 hover:border-slate-900 hover:text-slate-900"
+              }`}
+            >
+              {f}
+            </button>
+          );
+        })}
       </div>
+      {/* Locality chips */}
       <div className="mt-3 flex flex-wrap gap-2.5">
-        {AREAS.map((a) => (
-          <Link
-            key={a}
-            to="/search"
-            search={{ area: a } as never}
-            className="rounded-full bg-slate-100 px-4 py-2 text-[13px] font-medium text-slate-700 hover:bg-slate-200"
-          >
-            {a}
-          </Link>
-        ))}
+        {AREAS.map((a) => {
+          const active = selectedLocation === a;
+          return (
+            <button
+              key={a}
+              type="button"
+              onClick={() => pickLocation(a)}
+              className={`rounded-full px-4 py-2 text-[13px] font-medium transition ${
+                active
+                  ? "bg-slate-900 text-white"
+                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+              }`}
+            >
+              {a}
+            </button>
+          );
+        })}
       </div>
+
+      {/* Inline results */}
+      {hasSearched && (
+        <div ref={resultsRef} className="mt-10 scroll-mt-24">
+          <div className="mb-5 flex items-center justify-between">
+            <h2 className="text-[20px] font-bold text-slate-900">
+              {filteredBusinesses.length === 0
+                ? "No businesses found"
+                : resultCountText}
+            </h2>
+            {(selectedLocation !== ALL_AREAS_LABEL ||
+              selectedCategory !== ALL_CATS_LABEL ||
+              searchQuery ||
+              activeQuickFilter) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedLocation(ALL_AREAS_LABEL);
+                  setSelectedCategory(ALL_CATS_LABEL);
+                  setSearchQuery("");
+                  setActiveQuickFilter("");
+                }}
+                className="text-[13px] font-semibold text-slate-600 underline-offset-2 hover:text-slate-900 hover:underline"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+          {filteredBusinesses.length === 0 ? (
+            <div className="rounded-[24px] border border-dashed border-slate-300 bg-white p-10 text-center">
+              <p className="text-[15px] font-semibold text-slate-900">
+                No businesses found. Try another location or category.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {filteredBusinesses.slice(0, 24).map((b) => (
+                <MockBusinessCard key={b.slug} biz={b} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
 
-function Field({
+function FieldShell({
   label,
   icon,
   children,
@@ -456,6 +650,57 @@ function Field({
         <span className="min-w-0">{children}</span>
       </span>
     </label>
+  );
+}
+
+function MockBusinessCard({ biz }: { biz: ReturnType<typeof getMockBusinesses>[number] }) {
+  return (
+    <article className="group overflow-hidden rounded-[24px] border border-slate-200 bg-white transition hover:-translate-y-1 hover:shadow-xl">
+      <div className="relative h-[180px] overflow-hidden">
+        <img
+          src={biz.cover}
+          alt={biz.name}
+          loading="lazy"
+          className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+        />
+        {biz.isVerified && (
+          <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-bold text-emerald-700 shadow">
+            <ShieldCheck className="h-3 w-3" /> Verified
+          </span>
+        )}
+        <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[11px] font-bold text-amber-700 shadow">
+          <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
+          {biz.rating.toFixed(1)}
+        </span>
+      </div>
+      <div className="p-4">
+        <h3 className="truncate text-[15px] font-bold text-slate-900">{biz.name}</h3>
+        <p className="mt-0.5 truncate text-[12px] text-slate-500">
+          {biz.category} · {biz.area}, Jaipur
+        </p>
+        <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
+          <p className="text-[12px] text-slate-500">
+            From <span className="text-[14px] font-bold text-slate-900">₹{biz.startingPrice}</span>
+          </p>
+          <div className="flex gap-2">
+            <Link
+              to="/site/$businessSlug"
+              params={{ businessSlug: biz.slug }}
+              className="inline-flex h-9 items-center rounded-full border border-slate-200 px-3 text-[12px] font-semibold text-slate-800 hover:border-slate-300"
+            >
+              View Website
+            </Link>
+            <Link
+              to="/book/$slug"
+              params={{ slug: biz.slug }}
+              className="inline-flex h-9 items-center rounded-full bg-slate-900 px-3 text-[12px] font-semibold text-white hover:bg-slate-800"
+            >
+              Book Now
+            </Link>
+          </div>
+        </div>
+      </div>
+    </article>
   );
 }
 
