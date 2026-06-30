@@ -489,7 +489,7 @@ const SalonUpdateInput = z.object({
     seo_description: z.string().max(300).nullable().optional(),
     phone: z.string().max(20).nullable().optional(),
     whatsapp: z.string().max(20).nullable().optional(),
-    email: z.string().email().or(z.literal("")).max(160).nullable().optional(),
+    email: z.string().max(160).email().or(z.literal("")).nullable().optional(),
     address: z.string().max(300).nullable().optional(),
     location: z.string().max(120).nullable().optional(),
     city: z.string().max(80).nullable().optional(),
