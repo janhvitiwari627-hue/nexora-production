@@ -111,6 +111,7 @@ import { Route as PortalBrandsRegisterRouteImport } from './routes/portal.brands
 import { Route as PortalBrandsSlugRouteImport } from './routes/portal.brands.$slug'
 import { Route as OwnerJobsNewRouteImport } from './routes/owner.jobs.new'
 import { Route as DashboardBookingsIdRouteImport } from './routes/dashboard.bookings.$id'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as ApiPublicHooksReleaseExpiredBookingsRouteImport } from './routes/api/public/hooks/release-expired-bookings'
 import { Route as ApiPublicHooksRecomputeRankingsRouteImport } from './routes/api/public/hooks/recompute-rankings'
 import { Route as ApiPublicHooksRecomputeInsightsRouteImport } from './routes/api/public/hooks/recompute-insights'
@@ -629,6 +630,12 @@ const DashboardBookingsIdRoute = DashboardBookingsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => DashboardBookingsRoute,
 } as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksReleaseExpiredBookingsRoute =
   ApiPublicHooksReleaseExpiredBookingsRouteImport.update({
     id: '/api/public/hooks/release-expired-bookings',
@@ -768,6 +775,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
   '/api/public/hooks/recompute-rankings': typeof ApiPublicHooksRecomputeRankingsRoute
   '/api/public/hooks/release-expired-bookings': typeof ApiPublicHooksReleaseExpiredBookingsRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -874,6 +882,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
   '/api/public/hooks/recompute-rankings': typeof ApiPublicHooksRecomputeRankingsRoute
   '/api/public/hooks/release-expired-bookings': typeof ApiPublicHooksReleaseExpiredBookingsRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -984,6 +993,7 @@ export interface FileRoutesById {
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
   '/api/public/hooks/recompute-rankings': typeof ApiPublicHooksRecomputeRankingsRoute
   '/api/public/hooks/release-expired-bookings': typeof ApiPublicHooksReleaseExpiredBookingsRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1095,6 +1105,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/recompute-insights'
     | '/api/public/hooks/recompute-rankings'
     | '/api/public/hooks/release-expired-bookings'
+    | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1201,6 +1212,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/recompute-insights'
     | '/api/public/hooks/recompute-rankings'
     | '/api/public/hooks/release-expired-bookings'
+    | '/lovable/email/queue/process'
   id:
     | '__root__'
     | '/'
@@ -1310,6 +1322,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/recompute-insights'
     | '/api/public/hooks/recompute-rankings'
     | '/api/public/hooks/release-expired-bookings'
+    | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1369,6 +1382,7 @@ export interface RootRouteChildren {
   ApiPublicHooksRecomputeInsightsRoute: typeof ApiPublicHooksRecomputeInsightsRoute
   ApiPublicHooksRecomputeRankingsRoute: typeof ApiPublicHooksRecomputeRankingsRoute
   ApiPublicHooksReleaseExpiredBookingsRoute: typeof ApiPublicHooksReleaseExpiredBookingsRoute
+  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -2087,6 +2101,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardBookingsIdRouteImport
       parentRoute: typeof DashboardBookingsRoute
     }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/release-expired-bookings': {
       id: '/api/public/hooks/release-expired-bookings'
       path: '/api/public/hooks/release-expired-bookings'
@@ -2359,6 +2380,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksRecomputeRankingsRoute: ApiPublicHooksRecomputeRankingsRoute,
   ApiPublicHooksReleaseExpiredBookingsRoute:
     ApiPublicHooksReleaseExpiredBookingsRoute,
+  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
