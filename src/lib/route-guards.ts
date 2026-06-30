@@ -40,11 +40,25 @@ export async function requireRole(allowed: AllowedRole[], currentPath: string) {
     throw redirect({ to: "/login" });
   }
 
-  const roles = await fetchUserRoles(data.user.id);
+  const shouldAllowOwnerMembership = allowed.some((role) => normalizeRole(role) === "owner");
+  const [roles, ownerLink] = await Promise.all([
+    fetchUserRoles(data.user.id),
+    shouldAllowOwnerMembership
+      ? supabase
+        .from("salon_owners")
+        .select("id")
+        .eq("user_id", data.user.id)
+        .eq("is_approved", true)
+        .limit(1)
+      : Promise.resolve({ data: null, error: null }),
+  ]);
   const normalized = new Set(allowed.map(normalizeRole));
   // Treat shop_owner/shop_manager DB roles as equivalent to "owner" guard.
   const effectiveRoles = new Set<string>(roles);
   if (roles.includes("shop_owner" as UserRole) || roles.includes("shop_manager" as UserRole)) {
+    effectiveRoles.add("owner");
+  }
+  if (!ownerLink.error && (ownerLink.data?.length ?? 0) > 0) {
     effectiveRoles.add("owner");
   }
   if (roles.includes("super_admin" as UserRole)) effectiveRoles.add("admin");
