@@ -8,6 +8,7 @@ import { ViralGrowthWidget } from "@/components/whiteLabelWebsite/ViralGrowthWid
 import { DEFAULT_SECTIONS, type ShopData, type WebsiteConfig } from "@/components/whiteLabelWebsite/types";
 import { getTemplate, normalizeTemplateKey, TEMPLATE_KEYS, TEMPLATES, type TemplateKey } from "@/components/whiteLabelWebsite/templates";
 import { getSalonBySlug } from "@/lib/salons.functions";
+import { expandMockBusiness, getMockBusinessBySlug } from "@/lib/mock-businesses";
 import { Paintbrush } from "lucide-react";
 
 const DEFAULT_COVER =
@@ -32,7 +33,10 @@ export function WhiteLabelWebsitePage({ slug: _slug, routeSearch }: { slug?: str
     );
   }
 
-  if (!data?.salon) {
+  // Mock fallback: if Supabase has no record, look up the Jaipur mock catalog.
+  const mockBiz = !data?.salon && _slug ? getMockBusinessBySlug(_slug) : null;
+
+  if (!data?.salon && !mockBiz) {
     return (
       <div className="mx-auto grid min-h-[70vh] max-w-xl place-items-center px-6 text-center">
         <div className="space-y-4">
@@ -49,8 +53,8 @@ export function WhiteLabelWebsitePage({ slug: _slug, routeSearch }: { slug?: str
     );
   }
 
-  const shop = toShopData(data);
-  const savedTemplateKey = data.salon.selected_template_key ?? "modern-salon";
+  const shop: ShopData = data?.salon ? toShopData(data) : expandMockBusiness(mockBiz!);
+  const savedTemplateKey = data?.salon?.selected_template_key ?? "modern-salon";
   const templateKey = normalizeTemplateKey(routeSearch?.t ?? browserSearch?.get("t") ?? savedTemplateKey);
 
   const config: WebsiteConfig = {
@@ -62,8 +66,8 @@ export function WhiteLabelWebsitePage({ slug: _slug, routeSearch }: { slug?: str
     },
     sections: DEFAULT_SECTIONS,
     seoMeta: {
-      title: data.salon.name,
-      description: data.salon.description ?? data.salon.tagline ?? "",
+      title: shop.name,
+      description: shop.tagline ?? shop.about ?? "",
       keywords: [],
     },
     socialLinks: {},

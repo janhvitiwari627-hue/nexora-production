@@ -45,12 +45,16 @@ const AREAS = [
   "Mansarovar",
   "Vaishali Nagar",
   "Malviya Nagar",
-  "Raja Park",
   "Jagatpura",
+  "Raja Park",
+  "C-Scheme",
+  "Vidyadhar Nagar",
   "Tonk Road",
+  "Sanganer",
   "Sodala",
   "Jhotwara",
-  "Sanganer",
+  "Sitapura",
+  "Murlipura",
 ];
 
 const QUICK_FILTERS = [
