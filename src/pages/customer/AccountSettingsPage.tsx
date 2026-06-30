@@ -183,8 +183,10 @@ export function AccountSettingsPage() {
 
       </div>
     </div>
+    </>
   );
 }
+
 
 function ProfilePreviewPanel() {
   return (
