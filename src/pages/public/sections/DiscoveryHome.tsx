@@ -58,6 +58,12 @@ export type Enriched = Shop & {
   weeklyBookings: number;
   popularityScore: number;
   latestReviewDaysAgo: number;
+  rewardRatePct: number;
+  rewardUsagePct: number;
+  savesCount: number;
+  staffAvailable: number;
+  staffTotal: number;
+  slotsAvailable: number;
 };
 
 export type DiscoveryHomeProps = {
