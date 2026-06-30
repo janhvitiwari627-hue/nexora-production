@@ -170,14 +170,25 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
     onSearchChange(next === "grid" ? rest : { ...rest, view: next });
   };
 
+  // Preserve the user's scroll position across a state change that may shrink the page.
+  const preserveScroll = (fn: () => void) => {
+    const y = window.scrollY;
+    fn();
+    // Re-apply after layout settles (results re-render, AnimatePresence swaps).
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: y, behavior: "auto" });
+      requestAnimationFrame(() => window.scrollTo({ top: y, behavior: "auto" }));
+    });
+  };
+
   const resetFilters = () => {
     setDraft(DEFAULT_FILTERS);
-    commitFilters(DEFAULT_FILTERS);
+    preserveScroll(() => commitFilters(DEFAULT_FILTERS));
   };
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    onSearchChange({ ...search, q: q || undefined });
+    preserveScroll(() => onSearchChange({ ...search, q: q || undefined }));
   };
 
 
