@@ -4,40 +4,38 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ShieldCheck, Loader2, Lock } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { fetchUserRoles } from "@/lib/auth-redirect";
 
 export function AdminLoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [otpOpen, setOtpOpen] = useState(false);
-  const [otp, setOtp] = useState("");
-  const [verifying, setVerifying] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) return toast.error("Enter email and password");
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setOtpOpen(true);
-      toast.success("OTP sent to your authenticator");
-    }, 900);
-  };
-
-  const verify = () => {
-    if (otp.length !== 6) return toast.error("Enter 6-digit code");
-    setVerifying(true);
-    setTimeout(() => {
-      setVerifying(false);
-      setOtpOpen(false);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error || !data.user) {
+        toast.error(error?.message ?? "Invalid credentials");
+        return;
+      }
+      const roles = await fetchUserRoles(data.user.id);
+      if (!roles.includes("admin")) {
+        await supabase.auth.signOut();
+        toast.error("This account does not have admin access");
+        return;
+      }
       toast.success("Welcome, Admin");
       navigate({ to: "/admin/dashboard" });
-    }, 700);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -84,37 +82,10 @@ export function AdminLoginPage() {
           </form>
 
           <div className="text-xs text-slate-500 text-center border-t border-white/10 pt-4">
-            Protected by 2-factor authentication. All sign-ins are logged.
+            All admin sign-ins are logged and audited.
           </div>
         </CardContent>
       </Card>
-
-      <Dialog open={otpOpen} onOpenChange={setOtpOpen}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-primary" /> Two-Factor Verification
-            </DialogTitle>
-            <DialogDescription>
-              Enter the 6-digit code from your authenticator app.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col items-center gap-4 py-2">
-            <InputOTP maxLength={6} value={otp} onChange={setOtp}>
-              <InputOTPGroup>
-                {[0, 1, 2, 3, 4, 5].map((i) => <InputOTPSlot key={i} index={i} />)}
-              </InputOTPGroup>
-            </InputOTP>
-            <Button onClick={verify} disabled={verifying} className="w-full">
-              {verifying ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-              Verify & Continue
-            </Button>
-            <button className="text-xs text-muted-foreground hover:text-primary">
-              Use backup code instead
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
