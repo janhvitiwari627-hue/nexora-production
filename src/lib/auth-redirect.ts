@@ -20,10 +20,10 @@ const ROLE_PRIORITY: UserRole[] = [
 const ROLE_ROUTES: Record<UserRole, string> = {
   super_admin: "/admin",
   admin: "/admin",
-  shop_owner: "/owner/dashboard",
-  owner: "/owner/dashboard",
-  shop_manager: "/owner/dashboard",
-  staff: "/owner/dashboard",
+  shop_owner: "/owner",
+  owner: "/owner",
+  shop_manager: "/owner",
+  staff: "/owner",
   brand: "/portal/brands",
   distributor: "/partner/dashboard",
   district_partner: "/partner/dashboard",
@@ -51,9 +51,19 @@ export function pickPrimaryRole(roles: UserRole[]): UserRole {
 export function routeForRole(role: UserRole | "staff" | "shop_owner" | "shop_manager" | "super_admin"): string {
   // Map spec role names to existing app_role enum
   if (role === "super_admin") return "/admin";
-  if (role === "shop_owner" || role === "shop_manager") return "/owner/dashboard";
+  if (role === "shop_owner" || role === "shop_manager") return "/owner";
   if (role === "staff") return "/staff/dashboard";
   return ROLE_ROUTES[role as UserRole] ?? "/";
+}
+
+async function hasApprovedOwnerLink(userId: string): Promise<boolean> {
+  const { data } = await supabase
+    .from("salon_owners")
+    .select("salon_id")
+    .eq("user_id", userId)
+    .eq("is_approved", true)
+    .limit(1);
+  return !!data?.length;
 }
 
 export async function resolvePostLoginRedirect(userId: string): Promise<string> {
@@ -71,15 +81,13 @@ export async function resolvePostLoginRedirect(userId: string): Promise<string> 
 
   // Shop owners: route based on whether they already own a shop
   if (primary === "shop_owner" || primary === "owner" || primary === "shop_manager") {
-    const { data } = await supabase
-      .from("salon_owners")
-      .select("salon_id")
-      .eq("user_id", userId)
-      .eq("is_approved", true)
-      .limit(1);
-    if (!data || data.length === 0) return "/owner/register-business";
+    if (!(await hasApprovedOwnerLink(userId))) return "/owner/register-business";
     return "/owner/templates";
   }
+
+  // Some existing shop owners may have a salon link but no role row yet.
+  // Send them to the owner flow instead of the customer dashboard.
+  if (await hasApprovedOwnerLink(userId)) return "/owner/templates";
 
   return routeForRole(primary);
 }
