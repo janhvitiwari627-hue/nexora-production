@@ -18,7 +18,7 @@ import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { BackButton } from "@/components/shared/BackButton";
 import { useOwnerContext } from "@/hooks/use-owner-context";
-import { supabase } from "@/integrations/supabase/client";
+import { uploadToCloudinary, isCloudinaryConfigured } from "@/lib/cloudinary";
 import {
   getOwnerSalonFull,
   updateOwnerSalon,
