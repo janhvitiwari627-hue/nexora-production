@@ -461,6 +461,7 @@ function Field({
 
 /* ============= CATEGORY TILES ============= */
 function CategoryGrid() {
+  const counts = useMemo(() => getCategoryCounts(), []);
   return (
     <Section
       eyebrow="Categories"
@@ -468,33 +469,50 @@ function CategoryGrid() {
       subtitle="Premium tiles for every beauty experience in Jaipur."
     >
       <div className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
-        {CATEGORIES.map(({ name, desc, Icon, gradient }) => (
-          <Link
-            key={name}
-            to="/search"
-            search={{ category: name } as never}
-            className="group relative overflow-hidden rounded-[24px] border border-slate-200 bg-white p-5 transition hover:-translate-y-1 hover:border-slate-300 hover:shadow-xl sm:p-6 min-h-[180px]"
-          >
-            <div
-              className={`grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br ${gradient} text-white shadow-lg`}
+        {CATEGORIES.map(({ name, desc, Icon, gradient }) => {
+          const count = counts[name] ?? 0;
+          const img = CATEGORY_IMAGES[name];
+          return (
+            <Link
+              key={name}
+              to="/search"
+              search={{ category: name } as never}
+              className="group relative overflow-hidden rounded-[24px] border border-slate-200 bg-white transition hover:-translate-y-1 hover:border-slate-300 hover:shadow-xl"
             >
-              <Icon className="h-6 w-6" />
-            </div>
-            <p className="mt-5 text-[16px] font-bold text-slate-900 sm:text-[17px]">{name}</p>
-            <p className="mt-1 text-[12px] text-slate-500 sm:text-[13px]">{desc}</p>
-            <div className="mt-4 inline-flex items-center gap-1 text-[12px] font-semibold text-slate-900 opacity-0 transition group-hover:opacity-100">
-              Explore <ArrowUpRight className="h-3.5 w-3.5" />
-            </div>
-            <div
-              aria-hidden
-              className={`pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gradient-to-br ${gradient} opacity-0 blur-2xl transition group-hover:opacity-20`}
-            />
-          </Link>
-        ))}
+              <div className="relative h-[120px] w-full overflow-hidden">
+                {img && (
+                  <img
+                    src={img}
+                    alt={name}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                  />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                <div
+                  className={`absolute left-4 top-4 grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br ${gradient} text-white shadow-lg`}
+                >
+                  <Icon className="h-5 w-5" />
+                </div>
+                <span className="absolute right-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-bold text-slate-900 shadow">
+                  {count} Shops
+                </span>
+              </div>
+              <div className="p-4 sm:p-5">
+                <p className="text-[15px] font-bold text-slate-900 sm:text-[16px]">{name}</p>
+                <p className="mt-1 text-[12px] text-slate-500 sm:text-[13px] line-clamp-1">{desc}</p>
+                <div className="mt-3 inline-flex items-center gap-1 text-[12px] font-semibold text-slate-900">
+                  View Shops <ArrowUpRight className="h-3.5 w-3.5" />
+                </div>
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </Section>
   );
 }
+
 
 /* ============= SHOP LISTINGS ============= */
 type ShopRow = {
