@@ -124,10 +124,22 @@ export default function OwnerSignupPage() {
 
     setSubmitting(true);
     try {
-      // Create a normal Supabase auth user — profile starts as customer via DB trigger.
-      // Frontend NEVER sets shop_owner role. Admin elevates after manual verification.
+      const email = parsed.data.email.trim().toLowerCase();
+
+      // Enforce one-email-one-role before creating the auth user
+      try {
+        const check = await checkEmailRoleFn({ data: { email } });
+        if (check.exists) {
+          setServerError(roleConflictMessage(check.roleLabel, "Salon Owner"));
+          return;
+        }
+      } catch {
+        // Non-fatal — Supabase signUp will still reject duplicates
+      }
+
+      // Create a Supabase auth user and lock the role to salon owner.
       const { data, error } = await supabase.auth.signUp({
-        email: parsed.data.email.trim(),
+        email,
         password: parsed.data.password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
@@ -135,7 +147,7 @@ export default function OwnerSignupPage() {
             full_name: parsed.data.full_name,
             mobile: parsed.data.mobile,
             referred_by: referredBy || null,
-            role: "customer",
+            role: "owner",
             owner_request: {
               business_name: parsed.data.business_name,
               business_category: parsed.data.business_category,
@@ -146,6 +158,7 @@ export default function OwnerSignupPage() {
           },
         },
       });
+
 
       if (error) {
         const raw = parseErr(error);
