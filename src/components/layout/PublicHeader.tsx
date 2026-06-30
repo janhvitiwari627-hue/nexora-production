@@ -10,6 +10,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MobileMenuOverlay } from "./MobileMenuOverlay";
@@ -54,6 +64,7 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [logoutOpen, setLogoutOpen] = useState(false);
   const user = useAuthStore((s) => s.user);
   const profile = useAuthStore((s) => s.profile);
   const roles = useAuthStore((s) => s.roles);
@@ -78,8 +89,9 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
   }, []);
 
   const handleLogout = async () => {
+    setLogoutOpen(false);
     await signOut();
-    navigate({ to: "/", replace: true });
+    navigate({ to: "/login", replace: true });
   };
 
   const displayName =
@@ -224,7 +236,13 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={handleLogout} className="cursor-pointer text-destructive focus:text-destructive">
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setLogoutOpen(true);
+                  }}
+                  className="cursor-pointer text-destructive focus:text-destructive"
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   Logout
                 </DropdownMenuItem>
@@ -264,6 +282,21 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
       </div>
 
       <MobileMenuOverlay open={menuOpen} onClose={() => setMenuOpen(false)} />
+
+      <AlertDialog open={logoutOpen} onOpenChange={setLogoutOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Logout from Nexora?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You can sign in again anytime with your email and password.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleLogout}>Logout</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </header>
   );
 }
