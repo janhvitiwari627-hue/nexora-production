@@ -4,7 +4,12 @@ import { requireRole } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/owner")({
   ssr: false,
-  beforeLoad: () => requireRole(["owner", "admin"], "/owner"),
+  beforeLoad: ({ location }) => {
+    // Public owner routes (no auth required) — registration & template gallery handle their own auth.
+    const publicPaths = ["/owner/register-business", "/owner/templates", "/owner/create-website"];
+    if (publicPaths.some((p) => location.pathname.startsWith(p))) return;
+    return requireRole(["owner", "admin"], location.pathname);
+  },
   component: OwnerLayout,
 });
 
