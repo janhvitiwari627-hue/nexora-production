@@ -111,8 +111,9 @@ test.describe("/register — empty-alert regression guard for mismatched passwor
     await page.getByLabel("Full name").fill("Mismatch Reg");
     await page.getByLabel("Email").fill(`mismatch-reg-${Date.now()}@example.com`);
     await page.getByLabel("Mobile").fill("9876543210");
-    await page.getByLabel("Password", { exact: true }).fill("StrongP@ss123");
-    await page.getByLabel("Confirm password").fill("DifferentP@ss123");
+    await page.locator("#password").fill("StrongP@ss123");
+    await page.locator("#confirm_password").fill("DifferentP@ss123");
+
 
     await page.getByRole("button", { name: "Create account" }).click();
 
