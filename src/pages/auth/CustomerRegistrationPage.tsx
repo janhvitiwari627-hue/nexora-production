@@ -249,6 +249,10 @@ export default function CustomerRegistrationPage() {
       setResetSent(false);
     }
     if (errors[key]) setErrors((prev) => ({ ...prev, [key]: "" }));
+    // Clear cross-field "passwords do not match" error when either field changes
+    if ((key === "password" || key === "confirm_password") && errors.confirm_password) {
+      setErrors((prev) => ({ ...prev, confirm_password: "" }));
+    }
   };
 
   const sendResetLink = async () => {
