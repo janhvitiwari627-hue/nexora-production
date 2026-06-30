@@ -61,6 +61,7 @@ import { Route as OwnerStaffRouteImport } from './routes/owner.staff'
 import { Route as OwnerSetupWizardRouteImport } from './routes/owner.setup-wizard'
 import { Route as OwnerServicesRouteImport } from './routes/owner.services'
 import { Route as OwnerReviewsRouteImport } from './routes/owner.reviews'
+import { Route as OwnerRegisterBusinessRouteImport } from './routes/owner.register-business'
 import { Route as OwnerPendingRouteImport } from './routes/owner.pending'
 import { Route as OwnerPaymentsRouteImport } from './routes/owner.payments'
 import { Route as OwnerOnboardingRouteImport } from './routes/owner.onboarding'
@@ -380,6 +381,11 @@ const OwnerServicesRoute = OwnerServicesRouteImport.update({
 const OwnerReviewsRoute = OwnerReviewsRouteImport.update({
   id: '/reviews',
   path: '/reviews',
+  getParentRoute: () => OwnerRoute,
+} as any)
+const OwnerRegisterBusinessRoute = OwnerRegisterBusinessRouteImport.update({
+  id: '/register-business',
+  path: '/register-business',
   getParentRoute: () => OwnerRoute,
 } as any)
 const OwnerPendingRoute = OwnerPendingRouteImport.update({
@@ -763,6 +769,7 @@ export interface FileRoutesByFullPath {
   '/owner/onboarding': typeof OwnerOnboardingRoute
   '/owner/payments': typeof OwnerPaymentsRoute
   '/owner/pending': typeof OwnerPendingRoute
+  '/owner/register-business': typeof OwnerRegisterBusinessRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/owner/setup-wizard': typeof OwnerSetupWizardRoute
@@ -874,6 +881,7 @@ export interface FileRoutesByTo {
   '/owner/onboarding': typeof OwnerOnboardingRoute
   '/owner/payments': typeof OwnerPaymentsRoute
   '/owner/pending': typeof OwnerPendingRoute
+  '/owner/register-business': typeof OwnerRegisterBusinessRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/owner/setup-wizard': typeof OwnerSetupWizardRoute
@@ -989,6 +997,7 @@ export interface FileRoutesById {
   '/owner/onboarding': typeof OwnerOnboardingRoute
   '/owner/payments': typeof OwnerPaymentsRoute
   '/owner/pending': typeof OwnerPendingRoute
+  '/owner/register-business': typeof OwnerRegisterBusinessRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
   '/owner/setup-wizard': typeof OwnerSetupWizardRoute
@@ -1105,6 +1114,7 @@ export interface FileRouteTypes {
     | '/owner/onboarding'
     | '/owner/payments'
     | '/owner/pending'
+    | '/owner/register-business'
     | '/owner/reviews'
     | '/owner/services'
     | '/owner/setup-wizard'
@@ -1216,6 +1226,7 @@ export interface FileRouteTypes {
     | '/owner/onboarding'
     | '/owner/payments'
     | '/owner/pending'
+    | '/owner/register-business'
     | '/owner/reviews'
     | '/owner/services'
     | '/owner/setup-wizard'
@@ -1330,6 +1341,7 @@ export interface FileRouteTypes {
     | '/owner/onboarding'
     | '/owner/payments'
     | '/owner/pending'
+    | '/owner/register-business'
     | '/owner/reviews'
     | '/owner/services'
     | '/owner/setup-wizard'
@@ -1799,6 +1811,13 @@ declare module '@tanstack/react-router' {
       path: '/reviews'
       fullPath: '/owner/reviews'
       preLoaderRoute: typeof OwnerReviewsRouteImport
+      parentRoute: typeof OwnerRoute
+    }
+    '/owner/register-business': {
+      id: '/owner/register-business'
+      path: '/register-business'
+      fullPath: '/owner/register-business'
+      preLoaderRoute: typeof OwnerRegisterBusinessRouteImport
       parentRoute: typeof OwnerRoute
     }
     '/owner/pending': {
@@ -2356,6 +2375,7 @@ interface OwnerRouteChildren {
   OwnerOnboardingRoute: typeof OwnerOnboardingRoute
   OwnerPaymentsRoute: typeof OwnerPaymentsRoute
   OwnerPendingRoute: typeof OwnerPendingRoute
+  OwnerRegisterBusinessRoute: typeof OwnerRegisterBusinessRoute
   OwnerReviewsRoute: typeof OwnerReviewsRoute
   OwnerServicesRoute: typeof OwnerServicesRoute
   OwnerSetupWizardRoute: typeof OwnerSetupWizardRoute
@@ -2376,6 +2396,7 @@ const OwnerRouteChildren: OwnerRouteChildren = {
   OwnerOnboardingRoute: OwnerOnboardingRoute,
   OwnerPaymentsRoute: OwnerPaymentsRoute,
   OwnerPendingRoute: OwnerPendingRoute,
+  OwnerRegisterBusinessRoute: OwnerRegisterBusinessRoute,
   OwnerReviewsRoute: OwnerReviewsRoute,
   OwnerServicesRoute: OwnerServicesRoute,
   OwnerSetupWizardRoute: OwnerSetupWizardRoute,

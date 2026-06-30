@@ -3,12 +3,16 @@ import { z } from "zod";
 
 const ROLE_LABELS: Record<string, string> = {
   customer: "Customer",
-  owner: "Salon Owner",
-  salon_owner: "Salon Owner",
+  owner: "Shop Owner",
+  shop_owner: "Shop Owner",
+  shop_manager: "Shop Manager",
+  staff: "Staff",
   district_partner: "District Partner",
   growth_partner: "Growth Partner",
   distributor: "Distributor",
+  brand: "Brand",
   admin: "Admin",
+  super_admin: "Super Admin",
 };
 
 export type EmailRoleCheck = {

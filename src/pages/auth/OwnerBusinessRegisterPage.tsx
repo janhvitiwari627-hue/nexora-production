@@ -1,0 +1,266 @@
+import { useState } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { z } from "zod";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, Eye, EyeOff, Building2, CheckCircle2 } from "lucide-react";
+import { BackButton } from "@/components/shared/BackButton";
+
+const mobileRe = /^(\+91)?[6-9]\d{9}$/;
+
+const schema = z
+  .object({
+    owner_name: z.string().trim().min(2, "Enter your full name").max(100),
+    mobile: z
+      .string()
+      .trim()
+      .transform((v) => v.replace(/[\s-]/g, ""))
+      .pipe(z.string().regex(mobileRe, "Enter a valid 10-digit mobile")),
+    district: z.string().trim().min(2, "District is required").max(80),
+    shop_name: z.string().trim().min(2, "Shop name is required").max(120),
+    email: z.string().trim().email("Invalid email").max(255),
+    password: z.string().min(8, "Min 8 characters").max(72),
+  });
+
+type FormState = {
+  owner_name: string;
+  mobile: string;
+  district: string;
+  shop_name: string;
+  email: string;
+  password: string;
+};
+
+function parseErr(error: unknown): string {
+  if (!error) return "Something went wrong.";
+  if (typeof error === "string") return error;
+  if (typeof error === "object") {
+    const e = error as { message?: string };
+    return e.message || "Something went wrong.";
+  }
+  return "Something went wrong.";
+}
+
+export default function OwnerBusinessRegisterPage() {
+  const navigate = useNavigate();
+  const [form, setForm] = useState<FormState>({
+    owner_name: "",
+    mobile: "",
+    district: "",
+    shop_name: "",
+    email: "",
+    password: "",
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [showPw, setShowPw] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  const update = (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const v = e.target.value;
+    setForm((f) => ({ ...f, [k]: v }));
+    if (errors[k]) setErrors((p) => ({ ...p, [k]: "" }));
+    if (serverError) setServerError(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setServerError(null);
+    const parsed = schema.safeParse(form);
+    if (!parsed.success) {
+      const flat: Record<string, string> = {};
+      for (const issue of parsed.error.issues) {
+        const k = String(issue.path[0]);
+        if (!flat[k]) flat[k] = issue.message;
+      }
+      setErrors(flat);
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const email = parsed.data.email.toLowerCase();
+
+      // 1. Create auth user with shop_owner role
+      const signUp = await supabase.auth.signUp({
+        email,
+        password: parsed.data.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          data: {
+            full_name: parsed.data.owner_name,
+            mobile: parsed.data.mobile,
+            role: "shop_owner",
+          },
+        },
+      });
+
+      if (signUp.error) {
+        const raw = parseErr(signUp.error);
+        if (/already/i.test(raw)) {
+          setServerError("This email is already registered. Please sign in instead.");
+        } else {
+          setServerError(raw);
+        }
+        return;
+      }
+
+      // 2. Ensure session
+      let session = signUp.data.session;
+      if (!session) {
+        const signIn = await supabase.auth.signInWithPassword({
+          email,
+          password: parsed.data.password,
+        });
+        session = signIn.data.session ?? null;
+      }
+
+      if (!session) {
+        setServerError("Account created. Please sign in to continue.");
+        setTimeout(() => navigate({ to: "/login" }), 800);
+        return;
+      }
+
+      // 3. Atomically create the shop (RPC sets owner_id = auth.uid())
+      const { error: rpcError } = await supabase.rpc("register_owner_business", {
+        _shop_name: parsed.data.shop_name,
+        _district: parsed.data.district,
+        _owner_name: parsed.data.owner_name,
+        _mobile: parsed.data.mobile,
+        _email: email,
+      });
+
+      if (rpcError) {
+        setServerError(parseErr(rpcError));
+        return;
+      }
+
+      setSuccess(true);
+      setTimeout(() => navigate({ to: "/owner/templates", replace: true }), 600);
+    } catch (err) {
+      setServerError(parseErr(err));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (success) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+              <CheckCircle2 className="h-6 w-6 text-primary" />
+            </div>
+            <CardTitle>Your shop is ready!</CardTitle>
+            <CardDescription className="mt-2">
+              Taking you to template selection…
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12">
+      <div className="w-full max-w-xl">
+        <BackButton className="mb-3" />
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Building2 className="h-5 w-5 text-primary" />
+              <CardTitle className="text-2xl">Register your business</CardTitle>
+            </div>
+            <CardDescription>
+              Are you a salon / shop owner? Fill in the basics — you'll pick a website template right after.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {serverError && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertDescription>{serverError}</AlertDescription>
+              </Alert>
+            )}
+
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label htmlFor="shop_name">Shop name *</Label>
+                <Input id="shop_name" value={form.shop_name} onChange={update("shop_name")} disabled={submitting} />
+                {errors.shop_name && <p className="text-xs text-destructive">{errors.shop_name}</p>}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="owner_name">Shop owner name *</Label>
+                <Input id="owner_name" value={form.owner_name} onChange={update("owner_name")} disabled={submitting} />
+                {errors.owner_name && <p className="text-xs text-destructive">{errors.owner_name}</p>}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="district">District *</Label>
+                <Input id="district" value={form.district} onChange={update("district")} disabled={submitting} />
+                {errors.district && <p className="text-xs text-destructive">{errors.district}</p>}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="mobile">Mobile *</Label>
+                <Input id="mobile" type="tel" placeholder="+91 9876543210" value={form.mobile} onChange={update("mobile")} disabled={submitting} />
+                {errors.mobile && <p className="text-xs text-destructive">{errors.mobile}</p>}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="email">Email *</Label>
+                <Input id="email" type="email" autoComplete="email" value={form.email} onChange={update("email")} disabled={submitting} />
+                {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+              </div>
+
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label htmlFor="password">Password *</Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPw ? "text" : "password"}
+                    autoComplete="new-password"
+                    value={form.password}
+                    onChange={update("password")}
+                    disabled={submitting}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPw((s) => !s)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    tabIndex={-1}
+                  >
+                    {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
+              </div>
+
+              <div className="sm:col-span-2">
+                <Button type="submit" className="w-full" disabled={submitting}>
+                  {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Create my shop
+                </Button>
+                <p className="mt-3 text-center text-xs text-muted-foreground">
+                  Category, address, WhatsApp & Google Maps can be added later in the setup wizard.
+                </p>
+                <p className="mt-3 text-center text-sm text-muted-foreground">
+                  Already have an account?{" "}
+                  <Link to="/login" className="text-primary font-medium hover:underline">
+                    Sign in
+                  </Link>
+                </p>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

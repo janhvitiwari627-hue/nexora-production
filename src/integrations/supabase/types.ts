@@ -2549,6 +2549,7 @@ export type Database = {
           description: string | null
           discount: string | null
           distance: number | null
+          district: string | null
           email: string | null
           gallery_images: string[] | null
           hours: Json | null
@@ -2600,6 +2601,7 @@ export type Database = {
           description?: string | null
           discount?: string | null
           distance?: number | null
+          district?: string | null
           email?: string | null
           gallery_images?: string[] | null
           hours?: Json | null
@@ -2651,6 +2653,7 @@ export type Database = {
           description?: string | null
           discount?: string | null
           distance?: number | null
+          district?: string | null
           email?: string | null
           gallery_images?: string[] | null
           hours?: Json | null
@@ -3986,6 +3989,19 @@ export type Database = {
         Returns: number
       }
       refresh_salon_stats: { Args: never; Returns: undefined }
+      register_owner_business: {
+        Args: {
+          _address?: string
+          _category?: string
+          _district: string
+          _email?: string
+          _mobile: string
+          _owner_name: string
+          _shop_name: string
+          _whatsapp?: string
+        }
+        Returns: string
+      }
       release_expired_bookings: { Args: never; Returns: number }
       release_payment_to_wallet: {
         Args: { _payment_id: string }
@@ -4022,6 +4038,11 @@ export type Database = {
         | "growth_partner"
         | "district_partner"
         | "distributor"
+        | "super_admin"
+        | "shop_owner"
+        | "shop_manager"
+        | "staff"
+        | "brand"
       booking_status:
         | "pending"
         | "confirmed"
@@ -4199,6 +4220,11 @@ export const Constants = {
         "growth_partner",
         "district_partner",
         "distributor",
+        "super_admin",
+        "shop_owner",
+        "shop_manager",
+        "staff",
+        "brand",
       ],
       booking_status: [
         "pending",

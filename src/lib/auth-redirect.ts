@@ -4,8 +4,13 @@ import type { Database } from "@/integrations/supabase/types";
 export type UserRole = Database["public"]["Enums"]["app_role"];
 
 const ROLE_PRIORITY: UserRole[] = [
+  "super_admin",
   "admin",
+  "shop_owner",
   "owner",
+  "shop_manager",
+  "staff",
+  "brand",
   "distributor",
   "district_partner",
   "growth_partner",
@@ -13,8 +18,13 @@ const ROLE_PRIORITY: UserRole[] = [
 ];
 
 const ROLE_ROUTES: Record<UserRole, string> = {
+  super_admin: "/admin",
   admin: "/admin",
+  shop_owner: "/owner/dashboard",
   owner: "/owner/dashboard",
+  shop_manager: "/owner/dashboard",
+  staff: "/owner/dashboard",
+  brand: "/portal/brands",
   distributor: "/partner/dashboard",
   district_partner: "/partner/dashboard",
   growth_partner: "/partner/dashboard",
