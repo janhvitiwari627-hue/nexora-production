@@ -373,16 +373,16 @@ export function SetupWizardPage() {
     try {
       const result = await uploadToCloudinary(file, { folder: `salons/${activeSalonId}/${kind}` });
       // Persist URL immediately so a refresh keeps the image.
-      setAutosave({ status: "saving", at: null });
+      setAutosave({ status: "saving", at: null, error: null });
       const patch = kind === "logo"
         ? { logo_url: result.secure_url }
         : { cover_image_url: result.secure_url };
       await updateFn({ data: { salon_id: activeSalonId, patch } });
-      setAutosave({ status: "saved", at: Date.now() });
+      setAutosave({ status: "saved", at: Date.now(), error: null });
       qc.invalidateQueries({ queryKey: ["owner", "salon-full", activeSalonId] });
       return result.secure_url;
     } catch (e) {
-      setAutosave({ status: "error", at: Date.now() });
+      setAutosave({ status: "error", at: Date.now(), error: friendlySetupError(e) });
       toast.error(`Image upload failed: ${friendlySetupError(e)}`);
       return null;
     }
