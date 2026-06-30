@@ -193,7 +193,7 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
 
     fn();
 
-    const restore = () => {
+    const tryRestore = (): boolean => {
       if (anchorSlug) {
         const el = document.querySelector<HTMLElement>(
           `[data-result-slug="${CSS.escape(anchorSlug)}"]`,
@@ -201,28 +201,37 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
         if (el) {
           const top = el.getBoundingClientRect().top;
           window.scrollTo({ top: window.scrollY + top - anchorOffset, behavior: "auto" });
-          return;
-        }
-        // Anchor card filtered out — find nearest remaining card to fallbackY.
-        const remaining = Array.from(
-          document.querySelectorAll<HTMLElement>("[data-result-slug]"),
-        );
-        if (remaining.length > 0) {
-          const target = remaining.reduce((best, el) => {
-            const y = el.getBoundingClientRect().top + window.scrollY;
-            return Math.abs(y - fallbackY) < Math.abs(best.y - fallbackY)
-              ? { el, y }
-              : best;
-          }, { el: remaining[0], y: remaining[0].getBoundingClientRect().top + window.scrollY });
-          window.scrollTo({ top: target.y - anchorOffset, behavior: "auto" });
-          return;
+          return true;
         }
       }
-      window.scrollTo({ top: fallbackY, behavior: "auto" });
+      const remaining = Array.from(
+        document.querySelectorAll<HTMLElement>("[data-result-slug]"),
+      );
+      if (remaining.length > 0) {
+        const target = remaining.reduce((best, el) => {
+          const y = el.getBoundingClientRect().top + window.scrollY;
+          return Math.abs(y - fallbackY) < Math.abs(best.y - fallbackY)
+            ? { el, y }
+            : best;
+        }, { el: remaining[0], y: remaining[0].getBoundingClientRect().top + window.scrollY });
+        window.scrollTo({ top: target.y - anchorOffset, behavior: "auto" });
+        return true;
+      }
+      return false;
     };
 
-    // Wait two frames so AnimatePresence swap + suspense data settle.
-    requestAnimationFrame(() => requestAnimationFrame(restore));
+    // Hold the scroll at fallbackY across re-renders (incl. skeletons) and
+    // keep retrying the anchor lookup for up to ~1s while data resolves.
+    const deadline = performance.now() + 1000;
+    const tick = () => {
+      if (tryRestore()) return;
+      // Keep page pinned to the pre-navigation Y so it never snaps to top.
+      if (window.scrollY !== fallbackY) {
+        window.scrollTo({ top: fallbackY, behavior: "auto" });
+      }
+      if (performance.now() < deadline) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(() => requestAnimationFrame(tick));
   };
 
   const resetFilters = () => {
