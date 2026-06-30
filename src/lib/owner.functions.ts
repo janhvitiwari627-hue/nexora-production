@@ -474,9 +474,13 @@ const SalonUpdateInput = z.object({
   salon_id: z.string().uuid(),
   patch: z.object({
     name: z.string().trim().min(1).max(120).optional(),
+    category: z.string().max(80).nullable().optional(),
+    owner_name: z.string().max(120).nullable().optional(),
     tagline: z.string().max(200).nullable().optional(),
     description: z.string().max(2000).nullable().optional(),
     image_url: z.string().url().nullable().optional(),
+    logo_url: z.string().url().nullable().optional(),
+    cover_image_url: z.string().url().nullable().optional(),
     brand_primary: z.string().regex(/^#[0-9a-fA-F]{6}$/).nullable().optional(),
     brand_secondary: z.string().regex(/^#[0-9a-fA-F]{6}$/).nullable().optional(),
     theme: z.string().max(40).nullable().optional(),
@@ -484,9 +488,15 @@ const SalonUpdateInput = z.object({
     seo_title: z.string().max(120).nullable().optional(),
     seo_description: z.string().max(300).nullable().optional(),
     phone: z.string().max(20).nullable().optional(),
+    whatsapp: z.string().max(20).nullable().optional(),
     email: z.string().email().max(160).nullable().optional(),
     address: z.string().max(300).nullable().optional(),
     location: z.string().max(120).nullable().optional(),
+    city: z.string().max(80).nullable().optional(),
+    pincode: z.string().max(12).nullable().optional(),
+    latitude: z.number().min(-90).max(90).nullable().optional(),
+    longitude: z.number().min(-180).max(180).nullable().optional(),
+    upi_id: z.string().trim().max(120).regex(/^[a-zA-Z0-9._-]+@[a-zA-Z]{2,64}$/).nullable().optional(),
     hours: z.record(z.string(), z.object({
       open: z.string(), close: z.string(), closed: z.boolean(),
     })).nullable().optional(),
@@ -502,6 +512,46 @@ export const updateOwnerSalon = createServerFn({ method: "POST" })
       .from("salons").update(data.patch).eq("id", data.salon_id).select().single();
     if (error) throw new Error(error.message);
     return row;
+  });
+
+export const markSalonSetupComplete = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => SalonInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const { data: link } = await context.supabase
+      .from("salon_owners").select("id").eq("user_id", userId)
+      .eq("salon_id", data.salon_id).eq("is_approved", true).maybeSingle();
+    if (!link) throw new Error("Not authorized for this salon");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: salon, error: gErr } = await supabaseAdmin
+      .from("salons")
+      .select("name, category, owner_name, phone, whatsapp, address, latitude, longitude, logo_url, cover_image_url, hours, upi_id")
+      .eq("id", data.salon_id).single();
+    if (gErr) throw new Error(gErr.message);
+    const missing: string[] = [];
+    if (!salon.name) missing.push("Business name");
+    if (!salon.category) missing.push("Category");
+    if (!salon.owner_name) missing.push("Owner name");
+    if (!salon.phone) missing.push("Mobile");
+    if (!salon.whatsapp) missing.push("WhatsApp");
+    if (!salon.address) missing.push("Address");
+    if (salon.latitude == null || salon.longitude == null) missing.push("Google Maps pin");
+    if (!salon.logo_url) missing.push("Logo");
+    if (!salon.cover_image_url) missing.push("Cover banner");
+    if (!salon.hours) missing.push("Working hours");
+    if (!salon.upi_id) missing.push("Nexora QR (UPI ID)");
+    const { count: servicesCount } = await supabaseAdmin
+      .from("services").select("id", { count: "exact", head: true })
+      .eq("salon_id", data.salon_id).eq("is_active", true);
+    if ((servicesCount ?? 0) < 5) missing.push(`Top 5 services (have ${servicesCount ?? 0})`);
+    if (missing.length > 0) return { ok: false as const, missing };
+    const { error: uErr } = await supabaseAdmin
+      .from("salons")
+      .update({ setup_completed_at: new Date().toISOString(), is_active: true, website_created: true })
+      .eq("id", data.salon_id);
+    if (uErr) throw new Error(uErr.message);
+    return { ok: true as const, missing: [] as string[] };
   });
 
 // ---------- Wallet ----------

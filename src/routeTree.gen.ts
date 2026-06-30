@@ -57,6 +57,7 @@ import { Route as PartnerDistrictRouteImport } from './routes/partner.district'
 import { Route as PartnerDistributorRouteImport } from './routes/partner.distributor'
 import { Route as OwnerWebsiteRouteImport } from './routes/owner.website'
 import { Route as OwnerStaffRouteImport } from './routes/owner.staff'
+import { Route as OwnerSetupWizardRouteImport } from './routes/owner.setup-wizard'
 import { Route as OwnerServicesRouteImport } from './routes/owner.services'
 import { Route as OwnerReviewsRouteImport } from './routes/owner.reviews'
 import { Route as OwnerPendingRouteImport } from './routes/owner.pending'
@@ -358,6 +359,11 @@ const OwnerWebsiteRoute = OwnerWebsiteRouteImport.update({
 const OwnerStaffRoute = OwnerStaffRouteImport.update({
   id: '/staff',
   path: '/staff',
+  getParentRoute: () => OwnerRoute,
+} as any)
+const OwnerSetupWizardRoute = OwnerSetupWizardRouteImport.update({
+  id: '/setup-wizard',
+  path: '/setup-wizard',
   getParentRoute: () => OwnerRoute,
 } as any)
 const OwnerServicesRoute = OwnerServicesRouteImport.update({
@@ -753,6 +759,7 @@ export interface FileRoutesByFullPath {
   '/owner/pending': typeof OwnerPendingRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
+  '/owner/setup-wizard': typeof OwnerSetupWizardRoute
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/website': typeof OwnerWebsiteRoute
   '/partner/distributor': typeof PartnerDistributorRoute
@@ -862,6 +869,7 @@ export interface FileRoutesByTo {
   '/owner/pending': typeof OwnerPendingRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
+  '/owner/setup-wizard': typeof OwnerSetupWizardRoute
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/website': typeof OwnerWebsiteRoute
   '/partner/distributor': typeof PartnerDistributorRoute
@@ -975,6 +983,7 @@ export interface FileRoutesById {
   '/owner/pending': typeof OwnerPendingRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
+  '/owner/setup-wizard': typeof OwnerSetupWizardRoute
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/website': typeof OwnerWebsiteRoute
   '/partner/distributor': typeof PartnerDistributorRoute
@@ -1089,6 +1098,7 @@ export interface FileRouteTypes {
     | '/owner/pending'
     | '/owner/reviews'
     | '/owner/services'
+    | '/owner/setup-wizard'
     | '/owner/staff'
     | '/owner/website'
     | '/partner/distributor'
@@ -1198,6 +1208,7 @@ export interface FileRouteTypes {
     | '/owner/pending'
     | '/owner/reviews'
     | '/owner/services'
+    | '/owner/setup-wizard'
     | '/owner/staff'
     | '/owner/website'
     | '/partner/distributor'
@@ -1310,6 +1321,7 @@ export interface FileRouteTypes {
     | '/owner/pending'
     | '/owner/reviews'
     | '/owner/services'
+    | '/owner/setup-wizard'
     | '/owner/staff'
     | '/owner/website'
     | '/partner/distributor'
@@ -1747,6 +1759,13 @@ declare module '@tanstack/react-router' {
       path: '/staff'
       fullPath: '/owner/staff'
       preLoaderRoute: typeof OwnerStaffRouteImport
+      parentRoute: typeof OwnerRoute
+    }
+    '/owner/setup-wizard': {
+      id: '/owner/setup-wizard'
+      path: '/setup-wizard'
+      fullPath: '/owner/setup-wizard'
+      preLoaderRoute: typeof OwnerSetupWizardRouteImport
       parentRoute: typeof OwnerRoute
     }
     '/owner/services': {
@@ -2320,6 +2339,7 @@ interface OwnerRouteChildren {
   OwnerPendingRoute: typeof OwnerPendingRoute
   OwnerReviewsRoute: typeof OwnerReviewsRoute
   OwnerServicesRoute: typeof OwnerServicesRoute
+  OwnerSetupWizardRoute: typeof OwnerSetupWizardRoute
   OwnerStaffRoute: typeof OwnerStaffRoute
   OwnerWebsiteRoute: typeof OwnerWebsiteRoute
   OwnerIndexRoute: typeof OwnerIndexRoute
@@ -2338,6 +2358,7 @@ const OwnerRouteChildren: OwnerRouteChildren = {
   OwnerPendingRoute: OwnerPendingRoute,
   OwnerReviewsRoute: OwnerReviewsRoute,
   OwnerServicesRoute: OwnerServicesRoute,
+  OwnerSetupWizardRoute: OwnerSetupWizardRoute,
   OwnerStaffRoute: OwnerStaffRoute,
   OwnerWebsiteRoute: OwnerWebsiteRoute,
   OwnerIndexRoute: OwnerIndexRoute,
