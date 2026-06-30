@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import {
   Building2, User, Phone, MessageCircle, MapPin, Image as ImageIcon, Clock,
   Sparkles, QrCode, ListChecks, Check, ChevronLeft, ChevronRight, Loader2,
-  Palette, Rocket, Upload, LocateFixed,
+  Palette, Rocket, Upload, LocateFixed, Cloud,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -78,7 +78,22 @@ export function SetupWizardPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { activeSalonId, activeSalon, isLoading: ownerLoading, hasSalon } = useOwnerContext();
+  const stepStorageKey = activeSalonId ? `nexora.setup.step.${activeSalonId}` : null;
   const [stepIdx, setStepIdx] = useState(0);
+  const goToStep = (i: number) => {
+    setStepIdx(i);
+    if (stepStorageKey) try { localStorage.setItem(stepStorageKey, String(i)); } catch { /* noop */ }
+  };
+  // Restore last-visited step once we know which salon we're on.
+  useEffect(() => {
+    if (!stepStorageKey) return;
+    try {
+      const raw = localStorage.getItem(stepStorageKey);
+      const n = raw ? Number(raw) : NaN;
+      if (Number.isFinite(n) && n >= 0 && n < STEPS.length) setStepIdx(n);
+    } catch { /* noop */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stepStorageKey]);
 
   const fetchFull = useServerFn(getOwnerSalonFull);
   const updateFn = useServerFn(updateOwnerSalon);
@@ -107,6 +122,7 @@ export function SetupWizardPage() {
   );
 
   // Hydrate form once data lands.
+  const hydratedRef = useRef(false);
   useEffect(() => {
     const s = salonQ.data;
     if (!s) return;
@@ -121,19 +137,25 @@ export function SetupWizardPage() {
       hours: (s.hours as Hours | null) ?? DEFAULT_HOURS,
       upi_id: (s as { upi_id?: string }).upi_id ?? "",
     }));
+    hydratedRef.current = true;
   }, [salonQ.data]);
 
+  const servicesHydratedRef = useRef(false);
   useEffect(() => {
-    const existing = servicesQ.data ?? [];
-    if (existing.length === 0) return;
-    const rows: ServiceRow[] = Array.from({ length: 5 }, (_, i) => {
-      const e = existing[i];
-      return e
-        ? { id: e.id, name: e.name, price: Number(e.price), duration_minutes: e.duration_minutes }
-        : { ...EMPTY_SERVICE };
-    });
-    setServices(rows);
+    const existing = servicesQ.data;
+    if (!existing) return;
+    if (existing.length > 0) {
+      const rows: ServiceRow[] = Array.from({ length: 5 }, (_, i) => {
+        const e = existing[i];
+        return e
+          ? { id: e.id, name: e.name, price: Number(e.price), duration_minutes: e.duration_minutes }
+          : { ...EMPTY_SERVICE };
+      });
+      setServices(rows);
+    }
+    servicesHydratedRef.current = true;
   }, [servicesQ.data]);
+
 
   // ---------------- Checklist ----------------
   const checklist = useMemo(() => {
@@ -211,6 +233,75 @@ export function SetupWizardPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  // ---------------- Autosave ----------------
+  const [autosave, setAutosave] = useState<{ status: "idle" | "saving" | "saved" | "error"; at: number | null }>({
+    status: "idle", at: null,
+  });
+  const lastFormJsonRef = useRef<string>("");
+  const lastServicesJsonRef = useRef<string>("");
+
+  // Debounced autosave for salon profile fields.
+  useEffect(() => {
+    if (!activeSalonId || !hydratedRef.current) return;
+    const snapshot = JSON.stringify(form);
+    if (snapshot === lastFormJsonRef.current) return;
+    const handle = window.setTimeout(async () => {
+      try {
+        setAutosave({ status: "saving", at: null });
+        await updateFn({
+          data: {
+            salon_id: activeSalonId,
+            patch: {
+              name: form.name, category: form.category, owner_name: form.owner_name,
+              phone: form.phone, whatsapp: form.whatsapp, address: form.address,
+              city: form.city, pincode: form.pincode,
+              latitude: form.latitude, longitude: form.longitude,
+              logo_url: form.logo_url, cover_image_url: form.cover_image_url,
+              hours: form.hours, upi_id: form.upi_id,
+            },
+          },
+        });
+        lastFormJsonRef.current = snapshot;
+        setAutosave({ status: "saved", at: Date.now() });
+        qc.invalidateQueries({ queryKey: ["owner", "salon-full", activeSalonId] });
+      } catch (e) {
+        setAutosave({ status: "error", at: Date.now() });
+        toast.error(`Autosave failed: ${(e as Error).message}`);
+      }
+    }, 900);
+    return () => window.clearTimeout(handle);
+  }, [form, activeSalonId, updateFn, qc]);
+
+  // Debounced autosave for services (only valid rows).
+  useEffect(() => {
+    if (!activeSalonId || !servicesHydratedRef.current) return;
+    const snapshot = JSON.stringify(services);
+    if (snapshot === lastServicesJsonRef.current) return;
+    const handle = window.setTimeout(async () => {
+      const valid = services.filter((s) => s.name.trim() && s.price > 0);
+      if (valid.length === 0) { lastServicesJsonRef.current = snapshot; return; }
+      try {
+        setAutosave({ status: "saving", at: null });
+        for (const s of valid) {
+          await upsertSvc({
+            data: {
+              id: s.id, salon_id: activeSalonId, name: s.name.trim(),
+              price: Number(s.price), duration_minutes: Number(s.duration_minutes) || 30,
+              is_active: true,
+            },
+          });
+        }
+        lastServicesJsonRef.current = snapshot;
+        setAutosave({ status: "saved", at: Date.now() });
+        qc.invalidateQueries({ queryKey: ["owner", "services", activeSalonId] });
+      } catch (e) {
+        setAutosave({ status: "error", at: Date.now() });
+        toast.error(`Autosave failed: ${(e as Error).message}`);
+      }
+    }, 1200);
+    return () => window.clearTimeout(handle);
+  }, [services, activeSalonId, upsertSvc, qc]);
+
   // ---------------- File upload ----------------
   const uploadImage = async (file: File, kind: "logo" | "cover") => {
     if (!activeSalonId) return null;
@@ -221,8 +312,20 @@ export function SetupWizardPage() {
     });
     if (error) { toast.error(error.message); return null; }
     const { data } = supabase.storage.from("salon-media").getPublicUrl(path);
+    // Persist URL immediately so a refresh keeps the image.
+    try {
+      setAutosave({ status: "saving", at: null });
+      const patch = kind === "logo" ? { logo_url: data.publicUrl } : { cover_image_url: data.publicUrl };
+      await updateFn({ data: { salon_id: activeSalonId, patch } });
+      setAutosave({ status: "saved", at: Date.now() });
+      qc.invalidateQueries({ queryKey: ["owner", "salon-full", activeSalonId] });
+    } catch (e) {
+      setAutosave({ status: "error", at: Date.now() });
+      toast.error(`Image save failed: ${(e as Error).message}`);
+    }
     return data.publicUrl;
   };
+
 
   if (ownerLoading) {
     return (
@@ -266,9 +369,11 @@ export function SetupWizardPage() {
             <div className="text-xs uppercase tracking-wide text-muted-foreground">Setup progress</div>
             <div className="text-2xl font-bold text-heading">{pct}%</div>
             <Progress value={pct} className="mt-1 h-2 w-48" />
+            <AutosaveBadge state={autosave} />
           </div>
         </div>
       </div>
+
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         {/* ============ MAIN STEPS ============ */}
@@ -281,7 +386,7 @@ export function SetupWizardPage() {
               return (
                 <button
                   key={s.id}
-                  onClick={() => setStepIdx(i)}
+                  onClick={() => goToStep(i)}
                   className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                     active
                       ? "border-primary bg-primary text-primary-foreground"
@@ -671,6 +776,22 @@ function ImagePicker({
           }}
         />
       </label>
+    </div>
+  );
+}
+
+function AutosaveBadge({ state }: { state: { status: "idle" | "saving" | "saved" | "error"; at: number | null } }) {
+  const time = state.at ? new Date(state.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : null;
+  let label = "Autosave on";
+  let tone = "text-muted-foreground";
+  let Icon: typeof Cloud = Cloud;
+  if (state.status === "saving") { label = "Saving…"; tone = "text-primary"; Icon = Loader2; }
+  else if (state.status === "saved") { label = time ? `Saved ${time}` : "Saved"; tone = "text-emerald-600"; Icon = Check; }
+  else if (state.status === "error") { label = "Save failed — retrying on next change"; tone = "text-destructive"; Icon = Cloud; }
+  return (
+    <div className={`mt-1 inline-flex items-center justify-end gap-1.5 text-[11px] ${tone}`}>
+      <Icon className={`h-3 w-3 ${state.status === "saving" ? "animate-spin" : ""}`} />
+      <span>{label}</span>
     </div>
   );
 }
