@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { getEmailRole, roleConflictMessage } from "@/lib/auth-check.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -81,6 +83,7 @@ export default function SignupPage() {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const pwStrength = useMemo(() => scorePassword(form.password), [form.password]);
+  const checkEmailRoleFn = useServerFn(getEmailRole);
 
   useEffect(() => {
     if (!isInitialized || !user) return;
@@ -150,6 +153,19 @@ export default function SignupPage() {
     setSubmitting(true);
     try {
       const email = normalizeEmail(parsed.data.email);
+
+      // Enforce one-email-one-role before creating the auth user
+      try {
+        const check = await checkEmailRoleFn({ data: { email } });
+        if (check.exists) {
+          setAlreadyRegisteredEmail(email);
+          setServerError(roleConflictMessage(check.roleLabel, "Customer"));
+          return;
+        }
+      } catch {
+        // Non-fatal: if check fails, Supabase signUp will still block dupes
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password: parsed.data.password,

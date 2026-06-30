@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { getEmailRole, roleConflictMessage } from "@/lib/auth-check.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -89,6 +91,7 @@ export default function OwnerSignupPage() {
   const [showPw, setShowPw] = useState(false);
 
   const pwStrength = useMemo(() => scorePassword(form.password), [form.password]);
+  const checkEmailRoleFn = useServerFn(getEmailRole);
 
   const update = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
@@ -122,10 +125,22 @@ export default function OwnerSignupPage() {
 
     setSubmitting(true);
     try {
-      // Create a normal Supabase auth user — profile starts as customer via DB trigger.
-      // Frontend NEVER sets shop_owner role. Admin elevates after manual verification.
+      const email = parsed.data.email.trim().toLowerCase();
+
+      // Enforce one-email-one-role before creating the auth user
+      try {
+        const check = await checkEmailRoleFn({ data: { email } });
+        if (check.exists) {
+          setServerError(roleConflictMessage(check.roleLabel, "Salon Owner"));
+          return;
+        }
+      } catch {
+        // Non-fatal — Supabase signUp will still reject duplicates
+      }
+
+      // Create a Supabase auth user and lock the role to salon owner.
       const { data, error } = await supabase.auth.signUp({
-        email: parsed.data.email.trim(),
+        email,
         password: parsed.data.password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
@@ -133,7 +148,7 @@ export default function OwnerSignupPage() {
             full_name: parsed.data.full_name,
             mobile: parsed.data.mobile,
             referred_by: referredBy || null,
-            role: "customer",
+            role: "owner",
             owner_request: {
               business_name: parsed.data.business_name,
               business_category: parsed.data.business_category,
@@ -144,6 +159,7 @@ export default function OwnerSignupPage() {
           },
         },
       });
+
 
       if (error) {
         const raw = parseErr(error);
@@ -186,13 +202,24 @@ export default function OwnerSignupPage() {
         console.warn("[OwnerSignup] Skipping owner_requests insert:", parseErr(err));
       }
 
+      // Ensure session, then redirect to owner onboarding / create-website
+      let session = data.session;
+      if (!session && data.user) {
+        const { data: signIn } = await supabase.auth.signInWithPassword({
+          email,
+          password: parsed.data.password,
+        });
+        session = signIn.session ?? null;
+      }
       setSuccess(true);
+      setTimeout(() => navigate({ to: "/owner/create-website", replace: true }), 500);
     } catch (err) {
       setServerError(parseErr(err));
     } finally {
       setSubmitting(false);
     }
   };
+
 
   if (success) {
     return (
@@ -204,10 +231,9 @@ export default function OwnerSignupPage() {
               <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                 <CheckCircle2 className="h-6 w-6 text-primary" />
               </div>
-              <CardTitle>Request received</CardTitle>
+              <CardTitle>Welcome, Shop Owner!</CardTitle>
               <CardDescription className="mt-2">
-                Your owner account request has been received. Nexora team will verify and activate your shop
-                owner access.
+                Your owner account is created. Redirecting to your website setup…
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">

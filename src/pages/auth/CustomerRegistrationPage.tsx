@@ -35,6 +35,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useAuthStore } from "@/stores/authStore";
 import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
+import { getEmailRole, roleConflictMessage } from "@/lib/auth-check.functions";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 type AccountType = "customer" | "owner" | "district_partner";
@@ -237,6 +238,7 @@ export default function CustomerRegistrationPage() {
 
   const registerSalonFn = useServerFn(registerMySalon);
   const registerDbpFn = useServerFn(registerDistrictPartner);
+  const checkEmailRoleFn = useServerFn(getEmailRole);
   const pwStrength = useMemo(() => scorePassword(form.password), [form.password]);
 
   const update = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -310,6 +312,24 @@ export default function CustomerRegistrationPage() {
     setSubmitting(true);
     console.log("[Register] Attempting sign up with email:", email, "accountType:", accountType);
     try {
+      // Enforce one-email-one-role before creating the auth user
+      try {
+        const check = await checkEmailRoleFn({ data: { email } });
+        if (check.exists) {
+          const attemptedLabel =
+            accountType === "owner"
+              ? "Salon Owner"
+              : accountType === "district_partner"
+                ? "District Partner"
+                : "Customer";
+          setAlreadyRegisteredEmail(email);
+          setServerError(roleConflictMessage(check.roleLabel, attemptedLabel));
+          return;
+        }
+      } catch {
+        // Non-fatal — Supabase signUp will still reject duplicates
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password: parsed.data.password,
