@@ -524,7 +524,7 @@ function MapView({ shops }: { shops: Shop[] }) {
       </div>
       <ul className="flex max-h-[600px] flex-col gap-3 overflow-y-auto pr-1">
         {shops.map((s) => (
-          <li key={s.slug}>
+          <li key={s.slug} data-result-slug={s.slug}>
             <ShopCard shop={s} variant="list" />
           </li>
         ))}
