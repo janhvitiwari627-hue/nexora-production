@@ -956,3 +956,172 @@ function MostReviewedCategory({ shops, dest }: CategoryProps) {
     </section>
   );
 }
+
+/* ============= CATEGORY: MOST REWARDED ============= */
+type RewardSort = "rate" | "usage";
+function MostRewardedCategory({ shops, dest }: CategoryProps) {
+  const [sort, setSort] = useState<RewardSort>("rate");
+  const list = useMemo(
+    () =>
+      [...shops]
+        .sort((a, b) =>
+          sort === "rate"
+            ? b.rewardRatePct - a.rewardRatePct
+            : b.rewardUsagePct - a.rewardUsagePct,
+        )
+        .slice(0, 8),
+    [shops, sort],
+  );
+  if (list.length === 0) return null;
+  return (
+    <section
+      id="cat-most-rewarded"
+      className="rounded-3xl bg-gradient-to-br from-yellow-50 via-white to-white p-6 ring-1 ring-yellow-200 sm:p-8"
+    >
+      <CategoryHeader
+        title="Most Rewarded"
+        purpose="Businesses where customers earn maximum rewards"
+        badges={["Max Rewards", "Cashback"]}
+        dest={dest}
+      />
+      <div className="mt-3 inline-flex rounded-full bg-white p-1 ring-1 ring-slate-200">
+        {([
+          { id: "rate", label: "Highest Reward Rate" },
+          { id: "usage", label: "Highest Reward Usage" },
+        ] as { id: RewardSort; label: string }[]).map((o) => (
+          <button
+            key={o.id}
+            type="button"
+            onClick={() => setSort(o.id)}
+            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+              sort === o.id ? "bg-amber-500 text-white" : "text-slate-700 hover:text-slate-900"
+            }`}
+          >
+            {o.label}
+          </button>
+        ))}
+      </div>
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {list.map((s) => (
+          <div key={s.slug} className="space-y-2">
+            <Card s={s} />
+            <div className="rounded-xl bg-white p-3 ring-1 ring-slate-200">
+              <div className="flex items-center justify-between text-[11px] font-semibold text-slate-600">
+                <span className="inline-flex items-center gap-1">
+                  <Gift className="h-3 w-3 text-amber-600" /> Reward rate
+                </span>
+                <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-amber-700">
+                  {s.rewardRatePct}%
+                </span>
+              </div>
+              <div className="mt-2 flex items-center justify-between text-[11px] font-semibold text-slate-600">
+                <span>Usage</span>
+                <span className="text-slate-900">{s.rewardUsagePct}%</span>
+              </div>
+              <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className="h-full rounded-full bg-amber-500"
+                  style={{ width: `${s.rewardUsagePct}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ============= CATEGORY: MOST SAVED ============= */
+function MostSavedCategory({ shops, dest }: CategoryProps) {
+  const list = useMemo(
+    () => [...shops].sort((a, b) => b.savesCount - a.savesCount).slice(0, 8),
+    [shops],
+  );
+  if (list.length === 0) return null;
+  return (
+    <section
+      id="cat-most-saved"
+      className="rounded-3xl bg-gradient-to-br from-rose-50 via-white to-white p-6 ring-1 ring-rose-200 sm:p-8"
+    >
+      <CategoryHeader
+        title="Most Saved"
+        purpose="Businesses most added to Favorites"
+        badges={["Customer Favorite"]}
+        dest={dest}
+      />
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {list.map((s) => (
+          <div key={s.slug} className="space-y-2">
+            <Card s={s} />
+            <div className="flex items-center justify-between rounded-xl bg-white p-3 text-[11px] font-semibold ring-1 ring-slate-200">
+              <span className="inline-flex items-center gap-1 text-rose-600">
+                <Heart className="h-3 w-3 fill-rose-500 text-rose-500" />
+                Customer Favorite
+              </span>
+              <span className="text-slate-900">{s.savesCount.toLocaleString()} saves</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ============= CATEGORY: OPEN NOW ============= */
+function OpenNowCategory({ shops, dest }: CategoryProps) {
+  const list = useMemo(
+    () =>
+      shops
+        .filter((s) => s.isOpenNow && s.staffAvailable > 0 && s.slotsAvailable > 0)
+        .sort((a, b) => b.slotsAvailable - a.slotsAvailable)
+        .slice(0, 8),
+    [shops],
+  );
+  if (list.length === 0) return null;
+  return (
+    <section
+      id="cat-open-now"
+      className="rounded-3xl bg-gradient-to-br from-emerald-50 via-white to-white p-6 ring-1 ring-emerald-200 sm:p-8"
+    >
+      <CategoryHeader
+        title="Open Now"
+        purpose="Business open · Staff available · Booking slots available"
+        badges={["Live Status", "Open Now"]}
+        dest={dest}
+      />
+      <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold text-emerald-700">
+        <span className="relative flex h-2 w-2">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+        </span>
+        Real-time availability
+      </div>
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {list.map((s) => (
+          <div key={s.slug} className="space-y-2">
+            <Card s={s} showEta showOpen />
+            <div className="rounded-xl bg-white p-3 ring-1 ring-slate-200">
+              <div className="flex items-center justify-between text-[11px] font-semibold text-slate-600">
+                <span className="inline-flex items-center gap-1">
+                  <Users className="h-3 w-3 text-emerald-600" /> Staff
+                </span>
+                <span className="text-slate-900">
+                  {s.staffAvailable}/{s.staffTotal} available
+                </span>
+              </div>
+              <div className="mt-2 flex items-center justify-between text-[11px] font-semibold text-slate-600">
+                <span className="inline-flex items-center gap-1">
+                  <CalendarCheck className="h-3 w-3 text-emerald-600" /> Slots
+                </span>
+                <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-emerald-700">
+                  {s.slotsAvailable} open today
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
