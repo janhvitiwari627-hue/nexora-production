@@ -31,7 +31,7 @@ import {
 import Footer from "@/components/nexora-design/sections/Footer";
 import { PublicHeader } from "@/components/layout/PublicHeader";
 import { shopsQueryOptions } from "@/lib/shops.queries";
-import { getCategoryCounts } from "@/lib/mock-businesses";
+import { getCategoryCounts, getMockBusinesses, type MockBusiness } from "@/lib/mock-businesses";
 import { useAuthStore } from "@/stores/authStore";
 
 /* =========================================================
