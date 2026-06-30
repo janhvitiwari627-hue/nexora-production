@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -33,6 +33,23 @@ export function CreateWebsitePage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { activeSalon, activeSalonId, isLoading: ownerLoading } = useOwnerContext();
+
+  // Direct flow: if not signed in, send to owner signup and come straight back here.
+  useEffect(() => {
+    let cancelled = false;
+    import("@/integrations/supabase/client").then(({ supabase }) => {
+      supabase.auth.getSession().then(({ data }) => {
+        if (cancelled) return;
+        if (!data.session) {
+          if (typeof window !== "undefined") {
+            sessionStorage.setItem("nexora:postLoginRedirect", "/owner/create-website");
+          }
+          navigate({ to: "/owner-signup" });
+        }
+      });
+    });
+    return () => { cancelled = true; };
+  }, [navigate]);
   const { data: templates = [], isLoading } = useQuery(websiteTemplatesQuery());
   const [filter, setFilter] = useState("All");
   const [pendingId, setPendingId] = useState<string | null>(null);

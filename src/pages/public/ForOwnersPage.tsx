@@ -107,10 +107,10 @@ export function ForOwnersPage() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
-              to="/partner"
+              to="/owner/create-website"
               className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-2 rounded-[var(--radius-button)] px-6 py-3 text-sm font-bold shadow-[var(--shadow-glow)]"
             >
-              Become a partner <ArrowRight className="h-4 w-4" />
+              Create Shop Website <ArrowRight className="h-4 w-4" />
             </Link>
             <button className="rounded-[var(--radius-button)] border border-white/30 px-6 py-3 text-sm font-bold text-white hover:bg-white/10">
               Book a demo
@@ -289,7 +289,7 @@ export function ForOwnersPage() {
             to="/owner/create-website"
             className="bg-card text-heading mt-7 inline-flex items-center gap-2 rounded-[var(--radius-button)] px-7 py-3.5 text-sm font-bold shadow-2xl"
           >
-            Get started free <ArrowRight className="h-4 w-4" />
+            Create Shop Website <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </section>
