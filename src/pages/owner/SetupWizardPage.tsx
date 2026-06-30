@@ -277,20 +277,34 @@ export function SetupWizardPage() {
   });
 
   // ---------------- Autosave ----------------
-  const [autosave, setAutosave] = useState<{ status: "idle" | "saving" | "saved" | "error"; at: number | null }>({
-    status: "idle", at: null,
-  });
+  const [autosave, setAutosave] = useState<{
+    status: "idle" | "saving" | "saved" | "error";
+    at: number | null;
+    error: string | null;
+  }>({ status: "idle", at: null, error: null });
   const lastFormJsonRef = useRef<string>("");
   const lastServicesJsonRef = useRef<string>("");
+  const retryRef = useRef<null | (() => Promise<void>)>(null);
+  const [isRetrying, setIsRetrying] = useState(false);
+
+  const handleRetry = async () => {
+    if (!retryRef.current) return;
+    setIsRetrying(true);
+    try {
+      await retryRef.current();
+    } finally {
+      setIsRetrying(false);
+    }
+  };
 
   // Debounced autosave for salon profile fields.
   useEffect(() => {
     if (!activeSalonId || !hydratedRef.current) return;
     const snapshot = JSON.stringify(form);
     if (snapshot === lastFormJsonRef.current) return;
-    const handle = window.setTimeout(async () => {
+    const runSave = async () => {
       try {
-        setAutosave({ status: "saving", at: null });
+        setAutosave({ status: "saving", at: null, error: null });
         await updateFn({
           data: {
             salon_id: activeSalonId,
@@ -305,13 +319,15 @@ export function SetupWizardPage() {
           },
         });
         lastFormJsonRef.current = snapshot;
-        setAutosave({ status: "saved", at: Date.now() });
+        retryRef.current = null;
+        setAutosave({ status: "saved", at: Date.now(), error: null });
         qc.invalidateQueries({ queryKey: ["owner", "salon-full", activeSalonId] });
       } catch (e) {
-        setAutosave({ status: "error", at: Date.now() });
-        toast.error(`Autosave failed: ${friendlySetupError(e)}`);
+        retryRef.current = runSave;
+        setAutosave({ status: "error", at: Date.now(), error: friendlySetupError(e) });
       }
-    }, 900);
+    };
+    const handle = window.setTimeout(runSave, 900);
     return () => window.clearTimeout(handle);
   }, [form, activeSalonId, updateFn, qc]);
 
@@ -320,11 +336,11 @@ export function SetupWizardPage() {
     if (!activeSalonId || !servicesHydratedRef.current) return;
     const snapshot = JSON.stringify(services);
     if (snapshot === lastServicesJsonRef.current) return;
-    const handle = window.setTimeout(async () => {
+    const runSave = async () => {
       const valid = services.filter((s) => s.name.trim() && s.price > 0);
       if (valid.length === 0) { lastServicesJsonRef.current = snapshot; return; }
       try {
-        setAutosave({ status: "saving", at: null });
+        setAutosave({ status: "saving", at: null, error: null });
         for (const s of valid) {
           await upsertSvc({
             data: {
@@ -335,13 +351,15 @@ export function SetupWizardPage() {
           });
         }
         lastServicesJsonRef.current = snapshot;
-        setAutosave({ status: "saved", at: Date.now() });
+        retryRef.current = null;
+        setAutosave({ status: "saved", at: Date.now(), error: null });
         qc.invalidateQueries({ queryKey: ["owner", "services", activeSalonId] });
       } catch (e) {
-        setAutosave({ status: "error", at: Date.now() });
-        toast.error(`Autosave failed: ${friendlySetupError(e)}`);
+        retryRef.current = runSave;
+        setAutosave({ status: "error", at: Date.now(), error: friendlySetupError(e) });
       }
-    }, 1200);
+    };
+    const handle = window.setTimeout(runSave, 1200);
     return () => window.clearTimeout(handle);
   }, [services, activeSalonId, upsertSvc, qc]);
 
@@ -355,16 +373,16 @@ export function SetupWizardPage() {
     try {
       const result = await uploadToCloudinary(file, { folder: `salons/${activeSalonId}/${kind}` });
       // Persist URL immediately so a refresh keeps the image.
-      setAutosave({ status: "saving", at: null });
+      setAutosave({ status: "saving", at: null, error: null });
       const patch = kind === "logo"
         ? { logo_url: result.secure_url }
         : { cover_image_url: result.secure_url };
       await updateFn({ data: { salon_id: activeSalonId, patch } });
-      setAutosave({ status: "saved", at: Date.now() });
+      setAutosave({ status: "saved", at: Date.now(), error: null });
       qc.invalidateQueries({ queryKey: ["owner", "salon-full", activeSalonId] });
       return result.secure_url;
     } catch (e) {
-      setAutosave({ status: "error", at: Date.now() });
+      setAutosave({ status: "error", at: Date.now(), error: friendlySetupError(e) });
       toast.error(`Image upload failed: ${friendlySetupError(e)}`);
       return null;
     }
@@ -419,8 +437,33 @@ export function SetupWizardPage() {
         </div>
       </div>
 
+      {autosave.status === "error" && autosave.error && (
+        <div
+          role="alert"
+          className="mt-4 flex flex-col gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm sm:flex-row sm:items-start sm:justify-between"
+        >
+          <div className="flex-1">
+            <div className="font-medium text-destructive">Couldn't save your changes</div>
+            <div className="mt-1 text-destructive/80">{autosave.error}</div>
+            <div className="mt-1 text-xs text-muted-foreground">
+              Your edits are kept locally. Fix the highlighted field or press Retry.
+            </div>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleRetry}
+            disabled={isRetrying}
+            className="self-start border-destructive/40 text-destructive hover:bg-destructive/10"
+          >
+            {isRetrying ? <Loader2 className="mr-2 h-3 w-3 animate-spin" /> : null}
+            Retry save
+          </Button>
+        </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+
         {/* ============ MAIN STEPS ============ */}
         <div className="space-y-6">
           {/* Stepper bar */}
@@ -825,14 +868,14 @@ function ImagePicker({
   );
 }
 
-function AutosaveBadge({ state }: { state: { status: "idle" | "saving" | "saved" | "error"; at: number | null } }) {
+function AutosaveBadge({ state }: { state: { status: "idle" | "saving" | "saved" | "error"; at: number | null; error: string | null } }) {
   const time = state.at ? new Date(state.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : null;
   let label = "Autosave on";
   let tone = "text-muted-foreground";
   let Icon: typeof Cloud = Cloud;
   if (state.status === "saving") { label = "Saving…"; tone = "text-primary"; Icon = Loader2; }
   else if (state.status === "saved") { label = time ? `Saved ${time}` : "Saved"; tone = "text-emerald-600"; Icon = Check; }
-  else if (state.status === "error") { label = "Save failed — retrying on next change"; tone = "text-destructive"; Icon = Cloud; }
+  else if (state.status === "error") { label = "Save failed — see details above"; tone = "text-destructive"; Icon = Cloud; }
   return (
     <div className={`mt-1 inline-flex items-center justify-end gap-1.5 text-[11px] ${tone}`}>
       <Icon className={`h-3 w-3 ${state.status === "saving" ? "animate-spin" : ""}`} />
