@@ -554,10 +554,10 @@ export function SetupWizardPage() {
               <div className="space-y-5">
                 <SectionHeader icon={Building2} title="Business basics" subtitle="Tell customers who you are." />
                 <Grid2>
-                  <Field label="Business name *">
+                  <Field label="Business name *" error={fieldErrors.name}>
                     <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Luxe Hair Spa" />
                   </Field>
-                  <Field label="Category *">
+                  <Field label="Category *" error={fieldErrors.category}>
                     <select
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                       value={form.category}
@@ -567,20 +567,20 @@ export function SetupWizardPage() {
                       {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
                     </select>
                   </Field>
-                  <Field label="Owner name *" icon={User}>
+                  <Field label="Owner name *" icon={User} error={fieldErrors.owner_name}>
                     <Input value={form.owner_name} onChange={(e) => setForm({ ...form, owner_name: e.target.value })} />
                   </Field>
-                  <Field label="Mobile *" icon={Phone}>
+                  <Field label="Mobile *" icon={Phone} error={fieldErrors.phone}>
                     <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/[^\d+]/g, "") })} placeholder="9876543210" />
                   </Field>
-                  <Field label="WhatsApp *" icon={MessageCircle}>
+                  <Field label="WhatsApp *" icon={MessageCircle} error={fieldErrors.whatsapp}>
                     <Input value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: e.target.value.replace(/[^\d+]/g, "") })} placeholder="9876543210" />
                   </Field>
-                  <Field label="City">
+                  <Field label="City" error={fieldErrors.city}>
                     <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
                   </Field>
                 </Grid2>
-                <Field label="Full address *">
+                <Field label="Full address *" error={fieldErrors.address}>
                   <Textarea rows={3} value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Shop no, street, area, landmark…" />
                 </Field>
                 <Field label="PIN code">
