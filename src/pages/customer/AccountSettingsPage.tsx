@@ -163,6 +163,9 @@ export function AccountSettingsPage() {
           </div>
         </div>
       </div>
+    </div>
+
+
 
       <AlertDialog open={logoutOpen} onOpenChange={setLogoutOpen}>
         <AlertDialogContent>
