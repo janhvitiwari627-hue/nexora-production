@@ -386,7 +386,7 @@ export function SetupWizardPage() {
               return (
                 <button
                   key={s.id}
-                  onClick={() => setStepIdx(i)}
+                  onClick={() => goToStep(i)}
                   className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                     active
                       ? "border-primary bg-primary text-primary-foreground"
