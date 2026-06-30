@@ -372,10 +372,12 @@ export function SetupWizardPage() {
         });
         lastFormJsonRef.current = snapshot;
         retryRef.current = null;
+        setFieldErrors({});
         setAutosave({ status: "saved", at: Date.now(), error: null });
         qc.invalidateQueries({ queryKey: ["owner", "salon-full", activeSalonId] });
       } catch (e) {
         retryRef.current = runSave;
+        setFieldErrors(parseFieldErrors(e));
         setAutosave({ status: "error", at: Date.now(), error: friendlySetupError(e) });
       }
     };
