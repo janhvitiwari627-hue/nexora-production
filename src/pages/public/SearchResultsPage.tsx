@@ -23,6 +23,7 @@ import { FilterBottomSheet } from "./search/FilterBottomSheet";
 import { SortDropdown } from "./search/SortDropdown";
 import { ActiveFiltersBar } from "./search/ActiveFiltersBar";
 import { InstantBookingSection } from "./search/InstantBookingSection";
+import { DiscoveryRails } from "./search/DiscoveryRails";
 import { VoiceSearchButton } from "@/components/search/VoiceSearchButton";
 import {
   DEFAULT_FILTERS,
@@ -344,6 +345,17 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
             </div>
 
             <div className="mb-6">
+              <DiscoveryRails
+                shops={rawShops}
+                onApplyFilters={(f) => {
+                  setDraft(f);
+                  commitFilters(f);
+                }}
+                onSelectCategory={(cat) => {
+                  const { category: _omit, ...rest } = search;
+                  onSearchChange({ ...rest, category: cat });
+                }}
+              />
               <InstantBookingSection shops={filtered} />
             </div>
 
