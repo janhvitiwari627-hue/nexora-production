@@ -40,6 +40,7 @@ import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as PartnerIndexRouteImport } from './routes/partner.index'
 import { Route as OwnerIndexRouteImport } from './routes/owner.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
+import { Route as TemplatePreviewKeyRouteImport } from './routes/template-preview.$key'
 import { Route as StaffDashboardRouteImport } from './routes/staff.dashboard'
 import { Route as SiteBusinessSlugRouteImport } from './routes/site.$businessSlug'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
@@ -277,6 +278,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardRoute,
+} as any)
+const TemplatePreviewKeyRoute = TemplatePreviewKeyRouteImport.update({
+  id: '/template-preview/$key',
+  path: '/template-preview/$key',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const StaffDashboardRoute = StaffDashboardRouteImport.update({
   id: '/staff/dashboard',
@@ -791,6 +797,7 @@ export interface FileRoutesByFullPath {
   '/shop/$slug': typeof ShopSlugRoute
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/staff/dashboard': typeof StaffDashboardRoute
+  '/template-preview/$key': typeof TemplatePreviewKeyRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/owner/': typeof OwnerIndexRoute
   '/partner/': typeof PartnerIndexRoute
@@ -903,6 +910,7 @@ export interface FileRoutesByTo {
   '/shop/$slug': typeof ShopSlugRoute
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/staff/dashboard': typeof StaffDashboardRoute
+  '/template-preview/$key': typeof TemplatePreviewKeyRoute
   '/dashboard': typeof DashboardIndexRoute
   '/owner': typeof OwnerIndexRoute
   '/partner': typeof PartnerIndexRoute
@@ -1019,6 +1027,7 @@ export interface FileRoutesById {
   '/shop/$slug': typeof ShopSlugRoute
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/staff/dashboard': typeof StaffDashboardRoute
+  '/template-preview/$key': typeof TemplatePreviewKeyRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/owner/': typeof OwnerIndexRoute
   '/partner/': typeof PartnerIndexRoute
@@ -1136,6 +1145,7 @@ export interface FileRouteTypes {
     | '/shop/$slug'
     | '/site/$businessSlug'
     | '/staff/dashboard'
+    | '/template-preview/$key'
     | '/dashboard/'
     | '/owner/'
     | '/partner/'
@@ -1248,6 +1258,7 @@ export interface FileRouteTypes {
     | '/shop/$slug'
     | '/site/$businessSlug'
     | '/staff/dashboard'
+    | '/template-preview/$key'
     | '/dashboard'
     | '/owner'
     | '/partner'
@@ -1363,6 +1374,7 @@ export interface FileRouteTypes {
     | '/shop/$slug'
     | '/site/$businessSlug'
     | '/staff/dashboard'
+    | '/template-preview/$key'
     | '/dashboard/'
     | '/owner/'
     | '/partner/'
@@ -1430,6 +1442,7 @@ export interface RootRouteChildren {
   ShopSlugRoute: typeof ShopSlugRoute
   SiteBusinessSlugRoute: typeof SiteBusinessSlugRoute
   StaffDashboardRoute: typeof StaffDashboardRoute
+  TemplatePreviewKeyRoute: typeof TemplatePreviewKeyRoute
   PortalIndexRoute: typeof PortalIndexRoute
   PortalBrandsSlugRoute: typeof PortalBrandsSlugRoute
   PortalBrandsRegisterRoute: typeof PortalBrandsRegisterRoute
@@ -1665,6 +1678,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/template-preview/$key': {
+      id: '/template-preview/$key'
+      path: '/template-preview/$key'
+      fullPath: '/template-preview/$key'
+      preLoaderRoute: typeof TemplatePreviewKeyRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/staff/dashboard': {
       id: '/staff/dashboard'
@@ -2470,6 +2490,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopSlugRoute: ShopSlugRoute,
   SiteBusinessSlugRoute: SiteBusinessSlugRoute,
   StaffDashboardRoute: StaffDashboardRoute,
+  TemplatePreviewKeyRoute: TemplatePreviewKeyRoute,
   PortalIndexRoute: PortalIndexRoute,
   PortalBrandsSlugRoute: PortalBrandsSlugRoute,
   PortalBrandsRegisterRoute: PortalBrandsRegisterRoute,
