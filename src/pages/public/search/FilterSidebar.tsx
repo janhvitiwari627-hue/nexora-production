@@ -161,6 +161,16 @@ export function FilterSidebar({ draft, onChange, onApply, onReset }: Props) {
             onChange={(v) => set("verifiedOnly", v)}
           />
           <Toggle
+            label="Top Rated"
+            checked={draft.topRated}
+            onChange={(v) => set("topRated", v)}
+          />
+          <Toggle
+            label="Most Popular"
+            checked={draft.mostPopular}
+            onChange={(v) => set("mostPopular", v)}
+          />
+          <Toggle
             label="Offers Available"
             checked={draft.offersOnly}
             onChange={(v) => set("offersOnly", v)}
