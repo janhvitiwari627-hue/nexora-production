@@ -125,7 +125,8 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
   // Comparison badges
   const badges = useMemo(() => {
     if (filtered.length === 0) return { lowest: "", best: "", popular: "" };
-    const lowest = [...filtered].sort((a, b) => a.price_level - b.price_level)[0];
+    const price = (s: Shop) => shopStartingPrice(s) ?? Number.POSITIVE_INFINITY;
+    const lowest = [...filtered].sort((a, b) => price(a) - price(b))[0];
     const best = [...filtered].sort((a, b) => b.rating - a.rating)[0];
     const popular = [...filtered].sort((a, b) => b.review_count - a.review_count)[0];
     return { lowest: lowest.slug, best: best.slug, popular: popular.slug };
