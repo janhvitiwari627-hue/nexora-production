@@ -35,14 +35,57 @@ type FormState = {
   password: string;
 };
 
+const GENERIC_ERROR = "Registration failed. Please try again.";
+
 function parseErr(error: unknown): string {
-  if (!error) return "Something went wrong.";
-  if (typeof error === "string") return error;
+  if (!error) return GENERIC_ERROR;
+  if (typeof error === "string") return error.trim() || GENERIC_ERROR;
+  if (error instanceof Error) return error.message.trim() || GENERIC_ERROR;
   if (typeof error === "object") {
-    const e = error as { message?: string };
-    return e.message || "Something went wrong.";
+    const e = error as {
+      message?: unknown;
+      error_description?: unknown;
+      msg?: unknown;
+      statusText?: unknown;
+      code?: unknown;
+      data?: { message?: unknown } | string;
+    };
+
+    const candidates = [e.message, e.error_description, e.msg, e.statusText];
+    if (typeof e.data === "string") candidates.unshift(e.data);
+    if (typeof e.data === "object" && e.data) candidates.unshift(e.data.message);
+
+    for (const candidate of candidates) {
+      if (typeof candidate !== "string") continue;
+      const trimmed = candidate.trim();
+      if (!trimmed || trimmed === "{}") continue;
+      try {
+        const parsed = JSON.parse(trimmed) as { message?: unknown; msg?: unknown };
+        const nested = parsed.message ?? parsed.msg;
+        if (typeof nested === "string" && nested.trim()) return nested.trim();
+      } catch {
+        return trimmed;
+      }
+    }
+
+    if (e.code === "weak_password") return "Please choose a stronger password.";
+    if (e.code === "user_already_exists") return "This email is already registered. Please sign in instead.";
   }
-  return "Something went wrong.";
+  return GENERIC_ERROR;
+}
+
+function friendlyAuthError(error: unknown): string {
+  const raw = parseErr(error);
+  if (/already registered|already exists|user_already_exists/i.test(raw)) {
+    return "This email is already registered. Please sign in instead.";
+  }
+  if (/weak|pwned|easy to guess|password/i.test(raw) && /weak|pwned|easy to guess/i.test(raw)) {
+    return "This password is too common. Please choose a stronger password.";
+  }
+  if (/database error saving new user/i.test(raw)) {
+    return "We could not create your account due to a backend validation issue. Please try again.";
+  }
+  return raw;
 }
 
 export default function OwnerBusinessRegisterPage() {
@@ -84,7 +127,15 @@ export default function OwnerBusinessRegisterPage() {
 
     setSubmitting(true);
     try {
-      const email = parsed.data.email.toLowerCase();
+      const payload = {
+        ...parsed.data,
+        owner_name: parsed.data.owner_name.trim(),
+        mobile: parsed.data.mobile.trim(),
+        district: parsed.data.district.trim(),
+        shop_name: parsed.data.shop_name.trim(),
+        email: parsed.data.email.trim().toLowerCase(),
+      };
+      const email = payload.email;
 
       // 1. Create auth user with shop_owner role
       const signUp = await supabase.auth.signUp({
@@ -93,20 +144,15 @@ export default function OwnerBusinessRegisterPage() {
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
-            full_name: parsed.data.owner_name,
-            mobile: parsed.data.mobile,
+            full_name: payload.owner_name,
+            mobile: payload.mobile,
             role: "shop_owner",
           },
         },
       });
 
       if (signUp.error) {
-        const raw = parseErr(signUp.error);
-        if (/already/i.test(raw)) {
-          setServerError("This email is already registered. Please sign in instead.");
-        } else {
-          setServerError(raw);
-        }
+        setServerError(friendlyAuthError(signUp.error));
         return;
       }
 
@@ -115,9 +161,13 @@ export default function OwnerBusinessRegisterPage() {
       if (!session) {
         const signIn = await supabase.auth.signInWithPassword({
           email,
-          password: parsed.data.password,
+          password: payload.password,
         });
         session = signIn.data.session ?? null;
+        if (signIn.error) {
+          setServerError(friendlyAuthError(signIn.error));
+          return;
+        }
       }
 
       if (!session) {
@@ -128,10 +178,10 @@ export default function OwnerBusinessRegisterPage() {
 
       // 3. Atomically create the shop (RPC sets owner_id = auth.uid())
       const { error: rpcError } = await supabase.rpc("register_owner_business", {
-        _shop_name: parsed.data.shop_name,
-        _district: parsed.data.district,
-        _owner_name: parsed.data.owner_name,
-        _mobile: parsed.data.mobile,
+        _shop_name: payload.shop_name,
+        _district: payload.district,
+        _owner_name: payload.owner_name,
+        _mobile: payload.mobile,
         _email: email,
       });
 
