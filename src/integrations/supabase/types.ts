@@ -121,6 +121,36 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          id: string
+          metadata: Json
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          metadata?: Json
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          metadata?: Json
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           advance_amount: number | null
@@ -450,6 +480,82 @@ export type Database = {
           website?: string | null
         }
         Relationships: []
+      }
+      businesses: {
+        Row: {
+          area_locality: string | null
+          business_category: string | null
+          business_name: string
+          city: string | null
+          created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          id: string
+          is_active: boolean
+          owner_id: string
+          phone: string | null
+          salon_id: string | null
+          status: Database["public"]["Enums"]["business_status"]
+          updated_at: string
+          whatsapp_number: string | null
+        }
+        Insert: {
+          area_locality?: string | null
+          business_category?: string | null
+          business_name: string
+          city?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          id?: string
+          is_active?: boolean
+          owner_id: string
+          phone?: string | null
+          salon_id?: string | null
+          status?: Database["public"]["Enums"]["business_status"]
+          updated_at?: string
+          whatsapp_number?: string | null
+        }
+        Update: {
+          area_locality?: string | null
+          business_category?: string | null
+          business_name?: string
+          city?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          id?: string
+          is_active?: boolean
+          owner_id?: string
+          phone?: string | null
+          salon_id?: string | null
+          status?: Database["public"]["Enums"]["business_status"]
+          updated_at?: string
+          whatsapp_number?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "businesses_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "businesses_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "public_salon_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "businesses_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       customer_insights: {
         Row: {
@@ -1109,6 +1215,69 @@ export type Database = {
             columns: ["salon_id"]
             isOneToOne: false
             referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      owner_requests: {
+        Row: {
+          area_locality: string | null
+          business_category: string | null
+          business_id: string | null
+          business_name: string
+          city: string | null
+          created_at: string
+          email: string
+          id: string
+          owner_full_name: string
+          phone: string
+          status: string
+          user_id: string
+          whatsapp_number: string | null
+        }
+        Insert: {
+          area_locality?: string | null
+          business_category?: string | null
+          business_id?: string | null
+          business_name: string
+          city?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          owner_full_name: string
+          phone: string
+          status?: string
+          user_id: string
+          whatsapp_number?: string | null
+        }
+        Update: {
+          area_locality?: string | null
+          business_category?: string | null
+          business_id?: string | null
+          business_name?: string
+          city?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          owner_full_name?: string
+          phone?: string
+          status?: string
+          user_id?: string
+          whatsapp_number?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "owner_requests_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owner_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -2892,6 +3061,45 @@ export type Database = {
           },
         ]
       }
+      shop_members: {
+        Row: {
+          business_id: string
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_members_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shop_staff: {
         Row: {
           created_at: string | null
@@ -3940,7 +4148,11 @@ export type Database = {
         Args: { _salon_id: string; _user_id: string }
         Returns: boolean
       }
-      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_shop_member_biz: { Args: { _business_id: string }; Returns: boolean }
+      is_shop_owner_biz: { Args: { _business_id: string }; Returns: boolean }
+      is_super_admin:
+        | { Args: never; Returns: boolean }
+        | { Args: { _user_id: string }; Returns: boolean }
       list_salon_staff: {
         Args: { _salon_id: string }
         Returns: {
@@ -4078,6 +4290,15 @@ export type Database = {
         | "completed"
         | "cancelled"
         | "no_show"
+      business_status:
+        | "draft"
+        | "pending_verification"
+        | "verified"
+        | "active"
+        | "inactive"
+        | "suspended"
+        | "rejected"
+        | "archived"
       dbp_earning_status: "pending" | "approved" | "paid" | "rejected"
       dbp_earning_type:
         | "activation_reward"
@@ -4261,6 +4482,16 @@ export const Constants = {
         "completed",
         "cancelled",
         "no_show",
+      ],
+      business_status: [
+        "draft",
+        "pending_verification",
+        "verified",
+        "active",
+        "inactive",
+        "suspended",
+        "rejected",
+        "archived",
       ],
       dbp_earning_status: ["pending", "approved", "paid", "rejected"],
       dbp_earning_type: [
