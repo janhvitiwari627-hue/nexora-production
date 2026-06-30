@@ -2485,6 +2485,7 @@ export type Database = {
           longitude: number | null
           name: string
           nexora_score: number
+          owner_name: string | null
           phone: string | null
           pincode: string | null
           price_range: string | null
@@ -2495,11 +2496,13 @@ export type Database = {
           selected_template_key: string | null
           seo_description: string | null
           seo_title: string | null
+          setup_completed_at: string | null
           show_public_contact: boolean
           slug: string
           tagline: string | null
           theme: string | null
           updated_at: string
+          upi_id: string | null
           website_created: boolean
           website_url: string | null
           whatsapp: string | null
@@ -2533,6 +2536,7 @@ export type Database = {
           longitude?: number | null
           name: string
           nexora_score?: number
+          owner_name?: string | null
           phone?: string | null
           pincode?: string | null
           price_range?: string | null
@@ -2543,11 +2547,13 @@ export type Database = {
           selected_template_key?: string | null
           seo_description?: string | null
           seo_title?: string | null
+          setup_completed_at?: string | null
           show_public_contact?: boolean
           slug: string
           tagline?: string | null
           theme?: string | null
           updated_at?: string
+          upi_id?: string | null
           website_created?: boolean
           website_url?: string | null
           whatsapp?: string | null
@@ -2581,6 +2587,7 @@ export type Database = {
           longitude?: number | null
           name?: string
           nexora_score?: number
+          owner_name?: string | null
           phone?: string | null
           pincode?: string | null
           price_range?: string | null
@@ -2591,11 +2598,13 @@ export type Database = {
           selected_template_key?: string | null
           seo_description?: string | null
           seo_title?: string | null
+          setup_completed_at?: string | null
           show_public_contact?: boolean
           slug?: string
           tagline?: string | null
           theme?: string | null
           updated_at?: string
+          upi_id?: string | null
           website_created?: boolean
           website_url?: string | null
           whatsapp?: string | null
