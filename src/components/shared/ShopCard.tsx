@@ -18,7 +18,22 @@ export type Shop = {
   is_verified: boolean;
   distance_km?: number | null;
   membership_perk?: string | null;
+  starting_price?: number | null;
+  popularity?: number;
+  gender?: "male" | "female" | "unisex" | null;
+  badges?: Array<"verified" | "top_rated" | "most_popular">;
 };
+
+function formatStartingPrice(shop: Shop): string {
+  if (typeof shop.starting_price === "number" && shop.starting_price > 0) {
+    return `Starting from ₹${shop.starting_price.toLocaleString("en-IN")}`;
+  }
+  if (typeof shop.price_level === "number" && shop.price_level > 0) {
+    const approx = shop.price_level * 250;
+    return `Starting from ₹${approx.toLocaleString("en-IN")}`;
+  }
+  return "Price not added";
+}
 
 type Variant = "carousel" | "grid" | "list";
 
@@ -99,10 +114,7 @@ export function ShopCard({
           {shop.name}
         </h3>
         <span className="text-heading text-sm font-semibold whitespace-nowrap">
-          {"₹".repeat(Math.max(1, shop.price_level))}
-          <span className="text-muted-foreground">
-            {"₹".repeat(Math.max(0, 4 - shop.price_level))}
-          </span>
+          {formatStartingPrice(shop)}
         </span>
       </div>
 
@@ -110,6 +122,11 @@ export function ShopCard({
         <span className="bg-muted text-heading rounded-full px-2 py-0.5 text-[11px] font-semibold">
           {shop.category}
         </span>
+        {shop.gender && shop.gender !== "unisex" && (
+          <span className="bg-muted/60 text-muted-foreground rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize">
+            {shop.gender}
+          </span>
+        )}
       </div>
 
       <div className="text-muted-foreground flex items-center gap-1 text-xs">

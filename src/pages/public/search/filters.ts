@@ -2,15 +2,17 @@ export type SortKey =
   | "relevance"
   | "rating"
   | "distance"
-  | "price"
+  | "price_low"
+  | "price_high"
   | "popular";
 
 export const SORT_OPTIONS: { key: SortKey; label: string }[] = [
-  { key: "relevance", label: "Relevance" },
+  { key: "relevance", label: "Recommended" },
   { key: "rating", label: "Rating: High to Low" },
+  { key: "price_low", label: "Price: Low to High" },
+  { key: "price_high", label: "Price: High to Low" },
+  { key: "popular", label: "Popularity" },
   { key: "distance", label: "Distance: Near to Far" },
-  { key: "price", label: "Price: Low to High" },
-  { key: "popular", label: "Most Booked" },
 ];
 
 export const CATEGORIES = [
@@ -24,16 +26,21 @@ export const CATEGORIES = [
   "Massage Center",
 ];
 
-export type Gender = "all" | "men" | "women" | "unisex";
+export type Gender = "all" | "male" | "female" | "unisex";
+
+export const PRICE_MIN = 0;
+export const PRICE_MAX = 5000;
 
 export type Filters = {
   minRating: number;
   maxDistance: number;
-  priceRange: [number, number];
+  priceRange: [number, number]; // rupees
   categories: string[];
   gender: Gender;
   openNow: boolean;
   verifiedOnly: boolean;
+  topRated: boolean;
+  mostPopular: boolean;
   offersOnly: boolean;
   homeService: boolean;
 };
@@ -41,11 +48,13 @@ export type Filters = {
 export const DEFAULT_FILTERS: Filters = {
   minRating: 1,
   maxDistance: 20,
-  priceRange: [1, 4],
+  priceRange: [PRICE_MIN, PRICE_MAX],
   categories: [],
   gender: "all",
   openNow: false,
   verifiedOnly: false,
+  topRated: false,
+  mostPopular: false,
   offersOnly: false,
   homeService: false,
 };
@@ -54,13 +63,19 @@ export function isDefault(f: Filters): boolean {
   return (
     f.minRating === DEFAULT_FILTERS.minRating &&
     f.maxDistance === DEFAULT_FILTERS.maxDistance &&
-    f.priceRange[0] === 1 &&
-    f.priceRange[1] === 4 &&
+    f.priceRange[0] === PRICE_MIN &&
+    f.priceRange[1] === PRICE_MAX &&
     f.categories.length === 0 &&
     f.gender === "all" &&
     !f.openNow &&
     !f.verifiedOnly &&
+    !f.topRated &&
+    !f.mostPopular &&
     !f.offersOnly &&
     !f.homeService
   );
+}
+
+export function formatRupees(n: number): string {
+  return `₹${n.toLocaleString("en-IN")}`;
 }

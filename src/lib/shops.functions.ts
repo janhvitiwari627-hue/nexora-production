@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import type { Shop } from "@/components/shared/ShopCard";
+import { DEMO_SHOPS } from "./shops.demo";
 
 const ListInput = z
   .object({
@@ -18,15 +20,81 @@ function publicClient() {
   );
 }
 
+function priceLevelFromAmount(p: number | null | undefined): number {
+  if (!p || p <= 0) return 1;
+  if (p < 400) return 1;
+  if (p < 800) return 2;
+  if (p < 1500) return 3;
+  return 4;
+}
+
 export const listShops = createServerFn({ method: "GET" })
   .inputValidator((data: unknown) => ListInput.parse(data))
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<Shop[]> => {
     const supabase = publicClient();
-    const { data: rows, error } = await supabase.rpc("shops_search", {
-      _q: data?.q ?? null,
-      _category: data?.category ?? null,
-      _limit: data?.limit ?? 50,
-    });
-    if (error) throw new Error(error.message);
-    return rows ?? [];
+    const limit = data?.limit ?? 50;
+
+    try {
+      let q = supabase
+        .from("public_salon_cards")
+        .select(
+          "id, slug, name, tagline, category, city, location, cover_image_url, image_url, rating, reviews_count, is_verified",
+        )
+        .eq("is_active", true)
+        .limit(limit);
+
+      if (data?.category) q = q.eq("category", data.category);
+      if (data?.q) {
+        const term = data.q.replace(/[%_]/g, "");
+        q = q.or(
+          `name.ilike.%${term}%,category.ilike.%${term}%,location.ilike.%${term}%,tagline.ilike.%${term}%,city.ilike.%${term}%`,
+        );
+      }
+
+      const { data: salons, error } = await q;
+      if (error || !salons || salons.length === 0) {
+        return DEMO_SHOPS;
+      }
+
+      const ids = salons.map((s) => s.id).filter((x): x is string => !!x);
+      const minBySalon = new Map<string, number>();
+      if (ids.length > 0) {
+        const { data: services } = await supabase
+          .from("services")
+          .select("salon_id, price, is_active")
+          .in("salon_id", ids)
+          .eq("is_active", true);
+        (services ?? []).forEach((s) => {
+          if (!s.salon_id || typeof s.price !== "number") return;
+          const cur = minBySalon.get(s.salon_id);
+          if (cur === undefined || s.price < cur) minBySalon.set(s.salon_id, s.price);
+        });
+      }
+
+      const mapped: Shop[] = salons.map((s) => {
+        const startingPrice = s.id ? (minBySalon.get(s.id) ?? null) : null;
+        return {
+          slug: s.slug ?? "",
+          name: s.name ?? "Salon",
+          tagline: s.tagline,
+          category: s.category ?? "Salon",
+          area: s.location ?? null,
+          city: s.city ?? "Jaipur",
+          cover_image: s.cover_image_url ?? s.image_url ?? null,
+          rating: s.rating ?? 0,
+          review_count: s.reviews_count ?? 0,
+          price_level: priceLevelFromAmount(startingPrice),
+          is_verified: !!s.is_verified,
+          distance_km: null,
+          membership_perk: null,
+          starting_price: startingPrice,
+          popularity: s.reviews_count ?? 0,
+          gender: null,
+        };
+      });
+
+      return mapped;
+    } catch {
+      return DEMO_SHOPS;
+    }
   });

@@ -1,5 +1,13 @@
 import { Star } from "lucide-react";
-import { CATEGORIES, DEFAULT_FILTERS, type Filters, type Gender } from "./filters";
+import {
+  CATEGORIES,
+  DEFAULT_FILTERS,
+  PRICE_MAX,
+  PRICE_MIN,
+  formatRupees,
+  type Filters,
+  type Gender,
+} from "./filters";
 
 interface Props {
   draft: Filters;
@@ -63,15 +71,15 @@ export function FilterSidebar({ draft, onChange, onApply, onReset }: Props) {
 
       <Section title="Price Range">
         <div className="mb-2 flex items-center justify-between text-sm font-bold text-heading">
-          <span>{"₹".repeat(draft.priceRange[0])}</span>
-          <span>{"₹".repeat(draft.priceRange[1])}</span>
+          <span>{formatRupees(draft.priceRange[0])}</span>
+          <span>{formatRupees(draft.priceRange[1])}</span>
         </div>
         <div className="space-y-2">
           <input
             type="range"
-            min={1}
-            max={4}
-            step={1}
+            min={PRICE_MIN}
+            max={PRICE_MAX}
+            step={100}
             value={draft.priceRange[0]}
             onChange={(e) => {
               const lo = Math.min(Number(e.target.value), draft.priceRange[1]);
@@ -81,9 +89,9 @@ export function FilterSidebar({ draft, onChange, onApply, onReset }: Props) {
           />
           <input
             type="range"
-            min={1}
-            max={4}
-            step={1}
+            min={PRICE_MIN}
+            max={PRICE_MAX}
+            step={100}
             value={draft.priceRange[1]}
             onChange={(e) => {
               const hi = Math.max(Number(e.target.value), draft.priceRange[0]);
@@ -91,6 +99,10 @@ export function FilterSidebar({ draft, onChange, onApply, onReset }: Props) {
             }}
             className="w-full accent-primary"
           />
+          <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+            <span>Min: {formatRupees(PRICE_MIN)}</span>
+            <span>Max: {formatRupees(PRICE_MAX)}</span>
+          </div>
         </div>
       </Section>
 
@@ -114,7 +126,7 @@ export function FilterSidebar({ draft, onChange, onApply, onReset }: Props) {
 
       <Section title="Gender">
         <div className="grid grid-cols-2 gap-2">
-          {(["all", "men", "women", "unisex"] as Gender[]).map((g) => (
+          {(["all", "male", "female", "unisex"] as Gender[]).map((g) => (
             <label
               key={g}
               className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-xs font-semibold capitalize ${
@@ -147,6 +159,16 @@ export function FilterSidebar({ draft, onChange, onApply, onReset }: Props) {
             label="Verified Only"
             checked={draft.verifiedOnly}
             onChange={(v) => set("verifiedOnly", v)}
+          />
+          <Toggle
+            label="Top Rated"
+            checked={draft.topRated}
+            onChange={(v) => set("topRated", v)}
+          />
+          <Toggle
+            label="Most Popular"
+            checked={draft.mostPopular}
+            onChange={(v) => set("mostPopular", v)}
           />
           <Toggle
             label="Offers Available"
