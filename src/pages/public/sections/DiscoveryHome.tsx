@@ -279,6 +279,19 @@ function enrich(b: MockBusiness, i: number, istHour: number, liveTick: number): 
     staffAvailable,
     staffTotal,
     slotsAvailable,
+    starting_price: startingPrice,
+    isLuxury,
+    priceTier,
+    suitableFor,
+    genderFocus,
+    isHomeService,
+    travelChargeINR,
+    arrivalMin,
+    serviceAreas,
+    membershipTier,
+    aiMatchPct,
+    staffPickSpecialty,
+    seasonTag,
   };
 }
 
