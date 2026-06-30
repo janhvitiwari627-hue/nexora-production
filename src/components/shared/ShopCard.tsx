@@ -114,10 +114,7 @@ export function ShopCard({
           {shop.name}
         </h3>
         <span className="text-heading text-sm font-semibold whitespace-nowrap">
-          {"₹".repeat(Math.max(1, shop.price_level))}
-          <span className="text-muted-foreground">
-            {"₹".repeat(Math.max(0, 4 - shop.price_level))}
-          </span>
+          {formatStartingPrice(shop)}
         </span>
       </div>
 
@@ -125,6 +122,11 @@ export function ShopCard({
         <span className="bg-muted text-heading rounded-full px-2 py-0.5 text-[11px] font-semibold">
           {shop.category}
         </span>
+        {shop.gender && shop.gender !== "unisex" && (
+          <span className="bg-muted/60 text-muted-foreground rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize">
+            {shop.gender}
+          </span>
+        )}
       </div>
 
       <div className="text-muted-foreground flex items-center gap-1 text-xs">
