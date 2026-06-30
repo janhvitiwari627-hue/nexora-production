@@ -36,6 +36,14 @@ import {
   CloudRain,
   Brush,
   PaintBucket,
+  GraduationCap,
+  Briefcase,
+  Timer,
+  Palette,
+  Leaf,
+  Accessibility,
+  Filter,
+  ArrowUpDown,
 } from "lucide-react";
 import {
   getMockBusinesses,
