@@ -27,6 +27,8 @@ import { VoiceSearchButton } from "@/components/search/VoiceSearchButton";
 import {
   DEFAULT_FILTERS,
   isDefault,
+  PRICE_MIN,
+  PRICE_MAX,
   type Filters,
   type SortKey,
 } from "./search/filters";
@@ -38,13 +40,45 @@ interface Props {
   onSearchChange: (next: SearchParams) => void;
 }
 
-function applyFilters(shops: Shop[], f: Filters): Shop[] {
+function shopStartingPrice(s: Shop): number | null {
+  if (typeof s.starting_price === "number" && s.starting_price > 0) return s.starting_price;
+  if (typeof s.price_level === "number" && s.price_level > 0) return s.price_level * 250;
+  return null;
+}
+
+function matchesQuery(s: Shop, q: string): boolean {
+  const needle = q.toLowerCase().trim();
+  if (!needle) return true;
+  const hay = [s.name, s.category, s.area ?? "", s.city ?? "", s.tagline ?? ""]
+    .join(" ")
+    .toLowerCase();
+  return hay.includes(needle);
+}
+
+function applyFilters(shops: Shop[], f: Filters, q: string): Shop[] {
   return shops.filter((s) => {
+    if (!matchesQuery(s, q)) return false;
     if (s.rating < f.minRating) return false;
     if (typeof s.distance_km === "number" && s.distance_km > f.maxDistance) return false;
-    if (s.price_level < f.priceRange[0] || s.price_level > f.priceRange[1]) return false;
+
+    const priceFiltered = f.priceRange[0] !== PRICE_MIN || f.priceRange[1] !== PRICE_MAX;
+    if (priceFiltered) {
+      const sp = shopStartingPrice(s);
+      if (sp === null) return false;
+      if (sp < f.priceRange[0] || sp > f.priceRange[1]) return false;
+    }
     if (f.categories.length > 0 && !f.categories.includes(s.category)) return false;
+    if (f.gender !== "all") {
+      const g = s.gender ?? "unisex";
+      if (g !== "unisex" && g !== f.gender) return false;
+    }
     if (f.verifiedOnly && !s.is_verified) return false;
+    if (f.topRated && !(s.badges?.includes("top_rated") || s.rating >= 4.7)) return false;
+    if (
+      f.mostPopular &&
+      !(s.badges?.includes("most_popular") || (s.review_count ?? 0) >= 300)
+    )
+      return false;
     if (f.offersOnly && !s.membership_perk) return false;
     return true;
   });
@@ -52,6 +86,7 @@ function applyFilters(shops: Shop[], f: Filters): Shop[] {
 
 function sortShops(shops: Shop[], sort: SortKey): Shop[] {
   const arr = [...shops];
+  const price = (s: Shop) => shopStartingPrice(s) ?? Number.POSITIVE_INFINITY;
   switch (sort) {
     case "rating":
       return arr.sort((a, b) => b.rating - a.rating);
@@ -59,10 +94,14 @@ function sortShops(shops: Shop[], sort: SortKey): Shop[] {
       return arr.sort(
         (a, b) => (a.distance_km ?? Infinity) - (b.distance_km ?? Infinity),
       );
-    case "price":
-      return arr.sort((a, b) => a.price_level - b.price_level);
+    case "price_low":
+      return arr.sort((a, b) => price(a) - price(b));
+    case "price_high":
+      return arr.sort((a, b) => price(b) - price(a));
     case "popular":
-      return arr.sort((a, b) => b.review_count - a.review_count);
+      return arr.sort(
+        (a, b) => (b.popularity ?? b.review_count) - (a.popularity ?? a.review_count),
+      );
     default:
       return arr;
   }
