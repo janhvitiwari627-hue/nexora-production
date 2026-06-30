@@ -236,9 +236,9 @@ export default function OwnerSignupPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-          {serverError && (
+          {typeof serverError === "string" && serverError.trim().length > 0 && (
             <Alert variant="destructive" className="mb-4">
-              <AlertDescription>{serverError}</AlertDescription>
+              <AlertDescription>{serverError.trim()}</AlertDescription>
             </Alert>
           )}
 
