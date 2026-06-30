@@ -1,92 +1,47 @@
-ns# Nexora SalonOS — Premium SaaS Redesign
+## Goal
+Stop expanding scope. Lock V1 to the four items your own "Final Recommendation" lists, ship them to production-ready quality, and pilot in Jaipur before touching anything else on the gap list.
 
-Reposition the platform from "salon booking site" to **India's Beauty Industry Operating System**. The redesign is a visual + structural skin pass on the existing app — no feature removal, no backend changes.
+## In Scope (V1 — ship these only)
 
-## 1. Design tokens (src/styles.css)
+1. **Supabase schema + RLS hardening** (already ~90% done)
+   - Audit existing tables against SSOT; confirm RLS on every public table.
+   - Add only the 3 truly-blocking operational tables: `audit_events`, `system_settings`, `notification_queue`. Everything else on the "missing modules" list is deferred.
+   - Re-run security scanner; fix any findings.
 
-Replace the current public-site palette with the Nexora system. All values exposed as semantic tokens so every component picks them up automatically.
+2. **30-Minute White-Label Website Builder** (wizard already shipped last turn)
+   - Lock template gallery to the 3 approved templates: Luxury Salon (royal-luxe), Modern Professional (modern-salon), Spa & Wellness (professional-beauty).
+   - Verify: content persists across template switches, live preview works, mobile-first, "Powered by Nexora" only in footer, Nexora QR block present, no owner QR anywhere.
+   - Add a publish checklist gate (re-use `markSalonSetupComplete`).
 
-- **Primary** Deep Indigo `#3D2BAA`
-- **Secondary** Premium Purple `#7C5CFF`
-- **Accent** Electric Blue `#2D6BFF`
-- **Background** Soft Light Grey `#F6F7FB`
-- **Surface** Pure White `#FFFFFF`
-- **Text** Dark Navy `#0B1437`
-- **Muted text** `#5B6478`
-- **Border** Soft Neutral `#E5E8F0`
-- **Gradient mesh** indigo → purple → electric blue, used only in hero + premium cards
-- **Shadow** layered, low-opacity (`0 1px 2px rgba(11,20,55,.04), 0 8px 24px rgba(11,20,55,.06)`) — Stripe style
-- **Radius** `14px` cards, `12px` inputs/buttons, `20px` hero panels
-- **Font** Inter only (already loaded). Display sizes 56/40/32 with tight tracking for Apple-style headlines.
-- Remove pink/yellow/orange/dark-black surfaces from the public theme.
+3. **60-Second Booking Flow** (already wired)
+   - Verify Search → Business → Service → Staff → Date → Time → Confirm → WhatsApp end-to-end on mobile.
+   - Add: booking slot buffer (configurable, default 0), 90-day max advance window (already enforced as 30; bump to 90), min cancellation window (24h already), review eligibility = completed bookings only.
+   - WhatsApp deep link confirmation after booking.
 
-## 2. Global shell
+4. **Nexora QR + Daily 10 PM Settlement**
+   - Confirm only Nexora QR is rendered on public sites / booking confirmation (remove any owner-QR paths).
+   - Schedule `process_pending_settlements` via pg_cron at 22:00 IST daily.
+   - Owner wallet shows daily settlement entries.
 
-- **PublicHeader**: glass effect (white/70 + backdrop blur), sticky, thin border-bottom. Left logo + "Nexora", center nav (Explore / Membership / For Shop Owners), right search icon, notifications, Login, Register, Avatar. Keep existing Job Portal + Partner Growth items inside an "Explore" mega-menu so nav stays clean.
-- **PublicFooter**: minimal Stripe-style multi-column, dark navy on soft grey, with tagline "Salon Ja Rahe Ho? Nexora Kiya Kya?".
-- **MobileMenuOverlay**: same nav, full-screen, large tap targets.
+## Explicitly Deferred (NOT in V1)
 
-## 3. Home page (src/pages/public/HomePage.tsx and section components)
+Everything else in your message:
+- Legal/help/status/press pages (stub with placeholder routes only if missing)
+- 16 operational DB modules beyond the 3 above
+- Owner Referral 2%/8% split, District Partner 10/5/2% commission ladder, Distributor portal expansion, Super Admin fraud/AI suite
+- AI Marketing / Posters / Content / Revenue Advisor / Return Manager
+- 30 enterprise doc volumes
+- Search ranking algorithm, idempotency standard, correlation IDs, webhook management API, feature flags, support tickets, media processing jobs
 
-Restructure into clearly spaced sections with generous whitespace:
+These re-enter scope **after** the Jaipur pilot validates V1.
 
-1. **Hero** — split layout. Left: H1 "Book Jaipur's Best Beauty Services", subhead, two CTAs (Explore / Become a Partner). Right: layered visual composition (gradient mesh + Jaipur skyline silhouette + a beauty lifestyle photo card + a floating booking-confirmation card). Background: subtle gradient mesh.
-2. **Smart Search** — large floating pill search bar overlapping hero bottom. Filters chips below (Near Me, Open Now, Top Rated, Price, Male, Female, Unisex).
-3. **Categories** — large cards (Salon, Parlour, Spa, Tattoo, Massage, Nail, Makeup, Bridal) with premium line icons, hover-lift.
-4. **Shop Listings** — Airbnb-style: big rounded image, rating, distance, services pills, verified badge, Book Now.
-5. **Membership** — Apple product-showcase: 3 metallic cards (Silver/Gold/Platinum) with gradient + glass reflection, benefits list, CTA.
-6. **Offers** — Stripe promotional cards (no flashing banners).
-7. **White Label Builder** — Apple horizontal scroll of template previews (Royal Luxe / Urban Pro / Beauty Blossom) with "Choose → Customize → Publish" flow.
-8. **App Download** — phone mockup with real app screen, benefits list, store badges.
-9. **Trust strip** — partner brand logos + investor-grade stats (bookings, shops, cities).
+## Execution Order
+1. Run security scan → fix blockers (1 turn)
+2. Template gallery audit + publish-checklist gate (1 turn)
+3. Booking flow rule tweaks (buffer, 90-day window, review gating) (1 turn)
+4. pg_cron 22:00 IST settlement job + owner wallet verification (1 turn)
+5. Add `audit_events`, `system_settings`, `notification_queue` tables with RLS (1 migration)
+6. End-to-end Playwright smoke on mobile viewport, then publish "Nexora SalonOS V1 — Jaipur Pilot"
 
-Each existing section component gets restyled (no logic touched): `HeroSection`, `SmartSearchCard`, `CategorySection`, `NearbyShopsSection`, `TopRatedShopsSection`, `MembershipSection`, `OffersSection`, `AppDownloadSection`, `PortalSection`.
-
-## 4. Shop owner dashboard (Stripe-inspired)
-
-Restyle `src/pages/owner/*` and `src/routes/owner.*`:
-- KPI cards: large number, label, delta chip, sparkline. Soft white surface, thin border, layered shadow.
-- Tables: zebra-free, generous row padding, subtle dividers.
-- Charts: rounded, single-accent (indigo), clean axis.
-- Sidebar nav: white, icon + label, active state = indigo pill.
-
-## 5. Admin panel
-
-Restyle `src/pages/admin/*`:
-- Left sidebar SaaS control center (Analytics, Search, Reports, Settings, Payments, Memberships, Rewards, Advertisements).
-- Same KPI + table + chart language as owner dashboard.
-
-## 6. White-label templates
-
-Templates already exist (Royal Luxe / Urban Pro / Beauty Blossom). No changes to feature parity. Only ensure the showcase page on the public site uses the new Apple-style horizontal scroll presentation.
-
-## 7. Animations
-
-Add reusable utilities: `hover-lift`, `fade-in-up`, `soft-scale`. Apply sparingly to cards and CTAs. No parallax, no heavy motion.
-
-## 8. Copy + tagline
-
-- Inject tagline "Salon Ja Rahe Ho? Nexora Kiya Kya?" in hero subhead area and footer.
-- Replace headlines with the short powerful statements listed in the brief.
-
-## Out of scope
-
-- No DB / server-fn / auth changes.
-- No new routes (Job Portal & Partner Growth already exist).
-- White-label template internals untouched — only the public showcase styling.
-- No replacement of existing images with stock photos in this pass; reuse current assets and only swap where placeholders exist.
-
-## Technical notes
-
-- All color/shadow/radius edits land in `src/styles.css` via `@theme inline` tokens + utility classes, so shadcn components inherit automatically.
-- Section restyles are className-only edits in the existing components — no prop or data-shape changes.
-- Inter is already loaded via `<link>` in `__root.tsx`; no font work needed.
-- Verify after each major section with a Playwright screenshot at 1280×1800 on `/`, `/owner`, `/admin/dashboard`.
-
-## Rollout order
-
-1. Tokens in `src/styles.css` + header/footer.
-2. Home page sections top-to-bottom.
-3. Owner dashboard.
-4. Admin panel.
-5. Polish pass + screenshots.
+## Confirm before I start
+Reply **"go V1"** to proceed exactly as above, or tell me which of the deferred items must move into V1 (each one added pushes pilot launch).
