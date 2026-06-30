@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import {
   Building2, User, Phone, MessageCircle, MapPin, Image as ImageIcon, Clock,
   Sparkles, QrCode, ListChecks, Check, ChevronLeft, ChevronRight, Loader2,
-  Palette, Rocket, Upload, LocateFixed, CloudUpload, CloudCheck,
+  Palette, Rocket, Upload, LocateFixed, Cloud,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
