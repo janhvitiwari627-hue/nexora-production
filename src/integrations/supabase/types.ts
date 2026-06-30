@@ -4022,6 +4022,11 @@ export type Database = {
         | "growth_partner"
         | "district_partner"
         | "distributor"
+        | "super_admin"
+        | "shop_owner"
+        | "shop_manager"
+        | "staff"
+        | "brand"
       booking_status:
         | "pending"
         | "confirmed"
@@ -4199,6 +4204,11 @@ export const Constants = {
         "growth_partner",
         "district_partner",
         "distributor",
+        "super_admin",
+        "shop_owner",
+        "shop_manager",
+        "staff",
+        "brand",
       ],
       booking_status: [
         "pending",
