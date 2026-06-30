@@ -1,5 +1,11 @@
 import { X } from "lucide-react";
-import { DEFAULT_FILTERS, type Filters } from "./filters";
+import {
+  DEFAULT_FILTERS,
+  PRICE_MAX,
+  PRICE_MIN,
+  formatRupees,
+  type Filters,
+} from "./filters";
 
 interface Chip {
   key: string;
@@ -30,11 +36,11 @@ export function ActiveFiltersBar({
       label: `≤ ${filters.maxDistance} km`,
       clear: () => onChange({ ...filters, maxDistance: DEFAULT_FILTERS.maxDistance }),
     });
-  if (filters.priceRange[0] !== 1 || filters.priceRange[1] !== 4)
+  if (filters.priceRange[0] !== PRICE_MIN || filters.priceRange[1] !== PRICE_MAX)
     chips.push({
       key: "price",
-      label: `${"₹".repeat(filters.priceRange[0])} – ${"₹".repeat(filters.priceRange[1])}`,
-      clear: () => onChange({ ...filters, priceRange: [1, 4] }),
+      label: `${formatRupees(filters.priceRange[0])} – ${formatRupees(filters.priceRange[1])}`,
+      clear: () => onChange({ ...filters, priceRange: [PRICE_MIN, PRICE_MAX] }),
     });
   filters.categories.forEach((c) =>
     chips.push({
@@ -61,6 +67,18 @@ export function ActiveFiltersBar({
       key: "verified",
       label: "Verified",
       clear: () => onChange({ ...filters, verifiedOnly: false }),
+    });
+  if (filters.topRated)
+    chips.push({
+      key: "topRated",
+      label: "Top Rated",
+      clear: () => onChange({ ...filters, topRated: false }),
+    });
+  if (filters.mostPopular)
+    chips.push({
+      key: "mostPopular",
+      label: "Most Popular",
+      clear: () => onChange({ ...filters, mostPopular: false }),
     });
   if (filters.offersOnly)
     chips.push({
