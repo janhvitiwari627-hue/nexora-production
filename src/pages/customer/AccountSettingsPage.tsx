@@ -180,12 +180,10 @@ export function AccountSettingsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      </div>
-    </div>
     </>
   );
 }
+
 
 
 function ProfilePreviewPanel() {
