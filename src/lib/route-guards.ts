@@ -41,8 +41,14 @@ export async function requireRole(allowed: AllowedRole[], currentPath: string) {
   }
 
   const roles = await fetchUserRoles(data.user.id);
-  const normalized = Array.from(new Set(allowed.map(normalizeRole)));
-  const ok = normalized.some((r) => roles.includes(r));
+  const normalized = new Set(allowed.map(normalizeRole));
+  // Treat shop_owner/shop_manager DB roles as equivalent to "owner" guard.
+  const effectiveRoles = new Set<string>(roles);
+  if (roles.includes("shop_owner" as UserRole) || roles.includes("shop_manager" as UserRole)) {
+    effectiveRoles.add("owner");
+  }
+  if (roles.includes("super_admin" as UserRole)) effectiveRoles.add("admin");
+  const ok = Array.from(normalized).some((r) => effectiveRoles.has(r));
   if (!ok) {
     throw redirect({ to: "/" });
   }
