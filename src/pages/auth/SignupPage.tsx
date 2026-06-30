@@ -83,6 +83,7 @@ export default function SignupPage() {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const pwStrength = useMemo(() => scorePassword(form.password), [form.password]);
+  const checkEmailRoleFn = useServerFn(getEmailRole);
 
   useEffect(() => {
     if (!isInitialized || !user) return;
