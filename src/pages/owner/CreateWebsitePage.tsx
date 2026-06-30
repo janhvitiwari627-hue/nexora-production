@@ -207,7 +207,7 @@ export function CreateWebsitePage() {
                           navigate({ to: "/owner/onboarding" });
                           return;
                         }
-                        if (isCurrent) { navigate({ to: "/owner/website" }); return; }
+                        if (isCurrent) { navigate({ to: "/owner/setup-wizard" }); return; }
                         setPendingId(t.id);
                         mutate.mutate({ template_id: t.id });
                       }}
