@@ -1,0 +1,1 @@
+ALTER VIEW public.public_salon_cards SET (security_invoker = on);

@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback, type ReactNode } from "react";
+import { useMemo, useState, useCallback, useEffect, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   MapPin,
@@ -142,7 +142,7 @@ function parseHourField(hours: unknown, fallback: number): number {
 }
 
 /* ---------- ENRICHMENT ---------- */
-function enrich(b: MockBusiness, i: number, istHour: number): Enriched {
+function enrich(b: MockBusiness, i: number, istHour: number, liveTick: number): Enriched {
   const shop = mockBusinessToShop(b);
 
   // Real-ish hours: prefer business-provided opening hours when available.
@@ -177,8 +177,12 @@ function enrich(b: MockBusiness, i: number, istHour: number): Enriched {
   const rewardUsagePct = 30 + ((i * 17 + b.reviewCount) % 65); // 30–94%
   const savesCount = Math.round(40 + b.rating * 30 + (b.reviewCount % 200) + (i % 9) * 12);
   const staffTotal = 3 + (i % 6); // 3–8
-  const staffAvailable = isOpen ? Math.max(1, staffTotal - (i % 3)) : 0;
-  const slotsAvailable = isOpen ? Math.max(0, 8 - (i % 7)) : 0;
+  // Live tick perturbs staff/slots so the UI feels real-time.
+  const staffJitter = (i * 5 + liveTick * 3) % staffTotal;
+  const staffAvailable = isOpen ? Math.max(0, staffTotal - staffJitter) : 0;
+  const slotsBase = 8 - (i % 7);
+  const slotJitter = (i * 11 + liveTick * 7) % 6;
+  const slotsAvailable = isOpen ? Math.max(0, slotsBase - slotJitter + ((liveTick + i) % 3)) : 0;
 
   return {
     ...shop,
@@ -213,10 +217,11 @@ function useEnrichedShops(
   selectedCategory: string | undefined,
   allAreasLabel: string,
   allCategoriesLabel: string,
+  liveTick: number,
 ): Enriched[] {
   return useMemo(() => {
     const istHour = nowISTHour();
-    const all = getMockBusinesses().map((b, i) => enrich(b, i, istHour));
+    const all = getMockBusinesses().map((b, i) => enrich(b, i, istHour, liveTick));
     return all.filter((s) => {
       if (selectedLocation && selectedLocation !== allAreasLabel) {
         if (s.area !== selectedLocation) return false;
@@ -226,7 +231,7 @@ function useEnrichedShops(
       }
       return true;
     });
-  }, [selectedLocation, selectedCategory, allAreasLabel, allCategoriesLabel]);
+  }, [selectedLocation, selectedCategory, allAreasLabel, allCategoriesLabel, liveTick]);
 }
 
 /* ============= TOP-LEVEL ============= */
@@ -236,11 +241,30 @@ export function DiscoveryHome({
   allAreasLabel = "All locations",
   allCategoriesLabel = "All categories",
 }: DiscoveryHomeProps = {}) {
+  // Live tick — refreshes Open Now staff/slot availability every 20s while page is visible.
+  const [liveTick, setLiveTick] = useState(0);
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      if (document.visibilityState === "visible") {
+        setLiveTick((t) => t + 1);
+      }
+    }, 20_000);
+    const onVis = () => {
+      if (document.visibilityState === "visible") setLiveTick((t) => t + 1);
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      window.clearInterval(id);
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, []);
+
   const shops = useEnrichedShops(
     selectedLocation,
     selectedCategory,
     allAreasLabel,
     allCategoriesLabel,
+    liveTick,
   );
 
   // Base dest carries the user's active home filters into deep links.
@@ -438,7 +462,7 @@ export function DiscoveryHome({
         <MostReviewedCategory shops={shops} dest={{ ...baseDest, sort: "rating" }} />
         <MostRewardedCategory shops={shops} dest={{ ...baseDest }} />
         <MostSavedCategory shops={shops} dest={{ ...baseDest }} />
-        <OpenNowCategory shops={shops} dest={{ ...baseDest, on: 1, sort: "distance" }} />
+        <OpenNowCategory shops={shops} dest={{ ...baseDest, on: 1, sort: "distance" }} liveTick={liveTick} />
       </div>
     </div>
   );
@@ -1069,7 +1093,7 @@ function MostSavedCategory({ shops, dest }: CategoryProps) {
 }
 
 /* ============= CATEGORY: OPEN NOW ============= */
-function OpenNowCategory({ shops, dest }: CategoryProps) {
+function OpenNowCategory({ shops, dest, liveTick }: CategoryProps & { liveTick: number }) {
   const list = useMemo(
     () =>
       shops
@@ -1090,13 +1114,8 @@ function OpenNowCategory({ shops, dest }: CategoryProps) {
         badges={["Live Status", "Open Now"]}
         dest={dest}
       />
-      <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold text-emerald-700">
-        <span className="relative flex h-2 w-2">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-        </span>
-        Real-time availability
-      </div>
+      <LiveStatusBadge tick={liveTick} />
+
       <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {list.map((s) => (
           <div key={s.slug} className="space-y-2">
@@ -1123,5 +1142,30 @@ function OpenNowCategory({ shops, dest }: CategoryProps) {
         ))}
       </div>
     </section>
+  );
+}
+
+/* ---------- LIVE STATUS BADGE ---------- */
+function LiveStatusBadge({ tick }: { tick: number }) {
+  const [updatedAt, setUpdatedAt] = useState(() => Date.now());
+  const [, setNow] = useState(Date.now());
+  useEffect(() => {
+    setUpdatedAt(Date.now());
+  }, [tick]);
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+  const seconds = Math.max(0, Math.floor((Date.now() - updatedAt) / 1000));
+  const label =
+    seconds < 5 ? "just now" : seconds < 60 ? `${seconds}s ago` : `${Math.floor(seconds / 60)}m ago`;
+  return (
+    <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold text-emerald-700">
+      <span className="relative flex h-2 w-2">
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+        <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+      </span>
+      Live availability · updated {label}
+    </div>
   );
 }
