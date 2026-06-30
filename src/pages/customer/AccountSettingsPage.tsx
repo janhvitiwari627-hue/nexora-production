@@ -26,7 +26,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useAuthStore } from "@/stores/auth-store";
+import { useAuthStore } from "@/stores/authStore";
 import { PersonalInfoPanel } from "./settings/PersonalInfoPanel";
 import { ContactInfoPanel } from "./settings/ContactInfoPanel";
 import { SecurityPanel } from "./settings/SecurityPanel";
