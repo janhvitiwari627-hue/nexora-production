@@ -11,9 +11,10 @@ import {
 } from "@/components/ui/dialog";
 import { FilterPills } from "@/components/shared/FilterPills";
 import { BackButton } from "@/components/shared/BackButton";
-import { Check, Eye, Sparkles, ShieldCheck, Monitor, Smartphone } from "lucide-react";
+import { Check, Eye, Sparkles, ShieldCheck, Monitor, Smartphone, Tablet, Zap } from "lucide-react";
 import { useOwnerContext } from "@/hooks/use-owner-context";
 import { websiteTemplatesQuery } from "@/lib/website-templates.queries";
+import { getTemplateAsset } from "./templates/templateAssets";
 import { selectWebsiteTemplate } from "@/lib/owner.functions";
 
 const CATEGORIES = [
