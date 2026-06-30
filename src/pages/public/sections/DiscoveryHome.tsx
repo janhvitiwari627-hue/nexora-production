@@ -1868,3 +1868,745 @@ function SeasonalPicksCategory({ shops, dest }: CategoryProps) {
     </section>
   );
 }
+
+/* ============================================================
+ * NEXORA — DISCOVERY CATEGORIES 21–30
+ * Each section uses a distinctive card layout (no repeats).
+ * ============================================================ */
+
+/* === 21. FESTIVAL SPECIALS — Festive ribbon cards === */
+const FESTIVALS: { id: FestivalTag; emoji: string; cls: string }[] = [
+  { id: "Diwali", emoji: "🪔", cls: "from-amber-100 to-yellow-50 ring-amber-300" },
+  { id: "Holi", emoji: "🎨", cls: "from-pink-100 to-rose-50 ring-rose-300" },
+  { id: "Karwa Chauth", emoji: "🌙", cls: "from-rose-100 to-amber-50 ring-rose-300" },
+  { id: "Eid", emoji: "🕌", cls: "from-emerald-100 to-teal-50 ring-emerald-300" },
+  { id: "Christmas", emoji: "🎄", cls: "from-rose-100 to-emerald-50 ring-emerald-300" },
+  { id: "New Year", emoji: "🎆", cls: "from-violet-100 to-indigo-50 ring-violet-300" },
+  { id: "Raksha Bandhan", emoji: "🪢", cls: "from-orange-100 to-red-50 ring-orange-300" },
+];
+
+function FestivalSpecialsCategory({ shops, dest }: CategoryProps) {
+  const [fest, setFest] = useState<FestivalTag>("Diwali");
+  const active = FESTIVALS.find((f) => f.id === fest)!;
+  const list = useMemo(
+    () => shops.filter((s) => s.festivalTags.includes(fest)).slice(0, 8),
+    [shops, fest],
+  );
+  return (
+    <section
+      id="cat-festival"
+      className={`rounded-3xl bg-gradient-to-br ${active.cls} p-6 ring-1 sm:p-8`}
+    >
+      <CategoryHeader
+        title="Festival Specials"
+        purpose="Glow-up packages for every Indian celebration"
+        badges={["Festive", "Limited"]}
+        dest={dest}
+      />
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        {FESTIVALS.map((f) => (
+          <button
+            key={f.id}
+            type="button"
+            onClick={() => setFest(f.id)}
+            className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+              fest === f.id ? "bg-slate-900 text-white" : "bg-white/80 text-slate-700 ring-1 ring-white hover:text-slate-900"
+            }`}
+          >
+            <span>{f.emoji}</span>
+            {f.id}
+          </button>
+        ))}
+      </div>
+      {list.length === 0 ? (
+        <p className="mt-5 text-sm text-slate-600">No {fest} specials in this filter.</p>
+      ) : (
+        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {list.map((s) => (
+            <Link
+              key={s.slug}
+              to="/book/$slug"
+              params={{ slug: s.slug }}
+              className="group relative block overflow-hidden rounded-2xl bg-white shadow-md ring-1 ring-white transition hover:-translate-y-0.5 hover:shadow-xl"
+            >
+              <div className="absolute -top-3 left-4 z-10 rounded-b-md bg-rose-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow">
+                {active.emoji} {fest}
+              </div>
+              {s.cover_image && (
+                <img src={s.cover_image} alt={s.name} loading="lazy" className="h-36 w-full object-cover" />
+              )}
+              <div className="space-y-1 p-3 pt-4">
+                <h3 className="line-clamp-1 text-sm font-bold text-slate-900">{s.name}</h3>
+                <p className="line-clamp-1 text-xs text-slate-500">{s.area} · {s.category}</p>
+                <div className="flex items-center justify-between pt-1 text-xs">
+                  <span className="inline-flex items-center gap-1 font-semibold text-amber-700">
+                    <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
+                    {s.rating.toFixed(1)}
+                  </span>
+                  {s.hasOffer && (
+                    <span className="rounded-full bg-rose-600 px-2 py-0.5 text-[10px] font-bold text-white">
+                      {s.offerPct}% OFF
+                    </span>
+                  )}
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* === 22. COUPLE FRIENDLY — Side-by-side dual cards === */
+function CoupleFriendlyCategory({ shops, dest }: CategoryProps) {
+  const list = useMemo(
+    () => shops.filter((s) => s.isCoupleFriendly).slice(0, 6),
+    [shops],
+  );
+  if (list.length === 0) return null;
+  return (
+    <section id="cat-couple" className="rounded-3xl bg-gradient-to-br from-rose-50 via-pink-50 to-white p-6 ring-1 ring-rose-100 sm:p-8">
+      <CategoryHeader
+        title="Couple Friendly"
+        purpose="Couple spa, partner packages & duo discounts"
+        badges={["Couple Spa", "Partner Discount"]}
+        dest={dest}
+      />
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {list.map((s) => (
+          <Link
+            key={s.slug}
+            to="/book/$slug"
+            params={{ slug: s.slug }}
+            className="group flex overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-rose-100 transition hover:-translate-y-0.5 hover:shadow-lg"
+          >
+            <div className="relative w-1/2 bg-gradient-to-br from-rose-400 to-pink-500">
+              {s.cover_image && (
+                <img src={s.cover_image} alt={s.name} loading="lazy" className="h-full w-full object-cover opacity-90" />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-br from-rose-500/30 to-pink-500/40" />
+              <div className="absolute bottom-2 left-2 flex items-center gap-1 rounded-full bg-white px-2 py-0.5 text-[10px] font-bold text-rose-600 shadow">
+                <Heart className="h-3 w-3 fill-rose-500 text-rose-500" /> Couple
+              </div>
+            </div>
+            <div className="flex w-1/2 flex-col justify-between p-3">
+              <div>
+                <h3 className="line-clamp-1 text-sm font-bold text-slate-900">{s.name}</h3>
+                <p className="line-clamp-1 text-[11px] text-slate-500">{s.area}</p>
+              </div>
+              <div className="space-y-1">
+                <div className="text-[11px] text-slate-500">Couple Package</div>
+                <div className="text-base font-extrabold text-rose-600">
+                  ₹{s.couplePackagePriceINR.toLocaleString("en-IN")}
+                </div>
+                <span className="inline-block rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-bold text-rose-700">
+                  {s.partnerDiscountPct}% partner off
+                </span>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* === 23. STUDENT SPECIALS — Notebook / ID-card layout === */
+function StudentSpecialsCategory({ shops, dest }: CategoryProps) {
+  const list = useMemo(
+    () => shops.filter((s) => s.isStudentSpecial)
+      .sort((a, b) => b.studentDiscountPct - a.studentDiscountPct)
+      .slice(0, 8),
+    [shops],
+  );
+  if (list.length === 0) return null;
+  return (
+    <section id="cat-student" className="rounded-3xl bg-gradient-to-br from-indigo-50 to-sky-50 p-6 ring-1 ring-indigo-100 sm:p-8">
+      <CategoryHeader
+        title="Student Specials"
+        purpose="Show your ID, save big · college offers & youth packages"
+        badges={["Student", "Youth"]}
+        dest={dest}
+      />
+      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {list.map((s) => (
+          <Link
+            key={s.slug}
+            to="/book/$slug"
+            params={{ slug: s.slug }}
+            className="group flex flex-col overflow-hidden rounded-xl bg-white p-3 shadow-sm ring-1 ring-indigo-100 transition hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <div className="flex items-center gap-3">
+              <div className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-indigo-600 text-white">
+                <GraduationCap className="h-6 w-6" />
+              </div>
+              <div className="min-w-0">
+                <h3 className="line-clamp-1 text-sm font-bold text-slate-900">{s.name}</h3>
+                <p className="line-clamp-1 text-[11px] text-slate-500">{s.area}</p>
+              </div>
+            </div>
+            <div className="mt-3 flex items-center justify-between rounded-md border border-dashed border-indigo-300 bg-indigo-50 px-2 py-1.5">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-indigo-700">
+                Student ID
+              </span>
+              <span className="text-base font-extrabold text-indigo-700">
+                {s.studentDiscountPct}% OFF
+              </span>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* === 24. OFFICE BREAK — Express ticket cards === */
+function OfficeBreakCategory({ shops, dest }: CategoryProps) {
+  const [maxMin, setMaxMin] = useState<number>(30);
+  const list = useMemo(
+    () => shops.filter((s) => s.isOfficeBreak && s.expressMins <= maxMin)
+      .sort((a, b) => a.expressMins - b.expressMins)
+      .slice(0, 8),
+    [shops, maxMin],
+  );
+  return (
+    <section id="cat-office" className="rounded-3xl bg-slate-900 p-6 text-white sm:p-8">
+      <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-end">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Office Break</h2>
+          <p className="mt-1 text-sm text-slate-300">
+            Quick services that fit your lunch break · express grooming under {maxMin} min
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-1.5">
+          {[15, 20, 30, 45].map((m) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => setMaxMin(m)}
+              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+                maxMin === m ? "bg-emerald-400 text-slate-900" : "bg-white/10 text-white hover:bg-white/20"
+              }`}
+            >
+              ≤ {m} min
+            </button>
+          ))}
+        </div>
+      </div>
+      {list.length === 0 ? (
+        <p className="mt-5 text-sm text-slate-400">No express services match this duration.</p>
+      ) : (
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {list.map((s) => (
+            <Link
+              key={s.slug}
+              to="/book/$slug"
+              params={{ slug: s.slug }}
+              className="group block rounded-xl bg-white/5 p-3 ring-1 ring-white/10 transition hover:bg-white/10"
+            >
+              <div className="flex items-center justify-between">
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-400/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-300">
+                  <Timer className="h-3 w-3" /> {s.expressMins} min
+                </span>
+                <span className="inline-flex items-center gap-1 text-[11px] text-slate-300">
+                  <Briefcase className="h-3 w-3" /> Office
+                </span>
+              </div>
+              <h3 className="mt-2 line-clamp-1 text-sm font-bold text-white">{s.name}</h3>
+              <p className="line-clamp-1 text-[11px] text-slate-400">{s.area} · {s.category}</p>
+              <div className="mt-2 flex items-center justify-between text-[11px] text-slate-300">
+                <span className="inline-flex items-center gap-1">
+                  <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                  {s.rating.toFixed(1)}
+                </span>
+                {typeof s.starting_price === "number" && s.starting_price > 0 && (
+                  <span>From ₹{s.starting_price}</span>
+                )}
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* === 25. BRIDAL COLLECTION — Magazine hero cards === */
+function BridalCollectionCategory({ shops, dest }: CategoryProps) {
+  const list = useMemo(
+    () => shops.filter((s) => s.isBridal)
+      .sort((a, b) => b.rating - a.rating)
+      .slice(0, 5),
+    [shops],
+  );
+  if (list.length === 0) return null;
+  const [hero, ...rest] = list;
+  return (
+    <section id="cat-bridal" className="rounded-3xl bg-gradient-to-br from-rose-50 via-amber-50 to-white p-6 ring-1 ring-rose-100 sm:p-8">
+      <CategoryHeader
+        title="Bridal Collection"
+        purpose="Bridal makeup, pre-bridal, hair styling, photography & wedding packages"
+        badges={["Bridal", "Wedding"]}
+        dest={dest}
+      />
+      <div className="mt-6 grid gap-4 lg:grid-cols-5">
+        <Link
+          to="/book/$slug"
+          params={{ slug: hero.slug }}
+          className="group relative col-span-3 block overflow-hidden rounded-3xl bg-rose-900 text-white shadow-xl"
+        >
+          {hero.cover_image && (
+            <img src={hero.cover_image} alt={hero.name} loading="lazy" className="h-72 w-full object-cover opacity-80 transition group-hover:scale-105 sm:h-80" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-tr from-rose-950/85 via-rose-900/30 to-transparent" />
+          <div className="absolute top-4 left-4 flex items-center gap-1.5 rounded-full bg-amber-300/95 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-rose-900 shadow">
+            <Crown className="h-3.5 w-3.5" /> Editor's Pick
+          </div>
+          <div className="absolute right-5 bottom-5 left-5">
+            <h3 className="text-2xl font-extrabold leading-tight">{hero.name}</h3>
+            <p className="mt-1 text-sm text-rose-100">{hero.area} · Bridal Studio</p>
+            <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 backdrop-blur">
+              <span className="text-xs uppercase tracking-wider text-rose-100">Bridal Package</span>
+              <span className="text-base font-extrabold text-amber-300">
+                ₹{hero.bridalPackagePriceINR.toLocaleString("en-IN")}+
+              </span>
+            </div>
+          </div>
+        </Link>
+        <div className="col-span-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+          {rest.map((s) => (
+            <Link
+              key={s.slug}
+              to="/book/$slug"
+              params={{ slug: s.slug }}
+              className="group flex overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-rose-100 transition hover:shadow-md"
+            >
+              {s.cover_image && (
+                <img src={s.cover_image} alt={s.name} loading="lazy" className="h-24 w-24 shrink-0 object-cover" />
+              )}
+              <div className="flex min-w-0 flex-1 flex-col justify-between p-3">
+                <div>
+                  <h4 className="line-clamp-1 text-sm font-bold text-slate-900">{s.name}</h4>
+                  <p className="line-clamp-1 text-[11px] text-slate-500">{s.area}</p>
+                </div>
+                <div className="text-xs font-extrabold text-rose-600">
+                  ₹{s.bridalPackagePriceINR.toLocaleString("en-IN")}+
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* === 26. TATTOO COLLECTION — Dark gallery tiles === */
+function TattooCollectionCategory({ shops, dest }: CategoryProps) {
+  const types: Enriched["tattooType"][] = ["Minimal", "Premium", "Cover Up", "Removal"];
+  const [type, setType] = useState<Exclude<Enriched["tattooType"], null>>("Minimal");
+  const list = useMemo(
+    () => shops.filter((s) => s.isTattoo && s.tattooType === type).slice(0, 8),
+    [shops, type],
+  );
+  return (
+    <section id="cat-tattoo" className="rounded-3xl bg-zinc-950 p-6 text-white sm:p-8">
+      <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-end">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Tattoo Collection</h2>
+          <p className="mt-1 text-sm text-zinc-400">
+            Top tattoo artists · minimal, premium, cover-ups & removal
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-1.5">
+          {types.map((t) =>
+            t ? (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setType(t)}
+                className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+                  type === t ? "bg-white text-zinc-900" : "bg-white/10 text-zinc-200 hover:bg-white/20"
+                }`}
+              >
+                {t}
+              </button>
+            ) : null,
+          )}
+        </div>
+      </div>
+      {list.length === 0 ? (
+        <p className="mt-5 text-sm text-zinc-500">No {type} tattoo studios match this filter.</p>
+      ) : (
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {list.map((s) => (
+            <Link
+              key={s.slug}
+              to="/book/$slug"
+              params={{ slug: s.slug }}
+              className="group relative block overflow-hidden rounded-xl ring-1 ring-white/10"
+            >
+              <div className="relative aspect-square bg-zinc-800">
+                {s.cover_image && (
+                  <img src={s.cover_image} alt={s.name} loading="lazy" className="h-full w-full object-cover opacity-80 transition group-hover:scale-105 group-hover:opacity-100" />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                <div className="absolute top-2 left-2 rounded bg-white/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur">
+                  {s.tattooType}
+                </div>
+                <div className="absolute right-2 bottom-2 left-2">
+                  <h3 className="line-clamp-1 text-sm font-extrabold text-white">{s.name}</h3>
+                  <p className="line-clamp-1 text-[10px] text-zinc-300">
+                    Artist · {s.tattooArtist}
+                  </p>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* === 27. NAIL STUDIO — Polish-bottle pill cards === */
+function NailStudioCategory({ shops, dest }: CategoryProps) {
+  const services: Exclude<Enriched["nailService"], null>[] = ["Gel", "Acrylic", "Extensions", "Luxury Art"];
+  const [svc, setSvc] = useState<Exclude<Enriched["nailService"], null>>("Gel");
+  const list = useMemo(
+    () => shops.filter((s) => s.isNailStudio && s.nailService === svc).slice(0, 8),
+    [shops, svc],
+  );
+  const svcColor: Record<string, string> = {
+    Gel: "bg-fuchsia-500",
+    Acrylic: "bg-rose-500",
+    Extensions: "bg-violet-500",
+    "Luxury Art": "bg-amber-500",
+  };
+  return (
+    <section id="cat-nail" className="rounded-3xl bg-gradient-to-br from-fuchsia-50 to-pink-50 p-6 ring-1 ring-fuchsia-100 sm:p-8">
+      <CategoryHeader
+        title="Nail Studio Collection"
+        purpose="Gel, acrylic, extensions & luxury nail art"
+        badges={["Nails"]}
+        dest={dest}
+      />
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        {services.map((t) => (
+          <button
+            key={t}
+            type="button"
+            onClick={() => setSvc(t)}
+            className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+              svc === t ? "bg-slate-900 text-white" : "bg-white text-slate-700 ring-1 ring-fuchsia-200 hover:text-fuchsia-700"
+            }`}
+          >
+            <PaintBucket className="h-3 w-3" />
+            {t}
+          </button>
+        ))}
+      </div>
+      {list.length === 0 ? (
+        <p className="mt-5 text-sm text-slate-500">No {svc} studios in this filter.</p>
+      ) : (
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {list.map((s) => (
+            <Link
+              key={s.slug}
+              to="/book/$slug"
+              params={{ slug: s.slug }}
+              className="group flex items-center gap-3 rounded-full bg-white p-2 pr-4 shadow-sm ring-1 ring-fuchsia-100 transition hover:shadow-md"
+            >
+              <div className={`relative grid h-12 w-12 shrink-0 place-items-center rounded-full ${svcColor[svc]} text-white shadow-inner`}>
+                <Brush className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h3 className="line-clamp-1 text-sm font-bold text-slate-900">{s.name}</h3>
+                <p className="line-clamp-1 text-[11px] text-slate-500">
+                  {s.area} · {svc}
+                </p>
+              </div>
+              <div className="text-right">
+                <div className="text-xs font-bold text-slate-900">
+                  <Star className="-mt-0.5 mr-0.5 inline h-3 w-3 fill-amber-500 text-amber-500" />
+                  {s.rating.toFixed(1)}
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* === 28. WELLNESS COLLECTION — Zen leaf cards === */
+function WellnessCollectionCategory({ shops, dest }: CategoryProps) {
+  const list = useMemo(
+    () => shops.filter((s) => s.isWellness)
+      .sort((a, b) => b.rating - a.rating)
+      .slice(0, 8),
+    [shops],
+  );
+  if (list.length === 0) return null;
+  return (
+    <section id="cat-wellness" className="rounded-3xl bg-gradient-to-br from-emerald-50 to-teal-50 p-6 ring-1 ring-emerald-100 sm:p-8">
+      <CategoryHeader
+        title="Wellness Collection"
+        purpose="Spa, massage, therapy, relaxation & Ayurveda"
+        badges={["Wellness", "Calm"]}
+        dest={dest}
+      />
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {list.map((s) => (
+          <Link
+            key={s.slug}
+            to="/book/$slug"
+            params={{ slug: s.slug }}
+            className="group block rounded-2xl bg-white p-4 ring-1 ring-emerald-100 transition hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <div className="flex items-center justify-between">
+              <div className="grid h-10 w-10 place-items-center rounded-full bg-emerald-100 text-emerald-700">
+                <Leaf className="h-5 w-5" />
+              </div>
+              <span className="rounded-full bg-emerald-600/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-700">
+                {s.wellnessFocus}
+              </span>
+            </div>
+            <h3 className="mt-3 line-clamp-1 text-sm font-bold text-slate-900">{s.name}</h3>
+            <p className="line-clamp-1 text-[11px] text-slate-500">{s.area}</p>
+            <div className="mt-3 flex items-center justify-between text-xs">
+              <span className="inline-flex items-center gap-1 font-semibold text-amber-700">
+                <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
+                {s.rating.toFixed(1)}
+              </span>
+              {typeof s.starting_price === "number" && s.starting_price > 0 && (
+                <span className="font-bold text-emerald-700">From ₹{s.starting_price}</span>
+              )}
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* === 29. KIDS COLLECTION — Playful sticker cards === */
+function KidsCollectionCategory({ shops, dest }: CategoryProps) {
+  const list = useMemo(
+    () => shops.filter((s) => s.isKidsCollection).slice(0, 8),
+    [shops],
+  );
+  if (list.length === 0) return null;
+  return (
+    <section id="cat-kids" className="rounded-3xl bg-gradient-to-br from-sky-50 via-yellow-50 to-rose-50 p-6 ring-1 ring-sky-100 sm:p-8">
+      <CategoryHeader
+        title="Kids Collection"
+        purpose="Kids haircut, kid-safe products & family-friendly studios"
+        badges={["Kids", "Family Safe"]}
+        dest={dest}
+      />
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {list.map((s, idx) => {
+          const colors = ["bg-yellow-300", "bg-sky-300", "bg-rose-300", "bg-emerald-300"];
+          const dot = colors[idx % colors.length];
+          return (
+            <Link
+              key={s.slug}
+              to="/book/$slug"
+              params={{ slug: s.slug }}
+              className="group relative block overflow-hidden rounded-3xl bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+            >
+              <div className={`absolute -top-6 -right-6 h-20 w-20 rounded-full ${dot} opacity-70`} />
+              <div className={`absolute -bottom-6 -left-6 h-16 w-16 rounded-full ${dot} opacity-50`} />
+              <div className="relative p-4">
+                <div className="flex items-center gap-2">
+                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-yellow-300 text-slate-900 shadow">
+                    <Baby className="h-5 w-5" />
+                  </div>
+                  <span className="rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                    Kid Safe
+                  </span>
+                </div>
+                <h3 className="mt-3 line-clamp-1 text-base font-extrabold text-slate-900">{s.name}</h3>
+                <p className="line-clamp-1 text-[11px] text-slate-500">{s.area} · {s.category}</p>
+                <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-amber-700">
+                  <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
+                  {s.rating.toFixed(1)}
+                  <span className="text-slate-400">· {s.review_count} reviews</span>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+/* === 30. SENIOR CITIZEN — Large-text accessible cards === */
+function SeniorCitizenCategory({ shops, dest }: CategoryProps) {
+  const list = useMemo(
+    () => shops.filter((s) => s.isSeniorFriendly).slice(0, 8),
+    [shops],
+  );
+  if (list.length === 0) return null;
+  return (
+    <section id="cat-senior" className="rounded-3xl bg-gradient-to-br from-amber-50 to-stone-50 p-6 ring-1 ring-amber-100 sm:p-8">
+      <CategoryHeader
+        title="Senior Citizen Collection"
+        purpose="Senior-friendly, easy access, wheelchair-accessible studios with special discounts"
+        badges={["Senior", "Accessible"]}
+        dest={dest}
+      />
+      <div className="mt-5 grid gap-4 sm:grid-cols-2">
+        {list.map((s) => (
+          <Link
+            key={s.slug}
+            to="/book/$slug"
+            params={{ slug: s.slug }}
+            className="group flex items-center gap-4 rounded-2xl bg-white p-5 ring-1 ring-amber-100 transition hover:-translate-y-0.5 hover:shadow-md"
+          >
+            {s.cover_image && (
+              <img src={s.cover_image} alt={s.name} loading="lazy" className="h-20 w-20 shrink-0 rounded-xl object-cover" />
+            )}
+            <div className="min-w-0 flex-1">
+              <h3 className="line-clamp-1 text-lg font-extrabold text-slate-900">{s.name}</h3>
+              <p className="line-clamp-1 text-sm text-slate-600">{s.area} · {s.category}</p>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-800">
+                  <UserRound className="h-3 w-3" /> Senior Friendly
+                </span>
+                {s.wheelchairAccessible && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-sky-100 px-2 py-0.5 text-xs font-semibold text-sky-800">
+                    <Accessibility className="h-3 w-3" /> Wheelchair
+                  </span>
+                )}
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">
+                  <Tag className="h-3 w-3" /> Senior Discount
+                </span>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ============================================================
+ * SMART FILTERS · SMART SORTING · BADGES LEGEND
+ * ============================================================ */
+
+function SmartFiltersBar({ dest }: { dest: SearchDest }) {
+  const filters: { label: string; to: SearchDest }[] = [
+    { label: "Open Now", to: { ...dest, on: 1 } },
+    { label: "Verified", to: { ...dest, vo: 1 } },
+    { label: "Offers", to: { ...dest, oo: 1 } },
+    { label: "Membership", to: { ...dest, mp: 1 } },
+    { label: "Trending", to: { ...dest, tr: 1, sort: "popular" } },
+    { label: "Nearest", to: { ...dest, sort: "distance" } },
+    { label: "Highest Rated", to: { ...dest, sort: "rating" } },
+    { label: "Budget", to: { ...dest, sort: "price_low" } },
+    { label: "Luxury", to: { ...dest, sort: "price_high" } },
+  ];
+  return (
+    <section id="smart-filters" className="rounded-3xl bg-white p-6 ring-1 ring-slate-200 sm:p-8">
+      <div className="flex items-center gap-2">
+        <Filter className="h-4 w-4 text-slate-700" />
+        <h2 className="text-lg font-bold text-slate-900">Smart Filters</h2>
+      </div>
+      <p className="mt-1 text-sm text-slate-500">
+        Location, distance, price, rating, gender, parking, AC, home service & more
+      </p>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {filters.map((f) => (
+          <Link
+            key={f.label}
+            to="/search"
+            search={f.to}
+            className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-slate-900 hover:text-slate-900"
+          >
+            {f.label}
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function SmartSortingBar({ dest }: { dest: SearchDest }) {
+  const sorts: { label: string; to: SearchDest }[] = [
+    { label: "Nearest", to: { ...dest, sort: "distance" } },
+    { label: "Highest Rated", to: { ...dest, sort: "rating" } },
+    { label: "Lowest Price", to: { ...dest, sort: "price_low" } },
+    { label: "Highest Price", to: { ...dest, sort: "price_high" } },
+    { label: "Trending", to: { ...dest, sort: "popular", tr: 1 } },
+    { label: "Most Booked", to: { ...dest, sort: "popular" } },
+    { label: "Newest", to: { ...dest, sort: "relevance" } },
+  ];
+  return (
+    <section id="smart-sorting" className="rounded-3xl bg-slate-50 p-6 ring-1 ring-slate-200 sm:p-8">
+      <div className="flex items-center gap-2">
+        <ArrowUpDown className="h-4 w-4 text-slate-700" />
+        <h2 className="text-lg font-bold text-slate-900">Smart Sorting</h2>
+      </div>
+      <p className="mt-1 text-sm text-slate-500">Reorder discovery by what matters most to you</p>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {sorts.map((s) => (
+          <Link
+            key={s.label}
+            to="/search"
+            search={s.to}
+            className="inline-flex items-center gap-1.5 rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-700"
+          >
+            <Palette className="h-3 w-3" />
+            {s.label}
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function DiscoveryBadgesLegend() {
+  const badges: { label: string; cls: string }[] = [
+    { label: "Nearby", cls: "bg-slate-100 text-slate-700" },
+    { label: "Top Rated", cls: "bg-amber-500 text-white" },
+    { label: "🔥 Trending", cls: "bg-orange-500 text-white" },
+    { label: "Verified", cls: "bg-blue-500 text-white" },
+    { label: "New", cls: "bg-pink-500 text-white" },
+    { label: "Premium", cls: "bg-slate-900 text-white" },
+    { label: "Luxury", cls: "bg-amber-700 text-white" },
+    { label: "Budget", cls: "bg-emerald-500 text-white" },
+    { label: "Family Choice", cls: "bg-sky-500 text-white" },
+    { label: "Editor's Pick", cls: "bg-rose-600 text-white" },
+    { label: "AI Recommended", cls: "bg-violet-500 text-white" },
+    { label: "Member Exclusive", cls: "bg-indigo-500 text-white" },
+    { label: "Open Now", cls: "bg-emerald-100 text-emerald-800" },
+    { label: "Instant Booking", cls: "bg-teal-500 text-white" },
+    { label: "Sponsored", cls: "bg-blue-100 text-blue-800" },
+  ];
+  return (
+    <section id="badges-legend" className="rounded-3xl bg-white p-6 ring-1 ring-slate-200 sm:p-8">
+      <div className="flex items-center gap-2">
+        <Award className="h-4 w-4 text-slate-700" />
+        <h2 className="text-lg font-bold text-slate-900">Discovery Badges</h2>
+      </div>
+      <p className="mt-1 text-sm text-slate-500">
+        Every shop card may display these trust & quality signals
+      </p>
+      <div className="mt-4 flex flex-wrap gap-1.5">
+        {badges.map((b) => (
+          <span
+            key={b.label}
+            className={`rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider ${b.cls}`}
+          >
+            {b.label}
+          </span>
+        ))}
+      </div>
+    </section>
+  );
+}
