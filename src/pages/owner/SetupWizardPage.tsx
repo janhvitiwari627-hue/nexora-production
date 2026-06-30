@@ -779,3 +779,19 @@ function ImagePicker({
     </div>
   );
 }
+
+function AutosaveBadge({ state }: { state: { status: "idle" | "saving" | "saved" | "error"; at: number | null } }) {
+  const time = state.at ? new Date(state.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : null;
+  let label = "Autosave on";
+  let tone = "text-muted-foreground";
+  let Icon: typeof Cloud = Cloud;
+  if (state.status === "saving") { label = "Saving…"; tone = "text-primary"; Icon = Loader2; }
+  else if (state.status === "saved") { label = time ? `Saved ${time}` : "Saved"; tone = "text-emerald-600"; Icon = Check; }
+  else if (state.status === "error") { label = "Save failed — retrying on next change"; tone = "text-destructive"; Icon = Cloud; }
+  return (
+    <div className={`mt-1 inline-flex items-center justify-end gap-1.5 text-[11px] ${tone}`}>
+      <Icon className={`h-3 w-3 ${state.status === "saving" ? "animate-spin" : ""}`} />
+      <span>{label}</span>
+    </div>
+  );
+}
