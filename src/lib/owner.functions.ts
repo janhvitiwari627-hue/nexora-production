@@ -470,6 +470,27 @@ export const getOwnerSalonFull = createServerFn({ method: "GET" })
     return row;
   });
 
+const blankStringToNull = (value: unknown) => {
+  if (typeof value !== "string") return value;
+  const trimmed = value.trim();
+  return trimmed.length === 0 ? null : trimmed;
+};
+
+const nullableUrl = z.preprocess(
+  blankStringToNull,
+  z.string().url().nullable().optional(),
+);
+
+const nullableEmail = z.preprocess(
+  blankStringToNull,
+  z.string().email().max(160).nullable().optional(),
+);
+
+const nullableUpiId = z.preprocess(
+  blankStringToNull,
+  z.string().max(120).regex(/^[a-zA-Z0-9._-]+@[a-zA-Z]{2,64}$/).nullable().optional(),
+);
+
 const SalonUpdateInput = z.object({
   salon_id: z.string().uuid(),
   patch: z.object({
@@ -478,9 +499,9 @@ const SalonUpdateInput = z.object({
     owner_name: z.string().max(120).nullable().optional(),
     tagline: z.string().max(200).nullable().optional(),
     description: z.string().max(2000).nullable().optional(),
-    image_url: z.string().url().or(z.literal("")).nullable().optional(),
-    logo_url: z.string().url().or(z.literal("")).nullable().optional(),
-    cover_image_url: z.string().url().or(z.literal("")).nullable().optional(),
+    image_url: nullableUrl,
+    logo_url: nullableUrl,
+    cover_image_url: nullableUrl,
     brand_primary: z.string().regex(/^#[0-9a-fA-F]{6}$/).nullable().optional(),
     brand_secondary: z.string().regex(/^#[0-9a-fA-F]{6}$/).nullable().optional(),
     theme: z.string().max(40).nullable().optional(),
@@ -489,14 +510,14 @@ const SalonUpdateInput = z.object({
     seo_description: z.string().max(300).nullable().optional(),
     phone: z.string().max(20).nullable().optional(),
     whatsapp: z.string().max(20).nullable().optional(),
-    email: z.string().max(160).email().or(z.literal("")).nullable().optional(),
+    email: nullableEmail,
     address: z.string().max(300).nullable().optional(),
     location: z.string().max(120).nullable().optional(),
     city: z.string().max(80).nullable().optional(),
     pincode: z.string().max(12).nullable().optional(),
     latitude: z.number().min(-90).max(90).nullable().optional(),
     longitude: z.number().min(-180).max(180).nullable().optional(),
-    upi_id: z.string().trim().max(120).regex(/^[a-zA-Z0-9._-]+@[a-zA-Z]{2,64}$/).or(z.literal("")).nullable().optional(),
+    upi_id: nullableUpiId,
     hours: z.record(z.string(), z.object({
       open: z.string(), close: z.string(), closed: z.boolean(),
     })).nullable().optional(),
@@ -506,7 +527,16 @@ const SalonUpdateInput = z.object({
 
 export const updateOwnerSalon = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => SalonUpdateInput.parse(d))
+  .inputValidator((d: unknown) => {
+    const parsed = SalonUpdateInput.safeParse(d);
+    if (!parsed.success) {
+      const fields = Array.from(new Set(parsed.error.issues.map((issue) => issue.path.join("."))))
+        .filter(Boolean)
+        .map((path) => path.replace(/^patch\./, ""));
+      throw new Error(`Invalid setup field${fields.length === 1 ? "" : "s"}: ${fields.join(", ") || "details"}`);
+    }
+    return parsed.data;
+  })
   .handler(async ({ data, context }) => {
     const { error, data: row } = await context.supabase
       .from("salons").update(data.patch as never).eq("id", data.salon_id).select().single();
