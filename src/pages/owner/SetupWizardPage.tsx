@@ -648,10 +648,20 @@ export function SetupWizardPage() {
               <div className="space-y-5">
                 <SectionHeader icon={ImageIcon} title="Logo & cover banner" subtitle="Square logo + wide cover work best." />
                 <div className="grid gap-6 sm:grid-cols-2">
-                  <ImagePicker label="Logo" url={form.logo_url} aspect="aspect-square"
-                    onPick={async (f) => { const u = await uploadImage(f, "logo"); if (u) setForm({ ...form, logo_url: u }); }} />
-                  <ImagePicker label="Cover banner" url={form.cover_image_url} aspect="aspect-[16/9]"
-                    onPick={async (f) => { const u = await uploadImage(f, "cover"); if (u) setForm({ ...form, cover_image_url: u }); }} />
+                  <div className="space-y-1.5">
+                    <ImagePicker label="Logo" url={form.logo_url} aspect="aspect-square"
+                      onPick={async (f) => { const u = await uploadImage(f, "logo"); if (u) setForm({ ...form, logo_url: u }); }} />
+                    {fieldErrors.logo_url && (
+                      <p role="alert" className="text-xs text-destructive">{fieldErrors.logo_url}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1.5">
+                    <ImagePicker label="Cover banner" url={form.cover_image_url} aspect="aspect-[16/9]"
+                      onPick={async (f) => { const u = await uploadImage(f, "cover"); if (u) setForm({ ...form, cover_image_url: u }); }} />
+                    {fieldErrors.cover_image_url && (
+                      <p role="alert" className="text-xs text-destructive">{fieldErrors.cover_image_url}</p>
+                    )}
+                  </div>
                 </div>
                 <StepActions
                   onSave={() => saveStep.mutate({ logo_url: form.logo_url, cover_image_url: form.cover_image_url })}
