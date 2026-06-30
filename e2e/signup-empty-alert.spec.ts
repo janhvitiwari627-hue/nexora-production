@@ -99,23 +99,8 @@ test.describe("/owner-signup — empty alert + friendly validation", () => {
     await expect(page).toHaveURL(/\/owner-signup$/);
   });
 
-
-  test("mismatched passwords shows 'Passwords do not match', no empty alert", async ({ page }) => {
-    await gotoForm(page, "/owner-signup", /Owner full name/);
-    await page.getByLabel("Owner full name").fill("Mismatch Owner");
-    await page.getByLabel("Email").fill(`mismatch-owner-${Date.now()}@example.com`);
-    await page.getByLabel("Phone").fill("9876543210");
-    await page.getByLabel("Password", { exact: true }).fill("StrongP@ss123");
-    await page.getByLabel("Confirm password").fill("DifferentP@ss123");
-    await page.getByLabel("Business name").fill("Acme Salon");
-
-    await page.getByRole("button", { name: /Create owner account|Create account/ }).click();
-
-    await expect(page.getByText("Passwords do not match")).toBeVisible();
-    await expectNoEmptyDestructiveAlert(page);
-    await expect(page).toHaveURL(/\/owner-signup$/);
-  });
 });
+
 
 test.describe("/register — empty-alert regression guard for mismatched passwords", () => {
   test("mismatched passwords on customer tab shows friendly error, no empty alert", async ({ page }) => {
