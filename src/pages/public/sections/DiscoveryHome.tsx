@@ -1146,14 +1146,12 @@ function OpenNowCategory({ shops, dest, liveTick }: CategoryProps & { liveTick: 
 }
 
 /* ---------- LIVE STATUS BADGE ---------- */
-function LiveStatusBadge() {
+function LiveStatusBadge({ tick }: { tick: number }) {
   const [updatedAt, setUpdatedAt] = useState(() => Date.now());
   const [, setNow] = useState(Date.now());
   useEffect(() => {
-    // Reset the "Updated Xs ago" timer whenever this component re-renders due
-    // to fresh shop data (parent recomputes via liveTick → new children).
     setUpdatedAt(Date.now());
-  }, []);
+  }, [tick]);
   useEffect(() => {
     const id = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(id);
