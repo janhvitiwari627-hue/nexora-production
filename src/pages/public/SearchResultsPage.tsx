@@ -170,15 +170,59 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
     onSearchChange(next === "grid" ? rest : { ...rest, view: next });
   };
 
-  // Preserve the user's scroll position across a state change that may shrink the page.
+  // Anchor-based scroll restore: pin the topmost visible result card so the
+  // same section stays in view even when the list height changes.
   const preserveScroll = (fn: () => void) => {
-    const y = window.scrollY;
+    const fallbackY = window.scrollY;
+    const cards = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-result-slug]"),
+    );
+    let anchorSlug: string | null = null;
+    let anchorOffset = 0;
+    for (const el of cards) {
+      const top = el.getBoundingClientRect().top;
+      if (top >= 0) {
+        anchorSlug = el.dataset.resultSlug ?? null;
+        anchorOffset = top;
+        break;
+      }
+      // Track last above-viewport card as fallback anchor (offset is negative).
+      anchorSlug = el.dataset.resultSlug ?? anchorSlug;
+      anchorOffset = top;
+    }
+
     fn();
-    // Re-apply after layout settles (results re-render, AnimatePresence swaps).
-    requestAnimationFrame(() => {
-      window.scrollTo({ top: y, behavior: "auto" });
-      requestAnimationFrame(() => window.scrollTo({ top: y, behavior: "auto" }));
-    });
+
+    const restore = () => {
+      if (anchorSlug) {
+        const el = document.querySelector<HTMLElement>(
+          `[data-result-slug="${CSS.escape(anchorSlug)}"]`,
+        );
+        if (el) {
+          const top = el.getBoundingClientRect().top;
+          window.scrollTo({ top: window.scrollY + top - anchorOffset, behavior: "auto" });
+          return;
+        }
+        // Anchor card filtered out — find nearest remaining card to fallbackY.
+        const remaining = Array.from(
+          document.querySelectorAll<HTMLElement>("[data-result-slug]"),
+        );
+        if (remaining.length > 0) {
+          const target = remaining.reduce((best, el) => {
+            const y = el.getBoundingClientRect().top + window.scrollY;
+            return Math.abs(y - fallbackY) < Math.abs(best.y - fallbackY)
+              ? { el, y }
+              : best;
+          }, { el: remaining[0], y: remaining[0].getBoundingClientRect().top + window.scrollY });
+          window.scrollTo({ top: target.y - anchorOffset, behavior: "auto" });
+          return;
+        }
+      }
+      window.scrollTo({ top: fallbackY, behavior: "auto" });
+    };
+
+    // Wait two frames so AnimatePresence swap + suspense data settle.
+    requestAnimationFrame(() => requestAnimationFrame(restore));
   };
 
   const resetFilters = () => {
@@ -381,7 +425,7 @@ function ResultCard({
     tags.push({ label: "Most Popular", cls: "bg-warning text-heading", icon: TrendingUp });
 
   return (
-    <div className="relative">
+    <div className="relative" data-result-slug={shop.slug}>
       {tags.length > 0 && (
         <div className="pointer-events-none absolute top-5 left-1/2 z-10 flex -translate-x-1/2 flex-wrap justify-center gap-1.5">
           {tags.map((t) => (
@@ -480,7 +524,7 @@ function MapView({ shops }: { shops: Shop[] }) {
       </div>
       <ul className="flex max-h-[600px] flex-col gap-3 overflow-y-auto pr-1">
         {shops.map((s) => (
-          <li key={s.slug}>
+          <li key={s.slug} data-result-slug={s.slug}>
             <ShopCard shop={s} variant="list" />
           </li>
         ))}
