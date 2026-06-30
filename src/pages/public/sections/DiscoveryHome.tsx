@@ -1114,13 +1114,8 @@ function OpenNowCategory({ shops, dest }: CategoryProps) {
         badges={["Live Status", "Open Now"]}
         dest={dest}
       />
-      <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold text-emerald-700">
-        <span className="relative flex h-2 w-2">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-        </span>
-        Real-time availability
-      </div>
+      <LiveStatusBadge />
+
       <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {list.map((s) => (
           <div key={s.slug} className="space-y-2">
