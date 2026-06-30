@@ -6,6 +6,7 @@ import { shopsQueryOptions } from "@/lib/shops.queries";
 const searchSchema = z.object({
   q: z.string().optional(),
   category: z.string().optional(),
+  area: z.string().optional(),
   // Filter state — all optional so default URLs stay clean
   mr: z.coerce.number().int().min(1).max(5).optional(),
   md: z.coerce.number().min(0).max(100).optional(),
@@ -27,8 +28,8 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/search")({
   validateSearch: searchSchema,
-  // Only q/category affect the underlying data query; remaining params are client-side filters.
-  loaderDeps: ({ search }) => ({ q: search.q, category: search.category }),
+  // Only q/category/area affect the underlying data query; remaining params are client-side filters.
+  loaderDeps: ({ search }) => ({ q: search.q, category: search.category, area: search.area }),
   loader: ({ context, deps }) =>
     context.queryClient.ensureQueryData(shopsQueryOptions(deps)),
   head: () => ({

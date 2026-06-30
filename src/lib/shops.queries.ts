@@ -4,6 +4,7 @@ import { listShops } from "./shops.functions";
 export const shopsQueryOptions = (input?: {
   q?: string;
   category?: string;
+  area?: string;
   limit?: number;
 }) =>
   queryOptions({

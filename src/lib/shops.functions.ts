@@ -8,9 +8,30 @@ const ListInput = z
   .object({
     q: z.string().optional(),
     category: z.string().optional(),
-    limit: z.number().int().min(1).max(50).optional(),
+    area: z.string().optional(),
+    limit: z.number().int().min(1).max(200).optional(),
   })
   .optional();
+
+function filterDemo(
+  list: Shop[],
+  data?: { q?: string; category?: string; area?: string; limit?: number },
+): Shop[] {
+  let out = list;
+  if (data?.category && data.category !== "All Categories")
+    out = out.filter((s) => s.category.toLowerCase() === data.category!.toLowerCase());
+  if (data?.area && data.area !== "All Areas")
+    out = out.filter((s) => (s.area ?? "").toLowerCase() === data.area!.toLowerCase());
+  if (data?.q) {
+    const term = data.q.toLowerCase();
+    out = out.filter((s) =>
+      [s.name, s.category, s.area ?? "", s.city, s.tagline ?? ""]
+        .some((v) => v.toLowerCase().includes(term)),
+    );
+  }
+  if (data?.limit) out = out.slice(0, data.limit);
+  return out;
+}
 
 function publicClient() {
   return createClient(
@@ -53,7 +74,7 @@ export const listShops = createServerFn({ method: "GET" })
 
       const { data: salons, error } = await q;
       if (error || !salons || salons.length === 0) {
-        return DEMO_SHOPS;
+        return filterDemo(DEMO_SHOPS, data);
       }
 
       const ids = salons.map((s) => s.id).filter((x): x is string => !!x);
@@ -95,6 +116,6 @@ export const listShops = createServerFn({ method: "GET" })
 
       return mapped;
     } catch {
-      return DEMO_SHOPS;
+      return filterDemo(DEMO_SHOPS, data);
     }
   });

@@ -133,7 +133,7 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
   }, [filters]);
 
   const { data: rawShops, isFetching } = useSuspenseQuery(
-    shopsQueryOptions({ q: search.q, category: search.category }),
+    shopsQueryOptions({ q: search.q, category: search.category, area: search.area }),
   );
 
   const filtered = useMemo(
