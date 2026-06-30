@@ -1,4 +1,41 @@
-import { test, expect, type Page } from "@playwright/test";
+import { test as base, expect, type Page } from "@playwright/test";
+import { mkdir, rm } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import path from "node:path";
+
+/**
+ * Custom fixture: always record a HAR for the test's context, but only KEEP
+ * it when the test fails. On pass we delete it so artifacts stay small.
+ * Path: test-results/har/<sanitized-title>.har — picked up by the CI
+ * `test-results/**` artifact upload.
+ */
+const HAR_DIR = path.resolve("test-results", "har");
+
+const test = base.extend<{ harPath: string }>({
+  harPath: async ({}, use, testInfo) => {
+    await mkdir(HAR_DIR, { recursive: true });
+    const slug = testInfo.title.replace(/[^a-z0-9]+/gi, "-").toLowerCase();
+    const file = path.join(HAR_DIR, `${slug}-${testInfo.workerIndex}.har`);
+    await use(file);
+  },
+  context: async ({ browser, harPath }, use, testInfo) => {
+    const ctx = await browser.newContext({
+      recordHar: { path: harPath, content: "embed" },
+    });
+    await use(ctx);
+    await ctx.close(); // flushes HAR to disk
+    if (testInfo.status === testInfo.expectedStatus && existsSync(harPath)) {
+      await rm(harPath, { force: true });
+    } else if (existsSync(harPath)) {
+      await testInfo.attach("network.har", {
+        path: harPath,
+        contentType: "application/json",
+      });
+    }
+  },
+});
+
+
 
 /**
  * Verifies the "one email = one role" guard on the District Partner signup
