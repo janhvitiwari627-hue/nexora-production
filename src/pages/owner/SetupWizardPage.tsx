@@ -101,11 +101,62 @@ function sanitizeSetupPatch(
   return cleaned;
 }
 
+const FIELD_LABELS: Record<string, string> = {
+  name: "Business name",
+  category: "Category",
+  owner_name: "Owner name",
+  phone: "Mobile",
+  whatsapp: "WhatsApp",
+  address: "Address",
+  city: "City",
+  pincode: "PIN code",
+  latitude: "Latitude",
+  longitude: "Longitude",
+  logo_url: "Logo",
+  cover_image_url: "Cover banner",
+  upi_id: "UPI ID",
+  hours: "Working hours",
+  email: "Email",
+};
+
+const FIELD_HINTS: Record<string, string> = {
+  upi_id: "Enter a valid UPI ID, e.g. yourname@okhdfc.",
+  logo_url: "Please re-upload a valid logo image.",
+  cover_image_url: "Please re-upload a valid cover image.",
+  email: "Enter a valid email address.",
+  latitude: "Latitude must be between -90 and 90.",
+  longitude: "Longitude must be between -180 and 180.",
+  name: "Business name is required.",
+};
+
+// Parse server error message of shape `Invalid setup field(s): foo, bar`
+// into a per-field error map for inline display.
+function parseFieldErrors(error: unknown): Record<string, string> {
+  const message = error instanceof Error ? error.message : String(error || "");
+  const out: Record<string, string> = {};
+  const match = message.match(/Invalid setup fields?:\s*(.+)$/i);
+  if (match) {
+    for (const raw of match[1].split(",")) {
+      const key = raw.trim().split(".")[0];
+      if (!key) continue;
+      out[key] = FIELD_HINTS[key] ?? `Please check this field.`;
+    }
+    return out;
+  }
+  // Fallback: scan for known field names mentioned anywhere in the message.
+  for (const key of Object.keys(FIELD_LABELS)) {
+    if (message.includes(key)) out[key] = FIELD_HINTS[key] ?? "Please check this field.";
+  }
+  return out;
+}
+
 function friendlySetupError(error: unknown) {
   const message = error instanceof Error ? error.message : String(error || "Please check the setup fields.");
-  if (message.includes("upi_id")) return "Please enter a valid UPI ID, for example yourname@okhdfc.";
-  if (message.includes("logo_url") || message.includes("cover_image_url") || message.includes("Invalid url")) {
-    return "Please upload a valid logo or cover image before saving.";
+  const fields = parseFieldErrors(error);
+  const keys = Object.keys(fields);
+  if (keys.length > 0) {
+    const labels = keys.map((k) => FIELD_LABELS[k] ?? k).join(", ");
+    return `Please fix: ${labels}.`;
   }
   return message;
 }
@@ -286,6 +337,7 @@ export function SetupWizardPage() {
   const lastServicesJsonRef = useRef<string>("");
   const retryRef = useRef<null | (() => Promise<void>)>(null);
   const [isRetrying, setIsRetrying] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const handleRetry = async () => {
     if (!retryRef.current) return;
@@ -320,10 +372,12 @@ export function SetupWizardPage() {
         });
         lastFormJsonRef.current = snapshot;
         retryRef.current = null;
+        setFieldErrors({});
         setAutosave({ status: "saved", at: Date.now(), error: null });
         qc.invalidateQueries({ queryKey: ["owner", "salon-full", activeSalonId] });
       } catch (e) {
         retryRef.current = runSave;
+        setFieldErrors(parseFieldErrors(e));
         setAutosave({ status: "error", at: Date.now(), error: friendlySetupError(e) });
       }
     };
@@ -352,10 +406,12 @@ export function SetupWizardPage() {
         }
         lastServicesJsonRef.current = snapshot;
         retryRef.current = null;
+        setFieldErrors({});
         setAutosave({ status: "saved", at: Date.now(), error: null });
         qc.invalidateQueries({ queryKey: ["owner", "services", activeSalonId] });
       } catch (e) {
         retryRef.current = runSave;
+        setFieldErrors(parseFieldErrors(e));
         setAutosave({ status: "error", at: Date.now(), error: friendlySetupError(e) });
       }
     };
@@ -378,10 +434,15 @@ export function SetupWizardPage() {
         ? { logo_url: result.secure_url }
         : { cover_image_url: result.secure_url };
       await updateFn({ data: { salon_id: activeSalonId, patch } });
+      setFieldErrors((prev) => {
+        const { [kind === "logo" ? "logo_url" : "cover_image_url"]: _omit, ...rest } = prev;
+        return rest;
+      });
       setAutosave({ status: "saved", at: Date.now(), error: null });
       qc.invalidateQueries({ queryKey: ["owner", "salon-full", activeSalonId] });
       return result.secure_url;
     } catch (e) {
+      setFieldErrors((prev) => ({ ...prev, ...parseFieldErrors(e) }));
       setAutosave({ status: "error", at: Date.now(), error: friendlySetupError(e) });
       toast.error(`Image upload failed: ${friendlySetupError(e)}`);
       return null;
@@ -493,10 +554,10 @@ export function SetupWizardPage() {
               <div className="space-y-5">
                 <SectionHeader icon={Building2} title="Business basics" subtitle="Tell customers who you are." />
                 <Grid2>
-                  <Field label="Business name *">
+                  <Field label="Business name *" error={fieldErrors.name}>
                     <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Luxe Hair Spa" />
                   </Field>
-                  <Field label="Category *">
+                  <Field label="Category *" error={fieldErrors.category}>
                     <select
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                       value={form.category}
@@ -506,23 +567,23 @@ export function SetupWizardPage() {
                       {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
                     </select>
                   </Field>
-                  <Field label="Owner name *" icon={User}>
+                  <Field label="Owner name *" icon={User} error={fieldErrors.owner_name}>
                     <Input value={form.owner_name} onChange={(e) => setForm({ ...form, owner_name: e.target.value })} />
                   </Field>
-                  <Field label="Mobile *" icon={Phone}>
+                  <Field label="Mobile *" icon={Phone} error={fieldErrors.phone}>
                     <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/[^\d+]/g, "") })} placeholder="9876543210" />
                   </Field>
-                  <Field label="WhatsApp *" icon={MessageCircle}>
+                  <Field label="WhatsApp *" icon={MessageCircle} error={fieldErrors.whatsapp}>
                     <Input value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: e.target.value.replace(/[^\d+]/g, "") })} placeholder="9876543210" />
                   </Field>
-                  <Field label="City">
+                  <Field label="City" error={fieldErrors.city}>
                     <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
                   </Field>
                 </Grid2>
-                <Field label="Full address *">
+                <Field label="Full address *" error={fieldErrors.address}>
                   <Textarea rows={3} value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Shop no, street, area, landmark…" />
                 </Field>
-                <Field label="PIN code">
+                <Field label="PIN code" error={fieldErrors.pincode}>
                   <Input className="max-w-[160px]" value={form.pincode} onChange={(e) => setForm({ ...form, pincode: e.target.value.replace(/\D/g, "").slice(0, 6) })} />
                 </Field>
                 <StepActions
@@ -542,10 +603,10 @@ export function SetupWizardPage() {
               <div className="space-y-5">
                 <SectionHeader icon={MapPin} title="Pin your location" subtitle="Customers tap the pin for directions." />
                 <div className="grid gap-4 sm:grid-cols-3">
-                  <Field label="Latitude">
+                  <Field label="Latitude" error={fieldErrors.latitude}>
                     <Input type="number" step="0.000001" value={form.latitude ?? ""} onChange={(e) => setForm({ ...form, latitude: e.target.value ? Number(e.target.value) : null })} />
                   </Field>
-                  <Field label="Longitude">
+                  <Field label="Longitude" error={fieldErrors.longitude}>
                     <Input type="number" step="0.000001" value={form.longitude ?? ""} onChange={(e) => setForm({ ...form, longitude: e.target.value ? Number(e.target.value) : null })} />
                   </Field>
                   <div className="flex items-end">
@@ -587,10 +648,20 @@ export function SetupWizardPage() {
               <div className="space-y-5">
                 <SectionHeader icon={ImageIcon} title="Logo & cover banner" subtitle="Square logo + wide cover work best." />
                 <div className="grid gap-6 sm:grid-cols-2">
-                  <ImagePicker label="Logo" url={form.logo_url} aspect="aspect-square"
-                    onPick={async (f) => { const u = await uploadImage(f, "logo"); if (u) setForm({ ...form, logo_url: u }); }} />
-                  <ImagePicker label="Cover banner" url={form.cover_image_url} aspect="aspect-[16/9]"
-                    onPick={async (f) => { const u = await uploadImage(f, "cover"); if (u) setForm({ ...form, cover_image_url: u }); }} />
+                  <div className="space-y-1.5">
+                    <ImagePicker label="Logo" url={form.logo_url} aspect="aspect-square"
+                      onPick={async (f) => { const u = await uploadImage(f, "logo"); if (u) setForm({ ...form, logo_url: u }); }} />
+                    {fieldErrors.logo_url && (
+                      <p role="alert" className="text-xs text-destructive">{fieldErrors.logo_url}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1.5">
+                    <ImagePicker label="Cover banner" url={form.cover_image_url} aspect="aspect-[16/9]"
+                      onPick={async (f) => { const u = await uploadImage(f, "cover"); if (u) setForm({ ...form, cover_image_url: u }); }} />
+                    {fieldErrors.cover_image_url && (
+                      <p role="alert" className="text-xs text-destructive">{fieldErrors.cover_image_url}</p>
+                    )}
+                  </div>
                 </div>
                 <StepActions
                   onSave={() => saveStep.mutate({ logo_url: form.logo_url, cover_image_url: form.cover_image_url })}
@@ -659,7 +730,7 @@ export function SetupWizardPage() {
             {step.id === "payment" && (
               <div className="space-y-5">
                 <SectionHeader icon={QrCode} title="Nexora QR — UPI setup" subtitle="Bookings accept advance via your UPI. Settlement runs daily at 10 PM." />
-                <Field label="UPI ID *">
+                <Field label="UPI ID *" error={fieldErrors.upi_id}>
                   <Input value={form.upi_id} placeholder="yourname@okhdfc"
                     onChange={(e) => setForm({ ...form, upi_id: e.target.value.trim() })} />
                 </Field>
@@ -789,14 +860,19 @@ function Grid2({ children }: { children: React.ReactNode }) {
 }
 
 function Field({
-  label, icon: Icon, children,
-}: { label: string; icon?: typeof Building2; children: React.ReactNode }) {
+  label, icon: Icon, children, error,
+}: { label: string; icon?: typeof Building2; children: React.ReactNode; error?: string }) {
   return (
     <div className="space-y-1.5">
       <Label className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
         {Icon && <Icon className="h-3.5 w-3.5" />} {label}
       </Label>
-      {children}
+      <div className={error ? "[&_input]:border-destructive [&_textarea]:border-destructive [&_select]:border-destructive" : ""}>
+        {children}
+      </div>
+      {error && (
+        <p role="alert" className="text-xs text-destructive">{error}</p>
+      )}
     </div>
   );
 }
