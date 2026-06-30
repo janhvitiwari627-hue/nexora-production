@@ -8,14 +8,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Mail, CheckCircle2 } from "lucide-react";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
-import { supabase } from "@/integrations/supabase/client";
 
 const schema = z.object({
   email: z.string().trim().email("Invalid email address").max(255),
 });
 
 const normalizeEmail = (value: string) => value.trim().toLowerCase();
-const RESET_REDIRECT_TO = "https://meripahalfasthelp.online/auth/callback?next=/reset-password";
+
+async function requestPasswordReset(email: string) {
+  await fetch("/api/public/auth/forgot-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  }).catch(() => {
+    /* always show generic success — never leak account or network state */
+  });
+}
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -33,11 +41,7 @@ export default function ForgotPasswordPage() {
     }
     setSubmitting(true);
     try {
-      await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-        redirectTo: RESET_REDIRECT_TO,
-      }).catch(() => {
-        /* always show generic success — never leak account or network state */
-      });
+      await requestPasswordReset(parsed.data.email);
       setSent(true);
     } finally {
       setSubmitting(false);

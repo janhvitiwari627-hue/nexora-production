@@ -41,6 +41,14 @@ type AccountType = "customer" | "owner" | "district_partner";
 
 const normalizeEmail = (value: string) => value.trim().toLowerCase();
 
+async function requestPasswordReset(email: string) {
+  await fetch("/api/public/auth/forgot-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+}
+
 /**
  * Normalize any thrown or returned error value into a user-facing string.
  * Handles Supabase AuthError, plain Error, string, or bare objects (some
@@ -243,8 +251,6 @@ export default function CustomerRegistrationPage() {
     if (errors[key]) setErrors((prev) => ({ ...prev, [key]: "" }));
   };
 
-  const resetRedirectTo = "https://meripahalfasthelp.online/auth/callback?next=/reset-password";
-
   const sendResetLink = async () => {
     const email = normalizeEmail(alreadyRegisteredEmail || form.email);
     const parsed = baseSchema.innerType().shape.email.safeParse(email);
@@ -256,13 +262,7 @@ export default function CustomerRegistrationPage() {
     setResetSubmitting(true);
     setServerError(null);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: resetRedirectTo,
-      });
-      if (error) {
-        setResetSent(true);
-        return;
-      }
+      await requestPasswordReset(email);
       setResetSent(true);
     } catch (err) {
       setServerError(parseErrorMessage(err));

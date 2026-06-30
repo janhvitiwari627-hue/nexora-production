@@ -234,7 +234,7 @@ function AuthCallbackPage() {
               Back to login
             </Button>
             <Button onClick={() => navigate({ to: "/forgot-password" })}>
-              Request new link
+              Request New Link
             </Button>
           </div>
         </CardContent>
