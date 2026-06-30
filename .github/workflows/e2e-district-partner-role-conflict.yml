@@ -1,0 +1,88 @@
+name: E2E — District Partner Role Conflict
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  district-partner-role-conflict:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Required for the spec to actually run. If unset in repo/org secrets the
+      # spec will skip — which we treat as a CI failure below to enforce that
+      # the friendly {role} message is verified on every PR.
+      SUPABASE_E2E_EXISTING_EMAIL: ${{ secrets.SUPABASE_E2E_EXISTING_EMAIL }}
+      SUPABASE_E2E_EXISTING_ROLE: ${{ secrets.SUPABASE_E2E_EXISTING_ROLE }}
+      PLAYWRIGHT_BASE_URL: http://localhost:8080
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Guard — required secrets present
+        run: |
+          if [ -z "${SUPABASE_E2E_EXISTING_EMAIL}" ]; then
+            echo "::error::SUPABASE_E2E_EXISTING_EMAIL secret is not set. The"\
+                 "district_partner role-conflict spec cannot verify the friendly"\
+                 "{role} message without a pre-registered email. Add the secret"\
+                 "in repo settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: bunx playwright install --with-deps chromium
+
+      - name: Start dev server
+        run: |
+          bun run dev > /tmp/dev-server.log 2>&1 &
+          echo $! > /tmp/dev-server.pid
+          # Wait for the server to accept connections (up to ~60s).
+          for i in $(seq 1 60); do
+            if curl -sSf http://localhost:8080 >/dev/null 2>&1; then
+              echo "dev server ready"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::dev server failed to start within 60s"
+          tail -n 200 /tmp/dev-server.log || true
+          exit 1
+
+      - name: Run district_partner role-conflict spec
+        run: |
+          set -o pipefail
+          bunx playwright test e2e/district-partner-role-conflict.spec.ts \
+            --reporter=list 2>&1 | tee /tmp/pw-output.log
+          # The spec calls test.skip() when SUPABASE_E2E_EXISTING_EMAIL is
+          # missing. We already guard above, but double-check the output so a
+          # silent skip can never pass this job.
+          if grep -Eq "(^|\s)skipped" /tmp/pw-output.log; then
+            echo "::error::Role-conflict spec was skipped. The friendly {role}"\
+                 "message was not verified. Failing CI."
+            exit 1
+          fi
+
+      - name: Upload Playwright trace on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-trace-district-partner
+          path: |
+            test-results/
+            /tmp/dev-server.log
+            /tmp/pw-output.log
+          if-no-files-found: ignore
+
+      - name: Stop dev server
+        if: always()
+        run: |
+          if [ -f /tmp/dev-server.pid ]; then
+            kill "$(cat /tmp/dev-server.pid)" 2>/dev/null || true
+          fi
