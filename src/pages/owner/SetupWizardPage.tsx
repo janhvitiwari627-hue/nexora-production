@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import {
   Building2, User, Phone, MessageCircle, MapPin, Image as ImageIcon, Clock,
   Sparkles, QrCode, ListChecks, Check, ChevronLeft, ChevronRight, Loader2,
-  Palette, Rocket, Upload, LocateFixed,
+  Palette, Rocket, Upload, LocateFixed, CloudUpload, CloudCheck,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
