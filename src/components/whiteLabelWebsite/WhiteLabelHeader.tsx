@@ -88,7 +88,7 @@ export function WhiteLabelHeader({ shop, template }: { shop: ShopData; template:
         </div>
       </div>
       {open && (
-        <div className="border-t bg-white md:hidden">
+        <div className="border-t md:hidden" style={{ backgroundColor: headerBg, color: template.colors.text }}>
           <nav className="grid gap-1 px-6 py-3">
             {LINKS.map((l) => (
               <a
