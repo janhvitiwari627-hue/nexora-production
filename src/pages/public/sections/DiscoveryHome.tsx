@@ -173,6 +173,12 @@ function enrich(b: MockBusiness, i: number, istHour: number): Enriched {
     weeklyBookings * 0.6 + (b.rating - 3) * 30 + (hasOffer ? 15 : 0) + ((i * 11) % 25);
   const recommendedScore =
     b.rating * 20 + (b.isVerified ? 10 : 0) + repeatRate * 25 + (hasOffer ? 8 : 0);
+  const rewardRatePct = 2 + ((i * 7) % 13); // 2–14%
+  const rewardUsagePct = 30 + ((i * 17 + b.reviewCount) % 65); // 30–94%
+  const savesCount = Math.round(40 + b.rating * 30 + (b.reviewCount % 200) + (i % 9) * 12);
+  const staffTotal = 3 + (i % 6); // 3–8
+  const staffAvailable = isOpen ? Math.max(1, staffTotal - (i % 3)) : 0;
+  const slotsAvailable = isOpen ? Math.max(0, 8 - (i % 7)) : 0;
 
   return {
     ...shop,
@@ -193,6 +199,12 @@ function enrich(b: MockBusiness, i: number, istHour: number): Enriched {
     weeklyBookings,
     popularityScore,
     latestReviewDaysAgo,
+    rewardRatePct,
+    rewardUsagePct,
+    savesCount,
+    staffAvailable,
+    staffTotal,
+    slotsAvailable,
   };
 }
 
