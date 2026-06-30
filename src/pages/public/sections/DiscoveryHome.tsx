@@ -53,13 +53,16 @@ type Enriched = Shop & {
   verifiedReviews: number;
   trendingScore: number;
   recommendedScore: number;
+  weeklyBookings: number;
+  popularityScore: number;
+  latestReviewDaysAgo: number;
 };
 
 const TRENDING_BADGE = "🔥 Trending";
 
 function enrich(b: MockBusiness, i: number): Enriched {
   const shop = mockBusinessToShop(b);
-  const joined = (i * 7 + b.reviewCount) % 240; // 0..239 days
+  const joined = (i * 7 + b.reviewCount) % 240;
   const eta = Math.max(2, Math.round((shop.distance_km ?? 1) * 3 + (i % 4)));
   const hasOffer = i % 3 === 0;
   const isOpen = i % 5 !== 0;
@@ -67,16 +70,19 @@ function enrich(b: MockBusiness, i: number): Enriched {
   const repeatRate = Math.min(1, 0.4 + ((b.reviewCount % 60) / 100));
   const ownerActivity = ((i * 13) % 100) / 100;
   const verifiedReviews = Math.round(b.reviewCount * (0.5 + ((i % 4) / 10)));
+  const weeklyBookings =
+    Math.round(20 + (b.reviewCount % 80) + (b.rating - 3) * 25 + (i % 11) * 3);
+  const popularityScore = Math.min(
+    100,
+    Math.round(
+      weeklyBookings * 0.5 + b.rating * 8 + (b.isVerified ? 6 : 0) + repeatRate * 10,
+    ),
+  );
+  const latestReviewDaysAgo = (i * 3) % 21;
   const trendingScore =
-    b.reviewCount * 0.4 +
-    (b.rating - 3) * 30 +
-    (hasOffer ? 15 : 0) +
-    ((i * 11) % 25);
+    weeklyBookings * 0.6 + (b.rating - 3) * 30 + (hasOffer ? 15 : 0) + ((i * 11) % 25);
   const recommendedScore =
-    b.rating * 20 +
-    (b.isVerified ? 10 : 0) +
-    repeatRate * 25 +
-    (hasOffer ? 8 : 0);
+    b.rating * 20 + (b.isVerified ? 10 : 0) + repeatRate * 25 + (hasOffer ? 8 : 0);
   return {
     ...shop,
     joinedDaysAgo: joined,
@@ -84,14 +90,16 @@ function enrich(b: MockBusiness, i: number): Enriched {
     etaMin: eta,
     hasOffer,
     offerPct,
-    membershipPerk:
-      i % 4 === 0 ? "10% off + free service for members" : null,
+    membershipPerk: i % 4 === 0 ? "10% off + free service for members" : null,
     isSponsored: i % 9 === 0,
     repeatRate,
     ownerActivity,
     verifiedReviews,
     trendingScore,
     recommendedScore,
+    weeklyBookings,
+    popularityScore,
+    latestReviewDaysAgo,
   };
 }
 
@@ -215,6 +223,8 @@ export function DiscoveryHome() {
         <TopRatedCategory shops={shops} />
         <TrendingCategory shops={shops} />
         <NewShopsCategory shops={shops} />
+        <MostBookedCategory shops={shops} />
+        <MostReviewedCategory shops={shops} />
       </div>
     </div>
   );
@@ -610,5 +620,93 @@ function FormulaStrip({
         </div>
       ))}
     </div>
+  );
+}
+
+/* ============= CATEGORY: MOST BOOKED ============= */
+function MostBookedCategory({ shops }: { shops: Enriched[] }) {
+  const list = useMemo(
+    () => [...shops].sort((a, b) => b.weeklyBookings - a.weeklyBookings).slice(0, 8),
+    [shops],
+  );
+  const peak = list[0]?.weeklyBookings ?? 1;
+  return (
+    <section id="cat-most-booked" className="rounded-3xl bg-gradient-to-br from-blue-50 via-white to-white p-6 ring-1 ring-blue-200 sm:p-8">
+      <CategoryHeader
+        title="Most Booked"
+        purpose="Highest weekly bookings · sorted by demand"
+        badges={["Most Booked", "Hot Demand"]}
+      />
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {list.map((s) => (
+          <div key={s.slug} className="space-y-2">
+            <Card s={s} />
+            <div className="rounded-xl bg-white p-3 ring-1 ring-slate-200">
+              <div className="flex items-center justify-between text-[11px] font-semibold text-slate-600">
+                <span>Bookings this week</span>
+                <span className="text-slate-900">{s.weeklyBookings}</span>
+              </div>
+              <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className="h-full rounded-full bg-blue-500"
+                  style={{ width: `${Math.round((s.weeklyBookings / peak) * 100)}%` }}
+                />
+              </div>
+              <div className="mt-2 flex items-center justify-between text-[11px] font-semibold text-slate-600">
+                <span>Popularity score</span>
+                <span className="rounded-full bg-blue-500/10 px-2 py-0.5 text-blue-700">
+                  {s.popularityScore}/100
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ============= CATEGORY: MOST REVIEWED ============= */
+function MostReviewedCategory({ shops }: { shops: Enriched[] }) {
+  const list = useMemo(
+    () =>
+      [...shops]
+        .filter((s) => s.verifiedReviews > 0)
+        .sort((a, b) => b.verifiedReviews - a.verifiedReviews)
+        .slice(0, 8),
+    [shops],
+  );
+  return (
+    <section id="cat-most-reviewed" className="rounded-3xl bg-gradient-to-br from-emerald-50 via-white to-white p-6 ring-1 ring-emerald-200 sm:p-8">
+      <CategoryHeader
+        title="Most Reviewed"
+        purpose="Verified reviews only · social proof leaders"
+        badges={["Verified Reviews", "Community Favourite"]}
+      />
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {list.map((s) => (
+          <div key={s.slug} className="space-y-2">
+            <Card s={s} />
+            <div className="rounded-xl bg-white p-3 ring-1 ring-slate-200">
+              <div className="flex items-center justify-between text-[11px] font-semibold text-slate-600">
+                <span>Verified reviews</span>
+                <span className="inline-flex items-center gap-1 text-slate-900">
+                  <BadgeCheck className="h-3 w-3 text-emerald-600" />
+                  {s.verifiedReviews}
+                </span>
+              </div>
+              <div className="mt-2 flex items-center justify-between text-[11px] font-semibold text-slate-600">
+                <span>Latest review</span>
+                <span className="text-slate-900">
+                  {s.latestReviewDaysAgo === 0
+                    ? "Today"
+                    : `${s.latestReviewDaysAgo}d ago`}
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
