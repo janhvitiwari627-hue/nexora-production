@@ -27,7 +27,7 @@ const COLUMNS: Col[] = [
     title: "For Owners",
     links: [
       { label: "Run your salon", to: "/for-owners" },
-      { label: "Become a partner", to: "/partner" },
+      { label: "Join Growth Partner Program", to: "/partner" },
       { label: "Pricing", to: "/for-owners" },
       { label: "Owner login", to: "/login" },
     ],
