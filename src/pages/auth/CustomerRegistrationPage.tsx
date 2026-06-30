@@ -767,11 +767,9 @@ export default function CustomerRegistrationPage() {
             </div>
           )}
 
-          {serverError && (
+          {typeof serverError === "string" && serverError.trim().length > 0 && (
             <Alert variant="destructive">
-              <AlertDescription>
-                {typeof serverError === "string" ? serverError : String(serverError)}
-              </AlertDescription>
+              <AlertDescription>{serverError.trim()}</AlertDescription>
             </Alert>
           )}
 
