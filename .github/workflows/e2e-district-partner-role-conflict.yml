@@ -101,13 +101,14 @@ jobs:
             exit 1
           fi
 
-      - name: Upload Playwright failure artifacts (trace, screenshots, video, HTML report)
+      - name: Upload Playwright failure artifacts (trace, screenshots, video, HAR, HTML report)
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-district-partner-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             test-results/**
+            test-results/har/*.har
             playwright-report/**
             /tmp/dev-server.log
             /tmp/pw-output.log
