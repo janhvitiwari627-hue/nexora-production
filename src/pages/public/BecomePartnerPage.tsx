@@ -77,7 +77,7 @@ export function BecomePartnerPage() {
         <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 md:px-6 lg:grid-cols-2">
           <div>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white">
-              <Sparkles className="h-3 w-3" /> Become a partner
+              <Sparkles className="h-3 w-3" /> Join Growth Partner Program
             </span>
             <h1 className="mt-4 text-4xl font-black tracking-tight text-white md:text-6xl" style={{ fontFamily: "Inter, sans-serif" }}>
               Earn more. <br />Stress less.
@@ -568,7 +568,7 @@ export function BecomePartnerPage() {
                 </label>
               ))}
               <button type="submit" className="bg-gradient-cta text-primary-foreground md:col-span-2 mt-2 rounded-[var(--radius-button)] px-4 py-3 text-sm font-bold shadow-[var(--shadow-glow)]">
-                Apply to become a partner
+                Join Growth Partner Program
               </button>
             </form>
           )}
