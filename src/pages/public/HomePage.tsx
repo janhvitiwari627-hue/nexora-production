@@ -357,8 +357,16 @@ function useHomeFilters(): HomeFilters {
 
 function SearchPanel() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState<string>(ALL_AREAS_LABEL);
-  const [selectedCategory, setSelectedCategory] = useState<string>(ALL_CATS_LABEL);
+  const [selectedLocation, _setSelectedLocation] = useState<string>(ALL_AREAS_LABEL);
+  const [selectedCategory, _setSelectedCategory] = useState<string>(ALL_CATS_LABEL);
+  const setSelectedLocation = (v: string) => {
+    _setSelectedLocation(v);
+    setHomeFilters({ location: v });
+  };
+  const setSelectedCategory = (v: string) => {
+    _setSelectedCategory(v);
+    setHomeFilters({ category: v });
+  };
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [activeQuickFilter, setActiveQuickFilter] = useState<string>("");
