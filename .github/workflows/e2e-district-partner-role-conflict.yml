@@ -33,11 +33,43 @@ jobs:
             exit 1
           fi
 
+      - name: Cache Bun dependencies (~/.bun/install/cache)
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock', 'bun.lockb', 'package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Resolve Playwright version
+        id: pw-version
+        run: |
+          # Use the exact installed version so cache keys invalidate on upgrades.
+          VERSION=$(node -p "require('@playwright/test/package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browsers (~/.cache/ms-playwright)
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ steps.pw-version.outputs.version }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
       - name: Install Playwright browsers
-        run: bunx playwright install --with-deps chromium
+        # Skip the browser download when the cache hit already restored them;
+        # still install OS deps which aren't cached.
+        run: |
+          if [ "${{ steps.pw-cache.outputs.cache-hit }}" = "true" ]; then
+            bunx playwright install-deps chromium
+          else
+            bunx playwright install --with-deps chromium
+          fi
+
 
       - name: Start dev server
         run: |
