@@ -116,19 +116,14 @@ export function AccountSettingsPage() {
               {SECTIONS.map((s) => {
                 const Icon = s.icon;
                 const isActive = active === s.id;
-                const isDanger = s.id === "danger";
                 return (
                   <button
                     key={s.id}
                     onClick={() => setActive(s.id)}
                     className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm font-semibold transition ${
                       isActive
-                        ? isDanger
-                          ? "bg-destructive/10 text-destructive"
-                          : "bg-primary/10 text-primary"
-                        : isDanger
-                          ? "text-destructive hover:bg-destructive/5"
-                          : "text-foreground hover:bg-accent"
+                        ? "bg-primary/10 text-primary"
+                        : "text-foreground hover:bg-accent"
                     }`}
                   >
                     <Icon className="h-4 w-4" />
@@ -136,13 +131,54 @@ export function AccountSettingsPage() {
                   </button>
                 );
               })}
+
+              <div className="border-border my-2 border-t" />
+
+              <button
+                onClick={() => setLogoutOpen(true)}
+                className="text-foreground hover:bg-destructive/5 hover:text-destructive flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm font-semibold transition"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </button>
             </nav>
           </aside>
 
           <div className="min-w-0">
             <ActiveComp />
+
+            {/* Mobile logout */}
+            <div className="mt-6 md:hidden">
+              <Button
+                variant="outline"
+                onClick={() => setLogoutOpen(true)}
+                className="hover:border-destructive/40 hover:text-destructive w-full gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </Button>
+            </div>
           </div>
         </div>
+      </div>
+
+      <AlertDialog open={logoutOpen} onOpenChange={setLogoutOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Logout from Nexora?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You can sign in again anytime with your email and password.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={loggingOut}>Cancel</AlertogCancel_REPLACE_ME>
+            <AlertDialogAction onClick={handleLogout} disabled={loggingOut}>
+              {loggingOut ? "Logging out..." : "Logout"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       </div>
     </div>
   );
