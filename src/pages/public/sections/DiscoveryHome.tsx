@@ -1263,3 +1263,498 @@ function LiveStatusBadge({ tick }: { tick: number }) {
     </div>
   );
 }
+
+/* ============= CATEGORY: LUXURY ============= */
+function LuxuryCategory({ shops, dest }: CategoryProps) {
+  const list = useMemo(
+    () =>
+      shops
+        .filter((s) => s.isLuxury || s.priceTier === "luxury")
+        .sort((a, b) => (b.starting_price ?? 0) - (a.starting_price ?? 0))
+        .slice(0, 8),
+    [shops],
+  );
+  if (list.length === 0) return null;
+  return (
+    <section
+      id="cat-luxury"
+      className="rounded-3xl bg-gradient-to-br from-violet-50 via-white to-amber-50 p-6 ring-1 ring-violet-200 sm:p-8"
+    >
+      <CategoryHeader
+        title="Luxury"
+        purpose="Premium beauty experience · verified brands · VIP services"
+        badges={["Luxury", "Premium", "VIP"]}
+        dest={dest}
+      />
+      <div className="mt-3 flex flex-wrap gap-1.5 text-[11px] font-semibold text-slate-600">
+        {["Premium Interior", "Verified Brand", "Luxury Pricing", "Premium Staff", "VIP Services"].map((b) => (
+          <span key={b} className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 ring-1 ring-violet-200">
+            <Diamond className="h-3 w-3 text-violet-600" />
+            {b}
+          </span>
+        ))}
+      </div>
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {list.map((s) => (
+          <div key={s.slug} className="space-y-2">
+            <Card s={s} />
+            <div className="flex items-center justify-between rounded-xl bg-white p-3 text-[11px] font-semibold ring-1 ring-violet-200">
+              <span className="inline-flex items-center gap-1 text-violet-700">
+                <Crown className="h-3 w-3" />
+                Luxury Badge
+              </span>
+              <span className="text-slate-900">From ₹{s.starting_price}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ============= CATEGORY: BUDGET FRIENDLY ============= */
+type PriceCap = 199 | 399 | 599;
+function BudgetFriendlyCategory({ shops, dest }: CategoryProps) {
+  const [cap, setCap] = useState<PriceCap>(399);
+  const list = useMemo(
+    () =>
+      [...shops]
+        .filter((s) => (s.starting_price ?? 9999) <= cap)
+        .sort((a, b) => (a.starting_price ?? 0) - (b.starting_price ?? 0))
+        .slice(0, 8),
+    [shops, cap],
+  );
+  return (
+    <section
+      id="cat-budget"
+      className="rounded-3xl bg-gradient-to-br from-lime-50 via-white to-white p-6 ring-1 ring-lime-200 sm:p-8"
+    >
+      <CategoryHeader
+        title="Budget Friendly"
+        purpose="Best value · lowest prices in your area"
+        badges={["Best Value", "Lowest Price"]}
+        dest={dest}
+      />
+      <div className="mt-3 inline-flex rounded-full bg-white p-1 ring-1 ring-slate-200">
+        {([199, 399, 599] as PriceCap[]).map((c) => (
+          <button
+            key={c}
+            type="button"
+            onClick={() => setCap(c)}
+            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+              cap === c ? "bg-lime-600 text-white" : "text-slate-700 hover:text-slate-900"
+            }`}
+          >
+            Under ₹{c}
+          </button>
+        ))}
+      </div>
+      {list.length === 0 ? (
+        <p className="mt-5 text-sm text-slate-500">No shops under ₹{cap}. Try a higher cap.</p>
+      ) : (
+        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {list.map((s) => (
+            <div key={s.slug} className="space-y-2">
+              <Card s={s} />
+              <div className="flex items-center justify-between rounded-xl bg-white p-3 text-[11px] font-semibold ring-1 ring-lime-200">
+                <span className="inline-flex items-center gap-1 text-lime-700">
+                  <Wallet className="h-3 w-3" />
+                  Best Value
+                </span>
+                <span className="text-slate-900">From ₹{s.starting_price}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* ============= CATEGORY: FAMILY FRIENDLY ============= */
+function FamilyFriendlyCategory({ shops, dest }: CategoryProps) {
+  const list = useMemo(
+    () => shops.filter((s) => s.suitableFor.family).slice(0, 8),
+    [shops],
+  );
+  if (list.length === 0) return null;
+  return (
+    <section
+      id="cat-family"
+      className="rounded-3xl bg-gradient-to-br from-sky-50 via-white to-white p-6 ring-1 ring-sky-200 sm:p-8"
+    >
+      <CategoryHeader
+        title="Family Friendly"
+        purpose="Suitable for kids, women, men and senior citizens"
+        badges={["Family Packages"]}
+        dest={dest}
+      />
+      <div className="mt-3 flex flex-wrap gap-1.5 text-[11px] font-semibold text-slate-600">
+        {[
+          { l: "Kids", I: Baby },
+          { l: "Women", I: UserRound },
+          { l: "Men", I: User },
+          { l: "Seniors", I: Users },
+        ].map(({ l, I }) => (
+          <span key={l} className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 ring-1 ring-sky-200">
+            <I className="h-3 w-3 text-sky-600" />
+            {l}
+          </span>
+        ))}
+      </div>
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {list.map((s) => (
+          <div key={s.slug} className="space-y-2">
+            <Card s={s} />
+            <div className="flex flex-wrap gap-1 rounded-xl bg-white p-3 text-[10px] font-semibold ring-1 ring-sky-200">
+              {s.suitableFor.kids && <span className="rounded-full bg-sky-50 px-2 py-0.5 text-sky-700">Kids</span>}
+              {s.suitableFor.women && <span className="rounded-full bg-sky-50 px-2 py-0.5 text-sky-700">Women</span>}
+              {s.suitableFor.men && <span className="rounded-full bg-sky-50 px-2 py-0.5 text-sky-700">Men</span>}
+              {s.suitableFor.seniors && <span className="rounded-full bg-sky-50 px-2 py-0.5 text-sky-700">Seniors</span>}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ============= CATEGORY: WOMEN ONLY ============= */
+function WomenOnlyCategory({ shops, dest }: CategoryProps) {
+  const list = useMemo(
+    () => shops.filter((s) => s.genderFocus === "female").slice(0, 8),
+    [shops],
+  );
+  if (list.length === 0) return null;
+  return (
+    <section
+      id="cat-women-only"
+      className="rounded-3xl bg-gradient-to-br from-pink-50 via-white to-white p-6 ring-1 ring-pink-200 sm:p-8"
+    >
+      <CategoryHeader
+        title="Women Only"
+        purpose="Only female staff · ladies salons · women spas & beauty parlours"
+        badges={["Women Only", "Female Staff"]}
+        dest={dest}
+      />
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {list.map((s) => (
+          <Card key={s.slug} s={s} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ============= CATEGORY: MEN ONLY ============= */
+function MenOnlyCategory({ shops, dest }: CategoryProps) {
+  const list = useMemo(
+    () => shops.filter((s) => s.genderFocus === "male").slice(0, 8),
+    [shops],
+  );
+  if (list.length === 0) return null;
+  return (
+    <section
+      id="cat-men-only"
+      className="rounded-3xl bg-gradient-to-br from-slate-100 via-white to-white p-6 ring-1 ring-slate-300 sm:p-8"
+    >
+      <CategoryHeader
+        title="Men Only"
+        purpose="Barber shops · men's spa · grooming & salons"
+        badges={["Men Only", "Grooming"]}
+        dest={dest}
+      />
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {list.map((s) => (
+          <Card key={s.slug} s={s} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ============= CATEGORY: UNISEX ============= */
+function UnisexCategory({ shops, dest }: CategoryProps) {
+  const list = useMemo(
+    () => shops.filter((s) => s.genderFocus === "unisex").slice(0, 8),
+    [shops],
+  );
+  if (list.length === 0) return null;
+  return (
+    <section
+      id="cat-unisex"
+      className="rounded-3xl bg-gradient-to-br from-indigo-50 via-white to-white p-6 ring-1 ring-indigo-200 sm:p-8"
+    >
+      <CategoryHeader
+        title="Unisex"
+        purpose="Suitable for men, women, family and couples"
+        badges={["Unisex", "Couples"]}
+        dest={dest}
+      />
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {list.map((s) => (
+          <Card key={s.slug} s={s} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ============= CATEGORY: HOME SERVICE ============= */
+function HomeServiceCategory({ shops, dest }: CategoryProps) {
+  const list = useMemo(
+    () =>
+      shops
+        .filter((s) => s.isHomeService)
+        .sort((a, b) => a.arrivalMin - b.arrivalMin)
+        .slice(0, 8),
+    [shops],
+  );
+  if (list.length === 0) return null;
+  return (
+    <section
+      id="cat-home-service"
+      className="rounded-3xl bg-gradient-to-br from-teal-50 via-white to-white p-6 ring-1 ring-teal-200 sm:p-8"
+    >
+      <CategoryHeader
+        title="Home Service"
+        purpose="Professional visits your location · book a slot at home"
+        badges={["Home Visit", "At Your Door"]}
+        dest={dest}
+      />
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {list.map((s) => (
+          <div key={s.slug} className="space-y-2">
+            <Card s={s} />
+            <div className="space-y-1.5 rounded-xl bg-white p-3 text-[11px] font-semibold ring-1 ring-teal-200">
+              <div className="flex items-center justify-between text-slate-600">
+                <span className="inline-flex items-center gap-1"><Home className="h-3 w-3 text-teal-600" /> Travel</span>
+                <span className="text-slate-900">₹{s.travelChargeINR}</span>
+              </div>
+              <div className="flex items-center justify-between text-slate-600">
+                <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3 text-teal-600" /> Arrival</span>
+                <span className="text-slate-900">~{s.arrivalMin} min</span>
+              </div>
+              <div className="text-[10px] text-slate-500">Areas: {s.serviceAreas.join(", ")}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ============= CATEGORY: PREMIUM MEMBERS CHOICE ============= */
+type MTier = "silver" | "gold" | "platinum" | "vip";
+function PremiumMembersCategory({ shops, dest }: CategoryProps) {
+  const [tier, setTier] = useState<MTier>("gold");
+  const rank: Record<MTier, number> = { silver: 1, gold: 2, platinum: 3, vip: 4 };
+  const list = useMemo(
+    () =>
+      shops
+        .filter((s) => s.membershipTier && rank[s.membershipTier] >= rank[tier])
+        .slice(0, 8),
+    [shops, tier],
+  );
+  return (
+    <section
+      id="cat-members-choice"
+      className="rounded-3xl bg-gradient-to-br from-amber-50 via-white to-violet-50 p-6 ring-1 ring-amber-200 sm:p-8"
+    >
+      <CategoryHeader
+        title="Premium Members Choice"
+        purpose="Visible to members · based on membership usage & exclusive benefits"
+        badges={["Members Only", "Exclusive"]}
+        dest={dest}
+      />
+      <div className="mt-3 inline-flex rounded-full bg-white p-1 ring-1 ring-slate-200">
+        {(["silver", "gold", "platinum", "vip"] as MTier[]).map((t) => (
+          <button
+            key={t}
+            type="button"
+            onClick={() => setTier(t)}
+            className={`rounded-full px-3 py-1.5 text-xs font-semibold capitalize transition ${
+              tier === t ? "bg-slate-900 text-white" : "text-slate-700 hover:text-slate-900"
+            }`}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
+      {list.length === 0 ? (
+        <p className="mt-5 text-sm text-slate-500">No {tier}+ exclusives in this filter.</p>
+      ) : (
+        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {list.map((s) => (
+            <div key={s.slug} className="space-y-2">
+              <Card s={s} />
+              <div className="flex items-center justify-between rounded-xl bg-white p-3 text-[11px] font-semibold ring-1 ring-amber-200">
+                <span className="inline-flex items-center gap-1 text-amber-700">
+                  <Gem className="h-3 w-3" />
+                  {s.membershipTier?.toUpperCase()}
+                </span>
+                <span className="text-slate-900">Exclusive benefits</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* ============= CATEGORY: AI RECOMMENDED ============= */
+function AIRecommendedCategory({ shops, dest }: CategoryProps) {
+  const list = useMemo(
+    () => [...shops].sort((a, b) => b.aiMatchPct - a.aiMatchPct).slice(0, 8),
+    [shops],
+  );
+  if (list.length === 0) return null;
+  return (
+    <section
+      id="cat-ai-recommended"
+      className="rounded-3xl bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 p-6 ring-1 ring-violet-200 sm:p-8"
+    >
+      <CategoryHeader
+        title="AI Recommended"
+        purpose="AI analyzes bookings, favorites, location, budget & reward usage"
+        badges={["AI Match", "Personalised"]}
+        dest={dest}
+      />
+      <div className="mt-3 flex flex-wrap gap-1.5 text-[11px] font-semibold text-slate-600">
+        {["Previous Bookings", "Favorite Services", "Location", "Budget", "Preferred Staff", "Visit Frequency", "Reward Usage", "Membership"].map((b) => (
+          <span key={b} className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 ring-1 ring-violet-200">
+            <Sparkles className="h-3 w-3 text-violet-600" />
+            {b}
+          </span>
+        ))}
+      </div>
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {list.map((s) => (
+          <div key={s.slug} className="space-y-2">
+            <Card s={s} accent="ai" />
+            <div className="rounded-xl bg-white p-3 ring-1 ring-violet-200">
+              <div className="flex items-center justify-between text-[11px] font-semibold text-slate-600">
+                <span>AI match</span>
+                <span className="rounded-full bg-violet-500/10 px-2 py-0.5 text-violet-700">{s.aiMatchPct}%</span>
+              </div>
+              <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                <div className="h-full rounded-full bg-violet-500" style={{ width: `${s.aiMatchPct}%` }} />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ============= CATEGORY: STAFF PICKS ============= */
+type Specialty = "Hair" | "Spa" | "Tattoo" | "Makeup" | "Nails";
+function StaffPicksCategory({ shops, dest }: CategoryProps) {
+  const [sp, setSp] = useState<Specialty>("Hair");
+  const specs: { id: Specialty; I: typeof Scissors }[] = [
+    { id: "Hair", I: Scissors },
+    { id: "Spa", I: Sparkles },
+    { id: "Tattoo", I: PaintBucket },
+    { id: "Makeup", I: Brush },
+    { id: "Nails", I: Award },
+  ];
+  const list = useMemo(
+    () => shops.filter((s) => s.staffPickSpecialty === sp).slice(0, 8),
+    [shops, sp],
+  );
+  return (
+    <section
+      id="cat-staff-picks"
+      className="rounded-3xl bg-gradient-to-br from-fuchsia-50 via-white to-white p-6 ring-1 ring-fuchsia-200 sm:p-8"
+    >
+      <CategoryHeader
+        title="Staff Picks"
+        purpose="Top professionals across specialties"
+        badges={["Top Pros", "Expert Picks"]}
+        dest={dest}
+      />
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        {specs.map(({ id, I }) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => setSp(id)}
+            className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+              sp === id ? "bg-fuchsia-600 text-white" : "bg-white text-slate-700 ring-1 ring-slate-200 hover:text-slate-900"
+            }`}
+          >
+            <I className="h-3 w-3" />
+            {id}
+          </button>
+        ))}
+      </div>
+      {list.length === 0 ? (
+        <p className="mt-5 text-sm text-slate-500">No {sp} experts in this filter.</p>
+      ) : (
+        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {list.map((s) => (
+            <Card key={s.slug} s={s} />
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* ============= CATEGORY: SEASONAL PICKS ============= */
+type Season = "Wedding" | "Festival" | "Summer" | "Winter" | "Monsoon" | "Holiday";
+function SeasonalPicksCategory({ shops, dest }: CategoryProps) {
+  const seasons: { id: Season; I: typeof Sun; cls: string }[] = [
+    { id: "Wedding", I: Crown, cls: "from-rose-50 to-amber-50 ring-rose-200" },
+    { id: "Festival", I: PartyPopper, cls: "from-orange-50 to-yellow-50 ring-orange-200" },
+    { id: "Summer", I: Sun, cls: "from-yellow-50 to-amber-50 ring-yellow-200" },
+    { id: "Winter", I: Snowflake, cls: "from-sky-50 to-blue-50 ring-sky-200" },
+    { id: "Monsoon", I: CloudRain, cls: "from-emerald-50 to-teal-50 ring-teal-200" },
+    { id: "Holiday", I: Gift, cls: "from-violet-50 to-pink-50 ring-violet-200" },
+  ];
+  const [season, setSeason] = useState<Season>("Wedding");
+  const list = useMemo(
+    () => shops.filter((s) => s.seasonTag === season).slice(0, 8),
+    [shops, season],
+  );
+  const active = seasons.find((s) => s.id === season)!;
+  return (
+    <section
+      id="cat-seasonal"
+      className={`rounded-3xl bg-gradient-to-br ${active.cls} p-6 ring-1 sm:p-8`}
+    >
+      <CategoryHeader
+        title="Seasonal Picks"
+        purpose="Curated for the moment · wedding, festival, summer, winter, monsoon & holiday specials"
+        badges={["Seasonal"]}
+        dest={dest}
+      />
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        {seasons.map(({ id, I }) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => setSeason(id)}
+            className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+              season === id ? "bg-slate-900 text-white" : "bg-white text-slate-700 ring-1 ring-slate-200 hover:text-slate-900"
+            }`}
+          >
+            <I className="h-3 w-3" />
+            {id}
+          </button>
+        ))}
+      </div>
+      {list.length === 0 ? (
+        <p className="mt-5 text-sm text-slate-500">No {season} specials in this filter.</p>
+      ) : (
+        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {list.map((s) => (
+            <Card key={s.slug} s={s} />
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
