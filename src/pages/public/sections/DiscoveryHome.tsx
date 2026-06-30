@@ -217,10 +217,11 @@ function useEnrichedShops(
   selectedCategory: string | undefined,
   allAreasLabel: string,
   allCategoriesLabel: string,
+  liveTick: number,
 ): Enriched[] {
   return useMemo(() => {
     const istHour = nowISTHour();
-    const all = getMockBusinesses().map((b, i) => enrich(b, i, istHour));
+    const all = getMockBusinesses().map((b, i) => enrich(b, i, istHour, liveTick));
     return all.filter((s) => {
       if (selectedLocation && selectedLocation !== allAreasLabel) {
         if (s.area !== selectedLocation) return false;
