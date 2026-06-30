@@ -231,7 +231,7 @@ function useEnrichedShops(
       }
       return true;
     });
-  }, [selectedLocation, selectedCategory, allAreasLabel, allCategoriesLabel]);
+  }, [selectedLocation, selectedCategory, allAreasLabel, allCategoriesLabel, liveTick]);
 }
 
 /* ============= TOP-LEVEL ============= */
@@ -241,11 +241,30 @@ export function DiscoveryHome({
   allAreasLabel = "All locations",
   allCategoriesLabel = "All categories",
 }: DiscoveryHomeProps = {}) {
+  // Live tick — refreshes Open Now staff/slot availability every 20s while page is visible.
+  const [liveTick, setLiveTick] = useState(0);
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      if (document.visibilityState === "visible") {
+        setLiveTick((t) => t + 1);
+      }
+    }, 20_000);
+    const onVis = () => {
+      if (document.visibilityState === "visible") setLiveTick((t) => t + 1);
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      window.clearInterval(id);
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, []);
+
   const shops = useEnrichedShops(
     selectedLocation,
     selectedCategory,
     allAreasLabel,
     allCategoriesLabel,
+    liveTick,
   );
 
   // Base dest carries the user's active home filters into deep links.
