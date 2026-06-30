@@ -14,9 +14,16 @@ import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
 import { useAuthStore } from "@/stores/authStore";
 
 const normalizeEmail = (value: string) => value.trim().toLowerCase();
-const RESET_REDIRECT_TO = "https://meripahalfasthelp.online/auth/callback?next=/reset-password";
 const RECOVERY_ERROR_MESSAGE =
   "Reset link expired or already used. Please request a new password reset link.";
+
+async function requestPasswordReset(email: string) {
+  await fetch("/api/public/auth/forgot-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+}
 
 const safeAuthErrorMessage = (err: unknown, fallback: string) => {
   const message = err instanceof Error ? err.message : fallback;
@@ -81,13 +88,7 @@ export default function CustomerLoginPage() {
     setResetSubmitting(true);
     setServerError(null);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: RESET_REDIRECT_TO,
-      });
-      if (error) {
-        setResetSent(true);
-        return;
-      }
+      await requestPasswordReset(email);
       setResetSent(true);
     } catch (err) {
       setServerError(err instanceof Error ? err.message : "Could not send reset link. Please try again.");

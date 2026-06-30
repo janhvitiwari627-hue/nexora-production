@@ -138,7 +138,7 @@ export default function ResetPasswordPage() {
                 </AlertDescription>
               </Alert>
               <Button className="w-full" onClick={() => navigate({ to: "/forgot-password" })}>
-                Request new link
+                Request New Link
               </Button>
             </div>
           ) : done ? (

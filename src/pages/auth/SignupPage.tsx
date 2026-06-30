@@ -17,6 +17,14 @@ const normalizeEmail = (value: string) => value.trim().toLowerCase();
 
 const emailOnlySchema = z.string().trim().email("Invalid email address").max(255);
 
+async function requestPasswordReset(email: string) {
+  await fetch("/api/public/auth/forgot-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+}
+
 const schema = z
   .object({
     full_name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
@@ -96,8 +104,6 @@ export default function SignupPage() {
     if (errors[key]) setErrors((p) => ({ ...p, [key]: "" }));
   };
 
-  const resetRedirectTo = "https://meripahalfasthelp.online/auth/callback?next=/reset-password";
-
   const sendResetLink = async () => {
     const email = normalizeEmail(alreadyRegisteredEmail || form.email);
     const parsed = emailOnlySchema.safeParse(email);
@@ -109,13 +115,7 @@ export default function SignupPage() {
     setResetSubmitting(true);
     setServerError(null);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: resetRedirectTo,
-      });
-      if (error) {
-        setResetSent(true);
-        return;
-      }
+      await requestPasswordReset(email);
       setResetSent(true);
     } catch (err) {
       setServerError(parseErr(err));
