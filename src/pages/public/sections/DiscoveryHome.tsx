@@ -436,6 +436,9 @@ export function DiscoveryHome({
         <NewShopsCategory shops={shops} dest={{ ...baseDest }} />
         <MostBookedCategory shops={shops} dest={{ ...baseDest, sort: "popular" }} />
         <MostReviewedCategory shops={shops} dest={{ ...baseDest, sort: "rating" }} />
+        <MostRewardedCategory shops={shops} dest={{ ...baseDest }} />
+        <MostSavedCategory shops={shops} dest={{ ...baseDest }} />
+        <OpenNowCategory shops={shops} dest={{ ...baseDest, on: 1, sort: "distance" }} />
       </div>
     </div>
   );
