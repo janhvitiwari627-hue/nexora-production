@@ -1244,6 +1244,7 @@ function Section({
 
 /* ============= PAGE ============= */
 export function HomePage() {
+  const filters = useHomeFilters();
   return (
     <div className="min-h-screen bg-[#F8FAFC] font-sans text-slate-900 antialiased">
       <PublicHeader showBackButton={false} />
@@ -1252,8 +1253,8 @@ export function HomePage() {
         <SearchPanel />
         <CategoryGrid />
         <DiscoveryHome
-          selectedLocation={selectedLocation}
-          selectedCategory={selectedCategory}
+          selectedLocation={filters.location}
+          selectedCategory={filters.category}
           allAreasLabel={ALL_AREAS_LABEL}
           allCategoriesLabel={ALL_CATS_LABEL}
         />
