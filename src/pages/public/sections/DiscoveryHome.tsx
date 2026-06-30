@@ -283,6 +283,46 @@ function enrich(b: MockBusiness, i: number, istHour: number, liveTick: number): 
   const seasons: Enriched["seasonTag"][] = ["Wedding", "Festival", "Summer", "Winter", "Monsoon", "Holiday"];
   const seasonTag = seasons[i % seasons.length];
 
+  const allFestivals: FestivalTag[] = [
+    "Diwali", "Holi", "Karwa Chauth", "Eid", "Christmas", "New Year", "Raksha Bandhan",
+  ];
+  const festivalTags: FestivalTag[] = [
+    allFestivals[i % allFestivals.length],
+    allFestivals[(i * 3 + 2) % allFestivals.length],
+  ].filter((v, idx, arr) => arr.indexOf(v) === idx);
+
+  const isCoupleFriendly = i % 4 === 0 || isSpa;
+  const couplePackagePriceINR = isCoupleFriendly ? 1499 + ((i * 113) % 2500) : 0;
+  const partnerDiscountPct = isCoupleFriendly ? 10 + ((i * 7) % 21) : 0;
+
+  const isStudentSpecial = i % 5 === 0;
+  const studentDiscountPct = isStudentSpecial ? 10 + ((i * 11) % 26) : 0;
+
+  const isOfficeBreak = i % 4 === 1;
+  const expressMins = [15, 20, 30, 45][i % 4];
+
+  const isBridal = (isLadies || cat.includes("makeup") || cat.includes("beauty")) && i % 3 === 0;
+  const bridalPackagePriceINR = isBridal ? 4999 + ((i * 313) % 25000) : 0;
+
+  const isTattoo = cat.includes("tattoo") || i % 11 === 0;
+  const tattooTypes: Enriched["tattooType"][] = ["Minimal", "Premium", "Cover Up", "Removal"];
+  const tattooType = isTattoo ? tattooTypes[i % tattooTypes.length] : null;
+  const artistNames = ["Aarav Ink", "Riya Studio", "Vikram Tattoo", "Neha Art", "Karan Pro"];
+  const tattooArtist = isTattoo ? artistNames[i % artistNames.length] : null;
+
+  const isNailStudio = cat.includes("nail") || i % 9 === 0;
+  const nailServices: Enriched["nailService"][] = ["Gel", "Acrylic", "Extensions", "Luxury Art"];
+  const nailService = isNailStudio ? nailServices[i % nailServices.length] : null;
+
+  const isWellness = isSpa || cat.includes("wellness") || cat.includes("ayurved") || i % 7 === 0;
+  const wellnessFoci: Enriched["wellnessFocus"][] = ["Spa", "Massage", "Therapy", "Relaxation", "Ayurveda"];
+  const wellnessFocus = isWellness ? wellnessFoci[i % wellnessFoci.length] : null;
+
+  const isKidsCollection = suitableFor.kids && (cat.includes("salon") || i % 5 === 0);
+  const isSeniorFriendly = suitableFor.seniors || i % 6 === 0;
+  const wheelchairAccessible = isSeniorFriendly && i % 2 === 0;
+
+
   return {
     ...shop,
     joinedDaysAgo: joined,
