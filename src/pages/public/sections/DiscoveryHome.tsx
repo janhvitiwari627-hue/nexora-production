@@ -654,6 +654,19 @@ export function DiscoveryHome({
         <AIRecommendedCategory shops={shops} dest={{ ...baseDest, sort: "popular" }} />
         <StaffPicksCategory shops={shops} dest={{ ...baseDest }} />
         <SeasonalPicksCategory shops={shops} dest={{ ...baseDest }} />
+        <FestivalSpecialsCategory shops={shops} dest={{ ...baseDest }} />
+        <CoupleFriendlyCategory shops={shops} dest={{ ...baseDest }} />
+        <StudentSpecialsCategory shops={shops} dest={{ ...baseDest }} />
+        <OfficeBreakCategory shops={shops} dest={{ ...baseDest }} />
+        <BridalCollectionCategory shops={shops} dest={{ ...baseDest }} />
+        <TattooCollectionCategory shops={shops} dest={{ ...baseDest }} />
+        <NailStudioCategory shops={shops} dest={{ ...baseDest }} />
+        <WellnessCollectionCategory shops={shops} dest={{ ...baseDest }} />
+        <KidsCollectionCategory shops={shops} dest={{ ...baseDest }} />
+        <SeniorCitizenCategory shops={shops} dest={{ ...baseDest }} />
+        <SmartFiltersBar dest={{ ...baseDest }} />
+        <SmartSortingBar dest={{ ...baseDest }} />
+        <DiscoveryBadgesLegend />
       </div>
     </div>
   );
