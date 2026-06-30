@@ -49,7 +49,7 @@ function SearchRoute() {
   return (
     <SearchResultsPage
       search={search}
-      onSearchChange={(next) => navigate({ search: next, replace: true })}
+      onSearchChange={(next) => navigate({ search: next, replace: false, resetScroll: false })}
     />
   );
 }
