@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -26,14 +26,19 @@ import { InstantBookingSection } from "./search/InstantBookingSection";
 import { VoiceSearchButton } from "@/components/search/VoiceSearchButton";
 import {
   DEFAULT_FILTERS,
+  filtersFromSearch,
+  filtersToSearch,
   isDefault,
   PRICE_MIN,
   PRICE_MAX,
+  sortFromSearch,
+  viewFromSearch,
   type Filters,
+  type SearchUrlParams,
   type SortKey,
 } from "./search/filters";
 
-type SearchParams = { q?: string; category?: string };
+type SearchParams = SearchUrlParams;
 
 interface Props {
   search: SearchParams;
@@ -108,14 +113,28 @@ function sortShops(shops: Shop[], sort: SortKey): Shop[] {
 }
 
 export function SearchResultsPage({ search, onSearchChange }: Props) {
-  const [q, setQ] = useState(search.q ?? "");
-  const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
-  const [draft, setDraft] = useState<Filters>(DEFAULT_FILTERS);
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const [sort, setSort] = useState<SortKey>("relevance");
-  const [view, setView] = useState<"grid" | "map">("grid");
+  // Filters / sort / view are derived from the URL so refresh & sharing preserve state.
+  const filters = useMemo(() => filtersFromSearch(search), [search]);
+  const sort = sortFromSearch(search);
+  const view = viewFromSearch(search);
 
-  const { data: rawShops, isFetching } = useSuspenseQuery(shopsQueryOptions(search));
+  // Local typing buffer for the search input — committed to URL on submit.
+  const [q, setQ] = useState(search.q ?? "");
+  // Staging buffer for the filter sidebar (Apply commits to URL).
+  const [draft, setDraft] = useState<Filters>(filters);
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  // Re-sync local buffers when URL changes externally (back/forward, share-link).
+  useEffect(() => {
+    setQ(search.q ?? "");
+  }, [search.q]);
+  useEffect(() => {
+    setDraft(filters);
+  }, [filters]);
+
+  const { data: rawShops, isFetching } = useSuspenseQuery(
+    shopsQueryOptions({ q: search.q, category: search.category }),
+  );
 
   const filtered = useMemo(
     () => sortShops(applyFilters(rawShops, filters, q), sort),
@@ -132,15 +151,36 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
     return { lowest: lowest.slug, best: best.slug, popular: popular.slug };
   }, [filtered]);
 
+  // Helpers to write back to the URL while preserving unrelated params.
+  const commitFilters = (f: Filters) => {
+    onSearchChange({
+      q: search.q,
+      category: search.category,
+      sort: search.sort,
+      view: search.view,
+      ...filtersToSearch(f),
+    });
+  };
+  const setSort = (next: SortKey) => {
+    const { sort: _omit, ...rest } = search;
+    onSearchChange(next === "relevance" ? rest : { ...rest, sort: next });
+  };
+  const setView = (next: "grid" | "map") => {
+    const { view: _omit, ...rest } = search;
+    onSearchChange(next === "grid" ? rest : { ...rest, view: next });
+  };
+
   const resetFilters = () => {
     setDraft(DEFAULT_FILTERS);
-    setFilters(DEFAULT_FILTERS);
+    commitFilters(DEFAULT_FILTERS);
   };
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
     onSearchChange({ ...search, q: q || undefined });
   };
+
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -190,7 +230,7 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
               <FilterSidebar
                 draft={draft}
                 onChange={setDraft}
-                onApply={() => setFilters(draft)}
+                onApply={() => commitFilters(draft)}
                 onReset={resetFilters}
               />
             </div>
@@ -232,8 +272,8 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
               <ActiveFiltersBar
                 filters={filters}
                 onChange={(f) => {
-                  setFilters(f);
                   setDraft(f);
+                  commitFilters(f);
                 }}
                 onResetAll={resetFilters}
               />
@@ -305,7 +345,7 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
         onClose={() => setSheetOpen(false)}
         draft={draft}
         onChange={setDraft}
-        onApply={() => setFilters(draft)}
+        onApply={() => commitFilters(draft)}
         onReset={resetFilters}
       />
     </div>
