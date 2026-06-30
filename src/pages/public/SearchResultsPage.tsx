@@ -345,6 +345,17 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
             </div>
 
             <div className="mb-6">
+              <DiscoveryRails
+                shops={rawShops}
+                onApplyFilters={(f) => {
+                  setDraft(f);
+                  commitFilters(f);
+                }}
+                onSelectCategory={(cat) => {
+                  const { category: _omit, ...rest } = search;
+                  onSearchChange({ ...rest, category: cat });
+                }}
+              />
               <InstantBookingSection shops={filtered} />
             </div>
 
