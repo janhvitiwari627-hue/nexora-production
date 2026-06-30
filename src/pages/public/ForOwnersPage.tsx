@@ -107,7 +107,7 @@ export function ForOwnersPage() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
-              to="/owner/create-website"
+              to="/owner/templates"
               className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-2 rounded-[var(--radius-button)] px-6 py-3 text-sm font-bold shadow-[var(--shadow-glow)]"
             >
               Create Shop Website <ArrowRight className="h-4 w-4" />
@@ -286,7 +286,7 @@ export function ForOwnersPage() {
             Join 12,000+ salons using Nexora to delight their customers and grow faster.
           </p>
           <Link
-            to="/owner/create-website"
+            to="/owner/templates"
             className="bg-card text-heading mt-7 inline-flex items-center gap-2 rounded-[var(--radius-button)] px-7 py-3.5 text-sm font-bold shadow-2xl"
           >
             Create Shop Website <ArrowRight className="h-4 w-4" />

@@ -598,7 +598,7 @@ export function SetupWizardPage() {
                   <p className="text-sm text-muted-foreground">No theme picked yet.</p>
                 )}
                 <Button asChild variant="outline">
-                  <Link to="/owner/create-website">Open template gallery</Link>
+                  <Link to="/owner/templates">Open template gallery</Link>
                 </Button>
                 <StepActions
                   onSave={null}

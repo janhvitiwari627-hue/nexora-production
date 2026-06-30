@@ -178,7 +178,7 @@ function Hero() {
               Explore Salons <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
-              to="/owner/create-website"
+              to="/owner/templates"
               className="inline-flex h-12 items-center gap-2 rounded-full border border-slate-200 bg-white px-6 text-sm font-semibold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300"
             >
               Create Shop Website
@@ -936,7 +936,7 @@ function EmptyState() {
       </p>
       <div className="mt-6 flex flex-wrap justify-center gap-3">
         <Link
-          to="/owner/create-website"
+          to="/owner/templates"
           className="inline-flex h-11 items-center rounded-full bg-slate-900 px-5 text-sm font-semibold text-white"
         >
           Create Shop Website
@@ -1016,7 +1016,7 @@ function WebsiteBuilder() {
       subtitle="Template choose karo, details add karo, publish karo aur online bookings receive karo."
       action={
         <Link
-          to="/owner/create-website"
+          to="/owner/templates"
           className="inline-flex items-center gap-1 text-sm font-semibold text-slate-900"
         >
           Browse all <ArrowRight className="h-4 w-4" />
@@ -1046,7 +1046,7 @@ function WebsiteBuilder() {
                 Premium pages, booking, gallery, reviews & more.
               </p>
               <Link
-                to="/owner/create-website"
+                to="/owner/templates"
                 className="mt-5 inline-flex h-11 items-center gap-2 rounded-full bg-slate-900 px-5 text-sm font-semibold text-white"
               >
                 Preview Template <ChevronRight className="h-4 w-4" />
@@ -1057,7 +1057,7 @@ function WebsiteBuilder() {
       </div>
       <div className="mt-10 flex justify-center">
         <Link
-          to="/owner/create-website"
+          to="/owner/templates"
           className="inline-flex h-12 items-center gap-2 rounded-full bg-gradient-to-r from-[#2563EB] to-[#6D28D9] px-7 text-sm font-bold text-white shadow-lg shadow-blue-200/70"
         >
           Create Your Website <ArrowRight className="h-4 w-4" />
@@ -1166,7 +1166,7 @@ function FinalCTA() {
             Explore Salons <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
-            to="/owner/create-website"
+            to="/owner/templates"
             className="inline-flex h-12 items-center gap-2 rounded-full border border-white/30 bg-white/5 px-6 text-sm font-bold text-white backdrop-blur"
           >
             Create Shop Website

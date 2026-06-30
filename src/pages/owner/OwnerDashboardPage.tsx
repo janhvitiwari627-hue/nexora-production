@@ -67,7 +67,7 @@ function TopBar({ open, onToggle }: { open: boolean; onToggle: (v: boolean) => v
             <Switch checked={open} onCheckedChange={onToggle} className="ml-1" />
           </div>
           <Button variant="ghost" size="sm" className="hidden md:inline-flex gap-1.5" asChild>
-            <a href="/owner/create-website"><Globe className="h-4 w-4" /> Website</a>
+            <a href="/owner/templates"><Globe className="h-4 w-4" /> Website</a>
           </Button>
           <Button variant="outline" size="sm" className="hidden md:inline-flex gap-1.5" asChild>
             <a href="/owner/website"><Settings className="h-4 w-4" /> Edit Website</a>
@@ -516,7 +516,7 @@ export function OwnerDashboardPage() {
   // Mandatory onboarding: redirect approved owners with no website yet to template gallery.
   const needsWebsite = !!activeSalon && activeSalon.website_created === false;
   useEffect(() => {
-    if (needsWebsite) navigate({ to: "/owner/create-website" });
+    if (needsWebsite) navigate({ to: "/owner/templates" });
   }, [needsWebsite, navigate]);
 
   // Compute greeting on the client only to avoid SSR/CSR hydration mismatch
@@ -545,7 +545,7 @@ export function OwnerDashboardPage() {
                   </div>
                 </div>
               </div>
-              <Button onClick={() => navigate({ to: "/owner/create-website" })}>
+              <Button onClick={() => navigate({ to: "/owner/templates" })}>
                 Create Website
               </Button>
             </div>

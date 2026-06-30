@@ -42,7 +42,7 @@ const NAV = [
   { to: "/search", label: "Explore", icon: null },
   { to: "/jobs", label: "Job Portal", icon: Briefcase },
   { to: "/partner/growth", label: "Partner Growth", icon: TrendingUp },
-  { to: "/owner/create-website", label: "Create Shop Website", icon: null },
+  { to: "/owner/templates", label: "Create Shop Website", icon: null },
 ] as const;
 
 const PORTAL_MENU = [
