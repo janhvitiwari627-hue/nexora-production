@@ -152,6 +152,19 @@ export default function SignupPage() {
     setSubmitting(true);
     try {
       const email = normalizeEmail(parsed.data.email);
+
+      // Enforce one-email-one-role before creating the auth user
+      try {
+        const check = await checkEmailRoleFn({ data: { email } });
+        if (check.exists) {
+          setAlreadyRegisteredEmail(email);
+          setServerError(roleConflictMessage(check.roleLabel, "Customer"));
+          return;
+        }
+      } catch {
+        // Non-fatal: if check fails, Supabase signUp will still block dupes
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password: parsed.data.password,
