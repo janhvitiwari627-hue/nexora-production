@@ -406,10 +406,12 @@ export function SetupWizardPage() {
         }
         lastServicesJsonRef.current = snapshot;
         retryRef.current = null;
+        setFieldErrors({});
         setAutosave({ status: "saved", at: Date.now(), error: null });
         qc.invalidateQueries({ queryKey: ["owner", "services", activeSalonId] });
       } catch (e) {
         retryRef.current = runSave;
+        setFieldErrors(parseFieldErrors(e));
         setAutosave({ status: "error", at: Date.now(), error: friendlySetupError(e) });
       }
     };
