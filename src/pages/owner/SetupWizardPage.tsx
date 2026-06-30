@@ -583,7 +583,7 @@ export function SetupWizardPage() {
                 <Field label="Full address *" error={fieldErrors.address}>
                   <Textarea rows={3} value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Shop no, street, area, landmark…" />
                 </Field>
-                <Field label="PIN code">
+                <Field label="PIN code" error={fieldErrors.pincode}>
                   <Input className="max-w-[160px]" value={form.pincode} onChange={(e) => setForm({ ...form, pincode: e.target.value.replace(/\D/g, "").slice(0, 6) })} />
                 </Field>
                 <StepActions
