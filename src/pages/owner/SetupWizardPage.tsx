@@ -369,9 +369,11 @@ export function SetupWizardPage() {
             <div className="text-xs uppercase tracking-wide text-muted-foreground">Setup progress</div>
             <div className="text-2xl font-bold text-heading">{pct}%</div>
             <Progress value={pct} className="mt-1 h-2 w-48" />
+            <AutosaveBadge state={autosave} />
           </div>
         </div>
       </div>
+
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         {/* ============ MAIN STEPS ============ */}
