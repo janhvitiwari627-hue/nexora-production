@@ -33,6 +33,7 @@ import { PublicHeader } from "@/components/layout/PublicHeader";
 import { shopsQueryOptions } from "@/lib/shops.queries";
 import { getCategoryCounts, getMockBusinesses, type MockBusiness } from "@/lib/mock-businesses";
 import { useAuthStore } from "@/stores/authStore";
+import { DiscoveryHome } from "./sections/DiscoveryHome";
 
 /* =========================================================
  * NEXORA SALONOS — PREMIUM HOMEPAGE (Stripe × Apple × Airbnb)
@@ -1220,6 +1221,7 @@ export function HomePage() {
         <Hero />
         <SearchPanel />
         <CategoryGrid />
+        <DiscoveryHome />
         <ShopListings />
         <SmartPicks />
         <WebsiteBuilder />
