@@ -89,7 +89,36 @@ export type Enriched = Shop & {
   aiMatchPct: number;
   staffPickSpecialty: "Hair" | "Spa" | "Tattoo" | "Makeup" | "Nails" | null;
   seasonTag: "Wedding" | "Festival" | "Summer" | "Winter" | "Monsoon" | "Holiday";
+  festivalTags: FestivalTag[];
+  isCoupleFriendly: boolean;
+  couplePackagePriceINR: number;
+  partnerDiscountPct: number;
+  isStudentSpecial: boolean;
+  studentDiscountPct: number;
+  isOfficeBreak: boolean;
+  expressMins: number;
+  isBridal: boolean;
+  bridalPackagePriceINR: number;
+  isTattoo: boolean;
+  tattooArtist: string | null;
+  tattooType: "Minimal" | "Premium" | "Cover Up" | "Removal" | null;
+  isNailStudio: boolean;
+  nailService: "Gel" | "Acrylic" | "Extensions" | "Luxury Art" | null;
+  isWellness: boolean;
+  wellnessFocus: "Spa" | "Massage" | "Therapy" | "Relaxation" | "Ayurveda" | null;
+  isKidsCollection: boolean;
+  isSeniorFriendly: boolean;
+  wheelchairAccessible: boolean;
 };
+
+export type FestivalTag =
+  | "Diwali"
+  | "Holi"
+  | "Karwa Chauth"
+  | "Eid"
+  | "Christmas"
+  | "New Year"
+  | "Raksha Bandhan";
 
 export type DiscoveryHomeProps = {
   selectedLocation?: string;
