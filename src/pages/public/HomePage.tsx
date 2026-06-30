@@ -333,6 +333,28 @@ function HeroVisual() {
 const ALL_AREAS_LABEL = "Jaipur - All areas";
 const ALL_CATS_LABEL = "All categories";
 
+/* Tiny module-level store so DiscoveryHome reacts to SearchPanel filters
+ * without restructuring the 1200+ line component tree. */
+type HomeFilters = { location: string; category: string };
+const homeFilters: HomeFilters = { location: ALL_AREAS_LABEL, category: ALL_CATS_LABEL };
+const homeFiltersListeners = new Set<() => void>();
+function setHomeFilters(next: Partial<HomeFilters>) {
+  if (next.location !== undefined) homeFilters.location = next.location;
+  if (next.category !== undefined) homeFilters.category = next.category;
+  homeFiltersListeners.forEach((l) => l());
+}
+function useHomeFilters(): HomeFilters {
+  const [, force] = useState(0);
+  useEffect(() => {
+    const cb = () => force((n) => n + 1);
+    homeFiltersListeners.add(cb);
+    return () => {
+      homeFiltersListeners.delete(cb);
+    };
+  }, []);
+  return homeFilters;
+}
+
 function SearchPanel() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLocation, setSelectedLocation] = useState<string>(ALL_AREAS_LABEL);
