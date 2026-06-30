@@ -265,9 +265,9 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
                   exit={{ opacity: 0 }}
                 >
                   <EmptyState
-                    title="No salons match your filters."
-                    description="Try widening your distance, rating, or price range."
-                    ctaLabel="Reset filters"
+                    title="No matching beauty places found."
+                    description="Try changing your filters or search another area."
+                    ctaLabel="Reset Filters"
                     onCta={resetFilters}
                   />
                 </motion.div>
