@@ -11,9 +11,10 @@ import {
 } from "@/components/ui/dialog";
 import { FilterPills } from "@/components/shared/FilterPills";
 import { BackButton } from "@/components/shared/BackButton";
-import { Check, Eye, Sparkles, ShieldCheck, Monitor, Smartphone } from "lucide-react";
+import { Check, Eye, Sparkles, ShieldCheck, Monitor, Smartphone, Tablet, Zap } from "lucide-react";
 import { useOwnerContext } from "@/hooks/use-owner-context";
 import { websiteTemplatesQuery } from "@/lib/website-templates.queries";
+import { getTemplateAsset } from "./templates/templateAssets";
 import { selectWebsiteTemplate } from "@/lib/owner.functions";
 
 const CATEGORIES = [
@@ -79,7 +80,7 @@ export function CreateWebsitePage() {
     [templates, filter],
   );
 
-  const liveSlug = activeSalon?.slug ?? "your-salon";
+  
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8 space-y-8">
@@ -149,22 +150,30 @@ export function CreateWebsitePage() {
           {visible.map((t) => {
             const isCurrent = t.id === selectedId;
             const templateKey = t.template_key ?? t.template_slug;
-            const previewHref = `/site/${liveSlug}?t=${encodeURIComponent(templateKey)}&preview=1`;
+            const asset = getTemplateAsset(templateKey);
+            const previewImg = asset?.preview ?? t.preview_image ?? null;
+            const demoHref = `/template-preview/${encodeURIComponent(templateKey)}`;
+            const bestFor = asset?.bestFor ?? [t.category ?? "Salon"];
+            const tags = asset?.tags ?? [t.theme_type ?? "Premium"];
+            const features = asset?.features ?? ["Hero", "Services", "Booking"];
             return (
-              <Card key={t.id} className="overflow-hidden group relative flex flex-col">
+              <Card key={t.id} className="overflow-hidden group relative flex flex-col border-2 hover:border-primary/40 hover:shadow-2xl transition-all duration-300">
                 {isCurrent && (
-                  <div className="absolute top-3 left-3 z-10">
-                    <Badge className="bg-emerald-600 text-white gap-1">
+                  <div className="absolute top-3 left-3 z-20">
+                    <Badge className="bg-emerald-600 text-white gap-1 shadow-lg">
                       <Check className="h-3 w-3" /> Current
                     </Badge>
                   </div>
                 )}
-                <div className="aspect-[4/3] overflow-hidden bg-muted">
-                  {t.preview_image ? (
+                {/* Top: real screenshot with hover overlay */}
+                <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                  {previewImg ? (
                     <img
-                      src={t.preview_image}
-                      alt={t.template_name}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      src={previewImg}
+                      alt={`${t.template_name} — actual website preview`}
+                      width={1280}
+                      height={960}
+                      className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]"
                       loading="lazy"
                     />
                   ) : (
@@ -176,25 +185,84 @@ export function CreateWebsitePage() {
                       card={t.card_color ?? "#F8FAFC"}
                     />
                   )}
-                </div>
-                <div className="p-5 flex-1 flex flex-col">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <h3 className="text-lg font-semibold text-heading">{t.template_name}</h3>
-                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{t.description}</p>
+                  {/* Mobile preview chip (bottom-right) */}
+                  {previewImg && (
+                    <div className="absolute bottom-3 right-3 hidden sm:block">
+                      <div className="w-16 rounded-[10px] border-2 border-white/90 shadow-xl overflow-hidden bg-white">
+                        <img
+                          src={previewImg}
+                          alt=""
+                          aria-hidden
+                          className="w-full aspect-[9/16] object-cover object-top"
+                          loading="lazy"
+                        />
+                      </div>
                     </div>
+                  )}
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center p-5 gap-2">
+                    <Button size="sm" variant="secondary" asChild className="shadow-lg">
+                      <a href={demoHref} target="_blank" rel="noreferrer">
+                        <Eye className="h-3.5 w-3.5" /> Preview Website
+                      </a>
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="shadow-lg"
+                      disabled={ownerLoading || pendingId !== null}
+                      onClick={() => {
+                        if (pendingId) return;
+                        if (!activeSalonId) {
+                          toast.error("Please complete salon setup first.");
+                          navigate({ to: "/owner/onboarding" });
+                          return;
+                        }
+                        if (isCurrent) { navigate({ to: "/owner/setup-wizard" }); return; }
+                        setPendingId(t.id);
+                        mutate.mutate({ template_id: t.id });
+                      }}
+                    >
+                      <Zap className="h-3.5 w-3.5" /> Use This Template
+                    </Button>
                   </div>
-                  <div className="flex flex-wrap gap-1.5 mt-3">
-                    <Badge variant="secondary" className="text-xs">{t.theme_type ?? t.category}</Badge>
-                    <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-                      <Monitor className="h-3 w-3" /> Desktop
-                      <Smartphone className="h-3 w-3 ml-1" /> Mobile
-                    </span>
+                </div>
+
+                {/* Middle: info */}
+                <div className="p-5 flex-1 flex flex-col gap-3">
+                  <div>
+                    <h3 className="text-lg font-semibold text-heading">{t.template_name}</h3>
+                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                      Best for {bestFor.slice(0, 2).join(", ")}.
+                    </p>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t">
+
+                  <div className="flex flex-wrap gap-1.5">
+                    {tags.slice(0, 4).map((tag) => (
+                      <Badge key={tag} variant="secondary" className="text-[10px] font-medium">{tag}</Badge>
+                    ))}
+                  </div>
+
+                  {/* Feature checklist */}
+                  <ul className="grid grid-cols-2 gap-x-3 gap-y-1 text-[11px] text-body">
+                    {features.slice(0, 8).map((f) => (
+                      <li key={f} className="flex items-center gap-1">
+                        <Check className="h-3 w-3 text-emerald-500 shrink-0" /> {f}
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* Device support */}
+                  <div className="flex items-center gap-3 text-[11px] text-muted-foreground border-t pt-3">
+                    <span className="inline-flex items-center gap-1"><Monitor className="h-3 w-3" /> Desktop</span>
+                    <span className="inline-flex items-center gap-1"><Tablet className="h-3 w-3" /> Tablet</span>
+                    <span className="inline-flex items-center gap-1"><Smartphone className="h-3 w-3" /> Mobile</span>
+                  </div>
+
+                  {/* Bottom buttons */}
+                  <div className="grid grid-cols-2 gap-2 mt-1">
                     <Button variant="outline" size="sm" asChild>
-                      <a href={previewHref} target="_blank" rel="noreferrer" aria-label={`Preview ${t.template_name}`}>
-                        <Eye className="h-3.5 w-3.5" /> Preview
+                      <a href={demoHref} target="_blank" rel="noreferrer" aria-label={`Live demo of ${t.template_name}`}>
+                        <Eye className="h-3.5 w-3.5" /> Live Demo
                       </a>
                     </Button>
                     <Button
@@ -212,7 +280,8 @@ export function CreateWebsitePage() {
                         mutate.mutate({ template_id: t.id });
                       }}
                     >
-                      {ownerLoading ? "Loading…" : isCurrent ? "Edit & Go Live" : (pendingId === t.id ? "Applying…" : "Use & Edit")}
+                      <Zap className="h-3.5 w-3.5" />
+                      {ownerLoading ? "Loading…" : isCurrent ? "Edit & Go Live" : (pendingId === t.id ? "Applying…" : "Use This Template")}
                     </Button>
                   </div>
                 </div>
@@ -221,6 +290,7 @@ export function CreateWebsitePage() {
           })}
         </div>
       )}
+
 
       <Dialog open={confirm.open} onOpenChange={(o) => setConfirm((c) => ({ ...c, open: o }))}>
         <DialogContent>
