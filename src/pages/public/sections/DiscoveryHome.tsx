@@ -546,6 +546,17 @@ export function DiscoveryHome({
         <MostRewardedCategory shops={shops} dest={{ ...baseDest }} />
         <MostSavedCategory shops={shops} dest={{ ...baseDest }} />
         <OpenNowCategory shops={shops} dest={{ ...baseDest, on: 1, sort: "distance" }} liveTick={liveTick} />
+        <LuxuryCategory shops={shops} dest={{ ...baseDest }} />
+        <BudgetFriendlyCategory shops={shops} dest={{ ...baseDest, sort: "price_low" }} />
+        <FamilyFriendlyCategory shops={shops} dest={{ ...baseDest }} />
+        <WomenOnlyCategory shops={shops} dest={{ ...baseDest }} />
+        <MenOnlyCategory shops={shops} dest={{ ...baseDest }} />
+        <UnisexCategory shops={shops} dest={{ ...baseDest }} />
+        <HomeServiceCategory shops={shops} dest={{ ...baseDest }} />
+        <PremiumMembersCategory shops={shops} dest={{ ...baseDest }} />
+        <AIRecommendedCategory shops={shops} dest={{ ...baseDest, sort: "popular" }} />
+        <StaffPicksCategory shops={shops} dest={{ ...baseDest }} />
+        <SeasonalPicksCategory shops={shops} dest={{ ...baseDest }} />
       </div>
     </div>
   );
