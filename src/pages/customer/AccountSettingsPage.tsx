@@ -7,15 +7,26 @@ import {
   Home,
   Link2,
   Lock,
+  LogOut,
   Mail,
-  ShieldAlert,
   ShieldCheck,
   User,
   UserCircle,
 } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { BackButton } from "@/components/shared/BackButton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useAuthStore } from "@/stores/auth-store";
 import { PersonalInfoPanel } from "./settings/PersonalInfoPanel";
 import { ContactInfoPanel } from "./settings/ContactInfoPanel";
 import { SecurityPanel } from "./settings/SecurityPanel";
@@ -25,7 +36,6 @@ import { PrivacyPanel } from "./settings/PrivacyPanel";
 import { ConnectedAccountsPanel } from "./settings/ConnectedAccountsPanel";
 import { PaymentMethodsPanel } from "./settings/PaymentMethodsPanel";
 import { ReferralPanel } from "./settings/ReferralPanel";
-import { DangerZonePanel } from "./settings/DangerZonePanel";
 
 const SECTIONS = [
   { id: "personal", label: "Personal info", icon: User, Comp: PersonalInfoPanel },
@@ -38,14 +48,29 @@ const SECTIONS = [
   { id: "connected", label: "Connected accounts", icon: Link2, Comp: ConnectedAccountsPanel },
   { id: "payments", label: "Payment methods", icon: CreditCard, Comp: PaymentMethodsPanel },
   { id: "profile-card", label: "Profile preview", icon: UserCircle, Comp: ProfilePreviewPanel },
-  { id: "danger", label: "Danger zone", icon: ShieldAlert, Comp: DangerZonePanel },
 ] as const;
 
 type SectionId = (typeof SECTIONS)[number]["id"];
 
 export function AccountSettingsPage() {
   const [active, setActive] = useState<SectionId>("personal");
+  const [logoutOpen, setLogoutOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const signOut = useAuthStore((s) => s.signOut);
+  const navigate = useNavigate();
   const ActiveComp = SECTIONS.find((s) => s.id === active)!.Comp;
+
+  const handleLogout = async () => {
+    try {
+      setLoggingOut(true);
+      await signOut();
+      navigate({ to: "/login", replace: true });
+    } finally {
+      setLoggingOut(false);
+      setLogoutOpen(false);
+    }
+  };
+
 
   return (
     <div className="bg-background min-h-screen">
