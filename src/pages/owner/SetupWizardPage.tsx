@@ -720,7 +720,7 @@ export function SetupWizardPage() {
             {step.id === "payment" && (
               <div className="space-y-5">
                 <SectionHeader icon={QrCode} title="Nexora QR — UPI setup" subtitle="Bookings accept advance via your UPI. Settlement runs daily at 10 PM." />
-                <Field label="UPI ID *">
+                <Field label="UPI ID *" error={fieldErrors.upi_id}>
                   <Input value={form.upi_id} placeholder="yourname@okhdfc"
                     onChange={(e) => setForm({ ...form, upi_id: e.target.value.trim() })} />
                 </Field>
