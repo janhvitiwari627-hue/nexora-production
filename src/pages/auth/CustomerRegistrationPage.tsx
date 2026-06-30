@@ -312,6 +312,24 @@ export default function CustomerRegistrationPage() {
     setSubmitting(true);
     console.log("[Register] Attempting sign up with email:", email, "accountType:", accountType);
     try {
+      // Enforce one-email-one-role before creating the auth user
+      try {
+        const check = await checkEmailRoleFn({ data: { email } });
+        if (check.exists) {
+          const attemptedLabel =
+            accountType === "owner"
+              ? "Salon Owner"
+              : accountType === "district_partner"
+                ? "District Partner"
+                : "Customer";
+          setAlreadyRegisteredEmail(email);
+          setServerError(roleConflictMessage(check.roleLabel, attemptedLabel));
+          return;
+        }
+      } catch {
+        // Non-fatal — Supabase signUp will still reject duplicates
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password: parsed.data.password,
