@@ -46,6 +46,7 @@ import {
   ArrowUpDown,
 } from "lucide-react";
 import { BeautyIndustrySpotlight } from "./BeautyIndustrySpotlight";
+import { TrendingThisWeek } from "./TrendingThisWeek";
 import {
   getMockBusinesses,
   mockBusinessToShop,
