@@ -46,6 +46,7 @@ import {
   ArrowUpDown,
 } from "lucide-react";
 import { BeautyIndustrySpotlight } from "./BeautyIndustrySpotlight";
+import { TrendingThisWeek } from "./TrendingThisWeek";
 import {
   getMockBusinesses,
   mockBusinessToShop,
@@ -575,6 +576,11 @@ export function DiscoveryHome({
           render={(s) => <Card s={s} showOffer />}
           dest={{ ...baseDest, oo: 1, sort: "distance" }}
         />
+
+        {/* ───────── Trending This Week (Leaderboard) ───────── */}
+        <TrendingThisWeek shops={shops} />
+
+
 
         <Rail
           title="Membership Benefits"
