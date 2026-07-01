@@ -45,6 +45,7 @@ import {
   Filter,
   ArrowUpDown,
 } from "lucide-react";
+import { BeautyIndustrySpotlight } from "./BeautyIndustrySpotlight";
 import {
   getMockBusinesses,
   mockBusinessToShop,
