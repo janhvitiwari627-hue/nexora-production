@@ -576,6 +576,11 @@ export function DiscoveryHome({
           dest={{ ...baseDest, oo: 1, sort: "distance" }}
         />
 
+        {/* ───────── Trending This Week (Leaderboard) ───────── */}
+        <TrendingThisWeek shops={shops} />
+
+
+
         <Rail
           title="Membership Benefits"
           subtitle="Extra perks for Nexora Members"
