@@ -45,6 +45,7 @@ import {
   Filter,
   ArrowUpDown,
 } from "lucide-react";
+import { BeautyIndustrySpotlight } from "./BeautyIndustrySpotlight";
 import {
   getMockBusinesses,
   mockBusinessToShop,
@@ -632,6 +633,9 @@ export function DiscoveryHome({
           render={(s) => <Card s={s} showSponsored />}
           dest={{ ...baseDest }}
         />
+
+        {/* ───────── Beauty Industry Spotlight (Sponsored Video Ads) ───────── */}
+        <BeautyIndustrySpotlight />
 
         {/* ───────── Category deep dives ───────── */}
         <NearbyCategory shops={shops} dest={{ ...baseDest, sort: "distance" }} />
