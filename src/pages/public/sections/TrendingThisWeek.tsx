@@ -67,7 +67,7 @@ function scoreShops(shops: Enriched[]): ScoredShop[] {
     );
     const reviewsWeek = Math.max(
       1,
-      Math.round((s.verifiedReviews ?? s.reviews_count ?? 10) * 0.08),
+      Math.round((s.verifiedReviews ?? s.review_count ?? 10) * 0.08),
     );
     return { ...s, qrPaymentsWeek, bookingsWeek, reviewsWeek };
   });
@@ -167,7 +167,7 @@ export function TrendingThisWeek({ shops }: { shops: Enriched[] }) {
       {/* Top 3 podium — desktop grid, mobile stacked */}
       <div className="mt-7 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
         {top3.map((s) => (
-          <PodiumCard key={s.id} s={s} />
+          <PodiumCard key={s.slug} s={s} />
         ))}
       </div>
 
@@ -188,7 +188,7 @@ export function TrendingThisWeek({ shops }: { shops: Enriched[] }) {
           </div>
           <div className="-mx-2 flex snap-x snap-mandatory gap-3 overflow-x-auto px-2 pb-2 [scrollbar-width:thin]">
             {rest.map((s) => (
-              <CompactCard key={s.id} s={s} />
+              <CompactCard key={s.slug} s={s} />
             ))}
           </div>
         </div>
@@ -234,13 +234,13 @@ function PodiumCard({ s }: { s: ScoredShop }) {
   return (
     <Link
       to="/site/$slug"
-      params={{ slug: s.slug ?? String(s.id) }}
+      params={{ slug: s.slug }}
       className={`group relative flex flex-col overflow-hidden rounded-2xl bg-white ${style.ring} ${style.glow} transition-transform hover:-translate-y-0.5`}
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
-        {s.image_url ? (
+        {s.cover_image ? (
           <img
-            src={s.image_url}
+            src={s.cover_image}
             alt={s.name}
             loading="lazy"
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -297,13 +297,13 @@ function CompactCard({ s }: { s: ScoredShop }) {
   return (
     <Link
       to="/site/$slug"
-      params={{ slug: s.slug ?? String(s.id) }}
+      params={{ slug: s.slug }}
       className="group relative flex w-[260px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
-        {s.image_url ? (
+        {s.cover_image ? (
           <img
-            src={s.image_url}
+            src={s.cover_image}
             alt={s.name}
             loading="lazy"
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
