@@ -633,6 +633,9 @@ export function DiscoveryHome({
           dest={{ ...baseDest }}
         />
 
+        {/* ───────── Beauty Industry Spotlight (Sponsored Video Ads) ───────── */}
+        <BeautyIndustrySpotlight />
+
         {/* ───────── Category deep dives ───────── */}
         <NearbyCategory shops={shops} dest={{ ...baseDest, sort: "distance" }} />
         <TopRatedCategory shops={shops} dest={{ ...baseDest, sort: "rating" }} />
