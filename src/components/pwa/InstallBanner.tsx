@@ -38,13 +38,19 @@ export function InstallBanner() {
 
     setDismissed(isDismissed());
 
-    // Installed detection
+    // Reliable installed detection: standalone display-mode (Chromium/Android/desktop),
+    // iOS Safari's non-standard navigator.standalone, our persisted flag, and the
+    // pwa-install module's cached appinstalled signal.
+    const isStandalone =
+      window.matchMedia?.("(display-mode: standalone)").matches === true ||
+      (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
+
     try {
       if (localStorage.getItem(INSTALLED_KEY)) setInstalled(true);
     } catch { /* ignore */ }
-    if (isAppInstalled()) setInstalled(true);
-    if (typeof window !== "undefined" && window.matchMedia?.("(display-mode: standalone)").matches) {
+    if (isAppInstalled() || isStandalone) {
       setInstalled(true);
+      try { localStorage.setItem(INSTALLED_KEY, "1"); } catch { /* ignore */ }
     }
 
     const unsub = subscribeInstallPrompt((evt) => setDeferred(evt));
@@ -53,6 +59,7 @@ export function InstallBanner() {
       setInstalled(true);
       setDeferred(null);
       try { localStorage.setItem(INSTALLED_KEY, "1"); } catch { /* ignore */ }
+      toast.success("Nexora App installed successfully");
     };
     window.addEventListener("appinstalled", onInstalled);
     return () => {
