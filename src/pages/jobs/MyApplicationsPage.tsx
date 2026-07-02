@@ -140,9 +140,12 @@ export function MyApplicationsPage() {
       })
       .catch((e) => {
         if (!alive) return;
-        // Ignore aborts triggered by filter/query changes or unmount.
+        // Suppress any error that stems from an aborted fetch — no error UI.
         if (controller.signal.aborted) return;
-        if (e instanceof DOMException && e.name === "AbortError") return;
+        const name = (e as { name?: string } | null)?.name;
+        const code = (e as { code?: string } | null)?.code;
+        const msg = e instanceof Error ? e.message : String(e ?? "");
+        if (name === "AbortError" || code === "20" || /abort/i.test(msg)) return;
         setError(e instanceof Error ? e.message : "Failed to load applications");
       });
     return () => {
