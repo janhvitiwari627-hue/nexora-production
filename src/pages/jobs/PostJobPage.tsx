@@ -2731,47 +2731,164 @@ function ReviewStep({
 }
 
 function LivePreview({ form, profile }: { form: Form; profile: EmployerProfile | null }) {
-  const salary =
-    form.salary_min || form.salary_max
-      ? `₹${form.salary_min ?? ""}${form.salary_max ? `–${form.salary_max}` : ""} ${
-          form.salary_period ?? "monthly"
-        }`
-      : "Salary not disclosed";
+  const fmt = (n: string | number | null | undefined) => {
+    if (n === null || n === undefined || n === "") return "";
+    const num = typeof n === "number" ? n : Number(n);
+    return Number.isFinite(num) ? num.toLocaleString("en-IN") : String(n);
+  };
+  const periodLabel = (() => {
+    switch (form.salary_period) {
+      case "hourly": return "/hr";
+      case "daily": return "/day";
+      case "yearly": return "/yr";
+      case "monthly":
+      default: return "/mo";
+    }
+  })();
+  const salary = (() => {
+    const min = form.salary_min;
+    const max = form.salary_max;
+    if (!min && !max) return "Salary not disclosed";
+    if (min && max) return `₹${fmt(min)} – ₹${fmt(max)} ${periodLabel}`;
+    if (min) return `₹${fmt(min)}+ ${periodLabel}`;
+    return `Up to ₹${fmt(max)} ${periodLabel}`;
+  })();
+  const meta = parseRequirementsMeta(form.requirements);
+  const cleanRequirements = stripRequirementsMeta(form.requirements);
+  const reqLines = cleanRequirements
+    .split("\n")
+    .map((l) => l.replace(/^[-•\s]+/, "").trim())
+    .filter(Boolean)
+    .slice(0, 5);
+  const hoursText = form.flexible_schedule
+    ? "Flexible hours"
+    : form.start_time && form.end_time
+    ? `${form.start_time} – ${form.end_time}`
+    : "";
   return (
     <article className="rounded-[var(--radius-card)] border border-border bg-card p-5 shadow-[var(--shadow-card)]">
-      <div className="flex items-start justify-between gap-2">
-        <div>
-          <h3 className="text-heading text-lg font-bold">{form.title || "Your job title"}</h3>
-          <p className="text-muted-foreground text-sm">{profile?.business_name ?? "Your business"}</p>
-        </div>
-        <span className="bg-primary/10 text-heading rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wider">
-          {form.category}
+      <div className="mb-3 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-primary">
+        <span className="relative flex h-2 w-2">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
         </span>
+        Live preview
+      </div>
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <h3 className="text-heading text-lg font-bold">{form.title || "Your job title"}</h3>
+          <p className="text-muted-foreground truncate text-sm">{profile?.business_name ?? "Your business"}</p>
+        </div>
+        {form.category && (
+          <span className="bg-primary/10 text-heading shrink-0 rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wider">
+            {form.category}
+          </span>
+        )}
       </div>
       <div className="text-muted-foreground mt-2 flex items-center gap-1 text-xs">
         <MapPin className="h-3.5 w-3.5" /> {form.area || "Area"}, {form.city || "City"}
       </div>
+
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        {form.job_type && (
+          <span className="rounded-full border border-border bg-background px-2 py-0.5 text-[11px] font-semibold text-heading">
+            {form.job_type}
+          </span>
+        )}
+        {form.experience_level && (
+          <span className="rounded-full border border-border bg-background px-2 py-0.5 text-[11px] font-semibold text-heading">
+            {form.experience_level}
+          </span>
+        )}
+        {form.joining_availability && (
+          <span className="rounded-full border border-border bg-background px-2 py-0.5 text-[11px] font-semibold text-heading">
+            Joins: {form.joining_availability}
+          </span>
+        )}
+        {hoursText && (
+          <span className="rounded-full border border-border bg-background px-2 py-0.5 text-[11px] font-semibold text-heading">
+            {hoursText}
+          </span>
+        )}
+      </div>
+
       {form.skills.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {form.skills.map((s) => (
-            <span
-              key={s}
-              className="bg-muted text-heading rounded-full px-2 py-0.5 text-[11px] font-semibold"
-            >
-              {s}
-            </span>
-          ))}
+        <div className="mt-3">
+          <div className="text-muted-foreground mb-1 text-[10px] font-bold uppercase tracking-wider">Skills</div>
+          <div className="flex flex-wrap gap-1.5">
+            {form.skills.slice(0, 10).map((s) => (
+              <span key={s} className="bg-muted text-heading rounded-full px-2 py-0.5 text-[11px] font-semibold">
+                {s}
+              </span>
+            ))}
+            {form.skills.length > 10 && (
+              <span className="text-muted-foreground text-[11px] font-semibold">+{form.skills.length - 10} more</span>
+            )}
+          </div>
         </div>
       )}
+
+      {form.benefits.length > 0 && (
+        <div className="mt-3">
+          <div className="text-muted-foreground mb-1 text-[10px] font-bold uppercase tracking-wider">Benefits</div>
+          <ul className="grid grid-cols-1 gap-1">
+            {form.benefits.slice(0, 8).map((b) => (
+              <li key={b} className="text-heading flex items-center gap-1.5 text-xs">
+                <CheckCircle2 className="text-primary h-3.5 w-3.5 shrink-0" /> {b}
+              </li>
+            ))}
+            {form.benefits.length > 8 && (
+              <li className="text-muted-foreground text-[11px] font-semibold">+{form.benefits.length - 8} more</li>
+            )}
+          </ul>
+        </div>
+      )}
+
+      {(reqLines.length > 0 || meta.certification || meta.languages.length > 0 || meta.portfolio) && (
+        <div className="mt-3">
+          <div className="text-muted-foreground mb-1 text-[10px] font-bold uppercase tracking-wider">Requirements</div>
+          {reqLines.length > 0 && (
+            <ul className="space-y-0.5">
+              {reqLines.map((l, i) => (
+                <li key={i} className="text-heading text-xs">• {l}</li>
+              ))}
+            </ul>
+          )}
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {meta.certification && (
+              <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold text-heading">
+                {meta.certification}
+              </span>
+            )}
+            {meta.languages.map((l) => (
+              <span key={l} className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold text-heading">
+                {l}
+              </span>
+            ))}
+            {meta.portfolio && (
+              <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold text-heading">
+                {meta.portfolio}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
       {form.description && (
         <p className="mt-3 line-clamp-4 text-sm text-muted-foreground">{form.description}</p>
       )}
+
       <div className="border-border mt-4 flex items-end justify-between border-t pt-3">
-        <div>
-          <div className="text-heading text-sm font-black">{salary}</div>
-          <div className="text-muted-foreground text-[10px] uppercase tracking-wider">
-            {form.job_type}
+        <div className="min-w-0">
+          <div className="text-heading flex items-center gap-1 text-sm font-black">
+            <IndianRupee className="h-3.5 w-3.5" />
+            <span className="truncate">{salary.replace(/^₹/, "")}</span>
           </div>
+          {form.openings > 0 && (
+            <div className="text-muted-foreground text-[10px] uppercase tracking-wider">
+              {form.openings} opening{form.openings > 1 ? "s" : ""}
+            </div>
+          )}
         </div>
         <span className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-1 rounded-[var(--radius-button)] px-4 py-2 text-xs font-bold">
           <Briefcase className="h-3.5 w-3.5" /> Apply
