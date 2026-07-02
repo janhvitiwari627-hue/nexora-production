@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/customer_/verify-otp")({
   head: () => ({ meta: [{ title: "Verify OTP — Nexora Customer App" }] }),
@@ -26,6 +27,7 @@ function VerifyOtpPage() {
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [resending, setResending] = useState(false);
   const [resendIn, setResendIn] = useState(RESEND_SECONDS);
 
   useEffect(() => {
@@ -41,18 +43,49 @@ function VerifyOtpPage() {
       setError(parsed.error.issues[0]?.message ?? "Invalid code");
       return;
     }
+    if (!phone) {
+      setError("Missing phone number. Please restart sign in.");
+      return;
+    }
     setSubmitting(true);
-    await new Promise((r) => setTimeout(r, 700));
+    // `type: "sms"` matches the channel Supabase sent the code on. On success
+    // Supabase sets a session in localStorage; onAuthStateChange in
+    // __root.tsx picks it up and lets /customer/* pass its auth gate.
+    const { error: verifyError } = await supabase.auth.verifyOtp({
+      phone,
+      token: parsed.data.code,
+      type: "sms",
+    });
     setSubmitting(false);
+    if (verifyError) {
+      setError(verifyError.message);
+      toast.error("Verification failed", { description: verifyError.message });
+      return;
+    }
     toast.success("Phone verified", { description: "Welcome to Nexora." });
     navigate({ to: "/customer/onboarding" });
   };
 
-  const resend = () => {
-    if (resendIn > 0) return;
+  const resend = async () => {
+    if (resendIn > 0 || resending) return;
+    if (!phone) {
+      setError("Missing phone number. Please restart sign in.");
+      return;
+    }
+    setResending(true);
+    const { error: sendError } = await supabase.auth.signInWithOtp({
+      phone,
+      options: { channel: "sms" },
+    });
+    setResending(false);
+    if (sendError) {
+      toast.error("Couldn't resend OTP", { description: sendError.message });
+      return;
+    }
     setResendIn(RESEND_SECONDS);
-    toast("New code sent", { description: `Sent to ${phone || "your phone"}` });
+    toast("New code sent", { description: `Sent to ${phone}` });
   };
+
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-6 px-6 py-10">
@@ -95,10 +128,10 @@ function VerifyOtpPage() {
         <button
           type="button"
           onClick={resend}
-          disabled={resendIn > 0}
+          disabled={resendIn > 0 || resending}
           className="font-medium text-primary underline disabled:no-underline disabled:opacity-60"
         >
-          {resendIn > 0 ? `Resend in ${resendIn}s` : "Resend code"}
+          {resending ? "Sending…" : resendIn > 0 ? `Resend in ${resendIn}s` : "Resend code"}
         </button>
       </div>
       <button

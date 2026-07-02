@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+
 
 /**
  * /customer/login — pre-auth customer entry screen.
@@ -39,6 +41,13 @@ function CustomerLoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  // Supabase expects E.164 (leading +, no spaces/dashes). Strip formatting
+  // before calling the API but keep the raw value for the UI.
+  const toE164 = (raw: string) => {
+    const trimmed = raw.trim().replace(/[\s-]/g, "");
+    return trimmed.startsWith("+") ? trimmed : `+${trimmed}`;
+  };
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -47,16 +56,28 @@ function CustomerLoginPage() {
       setError(parsed.error.issues[0]?.message ?? "Invalid phone number");
       return;
     }
+    const e164 = toE164(parsed.data.phone);
     setSubmitting(true);
-    // Placeholder: pretend to request an OTP.
-    await new Promise((r) => setTimeout(r, 600));
+    // Supabase generates + delivers the OTP through the configured SMS
+    // provider. `channel: "sms"` is the default; passing it explicitly keeps
+    // the intent obvious. New numbers create an auth user automatically.
+    const { error: sendError } = await supabase.auth.signInWithOtp({
+      phone: e164,
+      options: { channel: "sms" },
+    });
     setSubmitting(false);
-    toast.success("OTP sent", { description: `We texted a code to ${parsed.data.phone}` });
+    if (sendError) {
+      setError(sendError.message);
+      toast.error("Couldn't send OTP", { description: sendError.message });
+      return;
+    }
+    toast.success("OTP sent", { description: `We texted a code to ${e164}` });
     navigate({
       to: "/customer/verify-otp",
-      search: { phone: parsed.data.phone },
+      search: { phone: e164 },
     });
   };
+
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-6 px-6 py-10">
