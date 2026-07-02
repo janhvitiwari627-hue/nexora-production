@@ -116,10 +116,18 @@ export function MyApplicationsPage() {
     });
   }, [apps, filter, q]);
 
-  // Reset pagination when filter/query/data changes
+  // Reset pagination to the first page whenever the filter or search query changes
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
-  }, [filter, q, refreshTick, apps]);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [filter, q]);
+
+  // Also reset when the underlying data reloads
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [refreshTick, apps]);
 
   const visible = useMemo(
     () => (filtered ? filtered.slice(0, visibleCount) : null),
