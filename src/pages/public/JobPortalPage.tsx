@@ -363,9 +363,12 @@ function JobCard({ job, compact }: { job: JobCardData; compact?: boolean }) {
             {job.type} · {job.posted}
           </div>
         </div>
-        <button className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-1 rounded-[var(--radius-button)] px-4 py-2 text-xs font-bold">
+        <Link
+          to={job.href ?? "/jobs"}
+          className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-1 rounded-[var(--radius-button)] px-4 py-2 text-xs font-bold"
+        >
           <Briefcase className="h-3.5 w-3.5" /> Apply
-        </button>
+        </Link>
       </div>
     </article>
   );
