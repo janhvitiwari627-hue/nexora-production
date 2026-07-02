@@ -141,3 +141,117 @@ test.describe("InstallBanner — prompt available state", () => {
     await expect(page.getByRole("heading", { name: "Install Nexora App" })).toHaveCount(0);
   });
 });
+
+test.describe("InstallBanner — standalone & appinstalled", () => {
+  test("standalone display-mode is detected as installed", async ({ browser }) => {
+    // Emulate the standalone display-mode media query that Chrome/Android set
+    // when the app is launched from the home screen.
+    const context = await browser.newContext({
+      colorScheme: "light",
+    });
+    const page = await context.newPage();
+    await page.emulateMedia({ media: "screen", colorScheme: "light", reducedMotion: null, forcedColors: null });
+    // Playwright doesn't expose display-mode emulation directly; patch the
+    // matchMedia call to report standalone before any app code runs.
+    await context.addInitScript(() => {
+      const origMatchMedia = window.matchMedia.bind(window);
+      window.matchMedia = ((query: string) => {
+        if (query.includes("display-mode: standalone")) {
+          return {
+            matches: true,
+            media: query,
+            onchange: null,
+            addListener: () => {},
+            removeListener: () => {},
+            addEventListener: () => {},
+            removeEventListener: () => {},
+            dispatchEvent: () => false,
+          } as MediaQueryList;
+        }
+        return origMatchMedia(query);
+      }) as typeof window.matchMedia;
+    });
+
+    await page.goto("/download-app");
+
+    await expect(page.getByText("Nexora App is installed")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Install", exact: true })).toHaveCount(0);
+
+    await context.close();
+  });
+
+  test("beforeinstallprompt listener is wired via dynamic import from __root", async ({ page, context }) => {
+    await context.addInitScript(() => {
+      const w = window as unknown as { __bipListeners?: number };
+      w.__bipListeners = 0;
+      const origAdd = window.addEventListener.bind(window);
+      window.addEventListener = ((type: string, listener: EventListenerOrEventListenerObject, opts?: boolean | AddEventListenerOptions) => {
+        if (type === "beforeinstallprompt") {
+          w.__bipListeners = (w.__bipListeners ?? 0) + 1;
+        }
+        return origAdd(type as never, listener as never, opts as never);
+      }) as typeof window.addEventListener;
+    });
+
+    await page.goto("/download-app");
+
+    // Production code should attach at least one beforeinstallprompt listener
+    // (one from pwa-install capture, one from InstallBanner subscription).
+    await page.waitForFunction(
+      () => (window as unknown as { __bipListeners?: number }).__bipListeners! >= 1,
+      { timeout: 10_000 },
+    );
+
+    const count = await page.evaluate(
+      () => (window as unknown as { __bipListeners: number }).__bipListeners,
+    );
+    expect(count).toBeGreaterThanOrEqual(1);
+  });
+
+  test("appinstalled event transitions to installed state and persists across reload", async ({ page, context }) => {
+    await context.addInitScript(() => {
+      const w = window as unknown as { __appInstalledListeners?: number };
+      w.__appInstalledListeners = 0;
+      const origAdd = window.addEventListener.bind(window);
+      window.addEventListener = ((type: string, listener: EventListenerOrEventListenerObject, opts?: boolean | AddEventListenerOptions) => {
+        if (type === "appinstalled") {
+          w.__appInstalledListeners = (w.__appInstalledListeners ?? 0) + 1;
+        }
+        return origAdd(type as never, listener as never, opts as never);
+      }) as typeof window.addEventListener;
+    });
+
+    await page.goto("/download-app");
+
+    // Initial state — not installed, no native prompt: state C.
+    await expect(
+      page.getByText("Install is available on the published live site", { exact: false }),
+    ).toBeVisible();
+
+    // Wait for InstallBanner's useEffect to attach its appinstalled listener.
+    await page.waitForFunction(
+      () => (window as unknown as { __appInstalledListeners?: number }).__appInstalledListeners! >= 1,
+      { timeout: 10_000 },
+    );
+
+    // Fire the native appinstalled event.
+    await page.evaluate(() => {
+      window.dispatchEvent(new Event("appinstalled"));
+    });
+
+    // State A pill appears.
+    await expect(page.getByText("Nexora App is installed")).toBeVisible();
+
+    // Flag persisted to localStorage.
+    const flag = await page.evaluate(() => localStorage.getItem("nexora_pwa_installed"));
+    expect(flag).toBe("1");
+
+    // Reload — installed state should be restored from localStorage.
+    await page.reload();
+    await expect(page.getByText("Nexora App is installed")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Install", exact: true })).toHaveCount(0);
+    await expect(
+      page.getByText("Install is available on the published live site", { exact: false }),
+    ).toHaveCount(0);
+  });
+});
