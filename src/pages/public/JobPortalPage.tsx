@@ -137,7 +137,17 @@ export function JobPortalPage({ initialRole = "seeker" }: { initialRole?: "seeke
   const [type, setType] = useState(TYPES[0]);
   const [remoteJobs, setRemoteJobs] = useState<JobCardData[]>([]);
   const [showEmployerModal, setShowEmployerModal] = useState(false);
-  const { user, isInitialized } = useAuthStore();
+  const { user, isInitialized, initError, retryInitialize } = useAuthStore();
+  const [retrying, setRetrying] = useState(false);
+
+  const handleRetryAuth = async () => {
+    setRetrying(true);
+    try {
+      await retryInitialize();
+    } finally {
+      setRetrying(false);
+    }
+  };
   const navigate = useNavigate();
 
   useEffect(() => {
