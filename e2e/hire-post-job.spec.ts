@@ -487,6 +487,102 @@ test.describe("/hire/post-job publish failure", () => {
   });
 });
 
+test.describe("/hire/post-job publish validation", () => {
+  test.skip(
+    !STORAGE_KEY || !SESSION_JSON,
+    "Supabase session env vars not present; skipping authenticated post-job checks.",
+  );
+
+  test("invalid draft blocks POST /rest/v1/jobs and scrolls to + highlights the first invalid step", async ({ page }) => {
+    // Track any POST to the jobs REST endpoint — if validation works, this
+    // must stay at 0 for the whole test.
+    let jobsPostCount = 0;
+    await page.route(/\/rest\/v1\/jobs(\?|$)/, async (route) => {
+      if (route.request().method() === "POST") {
+        jobsPostCount += 1;
+        await route.fulfill({
+          status: 500,
+          contentType: "application/json",
+          body: JSON.stringify({ message: "Should not have been called" }),
+        });
+        return;
+      }
+      await route.fallback();
+    });
+
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await seedSession(page);
+
+    // Preload a draft that lands the user on Step 5 (Review) with a
+    // deliberately invalid Salary step (min set, max missing).
+    await page.evaluate(() => {
+      const draft = {
+        step: 4,
+        form: {
+          title: "Senior Hair Stylist",
+          category: "Salon",
+          description: "Own the chair, deliver amazing cuts, and mentor junior stylists.",
+          job_type: "Full-time",
+          experience_level: "Mid",
+          city: "Mumbai",
+          area: "",
+          address: "",
+          schedule: "",
+          salary_min: 30000,
+          salary_max: null,
+          salary_period: "monthly",
+          benefits: [],
+          requirements: "",
+          skills: [],
+        },
+        skillsInput: "",
+      };
+      window.localStorage.setItem("nexora:postJobWizard:v1", JSON.stringify(draft));
+    });
+
+    await page.goto("/hire/post-job", { waitUntil: "networkidle" });
+
+    // We should land on Step 5 (Review & publish) thanks to the restored draft.
+    await expect(
+      page.getByRole("heading", { name: "Review & publish" }),
+    ).toBeVisible({ timeout: 10_000 });
+
+    // Click Publish — validation should block the network call and jump to
+    // the first invalid step (Salary & benefits, index 2).
+    await page.getByRole("button", { name: /^Publish job$/ }).first().click();
+
+    // Wizard should have jumped back to Step 3 (Salary & benefits).
+    await expect(
+      page.getByRole("heading", { name: "Salary & benefits" }),
+    ).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText(/Step 3 of 5/)).toBeVisible();
+
+    // The step card is highlighted (data attribute + destructive ring class).
+    const card = page.getByTestId("wizard-step-card");
+    await expect(card).toHaveAttribute("data-invalid-step", "true");
+
+    // Field-level error is surfaced on the invalid salary max input.
+    await expect(
+      page.getByText(/Enter a maximum, or clear the minimum/i),
+    ).toBeVisible();
+
+    // Card should be scrolled into view — its top should be near/within the viewport.
+    const inView = await card.evaluate((el) => {
+      const rect = (el as HTMLElement).getBoundingClientRect();
+      return rect.top < window.innerHeight && rect.bottom > 0;
+    });
+    expect(inView).toBe(true);
+
+    // Critically — no POST to /rest/v1/jobs happened.
+    expect(jobsPostCount).toBe(0);
+
+    // Give the highlight a moment to time out and confirm no request slipped through.
+    await page.waitForTimeout(500);
+    expect(jobsPostCount).toBe(0);
+  });
+});
+
+
 
 
 

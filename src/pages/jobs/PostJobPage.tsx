@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { AlertTriangle, ArrowLeft, ArrowRight, Briefcase, Check, MapPin, RefreshCw, Save, Sparkles } from "lucide-react";
 import { toast } from "sonner";
@@ -103,6 +103,8 @@ export function PostJobPage() {
   const [draftRestored, setDraftRestored] = useState<boolean>(!!initialDraft && (initialDraft.step > 0 || initialDraft.form.title.length > 0));
   const [publishError, setPublishError] = useState<string | null>(null);
   const [attempted, setAttempted] = useState<Set<number>>(new Set());
+  const [highlightInvalid, setHighlightInvalid] = useState(false);
+  const stepCardRef = useRef<HTMLDivElement | null>(null);
 
   // Persist wizard state to localStorage so it survives session expiry / re-login.
   useEffect(() => {
@@ -174,6 +176,14 @@ export function PostJobPage() {
         // Reveal errors on every step up through the failing one and jump there.
         setAttempted(new Set([0, 1, 2, 3]));
         setStep(bad);
+        setHighlightInvalid(true);
+        // Scroll the wizard card into view and pulse the ring highlight.
+        if (typeof window !== "undefined") {
+          window.requestAnimationFrame(() => {
+            stepCardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+          });
+          window.setTimeout(() => setHighlightInvalid(false), 1600);
+        }
         toast.error("Please fix the highlighted fields before publishing.");
         return;
       }
@@ -334,7 +344,15 @@ export function PostJobPage() {
 
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <div className="rounded-[var(--radius-card)] border border-border bg-card p-6 shadow-[var(--shadow-card)]">
+            <div
+              ref={stepCardRef}
+              data-testid="wizard-step-card"
+              data-invalid-step={highlightInvalid ? "true" : "false"}
+              className={cn(
+                "rounded-[var(--radius-card)] border border-border bg-card p-6 shadow-[var(--shadow-card)] transition-shadow",
+                highlightInvalid && "ring-2 ring-destructive ring-offset-2 border-destructive",
+              )}
+            >
               {step === 0 && (
                 <DetailsStep
                   form={form}
