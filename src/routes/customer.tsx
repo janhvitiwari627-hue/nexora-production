@@ -117,7 +117,7 @@ function CustomerLayout() {
 
   return (
     <>
-      <div className="pb-20 md:pb-0">
+      <div className="customer-app min-h-dvh bg-background pb-20 md:pb-0">
         {isBrowsingAsCustomer && (
           <div className="border-b border-primary/30 bg-primary/10 text-primary">
             <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-2 text-xs sm:text-sm">
