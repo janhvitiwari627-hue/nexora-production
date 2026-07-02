@@ -73,7 +73,7 @@ function fromReal(j: JobRow & { employer?: { business_name: string } | null }): 
     category: normalizeCategory(j.category),
     type: normalizeType(j.job_type),
     salary: fmtSalary(j.salary_min, j.salary_max, j.salary_period),
-    experience: j.experience_level ?? "Any",
+    experience: j.experience_level === "flexible" ? "Flexible" : (j.experience_level ?? "Any"),
     postedDays: daysSince(j.published_at),
     applicants: j.applicants_count ?? 0,
     description: j.description,
