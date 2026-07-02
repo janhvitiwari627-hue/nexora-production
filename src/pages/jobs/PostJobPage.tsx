@@ -242,6 +242,13 @@ export function PostJobPage() {
         salary_min: form.salary_min ?? null,
         salary_max: form.salary_max ?? null,
         openings: Math.min(50, Math.max(1, Number(form.openings) || 1)),
+        job_role: form.job_role?.trim() || null,
+        work_location: form.work_location || null,
+        contact_person: form.contact_person?.trim() || null,
+        contact_mobile: form.contact_mobile?.trim() || null,
+        whatsapp_number: form.whatsapp_number?.trim() || null,
+        interview_mode: form.interview_mode || null,
+        shop_id: shopId,
       };
       const row = await saveJob({
         jobId,
@@ -255,13 +262,11 @@ export function PostJobPage() {
       if (publish) {
         try { localStorage.removeItem(DRAFT_STORAGE_KEY); } catch {}
         toast.success("Job published successfully");
-        try {
-          await navigate({ to: "/jobs/$jobId", params: { jobId: row.id } });
-        } catch (navErr: any) {
-          // Job was created but navigation failed — surface a retry that goes to detail page.
-          setPublishError(
-            `Your job was published but we couldn't open it automatically. ${navErr?.message ?? ""}`.trim(),
-          );
+        setPublishedJob(row);
+        if (typeof window !== "undefined") {
+          window.requestAnimationFrame(() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
         }
       } else {
         toast.success("Draft saved");
