@@ -40,10 +40,13 @@ export function ProfileImageUpload({
   accept = "image/*",
   className,
   disabled,
+  error: externalError = null,
 }: ProfileImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [localError, setLocalError] = useState<string | null>(null);
+  const error = externalError ?? localError;
+  const setError = setLocalError;
 
   const openPicker = () => {
     if (disabled || uploading) return;
