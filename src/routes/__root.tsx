@@ -138,6 +138,8 @@ function RootComponent() {
       initializeAuthStore();
     }
 
+    registerServiceWorker();
+
     return () => {
       if (timer) clearTimeout(timer);
       unsubscribe?.();
