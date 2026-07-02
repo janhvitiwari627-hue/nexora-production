@@ -90,6 +90,7 @@ export type JobDraftInput = {
   skills?: string[];
   openings?: number;
   job_role?: string | null;
+  specific_role?: string | null;
   work_location?: string | null;
   contact_person?: string | null;
   contact_mobile?: string | null;

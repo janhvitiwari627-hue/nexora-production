@@ -1145,6 +1145,7 @@ export type Database = {
           schedule: string | null
           shop_id: string | null
           skills: string[] | null
+          specific_role: string | null
           status: string
           title: string
           updated_at: string
@@ -1179,6 +1180,7 @@ export type Database = {
           schedule?: string | null
           shop_id?: string | null
           skills?: string[] | null
+          specific_role?: string | null
           status?: string
           title: string
           updated_at?: string
@@ -1213,6 +1215,7 @@ export type Database = {
           schedule?: string | null
           shop_id?: string | null
           skills?: string[] | null
+          specific_role?: string | null
           status?: string
           title?: string
           updated_at?: string
