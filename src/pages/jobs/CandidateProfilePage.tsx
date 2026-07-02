@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Check, Plus, Trash2, Upload, Video } from "lucide-react";
+import { Check, CheckCircle2, Loader2, Plus, RefreshCw, Trash2, Upload, Video } from "lucide-react";
 import { toast } from "sonner";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 import { ProfileImageDropzone } from "@/components/shared/ProfileImageDropzone";
@@ -21,6 +22,7 @@ const STEPS = [
   "Portfolio",
   "Video",
   "Resume",
+  "Review & Submit",
 ];
 
 export function CandidateProfilePage() {
