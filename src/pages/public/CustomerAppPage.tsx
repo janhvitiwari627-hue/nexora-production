@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Smartphone, MapPin, Tag, UserCheck, Zap, MessageCircle, QrCode, Gift, History, Download, ExternalLink, Apple, Play } from "lucide-react";
+import { Smartphone, MapPin, Tag, UserCheck, Zap, MessageCircle, QrCode, Gift, History, Download, ExternalLink, Apple, Play, Share, Plus, MoreVertical, Chrome, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { PublicHeader } from "@/components/layout/PublicHeader";
 import { toast } from "sonner";
 
@@ -22,11 +23,33 @@ type BeforeInstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 };
 
+type Platform = "ios" | "android" | "desktop";
+
+function detectPlatform(): Platform {
+  if (typeof navigator === "undefined") return "desktop";
+  const ua = navigator.userAgent || "";
+  if (/iPad|iPhone|iPod/.test(ua) || (ua.includes("Mac") && "ontouchend" in document)) return "ios";
+  if (/Android/i.test(ua)) return "android";
+  return "desktop";
+}
+
+function isSafari() {
+  const ua = navigator.userAgent || "";
+  return /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|Chrome/.test(ua);
+}
+function isChromium() {
+  const ua = navigator.userAgent || "";
+  return /Chrome|CriOS|Edg|Brave|OPR/.test(ua);
+}
+
 export default function CustomerAppPage() {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
+  const [platform, setPlatform] = useState<Platform>("desktop");
+  const [showGuide, setShowGuide] = useState(false);
 
   useEffect(() => {
+    setPlatform(detectPlatform());
     const onPrompt = (e: Event) => {
       e.preventDefault();
       setDeferred(e as BeforeInstallPromptEvent);
@@ -52,10 +75,25 @@ export default function CustomerAppPage() {
       setDeferred(null);
       return;
     }
-    toast.message("Add to Home Screen", {
-      description: "Open this page in Chrome (Android) or Safari (iOS) and tap the browser menu → Add to Home Screen.",
-    });
+    setShowGuide(true);
+    // Nudge for wrong-browser cases
+    if (platform === "ios" && !isSafari()) {
+      toast.message("Open in Safari to install", {
+        description: "iOS only allows installing from Safari. Tap the ••• menu → Open in Safari, then follow the steps below.",
+      });
+    } else if (platform === "android" && !isChromium()) {
+      toast.message("Open in Chrome to install", {
+        description: "Tap your browser menu → Open in Chrome, then follow the steps below.",
+      });
+    }
   };
+
+  const installLabel =
+    installed ? "App Installed" :
+    deferred ? "Install Nexora App" :
+    platform === "ios" ? "Show iOS Install Steps" :
+    platform === "android" ? "Show Android Install Steps" :
+    "Install Nexora App";
 
   return (
     <div className="min-h-screen bg-background">
@@ -77,7 +115,7 @@ export default function CustomerAppPage() {
             <div className="mt-6 flex flex-wrap gap-3">
               <Button size="lg" onClick={handleInstall} disabled={installed}>
                 <Download className="mr-2 h-4 w-4" />
-                {installed ? "App Installed" : "Install Nexora App"}
+                {installLabel}
               </Button>
               <Button size="lg" variant="outline" asChild>
                 <Link to="/search">
@@ -87,12 +125,50 @@ export default function CustomerAppPage() {
             </div>
 
             {!deferred && !installed && (
-              <p className="mt-4 text-sm text-muted-foreground">
-                Tip: open in Chrome and tap <b>Add to Home Screen</b> to install.
+              <p className="mt-3 text-sm text-muted-foreground">
+                {platform === "ios" && (<>On iPhone/iPad: open in <b>Safari</b>, tap <Share className="inline h-3.5 w-3.5" /> Share, then <b>Add to Home Screen</b>.</>)}
+                {platform === "android" && (<>On Android: open in <b>Chrome</b>, tap <MoreVertical className="inline h-3.5 w-3.5" />, then <b>Install app</b> / <b>Add to Home screen</b>.</>)}
+                {platform === "desktop" && (<>On desktop Chrome/Edge: click the <Download className="inline h-3.5 w-3.5" /> install icon in the address bar.</>)}
               </p>
             )}
 
-            {/* Store placeholders */}
+            {showGuide && !deferred && !installed && (
+              <Alert className="mt-4">
+                <Info className="h-4 w-4" />
+                <AlertTitle>
+                  {platform === "ios" ? "Install on iPhone / iPad (Safari)" :
+                   platform === "android" ? "Install on Android (Chrome)" :
+                   "Install on Desktop"}
+                </AlertTitle>
+                <AlertDescription>
+                  {platform === "ios" && (
+                    <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm">
+                      <li>Open <b>meripahalfasthelp.online/customer-app</b> in <b>Safari</b> (not Chrome).</li>
+                      <li>Tap the <Share className="inline h-3.5 w-3.5" /> <b>Share</b> button at the bottom.</li>
+                      <li>Scroll and tap <Plus className="inline h-3.5 w-3.5" /> <b>Add to Home Screen</b>.</li>
+                      <li>Tap <b>Add</b> in the top-right — Nexora appears on your home screen.</li>
+                    </ol>
+                  )}
+                  {platform === "android" && (
+                    <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm">
+                      <li>Open this page in <b>Chrome</b>.</li>
+                      <li>Tap the <MoreVertical className="inline h-3.5 w-3.5" /> menu (top-right).</li>
+                      <li>Tap <b>Install app</b> (or <b>Add to Home screen</b>).</li>
+                      <li>Confirm <b>Install</b> — Nexora is added to your app drawer.</li>
+                    </ol>
+                  )}
+                  {platform === "desktop" && (
+                    <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm">
+                      <li>Use <Chrome className="inline h-3.5 w-3.5" /> <b>Chrome</b>, <b>Edge</b> or <b>Brave</b>.</li>
+                      <li>Click the <Download className="inline h-3.5 w-3.5" /> install icon on the right of the address bar.</li>
+                      <li>Click <b>Install</b> in the popup — Nexora opens in its own window.</li>
+                    </ol>
+                  )}
+                </AlertDescription>
+              </Alert>
+            )}
+
+
             <div className="mt-6 flex flex-wrap gap-3">
               <Button variant="secondary" size="lg" disabled className="opacity-70">
                 <Play className="mr-2 h-4 w-4" /> Get it on Google Play
