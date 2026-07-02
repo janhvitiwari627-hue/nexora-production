@@ -403,29 +403,18 @@ export default function CustomerAppPage() {
             </div>
           </div>
 
-          {/* Mockup */}
+          {/* Brand Banner */}
           <div className="flex justify-center">
-            <div className="relative aspect-[9/19] w-64 rounded-[2.5rem] border-8 border-foreground/90 bg-foreground p-2 shadow-2xl">
-              <div className="flex h-full flex-col overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-primary/10 via-background to-background">
-                <div className="p-4">
-                  <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Nexora</div>
-                  <div className="mt-1 text-sm font-semibold">Salons near you</div>
-                </div>
-                <div className="mx-3 rounded-xl bg-background p-3 shadow-sm">
-                  <div className="h-16 rounded-md bg-muted" />
-                  <div className="mt-2 h-2 w-2/3 rounded bg-muted" />
-                  <div className="mt-1 h-2 w-1/3 rounded bg-muted" />
-                </div>
-                <div className="mx-3 mt-2 rounded-xl bg-background p-3 shadow-sm">
-                  <div className="h-16 rounded-md bg-muted" />
-                  <div className="mt-2 h-2 w-1/2 rounded bg-muted" />
-                </div>
-                <div className="mt-auto rounded-b-[1.5rem] bg-primary/95 p-3 text-center text-xs font-medium text-primary-foreground">
-                  Book in 60 seconds
-                </div>
-              </div>
+            <div className="relative overflow-hidden rounded-3xl border border-yellow-500/30 bg-black shadow-2xl ring-1 ring-yellow-500/20">
+              <img
+                src={nexoraBannerAsset.url}
+                alt="Nexora Salonos — Your Salon. Your Brand. Your Success."
+                className="h-auto w-full max-w-md object-cover"
+                loading="eager"
+              />
             </div>
           </div>
+
         </section>
 
         {/* Benefits */}
