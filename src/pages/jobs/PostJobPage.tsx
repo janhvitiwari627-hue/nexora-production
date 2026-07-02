@@ -757,9 +757,13 @@ export function PostJobPage() {
         start_time: _st,
         end_time: _et,
         flexible_schedule: _fs,
+        joining_availability: _ja,
+        salary_type: _sty,
+        salary_range_preset: _srp,
         ...dbForm
       } = form;
       void _bt; void _dp; void _cd; void _hp; void _st; void _et; void _fs;
+      void _ja; void _sty; void _srp;
       const cleaned: JobDraftInput = {
         ...dbForm,
         area: dbForm.area || null,
