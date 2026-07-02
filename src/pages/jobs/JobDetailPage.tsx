@@ -126,7 +126,7 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
       }
       const mock = MOCK_JOBS.find((j) => j.id === jobId) ?? MOCK_JOBS[0];
       if (!alive) return;
-      setJob({ ...mock, isReal: false });
+      setJob({ ...mock, rawRequirements: null, isReal: false });
       setLoading(false);
     }
     run();
