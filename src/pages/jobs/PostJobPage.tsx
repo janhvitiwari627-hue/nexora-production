@@ -672,6 +672,59 @@ function DetailsStep({
         </div>
       </Field>
       <Field
+        label="Number of openings"
+        hint="How many people are you hiring for this role? (1–50)"
+        error={errors.openings}
+      >
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() =>
+              update({ openings: Math.max(1, (Number(form.openings) || 1) - 1) })
+            }
+            aria-label="Decrease openings"
+            className="h-10 w-10 rounded-lg border border-border bg-background text-lg font-bold text-heading hover:bg-muted disabled:opacity-40"
+            disabled={(Number(form.openings) || 1) <= 1}
+          >
+            −
+          </button>
+          <input
+            type="number"
+            inputMode="numeric"
+            min={1}
+            max={50}
+            step={1}
+            className={cn(errors.openings ? inputErrCls : inputCls, "w-24 text-center")}
+            aria-invalid={!!errors.openings}
+            value={form.openings ?? 1}
+            onChange={(e) => {
+              const raw = e.target.value;
+              if (raw === "") {
+                update({ openings: undefined as unknown as number });
+                return;
+              }
+              const n = parseInt(raw, 10);
+              if (Number.isNaN(n)) return;
+              update({ openings: Math.min(50, Math.max(1, n)) });
+            }}
+            onBlur={() => {
+              if (!form.openings || form.openings < 1) update({ openings: 1 });
+            }}
+          />
+          <button
+            type="button"
+            onClick={() =>
+              update({ openings: Math.min(50, (Number(form.openings) || 1) + 1) })
+            }
+            aria-label="Increase openings"
+            className="h-10 w-10 rounded-lg border border-border bg-background text-lg font-bold text-heading hover:bg-muted disabled:opacity-40"
+            disabled={(Number(form.openings) || 1) >= 50}
+          >
+            +
+          </button>
+        </div>
+      </Field>
+      <Field
         label="Description"
         hint="Describe the role, day-to-day work, and your salon culture."
         error={errors.description}
