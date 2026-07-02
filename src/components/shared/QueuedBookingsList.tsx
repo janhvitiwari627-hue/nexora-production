@@ -314,6 +314,13 @@ export function QueuedBookingsList({
         !notifiedRef.current.has(t.id),
     );
     if (!justConfirmed || !justConfirmed.result?.booking_id) return;
+
+    const bookingId = justConfirmed.result.booking_id;
+    const ref = justConfirmed.result.booking_reference;
+
+    // Mark this task as handled immediately — both in-memory and in
+    // sessionStorage — so any re-render (or a second mounted list) that
+    // observes the same succeeded task can't fire another navigation.
     notifiedRef.current.add(justConfirmed.id);
     seen.add(justConfirmed.id);
     try {
@@ -321,23 +328,34 @@ export function QueuedBookingsList({
     } catch {
       // ignore
     }
-    const bookingId = justConfirmed.result.booking_id;
-    const ref = justConfirmed.result.booking_reference;
+
+    // If the user is already on this booking's detail page, don't navigate
+    // again — just refresh its data in place.
+    const currentPath = router.state.location.pathname;
+    const targetPath = `/dashboard/bookings/${bookingId}`;
+    const alreadyThere = currentPath === targetPath;
+
+    queryClient.invalidateQueries({ queryKey: ["my-bookings"] });
+    queryClient.invalidateQueries({ queryKey: ["booking", bookingId] });
+    queryClient.invalidateQueries({ queryKey: ["bookings"] });
+
+    if (alreadyThere) {
+      toast.success(
+        ref ? `Booking #${ref} confirmed` : "Your booking is confirmed",
+        { description: "Refreshing your booking details…" },
+      );
+      void router.invalidate();
+      return;
+    }
+
     toast.success(
       ref ? `Booking #${ref} confirmed` : "Your booking is confirmed",
       { description: "Opening your booking details…" },
     );
-    // Invalidate any cached views of this booking so the detail page shows
-    // fresh server data as soon as we land on it.
-    queryClient.invalidateQueries({ queryKey: ["my-bookings"] });
-    queryClient.invalidateQueries({ queryKey: ["booking", bookingId] });
-    queryClient.invalidateQueries({ queryKey: ["bookings"] });
     void navigate({
       to: "/dashboard/bookings/$id",
       params: { id: bookingId },
     }).then(() => {
-      // Re-run route loaders on the destination so any loader-fetched
-      // booking data is refreshed post-navigation.
       void router.invalidate();
     });
   }, [tasks, autoNavigateOnConfirm, navigate, router, queryClient]);
