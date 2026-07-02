@@ -4,7 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Bookmark, Briefcase, Building2, Check, CheckCircle2, Clock, MapPin, Share2, Users } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Bookmark, Briefcase, Building2, Check, CheckCircle2, Clock, MapPin, Send, Share2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { MOCK_JOBS } from "./mockJobs";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
@@ -74,6 +76,8 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
   const [applying, setApplying] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
   const [successMode, setSuccessMode] = useState<"real" | "demo">("real");
+  const [applyOpen, setApplyOpen] = useState(false);
+  const [coverNote, setCoverNote] = useState("");
 
   useEffect(() => {
     let alive = true;
@@ -102,8 +106,8 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
     };
   }, [jobId]);
 
-  async function handleApply() {
-    if (!isInitialized || applying || !job) return;
+  function openApply() {
+    if (!isInitialized || !job) return;
     if (!user) {
       try {
         sessionStorage.setItem("nexora:postLoginRedirect", `/jobs/${jobId}`);
@@ -113,16 +117,41 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
       navigate({ to: "/login", search: { redirect: `/jobs/${jobId}` } as never });
       return;
     }
-    if (!job.isReal) {
-      toast.success("Application submitted (demo listing)");
+    setCoverNote("");
+    setApplyOpen(true);
+  }
+
+  async function handleSubmitApply(e: React.FormEvent) {
+    e.preventDefault();
+    if (applying || !job || !user) return;
+    // The route param is the source of truth for the backend payload.
+    const payloadJobId = jobId;
+    const note = coverNote.trim() || null;
+
+    if (!isRealJobId(payloadJobId)) {
+      // Demo listing — log the intended payload for transparency, skip backend
+      // (job_applications.job_id is a UUID FK and can't accept demo IDs).
+      console.info("[apply] demo submission payload:", { jobId: payloadJobId, coverNote: note });
+      toast.success(`Application submitted (demo · ${payloadJobId})`);
+      setApplyOpen(false);
       setSuccessMode("demo");
       setSuccessOpen(true);
       return;
     }
+
     setApplying(true);
     try {
-      await applyToJob({ jobId: job.id, applicantId: user.id });
+      const app = await applyToJob({
+        jobId: payloadJobId,
+        applicantId: user.id,
+        coverNote: note,
+      });
+      if (app.job_id !== payloadJobId) {
+        // Defensive: surface any mismatch instead of silently succeeding.
+        throw new Error(`Server recorded jobId ${app.job_id}, expected ${payloadJobId}`);
+      }
       toast.success("Application submitted");
+      setApplyOpen(false);
       setSuccessMode("real");
       setSuccessOpen(true);
     } catch (err) {
@@ -174,7 +203,7 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
                 >
                   <Share2 className="h-4 w-4" /> Share
                 </Button>
-                <Button size="sm" onClick={handleApply} disabled={applying}>
+                <Button size="sm" onClick={openApply} disabled={applying}>
                   {applying ? "Submitting…" : "Apply Now"}
                 </Button>
               </div>
@@ -236,13 +265,57 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
         </Card>
 
         <div className="sticky bottom-4 z-10 md:hidden">
-          <Button className="w-full" size="lg" onClick={handleApply} disabled={applying}>
+          <Button className="w-full" size="lg" onClick={openApply} disabled={applying}>
             {applying ? "Submitting…" : "Apply Now"}
           </Button>
         </div>
       </div>
 
+      <Modal
+        open={applyOpen}
+        onClose={() => (applying ? undefined : setApplyOpen(false))}
+        title={`Apply — ${job.title}`}
+        size="md"
+      >
+        <form onSubmit={handleSubmitApply} className="space-y-4 p-6">
+          <div className="bg-muted/40 flex items-center justify-between rounded-lg px-3 py-2 text-xs">
+            <span className="text-muted-foreground">Submitting for job</span>
+            <code className="text-heading font-mono text-[11px]">{jobId}</code>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="cover-note">Cover note (optional)</Label>
+            <Textarea
+              id="cover-note"
+              rows={5}
+              maxLength={1000}
+              placeholder={`Tell ${job.business} why you're a good fit…`}
+              value={coverNote}
+              onChange={(e) => setCoverNote(e.target.value)}
+              disabled={applying}
+            />
+            <div className="text-muted-foreground text-right text-[11px]">
+              {coverNote.length}/1000
+            </div>
+          </div>
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setApplyOpen(false)}
+              disabled={applying}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={applying}>
+              <Send className="h-4 w-4" />
+              {applying ? "Submitting…" : "Submit application"}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
       <Modal open={successOpen} onClose={() => setSuccessOpen(false)} size="sm">
+
         <div className="flex flex-col items-center gap-4 p-8 text-center">
           <div className="bg-primary/10 grid h-16 w-16 place-items-center rounded-full">
             <CheckCircle2 className="text-primary h-9 w-9" />
