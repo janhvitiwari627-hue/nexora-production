@@ -16,6 +16,22 @@ const ANDROID_UA =
 const DESKTOP_UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36";
 
+/**
+ * Suppresses `beforeinstallprompt` at the earliest possible moment so the
+ * page treats native install as unavailable — that is the branch we want
+ * to test. Real headed Chromium fires this event on eligible PWAs, which
+ * would hide the manual fallback hint / guide.
+ */
+async function suppressBeforeInstallPrompt(context: import("@playwright/test").BrowserContext) {
+  await context.addInitScript(() => {
+    const origAdd = window.addEventListener.bind(window);
+    window.addEventListener = ((type: string, listener: EventListenerOrEventListenerObject, opts?: boolean | AddEventListenerOptions) => {
+      if (type === "beforeinstallprompt" || type === "appinstalled") return;
+      return origAdd(type, listener, opts);
+    }) as typeof window.addEventListener;
+  });
+}
+
 test.describe("CustomerAppPage platform-aware install fallback", () => {
   test("iOS: shows Safari hint and Add to Home Screen steps", async ({ browser }) => {
     const context = await browser.newContext({
