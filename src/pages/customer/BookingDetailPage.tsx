@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { Link } from "@tanstack/react-router";
+import { Loader2 } from "lucide-react";
+import { useBookingRefreshing } from "@/lib/booking-refresh-signal";
 import {
   Copy,
   Check,
