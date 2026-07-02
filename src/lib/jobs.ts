@@ -33,6 +33,7 @@ export type JobRow = {
   benefits: string[] | null;
   requirements: string | null;
   skills: string[] | null;
+  openings: number;
   status: "draft" | "published" | "closed";
   published_at: string | null;
   applicants_count: number;
