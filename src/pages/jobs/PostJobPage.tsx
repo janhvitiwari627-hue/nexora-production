@@ -1191,17 +1191,6 @@ function RequirementsStep({
   return (
     <div className="space-y-4">
       <h2 className="text-heading text-xl font-bold">Requirements</h2>
-      <Field label="Experience level">
-        <select
-          className={inputCls}
-          value={form.experience_level ?? EXPERIENCE[0]}
-          onChange={(e) => update({ experience_level: e.target.value })}
-        >
-          {EXPERIENCE.map((e) => (
-            <option key={e}>{e}</option>
-          ))}
-        </select>
-      </Field>
       <Field label="Skills" hint="Press Enter to add.">
         <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-background p-2">
           {form.skills.map((s) => (
