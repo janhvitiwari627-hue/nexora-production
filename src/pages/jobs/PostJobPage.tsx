@@ -853,6 +853,65 @@ function LocationStep({
           onChange={(e) => update({ schedule: e.target.value })}
         />
       </Field>
+      <Field label="Work location">
+        <div className="flex flex-wrap gap-2">
+          {WORK_LOCATIONS.map((w) => {
+            const active = form.work_location === w;
+            return (
+              <button
+                key={w}
+                type="button"
+                onClick={() => update({ work_location: w })}
+                aria-pressed={active}
+                className={cn(
+                  "rounded-full border px-4 py-1.5 text-xs font-bold transition",
+                  active
+                    ? "border-transparent bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
+                    : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
+                )}
+              >
+                {w}
+              </button>
+            );
+          })}
+        </div>
+      </Field>
+      <div className="mt-2 border-t border-border pt-4">
+        <h3 className="text-heading mb-3 text-sm font-bold uppercase tracking-wide text-muted-foreground">
+          Contact details
+        </h3>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="Contact person" hint="Who should candidates reach out to?">
+            <input
+              className={inputCls}
+              placeholder="e.g. Priya (HR)"
+              value={form.contact_person ?? ""}
+              onChange={(e) => update({ contact_person: e.target.value })}
+            />
+          </Field>
+          <Field label="Contact mobile" error={errors.contact_mobile}>
+            <input
+              type="tel"
+              inputMode="numeric"
+              className={errors.contact_mobile ? inputErrCls : inputCls}
+              placeholder="10-digit mobile"
+              aria-invalid={!!errors.contact_mobile}
+              value={form.contact_mobile ?? ""}
+              onChange={(e) => update({ contact_mobile: e.target.value })}
+            />
+          </Field>
+          <Field label="WhatsApp number" hint="Optional — leave blank to use the contact mobile.">
+            <input
+              type="tel"
+              inputMode="numeric"
+              className={inputCls}
+              placeholder="WhatsApp number"
+              value={form.whatsapp_number ?? ""}
+              onChange={(e) => update({ whatsapp_number: e.target.value })}
+            />
+          </Field>
+        </div>
+      </div>
     </div>
   );
 }
