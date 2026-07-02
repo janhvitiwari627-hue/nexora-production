@@ -13,6 +13,7 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as SalonsRouteImport } from './routes/salons'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ReferralsRouteImport } from './routes/referrals'
@@ -154,6 +155,11 @@ const SignupRoute = SignupRouteImport.update({
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SalonsRoute = SalonsRouteImport.update({
+  id: '/salons',
+  path: '/salons',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -803,6 +809,7 @@ export interface FileRoutesByFullPath {
   '/referrals': typeof ReferralsRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/salons': typeof SalonsRoute
   '/search': typeof SearchRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -928,6 +935,7 @@ export interface FileRoutesByTo {
   '/referrals': typeof ReferralsRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/salons': typeof SalonsRoute
   '/search': typeof SearchRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -1057,6 +1065,7 @@ export interface FileRoutesById {
   '/referrals': typeof ReferralsRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/salons': typeof SalonsRoute
   '/search': typeof SearchRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -1187,6 +1196,7 @@ export interface FileRouteTypes {
     | '/referrals'
     | '/register'
     | '/reset-password'
+    | '/salons'
     | '/search'
     | '/signup'
     | '/sitemap.xml'
@@ -1312,6 +1322,7 @@ export interface FileRouteTypes {
     | '/referrals'
     | '/register'
     | '/reset-password'
+    | '/salons'
     | '/search'
     | '/signup'
     | '/sitemap.xml'
@@ -1440,6 +1451,7 @@ export interface FileRouteTypes {
     | '/referrals'
     | '/register'
     | '/reset-password'
+    | '/salons'
     | '/search'
     | '/signup'
     | '/sitemap.xml'
@@ -1569,6 +1581,7 @@ export interface RootRouteChildren {
   ReferralsRoute: typeof ReferralsRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SalonsRoute: typeof SalonsRoute
   SearchRoute: typeof SearchRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -1636,6 +1649,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/salons': {
+      id: '/salons'
+      path: '/salons'
+      fullPath: '/salons'
+      preLoaderRoute: typeof SalonsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -2739,6 +2759,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReferralsRoute: ReferralsRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SalonsRoute: SalonsRoute,
   SearchRoute: SearchRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
