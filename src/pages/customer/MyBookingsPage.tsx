@@ -1,5 +1,8 @@
 import { useMemo, useState } from "react";
 import { PublicHeader } from "@/components/layout/PublicHeader";
+import { OfflineBanner } from "@/components/shared/OfflineBanner";
+import { OfflineSyncStatus } from "@/components/shared/OfflineSyncStatus";
+import { TASK_CREATE_AND_CONFIRM_BOOKING } from "@/lib/booking-offline-sync";
 import { PublicFooter } from "@/components/layout/PublicFooter";
 import { BookingTabBar } from "./bookings/BookingTabBar";
 import { BookingFilterRow, type DateRangeId } from "./bookings/BookingFilterRow";
