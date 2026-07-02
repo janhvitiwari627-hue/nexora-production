@@ -150,6 +150,8 @@ export function PostJobPage() {
       return;
     }
     setSaving(publish ? "publish" : "draft");
+    if (publish) setPublishError(null);
+    let createdJobId: string | undefined;
     try {
       const cleaned: JobDraftInput = {
         ...form,
@@ -169,18 +171,44 @@ export function PostJobPage() {
         publish,
       });
       setJobId(row.id);
+      createdJobId = row.id;
       if (publish) {
         try { localStorage.removeItem(DRAFT_STORAGE_KEY); } catch {}
         toast.success("Job published successfully");
-        navigate({ to: "/jobs/$jobId", params: { jobId: row.id } });
+        try {
+          await navigate({ to: "/jobs/$jobId", params: { jobId: row.id } });
+        } catch (navErr: any) {
+          // Job was created but navigation failed — surface a retry that goes to detail page.
+          setPublishError(
+            `Your job was published but we couldn't open it automatically. ${navErr?.message ?? ""}`.trim(),
+          );
+        }
       } else {
         toast.success("Draft saved");
       }
-
     } catch (e: any) {
-      toast.error(e?.message ?? "Failed to save job");
+      const msg = e?.message ?? "Failed to save job";
+      if (publish) {
+        setPublishError(msg);
+      }
+      toast.error(msg);
     } finally {
       setSaving(null);
+    }
+    return createdJobId;
+  }
+
+  async function retryPublish() {
+    const created = await persist(true);
+    if (created && publishError) {
+      // Second attempt: try navigating again to the created listing.
+      try {
+        await navigate({ to: "/jobs/$jobId", params: { jobId: created } });
+      } catch (navErr: any) {
+        setPublishError(
+          `Your job was published but we couldn't open it automatically. ${navErr?.message ?? ""}`.trim(),
+        );
+      }
     }
   }
 
