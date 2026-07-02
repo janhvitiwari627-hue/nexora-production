@@ -169,11 +169,13 @@ export function PostJobPage() {
       });
       setJobId(row.id);
       if (publish) {
+        try { localStorage.removeItem(DRAFT_STORAGE_KEY); } catch {}
         toast.success("Job published successfully");
         navigate({ to: "/jobs/$jobId", params: { jobId: row.id } });
       } else {
         toast.success("Draft saved");
       }
+
     } catch (e: any) {
       toast.error(e?.message ?? "Failed to save job");
     } finally {
