@@ -83,6 +83,8 @@ export default function CustomerAppPage() {
 
   useEffect(() => {
     setPlatform(detectPlatform());
+    setEmbedded(isEmbeddedOrPreview());
+
 
     // Persistent install flag from any prior session.
     if (typeof localStorage !== "undefined" && localStorage.getItem(INSTALLED_KEY)) {
