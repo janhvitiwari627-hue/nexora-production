@@ -11,6 +11,7 @@ import {
   type CreateAndConfirmPayload,
 } from "@/lib/booking-offline-sync";
 import { useOnlineStatus } from "@/hooks/use-online-status";
+import { beginBookingRefresh } from "@/lib/booking-refresh-signal";
 import {
   AlertDialog,
   AlertDialogAction,
