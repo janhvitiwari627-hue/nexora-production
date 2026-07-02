@@ -2,6 +2,7 @@ import { createFileRoute, Link, Outlet, redirect } from "@tanstack/react-router"
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { LocationPermissionModal } from "@/components/auth/LocationPermissionModal";
 import { BackButton } from "@/components/shared/BackButton";
+import { ViewSwitcher } from "@/components/layout/ViewSwitcher";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchUserRoles, type UserRole } from "@/lib/auth-redirect";
 import { LayoutDashboard } from "lucide-react";
@@ -102,6 +103,9 @@ function CustomerLayout() {
           <div className="mx-auto flex max-w-7xl items-center gap-2 px-4 py-3">
             <BackButton size="icon" className="shrink-0" />
             <span className="text-sm font-semibold text-heading">Nexora</span>
+            <div className="ml-auto">
+              <ViewSwitcher mode="customer" />
+            </div>
           </div>
         </div>
         <Outlet />

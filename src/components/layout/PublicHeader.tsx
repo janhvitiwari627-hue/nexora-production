@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Bell, Briefcase, Building2, ChevronDown, LayoutDashboard, LogOut, Megaphone, Menu, Package, Phone, Settings, Smartphone, Sparkles, Star, Tag, Target, TrendingUp, Truck, User, Users } from "lucide-react";
+import { ArrowLeft, ArrowLeftRight, Bell, Briefcase, Building2, ChevronDown, LayoutDashboard, LogOut, Megaphone, Menu, Package, Phone, Settings, Smartphone, Sparkles, Star, Tag, Target, TrendingUp, Truck, User, UserCircle2, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -75,6 +75,20 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
   const isInitialized = useAuthStore((s) => s.isInitialized);
   const signOut = useAuthStore((s) => s.signOut);
   const navigate = useNavigate();
+  const isOwner = roles.some((r) => r === "owner" || r === "shop_owner" || r === "shop_manager");
+
+  const switchToCustomer = () => {
+    try {
+      sessionStorage.setItem("nexora:browseAsCustomer", "1");
+    } catch { /* ignore */ }
+    navigate({ to: "/customer/home", search: { as: "customer" } as never });
+  };
+  const switchToOwner = () => {
+    try {
+      sessionStorage.removeItem("nexora:browseAsCustomer");
+    } catch { /* ignore */ }
+    navigate({ to: "/owner/dashboard" });
+  };
 
   // Only trust auth state after the component is mounted AND the auth store
   // has finished bootstrapping the session from storage.
@@ -224,6 +238,32 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
                     {dashLabel}
                   </Link>
                 </DropdownMenuItem>
+                {isOwner && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                      <span className="inline-flex items-center gap-1">
+                        <ArrowLeftRight className="h-3 w-3" />
+                        Switch view
+                      </span>
+                    </DropdownMenuLabel>
+                    <DropdownMenuItem
+                      onSelect={(e) => { e.preventDefault(); switchToOwner(); }}
+                      className="cursor-pointer"
+                    >
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      Owner Dashboard
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={(e) => { e.preventDefault(); switchToCustomer(); }}
+                      className="cursor-pointer"
+                    >
+                      <UserCircle2 className="mr-2 h-4 w-4" />
+                      Browse as Customer
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
                 <DropdownMenuItem asChild>
                   <Link to="/profile" className="cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
