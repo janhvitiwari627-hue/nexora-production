@@ -60,7 +60,10 @@ const SOCIALS = [
   { Icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
 ];
 
+import { assertPublicOnly } from "@/lib/enforce-public-only";
+
 export function PublicFooter() {
+  if (assertPublicOnly("PublicFooter")) return null;
   return (
     <footer className="border-border bg-card mt-24 border-t">
       <div className="mx-auto max-w-7xl px-4 pt-14 pb-10 md:px-6">
