@@ -259,10 +259,12 @@ export function JobPortalPage({ initialRole = "seeker" }: { initialRole?: "seeke
           ) : (
             <div className="mt-8 text-center">
               <button
+                type="button"
                 onClick={handlePostJob}
-                className="bg-gradient-cta text-primary-foreground rounded-[var(--radius-button)] px-6 py-3 text-sm font-bold shadow-[var(--shadow-glow)]"
+                disabled={!isInitialized}
+                className="bg-gradient-cta text-primary-foreground rounded-[var(--radius-button)] px-6 py-3 text-sm font-bold shadow-[var(--shadow-glow)] disabled:cursor-not-allowed disabled:opacity-70"
               >
-                Post a job free
+                {isInitialized ? "Post a job free" : "Loading…"}
               </button>
               {!user && isInitialized && (
                 <p className="text-muted-foreground mt-3 text-xs">
