@@ -64,6 +64,10 @@ export async function requireRole(allowed: AllowedRole[], currentPath: string) {
   if (roles.includes("super_admin" as UserRole)) effectiveRoles.add("admin");
   const ok = Array.from(normalized).some((r) => effectiveRoles.has(r));
   if (!ok) {
+    // Redirect users to their own home surface when they hit the wrong dashboard.
+    if (effectiveRoles.has("admin")) throw redirect({ to: "/admin/dashboard" });
+    if (effectiveRoles.has("owner")) throw redirect({ to: "/owner/dashboard" });
+    if (effectiveRoles.has("customer")) throw redirect({ to: "/customer/home" });
     throw redirect({ to: "/" });
   }
   return { user: data.user, roles };
