@@ -328,6 +328,29 @@ export function PostJobPage() {
 
       <EmployerSetupModal open={showSetup} onClose={() => setShowSetup(false)} redirectTo="/hire/post-job" />
 
+      {publishedJob ? (
+        <div className="mx-auto max-w-3xl px-4 pb-24 pt-10 md:px-6">
+          <JobPublishedSuccess
+            job={publishedJob}
+            profile={profile}
+            onPostAnother={() => {
+              setPublishedJob(null);
+              setJobId(undefined);
+              setForm({
+                ...EMPTY,
+                city: profile?.city ?? "",
+                contact_person: profile?.business_name ?? "",
+                contact_mobile: profile?.phone ?? "",
+                whatsapp_number: profile?.phone ?? "",
+              });
+              setSkillsInput("");
+              setAttempted(new Set());
+              setStep(0);
+              try { localStorage.removeItem(DRAFT_STORAGE_KEY); } catch {}
+            }}
+          />
+        </div>
+      ) : (
       <div className="mx-auto max-w-7xl px-4 pb-32 pt-8 md:px-6">
         {draftRestored && (
           <div className="mb-4 flex items-center justify-between gap-3 rounded-[var(--radius-card)] border border-primary/30 bg-primary/5 px-4 py-3 text-sm">
