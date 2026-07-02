@@ -5,7 +5,6 @@ import {
   initInstallPromptCapture,
   subscribeInstallPrompt,
   clearInstallPrompt,
-  type BeforeInstallPromptEvent as GlobalBIP,
 } from "@/lib/pwa-install";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
