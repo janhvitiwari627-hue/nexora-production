@@ -1,24 +1,14 @@
 {
-  "id": "/customer/home",
-  "name": "Nexora SalonOS Customer App",
+  "name": "Nexora SalonOS",
   "short_name": "Nexora",
-  "description": "Book salons, earn rewards, and manage your visits with the Nexora Customer App.",
-  "start_url": "/customer/home",
-  "scope": "/customer/",
-  "display": "standalone",
-  "orientation": "portrait",
+  "description": "Discover top-rated salons, spas and barbershops on Nexora SalonOS.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "browser",
   "background_color": "#f8fafc",
   "theme_color": "#2563eb",
-  "categories": ["lifestyle", "shopping"],
   "icons": [
-    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
-  ],
-  "shortcuts": [
-    { "name": "My Bookings", "url": "/customer/bookings" },
-    { "name": "Rewards", "url": "/customer/rewards" },
-    { "name": "At Salon", "url": "/customer/at-salon" }
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
   ]
 }

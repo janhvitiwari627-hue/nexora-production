@@ -80,12 +80,8 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
   const navigate = useNavigate();
   const isOwner = roles.some((r) => r === "owner" || r === "shop_owner" || r === "shop_manager");
 
-  const switchToCustomer = () => {
-    try {
-      sessionStorage.setItem("nexora:browseAsCustomer", "1");
-    } catch { /* ignore */ }
-    navigate({ to: "/customer/home", search: { as: "customer" } as never });
-  };
+  // "Browse as Customer" was removed — the Customer App is shipping as a
+  // separate product; owners stay on their dashboard.
   const switchToOwner = () => {
     try {
       sessionStorage.removeItem("nexora:browseAsCustomer");
@@ -257,13 +253,6 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
                     >
                       <LayoutDashboard className="mr-2 h-4 w-4" />
                       Owner Dashboard
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onSelect={(e) => { e.preventDefault(); switchToCustomer(); }}
-                      className="cursor-pointer"
-                    >
-                      <UserCircle2 className="mr-2 h-4 w-4" />
-                      Browse as Customer
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                   </>

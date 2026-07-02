@@ -27,7 +27,12 @@ export function ViewSwitcher({
   const isOwner =
     mounted &&
     roles.some((r) => r === "owner" || r === "shop_owner" || r === "shop_manager");
+  // The Customer App now ships as a separate product; this switcher
+  // has no destination on the public website and always renders nothing.
+  void mode;
+  void navigate;
   if (!isOwner) return null;
+  return null;
 
   const goOwner = () => {
     try {

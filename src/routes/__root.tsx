@@ -11,11 +11,8 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { registerServiceWorker } from "../lib/register-sw";
 
 import { NotFoundPage } from "@/pages/public/NotFoundPage";
-import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
-import { ServiceWorkerUpdatePrompt } from "@/components/pwa/ServiceWorkerUpdatePrompt";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -87,7 +84,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/232256ad-c4f3-4f72-84f1-0c97aa408c63/id-preview-d451d0e4--822fe342-2aa4-466c-8092-9280657c85a5.lovable.app-1781852479510.png" },
     ],
     links: [
-      { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "icon", href: "/icon-192.png", type: "image/png", sizes: "192x192" },
       { rel: "icon", href: "/icon-512.png", type: "image/png", sizes: "512x512" },
       { rel: "apple-touch-icon", href: "/icon-192.png", sizes: "192x192" },
@@ -140,15 +136,15 @@ function RootComponent() {
       initializeAuthStore();
     }
 
-    registerServiceWorker();
-
-    void import("@/lib/pwa-standalone-guard").then(({ initStandaloneRedirectGuard }) => {
-      initStandaloneRedirectGuard();
-    });
-
-    void import("@/lib/pwa-install").then(({ initInstallPromptCapture }) => {
-      initInstallPromptCapture();
-    });
+    // Kill-switch: any previously-installed customer-app service worker
+    // gets replaced by /sw.js which unregisters itself on activate. We
+    // additionally best-effort unregister here so returning visitors on
+    // browsers that already cached the old SW get evicted immediately.
+    if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistrations?.()
+        .then((regs) => regs.forEach((r) => { void r.unregister(); }))
+        .catch(() => { /* ignore */ });
+    }
 
     void import("@/lib/booking-offline-sync").then(({ initBookingOfflineSync }) => {
       initBookingOfflineSync();
@@ -164,8 +160,6 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
-      <PWAInstallPrompt />
-      <ServiceWorkerUpdatePrompt />
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );
