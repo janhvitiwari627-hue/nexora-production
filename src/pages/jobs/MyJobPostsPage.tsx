@@ -116,7 +116,7 @@ export function MyJobPostsPage() {
             </p>
           </div>
           <Button asChild size="sm">
-            <Link to="/jobs/post-a-job">
+            <Link to="/hire/post-job">
               <Plus className="mr-1.5 h-4 w-4" /> Post a Job
             </Link>
           </Button>
@@ -142,7 +142,7 @@ export function MyJobPostsPage() {
                 </p>
               </div>
               <Button asChild>
-                <Link to="/jobs/post-a-job">
+                <Link to="/hire/post-job">
                   <Plus className="mr-1.5 h-4 w-4" /> Post a Job
                 </Link>
               </Button>
@@ -205,7 +205,7 @@ export function MyJobPostsPage() {
                         aria-disabled={!canEdit}
                       >
                         <Link
-                          to="/jobs/post-a-job"
+                          to="/hire/post-job"
                           search={{ jobId: job.id }}
                         >
                           <Pencil className="mr-1.5 h-4 w-4" /> Edit Job
