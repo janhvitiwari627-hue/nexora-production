@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 
 import { NotFoundPage } from "@/pages/public/NotFoundPage";
 import { Toaster } from "@/components/ui/sonner";
+import { useApplicationStatusNotifications } from "@/hooks/useApplicationStatusNotifications";
 
 function NotFoundComponent() {
   return <NotFoundPage />;
