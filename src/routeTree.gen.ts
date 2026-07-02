@@ -101,6 +101,7 @@ import { Route as CustomerRewardsRouteImport } from './routes/customer.rewards'
 import { Route as CustomerProfileRouteImport } from './routes/customer.profile'
 import { Route as CustomerHomeRouteImport } from './routes/customer.home'
 import { Route as CustomerBookingsRouteImport } from './routes/customer.bookings'
+import { Route as CustomerAtSalonRouteImport } from './routes/customer.at-salon'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as BrandSlugRouteImport } from './routes/brand.$slug'
 import { Route as BookSlugRouteImport } from './routes/book.$slug'
@@ -595,6 +596,11 @@ const CustomerBookingsRoute = CustomerBookingsRouteImport.update({
   path: '/bookings',
   getParentRoute: () => CustomerRoute,
 } as any)
+const CustomerAtSalonRoute = CustomerAtSalonRouteImport.update({
+  id: '/at-salon',
+  path: '/at-salon',
+  getParentRoute: () => CustomerRoute,
+} as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/category/$slug',
   path: '/category/$slug',
@@ -811,6 +817,7 @@ export interface FileRoutesByFullPath {
   '/book/$slug': typeof BookSlugRoute
   '/brand/$slug': typeof BrandSlugRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/customer/at-salon': typeof CustomerAtSalonRoute
   '/customer/bookings': typeof CustomerBookingsRoute
   '/customer/home': typeof CustomerHomeRoute
   '/customer/profile': typeof CustomerProfileRoute
@@ -934,6 +941,7 @@ export interface FileRoutesByTo {
   '/book/$slug': typeof BookSlugRoute
   '/brand/$slug': typeof BrandSlugRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/customer/at-salon': typeof CustomerAtSalonRoute
   '/customer/bookings': typeof CustomerBookingsRoute
   '/customer/home': typeof CustomerHomeRoute
   '/customer/profile': typeof CustomerProfileRoute
@@ -1061,6 +1069,7 @@ export interface FileRoutesById {
   '/book/$slug': typeof BookSlugRoute
   '/brand/$slug': typeof BrandSlugRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/customer/at-salon': typeof CustomerAtSalonRoute
   '/customer/bookings': typeof CustomerBookingsRoute
   '/customer/home': typeof CustomerHomeRoute
   '/customer/profile': typeof CustomerProfileRoute
@@ -1189,6 +1198,7 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/brand/$slug'
     | '/category/$slug'
+    | '/customer/at-salon'
     | '/customer/bookings'
     | '/customer/home'
     | '/customer/profile'
@@ -1312,6 +1322,7 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/brand/$slug'
     | '/category/$slug'
+    | '/customer/at-salon'
     | '/customer/bookings'
     | '/customer/home'
     | '/customer/profile'
@@ -1438,6 +1449,7 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/brand/$slug'
     | '/category/$slug'
+    | '/customer/at-salon'
     | '/customer/bookings'
     | '/customer/home'
     | '/customer/profile'
@@ -2230,6 +2242,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CustomerBookingsRouteImport
       parentRoute: typeof CustomerRoute
     }
+    '/customer/at-salon': {
+      id: '/customer/at-salon'
+      path: '/at-salon'
+      fullPath: '/customer/at-salon'
+      preLoaderRoute: typeof CustomerAtSalonRouteImport
+      parentRoute: typeof CustomerRoute
+    }
     '/category/$slug': {
       id: '/category/$slug'
       path: '/category/$slug'
@@ -2490,6 +2509,7 @@ const AdminRouteChildren: AdminRouteChildren = {
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface CustomerRouteChildren {
+  CustomerAtSalonRoute: typeof CustomerAtSalonRoute
   CustomerBookingsRoute: typeof CustomerBookingsRoute
   CustomerHomeRoute: typeof CustomerHomeRoute
   CustomerProfileRoute: typeof CustomerProfileRoute
@@ -2497,6 +2517,7 @@ interface CustomerRouteChildren {
 }
 
 const CustomerRouteChildren: CustomerRouteChildren = {
+  CustomerAtSalonRoute: CustomerAtSalonRoute,
   CustomerBookingsRoute: CustomerBookingsRoute,
   CustomerHomeRoute: CustomerHomeRoute,
   CustomerProfileRoute: CustomerProfileRoute,
