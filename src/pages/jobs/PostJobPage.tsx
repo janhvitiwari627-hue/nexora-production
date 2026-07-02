@@ -172,7 +172,7 @@ export function PostJobPage() {
 
   const stepInvalid = (i: number) => {
     if (i === 0) return !!(errors.title || errors.category || errors.description || errors.openings);
-    if (i === 1) return !!errors.city;
+    if (i === 1) return !!(errors.city || errors.contact_mobile);
     if (i === 2) return !!(errors.salary_min || errors.salary_max);
     return false;
   };
