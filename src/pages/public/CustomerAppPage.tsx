@@ -251,13 +251,23 @@ export default function CustomerAppPage() {
             {installed && (
               <Alert className="mt-5 border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-100">
                 <Download className="h-4 w-4" />
-                <AlertTitle>Nexora is already installed</AlertTitle>
+                <AlertTitle>Nexora App is installed</AlertTitle>
                 <AlertDescription>
                   <p className="mt-1 text-sm">
-                    {typeof window !== "undefined" && window.matchMedia?.("(display-mode: standalone)").matches
-                      ? "You're running Nexora as an installed app right now — no further action needed."
-                      : "This device has Nexora installed. Open it from your home screen or app drawer for the full standalone experience."}
+                    Skip the website — jump straight into the customer app.
                   </p>
+                  <div className="mt-3">
+                    <Button
+                      asChild
+                      size="sm"
+                      className="bg-emerald-600 text-white hover:bg-emerald-700"
+                    >
+                      <Link to="/customer/home">
+                        <Smartphone className="mr-2 h-3.5 w-3.5" />
+                        Open Nexora App
+                      </Link>
+                    </Button>
+                  </div>
                 </AlertDescription>
               </Alert>
             )}
