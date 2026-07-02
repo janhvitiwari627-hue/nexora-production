@@ -28,19 +28,39 @@ const otpSchema = z.object({
   code: z.string().regex(/^[0-9]{6}$/, "Enter the 6-digit code"),
 });
 
-const RESEND_SECONDS = 30;
+// Per-channel cooldowns. Email providers throttle harder than SMS gateways
+// (Supabase default: ~60s between email OTPs, ~30s between SMS OTPs), so we
+// mirror those windows in the UI to avoid hitting the 429 rate limit.
+const RESEND_SECONDS: Record<"sms" | "email", number> = {
+  sms: 30,
+  email: 60,
+};
+
+const RATE_LIMIT_COPY: Record<"sms" | "email", string> = {
+  sms: "SMS providers limit how often a code can be sent to the same number. You can request another text once the timer ends.",
+  email: "Email providers throttle repeated sends to avoid spam filters flagging the message. You can request another email once the timer ends.",
+};
+
+/** Parse "after N seconds" from Supabase 429 rate-limit messages. */
+function parseRetryAfter(message?: string | null): number | null {
+  if (!message) return null;
+  const m = message.match(/after (\d+)\s*seconds?/i);
+  return m ? Number(m[1]) : null;
+}
 
 function VerifyOtpPage() {
   const { phone, email } = Route.useSearch();
   const channel: "sms" | "email" = email ? "email" : "sms";
   const destination = email || phone;
+  const cooldown = RESEND_SECONDS[channel];
   const navigate = useNavigate();
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [smsConfigError, setSmsConfigError] = useState<string | null>(null);
+  const [rateLimitedUntil, setRateLimitedUntil] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [resending, setResending] = useState(false);
-  const [resendIn, setResendIn] = useState(RESEND_SECONDS);
+  const [resendIn, setResendIn] = useState(cooldown);
 
   useEffect(() => {
     if (resendIn <= 0) return;
