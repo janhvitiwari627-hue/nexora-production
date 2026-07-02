@@ -193,8 +193,196 @@ export function CandidateProfilePage() {
     }
   }
 
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState<{
+    candidateId: string;
+    name: string;
+    completion: number;
+  } | null>(null);
+
+  // Load any existing candidate profile so returning users see their data.
+  useEffect(() => {
+    if (!user) return;
+    let alive = true;
+    (async () => {
+      const { data } = await (supabase as any)
+        .from("candidate_profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (!alive || !data) return;
+      setPersonal({
+        name: data.full_name ?? "",
+        email: data.email ?? "",
+        phone: data.phone ?? "",
+        city: data.city ?? "",
+        bio: data.bio ?? "",
+      });
+      if (Array.isArray(data.skills) && data.skills.length) setSkills(data.skills);
+      if (Array.isArray(data.experience) && data.experience.length) setExperience(data.experience);
+      if (Array.isArray(data.education) && data.education.length) setEducation(data.education);
+      if (Array.isArray(data.certifications)) setCerts(data.certifications);
+      if (Array.isArray(data.portfolio_urls)) setPortfolio(data.portfolio_urls);
+      if (data.video_url) setVideo(data.video_url);
+      if (data.resume_url) setResume(data.resume_url);
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [user]);
+
+  function computeCompletion() {
+    let filled = 0;
+    let total = 6;
+    if (personal.name.trim()) filled++;
+    if (personal.email.trim()) filled++;
+    if (personal.phone.trim()) filled++;
+    if (personal.city.trim()) filled++;
+    if (skills.length > 0) filled++;
+    if (experience.some((e) => e.company || e.role) || education.some((e) => e.school)) filled++;
+    return Math.round((filled / total) * 100);
+  }
+
+  async function handleSubmitProfile() {
+    if (!user) {
+      toast.error("Please sign in to submit your profile.");
+      return;
+    }
+    if (!personal.name.trim() || !personal.phone.trim()) {
+      const msg = "Please add your full name and phone before submitting.";
+      setSubmitError(msg);
+      toast.error(msg);
+      setStep(0);
+      return;
+    }
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const payload = {
+        user_id: user.id,
+        full_name: personal.name.trim() || null,
+        email: personal.email.trim() || null,
+        phone: personal.phone.trim() || null,
+        city: personal.city.trim() || null,
+        bio: personal.bio.trim() || null,
+        avatar_url: avatar || null,
+        skills,
+        experience: experience.filter((e) => e.company || e.role),
+        education: education.filter((e) => e.school || e.course),
+        certifications: certs,
+        portfolio_urls: portfolio,
+        video_url: video || null,
+        resume_url: resume || null,
+        is_submitted: true,
+        submitted_at: new Date().toISOString(),
+      };
+      const { data, error } = await (supabase as any)
+        .from("candidate_profiles")
+        .upsert(payload, { onConflict: "user_id" })
+        .select("id")
+        .single();
+      if (error) throw error;
+
+      // Also mirror the basics on the shared profile row.
+      await (supabase as any)
+        .from("profiles")
+        .update({
+          full_name: payload.full_name,
+          mobile: payload.phone,
+          city: payload.city,
+        })
+        .eq("id", user.id);
+
+      await refreshProfile();
+      setSubmitted({
+        candidateId: data.id as string,
+        name: payload.full_name || "Candidate",
+        completion: computeCompletion(),
+      });
+      toast.success("Profile submitted successfully. You can now apply for jobs.");
+    } catch (err) {
+      console.error("[candidate profile submit]", err);
+      const msg =
+        err instanceof Error && err.message
+          ? err.message
+          : "We couldn't submit your profile. Please try again.";
+      setSubmitError(msg);
+      toast.error(msg);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   const next = () => setStep((s) => Math.min(STEPS.length - 1, s + 1));
   const back = () => setStep((s) => Math.max(0, s - 1));
+
+  if (submitted) {
+    return (
+      <>
+        <PublicPageHeader />
+        <div className="mx-auto max-w-2xl space-y-6 p-6">
+          <Card>
+            <CardContent className="space-y-6 p-8 text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
+                <CheckCircle2 className="h-9 w-9 text-emerald-600" />
+              </div>
+              <div className="space-y-2">
+                <h1 className="text-heading text-2xl font-bold">
+                  Your candidate profile has been submitted successfully.
+                </h1>
+                <p className="text-muted-foreground text-sm">
+                  You can now apply to jobs and track your applications.
+                </p>
+              </div>
+
+              <dl className="grid gap-3 rounded-xl border bg-muted/30 p-4 text-left text-sm sm:grid-cols-2">
+                <div>
+                  <dt className="text-muted-foreground text-xs uppercase tracking-wide">
+                    Candidate Name
+                  </dt>
+                  <dd className="font-medium">{submitted.name}</dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground text-xs uppercase tracking-wide">
+                    Profile Completion
+                  </dt>
+                  <dd className="font-medium">{submitted.completion}%</dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground text-xs uppercase tracking-wide">
+                    Application Ready
+                  </dt>
+                  <dd className="inline-flex items-center gap-1 font-medium text-emerald-700">
+                    <Check className="h-4 w-4" /> Ready to apply
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground text-xs uppercase tracking-wide">
+                    Candidate ID
+                  </dt>
+                  <dd className="font-mono text-xs">{submitted.candidateId}</dd>
+                </div>
+              </dl>
+
+              <div className="flex flex-wrap justify-center gap-2">
+                <Button asChild>
+                  <Link to="/jobs/search">Search Jobs</Link>
+                </Button>
+                <Button asChild variant="outline">
+                  <Link to="/jobs/applications">View My Applications</Link>
+                </Button>
+                <Button variant="ghost" onClick={() => setSubmitted(null)}>
+                  Edit Profile
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </>
+    );
+  }
+
 
   return (
     <>
