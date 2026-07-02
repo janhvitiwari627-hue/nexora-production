@@ -271,7 +271,51 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
         </div>
       </div>
 
+      <Modal
+        open={applyOpen}
+        onClose={() => (applying ? undefined : setApplyOpen(false))}
+        title={`Apply — ${job.title}`}
+        size="md"
+      >
+        <form onSubmit={handleSubmitApply} className="space-y-4 p-6">
+          <div className="bg-muted/40 flex items-center justify-between rounded-lg px-3 py-2 text-xs">
+            <span className="text-muted-foreground">Submitting for job</span>
+            <code className="text-heading font-mono text-[11px]">{jobId}</code>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="cover-note">Cover note (optional)</Label>
+            <Textarea
+              id="cover-note"
+              rows={5}
+              maxLength={1000}
+              placeholder={`Tell ${job.business} why you're a good fit…`}
+              value={coverNote}
+              onChange={(e) => setCoverNote(e.target.value)}
+              disabled={applying}
+            />
+            <div className="text-muted-foreground text-right text-[11px]">
+              {coverNote.length}/1000
+            </div>
+          </div>
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setApplyOpen(false)}
+              disabled={applying}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={applying}>
+              <Send className="h-4 w-4" />
+              {applying ? "Submitting…" : "Submit application"}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
       <Modal open={successOpen} onClose={() => setSuccessOpen(false)} size="sm">
+
         <div className="flex flex-col items-center gap-4 p-8 text-center">
           <div className="bg-primary/10 grid h-16 w-16 place-items-center rounded-full">
             <CheckCircle2 className="text-primary h-9 w-9" />
