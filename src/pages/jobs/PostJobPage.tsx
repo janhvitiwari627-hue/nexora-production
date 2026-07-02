@@ -1644,9 +1644,98 @@ function LocationStep({
   update: (p: Partial<Form>) => void;
   errors: FormErrors;
 }) {
+  const chipCls = (active: boolean) =>
+    cn(
+      "rounded-full border px-4 py-1.5 text-xs font-bold transition",
+      active
+        ? "border-transparent bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
+        : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
+    );
+
+  // Compose schedule text from days + hours whenever they change.
+  const composeSchedule = (patch: Partial<Form>) => {
+    const next = { ...form, ...patch };
+    const preset = next.days_preset ?? "";
+    let daysText = "";
+    if (preset === "Custom days") {
+      daysText = (next.custom_days ?? []).join(", ");
+    } else if (preset && preset !== "") {
+      daysText = preset;
+    }
+    let hoursText = "";
+    if (next.flexible_schedule) hoursText = "Flexible hours";
+    else if (next.start_time && next.end_time) hoursText = `${next.start_time} – ${next.end_time}`;
+    const schedule = [daysText, hoursText].filter(Boolean).join(" • ");
+    update({ ...patch, schedule });
+  };
+
+  const selectDaysPreset = (preset: DayPreset) => {
+    if (preset === "Custom days") {
+      composeSchedule({ days_preset: preset });
+      return;
+    }
+    composeSchedule({ days_preset: preset, custom_days: DAYS_FOR_PRESET[preset] });
+  };
+
+  const toggleCustomDay = (day: string) => {
+    const current = new Set(form.custom_days ?? []);
+    if (current.has(day)) current.delete(day);
+    else current.add(day);
+    // Preserve week order.
+    const ordered = WEEK_DAYS.filter((d) => current.has(d));
+    composeSchedule({ days_preset: "Custom days", custom_days: ordered });
+  };
+
+  const selectHoursPreset = (label: string) => {
+    const preset = HOUR_PRESETS.find((h) => h.label === label);
+    if (!preset) return;
+    if (preset.flexible) {
+      composeSchedule({
+        hours_preset: label,
+        flexible_schedule: true,
+        start_time: "",
+        end_time: "",
+      });
+      return;
+    }
+    if (preset.start && preset.end) {
+      composeSchedule({
+        hours_preset: label,
+        flexible_schedule: false,
+        start_time: preset.start,
+        end_time: preset.end,
+      });
+      return;
+    }
+    // Custom time — keep manual inputs, clear flexible.
+    composeSchedule({ hours_preset: label, flexible_schedule: false });
+  };
+
+  const [cityFocused, setCityFocused] = useState(false);
+
   return (
     <div className="space-y-4">
       <h2 className="text-heading text-xl font-bold">Location & schedule</h2>
+
+      <Field label="Business type">
+        <div className="flex flex-wrap gap-2">
+          {BUSINESS_TYPES.map((b) => {
+            const active = form.business_type === b;
+            return (
+              <button
+                key={b}
+                type="button"
+                onClick={() => update({ business_type: b })}
+                aria-pressed={active}
+                className={chipCls(active)}
+              >
+                {b}
+              </button>
+            );
+          })}
+        </div>
+      </Field>
+
       <div className="grid gap-4 md:grid-cols-2">
         <Field label="City" error={errors.city}>
           <input
@@ -1654,7 +1743,29 @@ function LocationStep({
             aria-invalid={!!errors.city}
             value={form.city}
             onChange={(e) => update({ city: e.target.value })}
+            onFocus={() => setCityFocused(true)}
+            onBlur={() => window.setTimeout(() => setCityFocused(false), 150)}
           />
+          {cityFocused && (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {CITY_QUICK_OPTIONS.map((c) => {
+                const active = form.city === c;
+                return (
+                  <button
+                    key={c}
+                    type="button"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      update({ city: c === "Other city" ? "" : c });
+                    }}
+                    className={chipCls(active)}
+                  >
+                    {c}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </Field>
         <Field label="Area / locality">
           <input
@@ -1664,6 +1775,7 @@ function LocationStep({
           />
         </Field>
       </div>
+
       <Field label="Address (optional)">
         <input
           className={inputCls}
@@ -1671,13 +1783,7 @@ function LocationStep({
           onChange={(e) => update({ address: e.target.value })}
         />
       </Field>
-      <Field label="Schedule" hint="e.g. Mon–Sat, 10 AM – 8 PM">
-        <input
-          className={inputCls}
-          value={form.schedule ?? ""}
-          onChange={(e) => update({ schedule: e.target.value })}
-        />
-      </Field>
+
       <Field label="Work location">
         <div className="flex flex-wrap gap-2">
           {WORK_LOCATIONS.map((w) => {
@@ -1688,12 +1794,7 @@ function LocationStep({
                 type="button"
                 onClick={() => update({ work_location: w })}
                 aria-pressed={active}
-                className={cn(
-                  "rounded-full border px-4 py-1.5 text-xs font-bold transition",
-                  active
-                    ? "border-transparent bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
-                    : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
-                )}
+                className={chipCls(active)}
               >
                 {w}
               </button>
@@ -1701,6 +1802,84 @@ function LocationStep({
           })}
         </div>
       </Field>
+
+      <Field label="Working days">
+        <div className="flex flex-wrap gap-2">
+          {DAY_PRESETS.map((p) => {
+            const active = form.days_preset === p;
+            return (
+              <button
+                key={p}
+                type="button"
+                onClick={() => selectDaysPreset(p)}
+                aria-pressed={active}
+                className={chipCls(active)}
+              >
+                {p}
+              </button>
+            );
+          })}
+        </div>
+        {form.days_preset === "Custom days" && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {WEEK_DAYS.map((d) => {
+              const active = (form.custom_days ?? []).includes(d);
+              return (
+                <button
+                  key={d}
+                  type="button"
+                  onClick={() => toggleCustomDay(d)}
+                  aria-pressed={active}
+                  className={chipCls(active)}
+                >
+                  {d}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </Field>
+
+      <Field label="Working hours">
+        <div className="flex flex-wrap gap-2">
+          {HOUR_PRESETS.map((h) => {
+            const active = form.hours_preset === h.label;
+            return (
+              <button
+                key={h.label}
+                type="button"
+                onClick={() => selectHoursPreset(h.label)}
+                aria-pressed={active}
+                className={chipCls(active)}
+              >
+                {h.label}
+              </button>
+            );
+          })}
+        </div>
+        {form.hours_preset === "Custom time" && (
+          <div className="mt-3 grid gap-3 md:grid-cols-2">
+            <input
+              className={inputCls}
+              placeholder="Start time (e.g. 10 AM)"
+              value={form.start_time ?? ""}
+              onChange={(e) => composeSchedule({ start_time: e.target.value })}
+            />
+            <input
+              className={inputCls}
+              placeholder="End time (e.g. 8 PM)"
+              value={form.end_time ?? ""}
+              onChange={(e) => composeSchedule({ end_time: e.target.value })}
+            />
+          </div>
+        )}
+        {form.schedule && (
+          <p className="text-muted-foreground mt-2 text-xs">
+            Preview: <span className="text-heading font-semibold">{form.schedule}</span>
+          </p>
+        )}
+      </Field>
+
       <div className="mt-2 border-t border-border pt-4">
         <h3 className="text-heading mb-3 text-sm font-bold uppercase tracking-wide text-muted-foreground">
           Contact details
