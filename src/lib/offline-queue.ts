@@ -13,8 +13,12 @@
 
 const STORAGE_KEY = "nx_offline_queue_v1";
 const MAX_ATTEMPTS = 6;
+/** Keep succeeded tasks around briefly so UI can show "Confirmed" state. */
+const SUCCESS_TTL_MS = 5 * 60_000;
 
-export type QueueTask<TPayload = unknown> = {
+export type QueueTaskStatus = "pending" | "running" | "succeeded" | "failed";
+
+export type QueueTask<TPayload = unknown, TResult = unknown> = {
   id: string;
   type: string;
   payload: TPayload;
@@ -22,10 +26,14 @@ export type QueueTask<TPayload = unknown> = {
   attempts: number;
   lastError: string | null;
   nextAttemptAt: number;
-  status: "pending" | "running" | "failed";
+  status: QueueTaskStatus;
+  completedAt?: number;
+  result?: TResult;
 };
 
-type Runner<TPayload = unknown> = (payload: TPayload) => Promise<void>;
+type Runner<TPayload = unknown, TResult = unknown> = (
+  payload: TPayload,
+) => Promise<TResult>;
 
 const runners = new Map<string, Runner>();
 const listeners = new Set<() => void>();
