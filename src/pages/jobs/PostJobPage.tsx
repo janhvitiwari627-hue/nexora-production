@@ -805,6 +805,9 @@ const EMPTY: Form = {
   joining_availability: "",
   salary_type: "",
   salary_range_preset: "",
+  certification: "",
+  languages: [],
+  portfolio_option: "",
 };
 
 const DRAFT_STORAGE_KEY = "nexora:postJobWizard:v1";
