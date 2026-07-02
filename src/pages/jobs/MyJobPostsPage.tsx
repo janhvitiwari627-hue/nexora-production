@@ -193,7 +193,7 @@ export function MyJobPostsPage() {
 
                     <div className="flex flex-wrap gap-2 md:justify-end">
                       <Button asChild size="sm" variant="outline">
-                        <Link to="/jobs/applications" search={{ status: "all", q: job.title }}>
+                        <Link to="/jobs/applications/$jobId" params={{ jobId: job.id }}>
                           <Eye className="mr-1.5 h-4 w-4" /> View Applications
                         </Link>
                       </Button>
