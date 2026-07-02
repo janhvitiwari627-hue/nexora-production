@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Smartphone, MapPin, Tag, UserCheck, Zap, MessageCircle, QrCode, Gift, History, Download, ExternalLink, Apple, Play, Share, Plus, MoreVertical, Chrome, Info, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -42,6 +42,26 @@ function isChromium() {
   return /Chrome|CriOS|Edg|Brave|OPR/.test(ua);
 }
 
+/**
+ * Chrome does not fire `beforeinstallprompt` inside iframes and
+ * Lovable's editor/preview URLs never serve the PWA install criteria.
+ * When the user clicks "Install" from inside one of these contexts we
+ * must explain that clearly instead of silently doing nothing.
+ */
+function isEmbeddedOrPreview() {
+  if (typeof window === "undefined") return false;
+  const inIframe = window.self !== window.top;
+  const host = window.location.hostname;
+  const isPreviewHost =
+    host.startsWith("id-preview--") ||
+    host.startsWith("preview--") ||
+    host.endsWith(".lovableproject.com") ||
+    host.endsWith(".lovableproject-dev.com") ||
+    host === "lovableproject.com" ||
+    host === "lovableproject-dev.com";
+  return inIframe || isPreviewHost;
+}
+
 const SESSION_DISMISS_KEY = "nexora_pwa_install_dismissed_session";
 const INSTALLED_KEY = "nexora_pwa_installed";
 
@@ -51,6 +71,7 @@ export default function CustomerAppPage() {
   const [dismissed, setDismissed] = useState(false);
   const [platform, setPlatform] = useState<Platform>("desktop");
   const [showGuide, setShowGuide] = useState(false);
+  const guideRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setPlatform(detectPlatform());
@@ -121,31 +142,59 @@ export default function CustomerAppPage() {
 
   const handleInstall = async () => {
     if (deferred) {
-      await deferred.prompt();
-      const { outcome } = await deferred.userChoice;
-      if (outcome === "accepted") {
-        setInstalled(true);
-        try { localStorage.setItem(INSTALLED_KEY, "1"); } catch { /* ignore */ }
-      } else {
-        // User dismissed the native prompt — respect that for the session.
-        setDismissed(true);
-        try { sessionStorage.setItem(SESSION_DISMISS_KEY, "1"); } catch { /* ignore */ }
+      try {
+        await deferred.prompt();
+        const { outcome } = await deferred.userChoice;
+        if (outcome === "accepted") {
+          setInstalled(true);
+          try { localStorage.setItem(INSTALLED_KEY, "1"); } catch { /* ignore */ }
+          toast.success("Installing Nexora…", { description: "You'll find Nexora on your home screen shortly." });
+        } else {
+          setDismissed(true);
+          try { sessionStorage.setItem(SESSION_DISMISS_KEY, "1"); } catch { /* ignore */ }
+        }
+      } catch {
+        toast.error("Install prompt failed", { description: "Try again from your browser's install icon in the address bar." });
+      } finally {
+        setDeferred(null);
       }
-      setDeferred(null);
       return;
     }
+
+    // No native prompt available. Always give the user visible feedback and
+    // reveal the platform-specific install guide.
     setShowGuide(true);
-    // Nudge for wrong-browser cases
-    if (platform === "ios" && !isSafari()) {
-      toast.message("Open in Safari to install", {
-        description: "iOS only allows installing from Safari. Tap the ••• menu → Open in Safari, then follow the steps below.",
+    // Scroll the guide into view on the next paint so it's obvious the click did something.
+    requestAnimationFrame(() => {
+      guideRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+
+    if (isEmbeddedOrPreview()) {
+      toast.message("Open the published site to install", {
+        description: "Installing to your home screen only works from the live Nexora URL (meripahalfasthelp.online), not the in-editor preview.",
       });
-    } else if (platform === "android" && !isChromium()) {
-      toast.message("Open in Chrome to install", {
-        description: "Tap your browser menu → Open in Chrome, then follow the steps below.",
+      return;
+    }
+
+    if (platform === "ios") {
+      toast.message(isSafari() ? "Follow the iOS install steps" : "Open in Safari to install", {
+        description: isSafari()
+          ? "Tap Share → Add to Home Screen to install Nexora."
+          : "iOS only allows installing from Safari. Open this page in Safari and follow the steps below.",
+      });
+    } else if (platform === "android") {
+      toast.message(isChromium() ? "Follow the Android install steps" : "Open in Chrome to install", {
+        description: isChromium()
+          ? "Tap the ⋮ menu → Install app to add Nexora to your device."
+          : "Open this page in Chrome, then tap ⋮ → Install app.",
+      });
+    } else {
+      toast.message("Install from your browser", {
+        description: "Click the install icon on the right of the address bar in Chrome, Edge or Brave.",
       });
     }
   };
+
 
   const handleDismiss = () => {
     setDismissed(true);
@@ -211,6 +260,16 @@ export default function CustomerAppPage() {
             )}
 
             {showGuide && showInstallCTA && !deferred && (
+              <div ref={guideRef}>
+              {isEmbeddedOrPreview() && (
+                <Alert className="mt-4">
+                  <Info className="h-4 w-4" />
+                  <AlertTitle>Install works only on the live site</AlertTitle>
+                  <AlertDescription>
+                    You're viewing this inside the in-editor preview, where browsers block the install prompt. Open the published Nexora URL on your phone or desktop browser to install the app.
+                  </AlertDescription>
+                </Alert>
+              )}
               <Alert className="mt-4">
                 <Info className="h-4 w-4" />
                 <AlertTitle>
@@ -244,6 +303,7 @@ export default function CustomerAppPage() {
                   )}
                 </AlertDescription>
               </Alert>
+              </div>
             )}
 
 
