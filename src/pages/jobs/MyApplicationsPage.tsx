@@ -91,6 +91,14 @@ function relative(iso: string) {
   return `${months}mo ago`;
 }
 
+function fmtSalary(min: number | null | undefined, max: number | null | undefined, period: string | null | undefined) {
+  if (!min && !max) return null;
+  const p = period === "hourly" ? "/hr" : period === "yearly" ? "/yr" : "/mo";
+  const f = (v: number) => (v >= 1000 ? `${Math.round(v / 1000)}k` : `${v}`);
+  if (min && max) return `₹${f(min)}–${f(max)}${p}`;
+  return `₹${f((min || max) as number)}${p}`;
+}
+
 export function MyApplicationsPage() {
   const { user, isInitialized } = useAuthStore();
   const search = applicationsRoute.useSearch();
