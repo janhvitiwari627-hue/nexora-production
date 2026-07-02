@@ -559,6 +559,11 @@ function validateForm(form: Form): FormErrors {
   if (city.length === 0) errs.city = "City is required.";
   else if (city.length < 2) errs.city = "Enter a valid city.";
 
+  const mobile = (form.contact_mobile ?? "").replace(/\D/g, "");
+  if (mobile.length === 0) errs.contact_mobile = "Contact mobile is required.";
+  else if (mobile.length < 10) errs.contact_mobile = "Enter a valid 10-digit mobile.";
+
+
   const min = form.salary_min;
   const max = form.salary_max;
   const hasMin = typeof min === "number" && !Number.isNaN(min);
