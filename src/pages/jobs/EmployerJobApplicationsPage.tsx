@@ -137,7 +137,9 @@ export function EmployerJobApplicationsPage() {
     try {
       await updateApplicationStatus(app.id, status);
       setApps((prev) => prev.map((a) => (a.id === app.id ? { ...a, status } : a)));
-      toast.success(`Marked as ${STATUS_LABEL[status]}`);
+      toast.success("Application status updated.", {
+        description: `Marked as ${STATUS_LABEL[status]}.`,
+      });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Could not update status";
       toast.error(message);

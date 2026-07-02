@@ -322,7 +322,9 @@ export function PostJobPage() {
       createdJobId = row.id;
       if (publish) {
         try { localStorage.removeItem(DRAFT_STORAGE_KEY); } catch {}
-        toast.success("Job published successfully");
+        toast.success("Job posted successfully.", {
+          description: `${row.title} is now live. Share it with candidates or view applications.`,
+        });
         setPublishedJob(row);
         if (typeof window !== "undefined") {
           window.requestAnimationFrame(() => {
