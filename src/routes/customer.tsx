@@ -153,7 +153,12 @@ function CustomerLayout() {
                   <span className="sm:hidden">Exit</span>
                 </Button>
               )}
-              <ViewSwitcher mode="customer" />
+              {/* ViewSwitcher exposes an "Owner" tab that jumps to the
+                  owner dashboard. Per the customer-app UI spec, owner /
+                  admin surfaces must not appear inside /customer/*, so
+                  only show it to users already in owner "browse as
+                  customer" mode — for pure customers it stays hidden. */}
+              {isBrowsingAsCustomer && <ViewSwitcher mode="customer" />}
             </div>
           </div>
         </div>
