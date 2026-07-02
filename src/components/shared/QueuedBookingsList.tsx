@@ -278,13 +278,59 @@ function QueuedBookingCard({
  * Renders all queued booking tasks (create + confirm) with per-item status.
  * Empty when there's nothing pending or recently confirmed.
  */
-export function QueuedBookingsList({ className, compact, limit }: Props) {
+export function QueuedBookingsList({
+  className,
+  compact,
+  limit,
+  autoNavigateOnConfirm = true,
+}: Props) {
   const queue = useOfflineQueue();
   const online = useOnlineStatus();
+  const navigate = useNavigate();
+  const notifiedRef = useRef<Set<string>>(new Set());
   const tasks = queue.filter(
     (t) => t.type === TASK_CREATE_AND_CONFIRM_BOOKING,
   ) as BookingTask[];
+
+  useEffect(() => {
+    if (!autoNavigateOnConfirm) return;
+    const seenKey = "nx_offline_queue_navigated_v1";
+    let seen: Set<string>;
+    try {
+      seen = new Set<string>(
+        JSON.parse(sessionStorage.getItem(seenKey) || "[]") as string[],
+      );
+    } catch {
+      seen = new Set<string>();
+    }
+    const justConfirmed = tasks.find(
+      (t) =>
+        t.status === "succeeded" &&
+        t.result?.booking_id &&
+        !seen.has(t.id) &&
+        !notifiedRef.current.has(t.id),
+    );
+    if (!justConfirmed || !justConfirmed.result?.booking_id) return;
+    notifiedRef.current.add(justConfirmed.id);
+    seen.add(justConfirmed.id);
+    try {
+      sessionStorage.setItem(seenKey, JSON.stringify(Array.from(seen)));
+    } catch {
+      // ignore
+    }
+    const ref = justConfirmed.result.booking_reference;
+    toast.success(
+      ref ? `Booking #${ref} confirmed` : "Your booking is confirmed",
+      { description: "Opening your booking details…" },
+    );
+    void navigate({
+      to: "/dashboard/bookings/$id",
+      params: { id: justConfirmed.result.booking_id },
+    });
+  }, [tasks, autoNavigateOnConfirm, navigate]);
+
   if (tasks.length === 0) return null;
+
 
   const list = limit ? tasks.slice(0, limit) : tasks;
   const pending = tasks.filter((t) => t.status !== "succeeded" && t.status !== "failed").length;
