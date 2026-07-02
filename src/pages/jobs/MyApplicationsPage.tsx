@@ -412,7 +412,9 @@ export function MyApplicationsPage() {
                 const title = j?.title ?? "Job";
                 const biz = j?.employer?.business_name ?? "Employer";
                 const loc = j ? `${j.area ? `${j.area}, ` : ""}${j.city}` : "";
+                const salary = fmtSalary(j?.salary_min, j?.salary_max, j?.salary_period);
                 const updated = a.updated_at && a.updated_at !== a.created_at;
+                const canWithdraw = a.status === "submitted" || a.status === "reviewed";
                 return (
                   <li key={a.id}>
                     <Card>
@@ -438,6 +440,12 @@ export function MyApplicationsPage() {
                                 {loc}
                               </span>
                             )}
+                            {salary && (
+                              <span className="text-primary inline-flex items-center gap-1 font-medium">
+                                <IndianRupee className="h-3 w-3" />
+                                {salary}
+                              </span>
+                            )}
                             <span
                               className="inline-flex items-center gap-1"
                               title={fmtDateTime(a.created_at)}
@@ -461,8 +469,19 @@ export function MyApplicationsPage() {
                           {j && (
                             <Button asChild size="sm" variant="outline">
                               <Link to="/jobs/$jobId" params={{ jobId: j.id }}>
-                                View job
+                                View Job
                               </Link>
+                            </Button>
+                          )}
+                          {canWithdraw && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-destructive hover:text-destructive"
+                              disabled={withdrawingId === a.id}
+                              onClick={() => handleWithdraw(a)}
+                            >
+                              {withdrawingId === a.id ? "Withdrawing…" : "Withdraw"}
                             </Button>
                           )}
                         </div>
