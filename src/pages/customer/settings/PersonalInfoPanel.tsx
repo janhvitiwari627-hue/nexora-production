@@ -24,6 +24,7 @@ export function PersonalInfoPanel() {
   const { user, profile, refreshProfile } = useAuthStore();
   const [avatar, setAvatar] = useState<string>(profile?.avatar_url || "");
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [usernameTouched, setUsernameTouched] = useState(false);
 
