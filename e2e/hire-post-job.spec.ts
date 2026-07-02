@@ -377,6 +377,117 @@ test.describe("/hire/post-job", () => {
   });
 });
 
+test.describe("/hire/post-job publish failure", () => {
+  test.skip(
+    !STORAGE_KEY || !SESSION_JSON,
+    "Supabase session env vars not present; skipping authenticated post-job checks.",
+  );
+
+  test("failing publish shows error alert with retry, and retry recovers or re-shows the error", async ({ page }) => {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await page.evaluate(() => {
+      window.localStorage.removeItem("nexora:postJobWizard:v1");
+    });
+
+    await seedSession(page);
+
+    // Intercept the first POST to the `jobs` REST endpoint and force a 500.
+    // Subsequent POSTs pass through so the retry can succeed.
+    let jobsPostCount = 0;
+    await page.route(/\/rest\/v1\/jobs(\?|$)/, async (route) => {
+      if (route.request().method() !== "POST") {
+        await route.fallback();
+        return;
+      }
+      jobsPostCount += 1;
+      if (jobsPostCount === 1) {
+        await route.fulfill({
+          status: 500,
+          contentType: "application/json",
+          body: JSON.stringify({
+            code: "500",
+            message: "Simulated publish failure",
+            details: null,
+            hint: null,
+          }),
+        });
+        return;
+      }
+      await route.fallback();
+    });
+
+    await page.goto("/hire/post-job", { waitUntil: "networkidle" });
+
+    const jobTitle = `Retry Stylist ${Date.now()}`;
+
+    // Step 1
+    await page.getByRole("textbox", { name: "Job title" }).fill(jobTitle);
+    await page
+      .getByRole("textbox", { name: "Description" })
+      .fill("Own the chair, deliver amazing cuts, and mentor junior stylists.");
+    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+
+    // Step 2
+    await expect(
+      page.getByRole("heading", { name: "Location & schedule" }),
+    ).toBeVisible({ timeout: 10_000 });
+    await page.getByRole("textbox", { name: "City" }).fill("Mumbai");
+    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+
+    // Step 3
+    await expect(
+      page.getByRole("heading", { name: "Salary & benefits" }),
+    ).toBeVisible({ timeout: 10_000 });
+    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+
+    // Step 4
+    await expect(
+      page.getByRole("heading", { name: "Requirements" }),
+    ).toBeVisible({ timeout: 10_000 });
+    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+
+    // Step 5 — publish (will fail due to intercept).
+    await expect(
+      page.getByRole("heading", { name: "Review & publish" }),
+    ).toBeVisible({ timeout: 10_000 });
+    await page.getByRole("button", { name: /^Publish job$/ }).first().click();
+
+    // Error alert renders with the failure title and retry button.
+    const alert = page.getByRole("alert");
+    await expect(alert).toBeVisible({ timeout: 10_000 });
+    await expect(alert.getByText("Publish failed")).toBeVisible();
+    const retryBtn = alert.getByRole("button", { name: /^Try again$/ });
+    await expect(retryBtn).toBeVisible();
+    await expect(retryBtn).toBeEnabled();
+
+    // We should still be on the wizard, not on a detail page.
+    expect(page.url()).toContain("/hire/post-job");
+
+    // Click retry — subsequent POST is allowed through.
+    await retryBtn.click();
+
+    // Either the detail page loads (recovery), or the alert stays / re-appears.
+    const detailUrlRe = /\/jobs\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const navigated = await page
+      .waitForURL(detailUrlRe, { timeout: 15_000 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (navigated) {
+      await expect(
+        page.getByRole("heading", { name: jobTitle }),
+      ).toBeVisible({ timeout: 15_000 });
+    } else {
+      // Retry did not recover — alert must still be shown to the user.
+      await expect(page.getByRole("alert")).toBeVisible();
+      await expect(
+        page.getByRole("alert").getByText(/Publish failed|Couldn't open your job listing/),
+      ).toBeVisible();
+    }
+  });
+});
+
+
 
 
 
