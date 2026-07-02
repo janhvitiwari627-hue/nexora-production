@@ -514,7 +514,132 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
           </div>
         </div>
       </Modal>
+
+      <ViewApplicationModal
+        open={viewOpen}
+        onClose={() => setViewOpen(false)}
+        job={job}
+        application={application}
+      />
     </>
+  );
+}
+
+function parseCoverNote(raw: string | null | undefined): {
+  name?: string;
+  email?: string;
+  phone?: string;
+  letter?: string;
+} {
+  if (!raw) return {};
+  const lines = raw.split("\n");
+  const out: { name?: string; email?: string; phone?: string; letter?: string } = {};
+  let i = 0;
+  for (; i < lines.length; i++) {
+    const line = lines[i];
+    const m = /^(Name|Email|Phone):\s*(.*)$/i.exec(line);
+    if (!m) break;
+    const key = m[1].toLowerCase();
+    if (key === "name") out.name = m[2].trim();
+    else if (key === "email") out.email = m[2].trim();
+    else if (key === "phone") out.phone = m[2].trim();
+  }
+  const rest = lines.slice(i).join("\n").trim();
+  if (rest) out.letter = rest;
+  return out;
+}
+
+function statusStyles(status: string): { label: string; className: string } {
+  const s = status.toLowerCase();
+  const map: Record<string, { label: string; className: string }> = {
+    submitted: { label: "Submitted", className: "bg-primary/10 text-primary border-primary/30" },
+    shortlisted: { label: "Shortlisted", className: "bg-blue-500/10 text-blue-600 border-blue-500/30" },
+    interviewing: { label: "Interviewing", className: "bg-amber-500/10 text-amber-600 border-amber-500/30" },
+    hired: { label: "Hired", className: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30" },
+    rejected: { label: "Not selected", className: "bg-destructive/10 text-destructive border-destructive/30" },
+    withdrawn: { label: "Withdrawn", className: "bg-muted text-muted-foreground border-border" },
+  };
+  return map[s] ?? { label: status || "Submitted", className: "bg-muted text-muted-foreground border-border" };
+}
+
+function ViewApplicationModal({
+  open,
+  onClose,
+  job,
+  application,
+}: {
+  open: boolean;
+  onClose: () => void;
+  job: DetailView;
+  application: {
+    id: string;
+    cover_note: string | null;
+    status: string;
+    created_at: string;
+  } | null;
+}) {
+  const parsed = parseCoverNote(application?.cover_note);
+  const status = statusStyles(application?.status ?? "submitted");
+  const submittedAt = application?.created_at
+    ? new Date(application.created_at).toLocaleString(undefined, {
+        dateStyle: "medium",
+        timeStyle: "short",
+      })
+    : "";
+
+  return (
+    <Modal open={open} onClose={onClose} title="Your application" size="md">
+      <div className="space-y-5 p-6">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="text-muted-foreground text-xs uppercase tracking-wider">
+              Applied to
+            </div>
+            <div className="text-heading text-lg font-bold">{job.title}</div>
+            <div className="text-muted-foreground text-sm">{job.business}</div>
+          </div>
+          <span
+            className={`shrink-0 rounded-full border px-2.5 py-1 text-xs font-semibold ${status.className}`}
+          >
+            {status.label}
+          </span>
+        </div>
+
+        {submittedAt && (
+          <div className="text-muted-foreground text-xs">Submitted on {submittedAt}</div>
+        )}
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <ViewField label="Full name" value={parsed.name} />
+          <ViewField label="Email" value={parsed.email} />
+          <ViewField label="Phone" value={parsed.phone} />
+        </div>
+
+        <div>
+          <div className="text-muted-foreground text-xs uppercase tracking-wider">
+            Cover letter
+          </div>
+          <div className="bg-muted/30 border-border mt-1 whitespace-pre-line rounded-md border p-3 text-sm">
+            {parsed.letter?.trim() ? parsed.letter : "— No cover letter provided —"}
+          </div>
+        </div>
+
+        <div className="flex justify-end">
+          <Button variant="outline" onClick={onClose}>
+            Close
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+function ViewField({ label, value }: { label: string; value?: string }) {
+  return (
+    <div>
+      <div className="text-muted-foreground text-xs uppercase tracking-wider">{label}</div>
+      <div className="text-sm font-medium break-words">{value?.trim() ? value : "—"}</div>
+    </div>
   );
 }
 
