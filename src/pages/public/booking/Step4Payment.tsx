@@ -51,6 +51,7 @@ export function Step4Payment({
   const [couponError, setCouponError] = useState<string | null>(null);
   const [qrOpen, setQrOpen] = useState(false);
   const items = selectedServices(booking);
+  const online = useOnlineStatus();
 
 
   const handleApply = () => {
