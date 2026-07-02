@@ -364,7 +364,8 @@ function JobCard({ job, compact }: { job: JobCardData; compact?: boolean }) {
           </div>
         </div>
         <Link
-          to={job.href ?? "/jobs"}
+          to="/jobs/$jobId"
+          params={{ jobId: job.id }}
           className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-1 rounded-[var(--radius-button)] px-4 py-2 text-xs font-bold"
         >
           <Briefcase className="h-3.5 w-3.5" /> Apply
