@@ -51,4 +51,36 @@ test.describe("/hire/post-job", () => {
       timeout: 10_000,
     });
   });
+
+  test("Continue from Job details advances to the Location & schedule step", async ({ page }) => {
+    // Start with a clean wizard so we don't inherit a persisted draft from
+    // a previous run (the wizard remembers step/form in localStorage).
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await page.evaluate(() => {
+      window.localStorage.removeItem("nexora:postJobWizard:v1");
+    });
+
+    await seedSession(page);
+    await page.goto("/hire/post-job", { waitUntil: "networkidle" });
+
+    await expect(page.getByRole("heading", { name: "Job details" })).toBeVisible({
+      timeout: 10_000,
+    });
+
+    // Fill the two required fields on step 1 so Continue enables.
+    await page.getByRole("textbox", { name: "Job title" }).fill("Senior Hair Stylist");
+    await page
+      .getByRole("textbox", { name: "Description" })
+      .fill("Own the chair, deliver amazing cuts, and mentor junior stylists.");
+
+    const continueBtn = page.getByRole("button", { name: /^Continue$/ }).first();
+    await expect(continueBtn).toBeEnabled();
+    await continueBtn.click();
+
+    // Next step should render its own heading and the progress label update.
+    await expect(
+      page.getByRole("heading", { name: "Location & schedule" }),
+    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/Step 2 of 5/)).toBeVisible();
+  });
 });
