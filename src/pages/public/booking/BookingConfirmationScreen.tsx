@@ -138,6 +138,9 @@ export function BookingConfirmationScreen({
         </p>
       </div>
 
+      <QueuedBookingsList className="mt-6" />
+
+
       <div className="border-border bg-card mt-8 rounded-[var(--radius-card-lg)] border p-6 shadow-[var(--shadow-card)]">
         <div className="text-muted-foreground text-[11px] uppercase tracking-wider">
           Booking ID
