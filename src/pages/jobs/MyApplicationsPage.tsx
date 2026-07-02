@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+const PAGE_SIZE = 10;
 import { Link } from "@tanstack/react-router";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -69,6 +71,8 @@ export function MyApplicationsPage() {
   const [refreshTick, setRefreshTick] = useState(0);
   const [filter, setFilter] = useState<string>("all");
   const [q, setQ] = useState("");
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!isInitialized || !user) return;
@@ -111,6 +115,34 @@ export function MyApplicationsPage() {
       return hay.includes(needle);
     });
   }, [apps, filter, q]);
+
+  // Reset pagination when filter/query/data changes
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [filter, q, refreshTick, apps]);
+
+  const visible = useMemo(
+    () => (filtered ? filtered.slice(0, visibleCount) : null),
+    [filtered, visibleCount],
+  );
+  const hasMore = !!filtered && visibleCount < filtered.length;
+
+  // Infinite scroll via IntersectionObserver
+  useEffect(() => {
+    if (!hasMore) return;
+    const el = sentinelRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setVisibleCount((c) => c + PAGE_SIZE);
+        }
+      },
+      { rootMargin: "300px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [hasMore, visible]);
 
   if (!isInitialized) {
     return (
@@ -218,73 +250,97 @@ export function MyApplicationsPage() {
           </Card>
         )}
 
-        {!error && filtered && filtered.length > 0 && (
-          <ul className="space-y-3">
-            {filtered.map((a) => {
-              const j = a.job;
-              const title = j?.title ?? "Job";
-              const biz = j?.employer?.business_name ?? "Employer";
-              const loc = j ? `${j.area ? `${j.area}, ` : ""}${j.city}` : "";
-              const updated = a.updated_at && a.updated_at !== a.created_at;
-              return (
-                <li key={a.id}>
-                  <Card>
-                    <CardContent className="flex flex-wrap items-start justify-between gap-4 p-5">
-                      <div className="min-w-0 flex-1 space-y-2">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <div className="text-heading font-semibold">{title}</div>
-                          <Badge className={STATUS_TONE[a.status] ?? "bg-muted"}>
-                            {STATUS_LABEL[a.status] ?? a.status.replace(/_/g, " ")}
-                          </Badge>
+        {!error && visible && filtered && visible.length > 0 && (
+          <>
+            <ul className="space-y-3">
+              {visible.map((a) => {
+                const j = a.job;
+                const title = j?.title ?? "Job";
+                const biz = j?.employer?.business_name ?? "Employer";
+                const loc = j ? `${j.area ? `${j.area}, ` : ""}${j.city}` : "";
+                const updated = a.updated_at && a.updated_at !== a.created_at;
+                return (
+                  <li key={a.id}>
+                    <Card>
+                      <CardContent className="flex flex-wrap items-start justify-between gap-4 p-5">
+                        <div className="min-w-0 flex-1 space-y-2">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <div className="text-heading font-semibold">{title}</div>
+                            <Badge className={STATUS_TONE[a.status] ?? "bg-muted"}>
+                              {STATUS_LABEL[a.status] ?? a.status.replace(/_/g, " ")}
+                            </Badge>
+                          </div>
+                          <div className="text-muted-foreground text-sm">{biz}</div>
+                          <div className="text-muted-foreground flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                            {j?.job_type && (
+                              <span className="inline-flex items-center gap-1">
+                                <Briefcase className="h-3 w-3" />
+                                {j.job_type}
+                              </span>
+                            )}
+                            {loc && (
+                              <span className="inline-flex items-center gap-1">
+                                <MapPin className="h-3 w-3" />
+                                {loc}
+                              </span>
+                            )}
+                            <span
+                              className="inline-flex items-center gap-1"
+                              title={fmtDateTime(a.created_at)}
+                            >
+                              <Clock className="h-3 w-3" />
+                              Applied {relative(a.created_at)}
+                            </span>
+                            {updated && (
+                              <span title={fmtDateTime(a.updated_at)}>
+                                Updated {relative(a.updated_at)}
+                              </span>
+                            )}
+                          </div>
+                          {a.cover_note && (
+                            <p className="text-muted-foreground border-border line-clamp-2 border-l-2 pl-3 text-xs italic">
+                              {a.cover_note}
+                            </p>
+                          )}
                         </div>
-                        <div className="text-muted-foreground text-sm">{biz}</div>
-                        <div className="text-muted-foreground flex flex-wrap gap-x-4 gap-y-1 text-xs">
-                          {j?.job_type && (
-                            <span className="inline-flex items-center gap-1">
-                              <Briefcase className="h-3 w-3" />
-                              {j.job_type}
-                            </span>
-                          )}
-                          {loc && (
-                            <span className="inline-flex items-center gap-1">
-                              <MapPin className="h-3 w-3" />
-                              {loc}
-                            </span>
-                          )}
-                          <span
-                            className="inline-flex items-center gap-1"
-                            title={fmtDateTime(a.created_at)}
-                          >
-                            <Clock className="h-3 w-3" />
-                            Applied {relative(a.created_at)}
-                          </span>
-                          {updated && (
-                            <span title={fmtDateTime(a.updated_at)}>
-                              Updated {relative(a.updated_at)}
-                            </span>
+                        <div className="flex flex-col items-end gap-2">
+                          {j && (
+                            <Button asChild size="sm" variant="outline">
+                              <Link to="/jobs/$jobId" params={{ jobId: j.id }}>
+                                View job
+                              </Link>
+                            </Button>
                           )}
                         </div>
-                        {a.cover_note && (
-                          <p className="text-muted-foreground line-clamp-2 border-l-2 border-border pl-3 text-xs italic">
-                            {a.cover_note}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex flex-col items-end gap-2">
-                        {j && (
-                          <Button asChild size="sm" variant="outline">
-                            <Link to="/jobs/$jobId" params={{ jobId: j.id }}>
-                              View job
-                            </Link>
-                          </Button>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </li>
-              );
-            })}
-          </ul>
+                      </CardContent>
+                    </Card>
+                  </li>
+                );
+              })}
+            </ul>
+
+            {hasMore ? (
+              <div
+                ref={sentinelRef}
+                className="flex items-center justify-center py-6"
+                aria-hidden="true"
+              >
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                >
+                  Load more
+                </Button>
+              </div>
+            ) : (
+              filtered.length > PAGE_SIZE && (
+                <p className="text-muted-foreground py-4 text-center text-xs">
+                  You've reached the end · {filtered.length} applications
+                </p>
+              )
+            )}
+          </>
         )}
       </div>
     </>
