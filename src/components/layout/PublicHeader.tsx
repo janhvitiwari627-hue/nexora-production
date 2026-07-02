@@ -61,7 +61,10 @@ const PORTAL_MENU = [
   { to: "/portal/contact", label: "Contact Us", icon: Phone },
 ] as const;
 
+import { assertPublicOnly } from "@/lib/enforce-public-only";
+
 export function PublicHeader({ showBackButton = true }: { showBackButton?: boolean }) {
+  if (assertPublicOnly("PublicHeader")) return null;
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
