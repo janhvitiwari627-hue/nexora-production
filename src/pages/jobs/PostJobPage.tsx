@@ -917,7 +917,7 @@ export function PostJobPage() {
           salary_max: job.salary_max,
           salary_period: (job.salary_period as any) ?? "monthly",
           benefits: job.benefits ?? [],
-          requirements: job.requirements ?? "",
+          requirements: stripRequirementsMeta(job.requirements),
           skills: job.skills ?? [],
           openings: job.openings ?? 1,
           job_role: job.job_role ?? "",
@@ -936,6 +936,14 @@ export function PostJobPage() {
           start_time: "",
           end_time: "",
           flexible_schedule: /flexible/i.test(job.schedule ?? ""),
+          ...(() => {
+            const m = parseRequirementsMeta(job.requirements);
+            return {
+              certification: m.certification,
+              languages: m.languages,
+              portfolio_option: m.portfolio,
+            };
+          })(),
         });
         setSkillsInput((job.skills ?? []).join(", "));
       })
