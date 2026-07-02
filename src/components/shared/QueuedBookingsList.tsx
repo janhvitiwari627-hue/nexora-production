@@ -1,4 +1,6 @@
-import { CheckCircle2, CloudUpload, Loader2, RefreshCw, Save, TriangleAlert, X } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { CheckCircle2, CloudUpload, Loader2, RefreshCw, Save, Trash2, TriangleAlert, X } from "lucide-react";
 import { flush, removeTask, type QueueTask, type QueueTaskStatus } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/lib/offline-queue.hooks";
 import {
@@ -7,6 +9,16 @@ import {
   type CreateAndConfirmPayload,
 } from "@/lib/booking-offline-sync";
 import { useOnlineStatus } from "@/hooks/use-online-status";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type Props = {
   className?: string;
