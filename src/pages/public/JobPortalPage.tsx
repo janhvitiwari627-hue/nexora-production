@@ -287,7 +287,7 @@ export function JobPortalPage({ initialRole = "seeker" }: { initialRole?: "seeke
           <TrendingUp className="text-warning h-5 w-5" /> Featured jobs
         </h2>
         <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 md:mx-0 md:px-0">
-          {featured.map((j) => (
+          {featuredForDisplay.map((j) => (
             <JobCard key={j.id} job={j} compact />
           ))}
         </div>
