@@ -415,6 +415,12 @@ function QrPaymentModal({
           Scan the QR with any UPI app, pay {formatINR(amount)}, then upload screenshot & transaction ID.
         </p>
 
+        <OfflineBanner
+          className="mt-3"
+          message="You're offline"
+          hint="Payment submission needs internet. Reconnect to submit your screenshot & UTR."
+        />
+
         <div className="mt-4 grid place-items-center rounded-[var(--radius-card)] border border-border bg-background p-4">
           <img src={qrSrc} alt="UPI QR code" className="h-56 w-56" />
           <div className="text-heading mt-2 text-sm font-bold">{upiId}</div>
