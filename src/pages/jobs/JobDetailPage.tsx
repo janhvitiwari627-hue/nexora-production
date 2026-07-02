@@ -115,17 +115,20 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
     }
     if (!job.isReal) {
       toast.success("Application submitted (demo listing)");
-      navigate({ to: "/jobs/applications" });
+      setSuccessMode("demo");
+      setSuccessOpen(true);
       return;
     }
     setApplying(true);
     try {
       await applyToJob({ jobId: job.id, applicantId: user.id });
       toast.success("Application submitted");
-      navigate({ to: "/jobs/applications" });
+      setSuccessMode("real");
+      setSuccessOpen(true);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Could not submit application";
       toast.error(msg);
+    } finally {
       setApplying(false);
     }
   }
