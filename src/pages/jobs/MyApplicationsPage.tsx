@@ -284,8 +284,8 @@ export function MyApplicationsPage() {
           <div className="relative ml-auto w-full max-w-xs">
             <Search className="text-muted-foreground pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2" />
             <Input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
+              value={qInput}
+              onChange={(e) => setQInput(e.target.value)}
               placeholder="Search title, employer, city…"
               className="pl-8"
             />
