@@ -583,6 +583,7 @@ export type Database = {
       }
       candidate_profiles: {
         Row: {
+          area: string | null
           avatar_url: string | null
           bio: string | null
           certifications: string[]
@@ -591,12 +592,18 @@ export type Database = {
           education: Json
           email: string | null
           experience: Json
+          experience_years: number | null
           full_name: string | null
           id: string
+          is_complete: boolean
           is_submitted: boolean
           phone: string | null
           portfolio_urls: string[]
           preferences: Json
+          preferred_job_role: string | null
+          preferred_salary_max: number | null
+          preferred_salary_min: number | null
+          profile_status: string
           resume_url: string | null
           skills: string[]
           submitted_at: string | null
@@ -605,6 +612,7 @@ export type Database = {
           video_url: string | null
         }
         Insert: {
+          area?: string | null
           avatar_url?: string | null
           bio?: string | null
           certifications?: string[]
@@ -613,12 +621,18 @@ export type Database = {
           education?: Json
           email?: string | null
           experience?: Json
+          experience_years?: number | null
           full_name?: string | null
           id?: string
+          is_complete?: boolean
           is_submitted?: boolean
           phone?: string | null
           portfolio_urls?: string[]
           preferences?: Json
+          preferred_job_role?: string | null
+          preferred_salary_max?: number | null
+          preferred_salary_min?: number | null
+          profile_status?: string
           resume_url?: string | null
           skills?: string[]
           submitted_at?: string | null
@@ -627,6 +641,7 @@ export type Database = {
           video_url?: string | null
         }
         Update: {
+          area?: string | null
           avatar_url?: string | null
           bio?: string | null
           certifications?: string[]
@@ -635,12 +650,18 @@ export type Database = {
           education?: Json
           email?: string | null
           experience?: Json
+          experience_years?: number | null
           full_name?: string | null
           id?: string
+          is_complete?: boolean
           is_submitted?: boolean
           phone?: string | null
           portfolio_urls?: string[]
           preferences?: Json
+          preferred_job_role?: string | null
+          preferred_salary_max?: number | null
+          preferred_salary_min?: number | null
+          profile_status?: string
           resume_url?: string | null
           skills?: string[]
           submitted_at?: string | null
@@ -1044,32 +1065,48 @@ export type Database = {
       job_applications: {
         Row: {
           applicant_id: string
+          applied_at: string
+          candidate_id: string | null
           cover_note: string | null
           created_at: string
           id: string
           job_id: string
+          owner_id: string | null
           status: string
           updated_at: string
         }
         Insert: {
           applicant_id: string
+          applied_at?: string
+          candidate_id?: string | null
           cover_note?: string | null
           created_at?: string
           id?: string
           job_id: string
+          owner_id?: string | null
           status?: string
           updated_at?: string
         }
         Update: {
           applicant_id?: string
+          applied_at?: string
+          candidate_id?: string | null
           cover_note?: string | null
           created_at?: string
           id?: string
           job_id?: string
+          owner_id?: string | null
           status?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "job_applications_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "candidate_profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "job_applications_job_id_fkey"
             columns: ["job_id"]
@@ -1085,6 +1122,7 @@ export type Database = {
           applicants_count: number
           area: string | null
           benefits: string[] | null
+          business_name: string | null
           category: string
           city: string
           contact_mobile: string | null
@@ -1118,6 +1156,7 @@ export type Database = {
           applicants_count?: number
           area?: string | null
           benefits?: string[] | null
+          business_name?: string | null
           category: string
           city: string
           contact_mobile?: string | null
@@ -1151,6 +1190,7 @@ export type Database = {
           applicants_count?: number
           area?: string | null
           benefits?: string[] | null
+          business_name?: string | null
           category?: string
           city?: string
           contact_mobile?: string | null
