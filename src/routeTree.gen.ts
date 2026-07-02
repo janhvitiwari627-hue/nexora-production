@@ -73,6 +73,7 @@ import { Route as OwnerOnboardingRouteImport } from './routes/owner.onboarding'
 import { Route as OwnerMarketingRouteImport } from './routes/owner.marketing'
 import { Route as OwnerJobsRouteImport } from './routes/owner.jobs'
 import { Route as OwnerGalleryRouteImport } from './routes/owner.gallery'
+import { Route as OwnerDashboardRouteImport } from './routes/owner.dashboard'
 import { Route as OwnerCrmRouteImport } from './routes/owner.crm'
 import { Route as OwnerCreateWebsiteRouteImport } from './routes/owner.create-website'
 import { Route as OwnerBookingsRouteImport } from './routes/owner.bookings'
@@ -453,6 +454,11 @@ const OwnerJobsRoute = OwnerJobsRouteImport.update({
 const OwnerGalleryRoute = OwnerGalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
+  getParentRoute: () => OwnerRoute,
+} as any)
+const OwnerDashboardRoute = OwnerDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => OwnerRoute,
 } as any)
 const OwnerCrmRoute = OwnerCrmRouteImport.update({
@@ -846,6 +852,7 @@ export interface FileRoutesByFullPath {
   '/owner/bookings': typeof OwnerBookingsRoute
   '/owner/create-website': typeof OwnerCreateWebsiteRoute
   '/owner/crm': typeof OwnerCrmRoute
+  '/owner/dashboard': typeof OwnerDashboardRoute
   '/owner/gallery': typeof OwnerGalleryRoute
   '/owner/jobs': typeof OwnerJobsRouteWithChildren
   '/owner/marketing': typeof OwnerMarketingRoute
@@ -970,6 +977,7 @@ export interface FileRoutesByTo {
   '/owner/bookings': typeof OwnerBookingsRoute
   '/owner/create-website': typeof OwnerCreateWebsiteRoute
   '/owner/crm': typeof OwnerCrmRoute
+  '/owner/dashboard': typeof OwnerDashboardRoute
   '/owner/gallery': typeof OwnerGalleryRoute
   '/owner/jobs': typeof OwnerJobsRouteWithChildren
   '/owner/marketing': typeof OwnerMarketingRoute
@@ -1098,6 +1106,7 @@ export interface FileRoutesById {
   '/owner/bookings': typeof OwnerBookingsRoute
   '/owner/create-website': typeof OwnerCreateWebsiteRoute
   '/owner/crm': typeof OwnerCrmRoute
+  '/owner/dashboard': typeof OwnerDashboardRoute
   '/owner/gallery': typeof OwnerGalleryRoute
   '/owner/jobs': typeof OwnerJobsRouteWithChildren
   '/owner/marketing': typeof OwnerMarketingRoute
@@ -1227,6 +1236,7 @@ export interface FileRouteTypes {
     | '/owner/bookings'
     | '/owner/create-website'
     | '/owner/crm'
+    | '/owner/dashboard'
     | '/owner/gallery'
     | '/owner/jobs'
     | '/owner/marketing'
@@ -1351,6 +1361,7 @@ export interface FileRouteTypes {
     | '/owner/bookings'
     | '/owner/create-website'
     | '/owner/crm'
+    | '/owner/dashboard'
     | '/owner/gallery'
     | '/owner/jobs'
     | '/owner/marketing'
@@ -1478,6 +1489,7 @@ export interface FileRouteTypes {
     | '/owner/bookings'
     | '/owner/create-website'
     | '/owner/crm'
+    | '/owner/dashboard'
     | '/owner/gallery'
     | '/owner/jobs'
     | '/owner/marketing'
@@ -2044,6 +2056,13 @@ declare module '@tanstack/react-router' {
       path: '/gallery'
       fullPath: '/owner/gallery'
       preLoaderRoute: typeof OwnerGalleryRouteImport
+      parentRoute: typeof OwnerRoute
+    }
+    '/owner/dashboard': {
+      id: '/owner/dashboard'
+      path: '/dashboard'
+      fullPath: '/owner/dashboard'
+      preLoaderRoute: typeof OwnerDashboardRouteImport
       parentRoute: typeof OwnerRoute
     }
     '/owner/crm': {
@@ -2634,6 +2653,7 @@ interface OwnerRouteChildren {
   OwnerBookingsRoute: typeof OwnerBookingsRoute
   OwnerCreateWebsiteRoute: typeof OwnerCreateWebsiteRoute
   OwnerCrmRoute: typeof OwnerCrmRoute
+  OwnerDashboardRoute: typeof OwnerDashboardRoute
   OwnerGalleryRoute: typeof OwnerGalleryRoute
   OwnerJobsRoute: typeof OwnerJobsRouteWithChildren
   OwnerMarketingRoute: typeof OwnerMarketingRoute
@@ -2655,6 +2675,7 @@ const OwnerRouteChildren: OwnerRouteChildren = {
   OwnerBookingsRoute: OwnerBookingsRoute,
   OwnerCreateWebsiteRoute: OwnerCreateWebsiteRoute,
   OwnerCrmRoute: OwnerCrmRoute,
+  OwnerDashboardRoute: OwnerDashboardRoute,
   OwnerGalleryRoute: OwnerGalleryRoute,
   OwnerJobsRoute: OwnerJobsRouteWithChildren,
   OwnerMarketingRoute: OwnerMarketingRoute,
