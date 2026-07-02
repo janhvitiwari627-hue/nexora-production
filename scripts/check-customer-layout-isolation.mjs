@@ -89,6 +89,63 @@ for (const rel of PUBLIC_COMPONENTS) {
   }
 }
 
+// 3. Enforce that the standalone-mode allow-list matches the 15-screen
+// customer-app spec exactly. Any drift (extra marketing/owner route
+// added to the allow-list, or a required screen removed) fails the build.
+const SPEC_ALLOWED_EXACT = [
+  "/customer/login",
+  "/customer/verify-otp",
+  "/customer/onboarding",
+  "/customer/location",
+  "/customer/home",
+  "/customer/at-salon",
+  "/customer/at-home",
+  "/customer/bookings",
+  "/customer/rewards",
+  "/customer/profile",
+  "/customer/settings",
+  "/customer/support",
+  "/customer/support/add-ticket",
+];
+const SPEC_ALLOWED_PREFIXES = ["/customer/", "/salon/", "/auth/callback"];
+
+const guardFile = join(ROOT, "src/lib/pwa-standalone-guard.ts");
+const guardSrc = readFileSync(guardFile, "utf8");
+for (const p of SPEC_ALLOWED_EXACT) {
+  if (!guardSrc.includes(`"${p}"`)) {
+    errors.push(
+      `src/lib/pwa-standalone-guard.ts: missing "${p}" from ALLOWED_EXACT — required by the 15-screen customer-app spec.`,
+    );
+  }
+}
+for (const p of SPEC_ALLOWED_PREFIXES) {
+  if (!guardSrc.includes(`"${p}"`)) {
+    errors.push(
+      `src/lib/pwa-standalone-guard.ts: missing prefix "${p}" — required by the customer-app spec.`,
+    );
+  }
+}
+// Reject any marketing / owner / distributor / growth path sneaking into the allow-list.
+const FORBIDDEN_ALLOWED = [
+  "/", // bare root
+  "/explore",
+  "/for-owners",
+  "/job-portal",
+  "/partner-growth",
+  "/create-shop-website",
+  "/distributor-brand-portal",
+  "/admin",
+  "/owner",
+];
+for (const p of FORBIDDEN_ALLOWED) {
+  const re = new RegExp(`"${p}"\\s*[,\\]]`);
+  if (re.test(guardSrc.replace(/\/customer\//g, ""))) {
+    errors.push(
+      `src/lib/pwa-standalone-guard.ts: forbidden marketing/owner path "${p}" present in allow-list.`,
+    );
+  }
+}
+
 if (errors.length) {
   console.error("\n[layout-isolation] FAILED — customer app must not render marketing layouts:\n");
   for (const e of errors) console.error("  • " + e);
