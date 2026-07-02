@@ -258,6 +258,60 @@ test.describe("/hire/post-job", () => {
       page.getByRole("heading", { name: "Senior Hair Stylist" }),
     ).toBeVisible();
   });
+
+  test("Publishing the job creates the listing and opens the job detail page with the entered title", async ({ page }) => {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await page.evaluate(() => {
+      window.localStorage.removeItem("nexora:postJobWizard:v1");
+    });
+
+    await seedSession(page);
+    await page.goto("/hire/post-job", { waitUntil: "networkidle" });
+
+    const jobTitle = `Senior Hair Stylist ${Date.now()}`;
+
+    // Step 1
+    await page.getByRole("textbox", { name: "Job title" }).fill(jobTitle);
+    await page
+      .getByRole("textbox", { name: "Description" })
+      .fill("Own the chair, deliver amazing cuts, and mentor junior stylists.");
+    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+
+    // Step 2
+    await expect(
+      page.getByRole("heading", { name: "Location & schedule" }),
+    ).toBeVisible({ timeout: 10_000 });
+    await page.getByRole("textbox", { name: "City" }).fill("Mumbai");
+    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+
+    // Step 3
+    await expect(
+      page.getByRole("heading", { name: "Salary & benefits" }),
+    ).toBeVisible({ timeout: 10_000 });
+    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+
+    // Step 4
+    await expect(
+      page.getByRole("heading", { name: "Requirements" }),
+    ).toBeVisible({ timeout: 10_000 });
+    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+
+    // Step 5 — publish.
+    await expect(
+      page.getByRole("heading", { name: "Review & publish" }),
+    ).toBeVisible({ timeout: 10_000 });
+    await page.getByRole("button", { name: /^Publish job$/ }).first().click();
+
+    // Navigation lands on /jobs/<uuid> and the detail page renders the entered title.
+    await page.waitForURL(
+      /\/jobs\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+      { timeout: 15_000 },
+    );
+    await expect(
+      page.getByRole("heading", { name: jobTitle }),
+    ).toBeVisible({ timeout: 15_000 });
+  });
 });
+
 
 
