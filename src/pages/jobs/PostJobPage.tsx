@@ -531,6 +531,7 @@ export type FormErrors = {
   city?: string;
   salary_min?: string;
   salary_max?: string;
+  contact_mobile?: string;
 };
 
 function validateForm(form: Form): FormErrors {
