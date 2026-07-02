@@ -18,17 +18,17 @@ const ROLE_PRIORITY: UserRole[] = [
 ];
 
 const ROLE_ROUTES: Record<UserRole, string> = {
-  super_admin: "/admin",
-  admin: "/admin",
-  shop_owner: "/owner",
-  owner: "/owner",
-  shop_manager: "/owner",
-  staff: "/owner",
+  super_admin: "/admin/dashboard",
+  admin: "/admin/dashboard",
+  shop_owner: "/owner/dashboard",
+  owner: "/owner/dashboard",
+  shop_manager: "/owner/dashboard",
+  staff: "/owner/dashboard",
   brand: "/portal/brands",
   distributor: "/partner/dashboard",
   district_partner: "/partner/dashboard",
   growth_partner: "/partner/dashboard",
-  customer: "/dashboard",
+  customer: "/customer/home",
 };
 
 
@@ -50,9 +50,9 @@ export function pickPrimaryRole(roles: UserRole[]): UserRole {
 
 export function routeForRole(role: UserRole | "staff" | "shop_owner" | "shop_manager" | "super_admin"): string {
   // Map spec role names to existing app_role enum
-  if (role === "super_admin") return "/admin";
-  if (role === "shop_owner" || role === "shop_manager") return "/owner";
-  if (role === "staff") return "/staff/dashboard";
+  if (role === "super_admin") return "/admin/dashboard";
+  if (role === "shop_owner" || role === "shop_manager") return "/owner/dashboard";
+  if (role === "staff") return "/owner/dashboard";
   return ROLE_ROUTES[role as UserRole] ?? "/";
 }
 

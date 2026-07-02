@@ -13,6 +13,7 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as SalonsRouteImport } from './routes/salons'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ReferralsRouteImport } from './routes/referrals'
@@ -28,12 +29,16 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as HireRouteImport } from './routes/hire'
 import { Route as HelpRouteImport } from './routes/help'
+import { Route as GrowthPartnerRouteImport } from './routes/growth-partner'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ForOwnersRouteImport } from './routes/for-owners'
 import { Route as DownloadAppRouteImport } from './routes/download-app'
 import { Route as DistrictBusinessPartnerRouteImport } from './routes/district-business-partner'
+import { Route as DistributorBrandPortalRouteImport } from './routes/distributor-brand-portal'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CustomerAppRouteImport } from './routes/customer-app'
+import { Route as CustomerRouteImport } from './routes/customer'
+import { Route as CreateShopWebsiteRouteImport } from './routes/create-shop-website'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AcademyRouteImport } from './routes/academy'
@@ -47,6 +52,7 @@ import { Route as TemplatePreviewKeyRouteImport } from './routes/template-previe
 import { Route as StaffDashboardRouteImport } from './routes/staff.dashboard'
 import { Route as SiteBusinessSlugRouteImport } from './routes/site.$businessSlug'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
+import { Route as SalonSlugRouteImport } from './routes/salon.$slug'
 import { Route as SSlugRouteImport } from './routes/s.$slug'
 import { Route as PortalSponsoredRouteImport } from './routes/portal.sponsored'
 import { Route as PortalPromotionsRouteImport } from './routes/portal.promotions'
@@ -72,6 +78,7 @@ import { Route as OwnerOnboardingRouteImport } from './routes/owner.onboarding'
 import { Route as OwnerMarketingRouteImport } from './routes/owner.marketing'
 import { Route as OwnerJobsRouteImport } from './routes/owner.jobs'
 import { Route as OwnerGalleryRouteImport } from './routes/owner.gallery'
+import { Route as OwnerDashboardRouteImport } from './routes/owner.dashboard'
 import { Route as OwnerCrmRouteImport } from './routes/owner.crm'
 import { Route as OwnerCreateWebsiteRouteImport } from './routes/owner.create-website'
 import { Route as OwnerBookingsRouteImport } from './routes/owner.bookings'
@@ -96,6 +103,11 @@ import { Route as DashboardMembershipRouteImport } from './routes/dashboard.memb
 import { Route as DashboardFavoritesRouteImport } from './routes/dashboard.favorites'
 import { Route as DashboardBookingsRouteImport } from './routes/dashboard.bookings'
 import { Route as DashboardActivityRouteImport } from './routes/dashboard.activity'
+import { Route as CustomerRewardsRouteImport } from './routes/customer.rewards'
+import { Route as CustomerProfileRouteImport } from './routes/customer.profile'
+import { Route as CustomerHomeRouteImport } from './routes/customer.home'
+import { Route as CustomerBookingsRouteImport } from './routes/customer.bookings'
+import { Route as CustomerAtSalonRouteImport } from './routes/customer.at-salon'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as BrandSlugRouteImport } from './routes/brand.$slug'
 import { Route as BookSlugRouteImport } from './routes/book.$slug'
@@ -147,6 +159,11 @@ const SignupRoute = SignupRouteImport.update({
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SalonsRoute = SalonsRouteImport.update({
+  id: '/salons',
+  path: '/salons',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -224,6 +241,11 @@ const HelpRoute = HelpRouteImport.update({
   path: '/help',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GrowthPartnerRoute = GrowthPartnerRouteImport.update({
+  id: '/growth-partner',
+  path: '/growth-partner',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
@@ -244,6 +266,11 @@ const DistrictBusinessPartnerRoute = DistrictBusinessPartnerRouteImport.update({
   path: '/district-business-partner',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DistributorBrandPortalRoute = DistributorBrandPortalRouteImport.update({
+  id: '/distributor-brand-portal',
+  path: '/distributor-brand-portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -252,6 +279,16 @@ const DashboardRoute = DashboardRouteImport.update({
 const CustomerAppRoute = CustomerAppRouteImport.update({
   id: '/customer-app',
   path: '/customer-app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CustomerRoute = CustomerRouteImport.update({
+  id: '/customer',
+  path: '/customer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreateShopWebsiteRoute = CreateShopWebsiteRouteImport.update({
+  id: '/create-shop-website',
+  path: '/create-shop-website',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -317,6 +354,11 @@ const SiteBusinessSlugRoute = SiteBusinessSlugRouteImport.update({
 const ShopSlugRoute = ShopSlugRouteImport.update({
   id: '/shop/$slug',
   path: '/shop/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SalonSlugRoute = SalonSlugRouteImport.update({
+  id: '/salon/$slug',
+  path: '/salon/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SSlugRoute = SSlugRouteImport.update({
@@ -444,6 +486,11 @@ const OwnerGalleryRoute = OwnerGalleryRouteImport.update({
   path: '/gallery',
   getParentRoute: () => OwnerRoute,
 } as any)
+const OwnerDashboardRoute = OwnerDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => OwnerRoute,
+} as any)
 const OwnerCrmRoute = OwnerCrmRouteImport.update({
   id: '/crm',
   path: '/crm',
@@ -564,6 +611,31 @@ const DashboardActivityRoute = DashboardActivityRouteImport.update({
   id: '/activity',
   path: '/activity',
   getParentRoute: () => DashboardRoute,
+} as any)
+const CustomerRewardsRoute = CustomerRewardsRouteImport.update({
+  id: '/rewards',
+  path: '/rewards',
+  getParentRoute: () => CustomerRoute,
+} as any)
+const CustomerProfileRoute = CustomerProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => CustomerRoute,
+} as any)
+const CustomerHomeRoute = CustomerHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => CustomerRoute,
+} as any)
+const CustomerBookingsRoute = CustomerBookingsRouteImport.update({
+  id: '/bookings',
+  path: '/bookings',
+  getParentRoute: () => CustomerRoute,
+} as any)
+const CustomerAtSalonRoute = CustomerAtSalonRouteImport.update({
+  id: '/at-salon',
+  path: '/at-salon',
+  getParentRoute: () => CustomerRoute,
 } as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/category/$slug',
@@ -739,12 +811,16 @@ export interface FileRoutesByFullPath {
   '/academy': typeof AcademyRoute
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
+  '/create-shop-website': typeof CreateShopWebsiteRoute
+  '/customer': typeof CustomerRouteWithChildren
   '/customer-app': typeof CustomerAppRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/distributor-brand-portal': typeof DistributorBrandPortalRoute
   '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
   '/download-app': typeof DownloadAppRoute
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/growth-partner': typeof GrowthPartnerRoute
   '/help': typeof HelpRoute
   '/hire': typeof HireRouteWithChildren
   '/jobs': typeof JobsRouteWithChildren
@@ -760,6 +836,7 @@ export interface FileRoutesByFullPath {
   '/referrals': typeof ReferralsRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/salons': typeof SalonsRoute
   '/search': typeof SearchRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -780,6 +857,11 @@ export interface FileRoutesByFullPath {
   '/book/$slug': typeof BookSlugRoute
   '/brand/$slug': typeof BrandSlugRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/customer/at-salon': typeof CustomerAtSalonRoute
+  '/customer/bookings': typeof CustomerBookingsRoute
+  '/customer/home': typeof CustomerHomeRoute
+  '/customer/profile': typeof CustomerProfileRoute
+  '/customer/rewards': typeof CustomerRewardsRoute
   '/dashboard/activity': typeof DashboardActivityRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
   '/dashboard/favorites': typeof DashboardFavoritesRoute
@@ -804,6 +886,7 @@ export interface FileRoutesByFullPath {
   '/owner/bookings': typeof OwnerBookingsRoute
   '/owner/create-website': typeof OwnerCreateWebsiteRoute
   '/owner/crm': typeof OwnerCrmRoute
+  '/owner/dashboard': typeof OwnerDashboardRoute
   '/owner/gallery': typeof OwnerGalleryRoute
   '/owner/jobs': typeof OwnerJobsRouteWithChildren
   '/owner/marketing': typeof OwnerMarketingRoute
@@ -829,6 +912,7 @@ export interface FileRoutesByFullPath {
   '/portal/promotions': typeof PortalPromotionsRoute
   '/portal/sponsored': typeof PortalSponsoredRoute
   '/s/$slug': typeof SSlugRoute
+  '/salon/$slug': typeof SalonSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/staff/dashboard': typeof StaffDashboardRoute
@@ -860,11 +944,15 @@ export interface FileRoutesByTo {
   '/academy': typeof AcademyRoute
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
+  '/create-shop-website': typeof CreateShopWebsiteRoute
+  '/customer': typeof CustomerRouteWithChildren
   '/customer-app': typeof CustomerAppRoute
+  '/distributor-brand-portal': typeof DistributorBrandPortalRoute
   '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
   '/download-app': typeof DownloadAppRoute
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/growth-partner': typeof GrowthPartnerRoute
   '/help': typeof HelpRoute
   '/hire': typeof HireRouteWithChildren
   '/jobs': typeof JobsRouteWithChildren
@@ -878,6 +966,7 @@ export interface FileRoutesByTo {
   '/referrals': typeof ReferralsRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/salons': typeof SalonsRoute
   '/search': typeof SearchRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -898,6 +987,11 @@ export interface FileRoutesByTo {
   '/book/$slug': typeof BookSlugRoute
   '/brand/$slug': typeof BrandSlugRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/customer/at-salon': typeof CustomerAtSalonRoute
+  '/customer/bookings': typeof CustomerBookingsRoute
+  '/customer/home': typeof CustomerHomeRoute
+  '/customer/profile': typeof CustomerProfileRoute
+  '/customer/rewards': typeof CustomerRewardsRoute
   '/dashboard/activity': typeof DashboardActivityRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
   '/dashboard/favorites': typeof DashboardFavoritesRoute
@@ -922,6 +1016,7 @@ export interface FileRoutesByTo {
   '/owner/bookings': typeof OwnerBookingsRoute
   '/owner/create-website': typeof OwnerCreateWebsiteRoute
   '/owner/crm': typeof OwnerCrmRoute
+  '/owner/dashboard': typeof OwnerDashboardRoute
   '/owner/gallery': typeof OwnerGalleryRoute
   '/owner/jobs': typeof OwnerJobsRouteWithChildren
   '/owner/marketing': typeof OwnerMarketingRoute
@@ -947,6 +1042,7 @@ export interface FileRoutesByTo {
   '/portal/promotions': typeof PortalPromotionsRoute
   '/portal/sponsored': typeof PortalSponsoredRoute
   '/s/$slug': typeof SSlugRoute
+  '/salon/$slug': typeof SalonSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/staff/dashboard': typeof StaffDashboardRoute
@@ -979,12 +1075,16 @@ export interface FileRoutesById {
   '/academy': typeof AcademyRoute
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
+  '/create-shop-website': typeof CreateShopWebsiteRoute
+  '/customer': typeof CustomerRouteWithChildren
   '/customer-app': typeof CustomerAppRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/distributor-brand-portal': typeof DistributorBrandPortalRoute
   '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
   '/download-app': typeof DownloadAppRoute
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/growth-partner': typeof GrowthPartnerRoute
   '/help': typeof HelpRoute
   '/hire': typeof HireRouteWithChildren
   '/jobs': typeof JobsRouteWithChildren
@@ -1000,6 +1100,7 @@ export interface FileRoutesById {
   '/referrals': typeof ReferralsRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/salons': typeof SalonsRoute
   '/search': typeof SearchRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -1020,6 +1121,11 @@ export interface FileRoutesById {
   '/book/$slug': typeof BookSlugRoute
   '/brand/$slug': typeof BrandSlugRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/customer/at-salon': typeof CustomerAtSalonRoute
+  '/customer/bookings': typeof CustomerBookingsRoute
+  '/customer/home': typeof CustomerHomeRoute
+  '/customer/profile': typeof CustomerProfileRoute
+  '/customer/rewards': typeof CustomerRewardsRoute
   '/dashboard/activity': typeof DashboardActivityRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
   '/dashboard/favorites': typeof DashboardFavoritesRoute
@@ -1044,6 +1150,7 @@ export interface FileRoutesById {
   '/owner/bookings': typeof OwnerBookingsRoute
   '/owner/create-website': typeof OwnerCreateWebsiteRoute
   '/owner/crm': typeof OwnerCrmRoute
+  '/owner/dashboard': typeof OwnerDashboardRoute
   '/owner/gallery': typeof OwnerGalleryRoute
   '/owner/jobs': typeof OwnerJobsRouteWithChildren
   '/owner/marketing': typeof OwnerMarketingRoute
@@ -1069,6 +1176,7 @@ export interface FileRoutesById {
   '/portal/promotions': typeof PortalPromotionsRoute
   '/portal/sponsored': typeof PortalSponsoredRoute
   '/s/$slug': typeof SSlugRoute
+  '/salon/$slug': typeof SalonSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/staff/dashboard': typeof StaffDashboardRoute
@@ -1102,12 +1210,16 @@ export interface FileRouteTypes {
     | '/academy'
     | '/admin'
     | '/contact'
+    | '/create-shop-website'
+    | '/customer'
     | '/customer-app'
     | '/dashboard'
+    | '/distributor-brand-portal'
     | '/district-business-partner'
     | '/download-app'
     | '/for-owners'
     | '/forgot-password'
+    | '/growth-partner'
     | '/help'
     | '/hire'
     | '/jobs'
@@ -1123,6 +1235,7 @@ export interface FileRouteTypes {
     | '/referrals'
     | '/register'
     | '/reset-password'
+    | '/salons'
     | '/search'
     | '/signup'
     | '/sitemap.xml'
@@ -1143,6 +1256,11 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/brand/$slug'
     | '/category/$slug'
+    | '/customer/at-salon'
+    | '/customer/bookings'
+    | '/customer/home'
+    | '/customer/profile'
+    | '/customer/rewards'
     | '/dashboard/activity'
     | '/dashboard/bookings'
     | '/dashboard/favorites'
@@ -1167,6 +1285,7 @@ export interface FileRouteTypes {
     | '/owner/bookings'
     | '/owner/create-website'
     | '/owner/crm'
+    | '/owner/dashboard'
     | '/owner/gallery'
     | '/owner/jobs'
     | '/owner/marketing'
@@ -1192,6 +1311,7 @@ export interface FileRouteTypes {
     | '/portal/promotions'
     | '/portal/sponsored'
     | '/s/$slug'
+    | '/salon/$slug'
     | '/shop/$slug'
     | '/site/$businessSlug'
     | '/staff/dashboard'
@@ -1223,11 +1343,15 @@ export interface FileRouteTypes {
     | '/academy'
     | '/admin'
     | '/contact'
+    | '/create-shop-website'
+    | '/customer'
     | '/customer-app'
+    | '/distributor-brand-portal'
     | '/district-business-partner'
     | '/download-app'
     | '/for-owners'
     | '/forgot-password'
+    | '/growth-partner'
     | '/help'
     | '/hire'
     | '/jobs'
@@ -1241,6 +1365,7 @@ export interface FileRouteTypes {
     | '/referrals'
     | '/register'
     | '/reset-password'
+    | '/salons'
     | '/search'
     | '/signup'
     | '/sitemap.xml'
@@ -1261,6 +1386,11 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/brand/$slug'
     | '/category/$slug'
+    | '/customer/at-salon'
+    | '/customer/bookings'
+    | '/customer/home'
+    | '/customer/profile'
+    | '/customer/rewards'
     | '/dashboard/activity'
     | '/dashboard/bookings'
     | '/dashboard/favorites'
@@ -1285,6 +1415,7 @@ export interface FileRouteTypes {
     | '/owner/bookings'
     | '/owner/create-website'
     | '/owner/crm'
+    | '/owner/dashboard'
     | '/owner/gallery'
     | '/owner/jobs'
     | '/owner/marketing'
@@ -1310,6 +1441,7 @@ export interface FileRouteTypes {
     | '/portal/promotions'
     | '/portal/sponsored'
     | '/s/$slug'
+    | '/salon/$slug'
     | '/shop/$slug'
     | '/site/$businessSlug'
     | '/staff/dashboard'
@@ -1341,12 +1473,16 @@ export interface FileRouteTypes {
     | '/academy'
     | '/admin'
     | '/contact'
+    | '/create-shop-website'
+    | '/customer'
     | '/customer-app'
     | '/dashboard'
+    | '/distributor-brand-portal'
     | '/district-business-partner'
     | '/download-app'
     | '/for-owners'
     | '/forgot-password'
+    | '/growth-partner'
     | '/help'
     | '/hire'
     | '/jobs'
@@ -1362,6 +1498,7 @@ export interface FileRouteTypes {
     | '/referrals'
     | '/register'
     | '/reset-password'
+    | '/salons'
     | '/search'
     | '/signup'
     | '/sitemap.xml'
@@ -1382,6 +1519,11 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/brand/$slug'
     | '/category/$slug'
+    | '/customer/at-salon'
+    | '/customer/bookings'
+    | '/customer/home'
+    | '/customer/profile'
+    | '/customer/rewards'
     | '/dashboard/activity'
     | '/dashboard/bookings'
     | '/dashboard/favorites'
@@ -1406,6 +1548,7 @@ export interface FileRouteTypes {
     | '/owner/bookings'
     | '/owner/create-website'
     | '/owner/crm'
+    | '/owner/dashboard'
     | '/owner/gallery'
     | '/owner/jobs'
     | '/owner/marketing'
@@ -1431,6 +1574,7 @@ export interface FileRouteTypes {
     | '/portal/promotions'
     | '/portal/sponsored'
     | '/s/$slug'
+    | '/salon/$slug'
     | '/shop/$slug'
     | '/site/$businessSlug'
     | '/staff/dashboard'
@@ -1463,12 +1607,16 @@ export interface RootRouteChildren {
   AcademyRoute: typeof AcademyRoute
   AdminRoute: typeof AdminRouteWithChildren
   ContactRoute: typeof ContactRoute
+  CreateShopWebsiteRoute: typeof CreateShopWebsiteRoute
+  CustomerRoute: typeof CustomerRouteWithChildren
   CustomerAppRoute: typeof CustomerAppRoute
   DashboardRoute: typeof DashboardRouteWithChildren
+  DistributorBrandPortalRoute: typeof DistributorBrandPortalRoute
   DistrictBusinessPartnerRoute: typeof DistrictBusinessPartnerRouteWithChildren
   DownloadAppRoute: typeof DownloadAppRoute
   ForOwnersRoute: typeof ForOwnersRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  GrowthPartnerRoute: typeof GrowthPartnerRoute
   HelpRoute: typeof HelpRoute
   HireRoute: typeof HireRouteWithChildren
   JobsRoute: typeof JobsRouteWithChildren
@@ -1484,6 +1632,7 @@ export interface RootRouteChildren {
   ReferralsRoute: typeof ReferralsRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SalonsRoute: typeof SalonsRoute
   SearchRoute: typeof SearchRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -1502,6 +1651,7 @@ export interface RootRouteChildren {
   PortalPromotionsRoute: typeof PortalPromotionsRoute
   PortalSponsoredRoute: typeof PortalSponsoredRoute
   SSlugRoute: typeof SSlugRoute
+  SalonSlugRoute: typeof SalonSlugRoute
   ShopSlugRoute: typeof ShopSlugRoute
   SiteBusinessSlugRoute: typeof SiteBusinessSlugRoute
   StaffDashboardRoute: typeof StaffDashboardRoute
@@ -1551,6 +1701,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/salons': {
+      id: '/salons'
+      path: '/salons'
+      fullPath: '/salons'
+      preLoaderRoute: typeof SalonsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -1658,6 +1815,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HelpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/growth-partner': {
+      id: '/growth-partner'
+      path: '/growth-partner'
+      fullPath: '/growth-partner'
+      preLoaderRoute: typeof GrowthPartnerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/forgot-password': {
       id: '/forgot-password'
       path: '/forgot-password'
@@ -1686,6 +1850,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DistrictBusinessPartnerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/distributor-brand-portal': {
+      id: '/distributor-brand-portal'
+      path: '/distributor-brand-portal'
+      fullPath: '/distributor-brand-portal'
+      preLoaderRoute: typeof DistributorBrandPortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -1698,6 +1869,20 @@ declare module '@tanstack/react-router' {
       path: '/customer-app'
       fullPath: '/customer-app'
       preLoaderRoute: typeof CustomerAppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/customer': {
+      id: '/customer'
+      path: '/customer'
+      fullPath: '/customer'
+      preLoaderRoute: typeof CustomerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/create-shop-website': {
+      id: '/create-shop-website'
+      path: '/create-shop-website'
+      fullPath: '/create-shop-website'
+      preLoaderRoute: typeof CreateShopWebsiteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -1789,6 +1974,13 @@ declare module '@tanstack/react-router' {
       path: '/shop/$slug'
       fullPath: '/shop/$slug'
       preLoaderRoute: typeof ShopSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/salon/$slug': {
+      id: '/salon/$slug'
+      path: '/salon/$slug'
+      fullPath: '/salon/$slug'
+      preLoaderRoute: typeof SalonSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/s/$slug': {
@@ -1966,6 +2158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OwnerGalleryRouteImport
       parentRoute: typeof OwnerRoute
     }
+    '/owner/dashboard': {
+      id: '/owner/dashboard'
+      path: '/dashboard'
+      fullPath: '/owner/dashboard'
+      preLoaderRoute: typeof OwnerDashboardRouteImport
+      parentRoute: typeof OwnerRoute
+    }
     '/owner/crm': {
       id: '/owner/crm'
       path: '/crm'
@@ -2133,6 +2332,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/activity'
       preLoaderRoute: typeof DashboardActivityRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/customer/rewards': {
+      id: '/customer/rewards'
+      path: '/rewards'
+      fullPath: '/customer/rewards'
+      preLoaderRoute: typeof CustomerRewardsRouteImport
+      parentRoute: typeof CustomerRoute
+    }
+    '/customer/profile': {
+      id: '/customer/profile'
+      path: '/profile'
+      fullPath: '/customer/profile'
+      preLoaderRoute: typeof CustomerProfileRouteImport
+      parentRoute: typeof CustomerRoute
+    }
+    '/customer/home': {
+      id: '/customer/home'
+      path: '/home'
+      fullPath: '/customer/home'
+      preLoaderRoute: typeof CustomerHomeRouteImport
+      parentRoute: typeof CustomerRoute
+    }
+    '/customer/bookings': {
+      id: '/customer/bookings'
+      path: '/bookings'
+      fullPath: '/customer/bookings'
+      preLoaderRoute: typeof CustomerBookingsRouteImport
+      parentRoute: typeof CustomerRoute
+    }
+    '/customer/at-salon': {
+      id: '/customer/at-salon'
+      path: '/at-salon'
+      fullPath: '/customer/at-salon'
+      preLoaderRoute: typeof CustomerAtSalonRouteImport
+      parentRoute: typeof CustomerRoute
     }
     '/category/$slug': {
       id: '/category/$slug'
@@ -2393,6 +2627,26 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface CustomerRouteChildren {
+  CustomerAtSalonRoute: typeof CustomerAtSalonRoute
+  CustomerBookingsRoute: typeof CustomerBookingsRoute
+  CustomerHomeRoute: typeof CustomerHomeRoute
+  CustomerProfileRoute: typeof CustomerProfileRoute
+  CustomerRewardsRoute: typeof CustomerRewardsRoute
+}
+
+const CustomerRouteChildren: CustomerRouteChildren = {
+  CustomerAtSalonRoute: CustomerAtSalonRoute,
+  CustomerBookingsRoute: CustomerBookingsRoute,
+  CustomerHomeRoute: CustomerHomeRoute,
+  CustomerProfileRoute: CustomerProfileRoute,
+  CustomerRewardsRoute: CustomerRewardsRoute,
+}
+
+const CustomerRouteWithChildren = CustomerRoute._addFileChildren(
+  CustomerRouteChildren,
+)
+
 interface DashboardBookingsRouteChildren {
   DashboardBookingsIdRoute: typeof DashboardBookingsIdRoute
 }
@@ -2499,6 +2753,7 @@ interface OwnerRouteChildren {
   OwnerBookingsRoute: typeof OwnerBookingsRoute
   OwnerCreateWebsiteRoute: typeof OwnerCreateWebsiteRoute
   OwnerCrmRoute: typeof OwnerCrmRoute
+  OwnerDashboardRoute: typeof OwnerDashboardRoute
   OwnerGalleryRoute: typeof OwnerGalleryRoute
   OwnerJobsRoute: typeof OwnerJobsRouteWithChildren
   OwnerMarketingRoute: typeof OwnerMarketingRoute
@@ -2520,6 +2775,7 @@ const OwnerRouteChildren: OwnerRouteChildren = {
   OwnerBookingsRoute: OwnerBookingsRoute,
   OwnerCreateWebsiteRoute: OwnerCreateWebsiteRoute,
   OwnerCrmRoute: OwnerCrmRoute,
+  OwnerDashboardRoute: OwnerDashboardRoute,
   OwnerGalleryRoute: OwnerGalleryRoute,
   OwnerJobsRoute: OwnerJobsRouteWithChildren,
   OwnerMarketingRoute: OwnerMarketingRoute,
@@ -2561,12 +2817,16 @@ const rootRouteChildren: RootRouteChildren = {
   AcademyRoute: AcademyRoute,
   AdminRoute: AdminRouteWithChildren,
   ContactRoute: ContactRoute,
+  CreateShopWebsiteRoute: CreateShopWebsiteRoute,
+  CustomerRoute: CustomerRouteWithChildren,
   CustomerAppRoute: CustomerAppRoute,
   DashboardRoute: DashboardRouteWithChildren,
+  DistributorBrandPortalRoute: DistributorBrandPortalRoute,
   DistrictBusinessPartnerRoute: DistrictBusinessPartnerRouteWithChildren,
   DownloadAppRoute: DownloadAppRoute,
   ForOwnersRoute: ForOwnersRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  GrowthPartnerRoute: GrowthPartnerRoute,
   HelpRoute: HelpRoute,
   HireRoute: HireRouteWithChildren,
   JobsRoute: JobsRouteWithChildren,
@@ -2582,6 +2842,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReferralsRoute: ReferralsRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SalonsRoute: SalonsRoute,
   SearchRoute: SearchRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
@@ -2600,6 +2861,7 @@ const rootRouteChildren: RootRouteChildren = {
   PortalPromotionsRoute: PortalPromotionsRoute,
   PortalSponsoredRoute: PortalSponsoredRoute,
   SSlugRoute: SSlugRoute,
+  SalonSlugRoute: SalonSlugRoute,
   ShopSlugRoute: ShopSlugRoute,
   SiteBusinessSlugRoute: SiteBusinessSlugRoute,
   StaffDashboardRoute: StaffDashboardRoute,
@@ -2624,13 +2886,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
