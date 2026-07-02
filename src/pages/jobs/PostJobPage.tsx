@@ -46,7 +46,12 @@ const EXPERIENCE = [
   "2–4 years",
   "4–6 years",
   "6+ years",
+  "Experience flexible",
 ];
+const FLEXIBLE_EXPERIENCE_VALUE = "flexible";
+const experienceValueFor = (label: string) =>
+  label === "Experience flexible" ? FLEXIBLE_EXPERIENCE_VALUE : label;
+
 const PERIODS: { label: string; value: JobDraftInput["salary_period"] }[] = [
   { label: "per month", value: "monthly" },
   { label: "per year", value: "yearly" },
