@@ -203,7 +203,7 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
                 >
                   <Share2 className="h-4 w-4" /> Share
                 </Button>
-                <Button size="sm" onClick={handleApply} disabled={applying}>
+                <Button size="sm" onClick={openApply} disabled={applying}>
                   {applying ? "Submitting…" : "Apply Now"}
                 </Button>
               </div>
@@ -265,7 +265,7 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
         </Card>
 
         <div className="sticky bottom-4 z-10 md:hidden">
-          <Button className="w-full" size="lg" onClick={handleApply} disabled={applying}>
+          <Button className="w-full" size="lg" onClick={openApply} disabled={applying}>
             {applying ? "Submitting…" : "Apply Now"}
           </Button>
         </div>
