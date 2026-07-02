@@ -680,13 +680,62 @@ function RequirementsStep({
   );
 }
 
-function ReviewStep({ form, profile }: { form: Form; profile: EmployerProfile | null }) {
+function ReviewStep({
+  form,
+  profile,
+  publishError,
+  onRetry,
+  onDismissError,
+  retrying,
+  hasSavedJob,
+}: {
+  form: Form;
+  profile: EmployerProfile | null;
+  publishError: string | null;
+  onRetry: () => void;
+  onDismissError: () => void;
+  retrying: boolean;
+  hasSavedJob: boolean;
+}) {
   return (
     <div className="space-y-4">
       <h2 className="text-heading text-xl font-bold">Review & publish</h2>
       <p className="text-sm text-muted-foreground">
         Please review the details below. You can go back to edit any section.
       </p>
+      {publishError && (
+        <div
+          role="alert"
+          aria-live="assertive"
+          className="flex items-start gap-3 rounded-[var(--radius-card)] border border-destructive/40 bg-destructive/5 p-4 text-sm"
+        >
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-destructive" aria-hidden />
+          <div className="min-w-0 flex-1">
+            <div className="font-semibold text-destructive">
+              {hasSavedJob ? "Couldn't open your job listing" : "Publish failed"}
+            </div>
+            <div className="mt-1 text-muted-foreground break-words">{publishError}</div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={onRetry}
+                disabled={retrying}
+                className="inline-flex items-center gap-1 rounded-[var(--radius-button)] border border-destructive/40 bg-card px-3 py-1.5 text-xs font-semibold text-destructive hover:bg-destructive/10 disabled:opacity-60"
+              >
+                <RefreshCw className={cn("h-3.5 w-3.5", retrying && "animate-spin")} />
+                {retrying ? "Retrying…" : hasSavedJob ? "Open job listing" : "Try again"}
+              </button>
+              <button
+                type="button"
+                onClick={onDismissError}
+                className="rounded-[var(--radius-button)] px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:text-heading"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <LivePreview form={form} profile={profile} />
     </div>
   );
