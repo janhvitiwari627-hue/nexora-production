@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { registerServiceWorker } from "../lib/register-sw";
 
 import { NotFoundPage } from "@/pages/public/NotFoundPage";
 import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
@@ -64,7 +65,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { name: "theme-color", content: "#635BFF" },
+      { name: "theme-color", content: "#2563eb" },
       { title: "Nexora — Book salons, spas & barbers near you" },
       {
         name: "description",
