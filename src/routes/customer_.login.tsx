@@ -7,6 +7,7 @@ import { useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { isSmsProviderConfigError, SmsNotConfiguredAlert } from "@/lib/sms-provider-error";
 
 
 /**
@@ -39,6 +40,7 @@ function CustomerLoginPage() {
   const navigate = useNavigate();
   const [phone, setPhone] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [smsConfigError, setSmsConfigError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   // Supabase expects E.164 (leading +, no spaces/dashes). Strip formatting
@@ -51,6 +53,7 @@ function CustomerLoginPage() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setSmsConfigError(null);
     const parsed = phoneSchema.safeParse({ phone });
     if (!parsed.success) {
       setError(parsed.error.issues[0]?.message ?? "Invalid phone number");
@@ -58,15 +61,16 @@ function CustomerLoginPage() {
     }
     const e164 = toE164(parsed.data.phone);
     setSubmitting(true);
-    // Supabase generates + delivers the OTP through the configured SMS
-    // provider. `channel: "sms"` is the default; passing it explicitly keeps
-    // the intent obvious. New numbers create an auth user automatically.
     const { error: sendError } = await supabase.auth.signInWithOtp({
       phone: e164,
       options: { channel: "sms" },
     });
     setSubmitting(false);
     if (sendError) {
+      if (isSmsProviderConfigError(sendError.message)) {
+        setSmsConfigError(sendError.message);
+        return;
+      }
       setError(sendError.message);
       toast.error("Couldn't send OTP", { description: sendError.message });
       return;
@@ -90,6 +94,7 @@ function CustomerLoginPage() {
           Enter your phone number to continue.
         </p>
       </div>
+      {smsConfigError && <SmsNotConfiguredAlert originalMessage={smsConfigError} />}
       <form className="space-y-3" onSubmit={onSubmit} noValidate>
         <Label htmlFor="phone">Phone number</Label>
         <Input
