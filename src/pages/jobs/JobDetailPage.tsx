@@ -481,6 +481,70 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
             {errors.phone && <p className="text-destructive text-xs">{errors.phone}</p>}
           </div>
 
+          {portfolioRequired && (
+            <div className="space-y-1.5">
+              <Label htmlFor="apply-portfolio">Portfolio link</Label>
+              <Input
+                id="apply-portfolio"
+                type="url"
+                placeholder="https://…"
+                value={portfolioUrl}
+                onChange={(e) => setPortfolioUrl(e.target.value)}
+                disabled={applying}
+                aria-invalid={!!errors.portfolioUrl}
+              />
+              {errors.portfolioUrl && (
+                <p className="text-destructive text-xs">{errors.portfolioUrl}</p>
+              )}
+              <p className="text-muted-foreground text-[11px]">
+                This employer has marked portfolio as required.
+              </p>
+            </div>
+          )}
+
+          {instagramRequired && (
+            <div className="space-y-1.5">
+              <Label htmlFor="apply-instagram">Instagram profile</Label>
+              <Input
+                id="apply-instagram"
+                placeholder="@yourhandle or instagram.com/…"
+                value={instagramHandle}
+                onChange={(e) => setInstagramHandle(e.target.value)}
+                disabled={applying}
+                aria-invalid={!!errors.instagramHandle}
+              />
+              {errors.instagramHandle && (
+                <p className="text-destructive text-xs">{errors.instagramHandle}</p>
+              )}
+              <p className="text-muted-foreground text-[11px]">
+                This employer has marked Instagram profile as required.
+              </p>
+            </div>
+          )}
+
+          {resumePreferred && (
+            <div className="space-y-1.5">
+              <Label htmlFor="apply-resume">Resume link (preferred)</Label>
+              <Input
+                id="apply-resume"
+                type="url"
+                placeholder="Link to your resume (Drive, Dropbox…)"
+                value={resumeUrl}
+                onChange={(e) => setResumeUrl(e.target.value)}
+                disabled={applying}
+              />
+              <p className="text-muted-foreground text-[11px]">
+                Resume is preferred but not required.
+              </p>
+            </div>
+          )}
+
+          {noPortfolio && (
+            <p className="text-muted-foreground rounded-md border border-dashed border-border bg-muted/30 px-3 py-2 text-[11px]">
+              No portfolio is needed for this job — apply with your details and a short note.
+            </p>
+          )}
+
           <div className="space-y-1.5">
             <Label htmlFor="cover-note">Cover letter (optional)</Label>
             <Textarea
