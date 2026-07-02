@@ -116,7 +116,12 @@ export function JobSearchPage() {
                     <span className="font-semibold text-primary">{j.salary}</span>
                     <span className="text-muted-foreground inline-flex items-center gap-1"><Users className="h-3 w-3" /> {j.applicants}</span>
                   </div>
-                  <div className="text-muted-foreground text-xs">Posted {j.postedDays}d ago</div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-muted-foreground text-xs">Posted {j.postedDays}d ago</div>
+                    <Button asChild size="sm">
+                      <Link to="/jobs/$jobId" params={{ jobId: j.id }}>Apply Now</Link>
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}
