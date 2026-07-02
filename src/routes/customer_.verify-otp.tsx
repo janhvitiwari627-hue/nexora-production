@@ -184,16 +184,29 @@ function VerifyOtpPage() {
         {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         {submitting ? "Verifying…" : "Verify & continue"}
       </Button>
-      <div className="text-center text-xs text-muted-foreground">
-        Didn't get it?{" "}
-        <button
-          type="button"
-          onClick={resend}
-          disabled={resendIn > 0 || resending}
-          className="font-medium text-primary underline disabled:no-underline disabled:opacity-60"
-        >
-          {resending ? "Sending…" : resendIn > 0 ? `Resend in ${resendIn}s` : "Resend code"}
-        </button>
+      <div className="space-y-1 text-center">
+        <div className="text-xs text-muted-foreground">
+          Didn't get it?{" "}
+          <button
+            type="button"
+            onClick={resend}
+            disabled={resendIn > 0 || resending}
+            className="font-medium text-primary underline disabled:no-underline disabled:opacity-60"
+          >
+            {resending
+              ? "Sending…"
+              : resendIn > 0
+              ? `Resend ${channel === "email" ? "email" : "SMS"} in ${resendIn}s`
+              : `Resend ${channel === "email" ? "email" : "SMS"} code`}
+          </button>
+        </div>
+        {resendIn > 0 && (
+          <p className="mx-auto max-w-xs text-[11px] leading-snug text-muted-foreground">
+            {rateLimitedUntil
+              ? `Rate limit hit — ${RATE_LIMIT_COPY[channel]}`
+              : RATE_LIMIT_COPY[channel]}
+          </p>
+        )}
       </div>
       <button
         type="button"
