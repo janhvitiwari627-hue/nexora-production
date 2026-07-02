@@ -72,6 +72,8 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
   const [job, setJob] = useState<DetailView | null>(null);
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState(false);
+  const [successOpen, setSuccessOpen] = useState(false);
+  const [successMode, setSuccessMode] = useState<"real" | "demo">("real");
 
   useEffect(() => {
     let alive = true;
