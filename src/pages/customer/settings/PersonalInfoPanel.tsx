@@ -231,6 +231,7 @@ export function PersonalInfoPanel() {
         fallback={initials}
         uploading={uploading}
         maxSizeMB={5}
+        error={uploadError}
       />
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
