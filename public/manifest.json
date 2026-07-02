@@ -1,8 +1,9 @@
 {
+  "id": "/?source=pwa",
   "name": "Nexora SalonOS",
   "short_name": "Nexora",
   "description": "Discover, book, and grow with the OS for modern salons.",
-  "start_url": "/customer/home",
+  "start_url": "/customer/home?source=pwa",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
