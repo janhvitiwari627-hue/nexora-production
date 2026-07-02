@@ -33,6 +33,7 @@ export type JobRow = {
   benefits: string[] | null;
   requirements: string | null;
   skills: string[] | null;
+  openings: number;
   status: "draft" | "published" | "closed";
   published_at: string | null;
   applicants_count: number;
@@ -80,6 +81,7 @@ export type JobDraftInput = {
   benefits?: string[];
   requirements?: string | null;
   skills?: string[];
+  openings?: number;
 };
 
 export async function saveJob(params: {

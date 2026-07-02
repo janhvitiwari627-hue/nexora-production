@@ -33,7 +33,14 @@ const CATEGORIES = [
   "Other",
 ];
 const JOB_TYPES = ["Full-time", "Part-time", "Freelance", "Contract", "Internship", "Temporary"];
-const EXPERIENCE = ["Fresher", "1–3 years", "3–5 years", "5+ years"];
+const EXPERIENCE = [
+  "Fresher welcome",
+  "0–1 years",
+  "1–2 years",
+  "2–4 years",
+  "4–6 years",
+  "6+ years",
+];
 const PERIODS: { label: string; value: JobDraftInput["salary_period"] }[] = [
   { label: "per month", value: "monthly" },
   { label: "per year", value: "yearly" },
@@ -65,7 +72,7 @@ type Form = Required<
 
 const EMPTY: Form = {
   title: "",
-  category: CATEGORIES[0],
+  category: "",
   description: "",
   job_type: JOB_TYPES[0],
   experience_level: EXPERIENCE[0],
@@ -79,6 +86,7 @@ const EMPTY: Form = {
   benefits: [],
   requirements: "",
   skills: [],
+  openings: 1,
 };
 
 const DRAFT_STORAGE_KEY = "nexora:postJobWizard:v1";
@@ -151,7 +159,7 @@ export function PostJobPage() {
     setAttempted((prev) => (prev.has(i) ? prev : new Set(prev).add(i)));
 
   const stepInvalid = (i: number) => {
-    if (i === 0) return !!(errors.title || errors.description);
+    if (i === 0) return !!(errors.title || errors.category || errors.description || errors.openings);
     if (i === 1) return !!errors.city;
     if (i === 2) return !!(errors.salary_min || errors.salary_max);
     return false;
@@ -210,6 +218,7 @@ export function PostJobPage() {
         requirements: form.requirements || null,
         salary_min: form.salary_min ?? null,
         salary_max: form.salary_max ?? null,
+        openings: Math.min(50, Math.max(1, Number(form.openings) || 1)),
       };
       const row = await saveJob({
         jobId,
@@ -504,7 +513,9 @@ export function PostJobPage() {
 
 export type FormErrors = {
   title?: string;
+  category?: string;
   description?: string;
+  openings?: string;
   city?: string;
   salary_min?: string;
   salary_max?: string;
@@ -517,9 +528,19 @@ function validateForm(form: Form): FormErrors {
   else if (title.length < 3) errs.title = "Job title must be at least 3 characters.";
   else if (title.length > 80) errs.title = "Job title must be 80 characters or fewer.";
 
+  if (!form.category || !form.category.trim())
+    errs.category = "Please pick a beauty category.";
+
   const desc = form.description.trim();
   if (desc.length === 0) errs.description = "Description is required.";
   else if (desc.length < 10) errs.description = "Description must be at least 10 characters.";
+
+  const openings = form.openings;
+  if (openings === undefined || openings === null || Number.isNaN(openings))
+    errs.openings = "Number of openings is required.";
+  else if (!Number.isInteger(openings)) errs.openings = "Openings must be a whole number.";
+  else if (openings < 1) errs.openings = "There must be at least 1 opening.";
+  else if (openings > 50) errs.openings = "Openings cannot exceed 50.";
 
   const city = form.city.trim();
   if (city.length === 0) errs.city = "City is required.";
@@ -592,16 +613,29 @@ function DetailsStep({
           onChange={(e) => update({ title: e.target.value })}
         />
       </Field>
-      <Field label="Beauty category" hint="Pick the role that best matches this job.">
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+      <Field
+        label="Beauty category"
+        hint={form.category ? `Selected: ${form.category}` : "Pick the role that best matches this job."}
+        error={errors.category}
+      >
+        <div
+          role="radiogroup"
+          aria-label="Beauty category"
+          aria-invalid={!!errors.category}
+          className={cn(
+            "grid grid-cols-2 gap-2 sm:grid-cols-3 rounded-lg",
+            errors.category && "ring-1 ring-destructive p-2",
+          )}
+        >
           {CATEGORIES.map((c) => {
             const active = form.category === c;
             return (
               <button
                 key={c}
                 type="button"
+                role="radio"
+                aria-checked={active}
                 onClick={() => update({ category: c })}
-                aria-pressed={active}
                 className={cn(
                   "rounded-lg border px-3 py-2 text-left text-sm font-semibold transition",
                   active
@@ -636,6 +670,59 @@ function DetailsStep({
               </button>
             );
           })}
+        </div>
+      </Field>
+      <Field
+        label="Number of openings"
+        hint="How many people are you hiring for this role? (1–50)"
+        error={errors.openings}
+      >
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() =>
+              update({ openings: Math.max(1, (Number(form.openings) || 1) - 1) })
+            }
+            aria-label="Decrease openings"
+            className="h-10 w-10 rounded-lg border border-border bg-background text-lg font-bold text-heading hover:bg-muted disabled:opacity-40"
+            disabled={(Number(form.openings) || 1) <= 1}
+          >
+            −
+          </button>
+          <input
+            type="number"
+            inputMode="numeric"
+            min={1}
+            max={50}
+            step={1}
+            className={cn(errors.openings ? inputErrCls : inputCls, "w-24 text-center")}
+            aria-invalid={!!errors.openings}
+            value={form.openings ?? 1}
+            onChange={(e) => {
+              const raw = e.target.value;
+              if (raw === "") {
+                update({ openings: undefined as unknown as number });
+                return;
+              }
+              const n = parseInt(raw, 10);
+              if (Number.isNaN(n)) return;
+              update({ openings: Math.min(50, Math.max(1, n)) });
+            }}
+            onBlur={() => {
+              if (!form.openings || form.openings < 1) update({ openings: 1 });
+            }}
+          />
+          <button
+            type="button"
+            onClick={() =>
+              update({ openings: Math.min(50, (Number(form.openings) || 1) + 1) })
+            }
+            aria-label="Increase openings"
+            className="h-10 w-10 rounded-lg border border-border bg-background text-lg font-bold text-heading hover:bg-muted disabled:opacity-40"
+            disabled={(Number(form.openings) || 1) >= 50}
+          >
+            +
+          </button>
         </div>
       </Field>
       <Field

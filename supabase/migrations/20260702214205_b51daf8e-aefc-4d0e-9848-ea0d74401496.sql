@@ -1,0 +1,1 @@
+ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS openings INTEGER NOT NULL DEFAULT 1 CHECK (openings >= 1 AND openings <= 50);
