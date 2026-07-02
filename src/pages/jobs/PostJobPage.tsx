@@ -199,18 +199,22 @@ export function PostJobPage() {
   }
 
   async function retryPublish() {
-    const created = await persist(true);
-    if (created && publishError) {
-      // Second attempt: try navigating again to the created listing.
+    // If the job was already created but only navigation failed, jump straight to it.
+    if (jobId) {
       try {
-        await navigate({ to: "/jobs/$jobId", params: { jobId: created } });
+        setPublishError(null);
+        await navigate({ to: "/jobs/$jobId", params: { jobId } });
+        return;
       } catch (navErr: any) {
         setPublishError(
           `Your job was published but we couldn't open it automatically. ${navErr?.message ?? ""}`.trim(),
         );
+        return;
       }
     }
+    await persist(true);
   }
+
 
   if (!isInitialized || loadingProfile) {
     return (
