@@ -10,9 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Briefcase, MapPin, Clock, Search, RefreshCw } from "lucide-react";
+import { Briefcase, MapPin, Clock, Search, RefreshCw, IndianRupee } from "lucide-react";
+import { toast } from "sonner";
 import { useAuthStore } from "@/stores/authStore";
-import { listMyApplications, type JobApplication } from "@/lib/jobs";
+import { listMyApplications, withdrawApplication, type JobApplication } from "@/lib/jobs";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 function ApplicationSkeleton() {
