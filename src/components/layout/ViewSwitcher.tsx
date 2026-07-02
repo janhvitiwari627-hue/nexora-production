@@ -44,7 +44,7 @@ export function ViewSwitcher({
     try {
       sessionStorage.setItem(KEY, "1");
     } catch { /* ignore */ }
-    navigate({ to: "/customer/home", search: { as: "customer" } as never });
+    navigate({ to: "/" });
   };
 
   const base =
