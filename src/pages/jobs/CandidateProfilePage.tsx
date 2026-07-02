@@ -649,18 +649,56 @@ export function CandidateProfilePage() {
               </div>
             )}
 
+            {step === 8 && (
+              <div className="space-y-4">
+                <div className="rounded-lg border bg-muted/30 p-4 text-sm">
+                  <div className="text-heading mb-2 font-semibold">Review your details</div>
+                  <ul className="text-muted-foreground space-y-1">
+                    <li><span className="font-medium text-foreground">Name:</span> {personal.name || "—"}</li>
+                    <li><span className="font-medium text-foreground">Email:</span> {personal.email || "—"}</li>
+                    <li><span className="font-medium text-foreground">Phone:</span> {personal.phone || "—"}</li>
+                    <li><span className="font-medium text-foreground">City:</span> {personal.city || "—"}</li>
+                    <li><span className="font-medium text-foreground">Skills:</span> {skills.join(", ") || "—"}</li>
+                    <li><span className="font-medium text-foreground">Experience:</span> {experience.filter((e) => e.company || e.role).length} entries</li>
+                    <li><span className="font-medium text-foreground">Education:</span> {education.filter((e) => e.school).length} entries</li>
+                    <li><span className="font-medium text-foreground">Resume:</span> {resume || "—"}</li>
+                  </ul>
+                </div>
+                <p className="text-muted-foreground text-xs">
+                  By submitting, your profile becomes visible to employers when you apply for jobs.
+                </p>
+                {submitError && (
+                  <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">
+                    <span>{submitError}</span>
+                    <Button size="sm" variant="outline" onClick={handleSubmitProfile} disabled={submitting}>
+                      <RefreshCw className="mr-1 h-3.5 w-3.5" /> Retry
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="flex justify-between border-t pt-4">
-              <Button variant="ghost" onClick={back} disabled={step === 0}>
+              <Button variant="ghost" onClick={back} disabled={step === 0 || submitting}>
                 Back
               </Button>
               {step < STEPS.length - 1 ? (
                 <Button onClick={next}>Continue</Button>
               ) : (
-                <Button onClick={() => toast.success("Profile saved")}>
-                  <Check className="h-4 w-4" /> Finish
+                <Button onClick={handleSubmitProfile} disabled={submitting}>
+                  {submitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" /> Submitting your profile...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="h-4 w-4" /> Submit Profile
+                    </>
+                  )}
                 </Button>
               )}
             </div>
+
           </CardContent>
         </Card>
       </div>
