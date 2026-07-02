@@ -73,17 +73,43 @@ const EMPTY: Form = {
   skills: [],
 };
 
+const DRAFT_STORAGE_KEY = "nexora:postJobWizard:v1";
+
+type PersistedDraft = { step: number; form: Form; jobId?: string; skillsInput: string; userId?: string };
+
+function loadDraft(): PersistedDraft | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as PersistedDraft;
+  } catch {
+    return null;
+  }
+}
+
 export function PostJobPage() {
   const navigate = useNavigate();
   const { user, isInitialized } = useAuthStore();
   const [profile, setProfile] = useState<EmployerProfile | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [showSetup, setShowSetup] = useState(false);
-  const [step, setStep] = useState(0);
-  const [form, setForm] = useState<Form>(EMPTY);
-  const [jobId, setJobId] = useState<string | undefined>(undefined);
+  const initialDraft = typeof window !== "undefined" ? loadDraft() : null;
+  const [step, setStep] = useState<number>(initialDraft?.step ?? 0);
+  const [form, setForm] = useState<Form>(initialDraft?.form ?? EMPTY);
+  const [jobId, setJobId] = useState<string | undefined>(initialDraft?.jobId);
   const [saving, setSaving] = useState<"draft" | "publish" | null>(null);
-  const [skillsInput, setSkillsInput] = useState("");
+  const [skillsInput, setSkillsInput] = useState(initialDraft?.skillsInput ?? "");
+  const [draftRestored, setDraftRestored] = useState<boolean>(!!initialDraft && (initialDraft.step > 0 || initialDraft.form.title.length > 0));
+
+  // Persist wizard state to localStorage so it survives session expiry / re-login.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const payload: PersistedDraft = { step, form, jobId, skillsInput, userId: user?.id };
+      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(payload));
+    } catch {}
+  }, [step, form, jobId, skillsInput, user?.id]);
 
   useEffect(() => {
     if (!isInitialized) return;
@@ -104,6 +130,7 @@ export function PostJobPage() {
       .finally(() => setLoadingProfile(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitialized, user]);
+
 
   const update = (patch: Partial<Form>) => setForm((f) => ({ ...f, ...patch }));
 
