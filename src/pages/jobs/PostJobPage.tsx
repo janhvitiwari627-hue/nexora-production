@@ -1022,17 +1022,31 @@ export function PostJobPage() {
         joining_availability: _ja,
         salary_type: _sty,
         salary_range_preset: _srp,
+        certification: _cert,
+        languages: _lng,
+        portfolio_option: _po,
         ...dbForm
       } = form;
       void _bt; void _dp; void _cd; void _hp; void _st; void _et; void _fs;
-      void _ja; void _sty; void _srp;
+      void _ja; void _sty; void _srp; void _cert; void _lng; void _po;
+
+      // Encode meta into requirements text so job detail + apply form can read
+      // them without a schema change. Human-readable "Key: value" lines.
+      const baseReq = stripRequirementsMeta(dbForm.requirements);
+      const metaLines: string[] = [];
+      if (form.certification) metaLines.push(`Certification: ${form.certification}`);
+      if (form.languages && form.languages.length > 0)
+        metaLines.push(`Languages: ${form.languages.join(", ")}`);
+      if (form.portfolio_option) metaLines.push(`Portfolio: ${form.portfolio_option}`);
+      const composedReq = [baseReq, metaLines.join("\n")].filter(Boolean).join("\n\n").trim();
+
       const cleaned: JobDraftInput = {
         ...dbForm,
         area: dbForm.area || null,
         address: dbForm.address || null,
         schedule: dbForm.schedule || null,
         experience_level: dbForm.experience_level || null,
-        requirements: dbForm.requirements || null,
+        requirements: composedReq || null,
         salary_min: dbForm.salary_min ?? null,
         salary_max: dbForm.salary_max ?? null,
         openings: Math.min(50, Math.max(1, Number(dbForm.openings) || 1)),
