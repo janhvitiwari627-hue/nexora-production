@@ -67,7 +67,7 @@ export async function requireRole(allowed: AllowedRole[], currentPath: string) {
     // Redirect users to their own home surface when they hit the wrong dashboard.
     if (effectiveRoles.has("admin")) throw redirect({ to: "/admin/dashboard" });
     if (effectiveRoles.has("owner")) throw redirect({ to: "/owner/dashboard" });
-    if (effectiveRoles.has("customer")) throw redirect({ to: "/customer/home" });
+    if (effectiveRoles.has("customer")) throw redirect({ to: "/" });
     throw redirect({ to: "/" });
   }
   return { user: data.user, roles };
