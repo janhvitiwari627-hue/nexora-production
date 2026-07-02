@@ -17,7 +17,7 @@ const FEATURES = [
 export default function DownloadAppPage() {
   return (
     <div className="min-h-screen bg-background">
-      <PublicHeader />
+      <CustomerAppHeader />
       <main className="mx-auto max-w-6xl px-4 py-12 md:py-20">
         {/* Hero */}
         <section className="grid gap-10 md:grid-cols-2 md:items-center">
