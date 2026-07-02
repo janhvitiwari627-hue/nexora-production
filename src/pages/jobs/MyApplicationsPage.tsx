@@ -131,19 +131,27 @@ export function MyApplicationsPage() {
 
   useEffect(() => {
     if (!isInitialized || !user) return;
+    const controller = new AbortController();
     let alive = true;
     setError(null);
-    listMyApplications(user.id)
+    listMyApplications(user.id, { signal: controller.signal })
       .then((rows) => {
         if (alive) setApps(rows);
       })
       .catch((e) => {
-        if (alive) setError(e instanceof Error ? e.message : "Failed to load applications");
+        if (!alive) return;
+        // Ignore aborts triggered by filter/query changes or unmount.
+        if (controller.signal.aborted) return;
+        if (e instanceof DOMException && e.name === "AbortError") return;
+        setError(e instanceof Error ? e.message : "Failed to load applications");
       });
     return () => {
       alive = false;
+      controller.abort();
     };
-  }, [isInitialized, user, refreshTick]);
+    // Aborts the in-flight fetch when the user changes filter/query, so a late
+    // response can't overwrite freshly filtered state.
+  }, [isInitialized, user, refreshTick, filter, q]);
 
   const counts = useMemo(() => {
     const c: Record<string, number> = { all: apps?.length ?? 0 };

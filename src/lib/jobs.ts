@@ -154,11 +154,19 @@ export async function applyToJob(params: {
   return data as JobApplication;
 }
 
-export async function listMyApplications(applicantId: string): Promise<JobApplication[]> {
-  const { data, error } = await table("job_applications")
+export async function listMyApplications(
+  applicantId: string,
+  options?: { signal?: AbortSignal },
+): Promise<JobApplication[]> {
+  const query = table("job_applications")
     .select("*, job:jobs(*, employer:employer_profiles(*))")
     .eq("applicant_id", applicantId)
     .order("created_at", { ascending: false });
+  const { data, error } = await (options?.signal
+    ? // supabase-js exposes abortSignal on the builder
+      (query as unknown as { abortSignal: (s: AbortSignal) => typeof query })
+        .abortSignal(options.signal)
+    : query);
   if (error) throw error;
   return (data ?? []) as JobApplication[];
 }
