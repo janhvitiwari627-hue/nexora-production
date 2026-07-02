@@ -25,6 +25,7 @@ import {
   ownerDashboardMetricsQuery, ownerAnalyticsQuery, ownerBookingsQuery,
 } from "@/lib/owner.queries";
 import { updateOwnerBookingStatus, getMyOwnerApprovalStatus } from "@/lib/owner.functions";
+import { getMyEventStats } from "@/lib/analytics-events.functions";
 import {
   ownerBusiness, kpis as mockKpis, revenueDaily, revenueWeekly, revenueMonthly,
   calendarDensity, calendarFirstWeekday, calendarMonthLabel,
