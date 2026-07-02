@@ -206,6 +206,16 @@ function QueuedBookingCard({
               <RefreshCw className="h-3 w-3" /> Retry
             </button>
           )}
+          {cancellable && (
+            <button
+              type="button"
+              onClick={() => setConfirmOpen(true)}
+              aria-label="Cancel queued booking"
+              className="border-danger/40 text-danger hover:bg-danger/10 inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+            >
+              <Trash2 className="h-3 w-3" /> Cancel
+            </button>
+          )}
           {(stage === "failed" || stage === "confirmed") && (
             <button
               type="button"
@@ -223,6 +233,37 @@ function QueuedBookingCard({
       {!compact && (
         <p className="text-muted-foreground mt-2 text-[11px]">{meta.hint}</p>
       )}
+
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancel this queued booking?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {payload.shop_name ?? "Your booking"} on{" "}
+              <span className="font-semibold text-heading">
+                {formatWhen(payload.booking_date, payload.booking_time)}
+              </span>{" "}
+              hasn't been sent yet. Cancelling removes it from this device and it
+              won't sync. This can't be undone.
+              {stage === "syncing" && (
+                <span className="mt-2 block text-xs text-amber-700">
+                  A sync is in progress — if it completes before you confirm, the
+                  booking may still go through.
+                </span>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep it</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={doCancel}
+              className="bg-danger text-white hover:bg-danger/90"
+            >
+              Yes, cancel booking
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </article>
   );
 }
