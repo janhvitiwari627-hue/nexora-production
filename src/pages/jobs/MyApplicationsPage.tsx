@@ -128,14 +128,19 @@ export function MyApplicationsPage() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [retryAttempt, setRetryAttempt] = useState(0);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  // Monotonic request id — only the latest request may commit results/errors,
+  // so a slow response from a previous filter/query can't overwrite newer state.
+  const requestIdRef = useRef(0);
 
   const MAX_RETRIES = 3;
 
   useEffect(() => {
     if (!isInitialized || !user) return;
     const controller = new AbortController();
+    const myRequestId = ++requestIdRef.current;
     let alive = true;
     let retryTimer: ReturnType<typeof setTimeout> | null = null;
+    const isCurrent = () => alive && requestIdRef.current === myRequestId;
     setError(null);
 
     const isAbort = (e: unknown) => {
@@ -149,10 +154,12 @@ export function MyApplicationsPage() {
     const attempt = (n: number) => {
       listMyApplications(user.id, { signal: controller.signal })
         .then((rows) => {
-          if (alive) setApps(rows);
+          // Drop stale responses from prior filter/search requests.
+          if (!isCurrent()) return;
+          setApps(rows);
         })
         .catch((e) => {
-          if (!alive) return;
+          if (!isCurrent()) return;
           // Silently ignore aborts — they are not real failures.
           if (isAbort(e)) return;
           if (n < MAX_RETRIES) {
@@ -160,7 +167,7 @@ export function MyApplicationsPage() {
             // failures reach here, so retrying is safe.
             const delay = 500 * 2 ** n;
             retryTimer = setTimeout(() => {
-              if (!alive) return;
+              if (!isCurrent()) return;
               setRetryAttempt(n + 1);
               attempt(n + 1);
             }, delay);
