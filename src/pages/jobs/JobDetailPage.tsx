@@ -76,7 +76,10 @@ function fromRealJob(j: JobRow & { employer?: { business_name: string } | null }
     category: j.category,
     description: j.description,
     responsibilities: [],
-    requirements: j.requirements ? [j.requirements] : [],
+    requirements: (() => {
+      const cleaned = stripRequirementsMeta(j.requirements);
+      return cleaned ? [cleaned] : [];
+    })(),
     benefits: j.benefits ?? [],
     rawRequirements: j.requirements ?? null,
     isReal: true,
