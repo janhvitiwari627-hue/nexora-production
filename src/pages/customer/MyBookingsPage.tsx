@@ -98,6 +98,11 @@ export function MyBookingsPage() {
           </p>
         </header>
 
+        <div className="mb-4 space-y-3">
+          <OfflineBanner hint="Your bookings list may be out of date until you reconnect." />
+          <OfflineSyncStatus type={TASK_CREATE_AND_CONFIRM_BOOKING} itemLabel="booking" />
+        </div>
+
         <div className="space-y-5">
           <BookingTabBar active={tab} counts={counts} onChange={setTab} />
           <BookingFilterRow
