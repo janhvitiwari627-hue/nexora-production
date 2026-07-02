@@ -1087,11 +1087,15 @@ export type Database = {
           benefits: string[] | null
           category: string
           city: string
+          contact_mobile: string | null
+          contact_person: string | null
           created_at: string
           description: string
           employer_id: string
           experience_level: string | null
           id: string
+          interview_mode: string | null
+          job_role: string | null
           job_type: string
           openings: number
           posted_by: string
@@ -1101,10 +1105,13 @@ export type Database = {
           salary_min: number | null
           salary_period: string | null
           schedule: string | null
+          shop_id: string | null
           skills: string[] | null
           status: string
           title: string
           updated_at: string
+          whatsapp_number: string | null
+          work_location: string | null
         }
         Insert: {
           address?: string | null
@@ -1113,11 +1120,15 @@ export type Database = {
           benefits?: string[] | null
           category: string
           city: string
+          contact_mobile?: string | null
+          contact_person?: string | null
           created_at?: string
           description: string
           employer_id: string
           experience_level?: string | null
           id?: string
+          interview_mode?: string | null
+          job_role?: string | null
           job_type: string
           openings?: number
           posted_by: string
@@ -1127,10 +1138,13 @@ export type Database = {
           salary_min?: number | null
           salary_period?: string | null
           schedule?: string | null
+          shop_id?: string | null
           skills?: string[] | null
           status?: string
           title: string
           updated_at?: string
+          whatsapp_number?: string | null
+          work_location?: string | null
         }
         Update: {
           address?: string | null
@@ -1139,11 +1153,15 @@ export type Database = {
           benefits?: string[] | null
           category?: string
           city?: string
+          contact_mobile?: string | null
+          contact_person?: string | null
           created_at?: string
           description?: string
           employer_id?: string
           experience_level?: string | null
           id?: string
+          interview_mode?: string | null
+          job_role?: string | null
           job_type?: string
           openings?: number
           posted_by?: string
@@ -1153,10 +1171,13 @@ export type Database = {
           salary_min?: number | null
           salary_period?: string | null
           schedule?: string | null
+          shop_id?: string | null
           skills?: string[] | null
           status?: string
           title?: string
           updated_at?: string
+          whatsapp_number?: string | null
+          work_location?: string | null
         }
         Relationships: [
           {
@@ -1164,6 +1185,20 @@ export type Database = {
             columns: ["employer_id"]
             isOneToOne: false
             referencedRelation: "employer_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jobs_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "public_salon_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jobs_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
             referencedColumns: ["id"]
           },
         ]
