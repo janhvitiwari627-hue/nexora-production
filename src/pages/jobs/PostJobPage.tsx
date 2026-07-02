@@ -2417,6 +2417,44 @@ function RequirementsStep({
             }}
           />
         </div>
+        {(() => {
+          const suggested = SKILL_SUGGESTIONS[form.category] ?? [];
+          if (suggested.length === 0) return null;
+          const toggle = (s: string) => {
+            const on = form.skills.includes(s);
+            update({
+              skills: on ? form.skills.filter((x) => x !== s) : [...form.skills, s],
+            });
+          };
+          return (
+            <div className="mt-3">
+              <p className="text-muted-foreground mb-2 text-[11px] uppercase tracking-wide font-semibold">
+                Suggested for {form.category}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {suggested.map((s) => {
+                  const on = form.skills.includes(s);
+                  return (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => toggle(s)}
+                      aria-pressed={on}
+                      className={cn(
+                        "rounded-full border px-3 py-1.5 text-xs font-semibold transition",
+                        on
+                          ? "bg-gradient-cta border-transparent text-primary-foreground"
+                          : "border-border bg-card text-heading hover:border-primary/50",
+                      )}
+                    >
+                      {s}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
       </Field>
       <Field label="Additional requirements">
         <textarea
