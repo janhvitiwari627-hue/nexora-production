@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { PaymentCountdown } from "@/components/shared/PaymentCountdown";
 import { OfflineBanner } from "@/components/shared/OfflineBanner";
 import { useOnlineStatus } from "@/hooks/use-online-status";
-import { toast } from "sonner";
+
 import {
   Check,
   CreditCard,
