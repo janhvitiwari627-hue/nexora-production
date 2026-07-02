@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, Briefcase, Check, MapPin, Save, Sparkles } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ArrowRight, Briefcase, Check, MapPin, RefreshCw, Save, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthStore } from "@/stores/authStore";
 import {
@@ -101,6 +101,7 @@ export function PostJobPage() {
   const [saving, setSaving] = useState<"draft" | "publish" | null>(null);
   const [skillsInput, setSkillsInput] = useState(initialDraft?.skillsInput ?? "");
   const [draftRestored, setDraftRestored] = useState<boolean>(!!initialDraft && (initialDraft.step > 0 || initialDraft.form.title.length > 0));
+  const [publishError, setPublishError] = useState<string | null>(null);
 
   // Persist wizard state to localStorage so it survives session expiry / re-login.
   useEffect(() => {
@@ -149,6 +150,8 @@ export function PostJobPage() {
       return;
     }
     setSaving(publish ? "publish" : "draft");
+    if (publish) setPublishError(null);
+    let createdJobId: string | undefined;
     try {
       const cleaned: JobDraftInput = {
         ...form,
@@ -168,20 +171,50 @@ export function PostJobPage() {
         publish,
       });
       setJobId(row.id);
+      createdJobId = row.id;
       if (publish) {
         try { localStorage.removeItem(DRAFT_STORAGE_KEY); } catch {}
         toast.success("Job published successfully");
-        navigate({ to: "/jobs/$jobId", params: { jobId: row.id } });
+        try {
+          await navigate({ to: "/jobs/$jobId", params: { jobId: row.id } });
+        } catch (navErr: any) {
+          // Job was created but navigation failed — surface a retry that goes to detail page.
+          setPublishError(
+            `Your job was published but we couldn't open it automatically. ${navErr?.message ?? ""}`.trim(),
+          );
+        }
       } else {
         toast.success("Draft saved");
       }
-
     } catch (e: any) {
-      toast.error(e?.message ?? "Failed to save job");
+      const msg = e?.message ?? "Failed to save job";
+      if (publish) {
+        setPublishError(msg);
+      }
+      toast.error(msg);
     } finally {
       setSaving(null);
     }
+    return createdJobId;
   }
+
+  async function retryPublish() {
+    // If the job was already created but only navigation failed, jump straight to it.
+    if (jobId) {
+      try {
+        setPublishError(null);
+        await navigate({ to: "/jobs/$jobId", params: { jobId } });
+        return;
+      } catch (navErr: any) {
+        setPublishError(
+          `Your job was published but we couldn't open it automatically. ${navErr?.message ?? ""}`.trim(),
+        );
+        return;
+      }
+    }
+    await persist(true);
+  }
+
 
   if (!isInitialized || loadingProfile) {
     return (
@@ -283,7 +316,17 @@ export function PostJobPage() {
                   setSkillsInput={setSkillsInput}
                 />
               )}
-              {step === 4 && <ReviewStep form={form} profile={profile} />}
+              {step === 4 && (
+                <ReviewStep
+                  form={form}
+                  profile={profile}
+                  publishError={publishError}
+                  onRetry={retryPublish}
+                  onDismissError={() => setPublishError(null)}
+                  retrying={saving === "publish"}
+                  hasSavedJob={!!jobId}
+                />
+              )}
             </div>
 
             {/* Desktop action row */}
@@ -637,13 +680,62 @@ function RequirementsStep({
   );
 }
 
-function ReviewStep({ form, profile }: { form: Form; profile: EmployerProfile | null }) {
+function ReviewStep({
+  form,
+  profile,
+  publishError,
+  onRetry,
+  onDismissError,
+  retrying,
+  hasSavedJob,
+}: {
+  form: Form;
+  profile: EmployerProfile | null;
+  publishError: string | null;
+  onRetry: () => void;
+  onDismissError: () => void;
+  retrying: boolean;
+  hasSavedJob: boolean;
+}) {
   return (
     <div className="space-y-4">
       <h2 className="text-heading text-xl font-bold">Review & publish</h2>
       <p className="text-sm text-muted-foreground">
         Please review the details below. You can go back to edit any section.
       </p>
+      {publishError && (
+        <div
+          role="alert"
+          aria-live="assertive"
+          className="flex items-start gap-3 rounded-[var(--radius-card)] border border-destructive/40 bg-destructive/5 p-4 text-sm"
+        >
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-destructive" aria-hidden />
+          <div className="min-w-0 flex-1">
+            <div className="font-semibold text-destructive">
+              {hasSavedJob ? "Couldn't open your job listing" : "Publish failed"}
+            </div>
+            <div className="mt-1 text-muted-foreground break-words">{publishError}</div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={onRetry}
+                disabled={retrying}
+                className="inline-flex items-center gap-1 rounded-[var(--radius-button)] border border-destructive/40 bg-card px-3 py-1.5 text-xs font-semibold text-destructive hover:bg-destructive/10 disabled:opacity-60"
+              >
+                <RefreshCw className={cn("h-3.5 w-3.5", retrying && "animate-spin")} />
+                {retrying ? "Retrying…" : hasSavedJob ? "Open job listing" : "Try again"}
+              </button>
+              <button
+                type="button"
+                onClick={onDismissError}
+                className="rounded-[var(--radius-button)] px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:text-heading"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <LivePreview form={form} profile={profile} />
     </div>
   );
