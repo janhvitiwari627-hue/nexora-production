@@ -114,6 +114,7 @@ import { Route as CustomerHomeRouteImport } from './routes/customer.home'
 import { Route as CustomerBookingsRouteImport } from './routes/customer.bookings'
 import { Route as CustomerAtSalonRouteImport } from './routes/customer.at-salon'
 import { Route as CustomerAtHomeRouteImport } from './routes/customer.at-home'
+import { Route as CustomerAppSplatRouteImport } from './routes/customer-app.$'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as BrandSlugRouteImport } from './routes/brand.$slug'
 import { Route as BookSlugRouteImport } from './routes/book.$slug'
@@ -676,6 +677,11 @@ const CustomerAtHomeRoute = CustomerAtHomeRouteImport.update({
   path: '/at-home',
   getParentRoute: () => CustomerRoute,
 } as any)
+const CustomerAppSplatRoute = CustomerAppSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => CustomerAppRoute,
+} as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/category/$slug',
   path: '/category/$slug',
@@ -869,7 +875,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/create-shop-website': typeof CreateShopWebsiteRoute
   '/customer': typeof CustomerRouteWithChildren
-  '/customer-app': typeof CustomerAppRoute
+  '/customer-app': typeof CustomerAppRouteWithChildren
   '/dashboard': typeof DashboardRouteWithChildren
   '/distributor-brand-portal': typeof DistributorBrandPortalRoute
   '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
@@ -912,6 +918,7 @@ export interface FileRoutesByFullPath {
   '/book/$slug': typeof BookSlugRoute
   '/brand/$slug': typeof BrandSlugRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/customer-app/$': typeof CustomerAppSplatRoute
   '/customer/at-home': typeof CustomerAtHomeRoute
   '/customer/at-salon': typeof CustomerAtSalonRoute
   '/customer/bookings': typeof CustomerBookingsRouteWithChildren
@@ -1011,7 +1018,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/create-shop-website': typeof CreateShopWebsiteRoute
   '/customer': typeof CustomerRouteWithChildren
-  '/customer-app': typeof CustomerAppRoute
+  '/customer-app': typeof CustomerAppRouteWithChildren
   '/distributor-brand-portal': typeof DistributorBrandPortalRoute
   '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
   '/download-app': typeof DownloadAppRoute
@@ -1051,6 +1058,7 @@ export interface FileRoutesByTo {
   '/book/$slug': typeof BookSlugRoute
   '/brand/$slug': typeof BrandSlugRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/customer-app/$': typeof CustomerAppSplatRoute
   '/customer/at-home': typeof CustomerAtHomeRoute
   '/customer/at-salon': typeof CustomerAtSalonRoute
   '/customer/bookings': typeof CustomerBookingsRouteWithChildren
@@ -1151,7 +1159,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/create-shop-website': typeof CreateShopWebsiteRoute
   '/customer': typeof CustomerRouteWithChildren
-  '/customer-app': typeof CustomerAppRoute
+  '/customer-app': typeof CustomerAppRouteWithChildren
   '/dashboard': typeof DashboardRouteWithChildren
   '/distributor-brand-portal': typeof DistributorBrandPortalRoute
   '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
@@ -1194,6 +1202,7 @@ export interface FileRoutesById {
   '/book/$slug': typeof BookSlugRoute
   '/brand/$slug': typeof BrandSlugRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/customer-app/$': typeof CustomerAppSplatRoute
   '/customer/at-home': typeof CustomerAtHomeRoute
   '/customer/at-salon': typeof CustomerAtSalonRoute
   '/customer/bookings': typeof CustomerBookingsRouteWithChildren
@@ -1338,6 +1347,7 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/brand/$slug'
     | '/category/$slug'
+    | '/customer-app/$'
     | '/customer/at-home'
     | '/customer/at-salon'
     | '/customer/bookings'
@@ -1477,6 +1487,7 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/brand/$slug'
     | '/category/$slug'
+    | '/customer-app/$'
     | '/customer/at-home'
     | '/customer/at-salon'
     | '/customer/bookings'
@@ -1619,6 +1630,7 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/brand/$slug'
     | '/category/$slug'
+    | '/customer-app/$'
     | '/customer/at-home'
     | '/customer/at-salon'
     | '/customer/bookings'
@@ -1719,7 +1731,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   CreateShopWebsiteRoute: typeof CreateShopWebsiteRoute
   CustomerRoute: typeof CustomerRouteWithChildren
-  CustomerAppRoute: typeof CustomerAppRoute
+  CustomerAppRoute: typeof CustomerAppRouteWithChildren
   DashboardRoute: typeof DashboardRouteWithChildren
   DistributorBrandPortalRoute: typeof DistributorBrandPortalRoute
   DistrictBusinessPartnerRoute: typeof DistrictBusinessPartnerRouteWithChildren
@@ -2524,6 +2536,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CustomerAtHomeRouteImport
       parentRoute: typeof CustomerRoute
     }
+    '/customer-app/$': {
+      id: '/customer-app/$'
+      path: '/$'
+      fullPath: '/customer-app/$'
+      preLoaderRoute: typeof CustomerAppSplatRouteImport
+      parentRoute: typeof CustomerAppRoute
+    }
     '/category/$slug': {
       id: '/category/$slug'
       path: '/category/$slug'
@@ -2853,6 +2872,18 @@ const CustomerRouteWithChildren = CustomerRoute._addFileChildren(
   CustomerRouteChildren,
 )
 
+interface CustomerAppRouteChildren {
+  CustomerAppSplatRoute: typeof CustomerAppSplatRoute
+}
+
+const CustomerAppRouteChildren: CustomerAppRouteChildren = {
+  CustomerAppSplatRoute: CustomerAppSplatRoute,
+}
+
+const CustomerAppRouteWithChildren = CustomerAppRoute._addFileChildren(
+  CustomerAppRouteChildren,
+)
+
 interface DashboardBookingsRouteChildren {
   DashboardBookingsIdRoute: typeof DashboardBookingsIdRoute
 }
@@ -3025,7 +3056,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   CreateShopWebsiteRoute: CreateShopWebsiteRoute,
   CustomerRoute: CustomerRouteWithChildren,
-  CustomerAppRoute: CustomerAppRoute,
+  CustomerAppRoute: CustomerAppRouteWithChildren,
   DashboardRoute: DashboardRouteWithChildren,
   DistributorBrandPortalRoute: DistributorBrandPortalRoute,
   DistrictBusinessPartnerRoute: DistrictBusinessPartnerRouteWithChildren,
