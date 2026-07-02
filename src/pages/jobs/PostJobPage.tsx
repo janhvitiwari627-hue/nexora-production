@@ -1915,6 +1915,25 @@ function LocationStep({
         )}
       </Field>
 
+      <Field label="Joining availability">
+        <div className="flex flex-wrap gap-2">
+          {JOINING_OPTIONS.map((j) => {
+            const active = form.joining_availability === j;
+            return (
+              <button
+                key={j}
+                type="button"
+                onClick={() => update({ joining_availability: j })}
+                aria-pressed={active}
+                className={chipCls(active)}
+              >
+                {j}
+              </button>
+            );
+          })}
+        </div>
+      </Field>
+
       <div className="mt-2 border-t border-border pt-4">
         <h3 className="text-heading mb-3 text-sm font-bold uppercase tracking-wide text-muted-foreground">
           Contact details
