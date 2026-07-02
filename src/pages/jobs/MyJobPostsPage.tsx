@@ -67,7 +67,7 @@ export function MyJobPostsPage() {
   const user = useAuthStore((s) => s.user);
   const [loading, setLoading] = useState(true);
   const [posts, setPosts] = useState<MyJobPost[]>([]);
-  const [closingId, setClosingId] = useState<string | null>(null);
+  const [pendingId, setPendingId] = useState<string | null>(null);
 
   const load = async () => {
     if (!user) return;
@@ -88,21 +88,37 @@ export function MyJobPostsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  const handleClose = async (id: string) => {
+  const changeStatus = async (
+    id: string,
+    next: "draft" | "published" | "closed",
+    confirmMessage?: string,
+  ) => {
     if (!user) return;
-    if (!confirm("Close this job post? Candidates will no longer see it.")) return;
-    setClosingId(id);
+    if (confirmMessage && !confirm(confirmMessage)) return;
+    setPendingId(id);
     try {
-      await closeJobPost(id, user.id);
-      toast.success("Job closed");
-      setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, status: "closed" } : p)));
+      await setJobStatus(id, user.id, next);
+      const label = next === "closed" ? "Job closed" : next === "published" ? "Job published" : "Moved to drafts";
+      toast.success(label);
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === id
+            ? {
+                ...p,
+                status: next,
+                published_at: next === "published" ? new Date().toISOString() : p.published_at,
+              }
+            : p,
+        ),
+      );
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Could not close job";
+      const message = err instanceof Error ? err.message : "Could not update job";
       toast.error(message);
     } finally {
-      setClosingId(null);
+      setPendingId(null);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-background">
