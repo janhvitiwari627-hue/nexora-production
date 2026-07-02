@@ -143,38 +143,31 @@ export const useAuthStore = create<AuthStore>((set, get) => {
   hasRole: (role) => get().roles.includes(role),
   hasAnyRole: (roles) => roles.some((r) => get().roles.includes(r)),
 
+  retryInitialize: async () => {
+    set({ isLoading: true, initError: null, isInitialized: false });
+    try {
+      await loadSessionAndProfile();
+      set({ isLoading: false, isInitialized: true, initError: null });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Failed to initialize authentication";
+      console.error("[Auth Store] Retry failed:", e);
+      set({ isLoading: false, isInitialized: true, initError: msg });
+    }
+  },
+
   initialize: async () => {
     console.log("[Auth Store] Initializing auth store...");
-    set({ isLoading: true });
+    set({ isLoading: true, initError: null });
 
-    // Bootstrap from current session
-    let session: Session | null = null;
     try {
-      const { data, error } = await supabase.auth.getSession();
-      if (error) {
-        const lower = error.message.toLowerCase();
-        if (lower.includes("refresh token") || lower.includes("invalid") || lower.includes("expired")) {
-          await supabase.auth.signOut({ scope: "local" }).catch(() => {});
-        }
-      }
-      session = data.session;
-    } catch {
-      session = null;
+      await loadSessionAndProfile();
+      set({ initError: null });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Failed to initialize authentication";
+      console.error("[Auth Store] Initialization error:", e);
+      set({ initError: msg });
     }
-    console.log("[Auth Store] Initial session:", session ? "found" : "none");
 
-    if (session?.user) {
-      console.log("[Auth Store] Loading profile and roles for user:", session.user.id);
-      // Ensure profile exists, then load profile and roles
-      const { profile, roles } = await ensureProfileExists(session.user);
-      set({
-        session,
-        user: session.user,
-        profile,
-        roles,
-        role: roles[0] ?? null,
-      });
-    }
     set({ isLoading: false, isInitialized: true });
     console.log("[Auth Store] Initialization complete");
 
@@ -192,12 +185,10 @@ export const useAuthStore = create<AuthStore>((set, get) => {
         const userId = nextSession.user.id;
         setTimeout(async () => {
           console.log("[Auth Store] Loading profile and roles for user:", userId);
-          // Ensure profile exists on sign in, then load
           const { profile, roles } = await ensureProfileExists(nextSession.user);
           set({ profile, roles, role: roles[0] ?? null });
         }, 0);
 
-        // Record a login event once per browser session
         if (event === "SIGNED_IN" && typeof window !== "undefined") {
           const flagKey = `nx_login_recorded_${nextSession.user.id}`;
           if (!sessionStorage.getItem(flagKey)) {
@@ -249,4 +240,5 @@ export const useAuthStore = create<AuthStore>((set, get) => {
       bc?.close();
     };
   },
-}));
+  });
+});
