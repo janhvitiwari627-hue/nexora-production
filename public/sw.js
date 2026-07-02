@@ -7,7 +7,7 @@
  *   - skipWaiting only when the page explicitly asks (user-approved refresh),
  *     so we never force-reload mid-session with a stale mismatch.
  */
-const VERSION = "nexora-v3";
+const VERSION = "nexora-v4";
 const PRECACHE = `${VERSION}-precache`;
 const RUNTIME = `${VERSION}-runtime`;
 const PAGES = `${VERSION}-pages`;
@@ -18,16 +18,26 @@ const PRECACHE_URLS = [
   "/icon-512.png",
 ];
 
+const PAGE_SHELLS = [
+  "/customer/home",
+  "/customer/dashboard",
+  "/customer/search",
+];
+
 self.addEventListener("install", (event) => {
   // Do NOT skipWaiting automatically — wait for the client to approve.
   event.waitUntil((async () => {
     const precache = await caches.open(PRECACHE);
     await precache.addAll(PRECACHE_URLS);
-    // Warm the pages cache with the customer home shell so it survives offline.
+    // Warm the pages cache with customer shells so they survive offline.
     try {
       const pages = await caches.open(PAGES);
-      const res = await fetch("/customer/home", { credentials: "same-origin" });
-      if (res && res.status === 200) await pages.put("/customer/home", res.clone());
+      await Promise.allSettled(
+        PAGE_SHELLS.map(async (path) => {
+          const res = await fetch(path, { credentials: "same-origin" });
+          if (res && res.status === 200) await pages.put(path, res.clone());
+        })
+      );
     } catch {}
   })());
 });
