@@ -28,10 +28,7 @@ import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 import { OfflineBanner, OfflinePill } from "@/components/shared/OfflineBanner";
 import { QueuedBookingsList } from "@/components/shared/QueuedBookingsList";
 import { useOnlineStatus } from "@/hooks/use-online-status";
-import {
-  enqueueCreateAndConfirmBooking,
-  TASK_CREATE_AND_CONFIRM_BOOKING,
-} from "@/lib/booking-offline-sync";
+import { enqueueCreateAndConfirmBooking } from "@/lib/booking-offline-sync";
 
 export type RealSalonRef = {
   id: string;
