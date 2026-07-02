@@ -33,7 +33,14 @@ const CATEGORIES = [
   "Other",
 ];
 const JOB_TYPES = ["Full-time", "Part-time", "Freelance", "Contract", "Internship", "Temporary"];
-const EXPERIENCE = ["Fresher", "1–3 years", "3–5 years", "5+ years"];
+const EXPERIENCE = [
+  "Fresher welcome",
+  "0–1 years",
+  "1–2 years",
+  "2–4 years",
+  "4–6 years",
+  "6+ years",
+];
 const PERIODS: { label: string; value: JobDraftInput["salary_period"] }[] = [
   { label: "per month", value: "monthly" },
   { label: "per year", value: "yearly" },
