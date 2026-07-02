@@ -1,8 +1,11 @@
-import { useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Briefcase, GraduationCap, MapPin, Search, Sparkles, Star, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BackButton } from "@/components/shared/BackButton";
+import { useAuthStore } from "@/stores/authStore";
+import { getMyEmployerProfile, listPublishedJobs, type JobRow } from "@/lib/jobs";
+import { EmployerSetupModal } from "@/pages/jobs/EmployerSetupModal";
 
 const JOBS = [
   {
