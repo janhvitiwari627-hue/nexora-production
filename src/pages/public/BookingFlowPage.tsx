@@ -229,7 +229,7 @@ export function BookingFlowPage({ salon }: { salon?: RealSalonRef } = {}) {
               : "Selections are saved on this device. Staff availability updates when you reconnect."
           }
         />
-        <OfflineSyncStatus type={TASK_CREATE_AND_CONFIRM_BOOKING} itemLabel="booking" />
+        <QueuedBookingsList />
       </div>
 
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 md:px-6 md:py-10 lg:grid-cols-[1fr_320px]">
