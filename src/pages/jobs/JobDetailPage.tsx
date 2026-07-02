@@ -241,6 +241,40 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
           </Button>
         </div>
       </div>
+
+      <Modal open={successOpen} onClose={() => setSuccessOpen(false)} size="sm">
+        <div className="flex flex-col items-center gap-4 p-8 text-center">
+          <div className="bg-primary/10 grid h-16 w-16 place-items-center rounded-full">
+            <CheckCircle2 className="text-primary h-9 w-9" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-heading text-xl font-bold">Application submitted!</h3>
+            <p className="text-muted-foreground text-sm">
+              {successMode === "demo"
+                ? "This is a demo listing — your interest has been recorded. You'll see it in your applications."
+                : `Your application for ${job.title} at ${job.business} has been sent. The employer will review it shortly.`}
+            </p>
+          </div>
+          <div className="mt-2 flex w-full flex-col gap-2 sm:flex-row">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => setSuccessOpen(false)}
+            >
+              Keep browsing
+            </Button>
+            <Button
+              className="flex-1"
+              onClick={() => {
+                setSuccessOpen(false);
+                navigate({ to: "/jobs/applications" });
+              }}
+            >
+              View applications
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 }
