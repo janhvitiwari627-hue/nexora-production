@@ -380,7 +380,7 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
               className="w-full"
               size="lg"
               variant="secondary"
-              onClick={() => navigate({ to: "/jobs/applications" })}
+              onClick={() => setViewOpen(true)}
             >
               <CheckCircle2 className="h-4 w-4" /> View Application
             </Button>
