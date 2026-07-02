@@ -1117,3 +1117,121 @@ function LivePreview({ form, profile }: { form: Form; profile: EmployerProfile |
     </article>
   );
 }
+
+function JobPublishedSuccess({
+  job,
+  profile,
+  onPostAnother,
+}: {
+  job: JobRow;
+  profile: EmployerProfile | null;
+  onPostAnother: () => void;
+}) {
+  const salaryText = (() => {
+    const min = job.salary_min;
+    const max = job.salary_max;
+    if (!min && !max) return "Not disclosed";
+    const period =
+      job.salary_period === "hourly" ? "/hr" : job.salary_period === "yearly" ? "/yr" : "/mo";
+    if (min && max) return `₹${min.toLocaleString()} – ₹${max.toLocaleString()} ${period}`;
+    return `₹${(min ?? max)!.toLocaleString()} ${period}`;
+  })();
+  const locationText = [job.area, job.city].filter(Boolean).join(", ") || job.city;
+  const postedDate = new Date(job.published_at ?? job.created_at).toLocaleString(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className="rounded-[var(--radius-card)] border border-primary/30 bg-card p-6 shadow-[var(--shadow-card)] md:p-8"
+    >
+      <div className="flex items-start gap-4">
+        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+          <CheckCircle2 className="h-7 w-7" aria-hidden />
+        </div>
+        <div className="min-w-0 flex-1">
+          <h2 className="text-heading text-2xl font-extrabold">
+            Your job post has been published successfully.
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Candidates can now discover and apply to your listing.
+          </p>
+        </div>
+      </div>
+
+      <dl className="mt-6 grid gap-4 rounded-lg border border-border bg-background p-4 sm:grid-cols-2">
+        <div className="sm:col-span-2">
+          <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Job title
+          </dt>
+          <dd className="mt-1 flex items-center gap-2 text-lg font-bold text-heading">
+            <Briefcase className="h-4 w-4 text-primary" aria-hidden />
+            <span className="truncate">{job.title}</span>
+          </dd>
+          {profile?.business_name && (
+            <div className="mt-1 text-xs text-muted-foreground">at {profile.business_name}</div>
+          )}
+        </div>
+        <div>
+          <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Location
+          </dt>
+          <dd className="mt-1 flex items-center gap-2 text-sm font-semibold text-heading">
+            <MapPin className="h-4 w-4 text-primary" aria-hidden />
+            {locationText}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Salary
+          </dt>
+          <dd className="mt-1 flex items-center gap-2 text-sm font-semibold text-heading">
+            <IndianRupee className="h-4 w-4 text-primary" aria-hidden />
+            {salaryText}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Status
+          </dt>
+          <dd className="mt-1">
+            <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">
+              <CheckCircle2 className="h-3.5 w-3.5" aria-hidden /> Published
+            </span>
+          </dd>
+        </div>
+        <div>
+          <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Posted
+          </dt>
+          <dd className="mt-1 text-sm font-semibold text-heading">{postedDate}</dd>
+        </div>
+      </dl>
+
+      <div className="mt-6 flex flex-wrap gap-2">
+        <Link
+          to="/owner/jobs"
+          className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-1 rounded-[var(--radius-button)] px-4 py-2.5 text-sm font-bold shadow-[var(--shadow-glow)]"
+        >
+          View My Job Posts
+        </Link>
+        <button
+          type="button"
+          onClick={onPostAnother}
+          className="inline-flex items-center gap-1 rounded-[var(--radius-button)] border border-border bg-card px-4 py-2.5 text-sm font-semibold text-heading hover:bg-muted"
+        >
+          Post Another Job
+        </button>
+        <Link
+          to="/jobs/$jobId"
+          params={{ jobId: job.id }}
+          className="inline-flex items-center gap-1 rounded-[var(--radius-button)] border border-border bg-card px-4 py-2.5 text-sm font-semibold text-heading hover:bg-muted"
+        >
+          View Applications
+        </Link>
+      </div>
+    </div>
+  );
+}
