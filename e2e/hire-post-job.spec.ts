@@ -116,4 +116,43 @@ test.describe("/hire/post-job", () => {
     ).toBeVisible({ timeout: 10_000 });
     await expect(page.getByText(/Step 3 of 5/)).toBeVisible();
   });
+
+  test("Continue from Salary & benefits advances to the Requirements step", async ({ page }) => {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await page.evaluate(() => {
+      window.localStorage.removeItem("nexora:postJobWizard:v1");
+    });
+
+    await seedSession(page);
+    await page.goto("/hire/post-job", { waitUntil: "networkidle" });
+
+    // Step 1: Job details
+    await page.getByRole("textbox", { name: "Job title" }).fill("Senior Hair Stylist");
+    await page
+      .getByRole("textbox", { name: "Description" })
+      .fill("Own the chair, deliver amazing cuts, and mentor junior stylists.");
+    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+
+    // Step 2: Location & schedule
+    await expect(
+      page.getByRole("heading", { name: "Location & schedule" }),
+    ).toBeVisible({ timeout: 10_000 });
+    await page.getByRole("textbox", { name: "City" }).fill("Mumbai");
+    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+
+    // Step 3: Salary & benefits — no required fields, just Continue.
+    await expect(
+      page.getByRole("heading", { name: "Salary & benefits" }),
+    ).toBeVisible({ timeout: 10_000 });
+
+    const continueBtn = page.getByRole("button", { name: /^Continue$/ }).first();
+    await expect(continueBtn).toBeEnabled();
+    await continueBtn.click();
+
+    // Step 4: Requirements should render.
+    await expect(
+      page.getByRole("heading", { name: "Requirements" }),
+    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/Step 4 of 5/)).toBeVisible();
+  });
 });
