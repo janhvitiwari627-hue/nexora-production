@@ -3,6 +3,7 @@ import { Smartphone, Download, Sparkles, Calendar, QrCode, Wallet, Gift, Bell, S
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PublicHeader } from "@/components/layout/PublicHeader";
+import { InstallBanner } from "@/components/pwa/InstallBanner";
 
 const FEATURES = [
   { icon: Calendar, title: "Instant Booking", desc: "Book your favourite salon in under 30 seconds." },
