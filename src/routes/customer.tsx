@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createFileRoute, Link, Outlet, redirect, useNavigate } from "@tanstack/react-router";
-import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
+import { CustomerBottomNav } from "@/components/pwa/CustomerBottomNav";
 import { LocationPermissionModal } from "@/components/auth/LocationPermissionModal";
 import { BackButton } from "@/components/shared/BackButton";
 import { ViewSwitcher } from "@/components/layout/ViewSwitcher";
@@ -159,7 +159,7 @@ function CustomerLayout() {
         </div>
         <Outlet />
       </div>
-      <MobileBottomNav />
+      <CustomerBottomNav />
       <LocationPermissionModal />
 
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
