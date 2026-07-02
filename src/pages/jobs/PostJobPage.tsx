@@ -452,14 +452,13 @@ export function PostJobPage() {
         </button>
         {step < STEPS.length - 1 ? (
           <button
-
             type="button"
-            onClick={() => canContinue && setStep((s) => s + 1)}
-            disabled={!canContinue}
-            className="bg-gradient-cta text-primary-foreground flex-1 rounded-[var(--radius-button)] px-4 py-2.5 text-sm font-bold disabled:opacity-60"
+            onClick={tryContinue}
+            className="bg-gradient-cta text-primary-foreground flex-1 rounded-[var(--radius-button)] px-4 py-2.5 text-sm font-bold"
           >
             Continue
           </button>
+
         ) : (
           <button
             type="button"
