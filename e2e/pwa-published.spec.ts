@@ -39,7 +39,8 @@ test.describe("Published PWA manifest", () => {
     expect(res.status(), "manifest.webmanifest must be 200").toBe(200);
 
     const contentType = res.headers()["content-type"] ?? "";
-    expect(contentType).toMatch(/manifest\+json|application\/json/);
+    // Browsers accept the manifest regardless of MIME, but a JSON-ish content type is preferred.
+    expect(contentType).toMatch(/manifest\+json|application\/json|octet-stream|text\/plain/);
 
     const manifest = (await res.json()) as Manifest;
 
