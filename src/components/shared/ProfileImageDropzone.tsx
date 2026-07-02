@@ -197,7 +197,20 @@ export function ProfileImageDropzone({
         </div>
       )}
 
-      {error && <p className="text-destructive text-xs">{error}</p>}
+      {error && (
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="text-destructive flex-1 text-xs">{error}</p>
+          {canRetry && onRetry && !busy && (
+            <button
+              type="button"
+              onClick={onRetry}
+              className="border-border hover:bg-accent inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-semibold"
+            >
+              Retry
+            </button>
+          )}
+        </div>
+      )}
 
       <input
         ref={inputRef}
