@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { PublicHeader } from "@/components/layout/PublicHeader";
+import { CustomerAppHeader } from "@/components/pwa/CustomerAppHeader";
 import { toast } from "sonner";
 
 const BENEFITS = [
@@ -233,7 +233,7 @@ export default function CustomerAppPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <PublicHeader />
+      <CustomerAppHeader />
       <main className="mx-auto max-w-6xl px-4 py-12 md:py-20">
         {/* Hero */}
         <section className="grid gap-10 md:grid-cols-2 md:items-center">
