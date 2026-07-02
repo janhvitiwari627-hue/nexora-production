@@ -7,9 +7,10 @@
  *   - skipWaiting only when the page explicitly asks (user-approved refresh),
  *     so we never force-reload mid-session with a stale mismatch.
  */
-const VERSION = "nexora-v2";
+const VERSION = "nexora-v3";
 const PRECACHE = `${VERSION}-precache`;
 const RUNTIME = `${VERSION}-runtime`;
+const PAGES = `${VERSION}-pages`;
 
 const PRECACHE_URLS = [
   "/offline.html",
