@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Smartphone, MapPin, Tag, UserCheck, Zap, MessageCircle, QrCode, Gift, History, Download, ExternalLink, Apple, Play, Share, Plus, MoreVertical, Chrome, Info } from "lucide-react";
+import { Smartphone, MapPin, Tag, UserCheck, Zap, MessageCircle, QrCode, Gift, History, Download, ExternalLink, Apple, Play, Share, Plus, MoreVertical, Chrome, Info, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -42,14 +42,28 @@ function isChromium() {
   return /Chrome|CriOS|Edg|Brave|OPR/.test(ua);
 }
 
+const SESSION_DISMISS_KEY = "nexora_pwa_install_dismissed_session";
+const INSTALLED_KEY = "nexora_pwa_installed";
+
 export default function CustomerAppPage() {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
   const [platform, setPlatform] = useState<Platform>("desktop");
   const [showGuide, setShowGuide] = useState(false);
 
   useEffect(() => {
     setPlatform(detectPlatform());
+
+    // Persistent install flag from any prior session.
+    if (typeof localStorage !== "undefined" && localStorage.getItem(INSTALLED_KEY)) {
+      setInstalled(true);
+    }
+    // Session-scoped dismissal.
+    if (typeof sessionStorage !== "undefined" && sessionStorage.getItem(SESSION_DISMISS_KEY)) {
+      setDismissed(true);
+    }
+
     const onPrompt = (e: Event) => {
       e.preventDefault();
       setDeferred(e as BeforeInstallPromptEvent);
@@ -57,6 +71,7 @@ export default function CustomerAppPage() {
     const onInstalled = () => {
       setInstalled(true);
       setDeferred(null);
+      try { localStorage.setItem(INSTALLED_KEY, "1"); } catch { /* ignore */ }
     };
     window.addEventListener("beforeinstallprompt", onPrompt);
     window.addEventListener("appinstalled", onInstalled);
@@ -71,7 +86,14 @@ export default function CustomerAppPage() {
     if (deferred) {
       await deferred.prompt();
       const { outcome } = await deferred.userChoice;
-      if (outcome === "accepted") setInstalled(true);
+      if (outcome === "accepted") {
+        setInstalled(true);
+        try { localStorage.setItem(INSTALLED_KEY, "1"); } catch { /* ignore */ }
+      } else {
+        // User dismissed the native prompt — respect that for the session.
+        setDismissed(true);
+        try { sessionStorage.setItem(SESSION_DISMISS_KEY, "1"); } catch { /* ignore */ }
+      }
       setDeferred(null);
       return;
     }
@@ -88,8 +110,15 @@ export default function CustomerAppPage() {
     }
   };
 
+  const handleDismiss = () => {
+    setDismissed(true);
+    setShowGuide(false);
+    try { sessionStorage.setItem(SESSION_DISMISS_KEY, "1"); } catch { /* ignore */ }
+  };
+
+  const showInstallCTA = !installed && !dismissed;
+
   const installLabel =
-    installed ? "App Installed" :
     deferred ? "Install Nexora App" :
     platform === "ios" ? "Show iOS Install Steps" :
     platform === "android" ? "Show Android Install Steps" :
@@ -113,10 +142,22 @@ export default function CustomerAppPage() {
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
-              <Button size="lg" onClick={handleInstall} disabled={installed}>
-                <Download className="mr-2 h-4 w-4" />
-                {installLabel}
-              </Button>
+              {showInstallCTA && (
+                <>
+                  <Button size="lg" onClick={handleInstall}>
+                    <Download className="mr-2 h-4 w-4" />
+                    {installLabel}
+                  </Button>
+                  <Button size="lg" variant="ghost" onClick={handleDismiss} aria-label="Dismiss install">
+                    <X className="mr-2 h-4 w-4" /> Not now
+                  </Button>
+                </>
+              )}
+              {installed && (
+                <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700">
+                  <Download className="h-4 w-4" /> App installed — open Nexora from your home screen
+                </div>
+              )}
               <Button size="lg" variant="outline" asChild>
                 <Link to="/search">
                   Continue in Browser <ExternalLink className="ml-2 h-4 w-4" />
@@ -124,7 +165,7 @@ export default function CustomerAppPage() {
               </Button>
             </div>
 
-            {!deferred && !installed && (
+            {showInstallCTA && !deferred && (
               <p className="mt-3 text-sm text-muted-foreground">
                 {platform === "ios" && (<>On iPhone/iPad: open in <b>Safari</b>, tap <Share className="inline h-3.5 w-3.5" /> Share, then <b>Add to Home Screen</b>.</>)}
                 {platform === "android" && (<>On Android: open in <b>Chrome</b>, tap <MoreVertical className="inline h-3.5 w-3.5" />, then <b>Install app</b> / <b>Add to Home screen</b>.</>)}
@@ -132,7 +173,7 @@ export default function CustomerAppPage() {
               </p>
             )}
 
-            {showGuide && !deferred && !installed && (
+            {showGuide && showInstallCTA && !deferred && (
               <Alert className="mt-4">
                 <Info className="h-4 w-4" />
                 <AlertTitle>
