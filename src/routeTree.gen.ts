@@ -29,6 +29,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as JobsRouteImport } from './routes/jobs'
 import { Route as HireRouteImport } from './routes/hire'
 import { Route as HelpRouteImport } from './routes/help'
+import { Route as GrowthPartnerRouteImport } from './routes/growth-partner'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ForOwnersRouteImport } from './routes/for-owners'
 import { Route as DownloadAppRouteImport } from './routes/download-app'
@@ -237,6 +238,11 @@ const HireRoute = HireRouteImport.update({
 const HelpRoute = HelpRouteImport.update({
   id: '/help',
   path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GrowthPartnerRoute = GrowthPartnerRouteImport.update({
+  id: '/growth-partner',
+  path: '/growth-partner',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
@@ -807,6 +813,7 @@ export interface FileRoutesByFullPath {
   '/download-app': typeof DownloadAppRoute
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/growth-partner': typeof GrowthPartnerRoute
   '/help': typeof HelpRoute
   '/hire': typeof HireRouteWithChildren
   '/jobs': typeof JobsRouteWithChildren
@@ -937,6 +944,7 @@ export interface FileRoutesByTo {
   '/download-app': typeof DownloadAppRoute
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/growth-partner': typeof GrowthPartnerRoute
   '/help': typeof HelpRoute
   '/hire': typeof HireRouteWithChildren
   '/jobs': typeof JobsRouteWithChildren
@@ -1067,6 +1075,7 @@ export interface FileRoutesById {
   '/download-app': typeof DownloadAppRoute
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/growth-partner': typeof GrowthPartnerRoute
   '/help': typeof HelpRoute
   '/hire': typeof HireRouteWithChildren
   '/jobs': typeof JobsRouteWithChildren
@@ -1200,6 +1209,7 @@ export interface FileRouteTypes {
     | '/download-app'
     | '/for-owners'
     | '/forgot-password'
+    | '/growth-partner'
     | '/help'
     | '/hire'
     | '/jobs'
@@ -1330,6 +1340,7 @@ export interface FileRouteTypes {
     | '/download-app'
     | '/for-owners'
     | '/forgot-password'
+    | '/growth-partner'
     | '/help'
     | '/hire'
     | '/jobs'
@@ -1459,6 +1470,7 @@ export interface FileRouteTypes {
     | '/download-app'
     | '/for-owners'
     | '/forgot-password'
+    | '/growth-partner'
     | '/help'
     | '/hire'
     | '/jobs'
@@ -1591,6 +1603,7 @@ export interface RootRouteChildren {
   DownloadAppRoute: typeof DownloadAppRoute
   ForOwnersRoute: typeof ForOwnersRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  GrowthPartnerRoute: typeof GrowthPartnerRoute
   HelpRoute: typeof HelpRoute
   HireRoute: typeof HireRouteWithChildren
   JobsRoute: typeof JobsRouteWithChildren
@@ -1787,6 +1800,13 @@ declare module '@tanstack/react-router' {
       path: '/help'
       fullPath: '/help'
       preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/growth-partner': {
+      id: '/growth-partner'
+      path: '/growth-partner'
+      fullPath: '/growth-partner'
+      preLoaderRoute: typeof GrowthPartnerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forgot-password': {
@@ -2785,6 +2805,7 @@ const rootRouteChildren: RootRouteChildren = {
   DownloadAppRoute: DownloadAppRoute,
   ForOwnersRoute: ForOwnersRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  GrowthPartnerRoute: GrowthPartnerRoute,
   HelpRoute: HelpRoute,
   HireRoute: HireRouteWithChildren,
   JobsRoute: JobsRouteWithChildren,
