@@ -338,7 +338,7 @@ export default function CustomerAppPage() {
                 </div>
               )}
               <Button size="lg" variant="outline" asChild>
-                <Link to="/search">
+                <Link to="/customer/home">
                   Continue in Browser <ExternalLink className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
