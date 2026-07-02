@@ -66,7 +66,36 @@ async function ensureProfileExists(user: User) {
   return loadProfileAndRoles(user.id);
 }
 
-export const useAuthStore = create<AuthStore>((set, get) => ({
+export const useAuthStore = create<AuthStore>((set, get) => {
+  const loadSessionAndProfile = async () => {
+    let session: Session | null = null;
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        const lower = error.message.toLowerCase();
+        if (lower.includes("refresh token") || lower.includes("invalid") || lower.includes("expired")) {
+          await supabase.auth.signOut({ scope: "local" }).catch(() => {});
+          session = null;
+        } else {
+          throw error;
+        }
+      } else {
+        session = data.session;
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Failed to reach authentication service";
+      throw new Error(msg);
+    }
+
+    if (session?.user) {
+      const { profile, roles } = await ensureProfileExists(session.user);
+      set({ session, user: session.user, profile, roles, role: roles[0] ?? null });
+    } else {
+      set({ session: null, user: null, profile: null, roles: [], role: null });
+    }
+  };
+
+  return ({
   user: null,
   profile: null,
   session: null,
@@ -74,6 +103,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   roles: [],
   isLoading: true,
   isInitialized: false,
+  initError: null,
 
   setUser: (user) => set({ user }),
   setProfile: (profile) => set({ profile }),
