@@ -72,7 +72,7 @@ type Form = Required<
 
 const EMPTY: Form = {
   title: "",
-  category: CATEGORIES[0],
+  category: "",
   description: "",
   job_type: JOB_TYPES[0],
   experience_level: EXPERIENCE[0],
@@ -86,6 +86,7 @@ const EMPTY: Form = {
   benefits: [],
   requirements: "",
   skills: [],
+  openings: 1,
 };
 
 const DRAFT_STORAGE_KEY = "nexora:postJobWizard:v1";
