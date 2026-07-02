@@ -2174,14 +2174,41 @@ function SalaryStep({
         ? "border-transparent bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
         : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
     );
-  const selectRange = (r: (typeof MONTHLY_SALARY_RANGES)[number]) => {
+  const selectRange = (
+    r: { label: string; min: number; max: number | null },
+    period: JobDraftInput["salary_period"],
+  ) => {
     update({
       salary_range_preset: r.label,
       salary_min: r.min,
       salary_max: r.max,
-      salary_period: "monthly",
+      salary_period: period,
     });
   };
+  const rangeSetFor = (
+    type: string | undefined,
+  ): { label: string; min: number; max: number | null }[] | null => {
+    if (type === "Monthly salary") return MONTHLY_SALARY_RANGES;
+    if (type === "Daily pay") return DAILY_PAY_RANGES;
+    if (type === "Hourly pay") return HOURLY_PAY_RANGES;
+    if (type === "Fixed + commission") return FIXED_COMMISSION_RANGES;
+    return null;
+  };
+  const periodFor = (type: string | undefined): JobDraftInput["salary_period"] => {
+    if (type === "Daily pay") return "daily" as JobDraftInput["salary_period"];
+    if (type === "Hourly pay") return "hourly";
+    return "monthly";
+  };
+  const rangeLabelFor = (type: string | undefined) => {
+    if (type === "Monthly salary") return "Monthly salary range";
+    if (type === "Daily pay") return "Daily pay range";
+    if (type === "Hourly pay") return "Hourly pay range";
+    if (type === "Fixed + commission") return "Fixed salary + commission";
+    return "";
+  };
+  const customLabelFor = (type: string | undefined) =>
+    type === "Fixed + commission" ? "Custom fixed salary" : "Custom amount";
+  const activeRanges = rangeSetFor(form.salary_type);
   return (
     <div className="space-y-4">
       <h2 className="text-heading text-xl font-bold">Salary & benefits</h2>
