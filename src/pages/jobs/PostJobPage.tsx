@@ -46,7 +46,12 @@ const EXPERIENCE = [
   "2–4 years",
   "4–6 years",
   "6+ years",
+  "Experience flexible",
 ];
+const FLEXIBLE_EXPERIENCE_VALUE = "flexible";
+const experienceValueFor = (label: string) =>
+  label === "Experience flexible" ? FLEXIBLE_EXPERIENCE_VALUE : label;
+
 const PERIODS: { label: string; value: JobDraftInput["salary_period"] }[] = [
   { label: "per month", value: "monthly" },
   { label: "per year", value: "yearly" },
@@ -1216,12 +1221,14 @@ function DetailsStep({
       <Field label="Experience required" hint="Choose the level that best matches this role.">
         <div className="flex flex-wrap gap-2">
           {EXPERIENCE.map((e) => {
-            const active = (form.experience_level ?? EXPERIENCE[0]) === e;
+            const value = experienceValueFor(e);
+            const current = form.experience_level ?? experienceValueFor(EXPERIENCE[0]);
+            const active = current === value;
             return (
               <button
                 key={e}
                 type="button"
-                onClick={() => update({ experience_level: e })}
+                onClick={() => update({ experience_level: value })}
                 aria-pressed={active}
                 className={cn(
                   "rounded-full border px-4 py-1.5 text-xs font-bold transition",
@@ -1236,6 +1243,7 @@ function DetailsStep({
           })}
         </div>
       </Field>
+
       <Field
         label="Number of openings"
         hint="How many people are you hiring for this role? (1–50)"
