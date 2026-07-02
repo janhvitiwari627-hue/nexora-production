@@ -1,6 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { Smartphone, MapPin, Tag, UserCheck, Zap, MessageCircle, QrCode, Gift, History, Download, ExternalLink, Apple, Play, Share, Plus, MoreVertical, Chrome, Info, X } from "lucide-react";
+import {
+  initInstallPromptCapture,
+  subscribeInstallPrompt,
+  clearInstallPrompt,
+  type BeforeInstallPromptEvent as GlobalBIP,
+} from "@/lib/pwa-install";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
