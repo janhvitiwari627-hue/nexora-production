@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Camera, Check, ChevronsUpDown, Loader2, Upload } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { PROFILE } from "./mockSettings";
 import { INDIAN_STATES, getDistricts, getBlocks } from "./indiaGeo";
@@ -8,6 +8,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
+import { ProfileImageUpload } from "@/components/shared/ProfileImageUpload";
 
 function slugifyUsername(name: string) {
   return name
@@ -21,7 +22,6 @@ function slugifyUsername(name: string) {
 
 export function PersonalInfoPanel() {
   const { user, profile, refreshProfile } = useAuthStore();
-  const fileRef = useRef<HTMLInputElement>(null);
   const [avatar, setAvatar] = useState<string>(profile?.avatar_url || "");
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -67,15 +67,9 @@ export function PersonalInfoPanel() {
     }));
   }
 
-  async function handleAvatar(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0];
-    if (!f) return;
+  async function handleAvatarFile(f: File) {
     if (!user) {
       toast.error("Please sign in to upload a photo");
-      return;
-    }
-    if (f.size > 5 * 1024 * 1024) {
-      toast.error("Image must be under 5 MB");
       return;
     }
     setUploading(true);
@@ -109,6 +103,25 @@ export function PersonalInfoPanel() {
       setUploading(false);
     }
   }
+
+  async function handleAvatarRemove() {
+    if (!user) return;
+    const previous = avatar;
+    setAvatar("");
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ avatar_url: null })
+        .eq("id", user.id);
+      if (error) throw error;
+      await refreshProfile();
+      toast.success("Profile photo removed");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to remove photo");
+      setAvatar(previous);
+    }
+  }
+
 
   function handlePincode(e: React.ChangeEvent<HTMLInputElement>) {
     const raw = e.target.value.replace(/\D/g, "").slice(0, 6);
@@ -162,44 +175,14 @@ export function PersonalInfoPanel() {
 
   return (
     <PanelShell title="Personal information" subtitle="How you appear across Nexora.">
-      <div className="flex items-start gap-4">
-        <div className="relative">
-          <div className="bg-muted ring-border grid h-24 w-24 place-items-center overflow-hidden rounded-full ring-2">
-            {avatar ? (
-              <img src={avatar} alt="Avatar" className="h-full w-full object-cover" />
-            ) : (
-              <span className="text-heading text-2xl font-black">{initials}</span>
-            )}
-            {uploading && (
-              <div className="absolute inset-0 grid place-items-center rounded-full bg-black/40">
-                <Loader2 className="h-5 w-5 animate-spin text-white" />
-              </div>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={() => fileRef.current?.click()}
-            disabled={uploading}
-            className="bg-primary text-primary-foreground absolute -bottom-1 -right-1 grid h-8 w-8 place-items-center rounded-full shadow-md disabled:opacity-60"
-            aria-label="Upload avatar"
-          >
-            <Camera className="h-4 w-4" />
-          </button>
-          <input ref={fileRef} type="file" accept="image/*" onChange={handleAvatar} className="hidden" />
-        </div>
-        <div className="flex-1">
-          <p className="text-heading text-sm font-bold">Profile photo</p>
-          <p className="text-muted-foreground text-xs">JPG or PNG, max 5 MB. We'll auto-crop to a circle.</p>
-          <button
-            type="button"
-            onClick={() => fileRef.current?.click()}
-            disabled={uploading}
-            className="border-border hover:bg-accent mt-2 inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-semibold disabled:opacity-60"
-          >
-            <Upload className="h-3.5 w-3.5" /> {uploading ? "Uploading…" : "Upload new"}
-          </button>
-        </div>
-      </div>
+      <ProfileImageUpload
+        value={avatar}
+        onFile={handleAvatarFile}
+        onRemove={handleAvatarRemove}
+        fallback={initials}
+        uploading={uploading}
+        maxSizeMB={5}
+      />
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <Field label="Full name">
