@@ -21,30 +21,32 @@ if (existsSync(FILE)) {
   );
 }
 
+const INCLUDE_GLOBS = ["src", "app"].filter((d) => existsSync(d));
 const EXCLUDES = [
   "--glob=!**/node_modules/**",
   "--glob=!**/dist/**",
   "--glob=!**/.output/**",
   "--glob=!**/.vinxi/**",
   "--glob=!**/routeTree.gen.ts",
-  "--glob=!scripts/check-pwa-standalone-guard.mjs",
 ];
 
-try {
-  const out = execSync(
-    `rg -n --no-heading -S ${EXCLUDES.map((e) => `'${e}'`).join(" ")} -- '${TERM}' .`,
-    { stdio: ["ignore", "pipe", "pipe"] },
-  ).toString();
-  if (out.trim()) {
-    errors.push(
-      `Found stale reference(s) to \`${TERM}\` (module was deleted):\n${out}`,
-    );
-  }
-} catch (err) {
-  // rg exits 1 when no matches — success.
-  if (err.status && err.status !== 1) {
-    console.error(`[pwa-standalone-guard] scan error:`, err.message);
-    process.exit(2);
+if (INCLUDE_GLOBS.length > 0) {
+  try {
+    const out = execSync(
+      `rg -n --no-heading -S ${EXCLUDES.map((e) => `'${e}'`).join(" ")} -- '${TERM}' ${INCLUDE_GLOBS.join(" ")}`,
+      { stdio: ["ignore", "pipe", "pipe"] },
+    ).toString();
+    if (out.trim()) {
+      errors.push(
+        `Found stale reference(s) to \`${TERM}\` in source (module was deleted):\n${out}`,
+      );
+    }
+  } catch (err) {
+    // rg exits 1 when no matches — success.
+    if (err.status && err.status !== 1) {
+      console.error(`[pwa-standalone-guard] scan error:`, err.message);
+      process.exit(2);
+    }
   }
 }
 
