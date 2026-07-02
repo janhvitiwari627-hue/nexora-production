@@ -120,6 +120,31 @@ const PERIODS: { label: string; value: JobDraftInput["salary_period"] }[] = [
   { label: "per year", value: "yearly" },
   { label: "per hour", value: "hourly" },
 ];
+
+const JOINING_OPTIONS = [
+  "Immediately",
+  "Within 7 days",
+  "Within 15 days",
+  "Within 30 days",
+  "Flexible",
+];
+
+const SALARY_TYPES = [
+  "Monthly salary",
+  "Daily pay",
+  "Hourly pay",
+  "Per service / commission",
+  "Fixed + commission",
+  "Negotiable",
+];
+
+const MONTHLY_SALARY_RANGES: { label: string; min: number; max: number | null }[] = [
+  { label: "₹8,000 – ₹12,000", min: 8000, max: 12000 },
+  { label: "₹12,000 – ₹18,000", min: 12000, max: 18000 },
+  { label: "₹18,000 – ₹25,000", min: 18000, max: 25000 },
+  { label: "₹25,000 – ₹35,000", min: 25000, max: 35000 },
+  { label: "₹35,000+", min: 35000, max: null },
+];
 const BENEFITS = [
   "PF & ESI",
   "Health insurance",
@@ -477,6 +502,9 @@ type UiOnlyFields = {
   start_time?: string;
   end_time?: string;
   flexible_schedule?: boolean;
+  joining_availability?: string;
+  salary_type?: string;
+  salary_range_preset?: string;
 };
 
 type Form = Required<
@@ -515,6 +543,9 @@ const EMPTY: Form = {
   start_time: "",
   end_time: "",
   flexible_schedule: false,
+  joining_availability: "",
+  salary_type: "",
+  salary_range_preset: "",
 };
 
 const DRAFT_STORAGE_KEY = "nexora:postJobWizard:v1";
@@ -726,9 +757,13 @@ export function PostJobPage() {
         start_time: _st,
         end_time: _et,
         flexible_schedule: _fs,
+        joining_availability: _ja,
+        salary_type: _sty,
+        salary_range_preset: _srp,
         ...dbForm
       } = form;
       void _bt; void _dp; void _cd; void _hp; void _st; void _et; void _fs;
+      void _ja; void _sty; void _srp;
       const cleaned: JobDraftInput = {
         ...dbForm,
         area: dbForm.area || null,
@@ -1880,6 +1915,25 @@ function LocationStep({
         )}
       </Field>
 
+      <Field label="Joining availability">
+        <div className="flex flex-wrap gap-2">
+          {JOINING_OPTIONS.map((j) => {
+            const active = form.joining_availability === j;
+            return (
+              <button
+                key={j}
+                type="button"
+                onClick={() => update({ joining_availability: j })}
+                aria-pressed={active}
+                className={chipCls(active)}
+              >
+                {j}
+              </button>
+            );
+          })}
+        </div>
+      </Field>
+
       <div className="mt-2 border-t border-border pt-4">
         <h3 className="text-heading mb-3 text-sm font-bold uppercase tracking-wide text-muted-foreground">
           Contact details
@@ -1929,10 +1983,75 @@ function SalaryStep({
   update: (p: Partial<Form>) => void;
   errors: FormErrors;
 }) {
+  const chipCls = (active: boolean) =>
+    cn(
+      "rounded-full border px-4 py-1.5 text-xs font-bold transition",
+      active
+        ? "border-transparent bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
+        : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
+    );
+  const selectRange = (r: (typeof MONTHLY_SALARY_RANGES)[number]) => {
+    update({
+      salary_range_preset: r.label,
+      salary_min: r.min,
+      salary_max: r.max,
+      salary_period: "monthly",
+    });
+  };
   return (
     <div className="space-y-4">
       <h2 className="text-heading text-xl font-bold">Salary & benefits</h2>
+
+      <Field label="Salary type">
+        <div className="flex flex-wrap gap-2">
+          {SALARY_TYPES.map((s) => {
+            const active = form.salary_type === s;
+            return (
+              <button
+                key={s}
+                type="button"
+                onClick={() => update({ salary_type: s })}
+                aria-pressed={active}
+                className={chipCls(active)}
+              >
+                {s}
+              </button>
+            );
+          })}
+        </div>
+      </Field>
+
+      {form.salary_type === "Monthly salary" && (
+        <Field label="Monthly salary range">
+          <div className="flex flex-wrap gap-2">
+            {MONTHLY_SALARY_RANGES.map((r) => {
+              const active = form.salary_range_preset === r.label;
+              return (
+                <button
+                  key={r.label}
+                  type="button"
+                  onClick={() => selectRange(r)}
+                  aria-pressed={active}
+                  className={chipCls(active)}
+                >
+                  {r.label}
+                </button>
+              );
+            })}
+            <button
+              type="button"
+              onClick={() => update({ salary_range_preset: "Custom amount" })}
+              aria-pressed={form.salary_range_preset === "Custom amount"}
+              className={chipCls(form.salary_range_preset === "Custom amount")}
+            >
+              Custom amount
+            </button>
+          </div>
+        </Field>
+      )}
+
       <div className="grid gap-4 md:grid-cols-3">
+
         <Field label="Min" error={errors.salary_min}>
           <input
             type="number"
