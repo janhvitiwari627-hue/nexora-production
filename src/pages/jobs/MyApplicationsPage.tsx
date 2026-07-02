@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Briefcase, MapPin } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Briefcase, MapPin, Clock, Search, RefreshCw } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 import { listMyApplications, type JobApplication } from "@/lib/jobs";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
@@ -14,16 +15,65 @@ const STATUS_TONE: Record<string, string> = {
   shortlisted: "bg-emerald-100 text-emerald-900",
   rejected: "bg-rose-100 text-rose-900",
   hired: "bg-violet-100 text-violet-900",
+  withdrawn: "bg-muted text-foreground",
 };
+
+const STATUS_LABEL: Record<string, string> = {
+  submitted: "Submitted",
+  reviewed: "Reviewed",
+  shortlisted: "Shortlisted",
+  rejected: "Rejected",
+  hired: "Hired",
+  withdrawn: "Withdrawn",
+};
+
+const FILTERS: Array<{ key: string; label: string }> = [
+  { key: "all", label: "All" },
+  { key: "submitted", label: "Submitted" },
+  { key: "reviewed", label: "Reviewed" },
+  { key: "shortlisted", label: "Shortlisted" },
+  { key: "hired", label: "Hired" },
+  { key: "rejected", label: "Rejected" },
+];
+
+function fmtDateTime(iso: string) {
+  const d = new Date(iso);
+  return d.toLocaleString(undefined, {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function relative(iso: string) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return `${days}d ago`;
+  const weeks = Math.floor(days / 7);
+  if (weeks < 5) return `${weeks}w ago`;
+  const months = Math.floor(days / 30);
+  return `${months}mo ago`;
+}
 
 export function MyApplicationsPage() {
   const { user, isInitialized } = useAuthStore();
   const [apps, setApps] = useState<JobApplication[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [refreshTick, setRefreshTick] = useState(0);
+  const [filter, setFilter] = useState<string>("all");
+  const [q, setQ] = useState("");
 
   useEffect(() => {
     if (!isInitialized || !user) return;
     let alive = true;
+    setError(null);
     listMyApplications(user.id)
       .then((rows) => {
         if (alive) setApps(rows);
@@ -34,13 +84,39 @@ export function MyApplicationsPage() {
     return () => {
       alive = false;
     };
-  }, [isInitialized, user]);
+  }, [isInitialized, user, refreshTick]);
+
+  const counts = useMemo(() => {
+    const c: Record<string, number> = { all: apps?.length ?? 0 };
+    for (const a of apps ?? []) c[a.status] = (c[a.status] ?? 0) + 1;
+    return c;
+  }, [apps]);
+
+  const filtered = useMemo(() => {
+    if (!apps) return null;
+    const needle = q.trim().toLowerCase();
+    return apps.filter((a) => {
+      if (filter !== "all" && a.status !== filter) return false;
+      if (!needle) return true;
+      const hay = [
+        a.job?.title,
+        a.job?.employer?.business_name,
+        a.job?.city,
+        a.job?.area,
+        a.job?.job_type,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return hay.includes(needle);
+    });
+  }, [apps, filter, q]);
 
   if (!isInitialized) {
     return (
       <>
         <PublicPageHeader />
-        <div className="mx-auto max-w-4xl p-6 text-sm text-muted-foreground">Loading…</div>
+        <div className="text-muted-foreground mx-auto max-w-5xl p-6 text-sm">Loading…</div>
       </>
     );
   }
@@ -49,7 +125,7 @@ export function MyApplicationsPage() {
     return (
       <>
         <PublicPageHeader />
-        <div className="mx-auto max-w-4xl space-y-4 p-6">
+        <div className="mx-auto max-w-5xl space-y-4 p-6">
           <h1 className="text-heading text-2xl font-bold">My Applications</h1>
           <p className="text-muted-foreground text-sm">Sign in to view your applications.</p>
           <Button asChild>
@@ -63,18 +139,55 @@ export function MyApplicationsPage() {
   return (
     <>
       <PublicPageHeader />
-      <div className="mx-auto max-w-4xl space-y-6 p-6">
-        <header className="flex items-center justify-between">
+      <div className="mx-auto max-w-5xl space-y-6 p-4 sm:p-6">
+        <header className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h1 className="text-heading text-2xl font-bold">My Applications</h1>
             <p className="text-muted-foreground text-sm">
-              Track jobs you have applied to and their status.
+              Track every role you have applied to, with live status and timestamps.
             </p>
           </div>
-          <Button asChild variant="outline">
-            <Link to="/jobs">Browse jobs</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setRefreshTick((t) => t + 1)}
+              aria-label="Refresh"
+            >
+              <RefreshCw className="mr-2 h-4 w-4" /> Refresh
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/jobs">Browse jobs</Link>
+            </Button>
+          </div>
         </header>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {FILTERS.map((f) => (
+            <button
+              key={f.key}
+              type="button"
+              onClick={() => setFilter(f.key)}
+              className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                filter === f.key
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-background hover:bg-muted"
+              }`}
+            >
+              {f.label}
+              <span className="ml-1.5 opacity-70">{counts[f.key] ?? 0}</span>
+            </button>
+          ))}
+          <div className="relative ml-auto w-full max-w-xs">
+            <Search className="text-muted-foreground pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2" />
+            <Input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search title, employer, city…"
+              className="pl-8"
+            />
+          </div>
+        </div>
 
         {error && (
           <Card>
@@ -82,11 +195,11 @@ export function MyApplicationsPage() {
           </Card>
         )}
 
-        {apps === null && !error && (
+        {!error && apps === null && (
           <div className="text-muted-foreground text-sm">Loading applications…</div>
         )}
 
-        {apps && apps.length === 0 && (
+        {!error && apps && apps.length === 0 && (
           <Card>
             <CardContent className="space-y-3 p-8 text-center">
               <p className="text-muted-foreground">You have not applied to any jobs yet.</p>
@@ -97,21 +210,35 @@ export function MyApplicationsPage() {
           </Card>
         )}
 
-        {apps && apps.length > 0 && (
+        {!error && filtered && apps && apps.length > 0 && filtered.length === 0 && (
+          <Card>
+            <CardContent className="text-muted-foreground p-6 text-sm">
+              No applications match your filter.
+            </CardContent>
+          </Card>
+        )}
+
+        {!error && filtered && filtered.length > 0 && (
           <ul className="space-y-3">
-            {apps.map((a) => {
+            {filtered.map((a) => {
               const j = a.job;
               const title = j?.title ?? "Job";
               const biz = j?.employer?.business_name ?? "Employer";
               const loc = j ? `${j.area ? `${j.area}, ` : ""}${j.city}` : "";
+              const updated = a.updated_at && a.updated_at !== a.created_at;
               return (
                 <li key={a.id}>
                   <Card>
-                    <CardContent className="flex flex-wrap items-start justify-between gap-3 p-5">
-                      <div className="space-y-1">
-                        <div className="font-semibold">{title}</div>
+                    <CardContent className="flex flex-wrap items-start justify-between gap-4 p-5">
+                      <div className="min-w-0 flex-1 space-y-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <div className="text-heading font-semibold">{title}</div>
+                          <Badge className={STATUS_TONE[a.status] ?? "bg-muted"}>
+                            {STATUS_LABEL[a.status] ?? a.status.replace(/_/g, " ")}
+                          </Badge>
+                        </div>
                         <div className="text-muted-foreground text-sm">{biz}</div>
-                        <div className="text-muted-foreground flex flex-wrap gap-3 text-xs">
+                        <div className="text-muted-foreground flex flex-wrap gap-x-4 gap-y-1 text-xs">
                           {j?.job_type && (
                             <span className="inline-flex items-center gap-1">
                               <Briefcase className="h-3 w-3" />
@@ -124,15 +251,26 @@ export function MyApplicationsPage() {
                               {loc}
                             </span>
                           )}
-                          <span>
-                            Applied {new Date(a.created_at).toLocaleDateString()}
+                          <span
+                            className="inline-flex items-center gap-1"
+                            title={fmtDateTime(a.created_at)}
+                          >
+                            <Clock className="h-3 w-3" />
+                            Applied {relative(a.created_at)}
                           </span>
+                          {updated && (
+                            <span title={fmtDateTime(a.updated_at)}>
+                              Updated {relative(a.updated_at)}
+                            </span>
+                          )}
                         </div>
+                        {a.cover_note && (
+                          <p className="text-muted-foreground line-clamp-2 border-l-2 border-border pl-3 text-xs italic">
+                            {a.cover_note}
+                          </p>
+                        )}
                       </div>
                       <div className="flex flex-col items-end gap-2">
-                        <Badge className={STATUS_TONE[a.status] ?? "bg-muted"}>
-                          {a.status.replace(/_/g, " ")}
-                        </Badge>
                         {j && (
                           <Button asChild size="sm" variant="outline">
                             <Link to="/jobs/$jobId" params={{ jobId: j.id }}>
