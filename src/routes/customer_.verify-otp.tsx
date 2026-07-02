@@ -8,10 +8,18 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { isSmsProviderConfigError, SmsNotConfiguredAlert } from "@/lib/sms-provider-error";
 
+/**
+ * /customer/verify-otp — verifies the OTP for either channel:
+ *  - ?phone=+E164 → SMS OTP (type: "sms")
+ *  - ?email=addr  → Email OTP (type: "email")
+ * If SMS resend fails because the SMS provider isn't configured, the
+ * screen surfaces the same helpful config alert used on /customer/login.
+ */
 export const Route = createFileRoute("/customer_/verify-otp")({
   head: () => ({ meta: [{ title: "Verify OTP — Nexora Customer App" }] }),
   validateSearch: (s: Record<string, unknown>) => ({
     phone: typeof s.phone === "string" ? s.phone : "",
+    email: typeof s.email === "string" ? s.email : "",
   }),
   component: VerifyOtpPage,
 });
@@ -23,7 +31,9 @@ const otpSchema = z.object({
 const RESEND_SECONDS = 30;
 
 function VerifyOtpPage() {
-  const { phone } = Route.useSearch();
+  const { phone, email } = Route.useSearch();
+  const channel: "sms" | "email" = email ? "email" : "sms";
+  const destination = email || phone;
   const navigate = useNavigate();
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -45,44 +55,56 @@ function VerifyOtpPage() {
       setError(parsed.error.issues[0]?.message ?? "Invalid code");
       return;
     }
-    if (!phone) {
-      setError("Missing phone number. Please restart sign in.");
+    if (!destination) {
+      setError("Missing contact info. Please restart sign in.");
       return;
     }
     setSubmitting(true);
-    // `type: "sms"` matches the channel Supabase sent the code on. On success
-    // Supabase sets a session in localStorage; onAuthStateChange in
-    // __root.tsx picks it up and lets /customer/* pass its auth gate.
-    const { error: verifyError } = await supabase.auth.verifyOtp({
-      phone,
-      token: parsed.data.code,
-      type: "sms",
-    });
+    const { error: verifyError } =
+      channel === "email"
+        ? await supabase.auth.verifyOtp({
+            email: destination,
+            token: parsed.data.code,
+            type: "email",
+          })
+        : await supabase.auth.verifyOtp({
+            phone: destination,
+            token: parsed.data.code,
+            type: "sms",
+          });
     setSubmitting(false);
     if (verifyError) {
       setError(verifyError.message);
       toast.error("Verification failed", { description: verifyError.message });
       return;
     }
-    toast.success("Phone verified", { description: "Welcome to Nexora." });
+    toast.success(channel === "email" ? "Email verified" : "Phone verified", {
+      description: "Welcome to Nexora.",
+    });
     navigate({ to: "/customer/onboarding" });
   };
 
   const resend = async () => {
     if (resendIn > 0 || resending) return;
-    if (!phone) {
-      setError("Missing phone number. Please restart sign in.");
+    if (!destination) {
+      setError("Missing contact info. Please restart sign in.");
       return;
     }
     setSmsConfigError(null);
     setResending(true);
-    const { error: sendError } = await supabase.auth.signInWithOtp({
-      phone,
-      options: { channel: "sms" },
-    });
+    const { error: sendError } =
+      channel === "email"
+        ? await supabase.auth.signInWithOtp({
+            email: destination,
+            options: { shouldCreateUser: true },
+          })
+        : await supabase.auth.signInWithOtp({
+            phone: destination,
+            options: { channel: "sms" },
+          });
     setResending(false);
     if (sendError) {
-      if (isSmsProviderConfigError(sendError.message)) {
+      if (channel === "sms" && isSmsProviderConfigError(sendError.message)) {
         setSmsConfigError(sendError.message);
         return;
       }
@@ -90,16 +112,17 @@ function VerifyOtpPage() {
       return;
     }
     setResendIn(RESEND_SECONDS);
-    toast("New code sent", { description: `Sent to ${phone}` });
+    toast("New code sent", { description: `Sent to ${destination}` });
   };
-
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-6 px-6 py-10">
       <div className="text-center">
-        <h1 className="text-2xl font-bold">Verify your number</h1>
+        <h1 className="text-2xl font-bold">
+          {channel === "email" ? "Verify your email" : "Verify your number"}
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          We sent a 6-digit code to {phone || "your phone"}.
+          We sent a 6-digit code to {destination || (channel === "email" ? "your email" : "your phone")}.
         </p>
       </div>
       {smsConfigError && <SmsNotConfiguredAlert originalMessage={smsConfigError} />}
@@ -147,7 +170,7 @@ function VerifyOtpPage() {
         className="text-center text-xs text-muted-foreground underline"
         onClick={() => history.back()}
       >
-        Change number
+        {channel === "email" ? "Change email" : "Change number"}
       </button>
     </main>
   );
