@@ -244,3 +244,57 @@ export async function closeJobPost(jobId: string, userId: string): Promise<void>
     .eq("posted_by", userId);
   if (error) throw error;
 }
+
+export type CandidateProfile = {
+  id: string;
+  user_id: string;
+  full_name: string | null;
+  email: string | null;
+  phone: string | null;
+  city: string | null;
+  bio: string | null;
+  avatar_url: string | null;
+  skills: string[];
+  experience: any;
+  resume_url: string | null;
+  preferences: any;
+};
+
+export type ApplicationWithCandidate = JobApplication & {
+  candidate?: CandidateProfile | null;
+};
+
+export async function getJobForEmployer(jobId: string, userId: string): Promise<JobRow | null> {
+  const { data, error } = await table("jobs")
+    .select("*")
+    .eq("id", jobId)
+    .eq("posted_by", userId)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as JobRow | null) ?? null;
+}
+
+export async function listApplicationsForJob(jobId: string): Promise<ApplicationWithCandidate[]> {
+  const { data, error } = await table("job_applications")
+    .select("*")
+    .eq("job_id", jobId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  const apps = (data ?? []) as JobApplication[];
+  if (apps.length === 0) return [];
+  const ids = Array.from(new Set(apps.map((a) => a.applicant_id)));
+  const { data: profiles } = await table("candidate_profiles").select("*").in("user_id", ids);
+  const map = new Map<string, CandidateProfile>();
+  for (const p of (profiles ?? []) as CandidateProfile[]) map.set(p.user_id, p);
+  return apps.map((a) => ({ ...a, candidate: map.get(a.applicant_id) ?? null }));
+}
+
+export async function updateApplicationStatus(
+  applicationId: string,
+  status: "submitted" | "reviewed" | "shortlisted" | "rejected" | "hired",
+): Promise<void> {
+  const { error } = await table("job_applications")
+    .update({ status })
+    .eq("id", applicationId);
+  if (error) throw error;
+}
