@@ -515,7 +515,7 @@ function validateForm(form: Form): FormErrors {
   const title = form.title.trim();
   if (title.length === 0) errs.title = "Job title is required.";
   else if (title.length < 3) errs.title = "Job title must be at least 3 characters.";
-  else if (title.length > 100) errs.title = "Job title must be 100 characters or fewer.";
+  else if (title.length > 80) errs.title = "Job title must be 80 characters or fewer.";
 
   const desc = form.description.trim();
   if (desc.length === 0) errs.description = "Description is required.";
