@@ -260,13 +260,26 @@ export function JobPortalPage({ initialRole = "seeker" }: { initialRole?: "seeke
             </div>
           ) : (
             <div className="mt-8 text-center">
-              <button className="bg-gradient-cta text-primary-foreground rounded-[var(--radius-button)] px-6 py-3 text-sm font-bold shadow-[var(--shadow-glow)]">
+              <button
+                onClick={handlePostJob}
+                className="bg-gradient-cta text-primary-foreground rounded-[var(--radius-button)] px-6 py-3 text-sm font-bold shadow-[var(--shadow-glow)]"
+              >
                 Post a job free
               </button>
+              {!user && isInitialized && (
+                <p className="text-muted-foreground mt-3 text-xs">
+                  Create an employer account to post your beauty job for free.
+                </p>
+              )}
             </div>
           )}
         </div>
       </section>
+
+      <EmployerSetupModal
+        open={showEmployerModal}
+        onClose={() => setShowEmployerModal(false)}
+      />
 
       {/* Featured carousel */}
       <section className="mx-auto max-w-7xl px-4 py-12 md:px-6">
