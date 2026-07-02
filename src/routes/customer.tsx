@@ -49,7 +49,9 @@ export const Route = createFileRoute("/customer")({
       if (typeof window !== "undefined") {
         sessionStorage.setItem("nexora:postLoginRedirect", location.pathname);
       }
-      throw redirect({ to: "/login" });
+      // Unauthenticated customer-app visitors go to the customer login,
+      // never the public website login — keeps the app shell isolated.
+      throw redirect({ to: "/customer/login" });
     }
 
     // Roles + owner-linkage (approved salon_owner row also counts as owner).
