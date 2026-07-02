@@ -81,6 +81,7 @@ export type JobDraftInput = {
   benefits?: string[];
   requirements?: string | null;
   skills?: string[];
+  openings?: number;
 };
 
 export async function saveJob(params: {
