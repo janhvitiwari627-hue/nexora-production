@@ -262,11 +262,17 @@ export function MyApplicationsPage() {
           </Card>
         )}
 
-        {!error && apps === null && (
-          <div className="text-muted-foreground text-sm">Loading applications…</div>
+        {!error && (apps === null || isReloading) && (
+          <ul className="space-y-3" aria-busy="true" aria-live="polite">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <li key={i}>
+                <ApplicationSkeleton />
+              </li>
+            ))}
+          </ul>
         )}
 
-        {!error && apps && apps.length === 0 && (
+        {!error && !isReloading && apps && apps.length === 0 && (
           <Card>
             <CardContent className="space-y-3 p-8 text-center">
               <p className="text-muted-foreground">You have not applied to any jobs yet.</p>
@@ -277,7 +283,7 @@ export function MyApplicationsPage() {
           </Card>
         )}
 
-        {!error && filtered && apps && apps.length > 0 && filtered.length === 0 && (
+        {!error && !isReloading && filtered && apps && apps.length > 0 && filtered.length === 0 && (
           <Card>
             <CardContent className="text-muted-foreground p-6 text-sm">
               No applications match your filter.
@@ -285,7 +291,7 @@ export function MyApplicationsPage() {
           </Card>
         )}
 
-        {!error && visible && filtered && visible.length > 0 && (
+        {!error && !isReloading && visible && filtered && visible.length > 0 && (
           <>
             <ul className="space-y-3">
               {visible.map((a) => {
