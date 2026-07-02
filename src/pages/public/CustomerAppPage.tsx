@@ -96,8 +96,79 @@ export default function CustomerAppPage() {
     "Install Nexora App";
 
   return (
+    <div className="min-h-screen bg-background">
+      <PublicHeader />
+      <main className="mx-auto max-w-6xl px-4 py-12 md:py-20">
+        {/* Hero */}
+        <section className="grid gap-10 md:grid-cols-2 md:items-center">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border bg-muted/40 px-3 py-1 text-xs font-medium">
+              <Smartphone className="h-3.5 w-3.5" /> Customer App
+            </div>
+            <h1 className="mt-4 text-4xl font-bold tracking-tight md:text-5xl">
+              Nexora Customer App
+            </h1>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Nearby verified salons, transparent prices, 60-second booking and QR rewards.
+            </p>
 
-            {/* Store placeholders */}
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Button size="lg" onClick={handleInstall} disabled={installed}>
+                <Download className="mr-2 h-4 w-4" />
+                {installLabel}
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <Link to="/search">
+                  Continue in Browser <ExternalLink className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+
+            {!deferred && !installed && (
+              <p className="mt-3 text-sm text-muted-foreground">
+                {platform === "ios" && (<>On iPhone/iPad: open in <b>Safari</b>, tap <Share className="inline h-3.5 w-3.5" /> Share, then <b>Add to Home Screen</b>.</>)}
+                {platform === "android" && (<>On Android: open in <b>Chrome</b>, tap <MoreVertical className="inline h-3.5 w-3.5" />, then <b>Install app</b> / <b>Add to Home screen</b>.</>)}
+                {platform === "desktop" && (<>On desktop Chrome/Edge: click the <Download className="inline h-3.5 w-3.5" /> install icon in the address bar.</>)}
+              </p>
+            )}
+
+            {showGuide && !deferred && !installed && (
+              <Alert className="mt-4">
+                <Info className="h-4 w-4" />
+                <AlertTitle>
+                  {platform === "ios" ? "Install on iPhone / iPad (Safari)" :
+                   platform === "android" ? "Install on Android (Chrome)" :
+                   "Install on Desktop"}
+                </AlertTitle>
+                <AlertDescription>
+                  {platform === "ios" && (
+                    <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm">
+                      <li>Open <b>meripahalfasthelp.online/customer-app</b> in <b>Safari</b> (not Chrome).</li>
+                      <li>Tap the <Share className="inline h-3.5 w-3.5" /> <b>Share</b> button at the bottom.</li>
+                      <li>Scroll and tap <Plus className="inline h-3.5 w-3.5" /> <b>Add to Home Screen</b>.</li>
+                      <li>Tap <b>Add</b> in the top-right — Nexora appears on your home screen.</li>
+                    </ol>
+                  )}
+                  {platform === "android" && (
+                    <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm">
+                      <li>Open this page in <b>Chrome</b>.</li>
+                      <li>Tap the <MoreVertical className="inline h-3.5 w-3.5" /> menu (top-right).</li>
+                      <li>Tap <b>Install app</b> (or <b>Add to Home screen</b>).</li>
+                      <li>Confirm <b>Install</b> — Nexora is added to your app drawer.</li>
+                    </ol>
+                  )}
+                  {platform === "desktop" && (
+                    <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm">
+                      <li>Use <Chrome className="inline h-3.5 w-3.5" /> <b>Chrome</b>, <b>Edge</b> or <b>Brave</b>.</li>
+                      <li>Click the <Download className="inline h-3.5 w-3.5" /> install icon on the right of the address bar.</li>
+                      <li>Click <b>Install</b> in the popup — Nexora opens in its own window.</li>
+                    </ol>
+                  )}
+                </AlertDescription>
+              </Alert>
+            )}
+
+
             <div className="mt-6 flex flex-wrap gap-3">
               <Button variant="secondary" size="lg" disabled className="opacity-70">
                 <Play className="mr-2 h-4 w-4" /> Get it on Google Play
