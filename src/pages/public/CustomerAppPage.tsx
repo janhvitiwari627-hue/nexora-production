@@ -42,6 +42,26 @@ function isChromium() {
   return /Chrome|CriOS|Edg|Brave|OPR/.test(ua);
 }
 
+/**
+ * Chrome does not fire `beforeinstallprompt` inside iframes and
+ * Lovable's editor/preview URLs never serve the PWA install criteria.
+ * When the user clicks "Install" from inside one of these contexts we
+ * must explain that clearly instead of silently doing nothing.
+ */
+function isEmbeddedOrPreview() {
+  if (typeof window === "undefined") return false;
+  const inIframe = window.self !== window.top;
+  const host = window.location.hostname;
+  const isPreviewHost =
+    host.startsWith("id-preview--") ||
+    host.startsWith("preview--") ||
+    host.endsWith(".lovableproject.com") ||
+    host.endsWith(".lovableproject-dev.com") ||
+    host === "lovableproject.com" ||
+    host === "lovableproject-dev.com";
+  return inIframe || isPreviewHost;
+}
+
 const SESSION_DISMISS_KEY = "nexora_pwa_install_dismissed_session";
 const INSTALLED_KEY = "nexora_pwa_installed";
 
@@ -51,6 +71,7 @@ export default function CustomerAppPage() {
   const [dismissed, setDismissed] = useState(false);
   const [platform, setPlatform] = useState<Platform>("desktop");
   const [showGuide, setShowGuide] = useState(false);
+  const guideRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setPlatform(detectPlatform());
