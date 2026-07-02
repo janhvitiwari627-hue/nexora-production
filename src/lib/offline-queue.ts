@@ -55,7 +55,22 @@ function readAll(): QueueTask[] {
     const raw = s.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as QueueTask[];
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) return [];
+    // Purge succeeded tasks past their TTL.
+    const now = Date.now();
+    const kept = parsed.filter(
+      (t) =>
+        t.status !== "succeeded" ||
+        (t.completedAt ? now - t.completedAt < SUCCESS_TTL_MS : false),
+    );
+    if (kept.length !== parsed.length) {
+      try {
+        s.setItem(STORAGE_KEY, JSON.stringify(kept));
+      } catch {
+        // ignore
+      }
+    }
+    return kept;
   } catch {
     return [];
   }
