@@ -246,6 +246,20 @@ export default function CustomerAppPage() {
               Nearby verified salons, transparent prices, 60-second booking and QR rewards.
             </p>
 
+            {installed && (
+              <Alert className="mt-5 border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-100">
+                <Download className="h-4 w-4" />
+                <AlertTitle>Nexora is already installed</AlertTitle>
+                <AlertDescription>
+                  <p className="mt-1 text-sm">
+                    {typeof window !== "undefined" && window.matchMedia?.("(display-mode: standalone)").matches
+                      ? "You're running Nexora as an installed app right now — no further action needed."
+                      : "This device has Nexora installed. Open it from your home screen or app drawer for the full standalone experience."}
+                  </p>
+                </AlertDescription>
+              </Alert>
+            )}
+
             {embedded && !installed && (
               <Alert className="mt-5 border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100">
                 <Info className="h-4 w-4" />
