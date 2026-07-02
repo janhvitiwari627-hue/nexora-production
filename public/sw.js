@@ -20,7 +20,16 @@ const PRECACHE_URLS = [
 
 self.addEventListener("install", (event) => {
   // Do NOT skipWaiting automatically — wait for the client to approve.
-  event.waitUntil(caches.open(PRECACHE).then((cache) => cache.addAll(PRECACHE_URLS)));
+  event.waitUntil((async () => {
+    const precache = await caches.open(PRECACHE);
+    await precache.addAll(PRECACHE_URLS);
+    // Warm the pages cache with the customer home shell so it survives offline.
+    try {
+      const pages = await caches.open(PAGES);
+      const res = await fetch("/customer/home", { credentials: "same-origin" });
+      if (res && res.status === 200) await pages.put("/customer/home", res.clone());
+    } catch {}
+  })());
 });
 
 self.addEventListener("activate", (event) => {
