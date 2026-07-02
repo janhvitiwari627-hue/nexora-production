@@ -44,6 +44,7 @@ type DetailView = {
   responsibilities: string[];
   requirements: string[];
   benefits: string[];
+  rawRequirements: string | null;
   isReal: boolean;
 };
 
