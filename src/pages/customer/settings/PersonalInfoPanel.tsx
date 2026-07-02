@@ -22,7 +22,6 @@ function slugifyUsername(name: string) {
 
 export function PersonalInfoPanel() {
   const { user, profile, refreshProfile } = useAuthStore();
-  const fileRef = useRef<HTMLInputElement>(null);
   const [avatar, setAvatar] = useState<string>(profile?.avatar_url || "");
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
