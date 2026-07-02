@@ -145,15 +145,53 @@ const MONTHLY_SALARY_RANGES: { label: string; min: number; max: number | null }[
   { label: "₹25,000 – ₹35,000", min: 25000, max: 35000 },
   { label: "₹35,000+", min: 35000, max: null },
 ];
+
+const DAILY_PAY_RANGES: { label: string; min: number; max: number | null }[] = [
+  { label: "₹500 – ₹800", min: 500, max: 800 },
+  { label: "₹800 – ₹1,200", min: 800, max: 1200 },
+  { label: "₹1,200 – ₹2,000", min: 1200, max: 2000 },
+];
+
+const HOURLY_PAY_RANGES: { label: string; min: number; max: number | null }[] = [
+  { label: "₹100 – ₹200 / hour", min: 100, max: 200 },
+  { label: "₹200 – ₹400 / hour", min: 200, max: 400 },
+  { label: "₹400 – ₹700 / hour", min: 400, max: 700 },
+];
+
+const FIXED_COMMISSION_RANGES: { label: string; min: number; max: number | null }[] = [
+  { label: "₹10,000 + commission", min: 10000, max: null },
+  { label: "₹15,000 + commission", min: 15000, max: null },
+  { label: "₹20,000 + commission", min: 20000, max: null },
+];
+
 const BENEFITS = [
-  "PF & ESI",
+  "Paid leave",
+  "Flexible hours",
+  "Weekly off",
+  "Training provided",
+  "Staff discount",
+  "Travel allowance",
+  "Food allowance",
+  "Accommodation",
   "Health insurance",
   "Incentives",
-  "Paid leave",
-  "Meals",
-  "Training",
-  "Product allowance",
-  "Travel allowance",
+  "Career growth",
+  "Equipment provided",
+  "Uniform provided",
+  "Festival bonus",
+  "Other",
+];
+
+const BENEFIT_BUNDLES: { label: string; items: string[] }[] = [
+  { label: "Basic benefits", items: ["Weekly off", "Training provided", "Incentives"] },
+  {
+    label: "Premium benefits",
+    items: ["Paid leave", "Health insurance", "Incentives", "Career growth", "Festival bonus"],
+  },
+  {
+    label: "Salon essentials",
+    items: ["Uniform provided", "Staff discount", "Training provided"],
+  },
 ];
 
 // Quick-select role suggestions grouped by beauty category.
@@ -305,6 +343,152 @@ const ROLE_SUGGESTIONS: Record<string, string[]> = {
     "Freelance Tattoo Artist",
   ],
   Other: ["Other Beauty Professional", "Custom Role"],
+};
+
+// Suggested skill chips by beauty category. Employer can click to add / remove
+// or type a custom skill and press Enter. Changing the category only refreshes
+// suggestions — it never removes already-selected skills.
+const SKILL_SUGGESTIONS: Record<string, string[]> = {
+  "Hair Stylist": [
+    "Hair cutting",
+    "Blow dry",
+    "Hair colouring",
+    "Highlights",
+    "Balayage",
+    "Keratin treatment",
+    "Hair spa",
+    "Straightening",
+    "Bridal hairstyling",
+    "Extensions",
+  ],
+  Barber: [
+    "Classic cuts",
+    "Fade cuts",
+    "Beard trim",
+    "Beard shaping",
+    "Hot towel shave",
+    "Head massage",
+    "Beard colouring",
+  ],
+  "Makeup Artist": [
+    "HD makeup",
+    "Airbrush makeup",
+    "Bridal makeup",
+    "Party makeup",
+    "Contouring",
+    "Eye makeup",
+    "Draping",
+    "Hair styling",
+  ],
+  "Nail Artist": [
+    "Manicure",
+    "Pedicure",
+    "Gel nails",
+    "Acrylic extensions",
+    "Nail art",
+    "3D nail art",
+    "Chrome nails",
+    "Nail repair",
+  ],
+  "Beauty Therapist": [
+    "Facials",
+    "Clean-up",
+    "Waxing",
+    "Threading",
+    "Bleach",
+    "Body polishing",
+    "D-Tan",
+    "Skin analysis",
+  ],
+  "Spa Therapist": [
+    "Swedish massage",
+    "Deep tissue",
+    "Aromatherapy",
+    "Body scrub",
+    "Body wrap",
+    "Ayurvedic therapy",
+    "Shirodhara",
+  ],
+  "Massage Therapist": [
+    "Swedish massage",
+    "Deep tissue",
+    "Thai massage",
+    "Ayurvedic massage",
+    "Foot reflexology",
+    "Sports massage",
+  ],
+  "Skin Therapist": [
+    "Advanced facials",
+    "Chemical peel",
+    "Hydra facial",
+    "Microdermabrasion",
+    "Laser assist",
+    "Skin consultation",
+  ],
+  "Eyelash / Brow Artist": [
+    "Lash extensions",
+    "Lash lift",
+    "Brow lamination",
+    "Brow tint",
+    "Microblading",
+    "Threading",
+  ],
+  "Tattoo Artist": [
+    "Line work",
+    "Shading",
+    "Colour realism",
+    "Fine line",
+    "Cover-up",
+    "Piercing",
+    "Sterilisation",
+  ],
+  "Salon Manager": [
+    "Staff scheduling",
+    "Inventory",
+    "Client retention",
+    "Billing systems",
+    "Team leadership",
+    "Reports",
+  ],
+  Receptionist: [
+    "Appointment booking",
+    "Client greeting",
+    "Billing",
+    "Phone handling",
+    "MS Office",
+    "Salon software",
+  ],
+  "Salon Assistant": [
+    "Shampooing",
+    "Tool prep",
+    "Hygiene",
+    "Client comfort",
+    "Product handling",
+  ],
+  "Hair Colourist": [
+    "Global colour",
+    "Highlights",
+    "Balayage",
+    "Ombre",
+    "Colour correction",
+    "Toning",
+  ],
+  "Bridal Makeup Artist": [
+    "HD bridal",
+    "Airbrush bridal",
+    "Traditional bridal",
+    "Draping",
+    "Hair styling",
+    "Trials",
+  ],
+  Freelancer: [
+    "Client handling",
+    "Portfolio",
+    "Travel-ready",
+    "Own kit",
+    "Time management",
+  ],
+  Other: ["Customer service", "Hygiene", "Teamwork", "Punctuality"],
 };
 
 // Ready-made job description starters shown under the Description field.
@@ -1990,14 +2174,41 @@ function SalaryStep({
         ? "border-transparent bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
         : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
     );
-  const selectRange = (r: (typeof MONTHLY_SALARY_RANGES)[number]) => {
+  const selectRange = (
+    r: { label: string; min: number; max: number | null },
+    period: JobDraftInput["salary_period"],
+  ) => {
     update({
       salary_range_preset: r.label,
       salary_min: r.min,
       salary_max: r.max,
-      salary_period: "monthly",
+      salary_period: period,
     });
   };
+  const rangeSetFor = (
+    type: string | undefined,
+  ): { label: string; min: number; max: number | null }[] | null => {
+    if (type === "Monthly salary") return MONTHLY_SALARY_RANGES;
+    if (type === "Daily pay") return DAILY_PAY_RANGES;
+    if (type === "Hourly pay") return HOURLY_PAY_RANGES;
+    if (type === "Fixed + commission") return FIXED_COMMISSION_RANGES;
+    return null;
+  };
+  const periodFor = (type: string | undefined): JobDraftInput["salary_period"] => {
+    if (type === "Daily pay") return "daily" as JobDraftInput["salary_period"];
+    if (type === "Hourly pay") return "hourly";
+    return "monthly";
+  };
+  const rangeLabelFor = (type: string | undefined) => {
+    if (type === "Monthly salary") return "Monthly salary range";
+    if (type === "Daily pay") return "Daily pay range";
+    if (type === "Hourly pay") return "Hourly pay range";
+    if (type === "Fixed + commission") return "Fixed salary + commission";
+    return "";
+  };
+  const customLabelFor = (type: string | undefined) =>
+    type === "Fixed + commission" ? "Custom fixed salary" : "Custom amount";
+  const activeRanges = rangeSetFor(form.salary_type);
   return (
     <div className="space-y-4">
       <h2 className="text-heading text-xl font-bold">Salary & benefits</h2>
@@ -2021,16 +2232,16 @@ function SalaryStep({
         </div>
       </Field>
 
-      {form.salary_type === "Monthly salary" && (
-        <Field label="Monthly salary range">
+      {activeRanges && (
+        <Field label={rangeLabelFor(form.salary_type)}>
           <div className="flex flex-wrap gap-2">
-            {MONTHLY_SALARY_RANGES.map((r) => {
+            {activeRanges.map((r) => {
               const active = form.salary_range_preset === r.label;
               return (
                 <button
                   key={r.label}
                   type="button"
-                  onClick={() => selectRange(r)}
+                  onClick={() => selectRange(r, periodFor(form.salary_type))}
                   aria-pressed={active}
                   className={chipCls(active)}
                 >
@@ -2040,11 +2251,11 @@ function SalaryStep({
             })}
             <button
               type="button"
-              onClick={() => update({ salary_range_preset: "Custom amount" })}
-              aria-pressed={form.salary_range_preset === "Custom amount"}
-              className={chipCls(form.salary_range_preset === "Custom amount")}
+              onClick={() => update({ salary_range_preset: customLabelFor(form.salary_type) })}
+              aria-pressed={form.salary_range_preset === customLabelFor(form.salary_type)}
+              className={chipCls(form.salary_range_preset === customLabelFor(form.salary_type))}
             >
-              Custom amount
+              {customLabelFor(form.salary_type)}
             </button>
           </div>
         </Field>
@@ -2090,34 +2301,66 @@ function SalaryStep({
           </select>
         </Field>
       </div>
-      <div>
-        <span className="text-heading mb-2 block text-sm font-semibold">Benefits</span>
-        <div className="flex flex-wrap gap-2">
-          {BENEFITS.map((b) => {
-            const on = form.benefits.includes(b);
-
-            return (
-              <button
-                type="button"
-                key={b}
-                onClick={() =>
-                  update({
-                    benefits: on ? form.benefits.filter((x) => x !== b) : [...form.benefits, b],
-                  })
-                }
-                className={cn(
-                  "rounded-full border px-3 py-1.5 text-xs font-semibold transition",
-                  on
-                    ? "bg-gradient-cta border-transparent text-primary-foreground"
-                    : "border-border bg-card text-heading",
-                )}
-              >
-                {b}
-              </button>
-            );
-          })}
+      <div className="space-y-3">
+        <div>
+          <span className="text-heading mb-2 block text-sm font-semibold">Benefit bundles</span>
+          <div className="flex flex-wrap gap-2">
+            {BENEFIT_BUNDLES.map((bundle) => {
+              const allSelected = bundle.items.every((i) => form.benefits.includes(i));
+              return (
+                <button
+                  type="button"
+                  key={bundle.label}
+                  onClick={() => {
+                    // Add all missing bundle items; never remove existing selections.
+                    const merged = Array.from(new Set([...form.benefits, ...bundle.items]));
+                    update({ benefits: merged });
+                  }}
+                  aria-pressed={allSelected}
+                  className={chipCls(allSelected)}
+                  title={bundle.items.join(", ")}
+                >
+                  {bundle.label}
+                </button>
+              );
+            })}
+          </div>
+          <p className="text-muted-foreground mt-1 text-[11px]">
+            Bundles add all their benefits. Active only when every benefit inside is selected.
+          </p>
+        </div>
+        <div>
+          <span className="text-heading mb-2 block text-sm font-semibold">Benefits</span>
+          <div className="flex flex-wrap gap-2">
+            {BENEFITS.map((b) => {
+              const on = form.benefits.includes(b);
+              return (
+                <button
+                  type="button"
+                  key={b}
+                  onClick={() =>
+                    update({
+                      benefits: on
+                        ? form.benefits.filter((x) => x !== b)
+                        : [...form.benefits, b],
+                    })
+                  }
+                  aria-pressed={on}
+                  className={cn(
+                    "rounded-full border px-3 py-1.5 text-xs font-semibold transition",
+                    on
+                      ? "bg-gradient-cta border-transparent text-primary-foreground"
+                      : "border-border bg-card text-heading",
+                  )}
+                >
+                  {b}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
+
     </div>
   );
 }
@@ -2174,6 +2417,44 @@ function RequirementsStep({
             }}
           />
         </div>
+        {(() => {
+          const suggested = SKILL_SUGGESTIONS[form.category] ?? [];
+          if (suggested.length === 0) return null;
+          const toggle = (s: string) => {
+            const on = form.skills.includes(s);
+            update({
+              skills: on ? form.skills.filter((x) => x !== s) : [...form.skills, s],
+            });
+          };
+          return (
+            <div className="mt-3">
+              <p className="text-muted-foreground mb-2 text-[11px] uppercase tracking-wide font-semibold">
+                Suggested for {form.category}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {suggested.map((s) => {
+                  const on = form.skills.includes(s);
+                  return (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => toggle(s)}
+                      aria-pressed={on}
+                      className={cn(
+                        "rounded-full border px-3 py-1.5 text-xs font-semibold transition",
+                        on
+                          ? "bg-gradient-cta border-transparent text-primary-foreground"
+                          : "border-border bg-card text-heading hover:border-primary/50",
+                      )}
+                    >
+                      {s}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
       </Field>
       <Field label="Additional requirements">
         <textarea
