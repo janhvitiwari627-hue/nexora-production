@@ -176,6 +176,14 @@ export function PostJobPage() {
         // Reveal errors on every step up through the failing one and jump there.
         setAttempted(new Set([0, 1, 2, 3]));
         setStep(bad);
+        setHighlightInvalid(true);
+        // Scroll the wizard card into view and pulse the ring highlight.
+        if (typeof window !== "undefined") {
+          window.requestAnimationFrame(() => {
+            stepCardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+          });
+          window.setTimeout(() => setHighlightInvalid(false), 1600);
+        }
         toast.error("Please fix the highlighted fields before publishing.");
         return;
       }
