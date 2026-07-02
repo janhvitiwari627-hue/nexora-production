@@ -1,4 +1,6 @@
 import { Link } from "@tanstack/react-router";
+import nexoraBannerAsset from "@/assets/nexora-salonos-banner.jpg.asset.json";
+
 import { useEffect, useRef, useState } from "react";
 import { Smartphone, MapPin, Tag, UserCheck, Zap, MessageCircle, QrCode, Gift, History, Download, ExternalLink, Apple, Play, Share, Plus, MoreVertical, Chrome, Info, X } from "lucide-react";
 import {
