@@ -4,7 +4,7 @@ import { Briefcase, GraduationCap, MapPin, Search, Sparkles, Star, TrendingUp } 
 import { cn } from "@/lib/utils";
 import { BackButton } from "@/components/shared/BackButton";
 import { useAuthStore } from "@/stores/authStore";
-import { getMyEmployerProfile, listPublishedJobs, type JobRow } from "@/lib/jobs";
+import { listPublishedJobs, type JobRow } from "@/lib/jobs";
 import { EmployerSetupModal } from "@/pages/jobs/EmployerSetupModal";
 
 const JOBS = [
