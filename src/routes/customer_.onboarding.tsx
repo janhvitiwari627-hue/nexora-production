@@ -57,7 +57,7 @@ function OnboardingPage() {
   };
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-6 px-6 py-10">
+    <main className="customer-app bg-background mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-6 px-6 py-10">
       <div>
         <h1 className="text-2xl font-bold">Tell us about you</h1>
         <p className="mt-1 text-sm text-muted-foreground">

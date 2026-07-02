@@ -131,6 +131,56 @@
   --input: oklch(1 0 0 / 12%);
 }
 
+/* -------------------------------------------------------------------------
+ * Customer App theme (mobile PWA)
+ *
+ * Scoped to `.customer-app` so the public marketing site keeps its indigo
+ * brand while /customer/* uses the lighter, app-like Nexora palette.
+ * Because tokens are mapped through `@theme inline`, overriding the raw
+ * variables here re-themes every utility (bg-background, text-foreground,
+ * border-border, bg-primary, etc.) for the customer-app subtree only.
+ * ------------------------------------------------------------------------- */
+.customer-app {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --heading: #0f172a;
+  --body: #0f172a;
+
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
+  --primary-dark: #1d4ed8;
+  --secondary: #6d28d9;
+  --secondary-foreground: #ffffff;
+  --accent: #3b82f6;
+  --accent-foreground: #ffffff;
+
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #2563eb;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f172a;
+  --sidebar-primary: #2563eb;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f1f5f9;
+  --sidebar-accent-foreground: #0f172a;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #2563eb;
+
+  --gradient-hero: linear-gradient(135deg, #2563eb 0%, #6d28d9 100%);
+  --gradient-cta: linear-gradient(135deg, #2563eb, #3b82f6);
+
+  color: var(--foreground);
+  background-color: var(--background);
+}
+
 @layer base {
   * { border-color: var(--color-border); }
   html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }

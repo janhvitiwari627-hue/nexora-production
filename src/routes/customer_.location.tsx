@@ -52,7 +52,7 @@ function LocationPermissionPage() {
   const requesting = status === "requesting";
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-6 px-6 py-10 text-center">
+    <main className="customer-app bg-background mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-6 px-6 py-10 text-center">
       <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-primary/10 text-primary">
         <MapPin className="h-7 w-7" />
       </div>
