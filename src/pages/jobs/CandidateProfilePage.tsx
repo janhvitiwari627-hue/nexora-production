@@ -40,10 +40,70 @@ export function CandidateProfilePage() {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [lastFailedFile, setLastFailedFile] = useState<File | null>(null);
 
   useEffect(() => {
     setAvatar(profile?.avatar_url || "");
   }, [profile?.avatar_url]);
+
+  function classifyUploadError(err: unknown, stage: "upload" | "sign" | "profile"): string {
+    if (!navigator.onLine) {
+      return "You appear to be offline. Check your connection and tap Retry.";
+    }
+    const anyErr = err as { name?: string; message?: string; statusCode?: number; status?: number };
+    const raw = (anyErr?.message ?? "").toString();
+    const lower = raw.toLowerCase();
+    const status = Number(anyErr?.statusCode ?? anyErr?.status ?? 0);
+
+    if (anyErr?.name === "AbortError" || lower.includes("timeout") || lower.includes("timed out")) {
+      return "The upload timed out. Please check your connection and try again.";
+    }
+    if (lower.includes("network") || lower.includes("failed to fetch") || lower.includes("load failed")) {
+      return "Network error while uploading. Please try again.";
+    }
+    if (status === 401 || lower.includes("unauthorized") || lower.includes("jwt")) {
+      return "Your session has expired. Please sign in again and retry.";
+    }
+    if (status === 403 || lower.includes("row-level security") || lower.includes("not allowed")) {
+      return "You don't have permission to upload this image.";
+    }
+    if (status === 413 || lower.includes("payload too large") || lower.includes("too large")) {
+      return "That image is too large. Please choose a file under 5 MB.";
+    }
+    if (status === 415 || lower.includes("mime") || lower.includes("content type")) {
+      return "Unsupported image type. Please use JPG, PNG, or WEBP.";
+    }
+    if (status === 429 || lower.includes("rate")) {
+      return "Too many uploads in a short time. Please wait a moment and retry.";
+    }
+    if (lower.includes("could not decode") || lower.includes("invalid image") || lower.includes("decode")) {
+      return "We couldn't read this image file. It may be corrupted — please try a different one.";
+    }
+    if (status >= 500) {
+      return "The server had a problem saving your photo. Please try again shortly.";
+    }
+    switch (stage) {
+      case "upload":  return "We couldn't upload your photo. Please try again.";
+      case "sign":    return "Uploaded, but we couldn't generate a preview link. Please retry.";
+      case "profile": return "Photo uploaded, but saving it to your profile failed. Please retry.";
+    }
+  }
+
+  async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+    let timer: ReturnType<typeof setTimeout>;
+    const timeout = new Promise<never>((_, reject) => {
+      timer = setTimeout(() => {
+        const e = new Error(`${label} timed out`);
+        (e as Error & { name: string }).name = "AbortError";
+        reject(e);
+      }, ms);
+    });
+    try {
+      return await Promise.race([promise, timeout]);
+    } finally {
+      clearTimeout(timer!);
+    }
+  }
 
   async function handleAvatarFile(file: File) {
     if (!user) {
@@ -57,37 +117,46 @@ export function CandidateProfilePage() {
     setUploadProgress(10);
     const preview = URL.createObjectURL(file);
     setAvatar(preview);
+    let stage: "upload" | "sign" | "profile" = "upload";
     try {
       const ext = file.type === "image/png" ? "png" : "jpg";
       const path = `${user.id}/avatar-${Date.now()}.${ext}`;
       setUploadProgress(35);
-      const { error: upErr } = await supabase.storage
-        .from("profile-images")
-        .upload(path, file, { upsert: true, contentType: file.type });
+      const { error: upErr } = await withTimeout(
+        supabase.storage
+          .from("profile-images")
+          .upload(path, file, { upsert: true, contentType: file.type }),
+        30_000,
+        "Upload",
+      );
       if (upErr) throw upErr;
+      stage = "sign";
       setUploadProgress(70);
-      const { data: signed, error: signErr } = await supabase.storage
-        .from("profile-images")
-        .createSignedUrl(path, 60 * 60 * 24 * 365);
+      const { data: signed, error: signErr } = await withTimeout(
+        supabase.storage.from("profile-images").createSignedUrl(path, 60 * 60 * 24 * 365),
+        15_000,
+        "Sign URL",
+      );
       if (signErr) throw signErr;
       const url = signed.signedUrl;
+      stage = "profile";
       setUploadProgress(90);
-      const { error: updErr } = await supabase
-        .from("profiles")
-        .update({ avatar_url: url })
-        .eq("id", user.id);
+      const { error: updErr } = await withTimeout(
+        supabase.from("profiles").update({ avatar_url: url }).eq("id", user.id),
+        15_000,
+        "Save profile",
+      );
       if (updErr) throw updErr;
       setUploadProgress(100);
       setAvatar(url);
+      setLastFailedFile(null);
       await refreshProfile();
       toast.success("Profile image updated");
     } catch (err) {
-      console.error("[candidate profile image]", err);
-      const msg =
-        !navigator.onLine
-          ? "You appear to be offline. Please check your connection."
-          : "We couldn't upload your profile image. Please try again.";
+      console.error("[candidate profile image] stage=", stage, err);
+      const msg = classifyUploadError(err, stage);
       setUploadError(msg);
+      setLastFailedFile(file);
       toast.error(msg);
       setAvatar(profile?.avatar_url || "");
     } finally {
@@ -95,6 +164,10 @@ export function CandidateProfilePage() {
       setUploading(false);
       setTimeout(() => setUploadProgress(null), 400);
     }
+  }
+
+  function handleRetryUpload() {
+    if (lastFailedFile) void handleAvatarFile(lastFailedFile);
   }
 
   async function handleAvatarRemove() {
