@@ -227,7 +227,12 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
       }
       toast.success("Application submitted successfully.");
       setApplyOpen(false);
-      setAlreadyApplied(true);
+      setApplication({
+        id: app.id,
+        cover_note: app.cover_note ?? note,
+        status: app.status ?? "submitted",
+        created_at: app.created_at ?? new Date().toISOString(),
+      });
       setSuccessMode("real");
       setSuccessOpen(true);
     } catch (err) {
