@@ -159,9 +159,15 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <AppSideEffects />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );
+}
+
+function AppSideEffects() {
+  useApplicationStatusNotifications();
+  return null;
 }
