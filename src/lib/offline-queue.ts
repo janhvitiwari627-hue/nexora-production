@@ -97,7 +97,10 @@ function notify() {
   }
 }
 
-export function registerRunner<TPayload>(type: string, runner: Runner<TPayload>) {
+export function registerRunner<TPayload, TResult = unknown>(
+  type: string,
+  runner: Runner<TPayload, TResult>,
+) {
   runners.set(type, runner as Runner);
 }
 
