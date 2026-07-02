@@ -128,10 +128,10 @@ function VerifyOtpPage() {
         <button
           type="button"
           onClick={resend}
-          disabled={resendIn > 0}
+          disabled={resendIn > 0 || resending}
           className="font-medium text-primary underline disabled:no-underline disabled:opacity-60"
         >
-          {resendIn > 0 ? `Resend in ${resendIn}s` : "Resend code"}
+          {resending ? "Sending…" : resendIn > 0 ? `Resend in ${resendIn}s` : "Resend code"}
         </button>
       </div>
       <button
