@@ -1,9 +1,20 @@
+import { useState } from "react";
 import { createFileRoute, Link, Outlet, redirect, useNavigate } from "@tanstack/react-router";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { LocationPermissionModal } from "@/components/auth/LocationPermissionModal";
 import { BackButton } from "@/components/shared/BackButton";
 import { ViewSwitcher } from "@/components/layout/ViewSwitcher";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchUserRoles, type UserRole } from "@/lib/auth-redirect";
 import { LayoutDashboard, LogOut } from "lucide-react";
