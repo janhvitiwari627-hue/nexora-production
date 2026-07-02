@@ -18,8 +18,9 @@ export const logAnalyticsEvent = createServerFn({ method: "POST" })
     const { error } = await context.supabase.from("analytics_events").insert({
       event_name: data.event_name,
       user_id: context.userId,
-      metadata: data.metadata ?? {},
+      metadata: (data.metadata ?? {}) as never,
     });
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
+
