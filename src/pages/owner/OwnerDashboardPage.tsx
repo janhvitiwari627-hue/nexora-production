@@ -2,8 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Bell, Settings, Upload, ArrowUpRight, ArrowDownRight, Check, X,
   Plus, UserPlus, Tag, Share2, QrCode, BarChart3, Star, Reply, Trophy,
-  Sparkles, Globe,
+  Sparkles, Globe, UserCircle2,
 } from "lucide-react";
+
 
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
