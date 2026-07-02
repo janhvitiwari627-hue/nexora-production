@@ -17,7 +17,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchUserRoles, type UserRole } from "@/lib/auth-redirect";
+import { logAnalyticsEvent } from "@/lib/analytics-events.functions";
 import { LayoutDashboard, LogOut } from "lucide-react";
+
 
 
 const BROWSE_AS_CUSTOMER_KEY = "nexora:browseAsCustomer";
