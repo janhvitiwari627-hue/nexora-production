@@ -324,7 +324,7 @@ export function JobPortalPage({ initialRole = "seeker" }: { initialRole?: "seeke
   );
 }
 
-function JobCard({ job, compact }: { job: (typeof JOBS)[number]; compact?: boolean }) {
+function JobCard({ job, compact }: { job: JobCardData; compact?: boolean }) {
   return (
     <article
       className={cn(
