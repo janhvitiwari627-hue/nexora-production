@@ -153,7 +153,34 @@ export function BookingFlowPage({ salon }: { salon?: RealSalonRef } = {}) {
   const onPay = () => {
     if (paying) return;
     if (!online) {
-      toast.error("You're offline. Reconnect to complete payment.");
+      // Queue for background sync when the connection returns.
+      if (!salon || !isUuid(salon.id)) {
+        toast.error("You're offline. Reconnect to complete this booking.");
+        return;
+      }
+      if (!booking.date || !booking.time) {
+        toast.error("Pick a date and time first.");
+        return;
+      }
+      const selected = selectedServices(booking);
+      if (selected.length === 0) {
+        toast.error("Pick at least one service.");
+        return;
+      }
+      const totalPrice = selected.reduce((sum, s) => sum + (s.offer_price ?? s.price), 0);
+      enqueueCreateAndConfirmBooking({
+        salon_id: salon.id,
+        service_name:
+          selected
+            .map((s) => s.name)
+            .join(", ")
+            .slice(0, 200) || selected[0].name,
+        price: totalPrice,
+        booking_date: booking.date,
+        booking_time: booking.time,
+        advance_amount: Math.round(totalPrice * 0.25 * 100) / 100,
+      });
+      toast.success("Saved offline — we'll confirm your booking automatically once you're back online.");
       return;
     }
     setPaying(true);
