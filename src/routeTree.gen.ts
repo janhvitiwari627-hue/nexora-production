@@ -36,6 +36,7 @@ import { Route as DistrictBusinessPartnerRouteImport } from './routes/district-b
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CustomerAppRouteImport } from './routes/customer-app'
 import { Route as CustomerRouteImport } from './routes/customer'
+import { Route as CreateShopWebsiteRouteImport } from './routes/create-shop-website'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AcademyRouteImport } from './routes/academy'
@@ -271,6 +272,11 @@ const CustomerAppRoute = CustomerAppRouteImport.update({
 const CustomerRoute = CustomerRouteImport.update({
   id: '/customer',
   path: '/customer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreateShopWebsiteRoute = CreateShopWebsiteRouteImport.update({
+  id: '/create-shop-website',
+  path: '/create-shop-website',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -793,6 +799,7 @@ export interface FileRoutesByFullPath {
   '/academy': typeof AcademyRoute
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
+  '/create-shop-website': typeof CreateShopWebsiteRoute
   '/customer': typeof CustomerRouteWithChildren
   '/customer-app': typeof CustomerAppRoute
   '/dashboard': typeof DashboardRouteWithChildren
@@ -923,6 +930,7 @@ export interface FileRoutesByTo {
   '/academy': typeof AcademyRoute
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
+  '/create-shop-website': typeof CreateShopWebsiteRoute
   '/customer': typeof CustomerRouteWithChildren
   '/customer-app': typeof CustomerAppRoute
   '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
@@ -1051,6 +1059,7 @@ export interface FileRoutesById {
   '/academy': typeof AcademyRoute
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
+  '/create-shop-website': typeof CreateShopWebsiteRoute
   '/customer': typeof CustomerRouteWithChildren
   '/customer-app': typeof CustomerAppRoute
   '/dashboard': typeof DashboardRouteWithChildren
@@ -1183,6 +1192,7 @@ export interface FileRouteTypes {
     | '/academy'
     | '/admin'
     | '/contact'
+    | '/create-shop-website'
     | '/customer'
     | '/customer-app'
     | '/dashboard'
@@ -1313,6 +1323,7 @@ export interface FileRouteTypes {
     | '/academy'
     | '/admin'
     | '/contact'
+    | '/create-shop-website'
     | '/customer'
     | '/customer-app'
     | '/district-business-partner'
@@ -1440,6 +1451,7 @@ export interface FileRouteTypes {
     | '/academy'
     | '/admin'
     | '/contact'
+    | '/create-shop-website'
     | '/customer'
     | '/customer-app'
     | '/dashboard'
@@ -1571,6 +1583,7 @@ export interface RootRouteChildren {
   AcademyRoute: typeof AcademyRoute
   AdminRoute: typeof AdminRouteWithChildren
   ContactRoute: typeof ContactRoute
+  CreateShopWebsiteRoute: typeof CreateShopWebsiteRoute
   CustomerRoute: typeof CustomerRouteWithChildren
   CustomerAppRoute: typeof CustomerAppRoute
   DashboardRoute: typeof DashboardRouteWithChildren
@@ -1823,6 +1836,13 @@ declare module '@tanstack/react-router' {
       path: '/customer'
       fullPath: '/customer'
       preLoaderRoute: typeof CustomerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/create-shop-website': {
+      id: '/create-shop-website'
+      path: '/create-shop-website'
+      fullPath: '/create-shop-website'
+      preLoaderRoute: typeof CreateShopWebsiteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -2757,6 +2777,7 @@ const rootRouteChildren: RootRouteChildren = {
   AcademyRoute: AcademyRoute,
   AdminRoute: AdminRouteWithChildren,
   ContactRoute: ContactRoute,
+  CreateShopWebsiteRoute: CreateShopWebsiteRoute,
   CustomerRoute: CustomerRouteWithChildren,
   CustomerAppRoute: CustomerAppRoute,
   DashboardRoute: DashboardRouteWithChildren,
