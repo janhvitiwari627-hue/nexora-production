@@ -56,7 +56,34 @@ export function BookingDetailPage({ booking = mockBookingDetail }: { booking?: B
   return (
     <div className="min-h-screen bg-background">
       <PublicHeader />
-      <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:py-10">
+      {isRefreshing && (
+        <>
+          {/* Indeterminate top progress bar */}
+          <div
+            role="progressbar"
+            aria-label="Refreshing booking details"
+            className="fixed inset-x-0 top-0 z-50 h-0.5 overflow-hidden bg-primary/10"
+          >
+            <div className="h-full w-1/3 animate-[refreshSlide_1.1s_ease-in-out_infinite] bg-primary" />
+          </div>
+          {/* Aria-live status pill */}
+          <div
+            aria-live="polite"
+            className="fixed left-1/2 top-3 z-50 inline-flex -translate-x-1/2 items-center gap-2 rounded-full border border-primary/30 bg-card px-3 py-1.5 text-xs font-semibold text-heading shadow-md"
+          >
+            <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+            Refreshing booking details…
+          </div>
+          <style>{`@keyframes refreshSlide{0%{transform:translateX(-100%)}50%{transform:translateX(150%)}100%{transform:translateX(400%)}}`}</style>
+        </>
+      )}
+      <main
+        className={
+          "mx-auto w-full max-w-5xl px-4 py-6 transition-opacity sm:py-10 " +
+          (isRefreshing ? "opacity-70" : "")
+        }
+        aria-busy={isRefreshing}
+      >
         <Link
           to="/dashboard/bookings"
           className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground hover:text-heading"
