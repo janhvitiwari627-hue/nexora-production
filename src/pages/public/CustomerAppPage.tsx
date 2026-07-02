@@ -171,6 +171,7 @@ export default function CustomerAppPage() {
         toast.error("Install prompt failed", { description: "Try again from your browser's install icon in the address bar." });
       } finally {
         setDeferred(null);
+        clearInstallPrompt();
       }
       return;
     }
