@@ -6,10 +6,33 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Briefcase, MapPin, Clock, Search, RefreshCw } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 import { listMyApplications, type JobApplication } from "@/lib/jobs";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
+
+function ApplicationSkeleton() {
+  return (
+    <Card>
+      <CardContent className="flex flex-wrap items-start justify-between gap-4 p-5">
+        <div className="min-w-0 flex-1 space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Skeleton className="h-5 w-48" />
+            <Skeleton className="h-5 w-20 rounded-full" />
+          </div>
+          <Skeleton className="h-4 w-40" />
+          <div className="flex flex-wrap gap-3">
+            <Skeleton className="h-3 w-20" />
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-3 w-28" />
+          </div>
+        </div>
+        <Skeleton className="h-8 w-24" />
+      </CardContent>
+    </Card>
+  );
+}
 
 const STATUS_TONE: Record<string, string> = {
   submitted: "bg-blue-100 text-blue-800",
@@ -116,12 +139,16 @@ export function MyApplicationsPage() {
     });
   }, [apps, filter, q]);
 
-  // Reset pagination to the first page whenever the filter or search query changes
+  // Brief skeleton reload when filter/query changes for perceived responsiveness
+  const [isReloading, setIsReloading] = useState(false);
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
+    setIsReloading(true);
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
+    const t = setTimeout(() => setIsReloading(false), 350);
+    return () => clearTimeout(t);
   }, [filter, q]);
 
   // Also reset when the underlying data reloads
@@ -235,11 +262,17 @@ export function MyApplicationsPage() {
           </Card>
         )}
 
-        {!error && apps === null && (
-          <div className="text-muted-foreground text-sm">Loading applications…</div>
+        {!error && (apps === null || isReloading) && (
+          <ul className="space-y-3" aria-busy="true" aria-live="polite">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <li key={i}>
+                <ApplicationSkeleton />
+              </li>
+            ))}
+          </ul>
         )}
 
-        {!error && apps && apps.length === 0 && (
+        {!error && !isReloading && apps && apps.length === 0 && (
           <Card>
             <CardContent className="space-y-3 p-8 text-center">
               <p className="text-muted-foreground">You have not applied to any jobs yet.</p>
@@ -250,7 +283,7 @@ export function MyApplicationsPage() {
           </Card>
         )}
 
-        {!error && filtered && apps && apps.length > 0 && filtered.length === 0 && (
+        {!error && !isReloading && filtered && apps && apps.length > 0 && filtered.length === 0 && (
           <Card>
             <CardContent className="text-muted-foreground p-6 text-sm">
               No applications match your filter.
@@ -258,7 +291,7 @@ export function MyApplicationsPage() {
           </Card>
         )}
 
-        {!error && visible && filtered && visible.length > 0 && (
+        {!error && !isReloading && visible && filtered && visible.length > 0 && (
           <>
             <ul className="space-y-3">
               {visible.map((a) => {
