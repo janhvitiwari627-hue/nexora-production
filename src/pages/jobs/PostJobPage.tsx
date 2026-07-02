@@ -559,7 +559,7 @@ function parseRequirementsMeta(raw: string | null | undefined): {
   return out;
 }
 
-export { parseRequirementsMeta, PORTFOLIO_OPTIONS };
+export { parseRequirementsMeta, stripRequirementsMeta, PORTFOLIO_OPTIONS };
 export type { PortfolioOption };
 
 
