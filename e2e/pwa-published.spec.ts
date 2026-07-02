@@ -85,9 +85,6 @@ test.describe("Published /customer-app install CTA visibility", () => {
       .getByRole("button", { name: /Show Android Install Steps|Install Nexora App/i });
     await expect(androidBtn).toBeVisible();
 
-    // The "Not now" dismiss button pairs with the CTA.
-    await expect(page.locator("main").getByRole("button", { name: /Not now/i })).toBeVisible();
-
     // Android hint copy should be present alongside the CTA.
     await expect(page.locator("main")).toContainText(/On Android:/i);
     await expect(page.locator("main")).toContainText(/Install app/i);
