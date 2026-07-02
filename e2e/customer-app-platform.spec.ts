@@ -121,4 +121,63 @@ test.describe("CustomerAppPage platform-aware install fallback", () => {
       await context.close();
     }
   });
+
+  test("Native prompt: dispatches beforeinstallprompt and calls prompt() on click", async ({ browser }) => {
+    const context = await browser.newContext({
+      ...devices["Pixel 7"],
+      userAgent: ANDROID_UA,
+    });
+    // Expose recording hooks + a helper to fire a synthetic beforeinstallprompt.
+    await context.addInitScript(() => {
+      (window as unknown as { __promptCalls: number }).__promptCalls = 0;
+      (window as unknown as { __userChoiceReads: number }).__userChoiceReads = 0;
+      (window as unknown as { __fireBIP: () => void }).__fireBIP = () => {
+        const evt = new Event("beforeinstallprompt") as Event & {
+          prompt: () => Promise<void>;
+          userChoice: Promise<{ outcome: string; platform: string }>;
+        };
+        evt.prompt = () => {
+          (window as unknown as { __promptCalls: number }).__promptCalls += 1;
+          return Promise.resolve();
+        };
+        Object.defineProperty(evt, "userChoice", {
+          get() {
+            (window as unknown as { __userChoiceReads: number }).__userChoiceReads += 1;
+            return Promise.resolve({ outcome: "accepted", platform: "web" });
+          },
+        });
+        window.dispatchEvent(evt);
+      };
+    });
+
+    const page = await context.newPage();
+    await page.goto("/customer-app", { waitUntil: "networkidle" });
+
+    // Fire the synthetic event after the page's listener is attached.
+    await page.evaluate(() => (window as unknown as { __fireBIP: () => void }).__fireBIP());
+
+    // Label switches from "Show Android Install Steps" to the native "Install Nexora App".
+    const installBtn = page.getByRole("button", { name: /^Install Nexora App$/i });
+    await expect(installBtn).toBeVisible();
+
+    await installBtn.click();
+
+    // The native prompt path was taken.
+    await expect
+      .poll(() => page.evaluate(() => (window as unknown as { __promptCalls: number }).__promptCalls))
+      .toBe(1);
+    await expect
+      .poll(() =>
+        page.evaluate(() => (window as unknown as { __userChoiceReads: number }).__userChoiceReads),
+      )
+      .toBe(1);
+
+    // The manual fallback guide must NOT appear when the native prompt fires.
+    await expect(page.getByText(/Install on Android \(Chrome\)/i)).toHaveCount(0);
+
+    // After an "accepted" outcome, the button reflects installed state.
+    await expect(page.getByRole("button", { name: /App Installed/i })).toBeVisible();
+
+    await context.close();
+  });
 });
