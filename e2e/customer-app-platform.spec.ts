@@ -91,7 +91,7 @@ test.describe("CustomerAppPage platform-aware install fallback", () => {
     const context = await browser.newContext({ userAgent: DESKTOP_UA });
     await suppressBeforeInstallPrompt(context);
     const page = await context.newPage();
-    await page.goto("/customer-app");
+    await page.goto("/customer-app", { waitUntil: "networkidle" });
 
     await expect(page.getByText(/On desktop Chrome\/Edge/i)).toBeVisible();
 
