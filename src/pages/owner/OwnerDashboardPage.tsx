@@ -611,7 +611,7 @@ export function OwnerDashboardPage() {
               className="gap-1.5"
               onClick={() => {
                 try { sessionStorage.setItem("nexora:browseAsCustomer", "1"); } catch { /* ignore */ }
-                navigate({ to: "/customer/home", search: { as: "customer" } as never });
+                navigate({ to: "/" });
               }}
             >
               <UserCircle2 className="h-4 w-4" />
