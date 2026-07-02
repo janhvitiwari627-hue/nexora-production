@@ -147,6 +147,10 @@ export function BookingFlowPage({ salon }: { salon?: RealSalonRef } = {}) {
 
   const onPay = () => {
     if (paying) return;
+    if (!online) {
+      toast.error("You're offline. Reconnect to complete payment.");
+      return;
+    }
     setPaying(true);
     payMutation.mutate(undefined, { onSettled: () => setPaying(false) });
   };
