@@ -103,6 +103,8 @@ export function PostJobPage() {
   const [draftRestored, setDraftRestored] = useState<boolean>(!!initialDraft && (initialDraft.step > 0 || initialDraft.form.title.length > 0));
   const [publishError, setPublishError] = useState<string | null>(null);
   const [attempted, setAttempted] = useState<Set<number>>(new Set());
+  const [highlightInvalid, setHighlightInvalid] = useState(false);
+  const stepCardRef = useRef<HTMLDivElement | null>(null);
 
   // Persist wizard state to localStorage so it survives session expiry / re-login.
   useEffect(() => {
