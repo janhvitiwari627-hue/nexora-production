@@ -27,13 +27,11 @@ async function waitForInstallPromptListener(page: Page) {
 test.describe("InstallBanner — prompt available state", () => {
   test.beforeEach(async ({ context }) => {
     await context.addInitScript(() => {
-      // Reset banner state between tests.
-      try {
-        localStorage.removeItem("nexora_install_banner_dismissed_at");
-        localStorage.removeItem("nexora_pwa_installed");
-      } catch {
-        /* ignore */
-      }
+      // Note: don't clear localStorage here — this init script runs on every
+      // navigation (including reload), which would wipe the dismiss marker
+      // the "persists across reload" test is asserting on. Playwright gives
+      // each test a fresh browser context, so storage is already empty.
+
 
       const w = window as unknown as {
         __bipListeners?: number;
