@@ -1,11 +1,13 @@
-import { createFileRoute, Link, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, redirect, useNavigate } from "@tanstack/react-router";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { LocationPermissionModal } from "@/components/auth/LocationPermissionModal";
 import { BackButton } from "@/components/shared/BackButton";
 import { ViewSwitcher } from "@/components/layout/ViewSwitcher";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchUserRoles, type UserRole } from "@/lib/auth-redirect";
-import { LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, LogOut } from "lucide-react";
+
 
 const BROWSE_AS_CUSTOMER_KEY = "nexora:browseAsCustomer";
 
