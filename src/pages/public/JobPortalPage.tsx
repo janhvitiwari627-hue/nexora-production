@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Briefcase, GraduationCap, MapPin, Search, Sparkles, Star, TrendingUp } from "lucide-react";
+import { Briefcase, GraduationCap, Loader2, MapPin, Search, Sparkles, Star, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BackButton } from "@/components/shared/BackButton";
 import { useAuthStore } from "@/stores/authStore";
@@ -262,9 +262,18 @@ export function JobPortalPage({ initialRole = "seeker" }: { initialRole?: "seeke
                 type="button"
                 onClick={handlePostJob}
                 disabled={!isInitialized}
-                className="bg-gradient-cta text-primary-foreground rounded-[var(--radius-button)] px-6 py-3 text-sm font-bold shadow-[var(--shadow-glow)] disabled:cursor-not-allowed disabled:opacity-70"
+                aria-busy={!isInitialized}
+                aria-live="polite"
+                className="bg-gradient-cta text-primary-foreground inline-flex items-center justify-center gap-2 rounded-[var(--radius-button)] px-6 py-3 text-sm font-bold shadow-[var(--shadow-glow)] transition disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {isInitialized ? "Post a job free" : "Loading…"}
+                {isInitialized ? (
+                  "Post a job free"
+                ) : (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                    <span>Auth initializing…</span>
+                  </>
+                )}
               </button>
               {!user && isInitialized && (
                 <p className="text-muted-foreground mt-3 text-xs">
