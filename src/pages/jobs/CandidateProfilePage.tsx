@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Check, Plus, Trash2, Upload, Video } from "lucide-react";
 import { toast } from "sonner";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
+import { ProfileImageDropzone } from "@/components/shared/ProfileImageDropzone";
+import { useAuthStore } from "@/stores/authStore";
+import { supabase } from "@/integrations/supabase/client";
 
 const STEPS = [
   "Personal",
