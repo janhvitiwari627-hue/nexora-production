@@ -16,8 +16,71 @@ import { EmployerSetupModal } from "@/pages/jobs/EmployerSetupModal";
 import { BackButton } from "@/components/shared/BackButton";
 import { cn } from "@/lib/utils";
 
-const WORK_LOCATIONS = ["Onsite", "Remote", "Hybrid"];
+const WORK_LOCATIONS = [
+  "At salon / studio",
+  "At client location",
+  "Hybrid",
+  "Remote consultation",
+];
+const LEGACY_WORK_LOCATION_MAP: Record<string, string> = {
+  Onsite: "At salon / studio",
+  Remote: "Remote consultation",
+  Hybrid: "Hybrid",
+};
 const INTERVIEW_MODES = ["In-person", "Phone call", "Video call", "WhatsApp"];
+
+const BUSINESS_TYPES = [
+  "Salon",
+  "Beauty Parlour",
+  "Barber Shop",
+  "Spa",
+  "Nail Studio",
+  "Makeup Studio",
+  "Tattoo Studio",
+  "Wellness Center",
+  "Home Service Business",
+  "Other",
+];
+
+const CITY_QUICK_OPTIONS = [
+  "Jaipur",
+  "Delhi",
+  "Mumbai",
+  "Bengaluru",
+  "Pune",
+  "Hyderabad",
+  "Ahmedabad",
+  "Kolkata",
+  "Chennai",
+  "Other city",
+];
+
+const DAY_PRESETS = ["Mon–Sat", "Tue–Sun", "All days", "Weekends only", "Custom days"] as const;
+type DayPreset = (typeof DAY_PRESETS)[number];
+const WEEK_DAYS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+] as const;
+const DAYS_FOR_PRESET: Record<Exclude<DayPreset, "Custom days">, string[]> = {
+  "Mon–Sat": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+  "Tue–Sun": ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+  "All days": [...WEEK_DAYS],
+  "Weekends only": ["Saturday", "Sunday"],
+};
+
+const HOUR_PRESETS: { label: string; start?: string; end?: string; flexible?: boolean }[] = [
+  { label: "9 AM – 6 PM", start: "9 AM", end: "6 PM" },
+  { label: "10 AM – 7 PM", start: "10 AM", end: "7 PM" },
+  { label: "11 AM – 8 PM", start: "11 AM", end: "8 PM" },
+  { label: "12 PM – 9 PM", start: "12 PM", end: "9 PM" },
+  { label: "Flexible hours", flexible: true },
+  { label: "Custom time" },
+];
 
 const CATEGORIES = [
   "Hair Stylist",
