@@ -49,6 +49,7 @@ import { Route as TemplatePreviewKeyRouteImport } from './routes/template-previe
 import { Route as StaffDashboardRouteImport } from './routes/staff.dashboard'
 import { Route as SiteBusinessSlugRouteImport } from './routes/site.$businessSlug'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
+import { Route as SalonSlugRouteImport } from './routes/salon.$slug'
 import { Route as SSlugRouteImport } from './routes/s.$slug'
 import { Route as PortalSponsoredRouteImport } from './routes/portal.sponsored'
 import { Route as PortalPromotionsRouteImport } from './routes/portal.promotions'
@@ -335,6 +336,11 @@ const SiteBusinessSlugRoute = SiteBusinessSlugRouteImport.update({
 const ShopSlugRoute = ShopSlugRouteImport.update({
   id: '/shop/$slug',
   path: '/shop/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SalonSlugRoute = SalonSlugRouteImport.update({
+  id: '/salon/$slug',
+  path: '/salon/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SSlugRoute = SSlugRouteImport.update({
@@ -885,6 +891,7 @@ export interface FileRoutesByFullPath {
   '/portal/promotions': typeof PortalPromotionsRoute
   '/portal/sponsored': typeof PortalSponsoredRoute
   '/s/$slug': typeof SSlugRoute
+  '/salon/$slug': typeof SalonSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/staff/dashboard': typeof StaffDashboardRoute
@@ -1011,6 +1018,7 @@ export interface FileRoutesByTo {
   '/portal/promotions': typeof PortalPromotionsRoute
   '/portal/sponsored': typeof PortalSponsoredRoute
   '/s/$slug': typeof SSlugRoute
+  '/salon/$slug': typeof SalonSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/staff/dashboard': typeof StaffDashboardRoute
@@ -1141,6 +1149,7 @@ export interface FileRoutesById {
   '/portal/promotions': typeof PortalPromotionsRoute
   '/portal/sponsored': typeof PortalSponsoredRoute
   '/s/$slug': typeof SSlugRoute
+  '/salon/$slug': typeof SalonSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/staff/dashboard': typeof StaffDashboardRoute
@@ -1272,6 +1281,7 @@ export interface FileRouteTypes {
     | '/portal/promotions'
     | '/portal/sponsored'
     | '/s/$slug'
+    | '/salon/$slug'
     | '/shop/$slug'
     | '/site/$businessSlug'
     | '/staff/dashboard'
@@ -1398,6 +1408,7 @@ export interface FileRouteTypes {
     | '/portal/promotions'
     | '/portal/sponsored'
     | '/s/$slug'
+    | '/salon/$slug'
     | '/shop/$slug'
     | '/site/$businessSlug'
     | '/staff/dashboard'
@@ -1527,6 +1538,7 @@ export interface FileRouteTypes {
     | '/portal/promotions'
     | '/portal/sponsored'
     | '/s/$slug'
+    | '/salon/$slug'
     | '/shop/$slug'
     | '/site/$businessSlug'
     | '/staff/dashboard'
@@ -1600,6 +1612,7 @@ export interface RootRouteChildren {
   PortalPromotionsRoute: typeof PortalPromotionsRoute
   PortalSponsoredRoute: typeof PortalSponsoredRoute
   SSlugRoute: typeof SSlugRoute
+  SalonSlugRoute: typeof SalonSlugRoute
   ShopSlugRoute: typeof ShopSlugRoute
   SiteBusinessSlugRoute: typeof SiteBusinessSlugRoute
   StaffDashboardRoute: typeof StaffDashboardRoute
@@ -1901,6 +1914,13 @@ declare module '@tanstack/react-router' {
       path: '/shop/$slug'
       fullPath: '/shop/$slug'
       preLoaderRoute: typeof ShopSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/salon/$slug': {
+      id: '/salon/$slug'
+      path: '/salon/$slug'
+      fullPath: '/salon/$slug'
+      preLoaderRoute: typeof SalonSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/s/$slug': {
@@ -2778,6 +2798,7 @@ const rootRouteChildren: RootRouteChildren = {
   PortalPromotionsRoute: PortalPromotionsRoute,
   PortalSponsoredRoute: PortalSponsoredRoute,
   SSlugRoute: SSlugRoute,
+  SalonSlugRoute: SalonSlugRoute,
   ShopSlugRoute: ShopSlugRoute,
   SiteBusinessSlugRoute: SiteBusinessSlugRoute,
   StaffDashboardRoute: StaffDashboardRoute,
