@@ -1,17 +1,22 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { AlertTriangle, ArrowLeft, ArrowRight, Briefcase, Check, MapPin, RefreshCw, Save, Sparkles } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ArrowRight, Briefcase, Check, CheckCircle2, IndianRupee, MapPin, RefreshCw, Save, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthStore } from "@/stores/authStore";
 import {
   getMyEmployerProfile,
+  getMyShopId,
   saveJob,
   type EmployerProfile,
   type JobDraftInput,
+  type JobRow,
 } from "@/lib/jobs";
 import { EmployerSetupModal } from "@/pages/jobs/EmployerSetupModal";
 import { BackButton } from "@/components/shared/BackButton";
 import { cn } from "@/lib/utils";
+
+const WORK_LOCATIONS = ["Onsite", "Remote", "Hybrid"];
+const INTERVIEW_MODES = ["In-person", "Phone call", "Video call", "WhatsApp"];
 
 const CATEGORIES = [
   "Hair Stylist",
