@@ -76,6 +76,8 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
   const [applying, setApplying] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
   const [successMode, setSuccessMode] = useState<"real" | "demo">("real");
+  const [applyOpen, setApplyOpen] = useState(false);
+  const [coverNote, setCoverNote] = useState("");
 
   useEffect(() => {
     let alive = true;
