@@ -98,6 +98,7 @@ import { Route as DashboardFavoritesRouteImport } from './routes/dashboard.favor
 import { Route as DashboardBookingsRouteImport } from './routes/dashboard.bookings'
 import { Route as DashboardActivityRouteImport } from './routes/dashboard.activity'
 import { Route as CustomerHomeRouteImport } from './routes/customer.home'
+import { Route as CustomerBookingsRouteImport } from './routes/customer.bookings'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as BrandSlugRouteImport } from './routes/brand.$slug'
 import { Route as BookSlugRouteImport } from './routes/book.$slug'
@@ -577,6 +578,11 @@ const CustomerHomeRoute = CustomerHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => CustomerRoute,
 } as any)
+const CustomerBookingsRoute = CustomerBookingsRouteImport.update({
+  id: '/bookings',
+  path: '/bookings',
+  getParentRoute: () => CustomerRoute,
+} as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/category/$slug',
   path: '/category/$slug',
@@ -793,6 +799,7 @@ export interface FileRoutesByFullPath {
   '/book/$slug': typeof BookSlugRoute
   '/brand/$slug': typeof BrandSlugRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/customer/bookings': typeof CustomerBookingsRoute
   '/customer/home': typeof CustomerHomeRoute
   '/dashboard/activity': typeof DashboardActivityRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
@@ -913,6 +920,7 @@ export interface FileRoutesByTo {
   '/book/$slug': typeof BookSlugRoute
   '/brand/$slug': typeof BrandSlugRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/customer/bookings': typeof CustomerBookingsRoute
   '/customer/home': typeof CustomerHomeRoute
   '/dashboard/activity': typeof DashboardActivityRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
@@ -1037,6 +1045,7 @@ export interface FileRoutesById {
   '/book/$slug': typeof BookSlugRoute
   '/brand/$slug': typeof BrandSlugRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/customer/bookings': typeof CustomerBookingsRoute
   '/customer/home': typeof CustomerHomeRoute
   '/dashboard/activity': typeof DashboardActivityRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
@@ -1162,6 +1171,7 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/brand/$slug'
     | '/category/$slug'
+    | '/customer/bookings'
     | '/customer/home'
     | '/dashboard/activity'
     | '/dashboard/bookings'
@@ -1282,6 +1292,7 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/brand/$slug'
     | '/category/$slug'
+    | '/customer/bookings'
     | '/customer/home'
     | '/dashboard/activity'
     | '/dashboard/bookings'
@@ -1405,6 +1416,7 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/brand/$slug'
     | '/category/$slug'
+    | '/customer/bookings'
     | '/customer/home'
     | '/dashboard/activity'
     | '/dashboard/bookings'
@@ -2173,6 +2185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CustomerHomeRouteImport
       parentRoute: typeof CustomerRoute
     }
+    '/customer/bookings': {
+      id: '/customer/bookings'
+      path: '/bookings'
+      fullPath: '/customer/bookings'
+      preLoaderRoute: typeof CustomerBookingsRouteImport
+      parentRoute: typeof CustomerRoute
+    }
     '/category/$slug': {
       id: '/category/$slug'
       path: '/category/$slug'
@@ -2433,10 +2452,12 @@ const AdminRouteChildren: AdminRouteChildren = {
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface CustomerRouteChildren {
+  CustomerBookingsRoute: typeof CustomerBookingsRoute
   CustomerHomeRoute: typeof CustomerHomeRoute
 }
 
 const CustomerRouteChildren: CustomerRouteChildren = {
+  CustomerBookingsRoute: CustomerBookingsRoute,
   CustomerHomeRoute: CustomerHomeRoute,
 }
 
