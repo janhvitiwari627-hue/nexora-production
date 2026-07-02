@@ -14,6 +14,7 @@ interface AuthStore {
   roles: UserRole[];
   isLoading: boolean;
   isInitialized: boolean;
+  initError: string | null;
 
   setUser: (user: User | null) => void;
   setProfile: (profile: Profile | null) => void;
@@ -21,6 +22,7 @@ interface AuthStore {
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   initialize: () => Promise<() => void>;
+  retryInitialize: () => Promise<void>;
   hasRole: (role: UserRole) => boolean;
   hasAnyRole: (roles: UserRole[]) => boolean;
 }
