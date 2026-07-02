@@ -218,6 +218,7 @@ export function PostJobPage() {
         requirements: form.requirements || null,
         salary_min: form.salary_min ?? null,
         salary_max: form.salary_max ?? null,
+        openings: Math.min(50, Math.max(1, Number(form.openings) || 1)),
       };
       const row = await saveJob({
         jobId,
