@@ -1,25 +1,25 @@
-/* Nexora SalonOS service worker — minimal offline shell.
+/* Nexora SalonOS service worker — controlled update flow.
  * Strategy:
- *   - Precache the offline fallback + core icons on install.
+ *   - Precache offline fallback + core icons on install.
+ *   - Manifest is ALWAYS network-first (never stale start_url / theme).
  *   - Navigation requests: network-first, fall back to /offline.html.
  *   - Same-origin static assets (JS/CSS/img/font): stale-while-revalidate.
- *   - Never intercept POST/PUT/DELETE, cross-origin, or Supabase/API calls.
+ *   - skipWaiting only when the page explicitly asks (user-approved refresh),
+ *     so we never force-reload mid-session with a stale mismatch.
  */
-const VERSION = "nexora-v1";
+const VERSION = "nexora-v2";
 const PRECACHE = `${VERSION}-precache`;
 const RUNTIME = `${VERSION}-runtime`;
 
 const PRECACHE_URLS = [
   "/offline.html",
-  "/manifest.webmanifest",
   "/icon-192.png",
   "/icon-512.png",
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(PRECACHE).then((cache) => cache.addAll(PRECACHE_URLS)).then(() => self.skipWaiting())
-  );
+  // Do NOT skipWaiting automatically — wait for the client to approve.
+  event.waitUntil(caches.open(PRECACHE).then((cache) => cache.addAll(PRECACHE_URLS)));
 });
 
 self.addEventListener("activate", (event) => {
@@ -37,11 +37,16 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("message", (event) => {
-  if (event.data === "SKIP_WAITING") self.skipWaiting();
+  const data = event.data;
+  if (data === "SKIP_WAITING" || data?.type === "SKIP_WAITING") self.skipWaiting();
 });
 
 function isSameOrigin(url) {
   try { return new URL(url).origin === self.location.origin; } catch { return false; }
+}
+
+function isManifestRequest(url) {
+  return url.pathname === "/manifest.webmanifest" || url.pathname === "/manifest.json";
 }
 
 self.addEventListener("fetch", (event) => {
@@ -49,16 +54,23 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET") return;
   const url = new URL(request.url);
   if (!isSameOrigin(request.url)) return;
-  // Skip API / auth endpoints — always network.
   if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/auth/") || url.pathname.startsWith("/_")) return;
 
-  // Navigation requests → network-first with offline fallback.
+  // Manifest — always network-first, never serve a stale start_url / theme.
+  if (isManifestRequest(url)) {
+    event.respondWith(
+      fetch(request, { cache: "no-store" }).catch(() =>
+        caches.match(request).then((c) => c || new Response("{}", { headers: { "Content-Type": "application/manifest+json" } }))
+      )
+    );
+    return;
+  }
+
   if (request.mode === "navigate") {
     event.respondWith(
       (async () => {
         try {
-          const fresh = await fetch(request);
-          return fresh;
+          return await fetch(request);
         } catch {
           const cache = await caches.open(PRECACHE);
           const offline = await cache.match("/offline.html");
@@ -69,7 +81,6 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Static assets → stale-while-revalidate.
   const dest = request.destination;
   if (["style", "script", "image", "font"].includes(dest)) {
     event.respondWith(
