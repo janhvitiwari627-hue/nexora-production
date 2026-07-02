@@ -1300,6 +1300,43 @@ function DetailsStep({
           value={form.description}
           onChange={(e) => update({ description: e.target.value })}
         />
+        {(() => {
+          const templates =
+            (form.category && DESCRIPTION_TEMPLATES[form.category]) ||
+            GENERAL_DESCRIPTION_TEMPLATES;
+          if (!templates.length) return null;
+          const insert = (body: string) => {
+            const current = form.description.trim();
+            const next = current.length === 0 ? body : `${current}\n\n${body}`;
+            update({ description: next });
+          };
+          return (
+            <div className="mt-3">
+              <p className="text-heading mb-2 text-xs font-semibold">
+                Description templates
+                {form.category ? (
+                  <span className="text-muted-foreground font-normal"> · {form.category}</span>
+                ) : null}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {templates.map((t) => (
+                  <button
+                    key={t.label}
+                    type="button"
+                    onClick={() => insert(t.body)}
+                    title={t.body}
+                    className="border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading rounded-full border px-3 py-1.5 text-xs font-semibold transition"
+                  >
+                    + {t.label}
+                  </button>
+                ))}
+              </div>
+              <p className="text-muted-foreground mt-1.5 text-[11px]">
+                Tap a template to insert it. You can edit the text after inserting.
+              </p>
+            </div>
+          );
+        })()}
       </Field>
     </div>
   );
