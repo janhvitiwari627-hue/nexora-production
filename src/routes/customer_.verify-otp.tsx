@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { isSmsProviderConfigError, SmsNotConfiguredAlert } from "@/lib/sms-provider-error";
 
 export const Route = createFileRoute("/customer_/verify-otp")({
   head: () => ({ meta: [{ title: "Verify OTP — Nexora Customer App" }] }),
@@ -26,6 +27,7 @@ function VerifyOtpPage() {
   const navigate = useNavigate();
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [smsConfigError, setSmsConfigError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [resending, setResending] = useState(false);
   const [resendIn, setResendIn] = useState(RESEND_SECONDS);
@@ -72,6 +74,7 @@ function VerifyOtpPage() {
       setError("Missing phone number. Please restart sign in.");
       return;
     }
+    setSmsConfigError(null);
     setResending(true);
     const { error: sendError } = await supabase.auth.signInWithOtp({
       phone,
@@ -79,6 +82,10 @@ function VerifyOtpPage() {
     });
     setResending(false);
     if (sendError) {
+      if (isSmsProviderConfigError(sendError.message)) {
+        setSmsConfigError(sendError.message);
+        return;
+      }
       toast.error("Couldn't resend OTP", { description: sendError.message });
       return;
     }
@@ -95,6 +102,7 @@ function VerifyOtpPage() {
           We sent a 6-digit code to {phone || "your phone"}.
         </p>
       </div>
+      {smsConfigError && <SmsNotConfiguredAlert originalMessage={smsConfigError} />}
       <div className="flex flex-col items-center gap-2">
         <InputOTP
           maxLength={6}
