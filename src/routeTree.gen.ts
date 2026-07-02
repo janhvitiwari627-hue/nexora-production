@@ -98,6 +98,7 @@ import { Route as DashboardFavoritesRouteImport } from './routes/dashboard.favor
 import { Route as DashboardBookingsRouteImport } from './routes/dashboard.bookings'
 import { Route as DashboardActivityRouteImport } from './routes/dashboard.activity'
 import { Route as CustomerRewardsRouteImport } from './routes/customer.rewards'
+import { Route as CustomerProfileRouteImport } from './routes/customer.profile'
 import { Route as CustomerHomeRouteImport } from './routes/customer.home'
 import { Route as CustomerBookingsRouteImport } from './routes/customer.bookings'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
@@ -579,6 +580,11 @@ const CustomerRewardsRoute = CustomerRewardsRouteImport.update({
   path: '/rewards',
   getParentRoute: () => CustomerRoute,
 } as any)
+const CustomerProfileRoute = CustomerProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => CustomerRoute,
+} as any)
 const CustomerHomeRoute = CustomerHomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -807,6 +813,7 @@ export interface FileRoutesByFullPath {
   '/category/$slug': typeof CategorySlugRoute
   '/customer/bookings': typeof CustomerBookingsRoute
   '/customer/home': typeof CustomerHomeRoute
+  '/customer/profile': typeof CustomerProfileRoute
   '/customer/rewards': typeof CustomerRewardsRoute
   '/dashboard/activity': typeof DashboardActivityRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
@@ -929,6 +936,7 @@ export interface FileRoutesByTo {
   '/category/$slug': typeof CategorySlugRoute
   '/customer/bookings': typeof CustomerBookingsRoute
   '/customer/home': typeof CustomerHomeRoute
+  '/customer/profile': typeof CustomerProfileRoute
   '/customer/rewards': typeof CustomerRewardsRoute
   '/dashboard/activity': typeof DashboardActivityRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
@@ -1055,6 +1063,7 @@ export interface FileRoutesById {
   '/category/$slug': typeof CategorySlugRoute
   '/customer/bookings': typeof CustomerBookingsRoute
   '/customer/home': typeof CustomerHomeRoute
+  '/customer/profile': typeof CustomerProfileRoute
   '/customer/rewards': typeof CustomerRewardsRoute
   '/dashboard/activity': typeof DashboardActivityRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
@@ -1182,6 +1191,7 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/customer/bookings'
     | '/customer/home'
+    | '/customer/profile'
     | '/customer/rewards'
     | '/dashboard/activity'
     | '/dashboard/bookings'
@@ -1304,6 +1314,7 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/customer/bookings'
     | '/customer/home'
+    | '/customer/profile'
     | '/customer/rewards'
     | '/dashboard/activity'
     | '/dashboard/bookings'
@@ -1429,6 +1440,7 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/customer/bookings'
     | '/customer/home'
+    | '/customer/profile'
     | '/customer/rewards'
     | '/dashboard/activity'
     | '/dashboard/bookings'
@@ -2197,6 +2209,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CustomerRewardsRouteImport
       parentRoute: typeof CustomerRoute
     }
+    '/customer/profile': {
+      id: '/customer/profile'
+      path: '/profile'
+      fullPath: '/customer/profile'
+      preLoaderRoute: typeof CustomerProfileRouteImport
+      parentRoute: typeof CustomerRoute
+    }
     '/customer/home': {
       id: '/customer/home'
       path: '/home'
@@ -2473,12 +2492,14 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 interface CustomerRouteChildren {
   CustomerBookingsRoute: typeof CustomerBookingsRoute
   CustomerHomeRoute: typeof CustomerHomeRoute
+  CustomerProfileRoute: typeof CustomerProfileRoute
   CustomerRewardsRoute: typeof CustomerRewardsRoute
 }
 
 const CustomerRouteChildren: CustomerRouteChildren = {
   CustomerBookingsRoute: CustomerBookingsRoute,
   CustomerHomeRoute: CustomerHomeRoute,
+  CustomerProfileRoute: CustomerProfileRoute,
   CustomerRewardsRoute: CustomerRewardsRoute,
 }
 
