@@ -558,18 +558,33 @@ export function OwnerDashboardPage() {
             <h1 className="text-2xl font-bold text-heading">{greeting}, {displayName.split(" ")[0]} 👋</h1>
             <p className="text-sm text-muted-foreground">Here's what's happening at your business today.</p>
           </div>
-          {!ctxLoading && (
-            activeSalon ? (
-              <Badge className="border-0 bg-success/10 text-success gap-1.5">
-                <Sparkles className="h-3 w-3" /> Live data · {activeSalon.name}
-              </Badge>
-            ) : (
-              <Badge className="border-0 bg-warning/10 text-warning">
-                Demo data — no salon linked yet
-              </Badge>
-            )
-          )}
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              onClick={() => {
+                try { sessionStorage.setItem("nexora:browseAsCustomer", "1"); } catch { /* ignore */ }
+                navigate({ to: "/customer/home", search: { as: "customer" } as never });
+              }}
+            >
+              <UserCircle2 className="h-4 w-4" />
+              Browse as customer
+            </Button>
+            {!ctxLoading && (
+              activeSalon ? (
+                <Badge className="border-0 bg-success/10 text-success gap-1.5">
+                  <Sparkles className="h-3 w-3" /> Live data · {activeSalon.name}
+                </Badge>
+              ) : (
+                <Badge className="border-0 bg-warning/10 text-warning">
+                  Demo data — no salon linked yet
+                </Badge>
+              )
+            )}
+          </div>
         </div>
+
 
 
 
