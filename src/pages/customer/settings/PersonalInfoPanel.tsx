@@ -175,44 +175,14 @@ export function PersonalInfoPanel() {
 
   return (
     <PanelShell title="Personal information" subtitle="How you appear across Nexora.">
-      <div className="flex items-start gap-4">
-        <div className="relative">
-          <div className="bg-muted ring-border grid h-24 w-24 place-items-center overflow-hidden rounded-full ring-2">
-            {avatar ? (
-              <img src={avatar} alt="Avatar" className="h-full w-full object-cover" />
-            ) : (
-              <span className="text-heading text-2xl font-black">{initials}</span>
-            )}
-            {uploading && (
-              <div className="absolute inset-0 grid place-items-center rounded-full bg-black/40">
-                <Loader2 className="h-5 w-5 animate-spin text-white" />
-              </div>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={() => fileRef.current?.click()}
-            disabled={uploading}
-            className="bg-primary text-primary-foreground absolute -bottom-1 -right-1 grid h-8 w-8 place-items-center rounded-full shadow-md disabled:opacity-60"
-            aria-label="Upload avatar"
-          >
-            <Camera className="h-4 w-4" />
-          </button>
-          <input ref={fileRef} type="file" accept="image/*" onChange={handleAvatar} className="hidden" />
-        </div>
-        <div className="flex-1">
-          <p className="text-heading text-sm font-bold">Profile photo</p>
-          <p className="text-muted-foreground text-xs">JPG or PNG, max 5 MB. We'll auto-crop to a circle.</p>
-          <button
-            type="button"
-            onClick={() => fileRef.current?.click()}
-            disabled={uploading}
-            className="border-border hover:bg-accent mt-2 inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-semibold disabled:opacity-60"
-          >
-            <Upload className="h-3.5 w-3.5" /> {uploading ? "Uploading…" : "Upload new"}
-          </button>
-        </div>
-      </div>
+      <ProfileImageUpload
+        value={avatar}
+        onFile={handleAvatarFile}
+        onRemove={handleAvatarRemove}
+        fallback={initials}
+        uploading={uploading}
+        maxSizeMB={5}
+      />
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <Field label="Full name">
