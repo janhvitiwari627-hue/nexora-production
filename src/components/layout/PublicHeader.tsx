@@ -131,6 +131,7 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
 
   return (
     <header
+      data-testid="public-header"
       className={`sticky top-0 z-50 w-full transition-all duration-300 ${
         scrolled
           ? "glass-panel border-b border-border/60 shadow-[var(--shadow-card)]"
