@@ -331,7 +331,15 @@ export function MyApplicationsPage() {
 
         {error && (
           <Card>
-            <CardContent className="p-6 text-sm text-rose-600">{error}</CardContent>
+            <CardContent className="flex flex-wrap items-center justify-between gap-3 p-6 text-sm">
+              <span className="text-rose-600">
+                {error}
+                {retryAttempt > 0 && ` (after ${retryAttempt} ${retryAttempt === 1 ? "retry" : "retries"})`}
+              </span>
+              <Button size="sm" variant="outline" onClick={() => setRefreshTick((t) => t + 1)}>
+                <RefreshCw className="mr-2 h-4 w-4" /> Try again
+              </Button>
+            </CardContent>
           </Card>
         )}
 
