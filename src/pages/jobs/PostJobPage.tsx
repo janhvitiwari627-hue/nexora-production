@@ -2884,9 +2884,9 @@ function LivePreview({ form, profile }: { form: Form; profile: EmployerProfile |
             <IndianRupee className="h-3.5 w-3.5" />
             <span className="truncate">{salary.replace(/^₹/, "")}</span>
           </div>
-          {form.openings > 0 && (
+          {(form.openings ?? 0) > 0 && (
             <div className="text-muted-foreground text-[10px] uppercase tracking-wider">
-              {form.openings} opening{form.openings > 1 ? "s" : ""}
+              {form.openings} opening{(form.openings ?? 0) > 1 ? "s" : ""}
             </div>
           )}
         </div>
