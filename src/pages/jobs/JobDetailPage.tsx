@@ -137,18 +137,18 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
     let alive = true;
     async function check() {
       if (!user || !isRealJobId(jobId)) {
-        setAlreadyApplied(false);
+        setApplication(null);
         return;
       }
       setCheckingApplied(true);
-      const { data } = await (supabase as never as { from: (n: string) => { select: (c: string) => { eq: (c: string, v: string) => { eq: (c: string, v: string) => { maybeSingle: () => Promise<{ data: unknown }> } } } } })
+      const { data } = await (supabase as never as { from: (n: string) => { select: (c: string) => { eq: (c: string, v: string) => { eq: (c: string, v: string) => { maybeSingle: () => Promise<{ data: { id: string; cover_note: string | null; status: string; created_at: string } | null }> } } } } })
         .from("job_applications")
-        .select("id")
+        .select("id, cover_note, status, created_at")
         .eq("job_id", jobId)
         .eq("applicant_id", user.id)
         .maybeSingle();
       if (!alive) return;
-      setAlreadyApplied(Boolean(data));
+      setApplication(data ?? null);
       setCheckingApplied(false);
     }
     check();
