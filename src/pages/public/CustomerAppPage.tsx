@@ -145,6 +145,7 @@ export default function CustomerAppPage() {
     document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
+      unsubGlobal();
       window.removeEventListener("beforeinstallprompt", onPrompt);
       window.removeEventListener("appinstalled", onInstalled);
       window.removeEventListener("storage", onStorage);
