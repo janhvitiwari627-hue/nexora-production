@@ -147,7 +147,7 @@ export function PostJobPage() {
     return false;
   };
 
-  const canContinue = !stepInvalid(step);
+  
 
   function tryContinue() {
     if (stepInvalid(step)) {
