@@ -7,7 +7,7 @@ import { useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/customer/onboarding")({
+export const Route = createFileRoute("/customer_/onboarding")({
   head: () => ({ meta: [{ title: "Set up your profile — Nexora" }] }),
   component: OnboardingPage,
 });

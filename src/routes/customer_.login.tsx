@@ -12,7 +12,7 @@ import { toast } from "sonner";
  * Uses a non-nested filename (`customer_.login`) so it skips the
  * authenticated /customer layout gate.
  */
-export const Route = createFileRoute("/customer/login")({
+export const Route = createFileRoute("/customer_/login")({
   head: () => ({
     meta: [
       { title: "Sign in — Nexora Customer App" },

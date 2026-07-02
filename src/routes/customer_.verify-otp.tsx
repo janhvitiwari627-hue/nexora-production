@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/customer/verify-otp")({
+export const Route = createFileRoute("/customer_/verify-otp")({
   head: () => ({ meta: [{ title: "Verify OTP — Nexora Customer App" }] }),
   validateSearch: (s: Record<string, unknown>) => ({
     phone: typeof s.phone === "string" ? s.phone : "",
