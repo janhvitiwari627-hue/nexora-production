@@ -43,6 +43,7 @@ const NAV = [
   { to: "/jobs", label: "Job Portal", icon: Briefcase },
   { to: "/partner/growth", label: "Partner Growth", icon: TrendingUp },
   { to: "/owner/templates", label: "Create Shop Website", icon: null },
+  { to: "/download-app", label: "Download App", icon: Smartphone },
 ] as const;
 
 const PORTAL_MENU = [
