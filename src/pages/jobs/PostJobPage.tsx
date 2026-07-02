@@ -673,6 +673,15 @@ function DetailsStep({
           onChange={(e) => update({ title: e.target.value })}
         />
       </Field>
+      <Field label="Specific job role" hint="Optional — e.g. Bridal Hair Specialist, Senior Nail Tech.">
+        <input
+          className={inputCls}
+          placeholder="Example: Bridal Hair Specialist"
+          maxLength={80}
+          value={form.job_role ?? ""}
+          onChange={(e) => update({ job_role: e.target.value })}
+        />
+      </Field>
       <Field
         label="Beauty category"
         hint={form.category ? `Selected: ${form.category}` : "Pick the role that best matches this job."}
