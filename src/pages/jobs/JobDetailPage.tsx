@@ -204,7 +204,12 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
       console.info("[apply] demo submission payload:", { jobId: payloadJobId, coverNote: note });
       toast.success("Application submitted (demo)");
       setApplyOpen(false);
-      setAlreadyApplied(true);
+      setApplication({
+        id: `demo-${payloadJobId}`,
+        cover_note: note,
+        status: "submitted",
+        created_at: new Date().toISOString(),
+      });
       setSuccessMode("demo");
       setSuccessOpen(true);
       return;
