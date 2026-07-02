@@ -75,10 +75,47 @@ export default function CustomerAppPage() {
     };
     window.addEventListener("beforeinstallprompt", onPrompt);
     window.addEventListener("appinstalled", onInstalled);
-    if (window.matchMedia?.("(display-mode: standalone)").matches) setInstalled(true);
+
+    // Sync with display-mode: standalone (persists on reload and updates live).
+    const mql = window.matchMedia?.("(display-mode: standalone)");
+    if (mql?.matches) {
+      setInstalled(true);
+      try { localStorage.setItem(INSTALLED_KEY, "1"); } catch { /* ignore */ }
+    }
+    const onDisplayModeChange = (e: MediaQueryListEvent) => {
+      if (e.matches) {
+        setInstalled(true);
+        try { localStorage.setItem(INSTALLED_KEY, "1"); } catch { /* ignore */ }
+      }
+    };
+    mql?.addEventListener?.("change", onDisplayModeChange);
+
+    // Cross-tab sync: reflect install/dismiss changes made in other tabs.
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === INSTALLED_KEY && e.newValue) setInstalled(true);
+      if (e.key === INSTALLED_KEY && e.newValue === null) setInstalled(false);
+      // sessionStorage doesn't cross tabs, but honor same-tab dismissal broadcasts via localStorage bridge below.
+      if (e.key === SESSION_DISMISS_KEY && e.newValue) setDismissed(true);
+    };
+    window.addEventListener("storage", onStorage);
+
+    // When the page regains focus, re-check flags (covers install completed while backgrounded).
+    const onVisibility = () => {
+      if (document.visibilityState !== "visible") return;
+      try {
+        if (localStorage.getItem(INSTALLED_KEY)) setInstalled(true);
+        if (sessionStorage.getItem(SESSION_DISMISS_KEY)) setDismissed(true);
+      } catch { /* ignore */ }
+      if (window.matchMedia?.("(display-mode: standalone)").matches) setInstalled(true);
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
     return () => {
       window.removeEventListener("beforeinstallprompt", onPrompt);
       window.removeEventListener("appinstalled", onInstalled);
+      window.removeEventListener("storage", onStorage);
+      document.removeEventListener("visibilitychange", onVisibility);
+      mql?.removeEventListener?.("change", onDisplayModeChange);
     };
   }, []);
 
