@@ -45,6 +45,7 @@ export function BookingFlowPage({ salon }: { salon?: RealSalonRef } = {}) {
   const queryClient = useQueryClient();
   const createFn = useServerFn(createBooking);
   const confirmFn = useServerFn(confirmBookingPayment);
+  const online = useOnlineStatus();
 
   const shop = MOCK_SHOP;
   const allServices = useMemo<Service[]>(() => {
