@@ -41,10 +41,12 @@ function walk(dir) {
   return out;
 }
 
-// 1. Scan customer route files.
+// 1. Scan customer route files + the customer-app install page. The
+// installed-state guard means /customer-app must also never import a
+// public marketing layout component.
 const routesDir = join(ROOT, "src/routes");
 const customerRouteFiles = readdirSync(routesDir)
-  .filter((n) => n.startsWith("customer.") || n === "customer.tsx")
+  .filter((n) => n.startsWith("customer.") || n === "customer.tsx" || n === "customer-app.tsx")
   .map((n) => join(routesDir, n));
 const customerDir = join(routesDir, "customer");
 try {
@@ -52,6 +54,15 @@ try {
 } catch {
   /* no nested customer dir — fine */
 }
+// The page component behind /customer-app also gets scanned.
+const customerAppPage = join(ROOT, "src/pages/public/CustomerAppPage.tsx");
+try {
+  statSync(customerAppPage);
+  customerRouteFiles.push(customerAppPage);
+} catch {
+  /* page missing — routing check will surface it separately */
+}
+
 
 for (const file of customerRouteFiles) {
   const src = readFileSync(file, "utf8");
