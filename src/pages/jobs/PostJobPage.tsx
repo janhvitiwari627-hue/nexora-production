@@ -612,16 +612,29 @@ function DetailsStep({
           onChange={(e) => update({ title: e.target.value })}
         />
       </Field>
-      <Field label="Beauty category" hint="Pick the role that best matches this job.">
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+      <Field
+        label="Beauty category"
+        hint={form.category ? `Selected: ${form.category}` : "Pick the role that best matches this job."}
+        error={errors.category}
+      >
+        <div
+          role="radiogroup"
+          aria-label="Beauty category"
+          aria-invalid={!!errors.category}
+          className={cn(
+            "grid grid-cols-2 gap-2 sm:grid-cols-3 rounded-lg",
+            errors.category && "ring-1 ring-destructive p-2",
+          )}
+        >
           {CATEGORIES.map((c) => {
             const active = form.category === c;
             return (
               <button
                 key={c}
                 type="button"
+                role="radio"
+                aria-checked={active}
                 onClick={() => update({ category: c })}
-                aria-pressed={active}
                 className={cn(
                   "rounded-lg border px-3 py-2 text-left text-sm font-semibold transition",
                   active
