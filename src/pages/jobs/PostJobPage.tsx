@@ -746,7 +746,18 @@ function DetailsStep({
   update: (p: Partial<Form>) => void;
   errors: FormErrors;
 }) {
-  const roleOptions = ROLE_SUGGESTIONS[form.category ?? ""] ?? [];
+  const GENERAL_ROLES = [
+    "Senior Beauty Professional",
+    "Junior Beauty Professional",
+    "Beauty Assistant",
+    "Salon Executive",
+    "Freelance Beauty Expert",
+    "Trainee",
+    "Other",
+  ];
+  const roleOptions = form.category
+    ? ROLE_SUGGESTIONS[form.category] ?? GENERAL_ROLES
+    : GENERAL_ROLES;
   const selectedRole = (form.job_role ?? "").trim();
   const titleValue = form.title.trim();
   const titleMatchesRole = selectedRole.length > 0 && titleValue === selectedRole;
@@ -836,11 +847,7 @@ function DetailsStep({
       </Field>
       <Field
         label="Specific job role"
-        hint={
-          form.category
-            ? "Tap a suggestion or type your own."
-            : "Optional — pick a category above to see quick suggestions."
-        }
+        hint="Choose a suggested role or type your own."
       >
         <input
           className={inputCls}
@@ -850,26 +857,29 @@ function DetailsStep({
           onChange={(e) => update({ job_role: e.target.value })}
         />
         {roleOptions.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-2">
-            {roleOptions.map((role) => {
-              const active = selectedRole === role;
-              return (
-                <button
-                  key={role}
-                  type="button"
-                  onClick={() => pickRole(role)}
-                  aria-pressed={active}
-                  className={cn(
-                    "rounded-full border px-3 py-1.5 text-xs font-semibold transition",
-                    active
-                      ? "border-transparent bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
-                      : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
-                  )}
-                >
-                  {role}
-                </button>
-              );
-            })}
+          <div className="mt-3">
+            <p className="text-heading mb-2 text-xs font-semibold">Quick role suggestions</p>
+            <div className="flex flex-wrap gap-2">
+              {roleOptions.map((role) => {
+                const active = selectedRole === role;
+                return (
+                  <button
+                    key={role}
+                    type="button"
+                    onClick={() => pickRole(role)}
+                    aria-pressed={active}
+                    className={cn(
+                      "rounded-full border px-3 py-1.5 text-xs font-semibold transition",
+                      active
+                        ? "border-transparent bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
+                        : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
+                    )}
+                  >
+                    {role}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
       </Field>
