@@ -1,16 +1,18 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Sparkles } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
+import { z } from "zod";
+import { toast } from "sonner";
 
 /**
  * /customer/login — pre-auth customer entry screen.
  * Uses a non-nested filename (`customer_.login`) so it skips the
  * authenticated /customer layout gate.
  */
-export const Route = createFileRoute("/customer_/login")({
+export const Route = createFileRoute("/customer/login")({
   head: () => ({
     meta: [
       { title: "Sign in — Nexora Customer App" },
@@ -20,8 +22,42 @@ export const Route = createFileRoute("/customer_/login")({
   component: CustomerLoginPage,
 });
 
+// E.164-ish: optional +, 8–15 digits total. Client-side only; real
+// verification happens server-side once wiring is added.
+const phoneSchema = z.object({
+  phone: z
+    .string()
+    .trim()
+    .min(8, "Enter a valid phone number")
+    .max(20, "Phone number is too long")
+    .regex(/^\+?[0-9\s-]{8,20}$/, "Only digits, spaces, or a leading +"),
+});
+
 function CustomerLoginPage() {
+  const navigate = useNavigate();
   const [phone, setPhone] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    const parsed = phoneSchema.safeParse({ phone });
+    if (!parsed.success) {
+      setError(parsed.error.issues[0]?.message ?? "Invalid phone number");
+      return;
+    }
+    setSubmitting(true);
+    // Placeholder: pretend to request an OTP.
+    await new Promise((r) => setTimeout(r, 600));
+    setSubmitting(false);
+    toast.success("OTP sent", { description: `We texted a code to ${parsed.data.phone}` });
+    navigate({
+      to: "/customer/verify-otp",
+      search: { phone: parsed.data.phone },
+    });
+  };
+
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-6 px-6 py-10">
       <div className="text-center">
@@ -33,15 +69,7 @@ function CustomerLoginPage() {
           Enter your phone number to continue.
         </p>
       </div>
-      <form
-        className="space-y-3"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (phone.trim().length >= 8) {
-            window.location.assign(`/customer/verify-otp?phone=${encodeURIComponent(phone)}`);
-          }
-        }}
-      >
+      <form className="space-y-3" onSubmit={onSubmit} noValidate>
         <Label htmlFor="phone">Phone number</Label>
         <Input
           id="phone"
@@ -50,9 +78,24 @@ function CustomerLoginPage() {
           autoComplete="tel"
           placeholder="+91 98765 43210"
           value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          maxLength={20}
+          onChange={(e) => {
+            setPhone(e.target.value);
+            if (error) setError(null);
+          }}
+          aria-invalid={error ? "true" : undefined}
+          aria-describedby={error ? "phone-error" : undefined}
+          disabled={submitting}
         />
-        <Button type="submit" className="w-full">Send OTP</Button>
+        {error && (
+          <p id="phone-error" className="text-xs text-destructive" role="alert">
+            {error}
+          </p>
+        )}
+        <Button type="submit" className="w-full" disabled={submitting}>
+          {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {submitting ? "Sending OTP…" : "Send OTP"}
+        </Button>
       </form>
       <p className="text-center text-xs text-muted-foreground">
         By continuing you agree to Nexora's{" "}
