@@ -14,17 +14,25 @@ import { BackButton } from "@/components/shared/BackButton";
 import { cn } from "@/lib/utils";
 
 const CATEGORIES = [
-  "Hair",
-  "Skin",
-  "Makeup",
-  "Nails",
-  "Spa & Massage",
+  "Hair Stylist",
   "Barber",
-  "Front Desk",
-  "Management",
+  "Makeup Artist",
+  "Nail Artist",
+  "Beauty Therapist",
+  "Spa Therapist",
+  "Massage Therapist",
+  "Skin Therapist",
+  "Eyelash / Brow Artist",
+  "Tattoo Artist",
+  "Salon Manager",
+  "Receptionist",
+  "Salon Assistant",
+  "Hair Colourist",
+  "Bridal Makeup Artist",
+  "Freelancer",
   "Other",
 ];
-const JOB_TYPES = ["Full-time", "Part-time", "Freelance", "Internship"];
+const JOB_TYPES = ["Full-time", "Part-time", "Freelance", "Contract", "Internship", "Temporary"];
 const EXPERIENCE = ["Fresher", "1–3 years", "3–5 years", "5+ years"];
 const PERIODS: { label: string; value: JobDraftInput["salary_period"] }[] = [
   { label: "per month", value: "monthly" },
@@ -507,7 +515,7 @@ function validateForm(form: Form): FormErrors {
   const title = form.title.trim();
   if (title.length === 0) errs.title = "Job title is required.";
   else if (title.length < 3) errs.title = "Job title must be at least 3 characters.";
-  else if (title.length > 100) errs.title = "Job title must be 100 characters or fewer.";
+  else if (title.length > 80) errs.title = "Job title must be 80 characters or fewer.";
 
   const desc = form.description.trim();
   if (desc.length === 0) errs.description = "Description is required.";
@@ -574,39 +582,62 @@ function DetailsStep({
   return (
     <div className="space-y-4">
       <h2 className="text-heading text-xl font-bold">Job details</h2>
-      <Field label="Job title" error={errors.title}>
+      <Field label="Job title" error={errors.title} hint={`${form.title.trim().length}/80 characters`}>
         <input
           className={errors.title ? inputErrCls : inputCls}
-          placeholder="e.g. Senior Hair Stylist"
+          placeholder="Example: Senior Hair Stylist"
           aria-invalid={!!errors.title}
+          maxLength={80}
           value={form.title}
           onChange={(e) => update({ title: e.target.value })}
         />
       </Field>
-      <div className="grid gap-4 md:grid-cols-2">
-        <Field label="Category">
-          <select
-            className={inputCls}
-            value={form.category}
-            onChange={(e) => update({ category: e.target.value })}
-          >
-            {CATEGORIES.map((c) => (
-              <option key={c}>{c}</option>
-            ))}
-          </select>
-        </Field>
-        <Field label="Job type">
-          <select
-            className={inputCls}
-            value={form.job_type}
-            onChange={(e) => update({ job_type: e.target.value })}
-          >
-            {JOB_TYPES.map((c) => (
-              <option key={c}>{c}</option>
-            ))}
-          </select>
-        </Field>
-      </div>
+      <Field label="Beauty category" hint="Pick the role that best matches this job.">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {CATEGORIES.map((c) => {
+            const active = form.category === c;
+            return (
+              <button
+                key={c}
+                type="button"
+                onClick={() => update({ category: c })}
+                aria-pressed={active}
+                className={cn(
+                  "rounded-lg border px-3 py-2 text-left text-sm font-semibold transition",
+                  active
+                    ? "border-primary bg-primary/10 text-heading shadow-[var(--shadow-glow)]"
+                    : "border-border bg-background text-muted-foreground hover:border-primary/50 hover:text-heading",
+                )}
+              >
+                {c}
+              </button>
+            );
+          })}
+        </div>
+      </Field>
+      <Field label="Employment type">
+        <div className="flex flex-wrap gap-2">
+          {JOB_TYPES.map((t) => {
+            const active = form.job_type === t;
+            return (
+              <button
+                key={t}
+                type="button"
+                onClick={() => update({ job_type: t })}
+                aria-pressed={active}
+                className={cn(
+                  "rounded-full border px-4 py-1.5 text-xs font-bold transition",
+                  active
+                    ? "border-transparent bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
+                    : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
+                )}
+              >
+                {t}
+              </button>
+            );
+          })}
+        </div>
+      </Field>
       <Field
         label="Description"
         hint="Describe the role, day-to-day work, and your salon culture."
