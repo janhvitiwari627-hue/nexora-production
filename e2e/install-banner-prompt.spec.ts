@@ -208,13 +208,31 @@ test.describe("InstallBanner — standalone & appinstalled", () => {
     expect(count).toBeGreaterThanOrEqual(1);
   });
 
-  test("appinstalled event transitions to installed state and persists across reload", async ({ page }) => {
+  test("appinstalled event transitions to installed state and persists across reload", async ({ page, context }) => {
+    await context.addInitScript(() => {
+      const w = window as unknown as { __appInstalledListeners?: number };
+      w.__appInstalledListeners = 0;
+      const origAdd = window.addEventListener.bind(window);
+      window.addEventListener = ((type: string, listener: EventListenerOrEventListenerObject, opts?: boolean | AddEventListenerOptions) => {
+        if (type === "appinstalled") {
+          w.__appInstalledListeners = (w.__appInstalledListeners ?? 0) + 1;
+        }
+        return origAdd(type as never, listener as never, opts as never);
+      }) as typeof window.addEventListener;
+    });
+
     await page.goto("/download-app");
 
     // Initial state — not installed, no native prompt: state C.
     await expect(
       page.getByText("Install is available on the published live site", { exact: false }),
     ).toBeVisible();
+
+    // Wait for InstallBanner's useEffect to attach its appinstalled listener.
+    await page.waitForFunction(
+      () => (window as unknown as { __appInstalledListeners?: number }).__appInstalledListeners! >= 1,
+      { timeout: 10_000 },
+    );
 
     // Fire the native appinstalled event.
     await page.evaluate(() => {
