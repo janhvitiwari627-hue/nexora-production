@@ -92,6 +92,13 @@ const EMPTY: Form = {
   requirements: "",
   skills: [],
   openings: 1,
+  job_role: "",
+  work_location: WORK_LOCATIONS[0],
+  contact_person: "",
+  contact_mobile: "",
+  whatsapp_number: "",
+  interview_mode: INTERVIEW_MODES[0],
+  shop_id: null,
 };
 
 const DRAFT_STORAGE_KEY = "nexora:postJobWizard:v1";
