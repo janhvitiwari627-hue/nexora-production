@@ -34,6 +34,13 @@ export type JobRow = {
   requirements: string | null;
   skills: string[] | null;
   openings: number;
+  job_role: string | null;
+  work_location: string | null;
+  contact_person: string | null;
+  contact_mobile: string | null;
+  whatsapp_number: string | null;
+  interview_mode: string | null;
+  shop_id: string | null;
   status: "draft" | "published" | "closed";
   published_at: string | null;
   applicants_count: number;
@@ -82,6 +89,13 @@ export type JobDraftInput = {
   requirements?: string | null;
   skills?: string[];
   openings?: number;
+  job_role?: string | null;
+  work_location?: string | null;
+  contact_person?: string | null;
+  contact_mobile?: string | null;
+  whatsapp_number?: string | null;
+  interview_mode?: string | null;
+  shop_id?: string | null;
 };
 
 export async function saveJob(params: {
@@ -108,6 +122,17 @@ export async function saveJob(params: {
   const { data, error } = await table("jobs").insert(payload).select("*").single();
   if (error) throw error;
   return data as JobRow;
+}
+
+export async function getMyShopId(userId: string): Promise<string | null> {
+  const { data, error } = await table("salon_owners")
+    .select("salon_id")
+    .eq("user_id", userId)
+    .eq("is_approved", true)
+    .limit(1)
+    .maybeSingle();
+  if (error) return null;
+  return (data?.salon_id as string | undefined) ?? null;
 }
 
 export async function listPublishedJobs(limit = 50): Promise<JobRow[]> {

@@ -1,17 +1,22 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { AlertTriangle, ArrowLeft, ArrowRight, Briefcase, Check, MapPin, RefreshCw, Save, Sparkles } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ArrowRight, Briefcase, Check, CheckCircle2, IndianRupee, MapPin, RefreshCw, Save, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthStore } from "@/stores/authStore";
 import {
   getMyEmployerProfile,
+  getMyShopId,
   saveJob,
   type EmployerProfile,
   type JobDraftInput,
+  type JobRow,
 } from "@/lib/jobs";
 import { EmployerSetupModal } from "@/pages/jobs/EmployerSetupModal";
 import { BackButton } from "@/components/shared/BackButton";
 import { cn } from "@/lib/utils";
+
+const WORK_LOCATIONS = ["Onsite", "Remote", "Hybrid"];
+const INTERVIEW_MODES = ["In-person", "Phone call", "Video call", "WhatsApp"];
 
 const CATEGORIES = [
   "Hair Stylist",
@@ -87,6 +92,13 @@ const EMPTY: Form = {
   requirements: "",
   skills: [],
   openings: 1,
+  job_role: "",
+  work_location: WORK_LOCATIONS[0],
+  contact_person: "",
+  contact_mobile: "",
+  whatsapp_number: "",
+  interview_mode: INTERVIEW_MODES[0],
+  shop_id: null,
 };
 
 const DRAFT_STORAGE_KEY = "nexora:postJobWizard:v1";
@@ -121,6 +133,8 @@ export function PostJobPage() {
   const [attempted, setAttempted] = useState<Set<number>>(new Set());
   const [highlightInvalid, setHighlightInvalid] = useState(false);
   const stepCardRef = useRef<HTMLDivElement | null>(null);
+  const [shopId, setShopId] = useState<string | null>(null);
+  const [publishedJob, setPublishedJob] = useState<JobRow | null>(null);
 
   // Persist wizard state to localStorage so it survives session expiry / re-login.
   useEffect(() => {
@@ -144,10 +158,19 @@ export function PostJobPage() {
       .then((p) => {
         setProfile(p);
         if (!p) setShowSetup(true);
-        else if (!form.city) setForm((f) => ({ ...f, city: p.city }));
+        else {
+          setForm((f) => ({
+            ...f,
+            city: f.city || p.city,
+            contact_mobile: f.contact_mobile || p.phone || "",
+            contact_person: f.contact_person || p.business_name || "",
+            whatsapp_number: f.whatsapp_number || p.phone || "",
+          }));
+        }
       })
       .catch(() => {})
       .finally(() => setLoadingProfile(false));
+    getMyShopId(user.id).then((sid) => setShopId(sid)).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitialized, user]);
 
@@ -160,7 +183,7 @@ export function PostJobPage() {
 
   const stepInvalid = (i: number) => {
     if (i === 0) return !!(errors.title || errors.category || errors.description || errors.openings);
-    if (i === 1) return !!errors.city;
+    if (i === 1) return !!(errors.city || errors.contact_mobile);
     if (i === 2) return !!(errors.salary_min || errors.salary_max);
     return false;
   };
@@ -219,6 +242,13 @@ export function PostJobPage() {
         salary_min: form.salary_min ?? null,
         salary_max: form.salary_max ?? null,
         openings: Math.min(50, Math.max(1, Number(form.openings) || 1)),
+        job_role: form.job_role?.trim() || null,
+        work_location: form.work_location || null,
+        contact_person: form.contact_person?.trim() || null,
+        contact_mobile: form.contact_mobile?.trim() || null,
+        whatsapp_number: form.whatsapp_number?.trim() || null,
+        interview_mode: form.interview_mode || null,
+        shop_id: shopId,
       };
       const row = await saveJob({
         jobId,
@@ -232,13 +262,11 @@ export function PostJobPage() {
       if (publish) {
         try { localStorage.removeItem(DRAFT_STORAGE_KEY); } catch {}
         toast.success("Job published successfully");
-        try {
-          await navigate({ to: "/jobs/$jobId", params: { jobId: row.id } });
-        } catch (navErr: any) {
-          // Job was created but navigation failed — surface a retry that goes to detail page.
-          setPublishError(
-            `Your job was published but we couldn't open it automatically. ${navErr?.message ?? ""}`.trim(),
-          );
+        setPublishedJob(row);
+        if (typeof window !== "undefined") {
+          window.requestAnimationFrame(() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          });
         }
       } else {
         toast.success("Draft saved");
@@ -300,6 +328,29 @@ export function PostJobPage() {
 
       <EmployerSetupModal open={showSetup} onClose={() => setShowSetup(false)} redirectTo="/hire/post-job" />
 
+      {publishedJob ? (
+        <div className="mx-auto max-w-3xl px-4 pb-24 pt-10 md:px-6">
+          <JobPublishedSuccess
+            job={publishedJob}
+            profile={profile}
+            onPostAnother={() => {
+              setPublishedJob(null);
+              setJobId(undefined);
+              setForm({
+                ...EMPTY,
+                city: profile?.city ?? "",
+                contact_person: profile?.business_name ?? "",
+                contact_mobile: profile?.phone ?? "",
+                whatsapp_number: profile?.phone ?? "",
+              });
+              setSkillsInput("");
+              setAttempted(new Set());
+              setStep(0);
+              try { localStorage.removeItem(DRAFT_STORAGE_KEY); } catch {}
+            }}
+          />
+        </div>
+      ) : (
       <div className="mx-auto max-w-7xl px-4 pb-32 pt-8 md:px-6">
         {draftRestored && (
           <div className="mb-4 flex items-center justify-between gap-3 rounded-[var(--radius-card)] border border-primary/30 bg-primary/5 px-4 py-3 text-sm">
@@ -466,8 +517,10 @@ export function PostJobPage() {
           </aside>
         </div>
       </div>
+      )}
 
       {/* Mobile sticky bottom action */}
+      {!publishedJob && (
       <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-2 border-t border-border bg-card/95 p-3 shadow-2xl backdrop-blur md:hidden">
         <button
           type="button"
@@ -505,6 +558,7 @@ export function PostJobPage() {
           </button>
         )}
       </div>
+      )}
     </div>
   );
 }
@@ -519,6 +573,7 @@ export type FormErrors = {
   city?: string;
   salary_min?: string;
   salary_max?: string;
+  contact_mobile?: string;
 };
 
 function validateForm(form: Form): FormErrors {
@@ -545,6 +600,11 @@ function validateForm(form: Form): FormErrors {
   const city = form.city.trim();
   if (city.length === 0) errs.city = "City is required.";
   else if (city.length < 2) errs.city = "Enter a valid city.";
+
+  const mobile = (form.contact_mobile ?? "").replace(/\D/g, "");
+  if (mobile.length === 0) errs.contact_mobile = "Contact mobile is required.";
+  else if (mobile.length < 10) errs.contact_mobile = "Enter a valid 10-digit mobile.";
+
 
   const min = form.salary_min;
   const max = form.salary_max;
@@ -611,6 +671,15 @@ function DetailsStep({
           maxLength={80}
           value={form.title}
           onChange={(e) => update({ title: e.target.value })}
+        />
+      </Field>
+      <Field label="Specific job role" hint="Optional — e.g. Bridal Hair Specialist, Senior Nail Tech.">
+        <input
+          className={inputCls}
+          placeholder="Example: Bridal Hair Specialist"
+          maxLength={80}
+          value={form.job_role ?? ""}
+          onChange={(e) => update({ job_role: e.target.value })}
         />
       </Field>
       <Field
@@ -784,6 +853,65 @@ function LocationStep({
           onChange={(e) => update({ schedule: e.target.value })}
         />
       </Field>
+      <Field label="Work location">
+        <div className="flex flex-wrap gap-2">
+          {WORK_LOCATIONS.map((w) => {
+            const active = form.work_location === w;
+            return (
+              <button
+                key={w}
+                type="button"
+                onClick={() => update({ work_location: w })}
+                aria-pressed={active}
+                className={cn(
+                  "rounded-full border px-4 py-1.5 text-xs font-bold transition",
+                  active
+                    ? "border-transparent bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
+                    : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
+                )}
+              >
+                {w}
+              </button>
+            );
+          })}
+        </div>
+      </Field>
+      <div className="mt-2 border-t border-border pt-4">
+        <h3 className="text-heading mb-3 text-sm font-bold uppercase tracking-wide text-muted-foreground">
+          Contact details
+        </h3>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="Contact person" hint="Who should candidates reach out to?">
+            <input
+              className={inputCls}
+              placeholder="e.g. Priya (HR)"
+              value={form.contact_person ?? ""}
+              onChange={(e) => update({ contact_person: e.target.value })}
+            />
+          </Field>
+          <Field label="Contact mobile" error={errors.contact_mobile}>
+            <input
+              type="tel"
+              inputMode="numeric"
+              className={errors.contact_mobile ? inputErrCls : inputCls}
+              placeholder="10-digit mobile"
+              aria-invalid={!!errors.contact_mobile}
+              value={form.contact_mobile ?? ""}
+              onChange={(e) => update({ contact_mobile: e.target.value })}
+            />
+          </Field>
+          <Field label="WhatsApp number" hint="Optional — leave blank to use the contact mobile.">
+            <input
+              type="tel"
+              inputMode="numeric"
+              className={inputCls}
+              placeholder="WhatsApp number"
+              value={form.whatsapp_number ?? ""}
+              onChange={(e) => update({ whatsapp_number: e.target.value })}
+            />
+          </Field>
+        </div>
+      </div>
     </div>
   );
 }
@@ -942,6 +1070,29 @@ function RequirementsStep({
           onChange={(e) => update({ requirements: e.target.value })}
         />
       </Field>
+      <Field label="Interview mode" hint="How would you like to interview shortlisted candidates?">
+        <div className="flex flex-wrap gap-2">
+          {INTERVIEW_MODES.map((m) => {
+            const active = form.interview_mode === m;
+            return (
+              <button
+                key={m}
+                type="button"
+                onClick={() => update({ interview_mode: m })}
+                aria-pressed={active}
+                className={cn(
+                  "rounded-full border px-4 py-1.5 text-xs font-bold transition",
+                  active
+                    ? "border-transparent bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
+                    : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
+                )}
+              >
+                {m}
+              </button>
+            );
+          })}
+        </div>
+      </Field>
     </div>
   );
 }
@@ -1055,5 +1206,123 @@ function LivePreview({ form, profile }: { form: Form; profile: EmployerProfile |
         </span>
       </div>
     </article>
+  );
+}
+
+function JobPublishedSuccess({
+  job,
+  profile,
+  onPostAnother,
+}: {
+  job: JobRow;
+  profile: EmployerProfile | null;
+  onPostAnother: () => void;
+}) {
+  const salaryText = (() => {
+    const min = job.salary_min;
+    const max = job.salary_max;
+    if (!min && !max) return "Not disclosed";
+    const period =
+      job.salary_period === "hourly" ? "/hr" : job.salary_period === "yearly" ? "/yr" : "/mo";
+    if (min && max) return `₹${min.toLocaleString()} – ₹${max.toLocaleString()} ${period}`;
+    return `₹${(min ?? max)!.toLocaleString()} ${period}`;
+  })();
+  const locationText = [job.area, job.city].filter(Boolean).join(", ") || job.city;
+  const postedDate = new Date(job.published_at ?? job.created_at).toLocaleString(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className="rounded-[var(--radius-card)] border border-primary/30 bg-card p-6 shadow-[var(--shadow-card)] md:p-8"
+    >
+      <div className="flex items-start gap-4">
+        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+          <CheckCircle2 className="h-7 w-7" aria-hidden />
+        </div>
+        <div className="min-w-0 flex-1">
+          <h2 className="text-heading text-2xl font-extrabold">
+            Your job post has been published successfully.
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Candidates can now discover and apply to your listing.
+          </p>
+        </div>
+      </div>
+
+      <dl className="mt-6 grid gap-4 rounded-lg border border-border bg-background p-4 sm:grid-cols-2">
+        <div className="sm:col-span-2">
+          <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Job title
+          </dt>
+          <dd className="mt-1 flex items-center gap-2 text-lg font-bold text-heading">
+            <Briefcase className="h-4 w-4 text-primary" aria-hidden />
+            <span className="truncate">{job.title}</span>
+          </dd>
+          {profile?.business_name && (
+            <div className="mt-1 text-xs text-muted-foreground">at {profile.business_name}</div>
+          )}
+        </div>
+        <div>
+          <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Location
+          </dt>
+          <dd className="mt-1 flex items-center gap-2 text-sm font-semibold text-heading">
+            <MapPin className="h-4 w-4 text-primary" aria-hidden />
+            {locationText}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Salary
+          </dt>
+          <dd className="mt-1 flex items-center gap-2 text-sm font-semibold text-heading">
+            <IndianRupee className="h-4 w-4 text-primary" aria-hidden />
+            {salaryText}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Status
+          </dt>
+          <dd className="mt-1">
+            <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">
+              <CheckCircle2 className="h-3.5 w-3.5" aria-hidden /> Published
+            </span>
+          </dd>
+        </div>
+        <div>
+          <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Posted
+          </dt>
+          <dd className="mt-1 text-sm font-semibold text-heading">{postedDate}</dd>
+        </div>
+      </dl>
+
+      <div className="mt-6 flex flex-wrap gap-2">
+        <Link
+          to="/owner/jobs"
+          className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-1 rounded-[var(--radius-button)] px-4 py-2.5 text-sm font-bold shadow-[var(--shadow-glow)]"
+        >
+          View My Job Posts
+        </Link>
+        <button
+          type="button"
+          onClick={onPostAnother}
+          className="inline-flex items-center gap-1 rounded-[var(--radius-button)] border border-border bg-card px-4 py-2.5 text-sm font-semibold text-heading hover:bg-muted"
+        >
+          Post Another Job
+        </button>
+        <Link
+          to="/jobs/$jobId"
+          params={{ jobId: job.id }}
+          className="inline-flex items-center gap-1 rounded-[var(--radius-button)] border border-border bg-card px-4 py-2.5 text-sm font-semibold text-heading hover:bg-muted"
+        >
+          View Applications
+        </Link>
+      </div>
+    </div>
   );
 }
