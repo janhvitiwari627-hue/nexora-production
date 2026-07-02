@@ -203,18 +203,24 @@ export function JobPortalPage({ initialRole = "seeker" }: { initialRole?: "seeke
       <section className="from-primary/10 to-accent/10 border-border border-b bg-gradient-to-br py-16 md:py-20">
         <div className="mx-auto max-w-6xl px-4 md:px-6">
           <div className="bg-card border-border mx-auto mb-6 inline-flex rounded-full border p-1">
-            {(["seeker", "employer"] as const).map((r) => (
-              <button
-                key={r}
-                onClick={() => setRole(r)}
-                className={cn(
-                  "rounded-full px-5 py-2 text-sm font-bold transition",
-                  role === r ? "bg-gradient-cta text-primary-foreground" : "text-muted-foreground",
-                )}
-              >
-                {r === "seeker" ? "Find a job" : "Hire talent"}
-              </button>
-            ))}
+            <Link
+              to="/jobs"
+              className={cn(
+                "rounded-full px-5 py-2 text-sm font-bold transition",
+                role === "seeker" ? "bg-gradient-cta text-primary-foreground" : "text-muted-foreground",
+              )}
+            >
+              Find a job
+            </Link>
+            <Link
+              to="/hire"
+              className={cn(
+                "rounded-full px-5 py-2 text-sm font-bold transition",
+                role === "employer" ? "bg-gradient-cta text-primary-foreground" : "text-muted-foreground",
+              )}
+            >
+              Hire talent
+            </Link>
           </div>
           <h1
             className="text-heading text-center text-4xl font-black tracking-tight md:text-6xl"
