@@ -475,11 +475,16 @@ function QrPaymentModal({
 
           <button
             type="button"
-            disabled={submitting}
+            disabled={submitting || !online}
+            aria-disabled={submitting || !online}
             onClick={handleSubmit}
-            className="bg-gradient-cta text-primary-foreground mt-2 w-full rounded-[var(--radius-button)] px-4 py-3 text-sm font-bold shadow-[var(--shadow-glow)] hover:brightness-110 disabled:opacity-60"
+            className="bg-gradient-cta text-primary-foreground mt-2 w-full rounded-[var(--radius-button)] px-4 py-3 text-sm font-bold shadow-[var(--shadow-glow)] hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
           >
-            {submitting ? "Submitting..." : "Submit for admin approval"}
+            {!online
+              ? "Offline — submit unavailable"
+              : submitting
+                ? "Submitting..."
+                : "Submit for admin approval"}
           </button>
           <p className="text-muted-foreground text-center text-[11px]">
             Your payment will be verified by admin within a few minutes.
