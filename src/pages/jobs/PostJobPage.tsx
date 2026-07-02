@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { AlertTriangle, ArrowLeft, ArrowRight, Briefcase, Check, CheckCircle2, IndianRupee, MapPin, RefreshCw, Save, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthStore } from "@/stores/authStore";
 import {
+  getJobForEmployer,
   getMyEmployerProfile,
   getMyShopId,
   saveJob,
@@ -118,14 +119,17 @@ function loadDraft(): PersistedDraft | null {
 
 export function PostJobPage() {
   const navigate = useNavigate();
+  const search = useSearch({ from: "/hire/post-job" }) as { jobId?: string };
+  const editJobId = search.jobId;
   const { user, isInitialized } = useAuthStore();
   const [profile, setProfile] = useState<EmployerProfile | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [showSetup, setShowSetup] = useState(false);
-  const initialDraft = typeof window !== "undefined" ? loadDraft() : null;
+  // When editing, ignore any persisted wizard draft — we hydrate from the job row.
+  const initialDraft = typeof window !== "undefined" && !editJobId ? loadDraft() : null;
   const [step, setStep] = useState<number>(initialDraft?.step ?? 0);
   const [form, setForm] = useState<Form>(initialDraft?.form ?? EMPTY);
-  const [jobId, setJobId] = useState<string | undefined>(initialDraft?.jobId);
+  const [jobId, setJobId] = useState<string | undefined>(editJobId ?? initialDraft?.jobId);
   const [saving, setSaving] = useState<"draft" | "publish" | null>(null);
   const [skillsInput, setSkillsInput] = useState(initialDraft?.skillsInput ?? "");
   const [draftRestored, setDraftRestored] = useState<boolean>(!!initialDraft && (initialDraft.step > 0 || initialDraft.form.title.length > 0));
@@ -135,15 +139,17 @@ export function PostJobPage() {
   const stepCardRef = useRef<HTMLDivElement | null>(null);
   const [shopId, setShopId] = useState<string | null>(null);
   const [publishedJob, setPublishedJob] = useState<JobRow | null>(null);
+  const [loadingEdit, setLoadingEdit] = useState<boolean>(!!editJobId);
 
   // Persist wizard state to localStorage so it survives session expiry / re-login.
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (editJobId) return; // don't overwrite the localStorage draft while editing
     try {
       const payload: PersistedDraft = { step, form, jobId, skillsInput, userId: user?.id };
       localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(payload));
     } catch {}
-  }, [step, form, jobId, skillsInput, user?.id]);
+  }, [step, form, jobId, skillsInput, user?.id, editJobId]);
 
   useEffect(() => {
     if (!isInitialized) return;
@@ -158,7 +164,7 @@ export function PostJobPage() {
       .then((p) => {
         setProfile(p);
         if (!p) setShowSetup(true);
-        else {
+        else if (!editJobId) {
           setForm((f) => ({
             ...f,
             city: f.city || p.city,
@@ -173,6 +179,61 @@ export function PostJobPage() {
     getMyShopId(user.id).then((sid) => setShopId(sid)).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitialized, user]);
+
+  // Load an existing job for editing.
+  useEffect(() => {
+    if (!editJobId || !user) return;
+    let cancelled = false;
+    setLoadingEdit(true);
+    setDraftRestored(false);
+    getJobForEmployer(editJobId, user.id)
+      .then((job) => {
+        if (cancelled) return;
+        if (!job) {
+          toast.error("Job not found or you don't have access");
+          navigate({ to: "/jobs/my-posts" });
+          return;
+        }
+        setJobId(job.id);
+        setForm({
+          title: job.title ?? "",
+          category: job.category ?? "",
+          description: job.description ?? "",
+          job_type: job.job_type ?? JOB_TYPES[0],
+          experience_level: job.experience_level ?? EXPERIENCE[0],
+          city: job.city ?? "",
+          area: job.area ?? "",
+          address: job.address ?? "",
+          schedule: job.schedule ?? "",
+          salary_min: job.salary_min,
+          salary_max: job.salary_max,
+          salary_period: (job.salary_period as any) ?? "monthly",
+          benefits: job.benefits ?? [],
+          requirements: job.requirements ?? "",
+          skills: job.skills ?? [],
+          openings: job.openings ?? 1,
+          job_role: job.job_role ?? "",
+          work_location: job.work_location ?? WORK_LOCATIONS[0],
+          contact_person: job.contact_person ?? "",
+          contact_mobile: job.contact_mobile ?? "",
+          whatsapp_number: job.whatsapp_number ?? "",
+          interview_mode: job.interview_mode ?? INTERVIEW_MODES[0],
+          shop_id: job.shop_id ?? null,
+        });
+        setSkillsInput((job.skills ?? []).join(", "));
+      })
+      .catch((err) => {
+        const message = err instanceof Error ? err.message : "Failed to load job";
+        toast.error(message);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingEdit(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [editJobId, user, navigate]);
+
 
 
   const update = (patch: Partial<Form>) => setForm((f) => ({ ...f, ...patch }));

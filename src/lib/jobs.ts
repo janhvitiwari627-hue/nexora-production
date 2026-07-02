@@ -298,3 +298,17 @@ export async function updateApplicationStatus(
     .eq("id", applicationId);
   if (error) throw error;
 }
+
+export async function setJobStatus(
+  jobId: string,
+  userId: string,
+  status: "draft" | "published" | "closed",
+): Promise<void> {
+  const patch: any = { status };
+  if (status === "published") patch.published_at = new Date().toISOString();
+  const { error } = await table("jobs")
+    .update(patch)
+    .eq("id", jobId)
+    .eq("posted_by", userId);
+  if (error) throw error;
+}

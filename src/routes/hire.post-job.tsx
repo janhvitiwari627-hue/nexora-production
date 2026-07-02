@@ -1,9 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PostJobPage } from "@/pages/jobs/PostJobPage";
 
+export type PostJobSearch = { jobId?: string };
+
 export const Route = createFileRoute("/hire/post-job")({
   head: () => ({
     meta: [{ title: "Post a job free — Nexora" }],
+  }),
+  validateSearch: (search: Record<string, unknown>): PostJobSearch => ({
+    jobId: typeof search.jobId === "string" && search.jobId ? search.jobId : undefined,
   }),
   component: PostJobPage,
 });
