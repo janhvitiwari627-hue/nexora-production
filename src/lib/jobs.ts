@@ -170,3 +170,11 @@ export async function listMyApplications(
   if (error) throw error;
   return (data ?? []) as JobApplication[];
 }
+
+export async function withdrawApplication(applicationId: string, applicantId: string): Promise<void> {
+  const { error } = await table("job_applications")
+    .update({ status: "withdrawn" })
+    .eq("id", applicationId)
+    .eq("applicant_id", applicantId);
+  if (error) throw error;
+}

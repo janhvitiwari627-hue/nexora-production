@@ -10,9 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Briefcase, MapPin, Clock, Search, RefreshCw } from "lucide-react";
+import { Briefcase, MapPin, Clock, Search, RefreshCw, IndianRupee } from "lucide-react";
+import { toast } from "sonner";
 import { useAuthStore } from "@/stores/authStore";
-import { listMyApplications, type JobApplication } from "@/lib/jobs";
+import { listMyApplications, withdrawApplication, type JobApplication } from "@/lib/jobs";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 function ApplicationSkeleton() {
@@ -90,6 +91,14 @@ function relative(iso: string) {
   return `${months}mo ago`;
 }
 
+function fmtSalary(min: number | null | undefined, max: number | null | undefined, period: string | null | undefined) {
+  if (!min && !max) return null;
+  const p = period === "hourly" ? "/hr" : period === "yearly" ? "/yr" : "/mo";
+  const f = (v: number) => (v >= 1000 ? `${Math.round(v / 1000)}k` : `${v}`);
+  if (min && max) return `₹${f(min)}–${f(max)}${p}`;
+  return `₹${f((min || max) as number)}${p}`;
+}
+
 export function MyApplicationsPage() {
   const { user, isInitialized } = useAuthStore();
   const search = applicationsRoute.useSearch();
@@ -123,6 +132,22 @@ export function MyApplicationsPage() {
   }, [qInput, q, navigate]);
 
   const [apps, setApps] = useState<JobApplication[] | null>(null);
+  const [withdrawingId, setWithdrawingId] = useState<string | null>(null);
+
+  async function handleWithdraw(app: JobApplication) {
+    if (!user) return;
+    if (typeof window !== "undefined" && !window.confirm("Withdraw this application? This cannot be undone.")) return;
+    setWithdrawingId(app.id);
+    try {
+      await withdrawApplication(app.id, user.id);
+      setApps((prev) => prev?.map((a) => (a.id === app.id ? { ...a, status: "withdrawn" } : a)) ?? prev);
+      toast.success("Application withdrawn");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not withdraw application");
+    } finally {
+      setWithdrawingId(null);
+    }
+  }
   const [error, setError] = useState<string | null>(null);
   const [refreshTick, setRefreshTick] = useState(0);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -363,9 +388,9 @@ export function MyApplicationsPage() {
         {!error && !isReloading && apps && apps.length === 0 && (
           <Card>
             <CardContent className="space-y-3 p-8 text-center">
-              <p className="text-muted-foreground">You have not applied to any jobs yet.</p>
+              <p className="text-muted-foreground">You have not applied for any job yet.</p>
               <Button asChild>
-                <Link to="/jobs">Find a job</Link>
+                <Link to="/jobs/search">Search Jobs</Link>
               </Button>
             </CardContent>
           </Card>
@@ -387,7 +412,9 @@ export function MyApplicationsPage() {
                 const title = j?.title ?? "Job";
                 const biz = j?.employer?.business_name ?? "Employer";
                 const loc = j ? `${j.area ? `${j.area}, ` : ""}${j.city}` : "";
+                const salary = fmtSalary(j?.salary_min, j?.salary_max, j?.salary_period);
                 const updated = a.updated_at && a.updated_at !== a.created_at;
+                const canWithdraw = a.status === "submitted" || a.status === "reviewed";
                 return (
                   <li key={a.id}>
                     <Card>
@@ -413,6 +440,12 @@ export function MyApplicationsPage() {
                                 {loc}
                               </span>
                             )}
+                            {salary && (
+                              <span className="text-primary inline-flex items-center gap-1 font-medium">
+                                <IndianRupee className="h-3 w-3" />
+                                {salary}
+                              </span>
+                            )}
                             <span
                               className="inline-flex items-center gap-1"
                               title={fmtDateTime(a.created_at)}
@@ -436,8 +469,19 @@ export function MyApplicationsPage() {
                           {j && (
                             <Button asChild size="sm" variant="outline">
                               <Link to="/jobs/$jobId" params={{ jobId: j.id }}>
-                                View job
+                                View Job
                               </Link>
+                            </Button>
+                          )}
+                          {canWithdraw && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-destructive hover:text-destructive"
+                              disabled={withdrawingId === a.id}
+                              onClick={() => handleWithdraw(a)}
+                            >
+                              {withdrawingId === a.id ? "Withdrawing…" : "Withdraw"}
                             </Button>
                           )}
                         </div>
