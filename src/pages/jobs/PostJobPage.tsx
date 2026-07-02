@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, Briefcase, Check, MapPin, Save, Sparkles } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ArrowRight, Briefcase, Check, MapPin, RefreshCw, Save, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthStore } from "@/stores/authStore";
 import {
