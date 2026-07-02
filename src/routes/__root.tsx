@@ -142,6 +142,10 @@ function RootComponent() {
 
     registerServiceWorker();
 
+    void import("@/lib/pwa-standalone-guard").then(({ initStandaloneRedirectGuard }) => {
+      initStandaloneRedirectGuard();
+    });
+
     void import("@/lib/pwa-install").then(({ initInstallPromptCapture }) => {
       initInstallPromptCapture();
     });
