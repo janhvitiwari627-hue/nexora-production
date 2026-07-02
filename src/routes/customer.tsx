@@ -96,9 +96,22 @@ function CustomerLayout() {
     } catch {
       /* ignore */
     }
+    // Fire-and-forget analytics: measure how often owners switch back.
+    void logAnalyticsEvent({
+      data: {
+        event_name: "owner.exit_customer_mode",
+        metadata: {
+          from_path:
+            typeof window !== "undefined" ? window.location.pathname : null,
+        },
+      },
+    }).catch(() => {
+      /* swallow — analytics must never block navigation */
+    });
     setConfirmOpen(false);
     navigate({ to: "/owner/dashboard" });
   };
+
 
   return (
     <>
