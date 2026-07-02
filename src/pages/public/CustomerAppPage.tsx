@@ -1,6 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { Smartphone, MapPin, Tag, UserCheck, Zap, MessageCircle, QrCode, Gift, History, Download, ExternalLink, Apple, Play, Share, Plus, MoreVertical, Chrome, Info, X } from "lucide-react";
+import {
+  initInstallPromptCapture,
+  subscribeInstallPrompt,
+  clearInstallPrompt,
+} from "@/lib/pwa-install";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -85,6 +90,13 @@ export default function CustomerAppPage() {
       setDismissed(true);
     }
 
+    // Use the global capture so the deferred prompt survives navigation
+    // between routes. Falls back to a local listener as a safety net.
+    initInstallPromptCapture();
+    const unsubGlobal = subscribeInstallPrompt((evt) => {
+      setDeferred((evt as unknown as BeforeInstallPromptEvent) ?? null);
+    });
+
     const onPrompt = (e: Event) => {
       e.preventDefault();
       setDeferred(e as BeforeInstallPromptEvent);
@@ -132,6 +144,7 @@ export default function CustomerAppPage() {
     document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
+      unsubGlobal();
       window.removeEventListener("beforeinstallprompt", onPrompt);
       window.removeEventListener("appinstalled", onInstalled);
       window.removeEventListener("storage", onStorage);
@@ -157,6 +170,7 @@ export default function CustomerAppPage() {
         toast.error("Install prompt failed", { description: "Try again from your browser's install icon in the address bar." });
       } finally {
         setDeferred(null);
+        clearInstallPrompt();
       }
       return;
     }
