@@ -11,6 +11,7 @@ import {
   type CreateAndConfirmPayload,
 } from "@/lib/booking-offline-sync";
 import { useOnlineStatus } from "@/hooks/use-online-status";
+import { beginBookingRefresh } from "@/lib/booking-refresh-signal";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -344,7 +345,8 @@ export function QueuedBookingsList({
         ref ? `Booking #${ref} confirmed` : "Your booking is confirmed",
         { description: "Refreshing your booking details…" },
       );
-      void router.invalidate();
+      const endRefresh = beginBookingRefresh(bookingId);
+      void Promise.resolve(router.invalidate()).finally(endRefresh);
       return;
     }
 
