@@ -1093,6 +1093,7 @@ export type Database = {
           experience_level: string | null
           id: string
           job_type: string
+          openings: number
           posted_by: string
           published_at: string | null
           requirements: string | null
@@ -1118,6 +1119,7 @@ export type Database = {
           experience_level?: string | null
           id?: string
           job_type: string
+          openings?: number
           posted_by: string
           published_at?: string | null
           requirements?: string | null
@@ -1143,6 +1145,7 @@ export type Database = {
           experience_level?: string | null
           id?: string
           job_type?: string
+          openings?: number
           posted_by?: string
           published_at?: string | null
           requirements?: string | null
