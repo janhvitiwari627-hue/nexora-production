@@ -166,7 +166,7 @@ export function InstallBanner() {
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             <Button size="sm" asChild>
-              <a href={LIVE_APP_URL} target="_blank" rel="noopener noreferrer">
+              <a href={CONTINUE_IN_BROWSER_URL}>
                 Continue in Browser <ExternalLink className="ml-2 h-3.5 w-3.5" />
               </a>
             </Button>
