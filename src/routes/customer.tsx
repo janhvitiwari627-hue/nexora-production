@@ -17,7 +17,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchUserRoles, type UserRole } from "@/lib/auth-redirect";
+import { logAnalyticsEvent } from "@/lib/analytics-events.functions";
 import { LayoutDashboard, LogOut } from "lucide-react";
+
 
 
 const BROWSE_AS_CUSTOMER_KEY = "nexora:browseAsCustomer";
@@ -94,9 +96,22 @@ function CustomerLayout() {
     } catch {
       /* ignore */
     }
+    // Fire-and-forget analytics: measure how often owners switch back.
+    void logAnalyticsEvent({
+      data: {
+        event_name: "owner.exit_customer_mode",
+        metadata: {
+          from_path:
+            typeof window !== "undefined" ? window.location.pathname : null,
+        },
+      },
+    }).catch(() => {
+      /* swallow — analytics must never block navigation */
+    });
     setConfirmOpen(false);
     navigate({ to: "/owner/dashboard" });
   };
+
 
   return (
     <>
