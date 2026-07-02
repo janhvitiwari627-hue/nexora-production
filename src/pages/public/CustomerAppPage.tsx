@@ -260,6 +260,16 @@ export default function CustomerAppPage() {
             )}
 
             {showGuide && showInstallCTA && !deferred && (
+              <div ref={guideRef}>
+              {isEmbeddedOrPreview() && (
+                <Alert className="mt-4">
+                  <Info className="h-4 w-4" />
+                  <AlertTitle>Install works only on the live site</AlertTitle>
+                  <AlertDescription>
+                    You're viewing this inside the in-editor preview, where browsers block the install prompt. Open the published Nexora URL on your phone or desktop browser to install the app.
+                  </AlertDescription>
+                </Alert>
+              )}
               <Alert className="mt-4">
                 <Info className="h-4 w-4" />
                 <AlertTitle>
