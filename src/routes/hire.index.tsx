@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { JobPortalPage } from "@/pages/public/JobPortalPage";
 
-export const Route = createFileRoute("/hire")({
+export const Route = createFileRoute("/hire/")({
   head: () => ({
     meta: [
       { title: "Hire the best in beauty — Nexora" },
