@@ -1370,6 +1370,68 @@ function DetailsStep({
           value={form.description}
           onChange={(e) => update({ description: e.target.value })}
         />
+        <div className="mt-3">
+          <p className="text-heading mb-2 text-xs font-semibold">Start with a template</p>
+          <div className="flex flex-wrap gap-2">
+            {QUICK_START_TEMPLATES.map((t) => {
+              const active = activeQuickTemplate === t.label;
+              return (
+                <button
+                  key={t.label}
+                  type="button"
+                  onClick={() => onQuickTemplateClick(t)}
+                  className={cn(
+                    "rounded-full border px-3 py-1.5 text-xs font-semibold transition",
+                    active
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
+                  )}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        {pendingTemplate && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ backgroundColor: "rgba(10,37,64,0.5)" }}
+            onClick={() => setPendingTemplate(null)}
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              onClick={(e) => e.stopPropagation()}
+              className="bg-card w-full max-w-md rounded-2xl p-6 shadow-[var(--shadow-float)]"
+            >
+              <h3 className="text-heading text-lg font-bold">Replace current description?</h3>
+              <p className="text-muted-foreground mt-2 text-sm">
+                You already have a job description. Do you want to replace it with this template?
+              </p>
+              <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={() => setPendingTemplate(null)}
+                  className="border-border text-heading hover:bg-muted rounded-lg border px-4 py-2 text-sm font-semibold"
+                >
+                  Keep my description
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    fillQuickTemplate(pendingTemplate);
+                    setPendingTemplate(null);
+                  }}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 text-sm font-semibold"
+                >
+                  Replace description
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {(() => {
           const rawTemplates =
             (form.category && DESCRIPTION_TEMPLATES[form.category]) ||
