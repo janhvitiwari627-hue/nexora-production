@@ -69,6 +69,7 @@ function isEmbeddedOrPreview() {
 
 const SESSION_DISMISS_KEY = "nexora_pwa_install_dismissed_session";
 const INSTALLED_KEY = "nexora_pwa_installed";
+const LIVE_APP_URL = "https://meripahalfasthelp.online/customer-app";
 
 export default function CustomerAppPage() {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
@@ -76,7 +77,9 @@ export default function CustomerAppPage() {
   const [dismissed, setDismissed] = useState(false);
   const [platform, setPlatform] = useState<Platform>("desktop");
   const [showGuide, setShowGuide] = useState(false);
+  const [embedded, setEmbedded] = useState(false);
   const guideRef = useRef<HTMLDivElement>(null);
+
 
   useEffect(() => {
     setPlatform(detectPlatform());
