@@ -24,6 +24,7 @@ const STEPS = [
 ];
 
 export function CandidateProfilePage() {
+  const { user, profile, refreshProfile } = useAuthStore();
   const [step, setStep] = useState(0);
   const [personal, setPersonal] = useState({ name: "", email: "", phone: "", city: "", bio: "" });
   const [skills, setSkills] = useState<string[]>(["Hair Coloring", "Keratin"]);
@@ -34,6 +35,88 @@ export function CandidateProfilePage() {
   const [portfolio, setPortfolio] = useState<string[]>([]);
   const [video, setVideo] = useState<string>("");
   const [resume, setResume] = useState<string>("");
+
+  const [avatar, setAvatar] = useState<string>(profile?.avatar_url || "");
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setAvatar(profile?.avatar_url || "");
+  }, [profile?.avatar_url]);
+
+  async function handleAvatarFile(file: File) {
+    if (!user) {
+      const msg = "Please sign in to upload a profile image.";
+      setUploadError(msg);
+      toast.error(msg);
+      return;
+    }
+    setUploadError(null);
+    setUploading(true);
+    setUploadProgress(10);
+    const preview = URL.createObjectURL(file);
+    setAvatar(preview);
+    try {
+      const ext = file.type === "image/png" ? "png" : "jpg";
+      const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+      setUploadProgress(35);
+      const { error: upErr } = await supabase.storage
+        .from("avatars")
+        .upload(path, file, { upsert: true, contentType: file.type });
+      if (upErr) throw upErr;
+      setUploadProgress(70);
+      const { data: signed, error: signErr } = await supabase.storage
+        .from("avatars")
+        .createSignedUrl(path, 60 * 60 * 24 * 365);
+      if (signErr) throw signErr;
+      const url = signed.signedUrl;
+      setUploadProgress(90);
+      const { error: updErr } = await supabase
+        .from("profiles")
+        .update({ avatar_url: url })
+        .eq("id", user.id);
+      if (updErr) throw updErr;
+      setUploadProgress(100);
+      setAvatar(url);
+      await refreshProfile();
+      toast.success("Profile image updated");
+    } catch (err) {
+      console.error("[candidate profile image]", err);
+      const msg =
+        !navigator.onLine
+          ? "You appear to be offline. Please check your connection."
+          : "We couldn't upload your profile image. Please try again.";
+      setUploadError(msg);
+      toast.error(msg);
+      setAvatar(profile?.avatar_url || "");
+    } finally {
+      URL.revokeObjectURL(preview);
+      setUploading(false);
+      setTimeout(() => setUploadProgress(null), 400);
+    }
+  }
+
+  async function handleAvatarRemove() {
+    if (!user) return;
+    const previous = avatar;
+    setAvatar("");
+    setUploadError(null);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ avatar_url: null })
+        .eq("id", user.id);
+      if (error) throw error;
+      await refreshProfile();
+      toast.success("Profile image removed");
+    } catch (err) {
+      console.error("[candidate profile image remove]", err);
+      setUploadError("We couldn't remove your profile image. Please try again.");
+      toast.error("Could not remove profile image");
+      setAvatar(previous);
+    }
+  }
 
   const next = () => setStep((s) => Math.min(STEPS.length - 1, s + 1));
   const back = () => setStep((s) => Math.max(0, s - 1));
