@@ -25,6 +25,8 @@ import type { Service } from "@/components/shared/ServiceCard";
 import type { Staff } from "@/components/shared/StaffCard";
 import { createBooking, confirmBookingPayment } from "@/lib/bookings.functions";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
+import { OfflineBanner, OfflinePill } from "@/components/shared/OfflineBanner";
+import { useOnlineStatus } from "@/hooks/use-online-status";
 
 export type RealSalonRef = {
   id: string;
