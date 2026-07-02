@@ -492,6 +492,77 @@ const SKILL_SUGGESTIONS: Record<string, string[]> = {
   Other: ["Customer service", "Hygiene", "Teamwork", "Punctuality"],
 };
 
+const CERTIFICATIONS = [
+  "No formal qualification required",
+  "Beauty course certificate",
+  "Diploma in cosmetology",
+  "Professional certification",
+  "Experience preferred",
+  "Other",
+];
+
+const LANGUAGES = [
+  "Hindi",
+  "English",
+  "Hinglish",
+  "Marathi",
+  "Gujarati",
+  "Punjabi",
+  "Tamil",
+  "Telugu",
+  "Bengali",
+  "Kannada",
+  "Malayalam",
+  "Other",
+];
+
+const PORTFOLIO_OPTIONS = [
+  "Portfolio required",
+  "Instagram profile required",
+  "Resume preferred",
+  "No portfolio needed",
+] as const;
+type PortfolioOption = (typeof PORTFOLIO_OPTIONS)[number];
+
+// Structured markers appended to the `requirements` text so the job detail
+// page and the candidate application form can parse these UI-only fields
+// without a schema change. Format: "Key: value" on its own line.
+const REQ_META_KEYS = {
+  certification: "Certification",
+  languages: "Languages",
+  portfolio: "Portfolio",
+} as const;
+
+function stripRequirementsMeta(raw: string | null | undefined): string {
+  if (!raw) return "";
+  const keys = Object.values(REQ_META_KEYS).join("|");
+  const re = new RegExp(`^\\s*(?:${keys}):\\s*.+$`, "gmi");
+  return raw.replace(re, "").replace(/\n{3,}/g, "\n\n").trim();
+}
+
+function parseRequirementsMeta(raw: string | null | undefined): {
+  certification: string;
+  languages: string[];
+  portfolio: PortfolioOption | "";
+} {
+  const out = { certification: "", languages: [] as string[], portfolio: "" as PortfolioOption | "" };
+  if (!raw) return out;
+  const certM = raw.match(/^\s*Certification:\s*(.+)$/mi);
+  if (certM) out.certification = certM[1].trim();
+  const langM = raw.match(/^\s*Languages:\s*(.+)$/mi);
+  if (langM) out.languages = langM[1].split(",").map((s) => s.trim()).filter(Boolean);
+  const portM = raw.match(/^\s*Portfolio:\s*(.+)$/mi);
+  if (portM) {
+    const val = portM[1].trim();
+    if ((PORTFOLIO_OPTIONS as readonly string[]).includes(val)) out.portfolio = val as PortfolioOption;
+  }
+  return out;
+}
+
+export { parseRequirementsMeta, PORTFOLIO_OPTIONS };
+export type { PortfolioOption };
+
+
 // Ready-made job description starters shown under the Description field.
 // Templates change with Beauty Category; a generic set is used when no
 // category is selected.
