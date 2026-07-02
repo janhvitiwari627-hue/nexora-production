@@ -644,7 +644,10 @@ export function OwnerDashboardPage() {
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
           <RecentBookingsList />
-          <PendingApprovalsWidget />
+          <div className="space-y-6">
+            <PendingApprovalsWidget />
+            <ExitCustomerModeCard />
+          </div>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
