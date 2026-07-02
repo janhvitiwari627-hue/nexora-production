@@ -142,7 +142,7 @@ export function CandidateProfilePage() {
       stage = "profile";
       setUploadProgress(90);
       const { error: updErr } = await withTimeout(
-        supabase.from("profiles").update({ avatar_url: url }).eq("id", user.id),
+        Promise.resolve(supabase.from("profiles").update({ avatar_url: url }).eq("id", user.id)),
         15_000,
         "Save profile",
       );
