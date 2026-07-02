@@ -133,6 +133,8 @@ export function PostJobPage() {
   const [attempted, setAttempted] = useState<Set<number>>(new Set());
   const [highlightInvalid, setHighlightInvalid] = useState(false);
   const stepCardRef = useRef<HTMLDivElement | null>(null);
+  const [shopId, setShopId] = useState<string | null>(null);
+  const [publishedJob, setPublishedJob] = useState<JobRow | null>(null);
 
   // Persist wizard state to localStorage so it survives session expiry / re-login.
   useEffect(() => {
