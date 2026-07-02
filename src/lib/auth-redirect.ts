@@ -18,17 +18,17 @@ const ROLE_PRIORITY: UserRole[] = [
 ];
 
 const ROLE_ROUTES: Record<UserRole, string> = {
-  super_admin: "/admin",
-  admin: "/admin",
-  shop_owner: "/owner",
-  owner: "/owner",
-  shop_manager: "/owner",
-  staff: "/owner",
+  super_admin: "/admin/dashboard",
+  admin: "/admin/dashboard",
+  shop_owner: "/owner/dashboard",
+  owner: "/owner/dashboard",
+  shop_manager: "/owner/dashboard",
+  staff: "/owner/dashboard",
   brand: "/portal/brands",
   distributor: "/partner/dashboard",
   district_partner: "/partner/dashboard",
   growth_partner: "/partner/dashboard",
-  customer: "/dashboard",
+  customer: "/customer/home",
 };
 
 
