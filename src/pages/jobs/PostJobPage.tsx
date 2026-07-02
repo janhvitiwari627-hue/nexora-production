@@ -1070,6 +1070,29 @@ function RequirementsStep({
           onChange={(e) => update({ requirements: e.target.value })}
         />
       </Field>
+      <Field label="Interview mode" hint="How would you like to interview shortlisted candidates?">
+        <div className="flex flex-wrap gap-2">
+          {INTERVIEW_MODES.map((m) => {
+            const active = form.interview_mode === m;
+            return (
+              <button
+                key={m}
+                type="button"
+                onClick={() => update({ interview_mode: m })}
+                aria-pressed={active}
+                className={cn(
+                  "rounded-full border px-4 py-1.5 text-xs font-bold transition",
+                  active
+                    ? "border-transparent bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
+                    : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
+                )}
+              >
+                {m}
+              </button>
+            );
+          })}
+        </div>
+      </Field>
     </div>
   );
 }
