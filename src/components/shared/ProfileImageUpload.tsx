@@ -68,14 +68,14 @@ export function ProfileImageUpload({
     e.target.value = "";
   };
 
-  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+  const handleDrop = (e: DragEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setDragOver(false);
     if (disabled || uploading) return;
     validateAndSend(e.dataTransfer.files?.[0]);
   };
 
-  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+  const handleDragOver = (e: DragEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (disabled || uploading) return;
     if (!dragOver) setDragOver(true);
