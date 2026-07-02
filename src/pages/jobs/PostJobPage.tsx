@@ -455,6 +455,7 @@ export function PostJobPage() {
         salary_max: form.salary_max ?? null,
         openings: Math.min(50, Math.max(1, Number(form.openings) || 1)),
         job_role: form.job_role?.trim() || null,
+        specific_role: form.job_role?.trim() || null,
         work_location: form.work_location || null,
         contact_person: form.contact_person?.trim() || null,
         contact_mobile: form.contact_mobile?.trim() || null,
