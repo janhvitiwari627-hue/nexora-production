@@ -67,15 +67,9 @@ export function PersonalInfoPanel() {
     }));
   }
 
-  async function handleAvatar(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0];
-    if (!f) return;
+  async function handleAvatarFile(f: File) {
     if (!user) {
       toast.error("Please sign in to upload a photo");
-      return;
-    }
-    if (f.size > 5 * 1024 * 1024) {
-      toast.error("Image must be under 5 MB");
       return;
     }
     setUploading(true);
@@ -109,6 +103,25 @@ export function PersonalInfoPanel() {
       setUploading(false);
     }
   }
+
+  async function handleAvatarRemove() {
+    if (!user) return;
+    const previous = avatar;
+    setAvatar("");
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ avatar_url: null })
+        .eq("id", user.id);
+      if (error) throw error;
+      await refreshProfile();
+      toast.success("Profile photo removed");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to remove photo");
+      setAvatar(previous);
+    }
+  }
+
 
   function handlePincode(e: React.ChangeEvent<HTMLInputElement>) {
     const raw = e.target.value.replace(/\D/g, "").slice(0, 6);
