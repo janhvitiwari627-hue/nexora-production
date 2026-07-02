@@ -62,12 +62,12 @@ export function CandidateProfilePage() {
       const path = `${user.id}/avatar-${Date.now()}.${ext}`;
       setUploadProgress(35);
       const { error: upErr } = await supabase.storage
-        .from("avatars")
+        .from("profile-images")
         .upload(path, file, { upsert: true, contentType: file.type });
       if (upErr) throw upErr;
       setUploadProgress(70);
       const { data: signed, error: signErr } = await supabase.storage
-        .from("avatars")
+        .from("profile-images")
         .createSignedUrl(path, 60 * 60 * 24 * 365);
       if (signErr) throw signErr;
       const url = signed.signedUrl;
