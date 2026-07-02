@@ -145,15 +145,53 @@ const MONTHLY_SALARY_RANGES: { label: string; min: number; max: number | null }[
   { label: "₹25,000 – ₹35,000", min: 25000, max: 35000 },
   { label: "₹35,000+", min: 35000, max: null },
 ];
+
+const DAILY_PAY_RANGES: { label: string; min: number; max: number | null }[] = [
+  { label: "₹500 – ₹800", min: 500, max: 800 },
+  { label: "₹800 – ₹1,200", min: 800, max: 1200 },
+  { label: "₹1,200 – ₹2,000", min: 1200, max: 2000 },
+];
+
+const HOURLY_PAY_RANGES: { label: string; min: number; max: number | null }[] = [
+  { label: "₹100 – ₹200 / hour", min: 100, max: 200 },
+  { label: "₹200 – ₹400 / hour", min: 200, max: 400 },
+  { label: "₹400 – ₹700 / hour", min: 400, max: 700 },
+];
+
+const FIXED_COMMISSION_RANGES: { label: string; min: number; max: number | null }[] = [
+  { label: "₹10,000 + commission", min: 10000, max: null },
+  { label: "₹15,000 + commission", min: 15000, max: null },
+  { label: "₹20,000 + commission", min: 20000, max: null },
+];
+
 const BENEFITS = [
-  "PF & ESI",
+  "Paid leave",
+  "Flexible hours",
+  "Weekly off",
+  "Training provided",
+  "Staff discount",
+  "Travel allowance",
+  "Food allowance",
+  "Accommodation",
   "Health insurance",
   "Incentives",
-  "Paid leave",
-  "Meals",
-  "Training",
-  "Product allowance",
-  "Travel allowance",
+  "Career growth",
+  "Equipment provided",
+  "Uniform provided",
+  "Festival bonus",
+  "Other",
+];
+
+const BENEFIT_BUNDLES: { label: string; items: string[] }[] = [
+  { label: "Basic benefits", items: ["Weekly off", "Training provided", "Incentives"] },
+  {
+    label: "Premium benefits",
+    items: ["Paid leave", "Health insurance", "Incentives", "Career growth", "Festival bonus"],
+  },
+  {
+    label: "Salon essentials",
+    items: ["Uniform provided", "Staff discount", "Training provided"],
+  },
 ];
 
 // Quick-select role suggestions grouped by beauty category.
