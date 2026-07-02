@@ -70,7 +70,7 @@ function fromRealJob(j: JobRow & { employer?: { business_name: string } | null }
     postedDays: daysSince(j.published_at),
     applicants: j.applicants_count ?? 0,
     salary: fmtSalary(j.salary_min, j.salary_max, j.salary_period),
-    experience: j.experience_level ?? "Not specified",
+    experience: j.experience_level === "flexible" ? "Flexible" : (j.experience_level ?? "Not specified"),
     category: j.category,
     description: j.description,
     responsibilities: [],
