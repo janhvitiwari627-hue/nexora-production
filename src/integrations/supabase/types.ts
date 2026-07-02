@@ -869,6 +869,42 @@ export type Database = {
         }
         Relationships: []
       }
+      employer_profiles: {
+        Row: {
+          business_name: string
+          business_type: string
+          city: string
+          created_at: string
+          id: string
+          phone: string
+          state: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_name: string
+          business_type: string
+          city: string
+          created_at?: string
+          id?: string
+          phone: string
+          state: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_name?: string
+          business_type?: string
+          city?: string
+          created_at?: string
+          id?: string
+          phone?: string
+          state?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       favorites: {
         Row: {
           created_at: string
@@ -908,6 +944,130 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_applications: {
+        Row: {
+          applicant_id: string
+          cover_note: string | null
+          created_at: string
+          id: string
+          job_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          applicant_id: string
+          cover_note?: string | null
+          created_at?: string
+          id?: string
+          job_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          applicant_id?: string
+          cover_note?: string | null
+          created_at?: string
+          id?: string
+          job_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_applications_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jobs: {
+        Row: {
+          address: string | null
+          applicants_count: number
+          area: string | null
+          benefits: string[] | null
+          category: string
+          city: string
+          created_at: string
+          description: string
+          employer_id: string
+          experience_level: string | null
+          id: string
+          job_type: string
+          posted_by: string
+          published_at: string | null
+          requirements: string | null
+          salary_max: number | null
+          salary_min: number | null
+          salary_period: string | null
+          schedule: string | null
+          skills: string[] | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          applicants_count?: number
+          area?: string | null
+          benefits?: string[] | null
+          category: string
+          city: string
+          created_at?: string
+          description: string
+          employer_id: string
+          experience_level?: string | null
+          id?: string
+          job_type: string
+          posted_by: string
+          published_at?: string | null
+          requirements?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          salary_period?: string | null
+          schedule?: string | null
+          skills?: string[] | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          applicants_count?: number
+          area?: string | null
+          benefits?: string[] | null
+          category?: string
+          city?: string
+          created_at?: string
+          description?: string
+          employer_id?: string
+          experience_level?: string | null
+          id?: string
+          job_type?: string
+          posted_by?: string
+          published_at?: string | null
+          requirements?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          salary_period?: string | null
+          schedule?: string | null
+          skills?: string[] | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jobs_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "employer_profiles"
             referencedColumns: ["id"]
           },
         ]
