@@ -211,8 +211,29 @@ export function PostJobPage() {
       <EmployerSetupModal open={showSetup} onClose={() => setShowSetup(false)} redirectTo="/hire/post-job" />
 
       <div className="mx-auto max-w-7xl px-4 pb-32 pt-8 md:px-6">
+        {draftRestored && (
+          <div className="mb-4 flex items-center justify-between gap-3 rounded-[var(--radius-card)] border border-primary/30 bg-primary/5 px-4 py-3 text-sm">
+            <span className="text-heading">
+              Welcome back — we restored your draft at <strong>{STEPS[step].label}</strong>.
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                try { localStorage.removeItem(DRAFT_STORAGE_KEY); } catch {}
+                setForm(EMPTY);
+                setStep(0);
+                setJobId(undefined);
+                setSkillsInput("");
+                setDraftRestored(false);
+              }}
+              className="rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold hover:bg-muted"
+            >
+              Start over
+            </button>
+          </div>
+        )}
         {/* Progress */}
-        <div className="mb-6">
+
           <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground">
             <span>
               Step {step + 1} of {STEPS.length} · <span className="text-heading">{STEPS[step].label}</span>
