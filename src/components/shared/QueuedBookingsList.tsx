@@ -213,12 +213,12 @@ function QueuedBookingCard({
  */
 export function QueuedBookingsList({ className, compact, limit }: Props) {
   const queue = useOfflineQueue();
+  const online = useOnlineStatus();
   const tasks = queue.filter(
     (t) => t.type === TASK_CREATE_AND_CONFIRM_BOOKING,
   ) as BookingTask[];
   if (tasks.length === 0) return null;
 
-  const online = useOnlineStatus();
   const list = limit ? tasks.slice(0, limit) : tasks;
   const pending = tasks.filter((t) => t.status !== "succeeded" && t.status !== "failed").length;
 
