@@ -52,6 +52,8 @@ export function ProfileImageDropzone({
   value,
   onFile,
   onRemove,
+  onRetry,
+  canRetry = false,
   uploading = false,
   progress = null,
   error: externalError = null,
