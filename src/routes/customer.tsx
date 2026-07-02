@@ -103,6 +103,9 @@ function CustomerLayout() {
           <div className="mx-auto flex max-w-7xl items-center gap-2 px-4 py-3">
             <BackButton size="icon" className="shrink-0" />
             <span className="text-sm font-semibold text-heading">Nexora</span>
+            <div className="ml-auto">
+              <ViewSwitcher mode="customer" />
+            </div>
           </div>
         </div>
         <Outlet />
