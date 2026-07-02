@@ -746,7 +746,18 @@ function DetailsStep({
   update: (p: Partial<Form>) => void;
   errors: FormErrors;
 }) {
-  const roleOptions = ROLE_SUGGESTIONS[form.category ?? ""] ?? [];
+  const GENERAL_ROLES = [
+    "Senior Beauty Professional",
+    "Junior Beauty Professional",
+    "Beauty Assistant",
+    "Salon Executive",
+    "Freelance Beauty Expert",
+    "Trainee",
+    "Other",
+  ];
+  const roleOptions = form.category
+    ? ROLE_SUGGESTIONS[form.category] ?? GENERAL_ROLES
+    : GENERAL_ROLES;
   const selectedRole = (form.job_role ?? "").trim();
   const titleValue = form.title.trim();
   const titleMatchesRole = selectedRole.length > 0 && titleValue === selectedRole;
