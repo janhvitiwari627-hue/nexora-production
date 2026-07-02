@@ -23,11 +23,33 @@ type BeforeInstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 };
 
+type Platform = "ios" | "android" | "desktop";
+
+function detectPlatform(): Platform {
+  if (typeof navigator === "undefined") return "desktop";
+  const ua = navigator.userAgent || "";
+  if (/iPad|iPhone|iPod/.test(ua) || (ua.includes("Mac") && "ontouchend" in document)) return "ios";
+  if (/Android/i.test(ua)) return "android";
+  return "desktop";
+}
+
+function isSafari() {
+  const ua = navigator.userAgent || "";
+  return /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|Chrome/.test(ua);
+}
+function isChromium() {
+  const ua = navigator.userAgent || "";
+  return /Chrome|CriOS|Edg|Brave|OPR/.test(ua);
+}
+
 export default function CustomerAppPage() {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
+  const [platform, setPlatform] = useState<Platform>("desktop");
+  const [showGuide, setShowGuide] = useState(false);
 
   useEffect(() => {
+    setPlatform(detectPlatform());
     const onPrompt = (e: Event) => {
       e.preventDefault();
       setDeferred(e as BeforeInstallPromptEvent);
@@ -53,45 +75,27 @@ export default function CustomerAppPage() {
       setDeferred(null);
       return;
     }
-    toast.message("Add to Home Screen", {
-      description: "Open this page in Chrome (Android) or Safari (iOS) and tap the browser menu → Add to Home Screen.",
-    });
+    setShowGuide(true);
+    // Nudge for wrong-browser cases
+    if (platform === "ios" && !isSafari()) {
+      toast.message("Open in Safari to install", {
+        description: "iOS only allows installing from Safari. Tap the ••• menu → Open in Safari, then follow the steps below.",
+      });
+    } else if (platform === "android" && !isChromium()) {
+      toast.message("Open in Chrome to install", {
+        description: "Tap your browser menu → Open in Chrome, then follow the steps below.",
+      });
+    }
   };
 
+  const installLabel =
+    installed ? "App Installed" :
+    deferred ? "Install Nexora App" :
+    platform === "ios" ? "Show iOS Install Steps" :
+    platform === "android" ? "Show Android Install Steps" :
+    "Install Nexora App";
+
   return (
-    <div className="min-h-screen bg-background">
-      <PublicHeader />
-      <main className="mx-auto max-w-6xl px-4 py-12 md:py-20">
-        {/* Hero */}
-        <section className="grid gap-10 md:grid-cols-2 md:items-center">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full border bg-muted/40 px-3 py-1 text-xs font-medium">
-              <Smartphone className="h-3.5 w-3.5" /> Customer App
-            </div>
-            <h1 className="mt-4 text-4xl font-bold tracking-tight md:text-5xl">
-              Nexora Customer App
-            </h1>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Nearby verified salons, transparent prices, 60-second booking and QR rewards.
-            </p>
-
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Button size="lg" onClick={handleInstall} disabled={installed}>
-                <Download className="mr-2 h-4 w-4" />
-                {installed ? "App Installed" : "Install Nexora App"}
-              </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link to="/search">
-                  Continue in Browser <ExternalLink className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-
-            {!deferred && !installed && (
-              <p className="mt-4 text-sm text-muted-foreground">
-                Tip: open in Chrome and tap <b>Add to Home Screen</b> to install.
-              </p>
-            )}
 
             {/* Store placeholders */}
             <div className="mt-6 flex flex-wrap gap-3">
