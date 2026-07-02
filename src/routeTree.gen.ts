@@ -25,7 +25,6 @@ import { Route as OwnerRouteImport } from './routes/owner'
 import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as HireRouteImport } from './routes/hire'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as GrowthPartnerRouteImport } from './routes/growth-partner'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
@@ -45,6 +44,7 @@ import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as PartnerIndexRouteImport } from './routes/partner.index'
 import { Route as OwnerIndexRouteImport } from './routes/owner.index'
 import { Route as JobsIndexRouteImport } from './routes/jobs.index'
+import { Route as HireIndexRouteImport } from './routes/hire.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as TemplatePreviewKeyRouteImport } from './routes/template-preview.$key'
 import { Route as StaffDashboardRouteImport } from './routes/staff.dashboard'
@@ -215,11 +215,6 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HireRoute = HireRouteImport.update({
-  id: '/hire',
-  path: '/hire',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const HelpRoute = HelpRouteImport.update({
   id: '/help',
   path: '/help',
@@ -313,6 +308,11 @@ const OwnerIndexRoute = OwnerIndexRouteImport.update({
 const JobsIndexRoute = JobsIndexRouteImport.update({
   id: '/jobs/',
   path: '/jobs/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HireIndexRoute = HireIndexRouteImport.update({
+  id: '/hire/',
+  path: '/hire/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
@@ -516,9 +516,9 @@ const JobsJobIdRoute = JobsJobIdRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const HirePostJobRoute = HirePostJobRouteImport.update({
-  id: '/post-job',
-  path: '/post-job',
-  getParentRoute: () => HireRoute,
+  id: '/hire/post-job',
+  path: '/hire/post-job',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DistrictBusinessPartnerSlugRoute =
   DistrictBusinessPartnerSlugRouteImport.update({
@@ -785,7 +785,6 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/growth-partner': typeof GrowthPartnerRoute
   '/help': typeof HelpRoute
-  '/hire': typeof HireRouteWithChildren
   '/login': typeof LoginRoute
   '/membership': typeof MembershipRoute
   '/offline': typeof OfflineRoute
@@ -874,6 +873,7 @@ export interface FileRoutesByFullPath {
   '/staff/dashboard': typeof StaffDashboardRoute
   '/template-preview/$key': typeof TemplatePreviewKeyRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/hire/': typeof HireIndexRoute
   '/jobs/': typeof JobsIndexRoute
   '/owner/': typeof OwnerIndexRoute
   '/partner/': typeof PartnerIndexRoute
@@ -911,7 +911,6 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/growth-partner': typeof GrowthPartnerRoute
   '/help': typeof HelpRoute
-  '/hire': typeof HireRouteWithChildren
   '/login': typeof LoginRoute
   '/membership': typeof MembershipRoute
   '/offline': typeof OfflineRoute
@@ -998,6 +997,7 @@ export interface FileRoutesByTo {
   '/staff/dashboard': typeof StaffDashboardRoute
   '/template-preview/$key': typeof TemplatePreviewKeyRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/hire': typeof HireIndexRoute
   '/jobs': typeof JobsIndexRoute
   '/owner': typeof OwnerIndexRoute
   '/partner': typeof PartnerIndexRoute
@@ -1037,7 +1037,6 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/growth-partner': typeof GrowthPartnerRoute
   '/help': typeof HelpRoute
-  '/hire': typeof HireRouteWithChildren
   '/login': typeof LoginRoute
   '/membership': typeof MembershipRoute
   '/offline': typeof OfflineRoute
@@ -1126,6 +1125,7 @@ export interface FileRoutesById {
   '/staff/dashboard': typeof StaffDashboardRoute
   '/template-preview/$key': typeof TemplatePreviewKeyRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/hire/': typeof HireIndexRoute
   '/jobs/': typeof JobsIndexRoute
   '/owner/': typeof OwnerIndexRoute
   '/partner/': typeof PartnerIndexRoute
@@ -1166,7 +1166,6 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/growth-partner'
     | '/help'
-    | '/hire'
     | '/login'
     | '/membership'
     | '/offline'
@@ -1255,6 +1254,7 @@ export interface FileRouteTypes {
     | '/staff/dashboard'
     | '/template-preview/$key'
     | '/dashboard/'
+    | '/hire/'
     | '/jobs/'
     | '/owner/'
     | '/partner/'
@@ -1292,7 +1292,6 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/growth-partner'
     | '/help'
-    | '/hire'
     | '/login'
     | '/membership'
     | '/offline'
@@ -1379,6 +1378,7 @@ export interface FileRouteTypes {
     | '/staff/dashboard'
     | '/template-preview/$key'
     | '/dashboard'
+    | '/hire'
     | '/jobs'
     | '/owner'
     | '/partner'
@@ -1417,7 +1417,6 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/growth-partner'
     | '/help'
-    | '/hire'
     | '/login'
     | '/membership'
     | '/offline'
@@ -1506,6 +1505,7 @@ export interface FileRouteTypes {
     | '/staff/dashboard'
     | '/template-preview/$key'
     | '/dashboard/'
+    | '/hire/'
     | '/jobs/'
     | '/owner/'
     | '/partner/'
@@ -1545,7 +1545,6 @@ export interface RootRouteChildren {
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   GrowthPartnerRoute: typeof GrowthPartnerRoute
   HelpRoute: typeof HelpRoute
-  HireRoute: typeof HireRouteWithChildren
   LoginRoute: typeof LoginRoute
   MembershipRoute: typeof MembershipRoute
   OfflineRoute: typeof OfflineRoute
@@ -1567,6 +1566,7 @@ export interface RootRouteChildren {
   BrandSlugRoute: typeof BrandSlugRoute
   CategorySlugRoute: typeof CategorySlugRoute
   DistributorSlugRoute: typeof DistributorSlugRoute
+  HirePostJobRoute: typeof HirePostJobRoute
   JobsJobIdRoute: typeof JobsJobIdRoute
   JobsApplicationsRoute: typeof JobsApplicationsRoute
   JobsProfileRoute: typeof JobsProfileRoute
@@ -1585,6 +1585,7 @@ export interface RootRouteChildren {
   SiteBusinessSlugRoute: typeof SiteBusinessSlugRoute
   StaffDashboardRoute: typeof StaffDashboardRoute
   TemplatePreviewKeyRoute: typeof TemplatePreviewKeyRoute
+  HireIndexRoute: typeof HireIndexRoute
   JobsIndexRoute: typeof JobsIndexRoute
   PortalIndexRoute: typeof PortalIndexRoute
   PortalBrandsSlugRoute: typeof PortalBrandsSlugRoute
@@ -1718,13 +1719,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/hire': {
-      id: '/hire'
-      path: '/hire'
-      fullPath: '/hire'
-      preLoaderRoute: typeof HireRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/help': {
       id: '/help'
       path: '/help'
@@ -1856,6 +1850,13 @@ declare module '@tanstack/react-router' {
       path: '/jobs'
       fullPath: '/jobs/'
       preLoaderRoute: typeof JobsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hire/': {
+      id: '/hire/'
+      path: '/hire'
+      fullPath: '/hire/'
+      preLoaderRoute: typeof HireIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/': {
@@ -2140,10 +2141,10 @@ declare module '@tanstack/react-router' {
     }
     '/hire/post-job': {
       id: '/hire/post-job'
-      path: '/post-job'
+      path: '/hire/post-job'
       fullPath: '/hire/post-job'
       preLoaderRoute: typeof HirePostJobRouteImport
-      parentRoute: typeof HireRoute
+      parentRoute: typeof rootRouteImport
     }
     '/district-business-partner/$slug': {
       id: '/district-business-partner/$slug'
@@ -2579,16 +2580,6 @@ const DistrictBusinessPartnerRouteWithChildren =
     DistrictBusinessPartnerRouteChildren,
   )
 
-interface HireRouteChildren {
-  HirePostJobRoute: typeof HirePostJobRoute
-}
-
-const HireRouteChildren: HireRouteChildren = {
-  HirePostJobRoute: HirePostJobRoute,
-}
-
-const HireRouteWithChildren = HireRoute._addFileChildren(HireRouteChildren)
-
 interface OwnerJobsRouteChildren {
   OwnerJobsNewRoute: typeof OwnerJobsNewRoute
 }
@@ -2680,7 +2671,6 @@ const rootRouteChildren: RootRouteChildren = {
   ForgotPasswordRoute: ForgotPasswordRoute,
   GrowthPartnerRoute: GrowthPartnerRoute,
   HelpRoute: HelpRoute,
-  HireRoute: HireRouteWithChildren,
   LoginRoute: LoginRoute,
   MembershipRoute: MembershipRoute,
   OfflineRoute: OfflineRoute,
@@ -2702,6 +2692,7 @@ const rootRouteChildren: RootRouteChildren = {
   BrandSlugRoute: BrandSlugRoute,
   CategorySlugRoute: CategorySlugRoute,
   DistributorSlugRoute: DistributorSlugRoute,
+  HirePostJobRoute: HirePostJobRoute,
   JobsJobIdRoute: JobsJobIdRoute,
   JobsApplicationsRoute: JobsApplicationsRoute,
   JobsProfileRoute: JobsProfileRoute,
@@ -2720,6 +2711,7 @@ const rootRouteChildren: RootRouteChildren = {
   SiteBusinessSlugRoute: SiteBusinessSlugRoute,
   StaffDashboardRoute: StaffDashboardRoute,
   TemplatePreviewKeyRoute: TemplatePreviewKeyRoute,
+  HireIndexRoute: HireIndexRoute,
   JobsIndexRoute: JobsIndexRoute,
   PortalIndexRoute: PortalIndexRoute,
   PortalBrandsSlugRoute: PortalBrandsSlugRoute,
