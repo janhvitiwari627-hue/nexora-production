@@ -238,6 +238,32 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
                     {dashLabel}
                   </Link>
                 </DropdownMenuItem>
+                {isOwner && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                      <span className="inline-flex items-center gap-1">
+                        <ArrowLeftRight className="h-3 w-3" />
+                        Switch view
+                      </span>
+                    </DropdownMenuLabel>
+                    <DropdownMenuItem
+                      onSelect={(e) => { e.preventDefault(); switchToOwner(); }}
+                      className="cursor-pointer"
+                    >
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      Owner Dashboard
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={(e) => { e.preventDefault(); switchToCustomer(); }}
+                      className="cursor-pointer"
+                    >
+                      <UserCircle2 className="mr-2 h-4 w-4" />
+                      Browse as Customer
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
                 <DropdownMenuItem asChild>
                   <Link to="/profile" className="cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
