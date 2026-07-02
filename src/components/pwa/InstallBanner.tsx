@@ -14,7 +14,11 @@ import { toast } from "sonner";
 const DISMISS_KEY = "nexora_install_banner_dismissed_at";
 const DISMISS_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 const INSTALLED_KEY = "nexora_pwa_installed";
+// Shareable link for "Copy App Link" — points at the install landing page.
 const LIVE_APP_URL = "https://meripahalfasthelp.online/customer-app";
+// "Continue in Browser" bypasses install and drops the user straight into
+// the customer app shell (unauth users are then routed to /customer/login).
+const CONTINUE_IN_BROWSER_URL = "/customer/home";
 
 function isDismissed(): boolean {
   try {
