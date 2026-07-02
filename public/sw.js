@@ -7,7 +7,7 @@
  *   - skipWaiting only when the page explicitly asks (user-approved refresh),
  *     so we never force-reload mid-session with a stale mismatch.
  */
-const VERSION = "nexora-v4";
+const VERSION = "nexora-v5";
 const PRECACHE = `${VERSION}-precache`;
 const RUNTIME = `${VERSION}-runtime`;
 const PAGES = `${VERSION}-pages`;
@@ -22,6 +22,10 @@ const PAGE_SHELLS = [
   "/customer/home",
   "/customer/dashboard",
   "/customer/search",
+  "/customer/bookings",
+  "/customer/at-salon",
+  "/customer/profile",
+  "/customer/rewards",
 ];
 
 self.addEventListener("install", (event) => {
