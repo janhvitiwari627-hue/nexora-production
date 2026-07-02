@@ -335,9 +335,28 @@ export function PostJobPage() {
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <div className="rounded-[var(--radius-card)] border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-              {step === 0 && <DetailsStep form={form} update={update} />}
-              {step === 1 && <LocationStep form={form} update={update} />}
-              {step === 2 && <SalaryStep form={form} update={update} />}
+              {step === 0 && (
+                <DetailsStep
+                  form={form}
+                  update={update}
+                  errors={attempted.has(0) ? errors : {}}
+                />
+              )}
+              {step === 1 && (
+                <LocationStep
+                  form={form}
+                  update={update}
+                  errors={attempted.has(1) ? errors : {}}
+                />
+              )}
+              {step === 2 && (
+                <SalaryStep
+                  form={form}
+                  update={update}
+                  errors={attempted.has(2) ? errors : {}}
+                />
+              )}
+
               {step === 3 && (
                 <RequirementsStep
                   form={form}
