@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { PublicHeader } from "@/components/layout/PublicHeader";
+import { CustomerAppHeader } from "@/components/pwa/CustomerAppHeader";
 import { toast } from "sonner";
 
 const BENEFITS = [
