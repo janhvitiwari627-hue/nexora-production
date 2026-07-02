@@ -89,7 +89,14 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
   const [successOpen, setSuccessOpen] = useState(false);
   const [successMode, setSuccessMode] = useState<"real" | "demo">("real");
   const [applyOpen, setApplyOpen] = useState(false);
-  const [alreadyApplied, setAlreadyApplied] = useState(false);
+  const [viewOpen, setViewOpen] = useState(false);
+  const [application, setApplication] = useState<{
+    id: string;
+    cover_note: string | null;
+    status: string;
+    created_at: string;
+  } | null>(null);
+  const alreadyApplied = Boolean(application);
   const [checkingApplied, setCheckingApplied] = useState(false);
 
   const [fullName, setFullName] = useState("");
