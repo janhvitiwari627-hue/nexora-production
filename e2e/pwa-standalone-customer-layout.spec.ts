@@ -11,9 +11,10 @@ import { test, expect, type BrowserContext } from "@playwright/test";
  * inspects on boot.
  *
  * Auth: these tests do not sign in. Unauthenticated visits to /customer/*
- * are redirected to /login by the route's `beforeLoad`. The assertion that
- * matters is layout isolation — no public marketing chrome must render at
- * any point in the flow, regardless of the eventual URL.
+ * are redirected to /customer/login by the route's `beforeLoad` — the
+ * redirect must stay inside the /customer/* scope, never bounce out to
+ * the public /login. The assertion that matters is layout isolation —
+ * no public marketing chrome must render at any point in the flow.
  */
 
 const CUSTOMER_ROUTES = [
