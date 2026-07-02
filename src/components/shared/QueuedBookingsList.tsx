@@ -156,6 +156,14 @@ function QueuedBookingCard({
   const Icon = meta.Icon;
   const payload = task.payload;
   const spinning = stage === "syncing";
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const cancellable = stage === "saved" || stage === "syncing";
+
+  const doCancel = () => {
+    removeTask(task.id);
+    setConfirmOpen(false);
+    toast.success("Queued booking cancelled");
+  };
 
   return (
     <article
