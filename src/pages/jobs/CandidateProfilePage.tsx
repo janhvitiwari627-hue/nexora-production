@@ -223,6 +223,8 @@ export function CandidateProfilePage() {
                     value={avatar}
                     onFile={handleAvatarFile}
                     onRemove={handleAvatarRemove}
+                    onRetry={handleRetryUpload}
+                    canRetry={!!lastFailedFile}
                     uploading={uploading}
                     progress={uploadProgress}
                     error={uploadError}
