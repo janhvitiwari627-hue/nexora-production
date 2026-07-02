@@ -36,7 +36,6 @@ import { Route as DistrictBusinessPartnerRouteImport } from './routes/district-b
 import { Route as DistributorBrandPortalRouteImport } from './routes/distributor-brand-portal'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CustomerAppRouteImport } from './routes/customer-app'
-import { Route as CustomerRouteImport } from './routes/customer'
 import { Route as CreateShopWebsiteRouteImport } from './routes/create-shop-website'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -102,19 +101,6 @@ import { Route as DashboardMembershipRouteImport } from './routes/dashboard.memb
 import { Route as DashboardFavoritesRouteImport } from './routes/dashboard.favorites'
 import { Route as DashboardBookingsRouteImport } from './routes/dashboard.bookings'
 import { Route as DashboardActivityRouteImport } from './routes/dashboard.activity'
-import { Route as CustomerVerifyOtpRouteImport } from './routes/customer_.verify-otp'
-import { Route as CustomerOnboardingRouteImport } from './routes/customer_.onboarding'
-import { Route as CustomerLoginRouteImport } from './routes/customer_.login'
-import { Route as CustomerLocationRouteImport } from './routes/customer_.location'
-import { Route as CustomerSupportRouteImport } from './routes/customer.support'
-import { Route as CustomerSettingsRouteImport } from './routes/customer.settings'
-import { Route as CustomerRewardsRouteImport } from './routes/customer.rewards'
-import { Route as CustomerProfileRouteImport } from './routes/customer.profile'
-import { Route as CustomerHomeRouteImport } from './routes/customer.home'
-import { Route as CustomerBookingsRouteImport } from './routes/customer.bookings'
-import { Route as CustomerAtSalonRouteImport } from './routes/customer.at-salon'
-import { Route as CustomerAtHomeRouteImport } from './routes/customer.at-home'
-import { Route as CustomerAppSplatRouteImport } from './routes/customer-app.$'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as BrandSlugRouteImport } from './routes/brand.$slug'
 import { Route as BookSlugRouteImport } from './routes/book.$slug'
@@ -140,8 +126,6 @@ import { Route as PortalBrandsRegisterRouteImport } from './routes/portal.brands
 import { Route as PortalBrandsSlugRouteImport } from './routes/portal.brands.$slug'
 import { Route as OwnerJobsNewRouteImport } from './routes/owner.jobs.new'
 import { Route as DashboardBookingsIdRouteImport } from './routes/dashboard.bookings.$id'
-import { Route as CustomerSupportAddTicketRouteImport } from './routes/customer.support.add-ticket'
-import { Route as CustomerBookingsBookingIdRouteImport } from './routes/customer.bookings.$bookingId'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -284,11 +268,6 @@ const DashboardRoute = DashboardRouteImport.update({
 const CustomerAppRoute = CustomerAppRouteImport.update({
   id: '/customer-app',
   path: '/customer-app',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CustomerRoute = CustomerRouteImport.update({
-  id: '/customer',
-  path: '/customer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CreateShopWebsiteRoute = CreateShopWebsiteRouteImport.update({
@@ -617,71 +596,6 @@ const DashboardActivityRoute = DashboardActivityRouteImport.update({
   path: '/activity',
   getParentRoute: () => DashboardRoute,
 } as any)
-const CustomerVerifyOtpRoute = CustomerVerifyOtpRouteImport.update({
-  id: '/customer_/verify-otp',
-  path: '/customer/verify-otp',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CustomerOnboardingRoute = CustomerOnboardingRouteImport.update({
-  id: '/customer_/onboarding',
-  path: '/customer/onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CustomerLoginRoute = CustomerLoginRouteImport.update({
-  id: '/customer_/login',
-  path: '/customer/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CustomerLocationRoute = CustomerLocationRouteImport.update({
-  id: '/customer_/location',
-  path: '/customer/location',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CustomerSupportRoute = CustomerSupportRouteImport.update({
-  id: '/support',
-  path: '/support',
-  getParentRoute: () => CustomerRoute,
-} as any)
-const CustomerSettingsRoute = CustomerSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => CustomerRoute,
-} as any)
-const CustomerRewardsRoute = CustomerRewardsRouteImport.update({
-  id: '/rewards',
-  path: '/rewards',
-  getParentRoute: () => CustomerRoute,
-} as any)
-const CustomerProfileRoute = CustomerProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => CustomerRoute,
-} as any)
-const CustomerHomeRoute = CustomerHomeRouteImport.update({
-  id: '/home',
-  path: '/home',
-  getParentRoute: () => CustomerRoute,
-} as any)
-const CustomerBookingsRoute = CustomerBookingsRouteImport.update({
-  id: '/bookings',
-  path: '/bookings',
-  getParentRoute: () => CustomerRoute,
-} as any)
-const CustomerAtSalonRoute = CustomerAtSalonRouteImport.update({
-  id: '/at-salon',
-  path: '/at-salon',
-  getParentRoute: () => CustomerRoute,
-} as any)
-const CustomerAtHomeRoute = CustomerAtHomeRouteImport.update({
-  id: '/at-home',
-  path: '/at-home',
-  getParentRoute: () => CustomerRoute,
-} as any)
-const CustomerAppSplatRoute = CustomerAppSplatRouteImport.update({
-  id: '/$',
-  path: '/$',
-  getParentRoute: () => CustomerAppRoute,
-} as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/category/$slug',
   path: '/category/$slug',
@@ -808,18 +722,6 @@ const DashboardBookingsIdRoute = DashboardBookingsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => DashboardBookingsRoute,
 } as any)
-const CustomerSupportAddTicketRoute =
-  CustomerSupportAddTicketRouteImport.update({
-    id: '/add-ticket',
-    path: '/add-ticket',
-    getParentRoute: () => CustomerSupportRoute,
-  } as any)
-const CustomerBookingsBookingIdRoute =
-  CustomerBookingsBookingIdRouteImport.update({
-    id: '/$bookingId',
-    path: '/$bookingId',
-    getParentRoute: () => CustomerBookingsRoute,
-  } as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -874,8 +776,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
   '/create-shop-website': typeof CreateShopWebsiteRoute
-  '/customer': typeof CustomerRouteWithChildren
-  '/customer-app': typeof CustomerAppRouteWithChildren
+  '/customer-app': typeof CustomerAppRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/distributor-brand-portal': typeof DistributorBrandPortalRoute
   '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
@@ -918,19 +819,6 @@ export interface FileRoutesByFullPath {
   '/book/$slug': typeof BookSlugRoute
   '/brand/$slug': typeof BrandSlugRoute
   '/category/$slug': typeof CategorySlugRoute
-  '/customer-app/$': typeof CustomerAppSplatRoute
-  '/customer/at-home': typeof CustomerAtHomeRoute
-  '/customer/at-salon': typeof CustomerAtSalonRoute
-  '/customer/bookings': typeof CustomerBookingsRouteWithChildren
-  '/customer/home': typeof CustomerHomeRoute
-  '/customer/profile': typeof CustomerProfileRoute
-  '/customer/rewards': typeof CustomerRewardsRoute
-  '/customer/settings': typeof CustomerSettingsRoute
-  '/customer/support': typeof CustomerSupportRouteWithChildren
-  '/customer/location': typeof CustomerLocationRoute
-  '/customer/login': typeof CustomerLoginRoute
-  '/customer/onboarding': typeof CustomerOnboardingRoute
-  '/customer/verify-otp': typeof CustomerVerifyOtpRoute
   '/dashboard/activity': typeof DashboardActivityRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
   '/dashboard/favorites': typeof DashboardFavoritesRoute
@@ -990,8 +878,6 @@ export interface FileRoutesByFullPath {
   '/owner/': typeof OwnerIndexRoute
   '/partner/': typeof PartnerIndexRoute
   '/portal/': typeof PortalIndexRoute
-  '/customer/bookings/$bookingId': typeof CustomerBookingsBookingIdRoute
-  '/customer/support/add-ticket': typeof CustomerSupportAddTicketRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
   '/portal/brands/$slug': typeof PortalBrandsSlugRoute
@@ -1017,8 +903,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
   '/create-shop-website': typeof CreateShopWebsiteRoute
-  '/customer': typeof CustomerRouteWithChildren
-  '/customer-app': typeof CustomerAppRouteWithChildren
+  '/customer-app': typeof CustomerAppRoute
   '/distributor-brand-portal': typeof DistributorBrandPortalRoute
   '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
   '/download-app': typeof DownloadAppRoute
@@ -1058,19 +943,6 @@ export interface FileRoutesByTo {
   '/book/$slug': typeof BookSlugRoute
   '/brand/$slug': typeof BrandSlugRoute
   '/category/$slug': typeof CategorySlugRoute
-  '/customer-app/$': typeof CustomerAppSplatRoute
-  '/customer/at-home': typeof CustomerAtHomeRoute
-  '/customer/at-salon': typeof CustomerAtSalonRoute
-  '/customer/bookings': typeof CustomerBookingsRouteWithChildren
-  '/customer/home': typeof CustomerHomeRoute
-  '/customer/profile': typeof CustomerProfileRoute
-  '/customer/rewards': typeof CustomerRewardsRoute
-  '/customer/settings': typeof CustomerSettingsRoute
-  '/customer/support': typeof CustomerSupportRouteWithChildren
-  '/customer/location': typeof CustomerLocationRoute
-  '/customer/login': typeof CustomerLoginRoute
-  '/customer/onboarding': typeof CustomerOnboardingRoute
-  '/customer/verify-otp': typeof CustomerVerifyOtpRoute
   '/dashboard/activity': typeof DashboardActivityRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
   '/dashboard/favorites': typeof DashboardFavoritesRoute
@@ -1130,8 +1002,6 @@ export interface FileRoutesByTo {
   '/owner': typeof OwnerIndexRoute
   '/partner': typeof PartnerIndexRoute
   '/portal': typeof PortalIndexRoute
-  '/customer/bookings/$bookingId': typeof CustomerBookingsBookingIdRoute
-  '/customer/support/add-ticket': typeof CustomerSupportAddTicketRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
   '/portal/brands/$slug': typeof PortalBrandsSlugRoute
@@ -1158,8 +1028,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
   '/create-shop-website': typeof CreateShopWebsiteRoute
-  '/customer': typeof CustomerRouteWithChildren
-  '/customer-app': typeof CustomerAppRouteWithChildren
+  '/customer-app': typeof CustomerAppRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/distributor-brand-portal': typeof DistributorBrandPortalRoute
   '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
@@ -1202,19 +1071,6 @@ export interface FileRoutesById {
   '/book/$slug': typeof BookSlugRoute
   '/brand/$slug': typeof BrandSlugRoute
   '/category/$slug': typeof CategorySlugRoute
-  '/customer-app/$': typeof CustomerAppSplatRoute
-  '/customer/at-home': typeof CustomerAtHomeRoute
-  '/customer/at-salon': typeof CustomerAtSalonRoute
-  '/customer/bookings': typeof CustomerBookingsRouteWithChildren
-  '/customer/home': typeof CustomerHomeRoute
-  '/customer/profile': typeof CustomerProfileRoute
-  '/customer/rewards': typeof CustomerRewardsRoute
-  '/customer/settings': typeof CustomerSettingsRoute
-  '/customer/support': typeof CustomerSupportRouteWithChildren
-  '/customer_/location': typeof CustomerLocationRoute
-  '/customer_/login': typeof CustomerLoginRoute
-  '/customer_/onboarding': typeof CustomerOnboardingRoute
-  '/customer_/verify-otp': typeof CustomerVerifyOtpRoute
   '/dashboard/activity': typeof DashboardActivityRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
   '/dashboard/favorites': typeof DashboardFavoritesRoute
@@ -1274,8 +1130,6 @@ export interface FileRoutesById {
   '/owner/': typeof OwnerIndexRoute
   '/partner/': typeof PartnerIndexRoute
   '/portal/': typeof PortalIndexRoute
-  '/customer/bookings/$bookingId': typeof CustomerBookingsBookingIdRoute
-  '/customer/support/add-ticket': typeof CustomerSupportAddTicketRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
   '/portal/brands/$slug': typeof PortalBrandsSlugRoute
@@ -1303,7 +1157,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/contact'
     | '/create-shop-website'
-    | '/customer'
     | '/customer-app'
     | '/dashboard'
     | '/distributor-brand-portal'
@@ -1347,19 +1200,6 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/brand/$slug'
     | '/category/$slug'
-    | '/customer-app/$'
-    | '/customer/at-home'
-    | '/customer/at-salon'
-    | '/customer/bookings'
-    | '/customer/home'
-    | '/customer/profile'
-    | '/customer/rewards'
-    | '/customer/settings'
-    | '/customer/support'
-    | '/customer/location'
-    | '/customer/login'
-    | '/customer/onboarding'
-    | '/customer/verify-otp'
     | '/dashboard/activity'
     | '/dashboard/bookings'
     | '/dashboard/favorites'
@@ -1419,8 +1259,6 @@ export interface FileRouteTypes {
     | '/owner/'
     | '/partner/'
     | '/portal/'
-    | '/customer/bookings/$bookingId'
-    | '/customer/support/add-ticket'
     | '/dashboard/bookings/$id'
     | '/owner/jobs/new'
     | '/portal/brands/$slug'
@@ -1446,7 +1284,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/contact'
     | '/create-shop-website'
-    | '/customer'
     | '/customer-app'
     | '/distributor-brand-portal'
     | '/district-business-partner'
@@ -1487,19 +1324,6 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/brand/$slug'
     | '/category/$slug'
-    | '/customer-app/$'
-    | '/customer/at-home'
-    | '/customer/at-salon'
-    | '/customer/bookings'
-    | '/customer/home'
-    | '/customer/profile'
-    | '/customer/rewards'
-    | '/customer/settings'
-    | '/customer/support'
-    | '/customer/location'
-    | '/customer/login'
-    | '/customer/onboarding'
-    | '/customer/verify-otp'
     | '/dashboard/activity'
     | '/dashboard/bookings'
     | '/dashboard/favorites'
@@ -1559,8 +1383,6 @@ export interface FileRouteTypes {
     | '/owner'
     | '/partner'
     | '/portal'
-    | '/customer/bookings/$bookingId'
-    | '/customer/support/add-ticket'
     | '/dashboard/bookings/$id'
     | '/owner/jobs/new'
     | '/portal/brands/$slug'
@@ -1586,7 +1408,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/contact'
     | '/create-shop-website'
-    | '/customer'
     | '/customer-app'
     | '/dashboard'
     | '/distributor-brand-portal'
@@ -1630,19 +1451,6 @@ export interface FileRouteTypes {
     | '/book/$slug'
     | '/brand/$slug'
     | '/category/$slug'
-    | '/customer-app/$'
-    | '/customer/at-home'
-    | '/customer/at-salon'
-    | '/customer/bookings'
-    | '/customer/home'
-    | '/customer/profile'
-    | '/customer/rewards'
-    | '/customer/settings'
-    | '/customer/support'
-    | '/customer_/location'
-    | '/customer_/login'
-    | '/customer_/onboarding'
-    | '/customer_/verify-otp'
     | '/dashboard/activity'
     | '/dashboard/bookings'
     | '/dashboard/favorites'
@@ -1702,8 +1510,6 @@ export interface FileRouteTypes {
     | '/owner/'
     | '/partner/'
     | '/portal/'
-    | '/customer/bookings/$bookingId'
-    | '/customer/support/add-ticket'
     | '/dashboard/bookings/$id'
     | '/owner/jobs/new'
     | '/portal/brands/$slug'
@@ -1730,8 +1536,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   ContactRoute: typeof ContactRoute
   CreateShopWebsiteRoute: typeof CreateShopWebsiteRoute
-  CustomerRoute: typeof CustomerRouteWithChildren
-  CustomerAppRoute: typeof CustomerAppRouteWithChildren
+  CustomerAppRoute: typeof CustomerAppRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   DistributorBrandPortalRoute: typeof DistributorBrandPortalRoute
   DistrictBusinessPartnerRoute: typeof DistrictBusinessPartnerRouteWithChildren
@@ -1762,10 +1567,6 @@ export interface RootRouteChildren {
   BookSlugRoute: typeof BookSlugRoute
   BrandSlugRoute: typeof BrandSlugRoute
   CategorySlugRoute: typeof CategorySlugRoute
-  CustomerLocationRoute: typeof CustomerLocationRoute
-  CustomerLoginRoute: typeof CustomerLoginRoute
-  CustomerOnboardingRoute: typeof CustomerOnboardingRoute
-  CustomerVerifyOtpRoute: typeof CustomerVerifyOtpRoute
   DistributorSlugRoute: typeof DistributorSlugRoute
   PortalBusinessPagesRoute: typeof PortalBusinessPagesRoute
   PortalContactRoute: typeof PortalContactRoute
@@ -1988,13 +1789,6 @@ declare module '@tanstack/react-router' {
       path: '/customer-app'
       fullPath: '/customer-app'
       preLoaderRoute: typeof CustomerAppRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/customer': {
-      id: '/customer'
-      path: '/customer'
-      fullPath: '/customer'
-      preLoaderRoute: typeof CustomerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/create-shop-website': {
@@ -2452,97 +2246,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardActivityRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/customer_/verify-otp': {
-      id: '/customer_/verify-otp'
-      path: '/customer/verify-otp'
-      fullPath: '/customer/verify-otp'
-      preLoaderRoute: typeof CustomerVerifyOtpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/customer_/onboarding': {
-      id: '/customer_/onboarding'
-      path: '/customer/onboarding'
-      fullPath: '/customer/onboarding'
-      preLoaderRoute: typeof CustomerOnboardingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/customer_/login': {
-      id: '/customer_/login'
-      path: '/customer/login'
-      fullPath: '/customer/login'
-      preLoaderRoute: typeof CustomerLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/customer_/location': {
-      id: '/customer_/location'
-      path: '/customer/location'
-      fullPath: '/customer/location'
-      preLoaderRoute: typeof CustomerLocationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/customer/support': {
-      id: '/customer/support'
-      path: '/support'
-      fullPath: '/customer/support'
-      preLoaderRoute: typeof CustomerSupportRouteImport
-      parentRoute: typeof CustomerRoute
-    }
-    '/customer/settings': {
-      id: '/customer/settings'
-      path: '/settings'
-      fullPath: '/customer/settings'
-      preLoaderRoute: typeof CustomerSettingsRouteImport
-      parentRoute: typeof CustomerRoute
-    }
-    '/customer/rewards': {
-      id: '/customer/rewards'
-      path: '/rewards'
-      fullPath: '/customer/rewards'
-      preLoaderRoute: typeof CustomerRewardsRouteImport
-      parentRoute: typeof CustomerRoute
-    }
-    '/customer/profile': {
-      id: '/customer/profile'
-      path: '/profile'
-      fullPath: '/customer/profile'
-      preLoaderRoute: typeof CustomerProfileRouteImport
-      parentRoute: typeof CustomerRoute
-    }
-    '/customer/home': {
-      id: '/customer/home'
-      path: '/home'
-      fullPath: '/customer/home'
-      preLoaderRoute: typeof CustomerHomeRouteImport
-      parentRoute: typeof CustomerRoute
-    }
-    '/customer/bookings': {
-      id: '/customer/bookings'
-      path: '/bookings'
-      fullPath: '/customer/bookings'
-      preLoaderRoute: typeof CustomerBookingsRouteImport
-      parentRoute: typeof CustomerRoute
-    }
-    '/customer/at-salon': {
-      id: '/customer/at-salon'
-      path: '/at-salon'
-      fullPath: '/customer/at-salon'
-      preLoaderRoute: typeof CustomerAtSalonRouteImport
-      parentRoute: typeof CustomerRoute
-    }
-    '/customer/at-home': {
-      id: '/customer/at-home'
-      path: '/at-home'
-      fullPath: '/customer/at-home'
-      preLoaderRoute: typeof CustomerAtHomeRouteImport
-      parentRoute: typeof CustomerRoute
-    }
-    '/customer-app/$': {
-      id: '/customer-app/$'
-      path: '/$'
-      fullPath: '/customer-app/$'
-      preLoaderRoute: typeof CustomerAppSplatRouteImport
-      parentRoute: typeof CustomerAppRoute
-    }
     '/category/$slug': {
       id: '/category/$slug'
       path: '/category/$slug'
@@ -2718,20 +2421,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardBookingsIdRouteImport
       parentRoute: typeof DashboardBookingsRoute
     }
-    '/customer/support/add-ticket': {
-      id: '/customer/support/add-ticket'
-      path: '/add-ticket'
-      fullPath: '/customer/support/add-ticket'
-      preLoaderRoute: typeof CustomerSupportAddTicketRouteImport
-      parentRoute: typeof CustomerSupportRoute
-    }
-    '/customer/bookings/$bookingId': {
-      id: '/customer/bookings/$bookingId'
-      path: '/$bookingId'
-      fullPath: '/customer/bookings/$bookingId'
-      preLoaderRoute: typeof CustomerBookingsBookingIdRouteImport
-      parentRoute: typeof CustomerBookingsRoute
-    }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
       path: '/lovable/email/queue/process'
@@ -2822,67 +2511,6 @@ const AdminRouteChildren: AdminRouteChildren = {
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
-
-interface CustomerBookingsRouteChildren {
-  CustomerBookingsBookingIdRoute: typeof CustomerBookingsBookingIdRoute
-}
-
-const CustomerBookingsRouteChildren: CustomerBookingsRouteChildren = {
-  CustomerBookingsBookingIdRoute: CustomerBookingsBookingIdRoute,
-}
-
-const CustomerBookingsRouteWithChildren =
-  CustomerBookingsRoute._addFileChildren(CustomerBookingsRouteChildren)
-
-interface CustomerSupportRouteChildren {
-  CustomerSupportAddTicketRoute: typeof CustomerSupportAddTicketRoute
-}
-
-const CustomerSupportRouteChildren: CustomerSupportRouteChildren = {
-  CustomerSupportAddTicketRoute: CustomerSupportAddTicketRoute,
-}
-
-const CustomerSupportRouteWithChildren = CustomerSupportRoute._addFileChildren(
-  CustomerSupportRouteChildren,
-)
-
-interface CustomerRouteChildren {
-  CustomerAtHomeRoute: typeof CustomerAtHomeRoute
-  CustomerAtSalonRoute: typeof CustomerAtSalonRoute
-  CustomerBookingsRoute: typeof CustomerBookingsRouteWithChildren
-  CustomerHomeRoute: typeof CustomerHomeRoute
-  CustomerProfileRoute: typeof CustomerProfileRoute
-  CustomerRewardsRoute: typeof CustomerRewardsRoute
-  CustomerSettingsRoute: typeof CustomerSettingsRoute
-  CustomerSupportRoute: typeof CustomerSupportRouteWithChildren
-}
-
-const CustomerRouteChildren: CustomerRouteChildren = {
-  CustomerAtHomeRoute: CustomerAtHomeRoute,
-  CustomerAtSalonRoute: CustomerAtSalonRoute,
-  CustomerBookingsRoute: CustomerBookingsRouteWithChildren,
-  CustomerHomeRoute: CustomerHomeRoute,
-  CustomerProfileRoute: CustomerProfileRoute,
-  CustomerRewardsRoute: CustomerRewardsRoute,
-  CustomerSettingsRoute: CustomerSettingsRoute,
-  CustomerSupportRoute: CustomerSupportRouteWithChildren,
-}
-
-const CustomerRouteWithChildren = CustomerRoute._addFileChildren(
-  CustomerRouteChildren,
-)
-
-interface CustomerAppRouteChildren {
-  CustomerAppSplatRoute: typeof CustomerAppSplatRoute
-}
-
-const CustomerAppRouteChildren: CustomerAppRouteChildren = {
-  CustomerAppSplatRoute: CustomerAppSplatRoute,
-}
-
-const CustomerAppRouteWithChildren = CustomerAppRoute._addFileChildren(
-  CustomerAppRouteChildren,
-)
 
 interface DashboardBookingsRouteChildren {
   DashboardBookingsIdRoute: typeof DashboardBookingsIdRoute
@@ -3055,8 +2683,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   ContactRoute: ContactRoute,
   CreateShopWebsiteRoute: CreateShopWebsiteRoute,
-  CustomerRoute: CustomerRouteWithChildren,
-  CustomerAppRoute: CustomerAppRouteWithChildren,
+  CustomerAppRoute: CustomerAppRoute,
   DashboardRoute: DashboardRouteWithChildren,
   DistributorBrandPortalRoute: DistributorBrandPortalRoute,
   DistrictBusinessPartnerRoute: DistrictBusinessPartnerRouteWithChildren,
@@ -3087,10 +2714,6 @@ const rootRouteChildren: RootRouteChildren = {
   BookSlugRoute: BookSlugRoute,
   BrandSlugRoute: BrandSlugRoute,
   CategorySlugRoute: CategorySlugRoute,
-  CustomerLocationRoute: CustomerLocationRoute,
-  CustomerLoginRoute: CustomerLoginRoute,
-  CustomerOnboardingRoute: CustomerOnboardingRoute,
-  CustomerVerifyOtpRoute: CustomerVerifyOtpRoute,
   DistributorSlugRoute: DistributorSlugRoute,
   PortalBusinessPagesRoute: PortalBusinessPagesRoute,
   PortalContactRoute: PortalContactRoute,
