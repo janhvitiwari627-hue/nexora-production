@@ -89,6 +89,13 @@ export type JobDraftInput = {
   requirements?: string | null;
   skills?: string[];
   openings?: number;
+  job_role?: string | null;
+  work_location?: string | null;
+  contact_person?: string | null;
+  contact_mobile?: string | null;
+  whatsapp_number?: string | null;
+  interview_mode?: string | null;
+  shop_id?: string | null;
 };
 
 export async function saveJob(params: {
