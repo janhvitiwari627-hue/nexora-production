@@ -717,23 +717,35 @@ export function PostJobPage() {
 
     let createdJobId: string | undefined;
     try {
+      // Strip UI-only fields — they belong to the draft, not the DB.
+      const {
+        business_type: _bt,
+        days_preset: _dp,
+        custom_days: _cd,
+        hours_preset: _hp,
+        start_time: _st,
+        end_time: _et,
+        flexible_schedule: _fs,
+        ...dbForm
+      } = form;
+      void _bt; void _dp; void _cd; void _hp; void _st; void _et; void _fs;
       const cleaned: JobDraftInput = {
-        ...form,
-        area: form.area || null,
-        address: form.address || null,
-        schedule: form.schedule || null,
-        experience_level: form.experience_level || null,
-        requirements: form.requirements || null,
-        salary_min: form.salary_min ?? null,
-        salary_max: form.salary_max ?? null,
-        openings: Math.min(50, Math.max(1, Number(form.openings) || 1)),
-        job_role: form.job_role?.trim() || null,
-        specific_role: form.job_role?.trim() || null,
-        work_location: form.work_location || null,
-        contact_person: form.contact_person?.trim() || null,
-        contact_mobile: form.contact_mobile?.trim() || null,
-        whatsapp_number: form.whatsapp_number?.trim() || null,
-        interview_mode: form.interview_mode || null,
+        ...dbForm,
+        area: dbForm.area || null,
+        address: dbForm.address || null,
+        schedule: dbForm.schedule || null,
+        experience_level: dbForm.experience_level || null,
+        requirements: dbForm.requirements || null,
+        salary_min: dbForm.salary_min ?? null,
+        salary_max: dbForm.salary_max ?? null,
+        openings: Math.min(50, Math.max(1, Number(dbForm.openings) || 1)),
+        job_role: dbForm.job_role?.trim() || null,
+        specific_role: dbForm.job_role?.trim() || null,
+        work_location: dbForm.work_location || null,
+        contact_person: dbForm.contact_person?.trim() || null,
+        contact_mobile: dbForm.contact_mobile?.trim() || null,
+        whatsapp_number: dbForm.whatsapp_number?.trim() || null,
+        interview_mode: dbForm.interview_mode || null,
         shop_id: shopId,
       };
       const row = await saveJob({
