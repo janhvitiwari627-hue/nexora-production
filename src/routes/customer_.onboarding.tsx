@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 
-export const Route = createFileRoute("/customer/onboarding")({
+export const Route = createFileRoute("/customer_/onboarding")({
   head: () => ({ meta: [{ title: "Set up your profile — Nexora" }] }),
   component: OnboardingPage,
 });

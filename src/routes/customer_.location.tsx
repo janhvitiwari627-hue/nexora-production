@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { MapPin } from "lucide-react";
 import { useState } from "react";
 
-export const Route = createFileRoute("/customer/location")({
+export const Route = createFileRoute("/customer_/location")({
   head: () => ({ meta: [{ title: "Enable location — Nexora" }] }),
   component: LocationPermissionPage,
 });

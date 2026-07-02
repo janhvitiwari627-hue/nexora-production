@@ -9,7 +9,7 @@ import { Calendar, Clock, Sparkles } from "lucide-react";
  * Uses a non-nested filename (`salon.$slug_.book`) so it does not inherit
  * the /salon/$slug parent route (which redirects to /site/$businessSlug).
  */
-export const Route = createFileRoute("/salon/$slug/book")({
+export const Route = createFileRoute("/salon/$slug_/book")({
   head: ({ params }) => ({
     meta: [{ title: `Book at ${params.slug} — Nexora` }],
   }),

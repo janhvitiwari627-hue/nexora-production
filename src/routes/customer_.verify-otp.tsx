@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useState } from "react";
 
-export const Route = createFileRoute("/customer/verify-otp")({
+export const Route = createFileRoute("/customer_/verify-otp")({
   head: () => ({
     meta: [{ title: "Verify OTP — Nexora Customer App" }],
   }),
