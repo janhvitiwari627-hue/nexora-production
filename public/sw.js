@@ -29,7 +29,7 @@ self.addEventListener("activate", (event) => {
       const keys = await caches.keys();
       await Promise.all(
         keys
-          .filter((k) => k.startsWith("nexora-") && k !== PRECACHE && k !== RUNTIME)
+          .filter((k) => k.startsWith("nexora-") && k !== PRECACHE && k !== RUNTIME && k !== PAGES)
           .map((k) => caches.delete(k))
       );
       await self.clients.claim();
