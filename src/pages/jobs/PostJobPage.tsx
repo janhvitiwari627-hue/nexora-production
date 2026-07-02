@@ -159,7 +159,7 @@ export function PostJobPage() {
     setAttempted((prev) => (prev.has(i) ? prev : new Set(prev).add(i)));
 
   const stepInvalid = (i: number) => {
-    if (i === 0) return !!(errors.title || errors.description);
+    if (i === 0) return !!(errors.title || errors.category || errors.description || errors.openings);
     if (i === 1) return !!errors.city;
     if (i === 2) return !!(errors.salary_min || errors.salary_max);
     return false;
