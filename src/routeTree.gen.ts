@@ -33,6 +33,7 @@ import { Route as ForOwnersRouteImport } from './routes/for-owners'
 import { Route as DownloadAppRouteImport } from './routes/download-app'
 import { Route as DistrictBusinessPartnerRouteImport } from './routes/district-business-partner'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CustomerAppRouteImport } from './routes/customer-app'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AcademyRouteImport } from './routes/academy'
@@ -246,6 +247,11 @@ const DistrictBusinessPartnerRoute = DistrictBusinessPartnerRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CustomerAppRoute = CustomerAppRouteImport.update({
+  id: '/customer-app',
+  path: '/customer-app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -733,6 +739,7 @@ export interface FileRoutesByFullPath {
   '/academy': typeof AcademyRoute
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
+  '/customer-app': typeof CustomerAppRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
   '/download-app': typeof DownloadAppRoute
@@ -853,6 +860,7 @@ export interface FileRoutesByTo {
   '/academy': typeof AcademyRoute
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
+  '/customer-app': typeof CustomerAppRoute
   '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
   '/download-app': typeof DownloadAppRoute
   '/for-owners': typeof ForOwnersRoute
@@ -971,6 +979,7 @@ export interface FileRoutesById {
   '/academy': typeof AcademyRoute
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
+  '/customer-app': typeof CustomerAppRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
   '/download-app': typeof DownloadAppRoute
@@ -1093,6 +1102,7 @@ export interface FileRouteTypes {
     | '/academy'
     | '/admin'
     | '/contact'
+    | '/customer-app'
     | '/dashboard'
     | '/district-business-partner'
     | '/download-app'
@@ -1213,6 +1223,7 @@ export interface FileRouteTypes {
     | '/academy'
     | '/admin'
     | '/contact'
+    | '/customer-app'
     | '/district-business-partner'
     | '/download-app'
     | '/for-owners'
@@ -1330,6 +1341,7 @@ export interface FileRouteTypes {
     | '/academy'
     | '/admin'
     | '/contact'
+    | '/customer-app'
     | '/dashboard'
     | '/district-business-partner'
     | '/download-app'
@@ -1451,6 +1463,7 @@ export interface RootRouteChildren {
   AcademyRoute: typeof AcademyRoute
   AdminRoute: typeof AdminRouteWithChildren
   ContactRoute: typeof ContactRoute
+  CustomerAppRoute: typeof CustomerAppRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   DistrictBusinessPartnerRoute: typeof DistrictBusinessPartnerRouteWithChildren
   DownloadAppRoute: typeof DownloadAppRoute
@@ -1678,6 +1691,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/customer-app': {
+      id: '/customer-app'
+      path: '/customer-app'
+      fullPath: '/customer-app'
+      preLoaderRoute: typeof CustomerAppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -2541,6 +2561,7 @@ const rootRouteChildren: RootRouteChildren = {
   AcademyRoute: AcademyRoute,
   AdminRoute: AdminRouteWithChildren,
   ContactRoute: ContactRoute,
+  CustomerAppRoute: CustomerAppRoute,
   DashboardRoute: DashboardRouteWithChildren,
   DistrictBusinessPartnerRoute: DistrictBusinessPartnerRouteWithChildren,
   DownloadAppRoute: DownloadAppRoute,
