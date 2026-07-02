@@ -142,31 +142,59 @@ export default function CustomerAppPage() {
 
   const handleInstall = async () => {
     if (deferred) {
-      await deferred.prompt();
-      const { outcome } = await deferred.userChoice;
-      if (outcome === "accepted") {
-        setInstalled(true);
-        try { localStorage.setItem(INSTALLED_KEY, "1"); } catch { /* ignore */ }
-      } else {
-        // User dismissed the native prompt — respect that for the session.
-        setDismissed(true);
-        try { sessionStorage.setItem(SESSION_DISMISS_KEY, "1"); } catch { /* ignore */ }
+      try {
+        await deferred.prompt();
+        const { outcome } = await deferred.userChoice;
+        if (outcome === "accepted") {
+          setInstalled(true);
+          try { localStorage.setItem(INSTALLED_KEY, "1"); } catch { /* ignore */ }
+          toast.success("Installing Nexora…", { description: "You'll find Nexora on your home screen shortly." });
+        } else {
+          setDismissed(true);
+          try { sessionStorage.setItem(SESSION_DISMISS_KEY, "1"); } catch { /* ignore */ }
+        }
+      } catch {
+        toast.error("Install prompt failed", { description: "Try again from your browser's install icon in the address bar." });
+      } finally {
+        setDeferred(null);
       }
-      setDeferred(null);
       return;
     }
+
+    // No native prompt available. Always give the user visible feedback and
+    // reveal the platform-specific install guide.
     setShowGuide(true);
-    // Nudge for wrong-browser cases
-    if (platform === "ios" && !isSafari()) {
-      toast.message("Open in Safari to install", {
-        description: "iOS only allows installing from Safari. Tap the ••• menu → Open in Safari, then follow the steps below.",
+    // Scroll the guide into view on the next paint so it's obvious the click did something.
+    requestAnimationFrame(() => {
+      guideRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+
+    if (isEmbeddedOrPreview()) {
+      toast.message("Open the published site to install", {
+        description: "Installing to your home screen only works from the live Nexora URL (meripahalfasthelp.online), not the in-editor preview.",
       });
-    } else if (platform === "android" && !isChromium()) {
-      toast.message("Open in Chrome to install", {
-        description: "Tap your browser menu → Open in Chrome, then follow the steps below.",
+      return;
+    }
+
+    if (platform === "ios") {
+      toast.message(isSafari() ? "Follow the iOS install steps" : "Open in Safari to install", {
+        description: isSafari()
+          ? "Tap Share → Add to Home Screen to install Nexora."
+          : "iOS only allows installing from Safari. Open this page in Safari and follow the steps below.",
+      });
+    } else if (platform === "android") {
+      toast.message(isChromium() ? "Follow the Android install steps" : "Open in Chrome to install", {
+        description: isChromium()
+          ? "Tap the ⋮ menu → Install app to add Nexora to your device."
+          : "Open this page in Chrome, then tap ⋮ → Install app.",
+      });
+    } else {
+      toast.message("Install from your browser", {
+        description: "Click the install icon on the right of the address bar in Chrome, Edge or Brave.",
       });
     }
   };
+
 
   const handleDismiss = () => {
     setDismissed(true);
