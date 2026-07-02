@@ -33,6 +33,7 @@ const STATUS_BADGE: Record<string, string> = {
 export function BookingDetailPage({ booking = mockBookingDetail }: { booking?: BookingDetail }) {
   const [copied, setCopied] = useState(false);
   const qrWrapRef = useRef<HTMLDivElement>(null);
+  const isRefreshing = useBookingRefreshing(booking.id);
 
   const total = booking.payment.servicePrice + booking.payment.platformFee - booking.payment.discount;
   const remaining = Math.max(0, total - booking.payment.advancePaid);
