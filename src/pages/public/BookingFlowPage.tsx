@@ -169,15 +169,33 @@ export function BookingFlowPage({ salon }: { salon?: RealSalonRef } = {}) {
       {/* Header */}
       <div className="border-border bg-card/95 sticky top-0 z-30 border-b backdrop-blur">
         <div className="mx-auto max-w-7xl px-4 py-4 md:px-6">
-          <button
-            type="button"
-            onClick={step === 0 ? () => navigate({ to: "/search" }) : goBack}
-            className="text-muted-foreground hover:text-heading mb-3 inline-flex items-center gap-1 text-xs font-semibold"
-          >
-            <ChevronLeft className="h-4 w-4" /> Back
-          </button>
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <button
+              type="button"
+              onClick={step === 0 ? () => navigate({ to: "/search" }) : goBack}
+              className="text-muted-foreground hover:text-heading inline-flex items-center gap-1 text-xs font-semibold"
+            >
+              <ChevronLeft className="h-4 w-4" /> Back
+            </button>
+            <OfflinePill />
+          </div>
           <StepProgressIndicator active={step} />
         </div>
+      </div>
+
+      <div className="mx-auto max-w-7xl px-4 pt-4 md:px-6">
+        <OfflineBanner
+          message={
+            step === 3
+              ? "You're offline — payment is paused"
+              : "You're offline — you can keep picking, but you'll need internet to confirm"
+          }
+          hint={
+            step === 3
+              ? "Reconnect to complete payment. Your selections are saved on this device."
+              : "Selections are saved locally. Come back online for staff availability and payment."
+          }
+        />
       </div>
 
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 md:px-6 md:py-10 lg:grid-cols-[1fr_320px]">
