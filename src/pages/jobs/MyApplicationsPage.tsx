@@ -183,12 +183,16 @@ export function MyApplicationsPage() {
   const hasMore = !!filtered && visibleCount < filtered.length;
 
   // Infinite scroll via IntersectionObserver
+  // Skip while reloading so the transient skeleton window can't trigger
+  // duplicate page-size bumps (the sentinel unmounts, but we also guard
+  // the callback in case an in-flight entry fires before disconnect).
   useEffect(() => {
-    if (!hasMore) return;
+    if (!hasMore || isReloading) return;
     const el = sentinelRef.current;
     if (!el) return;
     const io = new IntersectionObserver(
       (entries) => {
+        if (isReloading) return;
         if (entries.some((e) => e.isIntersecting)) {
           setVisibleCount((c) => c + PAGE_SIZE);
         }
@@ -197,7 +201,7 @@ export function MyApplicationsPage() {
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [hasMore, visible]);
+  }, [hasMore, visible, isReloading]);
 
   if (!isInitialized) {
     return (
