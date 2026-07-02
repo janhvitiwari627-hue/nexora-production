@@ -1108,6 +1108,33 @@ function DetailsStep({
   const selectedRole = (form.job_role ?? "").trim();
   const titleValue = form.title.trim();
   const titleMatchesRole = selectedRole.length > 0 && titleValue === selectedRole;
+  const [pendingTemplate, setPendingTemplate] = useState<{ label: string; body: string } | null>(null);
+  const [activeQuickTemplate, setActiveQuickTemplate] = useState<string | null>(null);
+
+  function fillQuickTemplate(t: { label: string; body: string }) {
+    const roleForTemplate =
+      (form.specific_role ?? "").trim() ||
+      selectedRole ||
+      form.category ||
+      "beauty professional";
+    const filled = t.body.replace(/\[Specific Job Role\]/g, roleForTemplate);
+    update({ description: filled });
+    setActiveQuickTemplate(t.label);
+  }
+
+  function onQuickTemplateClick(t: { label: string; body: string }) {
+    if (t.body === "") {
+      // "Write my own" — clear selection, do not touch description.
+      setActiveQuickTemplate(t.label);
+      return;
+    }
+    if (form.description.trim().length === 0) {
+      fillQuickTemplate(t);
+    } else {
+      setPendingTemplate(t);
+    }
+  }
+
 
   function pickRole(role: string) {
     const next = selectedRole === role ? "" : role;
