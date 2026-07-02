@@ -168,8 +168,19 @@ export function PostJobPage() {
       setShowSetup(true);
       return;
     }
+    if (publish) {
+      const bad = firstInvalidStep();
+      if (bad !== null) {
+        // Reveal errors on every step up through the failing one and jump there.
+        setAttempted(new Set([0, 1, 2, 3]));
+        setStep(bad);
+        toast.error("Please fix the highlighted fields before publishing.");
+        return;
+      }
+    }
     setSaving(publish ? "publish" : "draft");
     if (publish) setPublishError(null);
+
     let createdJobId: string | undefined;
     try {
       const cleaned: JobDraftInput = {
