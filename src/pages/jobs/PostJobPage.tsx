@@ -14,17 +14,25 @@ import { BackButton } from "@/components/shared/BackButton";
 import { cn } from "@/lib/utils";
 
 const CATEGORIES = [
-  "Hair",
-  "Skin",
-  "Makeup",
-  "Nails",
-  "Spa & Massage",
+  "Hair Stylist",
   "Barber",
-  "Front Desk",
-  "Management",
+  "Makeup Artist",
+  "Nail Artist",
+  "Beauty Therapist",
+  "Spa Therapist",
+  "Massage Therapist",
+  "Skin Therapist",
+  "Eyelash / Brow Artist",
+  "Tattoo Artist",
+  "Salon Manager",
+  "Receptionist",
+  "Salon Assistant",
+  "Hair Colourist",
+  "Bridal Makeup Artist",
+  "Freelancer",
   "Other",
 ];
-const JOB_TYPES = ["Full-time", "Part-time", "Freelance", "Internship"];
+const JOB_TYPES = ["Full-time", "Part-time", "Freelance", "Contract", "Internship", "Temporary"];
 const EXPERIENCE = ["Fresher", "1–3 years", "3–5 years", "5+ years"];
 const PERIODS: { label: string; value: JobDraftInput["salary_period"] }[] = [
   { label: "per month", value: "monthly" },
