@@ -84,19 +84,105 @@ const JOBS = [
 
 const TYPES = ["All types", "Full-time", "Part-time", "Freelance"];
 
-export function JobPortalPage() {
-  const [role, setRole] = useState<"seeker" | "employer">("seeker");
+type JobCardData = {
+  id: string;
+  title: string;
+  salon: string;
+  area: string;
+  city: string;
+  salary: string;
+  type: string;
+  featured: boolean;
+  posted: string;
+  tags: string[];
+  href?: string;
+};
+
+function fmtSalary(min: number | null, max: number | null, period: string | null): string {
+  if (!min && !max) return "Salary not disclosed";
+  const p = period === "hourly" ? "/hr" : period === "yearly" ? "/yr" : "/mo";
+  const f = (v: number) => (v >= 1000 ? `${Math.round(v / 1000)}k` : `${v}`);
+  if (min && max) return `₹${f(min)}–${f(max)}${p}`;
+  return `₹${f((min || max) as number)}${p}`;
+}
+
+function relTime(iso: string | null): string {
+  if (!iso) return "recently";
+  const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  if (days <= 0) return "Today";
+  if (days < 7) return `${days}d ago`;
+  if (days < 30) return `${Math.floor(days / 7)}w ago`;
+  return `${Math.floor(days / 30)}mo ago`;
+}
+
+function toCardData(j: JobRow): JobCardData {
+  return {
+    id: j.id,
+    title: j.title,
+    salon: j.employer?.business_name ?? "Nexora Partner",
+    area: j.area ?? "",
+    city: j.city,
+    salary: fmtSalary(j.salary_min, j.salary_max, j.salary_period),
+    type: j.job_type,
+    featured: false,
+    posted: relTime(j.published_at),
+    tags: j.skills ?? [],
+    href: `/jobs/${j.id}`,
+  };
+}
+
+export function JobPortalPage({ initialRole = "seeker" }: { initialRole?: "seeker" | "employer" }) {
+  const [role, setRole] = useState<"seeker" | "employer">(initialRole);
   const [q, setQ] = useState("");
   const [type, setType] = useState(TYPES[0]);
+  const [remoteJobs, setRemoteJobs] = useState<JobCardData[]>([]);
+  const [showEmployerModal, setShowEmployerModal] = useState(false);
+  const { user, isInitialized } = useAuthStore();
+  const navigate = useNavigate();
 
-  const filtered = JOBS.filter(
+  useEffect(() => {
+    setRole(initialRole);
+  }, [initialRole]);
+
+  useEffect(() => {
+    listPublishedJobs(50)
+      .then((rows) => setRemoteJobs(rows.map(toCardData)))
+      .catch(() => setRemoteJobs([]));
+  }, []);
+
+  const allJobs: JobCardData[] = useMemo(() => {
+    if (remoteJobs.length === 0) return JOBS as JobCardData[];
+    return [...remoteJobs, ...(JOBS as JobCardData[])];
+  }, [remoteJobs]);
+
+  const filtered = allJobs.filter(
     (j) =>
       (type === "All types" || j.type === type) &&
       (q === "" ||
         j.title.toLowerCase().includes(q.toLowerCase()) ||
         j.salon.toLowerCase().includes(q.toLowerCase())),
   );
-  const featured = JOBS.filter((j) => j.featured);
+  const featured = allJobs.filter((j) => j.featured).slice(0, 6);
+  const featuredForDisplay = featured.length > 0 ? featured : allJobs.slice(0, 6);
+
+  async function handlePostJob() {
+    if (!isInitialized) return;
+    if (!user) {
+      try {
+        sessionStorage.setItem("nexora:postLoginRedirect", "/hire/post-job");
+      } catch {
+        // ignore
+      }
+      navigate({ to: "/login", search: { redirect: "/hire/post-job" } as never });
+      return;
+    }
+    const profile = await getMyEmployerProfile(user.id).catch(() => null);
+    if (profile) {
+      navigate({ to: "/hire/post-job" });
+    } else {
+      setShowEmployerModal(true);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background">
