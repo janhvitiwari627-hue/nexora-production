@@ -83,6 +83,7 @@ export const Route = createFileRoute("/customer")({
 
 function CustomerLayout() {
   const navigate = useNavigate();
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const isBrowsingAsCustomer =
     typeof window !== "undefined" &&
     sessionStorage.getItem(BROWSE_AS_CUSTOMER_KEY) === "1";
@@ -93,6 +94,7 @@ function CustomerLayout() {
     } catch {
       /* ignore */
     }
+    setConfirmOpen(false);
     navigate({ to: "/owner/dashboard" });
   };
 
@@ -105,20 +107,14 @@ function CustomerLayout() {
               <span>
                 You're browsing as a customer. Owner tools stay in your dashboard.
               </span>
-              <Link
-                to="/owner/dashboard"
-                onClick={() => {
-                  try {
-                    sessionStorage.removeItem(BROWSE_AS_CUSTOMER_KEY);
-                  } catch {
-                    /* ignore */
-                  }
-                }}
+              <button
+                type="button"
+                onClick={() => setConfirmOpen(true)}
                 className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 font-semibold text-primary-foreground hover:opacity-90"
               >
                 <LayoutDashboard className="h-3.5 w-3.5" />
                 Back to owner dashboard
-              </Link>
+              </button>
             </div>
           </div>
         )}
@@ -132,7 +128,7 @@ function CustomerLayout() {
                   size="sm"
                   variant="outline"
                   className="gap-1.5"
-                  onClick={exitCustomerMode}
+                  onClick={() => setConfirmOpen(true)}
                   aria-label="Exit customer mode and return to owner dashboard"
                 >
                   <LogOut className="h-3.5 w-3.5" />
@@ -148,7 +144,26 @@ function CustomerLayout() {
       </div>
       <MobileBottomNav />
       <LocationPermissionModal />
+
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Exit customer mode?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You'll return to your owner dashboard. You can switch back to
+              customer view anytime from the dashboard.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Stay in customer mode</AlertDialogCancel>
+            <AlertDialogAction onClick={exitCustomerMode}>
+              Exit to owner dashboard
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
+
 
