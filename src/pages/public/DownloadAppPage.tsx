@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Smartphone, Download, Sparkles, Calendar, QrCode, Wallet, Gift, Bell, Star, ShieldCheck } from "lucide-react";
+import { Smartphone, Sparkles, Calendar, QrCode, Wallet, Gift, Bell, Star, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PublicHeader } from "@/components/layout/PublicHeader";
