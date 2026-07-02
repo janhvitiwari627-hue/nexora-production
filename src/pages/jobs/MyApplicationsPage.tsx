@@ -71,6 +71,8 @@ export function MyApplicationsPage() {
   const [refreshTick, setRefreshTick] = useState(0);
   const [filter, setFilter] = useState<string>("all");
   const [q, setQ] = useState("");
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!isInitialized || !user) return;
