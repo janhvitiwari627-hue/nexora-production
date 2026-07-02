@@ -63,6 +63,29 @@ const BENEFITS = [
   "Travel allowance",
 ];
 
+// Quick-select role suggestions grouped by beauty category.
+// Selecting a chip fills the "Specific job role" field (single-choice) and, if
+// Job Title is empty, mirrors into Job Title. Manual typing stays available.
+const ROLE_SUGGESTIONS: Record<string, string[]> = {
+  "Hair Stylist": ["Senior Hair Stylist", "Junior Hair Stylist", "Hair Stylist Trainee", "Bridal Hair Specialist", "Hair Extensions Specialist"],
+  Barber: ["Senior Barber", "Junior Barber", "Master Barber", "Beard Grooming Specialist"],
+  "Makeup Artist": ["Senior Makeup Artist", "Junior Makeup Artist", "Party Makeup Artist", "HD Makeup Artist", "Airbrush Makeup Artist"],
+  "Bridal Makeup Artist": ["Senior Bridal Makeup Artist", "Bridal Hair & Makeup Artist", "South Indian Bridal Specialist", "Muslim Bridal Specialist"],
+  "Nail Artist": ["Senior Nail Technician", "Junior Nail Technician", "Nail Art Specialist", "Gel & Acrylic Specialist"],
+  "Beauty Therapist": ["Senior Beauty Therapist", "Junior Beauty Therapist", "Facial Specialist", "Waxing Specialist"],
+  "Spa Therapist": ["Senior Spa Therapist", "Junior Spa Therapist", "Ayurvedic Therapist", "Aromatherapy Specialist"],
+  "Massage Therapist": ["Senior Massage Therapist", "Deep Tissue Specialist", "Thai Massage Therapist", "Swedish Massage Therapist"],
+  "Skin Therapist": ["Senior Skin Therapist", "Advanced Facial Specialist", "Acne & Pigmentation Specialist", "Laser Skin Therapist"],
+  "Eyelash / Brow Artist": ["Lash Extension Specialist", "Brow Lamination Specialist", "Microblading Artist", "Lash Lift Specialist"],
+  "Tattoo Artist": ["Senior Tattoo Artist", "Junior Tattoo Artist", "Permanent Makeup Artist"],
+  "Hair Colourist": ["Senior Hair Colourist", "Balayage Specialist", "Global Colour Specialist", "Highlights Specialist"],
+  "Salon Manager": ["Salon Manager", "Assistant Salon Manager", "Operations Manager", "Branch Manager"],
+  Receptionist: ["Salon Receptionist", "Front Desk Executive", "Guest Relations Executive"],
+  "Salon Assistant": ["Salon Assistant", "Shampoo Assistant", "Beauty Assistant", "Trainee Assistant"],
+  Freelancer: ["Freelance Hair Stylist", "Freelance Makeup Artist", "Freelance Bridal Artist", "Freelance Nail Artist"],
+  Other: ["Trainer / Educator", "Photographer", "Content Creator"],
+};
+
 const STEPS = [
   { key: "details", label: "Job details" },
   { key: "location", label: "Location & schedule" },
