@@ -792,13 +792,13 @@ function DetailsStep({
         </div>
       </Field>
       <Field
-        label="Beauty category"
-        hint={form.category ? `Selected: ${form.category}` : "Pick the role that best matches this job."}
+        label="Choose beauty category"
+        hint="Select a category to see relevant role, skill and job description suggestions."
         error={errors.category}
       >
         <div
           role="radiogroup"
-          aria-label="Beauty category"
+          aria-label="Choose beauty category"
           aria-invalid={!!errors.category}
           className={cn(
             "grid grid-cols-2 gap-2 sm:grid-cols-3 rounded-lg",
@@ -813,7 +813,11 @@ function DetailsStep({
                 type="button"
                 role="radio"
                 aria-checked={active}
-                onClick={() => update({ category: c })}
+                onClick={() => {
+                  if (form.category === c) return;
+                  update({ category: c });
+                  toast.success(`Suggestions updated for ${c}.`, { duration: 2000 });
+                }}
                 className={cn(
                   "rounded-lg border px-3 py-2 text-left text-sm font-semibold transition",
                   active
@@ -826,6 +830,9 @@ function DetailsStep({
             );
           })}
         </div>
+        {form.category && (
+          <p className="text-muted-foreground mt-2 text-xs">Selected: {form.category}</p>
+        )}
       </Field>
       <Field
         label="Specific job role"
