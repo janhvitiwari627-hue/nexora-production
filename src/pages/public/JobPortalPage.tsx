@@ -268,27 +268,62 @@ export function JobPortalPage({ initialRole = "seeker" }: { initialRole?: "seeke
             </div>
           ) : (
             <div className="mt-8 text-center">
-              <button
-                type="button"
-                onClick={handlePostJob}
-                disabled={!isInitialized}
-                aria-busy={!isInitialized}
-                aria-live="polite"
-                className="bg-gradient-cta text-primary-foreground inline-flex items-center justify-center gap-2 rounded-[var(--radius-button)] px-6 py-3 text-sm font-bold shadow-[var(--shadow-glow)] transition disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                {isInitialized ? (
-                  "Post a job free"
-                ) : (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                    <span>Auth initializing…</span>
-                  </>
-                )}
-              </button>
-              {!user && isInitialized && (
-                <p className="text-muted-foreground mt-3 text-xs">
-                  Create an employer account to post your beauty job for free.
-                </p>
+              {initError ? (
+                <div
+                  role="alert"
+                  className="border-destructive/40 bg-destructive/10 text-destructive mx-auto flex max-w-md flex-col items-center gap-3 rounded-[var(--radius-card)] border p-4 text-sm"
+                >
+                  <div className="flex items-start gap-2 text-left">
+                    <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+                    <div>
+                      <div className="font-semibold">Couldn't initialize sign-in</div>
+                      <div className="text-destructive/90 mt-0.5 text-xs">{initError}</div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRetryAuth}
+                    disabled={retrying}
+                    className="border-destructive/40 hover:bg-destructive/20 inline-flex items-center gap-2 rounded-[var(--radius-button)] border px-4 py-2 text-xs font-bold disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {retrying ? (
+                      <>
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+                        Retrying…
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="h-3.5 w-3.5" aria-hidden />
+                        Try again
+                      </>
+                    )}
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={handlePostJob}
+                    disabled={!isInitialized}
+                    aria-busy={!isInitialized}
+                    aria-live="polite"
+                    className="bg-gradient-cta text-primary-foreground inline-flex items-center justify-center gap-2 rounded-[var(--radius-button)] px-6 py-3 text-sm font-bold shadow-[var(--shadow-glow)] transition disabled:cursor-not-allowed disabled:opacity-70"
+                  >
+                    {isInitialized ? (
+                      "Post a job free"
+                    ) : (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                        <span>Auth initializing…</span>
+                      </>
+                    )}
+                  </button>
+                  {!user && isInitialized && (
+                    <p className="text-muted-foreground mt-3 text-xs">
+                      Create an employer account to post your beauty job for free.
+                    </p>
+                  )}
+                </>
               )}
             </div>
           )}
