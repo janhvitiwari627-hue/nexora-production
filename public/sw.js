@@ -7,9 +7,10 @@
  *   - skipWaiting only when the page explicitly asks (user-approved refresh),
  *     so we never force-reload mid-session with a stale mismatch.
  */
-const VERSION = "nexora-v2";
+const VERSION = "nexora-v3";
 const PRECACHE = `${VERSION}-precache`;
 const RUNTIME = `${VERSION}-runtime`;
+const PAGES = `${VERSION}-pages`;
 
 const PRECACHE_URLS = [
   "/offline.html",
@@ -19,7 +20,16 @@ const PRECACHE_URLS = [
 
 self.addEventListener("install", (event) => {
   // Do NOT skipWaiting automatically — wait for the client to approve.
-  event.waitUntil(caches.open(PRECACHE).then((cache) => cache.addAll(PRECACHE_URLS)));
+  event.waitUntil((async () => {
+    const precache = await caches.open(PRECACHE);
+    await precache.addAll(PRECACHE_URLS);
+    // Warm the pages cache with the customer home shell so it survives offline.
+    try {
+      const pages = await caches.open(PAGES);
+      const res = await fetch("/customer/home", { credentials: "same-origin" });
+      if (res && res.status === 200) await pages.put("/customer/home", res.clone());
+    } catch {}
+  })());
 });
 
 self.addEventListener("activate", (event) => {
@@ -28,7 +38,7 @@ self.addEventListener("activate", (event) => {
       const keys = await caches.keys();
       await Promise.all(
         keys
-          .filter((k) => k.startsWith("nexora-") && k !== PRECACHE && k !== RUNTIME)
+          .filter((k) => k.startsWith("nexora-") && k !== PRECACHE && k !== RUNTIME && k !== PAGES)
           .map((k) => caches.delete(k))
       );
       await self.clients.claim();
@@ -69,11 +79,18 @@ self.addEventListener("fetch", (event) => {
   if (request.mode === "navigate") {
     event.respondWith(
       (async () => {
+        const pages = await caches.open(PAGES);
         try {
-          return await fetch(request);
+          const fresh = await fetch(request);
+          if (fresh && fresh.status === 200 && fresh.type === "basic") {
+            pages.put(request, fresh.clone()).catch(() => {});
+          }
+          return fresh;
         } catch {
-          const cache = await caches.open(PRECACHE);
-          const offline = await cache.match("/offline.html");
+          const cachedPage = await pages.match(request, { ignoreSearch: true });
+          if (cachedPage) return cachedPage;
+          const precache = await caches.open(PRECACHE);
+          const offline = await precache.match("/offline.html");
           return offline || new Response("Offline", { status: 503, statusText: "Offline" });
         }
       })()
