@@ -183,9 +183,21 @@ export async function flush(): Promise<void> {
       );
 
       try {
-        await runner(next.payload);
-        // Success — drop it
-        writeAll(readAll().filter((t) => t.id !== next.id));
+        const result = await runner(next.payload);
+        // Keep the task briefly as "succeeded" so UI can render a confirmation state.
+        writeAll(
+          readAll().map((t) =>
+            t.id === next.id
+              ? {
+                  ...t,
+                  status: "succeeded" as const,
+                  completedAt: Date.now(),
+                  result,
+                  lastError: null,
+                }
+              : t,
+          ),
+        );
       } catch (err) {
         const attempts = next.attempts + 1;
         const failed = attempts >= MAX_ATTEMPTS;
