@@ -1301,15 +1301,49 @@ function DetailsStep({
           onChange={(e) => update({ description: e.target.value })}
         />
         {(() => {
-          const templates =
+          const rawTemplates =
             (form.category && DESCRIPTION_TEMPLATES[form.category]) ||
             GENERAL_DESCRIPTION_TEMPLATES;
-          if (!templates.length) return null;
+          if (!rawTemplates.length) return null;
+
+          const PLACEHOLDER_TAIL =
+            "\n\nRole: {role}\nCategory: {category}\nLocation: {city}\nExperience: {experience}\nOpenings: {openings}\nSalary: {salary}";
+
+          const templates = rawTemplates.map((t) => ({
+            ...t,
+            body: `${t.body}${PLACEHOLDER_TAIL}`,
+          }));
+
+          const salary =
+            form.salary_min != null && form.salary_max != null
+              ? `₹${form.salary_min}–₹${form.salary_max}`
+              : form.salary_min != null
+                ? `₹${form.salary_min}+`
+                : "";
+          const values: Record<string, string> = {
+            role: form.job_role?.trim() || "",
+            category: form.category || "",
+            city: form.city?.trim() || "",
+            experience: form.experience_level || "",
+            openings: form.openings ? String(form.openings) : "",
+            salary,
+          };
+          const substitute = (body: string) =>
+            body.replace(/\{(\w+)\}/g, (m, k: string) =>
+              values[k] ? values[k] : m,
+            );
+          const extractTokens = (body: string) =>
+            Array.from(
+              new Set(Array.from(body.matchAll(/\{(\w+)\}/g)).map((x) => x[1])),
+            );
+
           const insert = (body: string) => {
+            const filled = substitute(body);
             const current = form.description.trim();
-            const next = current.length === 0 ? body : `${current}\n\n${body}`;
+            const next = current.length === 0 ? filled : `${current}\n\n${filled}`;
             update({ description: next });
           };
+
           return (
             <div className="mt-3">
               <p className="text-heading mb-2 text-xs font-semibold">
@@ -1319,24 +1353,49 @@ function DetailsStep({
                 ) : null}
               </p>
               <div className="flex flex-wrap gap-2">
-                {templates.map((t) => (
-                  <button
-                    key={t.label}
-                    type="button"
-                    onClick={() => insert(t.body)}
-                    title={t.body}
-                    className="border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading rounded-full border px-3 py-1.5 text-xs font-semibold transition"
-                  >
-                    + {t.label}
-                  </button>
-                ))}
+                {templates.map((t) => {
+                  const tokens = extractTokens(t.body);
+                  return (
+                    <button
+                      key={t.label}
+                      type="button"
+                      onClick={() => insert(t.body)}
+                      title={substitute(t.body)}
+                      className="border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading flex flex-col items-start gap-1 rounded-xl border px-3 py-2 text-left text-xs font-semibold transition"
+                    >
+                      <span>+ {t.label}</span>
+                      {tokens.length > 0 && (
+                        <span className="flex flex-wrap gap-1">
+                          {tokens.map((tok) => {
+                            const filled = !!values[tok];
+                            return (
+                              <span
+                                key={tok}
+                                className={cn(
+                                  "rounded-md px-1.5 py-0.5 text-[10px] font-medium",
+                                  filled
+                                    ? "bg-primary/10 text-primary"
+                                    : "bg-muted text-muted-foreground",
+                                )}
+                              >
+                                {`{${tok}}`}
+                              </span>
+                            );
+                          })}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
               <p className="text-muted-foreground mt-1.5 text-[11px]">
-                Tap a template to insert it. You can edit the text after inserting.
+                Chips show the variables each template uses. Filled variables (highlighted) are replaced with your form values on insert; empty ones stay as{" "}
+                <code>{"{placeholder}"}</code> so you can edit later.
               </p>
             </div>
           );
         })()}
+
       </Field>
     </div>
   );
