@@ -1983,10 +1983,75 @@ function SalaryStep({
   update: (p: Partial<Form>) => void;
   errors: FormErrors;
 }) {
+  const chipCls = (active: boolean) =>
+    cn(
+      "rounded-full border px-4 py-1.5 text-xs font-bold transition",
+      active
+        ? "border-transparent bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
+        : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
+    );
+  const selectRange = (r: (typeof MONTHLY_SALARY_RANGES)[number]) => {
+    update({
+      salary_range_preset: r.label,
+      salary_min: r.min,
+      salary_max: r.max,
+      salary_period: "monthly",
+    });
+  };
   return (
     <div className="space-y-4">
       <h2 className="text-heading text-xl font-bold">Salary & benefits</h2>
+
+      <Field label="Salary type">
+        <div className="flex flex-wrap gap-2">
+          {SALARY_TYPES.map((s) => {
+            const active = form.salary_type === s;
+            return (
+              <button
+                key={s}
+                type="button"
+                onClick={() => update({ salary_type: s })}
+                aria-pressed={active}
+                className={chipCls(active)}
+              >
+                {s}
+              </button>
+            );
+          })}
+        </div>
+      </Field>
+
+      {form.salary_type === "Monthly salary" && (
+        <Field label="Monthly salary range">
+          <div className="flex flex-wrap gap-2">
+            {MONTHLY_SALARY_RANGES.map((r) => {
+              const active = form.salary_range_preset === r.label;
+              return (
+                <button
+                  key={r.label}
+                  type="button"
+                  onClick={() => selectRange(r)}
+                  aria-pressed={active}
+                  className={chipCls(active)}
+                >
+                  {r.label}
+                </button>
+              );
+            })}
+            <button
+              type="button"
+              onClick={() => update({ salary_range_preset: "Custom amount" })}
+              aria-pressed={form.salary_range_preset === "Custom amount"}
+              className={chipCls(form.salary_range_preset === "Custom amount")}
+            >
+              Custom amount
+            </button>
+          </div>
+        </Field>
+      )}
+
       <div className="grid gap-4 md:grid-cols-3">
+
         <Field label="Min" error={errors.salary_min}>
           <input
             type="number"
