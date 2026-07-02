@@ -136,15 +136,15 @@ function RootComponent() {
       initializeAuthStore();
     }
 
-    registerServiceWorker();
-
-    void import("@/lib/pwa-standalone-guard").then(({ initStandaloneRedirectGuard }) => {
-      initStandaloneRedirectGuard();
-    });
-
-    void import("@/lib/pwa-install").then(({ initInstallPromptCapture }) => {
-      initInstallPromptCapture();
-    });
+    // Kill-switch: any previously-installed customer-app service worker
+    // gets replaced by /sw.js which unregisters itself on activate. We
+    // additionally best-effort unregister here so returning visitors on
+    // browsers that already cached the old SW get evicted immediately.
+    if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistrations?.()
+        .then((regs) => regs.forEach((r) => { void r.unregister(); }))
+        .catch(() => { /* ignore */ });
+    }
 
     void import("@/lib/booking-offline-sync").then(({ initBookingOfflineSync }) => {
       initBookingOfflineSync();
