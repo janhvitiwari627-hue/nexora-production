@@ -388,9 +388,9 @@ export function MyApplicationsPage() {
         {!error && !isReloading && apps && apps.length === 0 && (
           <Card>
             <CardContent className="space-y-3 p-8 text-center">
-              <p className="text-muted-foreground">You have not applied to any jobs yet.</p>
+              <p className="text-muted-foreground">You have not applied for any job yet.</p>
               <Button asChild>
-                <Link to="/jobs">Find a job</Link>
+                <Link to="/jobs/search">Search Jobs</Link>
               </Button>
             </CardContent>
           </Card>
