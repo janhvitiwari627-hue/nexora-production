@@ -111,12 +111,14 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
       return;
     }
     if (!job.isReal) {
-      toast.error("This is a demo listing. Applications are only accepted on live jobs.");
+      toast.success("Application submitted (demo listing)");
+      navigate({ to: "/jobs/applications" });
       return;
     }
     setApplying(true);
     try {
       await applyToJob({ jobId: job.id, applicantId: user.id });
+      toast.success("Application submitted");
       navigate({ to: "/jobs/applications" });
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Could not submit application";
