@@ -140,6 +140,10 @@ function RootComponent() {
 
     registerServiceWorker();
 
+    void import("@/lib/pwa-install").then(({ initInstallPromptCapture }) => {
+      initInstallPromptCapture();
+    });
+
     void import("@/lib/booking-offline-sync").then(({ initBookingOfflineSync }) => {
       initBookingOfflineSync();
     });
