@@ -91,13 +91,24 @@ function relative(iso: string) {
 
 export function MyApplicationsPage() {
   const { user, isInitialized } = useAuthStore();
+  const search = applicationsRoute.useSearch();
+  const navigate = useNavigate({ from: "/jobs/applications" });
+  const filter = search.status;
+  const q = search.q;
+  const setFilter = (status: string) =>
+    navigate({
+      search: (prev) => ({ ...prev, status: status as typeof prev.status }),
+      replace: false,
+    });
+  const setQ = (value: string) =>
+    navigate({ search: (prev) => ({ ...prev, q: value }), replace: true });
+
   const [apps, setApps] = useState<JobApplication[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [refreshTick, setRefreshTick] = useState(0);
-  const [filter, setFilter] = useState<string>("all");
-  const [q, setQ] = useState("");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+
 
   useEffect(() => {
     if (!isInitialized || !user) return;
