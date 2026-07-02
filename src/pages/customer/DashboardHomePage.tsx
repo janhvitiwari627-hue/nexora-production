@@ -41,6 +41,8 @@ export function DashboardHomePage() {
             <RecentActivityFeed />
           </div>
 
+          <MyApplicationsWidget />
+
           <ExclusiveOffersSection />
         </div>
       </main>
