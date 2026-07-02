@@ -18,6 +18,13 @@ export type CreateAndConfirmPayload = {
   booking_time: string; // HH:mm
   advance_amount: number; // client estimate; server re-validates
   payment_reference?: string;
+  /** Free-form label shown in queued-card UI while syncing. */
+  shop_name?: string;
+};
+
+export type BookingSyncResult = {
+  booking_id: string;
+  booking_reference: string | null;
 };
 
 export type QrPaymentPayload = {
