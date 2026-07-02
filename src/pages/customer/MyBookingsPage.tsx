@@ -1,8 +1,7 @@
 import { useMemo, useState } from "react";
 import { PublicHeader } from "@/components/layout/PublicHeader";
 import { OfflineBanner } from "@/components/shared/OfflineBanner";
-import { OfflineSyncStatus } from "@/components/shared/OfflineSyncStatus";
-import { TASK_CREATE_AND_CONFIRM_BOOKING } from "@/lib/booking-offline-sync";
+import { QueuedBookingsList } from "@/components/shared/QueuedBookingsList";
 import { PublicFooter } from "@/components/layout/PublicFooter";
 import { BookingTabBar } from "./bookings/BookingTabBar";
 import { BookingFilterRow, type DateRangeId } from "./bookings/BookingFilterRow";
@@ -100,7 +99,7 @@ export function MyBookingsPage() {
 
         <div className="mb-4 space-y-3">
           <OfflineBanner hint="Your bookings list may be out of date until you reconnect." />
-          <OfflineSyncStatus type={TASK_CREATE_AND_CONFIRM_BOOKING} itemLabel="booking" />
+          <QueuedBookingsList />
         </div>
 
         <div className="space-y-5">

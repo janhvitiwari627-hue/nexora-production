@@ -18,6 +18,13 @@ export type CreateAndConfirmPayload = {
   booking_time: string; // HH:mm
   advance_amount: number; // client estimate; server re-validates
   payment_reference?: string;
+  /** Free-form label shown in queued-card UI while syncing. */
+  shop_name?: string;
+};
+
+export type BookingSyncResult = {
+  booking_id: string;
+  booking_reference: string | null;
 };
 
 export type QrPaymentPayload = {
@@ -47,13 +54,17 @@ export function initBookingOfflineSync() {
     })) as { id: string; advance_amount?: number };
 
     const advance = Number(created.advance_amount ?? p.advance_amount ?? p.price * 0.25);
-    await confirmBookingPayment({
+    const confirmed = (await confirmBookingPayment({
       data: {
         id: created.id,
         amount_paid: advance,
         payment_reference: p.payment_reference ?? `OFFLINE-SYNC-${Date.now()}`,
       },
-    });
+    })) as { id: string; booking_reference?: string };
+    return {
+      booking_id: confirmed.id,
+      booking_reference: confirmed.booking_reference ?? null,
+    };
   });
 
   // QR payment submissions are already persisted locally to `nx_pending_payments`

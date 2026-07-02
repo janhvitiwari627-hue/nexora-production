@@ -13,8 +13,12 @@
 
 const STORAGE_KEY = "nx_offline_queue_v1";
 const MAX_ATTEMPTS = 6;
+/** Keep succeeded tasks around briefly so UI can show "Confirmed" state. */
+const SUCCESS_TTL_MS = 5 * 60_000;
 
-export type QueueTask<TPayload = unknown> = {
+export type QueueTaskStatus = "pending" | "running" | "succeeded" | "failed";
+
+export type QueueTask<TPayload = unknown, TResult = unknown> = {
   id: string;
   type: string;
   payload: TPayload;
@@ -22,10 +26,14 @@ export type QueueTask<TPayload = unknown> = {
   attempts: number;
   lastError: string | null;
   nextAttemptAt: number;
-  status: "pending" | "running" | "failed";
+  status: QueueTaskStatus;
+  completedAt?: number;
+  result?: TResult;
 };
 
-type Runner<TPayload = unknown> = (payload: TPayload) => Promise<void>;
+type Runner<TPayload = unknown, TResult = unknown> = (
+  payload: TPayload,
+) => Promise<TResult>;
 
 const runners = new Map<string, Runner>();
 const listeners = new Set<() => void>();
@@ -47,7 +55,22 @@ function readAll(): QueueTask[] {
     const raw = s.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as QueueTask[];
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) return [];
+    // Purge succeeded tasks past their TTL.
+    const now = Date.now();
+    const kept = parsed.filter(
+      (t) =>
+        t.status !== "succeeded" ||
+        (t.completedAt ? now - t.completedAt < SUCCESS_TTL_MS : false),
+    );
+    if (kept.length !== parsed.length) {
+      try {
+        s.setItem(STORAGE_KEY, JSON.stringify(kept));
+      } catch {
+        // ignore
+      }
+    }
+    return kept;
   } catch {
     return [];
   }
@@ -74,7 +97,10 @@ function notify() {
   }
 }
 
-export function registerRunner<TPayload>(type: string, runner: Runner<TPayload>) {
+export function registerRunner<TPayload, TResult = unknown>(
+  type: string,
+  runner: Runner<TPayload, TResult>,
+) {
   runners.set(type, runner as Runner);
 }
 
@@ -157,9 +183,21 @@ export async function flush(): Promise<void> {
       );
 
       try {
-        await runner(next.payload);
-        // Success — drop it
-        writeAll(readAll().filter((t) => t.id !== next.id));
+        const result = await runner(next.payload);
+        // Keep the task briefly as "succeeded" so UI can render a confirmation state.
+        writeAll(
+          readAll().map((t) =>
+            t.id === next.id
+              ? {
+                  ...t,
+                  status: "succeeded" as const,
+                  completedAt: Date.now(),
+                  result,
+                  lastError: null,
+                }
+              : t,
+          ),
+        );
       } catch (err) {
         const attempts = next.attempts + 1;
         const failed = attempts >= MAX_ATTEMPTS;

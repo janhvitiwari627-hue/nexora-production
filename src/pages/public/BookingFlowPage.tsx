@@ -26,12 +26,9 @@ import type { Staff } from "@/components/shared/StaffCard";
 import { createBooking, confirmBookingPayment } from "@/lib/bookings.functions";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 import { OfflineBanner, OfflinePill } from "@/components/shared/OfflineBanner";
-import { OfflineSyncStatus } from "@/components/shared/OfflineSyncStatus";
+import { QueuedBookingsList } from "@/components/shared/QueuedBookingsList";
 import { useOnlineStatus } from "@/hooks/use-online-status";
-import {
-  enqueueCreateAndConfirmBooking,
-  TASK_CREATE_AND_CONFIRM_BOOKING,
-} from "@/lib/booking-offline-sync";
+import { enqueueCreateAndConfirmBooking } from "@/lib/booking-offline-sync";
 
 export type RealSalonRef = {
   id: string;
@@ -179,6 +176,7 @@ export function BookingFlowPage({ salon }: { salon?: RealSalonRef } = {}) {
         booking_date: booking.date,
         booking_time: booking.time,
         advance_amount: Math.round(totalPrice * 0.25 * 100) / 100,
+        shop_name: booking.shopName,
       });
       toast.success("Saved offline — we'll confirm your booking automatically once you're back online.");
       return;
@@ -228,7 +226,7 @@ export function BookingFlowPage({ salon }: { salon?: RealSalonRef } = {}) {
               : "Selections are saved on this device. Staff availability updates when you reconnect."
           }
         />
-        <OfflineSyncStatus type={TASK_CREATE_AND_CONFIRM_BOOKING} itemLabel="booking" />
+        <QueuedBookingsList />
       </div>
 
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 md:px-6 md:py-10 lg:grid-cols-[1fr_320px]">
