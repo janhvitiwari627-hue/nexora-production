@@ -581,6 +581,75 @@ export type Database = {
           },
         ]
       }
+      candidate_profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          certifications: string[]
+          city: string | null
+          created_at: string
+          education: Json
+          email: string | null
+          experience: Json
+          full_name: string | null
+          id: string
+          is_submitted: boolean
+          phone: string | null
+          portfolio_urls: string[]
+          preferences: Json
+          resume_url: string | null
+          skills: string[]
+          submitted_at: string | null
+          updated_at: string
+          user_id: string
+          video_url: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          certifications?: string[]
+          city?: string | null
+          created_at?: string
+          education?: Json
+          email?: string | null
+          experience?: Json
+          full_name?: string | null
+          id?: string
+          is_submitted?: boolean
+          phone?: string | null
+          portfolio_urls?: string[]
+          preferences?: Json
+          resume_url?: string | null
+          skills?: string[]
+          submitted_at?: string | null
+          updated_at?: string
+          user_id: string
+          video_url?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          certifications?: string[]
+          city?: string | null
+          created_at?: string
+          education?: Json
+          email?: string | null
+          experience?: Json
+          full_name?: string | null
+          id?: string
+          is_submitted?: boolean
+          phone?: string | null
+          portfolio_urls?: string[]
+          preferences?: Json
+          resume_url?: string | null
+          skills?: string[]
+          submitted_at?: string | null
+          updated_at?: string
+          user_id?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       customer_insights: {
         Row: {
           avg_booking_frequency: number | null
