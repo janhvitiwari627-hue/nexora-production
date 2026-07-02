@@ -4,6 +4,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import { motion } from "framer-motion";
 import { Calendar, Check, CheckCircle2, Copy, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { QueuedBookingsList } from "@/components/shared/QueuedBookingsList";
 import {
   advancePayable,
   formatINR,
