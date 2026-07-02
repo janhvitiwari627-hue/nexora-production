@@ -116,12 +116,16 @@ export function MyApplicationsPage() {
     });
   }, [apps, filter, q]);
 
-  // Reset pagination to the first page whenever the filter or search query changes
+  // Brief skeleton reload when filter/query changes for perceived responsiveness
+  const [isReloading, setIsReloading] = useState(false);
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
+    setIsReloading(true);
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
+    const t = setTimeout(() => setIsReloading(false), 350);
+    return () => clearTimeout(t);
   }, [filter, q]);
 
   // Also reset when the underlying data reloads
