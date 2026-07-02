@@ -558,6 +558,7 @@ export function PostJobPage() {
           </button>
         )}
       </div>
+      )}
     </div>
   );
 }
