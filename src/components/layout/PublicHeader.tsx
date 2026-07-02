@@ -258,13 +258,6 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
                       <LayoutDashboard className="mr-2 h-4 w-4" />
                       Owner Dashboard
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onSelect={(e) => { e.preventDefault(); switchToCustomer(); }}
-                      className="cursor-pointer"
-                    >
-                      <UserCircle2 className="mr-2 h-4 w-4" />
-                      Browse as Customer
-                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                   </>
                 )}
