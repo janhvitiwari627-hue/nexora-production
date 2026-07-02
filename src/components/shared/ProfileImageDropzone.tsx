@@ -12,6 +12,8 @@ export type ProfileImageDropzoneProps = {
   value: string;
   onFile: (file: File) => void | Promise<void>;
   onRemove?: () => void | Promise<void>;
+  onRetry?: () => void;
+  canRetry?: boolean;
   uploading?: boolean;
   progress?: number | null;
   error?: string | null;
