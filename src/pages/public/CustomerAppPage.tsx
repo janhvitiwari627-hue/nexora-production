@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Smartphone, MapPin, Tag, UserCheck, Zap, MessageCircle, QrCode, Gift, History, Download, ExternalLink, Apple, Play, Share, Plus, MoreVertical, Chrome, Info } from "lucide-react";
+import { Smartphone, MapPin, Tag, UserCheck, Zap, MessageCircle, QrCode, Gift, History, Download, ExternalLink, Apple, Play, Share, Plus, MoreVertical, Chrome, Info, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -42,14 +42,28 @@ function isChromium() {
   return /Chrome|CriOS|Edg|Brave|OPR/.test(ua);
 }
 
+const SESSION_DISMISS_KEY = "nexora_pwa_install_dismissed_session";
+const INSTALLED_KEY = "nexora_pwa_installed";
+
 export default function CustomerAppPage() {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
   const [platform, setPlatform] = useState<Platform>("desktop");
   const [showGuide, setShowGuide] = useState(false);
 
   useEffect(() => {
     setPlatform(detectPlatform());
+
+    // Persistent install flag from any prior session.
+    if (typeof localStorage !== "undefined" && localStorage.getItem(INSTALLED_KEY)) {
+      setInstalled(true);
+    }
+    // Session-scoped dismissal.
+    if (typeof sessionStorage !== "undefined" && sessionStorage.getItem(SESSION_DISMISS_KEY)) {
+      setDismissed(true);
+    }
+
     const onPrompt = (e: Event) => {
       e.preventDefault();
       setDeferred(e as BeforeInstallPromptEvent);
@@ -57,6 +71,7 @@ export default function CustomerAppPage() {
     const onInstalled = () => {
       setInstalled(true);
       setDeferred(null);
+      try { localStorage.setItem(INSTALLED_KEY, "1"); } catch { /* ignore */ }
     };
     window.addEventListener("beforeinstallprompt", onPrompt);
     window.addEventListener("appinstalled", onInstalled);
