@@ -47,13 +47,17 @@ export function initBookingOfflineSync() {
     })) as { id: string; advance_amount?: number };
 
     const advance = Number(created.advance_amount ?? p.advance_amount ?? p.price * 0.25);
-    await confirmBookingPayment({
+    const confirmed = (await confirmBookingPayment({
       data: {
         id: created.id,
         amount_paid: advance,
         payment_reference: p.payment_reference ?? `OFFLINE-SYNC-${Date.now()}`,
       },
-    });
+    })) as { id: string; booking_reference?: string };
+    return {
+      booking_id: confirmed.id,
+      booking_reference: confirmed.booking_reference ?? null,
+    };
   });
 
   // QR payment submissions are already persisted locally to `nx_pending_payments`
