@@ -27,6 +27,11 @@ type Props = {
   compact?: boolean;
   /** Limit how many queued cards to show. */
   limit?: number;
+  /**
+   * When a queued booking transitions to "confirmed", automatically navigate
+   * the user to its detail page. Defaults to true.
+   */
+  autoNavigateOnConfirm?: boolean;
 };
 
 type BookingTask = QueueTask<CreateAndConfirmPayload, BookingSyncResult>;
