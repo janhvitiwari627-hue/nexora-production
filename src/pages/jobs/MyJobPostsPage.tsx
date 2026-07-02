@@ -222,19 +222,48 @@ export function MyJobPostsPage() {
                         disabled={!canEdit}
                         aria-disabled={!canEdit}
                       >
-                        <Link to="/hire/post-job">
+                        <Link to="/hire/post-job" search={{ jobId: job.id }}>
                           <Pencil className="mr-1.5 h-4 w-4" /> Edit Job
                         </Link>
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleClose(job.id)}
-                        disabled={!canClose || closingId === job.id}
-                      >
-                        <XCircle className="mr-1.5 h-4 w-4" />
-                        {closingId === job.id ? "Closing…" : "Close Job"}
-                      </Button>
+                      {job.status === "draft" && (
+                        <Button
+                          size="sm"
+                          onClick={() => changeStatus(job.id, "published")}
+                          disabled={pendingId === job.id}
+                        >
+                          <Send className="mr-1.5 h-4 w-4" />
+                          {pendingId === job.id ? "Publishing…" : "Publish"}
+                        </Button>
+                      )}
+                      {job.status === "closed" && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => changeStatus(job.id, "published")}
+                          disabled={pendingId === job.id}
+                        >
+                          <RotateCcw className="mr-1.5 h-4 w-4" />
+                          {pendingId === job.id ? "Reopening…" : "Reopen"}
+                        </Button>
+                      )}
+                      {canClose && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() =>
+                            changeStatus(
+                              job.id,
+                              "closed",
+                              "Close this job post? Candidates will no longer see it.",
+                            )
+                          }
+                          disabled={pendingId === job.id}
+                        >
+                          <XCircle className="mr-1.5 h-4 w-4" />
+                          {pendingId === job.id ? "Closing…" : "Close Job"}
+                        </Button>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
