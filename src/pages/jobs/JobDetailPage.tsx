@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -6,9 +8,133 @@ import { Bookmark, Briefcase, Building2, Check, Clock, MapPin, Share2, Users } f
 import { toast } from "sonner";
 import { MOCK_JOBS } from "./mockJobs";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuthStore } from "@/stores/authStore";
+import { applyToJob, isRealJobId, type JobRow } from "@/lib/jobs";
+
+type DetailView = {
+  id: string;
+  title: string;
+  business: string;
+  area: string;
+  city: string;
+  type: string;
+  postedDays: number;
+  applicants: number;
+  salary: string;
+  experience: string;
+  category: string;
+  description: string;
+  responsibilities: string[];
+  requirements: string[];
+  benefits: string[];
+  isReal: boolean;
+};
+
+function fmtSalary(min: number | null, max: number | null, period: string | null) {
+  if (!min && !max) return "Salary not disclosed";
+  const p = period === "hourly" ? "/hr" : period === "yearly" ? "/yr" : "/mo";
+  const f = (v: number) => (v >= 1000 ? `${Math.round(v / 1000)}k` : `${v}`);
+  if (min && max) return `₹${f(min)}–${f(max)}${p}`;
+  return `₹${f((min || max) as number)}${p}`;
+}
+
+function daysSince(iso: string | null) {
+  if (!iso) return 0;
+  return Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 86400000));
+}
+
+function fromRealJob(j: JobRow & { employer?: { business_name: string } | null }): DetailView {
+  return {
+    id: j.id,
+    title: j.title,
+    business: j.employer?.business_name ?? "Nexora Partner",
+    area: j.area ?? "",
+    city: j.city,
+    type: j.job_type,
+    postedDays: daysSince(j.published_at),
+    applicants: j.applicants_count ?? 0,
+    salary: fmtSalary(j.salary_min, j.salary_max, j.salary_period),
+    experience: j.experience_level ?? "Not specified",
+    category: j.category,
+    description: j.description,
+    responsibilities: [],
+    requirements: j.requirements ? [j.requirements] : [],
+    benefits: j.benefits ?? [],
+    isReal: true,
+  };
+}
 
 export function JobDetailPage({ jobId }: { jobId: string }) {
-  const job = MOCK_JOBS.find((j) => j.id === jobId) ?? MOCK_JOBS[0];
+  const navigate = useNavigate();
+  const { user, isInitialized } = useAuthStore();
+  const [job, setJob] = useState<DetailView | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [applying, setApplying] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    async function run() {
+      if (isRealJobId(jobId)) {
+        const { data, error } = await supabase
+          .from("jobs")
+          .select("*, employer:employer_profiles(*)")
+          .eq("id", jobId)
+          .maybeSingle();
+        if (!alive) return;
+        if (!error && data) {
+          setJob(fromRealJob(data as never));
+          setLoading(false);
+          return;
+        }
+      }
+      const mock = MOCK_JOBS.find((j) => j.id === jobId) ?? MOCK_JOBS[0];
+      if (!alive) return;
+      setJob({ ...mock, isReal: false });
+      setLoading(false);
+    }
+    run();
+    return () => {
+      alive = false;
+    };
+  }, [jobId]);
+
+  async function handleApply() {
+    if (!isInitialized || applying || !job) return;
+    if (!user) {
+      try {
+        sessionStorage.setItem("nexora:postLoginRedirect", `/jobs/${jobId}`);
+      } catch {
+        // ignore
+      }
+      navigate({ to: "/login", search: { redirect: `/jobs/${jobId}` } as never });
+      return;
+    }
+    if (!job.isReal) {
+      toast.error("This is a demo listing. Applications are only accepted on live jobs.");
+      return;
+    }
+    setApplying(true);
+    try {
+      await applyToJob({ jobId: job.id, applicantId: user.id });
+      navigate({ to: "/jobs/applications" });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Could not submit application";
+      toast.error(msg);
+      setApplying(false);
+    }
+  }
+
+  if (loading || !job) {
+    return (
+      <>
+        <PublicPageHeader />
+        <div className="mx-auto max-w-5xl p-6">
+          <div className="text-muted-foreground text-sm">Loading job…</div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -40,8 +166,8 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
                 >
                   <Share2 className="h-4 w-4" /> Share
                 </Button>
-                <Button size="sm" onClick={() => toast.success("Application submitted")}>
-                  Apply Now
+                <Button size="sm" onClick={handleApply} disabled={applying}>
+                  {applying ? "Submitting…" : "Apply Now"}
                 </Button>
               </div>
             </div>
@@ -52,7 +178,7 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
               </Badge>
               <Badge variant="outline">
                 <MapPin className="mr-1 h-3 w-3" />
-                {job.area}, {job.city}
+                {job.area}{job.area && job.city ? ", " : ""}{job.city}
               </Badge>
               <Badge variant="outline">
                 <Clock className="mr-1 h-3 w-3" />
@@ -76,10 +202,14 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
             <CardTitle>Job Description</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6 text-sm">
-            <p>{job.description}</p>
-            <BulletGroup title="Responsibilities" items={job.responsibilities} />
-            <BulletGroup title="Requirements" items={job.requirements} />
-            <BulletGroup title="Benefits" items={job.benefits} />
+            <p className="whitespace-pre-line">{job.description}</p>
+            {job.responsibilities.length > 0 && (
+              <BulletGroup title="Responsibilities" items={job.responsibilities} />
+            )}
+            {job.requirements.length > 0 && (
+              <BulletGroup title="Requirements" items={job.requirements} />
+            )}
+            {job.benefits.length > 0 && <BulletGroup title="Benefits" items={job.benefits} />}
           </CardContent>
         </Card>
 
@@ -94,24 +224,12 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
               A premium {job.category.toLowerCase()} destination in {job.city}, serving 1,000+ happy
               clients monthly with a team of certified professionals.
             </p>
-            <div className="grid gap-3 md:grid-cols-3">
-              <Stat label="Founded" value="2018" />
-              <Stat label="Team Size" value="25+" />
-              <Stat label="Avg Rating" value="4.8 ★" />
-            </div>
-            <Button variant="outline" size="sm">
-              View Company Profile
-            </Button>
           </CardContent>
         </Card>
 
         <div className="sticky bottom-4 z-10 md:hidden">
-          <Button
-            className="w-full"
-            size="lg"
-            onClick={() => toast.success("Application submitted")}
-          >
-            Apply Now
+          <Button className="w-full" size="lg" onClick={handleApply} disabled={applying}>
+            {applying ? "Submitting…" : "Apply Now"}
           </Button>
         </div>
       </div>
