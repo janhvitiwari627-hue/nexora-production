@@ -98,11 +98,17 @@ export function MyApplicationsPage() {
   const q = search.q;
   const setFilter = (status: string) =>
     navigate({
-      search: (prev) => ({ ...prev, status: status as typeof prev.status }),
+      search: (prev: ApplicationsSearch) => ({
+        ...prev,
+        status: status as ApplicationsSearch["status"],
+      }),
       replace: false,
     });
   const setQ = (value: string) =>
-    navigate({ search: (prev) => ({ ...prev, q: value }), replace: true });
+    navigate({
+      search: (prev: ApplicationsSearch) => ({ ...prev, q: value }),
+      replace: true,
+    });
 
   const [apps, setApps] = useState<JobApplication[] | null>(null);
   const [error, setError] = useState<string | null>(null);
