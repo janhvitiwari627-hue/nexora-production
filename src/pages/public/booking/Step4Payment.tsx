@@ -358,6 +358,7 @@ function QrPaymentModal({
   };
 
   const handleSubmit = () => {
+    if (!online) return setError("You're offline. Reconnect to submit payment.");
     if (!screenshot) return setError("Upload payment screenshot");
     if (txnId.trim().length < 6) return setError("Enter a valid transaction ID");
     setSubmitting(true);
