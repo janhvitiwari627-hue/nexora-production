@@ -104,20 +104,23 @@ export function MyJobPostsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <PublicPageHeader
-        eyebrow="Employer"
-        title="My Job Posts"
-        description="Manage every job you've posted, track applications and close roles you've filled."
-        actions={
+      <PublicPageHeader />
+
+      <div className="mx-auto max-w-5xl px-4 py-8">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Employer</p>
+            <h1 className="text-2xl font-bold text-heading">My Job Posts</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Manage every job you've posted, track applications and close roles you've filled.
+            </p>
+          </div>
           <Button asChild size="sm">
             <Link to="/jobs/post-a-job">
               <Plus className="mr-1.5 h-4 w-4" /> Post a Job
             </Link>
           </Button>
-        }
-      />
-
-      <div className="mx-auto max-w-5xl px-4 py-8">
+        </div>
         {loading ? (
           <div className="space-y-3">
             <PostSkeleton />
