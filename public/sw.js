@@ -70,11 +70,18 @@ self.addEventListener("fetch", (event) => {
   if (request.mode === "navigate") {
     event.respondWith(
       (async () => {
+        const pages = await caches.open(PAGES);
         try {
-          return await fetch(request);
+          const fresh = await fetch(request);
+          if (fresh && fresh.status === 200 && fresh.type === "basic") {
+            pages.put(request, fresh.clone()).catch(() => {});
+          }
+          return fresh;
         } catch {
-          const cache = await caches.open(PRECACHE);
-          const offline = await cache.match("/offline.html");
+          const cachedPage = await pages.match(request, { ignoreSearch: true });
+          if (cachedPage) return cachedPage;
+          const precache = await caches.open(PRECACHE);
+          const offline = await precache.match("/offline.html");
           return offline || new Response("Offline", { status: 503, statusText: "Offline" });
         }
       })()
