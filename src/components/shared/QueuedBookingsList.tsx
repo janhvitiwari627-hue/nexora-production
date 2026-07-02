@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouter } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, CloudUpload, Loader2, RefreshCw, Save, Trash2, TriangleAlert, X } from "lucide-react";
 import { flush, removeTask, type QueueTask, type QueueTaskStatus } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/lib/offline-queue.hooks";
@@ -287,6 +288,8 @@ export function QueuedBookingsList({
   const queue = useOfflineQueue();
   const online = useOnlineStatus();
   const navigate = useNavigate();
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const notifiedRef = useRef<Set<string>>(new Set());
   const tasks = queue.filter(
     (t) => t.type === TASK_CREATE_AND_CONFIRM_BOOKING,
@@ -318,16 +321,27 @@ export function QueuedBookingsList({
     } catch {
       // ignore
     }
+    const bookingId = justConfirmed.result.booking_id;
     const ref = justConfirmed.result.booking_reference;
     toast.success(
       ref ? `Booking #${ref} confirmed` : "Your booking is confirmed",
       { description: "Opening your booking details…" },
     );
+    // Invalidate any cached views of this booking so the detail page shows
+    // fresh server data as soon as we land on it.
+    queryClient.invalidateQueries({ queryKey: ["my-bookings"] });
+    queryClient.invalidateQueries({ queryKey: ["booking", bookingId] });
+    queryClient.invalidateQueries({ queryKey: ["bookings"] });
     void navigate({
       to: "/dashboard/bookings/$id",
-      params: { id: justConfirmed.result.booking_id },
+      params: { id: bookingId },
+    }).then(() => {
+      // Re-run route loaders on the destination so any loader-fetched
+      // booking data is refreshed post-navigation.
+      void router.invalidate();
     });
-  }, [tasks, autoNavigateOnConfirm, navigate]);
+  }, [tasks, autoNavigateOnConfirm, navigate, router, queryClient]);
+
 
   if (tasks.length === 0) return null;
 
