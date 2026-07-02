@@ -24,6 +24,7 @@ export function PersonalInfoPanel() {
   const { user, profile, refreshProfile } = useAuthStore();
   const [avatar, setAvatar] = useState<string>(profile?.avatar_url || "");
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [usernameTouched, setUsernameTouched] = useState(false);
 
@@ -67,14 +68,52 @@ export function PersonalInfoPanel() {
     }));
   }
 
+  function friendlyUploadError(err: any, stage: "upload" | "sign" | "profile" | "remove"): string {
+    const raw = (err?.message || err?.error_description || err?.error || "").toString();
+    const status = Number(err?.statusCode ?? err?.status ?? 0);
+    const lower = raw.toLowerCase();
+
+    if (!navigator.onLine) return "You appear to be offline. Check your connection and try again.";
+    if (lower.includes("network") || lower.includes("fetch") || lower.includes("failed to fetch")) {
+      return "Network error while contacting the server. Please try again.";
+    }
+    if (status === 401 || lower.includes("jwt") || lower.includes("unauthorized")) {
+      return "Your session has expired. Please sign in again and retry.";
+    }
+    if (status === 403 || lower.includes("row-level security") || lower.includes("not allowed") || lower.includes("policy")) {
+      return "You don't have permission to update this photo.";
+    }
+    if (status === 413 || lower.includes("payload too large") || lower.includes("too large")) {
+      return "That image is too large. Please choose a file under 5 MB.";
+    }
+    if (status === 415 || lower.includes("mime") || lower.includes("content type")) {
+      return "Unsupported image type. Please use a JPG, PNG, or WEBP.";
+    }
+    if (status === 429 || lower.includes("rate")) {
+      return "Too many uploads in a short time. Please wait a moment and try again.";
+    }
+    if (status >= 500) return "The server had a problem saving your photo. Please try again shortly.";
+
+    switch (stage) {
+      case "upload": return "We couldn't upload your photo. Please try a different image.";
+      case "sign":   return "Uploaded, but we couldn't generate a preview link. Please try again.";
+      case "profile":return "Photo uploaded, but saving it to your profile failed. Please retry.";
+      case "remove": return "We couldn't remove your photo. Please try again.";
+    }
+  }
+
   async function handleAvatarFile(f: File) {
     if (!user) {
-      toast.error("Please sign in to upload a photo");
+      const msg = "Please sign in to upload a photo";
+      setUploadError(msg);
+      toast.error(msg);
       return;
     }
     setUploading(true);
+    setUploadError(null);
     const preview = URL.createObjectURL(f);
     setAvatar(preview);
+    let stage: "upload" | "sign" | "profile" = "upload";
     try {
       const ext = f.name.split(".").pop()?.toLowerCase() || "jpg";
       const path = `${user.id}/avatar-${Date.now()}.${ext}`;
@@ -82,12 +121,13 @@ export function PersonalInfoPanel() {
         .from("avatars")
         .upload(path, f, { upsert: true, contentType: f.type });
       if (upErr) throw upErr;
-      // Bucket is private — generate a long-lived signed URL (1 year)
+      stage = "sign";
       const { data: signed, error: signErr } = await supabase.storage
         .from("avatars")
         .createSignedUrl(path, 60 * 60 * 24 * 365);
       if (signErr) throw signErr;
       const url = signed.signedUrl;
+      stage = "profile";
       const { error: updErr } = await supabase
         .from("profiles")
         .update({ avatar_url: url })
@@ -97,9 +137,13 @@ export function PersonalInfoPanel() {
       await refreshProfile();
       toast.success("Profile photo updated");
     } catch (err: any) {
-      toast.error(err?.message || "Failed to upload photo");
+      const msg = friendlyUploadError(err, stage);
+      console.error("[avatar upload] stage=", stage, err);
+      setUploadError(msg);
+      toast.error(msg);
       setAvatar(profile?.avatar_url || "");
     } finally {
+      URL.revokeObjectURL(preview);
       setUploading(false);
     }
   }
@@ -108,6 +152,7 @@ export function PersonalInfoPanel() {
     if (!user) return;
     const previous = avatar;
     setAvatar("");
+    setUploadError(null);
     try {
       const { error } = await supabase
         .from("profiles")
@@ -117,10 +162,14 @@ export function PersonalInfoPanel() {
       await refreshProfile();
       toast.success("Profile photo removed");
     } catch (err: any) {
-      toast.error(err?.message || "Failed to remove photo");
+      const msg = friendlyUploadError(err, "remove");
+      console.error("[avatar remove]", err);
+      setUploadError(msg);
+      toast.error(msg);
       setAvatar(previous);
     }
   }
+
 
 
   function handlePincode(e: React.ChangeEvent<HTMLInputElement>) {
@@ -182,6 +231,7 @@ export function PersonalInfoPanel() {
         fallback={initials}
         uploading={uploading}
         maxSizeMB={5}
+        error={uploadError}
       />
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
