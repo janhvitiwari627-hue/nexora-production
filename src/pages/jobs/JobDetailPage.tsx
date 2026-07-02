@@ -5,8 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Bookmark, Briefcase, Building2, Check, CheckCircle2, Clock, MapPin, Send, Share2, Users } from "lucide-react";
+import {
+  Bookmark,
+  Briefcase,
+  Building2,
+  Check,
+  CheckCircle2,
+  Clock,
+  MapPin,
+  Send,
+  Share2,
+  Users,
+} from "lucide-react";
 import { toast } from "sonner";
 import { MOCK_JOBS } from "./mockJobs";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
@@ -70,14 +82,21 @@ function fromRealJob(j: JobRow & { employer?: { business_name: string } | null }
 
 export function JobDetailPage({ jobId }: { jobId: string }) {
   const navigate = useNavigate();
-  const { user, isInitialized } = useAuthStore();
+  const { user, profile } = useAuthStore();
   const [job, setJob] = useState<DetailView | null>(null);
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
   const [successMode, setSuccessMode] = useState<"real" | "demo">("real");
   const [applyOpen, setApplyOpen] = useState(false);
+  const [alreadyApplied, setAlreadyApplied] = useState(false);
+  const [checkingApplied, setCheckingApplied] = useState(false);
+
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [coverNote, setCoverNote] = useState("");
+  const [errors, setErrors] = useState<{ fullName?: string; email?: string; phone?: string }>({});
 
   useEffect(() => {
     let alive = true;
@@ -106,8 +125,33 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
     };
   }, [jobId]);
 
+  // Check whether current user has already applied for this real job.
+  useEffect(() => {
+    let alive = true;
+    async function check() {
+      if (!user || !isRealJobId(jobId)) {
+        setAlreadyApplied(false);
+        return;
+      }
+      setCheckingApplied(true);
+      const { data } = await (supabase as never as { from: (n: string) => { select: (c: string) => { eq: (c: string, v: string) => { eq: (c: string, v: string) => { maybeSingle: () => Promise<{ data: unknown }> } } } } })
+        .from("job_applications")
+        .select("id")
+        .eq("job_id", jobId)
+        .eq("applicant_id", user.id)
+        .maybeSingle();
+      if (!alive) return;
+      setAlreadyApplied(Boolean(data));
+      setCheckingApplied(false);
+    }
+    check();
+    return () => {
+      alive = false;
+    };
+  }, [user, jobId]);
+
   function openApply() {
-    if (!isInitialized || !job) return;
+    if (!job) return;
     if (!user) {
       try {
         sessionStorage.setItem("nexora:postLoginRedirect", `/jobs/${jobId}`);
@@ -117,23 +161,43 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
       navigate({ to: "/login", search: { redirect: `/jobs/${jobId}` } as never });
       return;
     }
+    if (alreadyApplied) return;
+    setFullName(profile?.full_name ?? user.user_metadata?.full_name ?? "");
+    setEmail(profile?.email ?? user.email ?? "");
+    setPhone(profile?.mobile ?? user.user_metadata?.mobile ?? "");
     setCoverNote("");
+    setErrors({});
     setApplyOpen(true);
+  }
+
+  function validate() {
+    const next: typeof errors = {};
+    if (!fullName.trim()) next.fullName = "Enter your full name";
+    if (!/^\S+@\S+\.\S+$/.test(email.trim())) next.email = "Enter a valid email";
+    if (!/^[0-9+()\-\s]{7,15}$/.test(phone.trim())) next.phone = "Enter a valid phone number";
+    setErrors(next);
+    return Object.keys(next).length === 0;
   }
 
   async function handleSubmitApply(e: React.FormEvent) {
     e.preventDefault();
     if (applying || !job || !user) return;
-    // The route param is the source of truth for the backend payload.
+    if (!validate()) return;
+
     const payloadJobId = jobId;
-    const note = coverNote.trim() || null;
+    const notePieces = [
+      `Name: ${fullName.trim()}`,
+      `Email: ${email.trim()}`,
+      `Phone: ${phone.trim()}`,
+    ];
+    if (coverNote.trim()) notePieces.push("", coverNote.trim());
+    const note = notePieces.join("\n");
 
     if (!isRealJobId(payloadJobId)) {
-      // Demo listing — log the intended payload for transparency, skip backend
-      // (job_applications.job_id is a UUID FK and can't accept demo IDs).
       console.info("[apply] demo submission payload:", { jobId: payloadJobId, coverNote: note });
-      toast.success(`Application submitted (demo · ${payloadJobId})`);
+      toast.success("Application submitted (demo)");
       setApplyOpen(false);
+      setAlreadyApplied(true);
       setSuccessMode("demo");
       setSuccessOpen(true);
       return;
@@ -147,11 +211,11 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
         coverNote: note,
       });
       if (app.job_id !== payloadJobId) {
-        // Defensive: surface any mismatch instead of silently succeeding.
         throw new Error(`Server recorded jobId ${app.job_id}, expected ${payloadJobId}`);
       }
-      toast.success("Application submitted");
+      toast.success("Application submitted successfully.");
       setApplyOpen(false);
+      setAlreadyApplied(true);
       setSuccessMode("real");
       setSuccessOpen(true);
     } catch (err) {
@@ -172,6 +236,14 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
       </>
     );
   }
+
+  const applyLabel = applying
+    ? "Submitting…"
+    : alreadyApplied
+      ? "Applied"
+      : !user
+        ? "Sign in to Apply"
+        : "Apply Now";
 
   return (
     <>
@@ -203,11 +275,32 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
                 >
                   <Share2 className="h-4 w-4" /> Share
                 </Button>
-                <Button size="sm" onClick={openApply} disabled={applying}>
-                  {applying ? "Submitting…" : "Apply Now"}
-                </Button>
+                {alreadyApplied ? (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => navigate({ to: "/jobs/applications" })}
+                  >
+                    <CheckCircle2 className="h-4 w-4" /> View Application
+                  </Button>
+                ) : (
+                  <Button
+                    size="sm"
+                    onClick={openApply}
+                    disabled={applying || checkingApplied}
+                    data-testid="apply-button"
+                  >
+                    {applyLabel}
+                  </Button>
+                )}
               </div>
             </div>
+            {alreadyApplied && (
+              <div className="border-primary/30 bg-primary/5 text-primary flex items-center gap-2 rounded-md border px-3 py-2 text-sm">
+                <CheckCircle2 className="h-4 w-4" />
+                You have already applied for this job.
+              </div>
+            )}
             <div className="flex flex-wrap gap-2 text-sm">
               <Badge variant="secondary">
                 <Briefcase className="mr-1 h-3 w-3" />
@@ -265,9 +358,25 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
         </Card>
 
         <div className="sticky bottom-4 z-10 md:hidden">
-          <Button className="w-full" size="lg" onClick={openApply} disabled={applying}>
-            {applying ? "Submitting…" : "Apply Now"}
-          </Button>
+          {alreadyApplied ? (
+            <Button
+              className="w-full"
+              size="lg"
+              variant="secondary"
+              onClick={() => navigate({ to: "/jobs/applications" })}
+            >
+              <CheckCircle2 className="h-4 w-4" /> View Application
+            </Button>
+          ) : (
+            <Button
+              className="w-full"
+              size="lg"
+              onClick={openApply}
+              disabled={applying || checkingApplied}
+            >
+              {applyLabel}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -278,12 +387,56 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
         size="md"
       >
         <form onSubmit={handleSubmitApply} className="space-y-4 p-6">
-          <div className="bg-muted/40 flex items-center justify-between rounded-lg px-3 py-2 text-xs">
-            <span className="text-muted-foreground">Submitting for job</span>
-            <code className="text-heading font-mono text-[11px]">{jobId}</code>
+          <div className="bg-muted/40 rounded-lg px-3 py-2 text-xs">
+            <div className="text-muted-foreground">Applying to</div>
+            <div className="text-heading font-semibold">{job.title}</div>
+            <div className="text-muted-foreground">{job.business}</div>
           </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="apply-name">Full name</Label>
+              <Input
+                id="apply-name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                disabled={applying}
+                aria-invalid={!!errors.fullName}
+              />
+              {errors.fullName && (
+                <p className="text-destructive text-xs">{errors.fullName}</p>
+              )}
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="apply-email">Email</Label>
+              <Input
+                id="apply-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={applying}
+                aria-invalid={!!errors.email}
+              />
+              {errors.email && <p className="text-destructive text-xs">{errors.email}</p>}
+            </div>
+          </div>
+
           <div className="space-y-1.5">
-            <Label htmlFor="cover-note">Cover note (optional)</Label>
+            <Label htmlFor="apply-phone">Phone number</Label>
+            <Input
+              id="apply-phone"
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              disabled={applying}
+              aria-invalid={!!errors.phone}
+              placeholder="+91 98xxxxxxxx"
+            />
+            {errors.phone && <p className="text-destructive text-xs">{errors.phone}</p>}
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="cover-note">Cover letter (optional)</Label>
             <Textarea
               id="cover-note"
               rows={5}
@@ -297,6 +450,7 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
               {coverNote.length}/1000
             </div>
           </div>
+
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Button
               type="button"
@@ -308,14 +462,13 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
             </Button>
             <Button type="submit" disabled={applying}>
               <Send className="h-4 w-4" />
-              {applying ? "Submitting…" : "Submit application"}
+              {applying ? "Submitting application…" : "Submit application"}
             </Button>
           </div>
         </form>
       </Modal>
 
       <Modal open={successOpen} onClose={() => setSuccessOpen(false)} size="sm">
-
         <div className="flex flex-col items-center gap-4 p-8 text-center">
           <div className="bg-primary/10 grid h-16 w-16 place-items-center rounded-full">
             <CheckCircle2 className="text-primary h-9 w-9" />
@@ -329,11 +482,7 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
             </p>
           </div>
           <div className="mt-2 flex w-full flex-col gap-2 sm:flex-row">
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={() => setSuccessOpen(false)}
-            >
+            <Button variant="outline" className="flex-1" onClick={() => setSuccessOpen(false)}>
               Keep browsing
             </Button>
             <Button
