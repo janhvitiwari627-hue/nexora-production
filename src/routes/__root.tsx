@@ -11,11 +11,8 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { registerServiceWorker } from "../lib/register-sw";
 
 import { NotFoundPage } from "@/pages/public/NotFoundPage";
-import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
-import { ServiceWorkerUpdatePrompt } from "@/components/pwa/ServiceWorkerUpdatePrompt";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
