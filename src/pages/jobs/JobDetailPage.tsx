@@ -192,6 +192,9 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
     setEmail(profile?.email ?? user.email ?? "");
     setPhone(profile?.mobile ?? user.user_metadata?.mobile ?? "");
     setCoverNote("");
+    setPortfolioUrl("");
+    setInstagramHandle("");
+    setResumeUrl("");
     setErrors({});
     setApplyOpen(true);
   }
@@ -201,6 +204,10 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
     if (!fullName.trim()) next.fullName = "Enter your full name";
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) next.email = "Enter a valid email";
     if (!/^[0-9+()\-\s]{7,15}$/.test(phone.trim())) next.phone = "Enter a valid phone number";
+    if (portfolioRequired && !portfolioUrl.trim())
+      next.portfolioUrl = "Portfolio link is required for this job";
+    if (instagramRequired && !instagramHandle.trim())
+      next.instagramHandle = "Instagram profile is required for this job";
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -216,6 +223,9 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
       `Email: ${email.trim()}`,
       `Phone: ${phone.trim()}`,
     ];
+    if (portfolioUrl.trim()) notePieces.push(`Portfolio: ${portfolioUrl.trim()}`);
+    if (instagramHandle.trim()) notePieces.push(`Instagram: ${instagramHandle.trim()}`);
+    if (resumeUrl.trim()) notePieces.push(`Resume: ${resumeUrl.trim()}`);
     if (coverNote.trim()) notePieces.push("", coverNote.trim());
     const note = notePieces.join("\n");
 
