@@ -104,11 +104,23 @@ export function MyApplicationsPage() {
       }),
       replace: false,
     });
-  const setQ = (value: string) =>
-    navigate({
-      search: (prev: ApplicationsSearch) => ({ ...prev, q: value }),
-      replace: true,
-    });
+  // Local input value; the URL `q` is only updated after the user pauses typing
+  // so we don't spam history entries or trigger a skeleton reload per keystroke.
+  const [qInput, setQInput] = useState<string>(q);
+  useEffect(() => {
+    // Keep the input in sync when q changes from elsewhere (back/forward, reset).
+    setQInput(q);
+  }, [q]);
+  useEffect(() => {
+    if (qInput === q) return;
+    const t = setTimeout(() => {
+      navigate({
+        search: (prev: ApplicationsSearch) => ({ ...prev, q: qInput }),
+        replace: true,
+      });
+    }, 300);
+    return () => clearTimeout(t);
+  }, [qInput, q, navigate]);
 
   const [apps, setApps] = useState<JobApplication[] | null>(null);
   const [error, setError] = useState<string | null>(null);
