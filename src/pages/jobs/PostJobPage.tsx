@@ -2563,6 +2563,85 @@ function RequirementsStep({
           onChange={(e) => update({ requirements: e.target.value })}
         />
       </Field>
+
+      <Field label="Certification">
+        <div className="flex flex-wrap gap-2">
+          {CERTIFICATIONS.map((c) => {
+            const active = form.certification === c;
+            return (
+              <button
+                key={c}
+                type="button"
+                onClick={() => update({ certification: c })}
+                aria-pressed={active}
+                className={cn(
+                  "rounded-full border px-4 py-1.5 text-xs font-bold transition",
+                  active
+                    ? "border-transparent bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
+                    : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
+                )}
+              >
+                {c}
+              </button>
+            );
+          })}
+        </div>
+      </Field>
+
+      <Field label="Language preferences" hint="Select all that apply.">
+        <div className="flex flex-wrap gap-2">
+          {LANGUAGES.map((l) => {
+            const active = (form.languages ?? []).includes(l);
+            return (
+              <button
+                key={l}
+                type="button"
+                onClick={() =>
+                  update({
+                    languages: active
+                      ? (form.languages ?? []).filter((x) => x !== l)
+                      : [...(form.languages ?? []), l],
+                  })
+                }
+                aria-pressed={active}
+                className={cn(
+                  "rounded-full border px-3 py-1.5 text-xs font-semibold transition",
+                  active
+                    ? "bg-gradient-cta border-transparent text-primary-foreground"
+                    : "border-border bg-card text-heading hover:border-primary/50",
+                )}
+              >
+                {l}
+              </button>
+            );
+          })}
+        </div>
+      </Field>
+
+      <Field label="Portfolio requirement">
+        <div className="flex flex-wrap gap-2">
+          {PORTFOLIO_OPTIONS.map((p) => {
+            const active = form.portfolio_option === p;
+            return (
+              <button
+                key={p}
+                type="button"
+                onClick={() => update({ portfolio_option: p })}
+                aria-pressed={active}
+                className={cn(
+                  "rounded-full border px-4 py-1.5 text-xs font-bold transition",
+                  active
+                    ? "border-transparent bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
+                    : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
+                )}
+              >
+                {p}
+              </button>
+            );
+          })}
+        </div>
+      </Field>
+
       <Field label="Interview mode" hint="How would you like to interview shortlisted candidates?">
         <div className="flex flex-wrap gap-2">
           {INTERVIEW_MODES.map((m) => {
