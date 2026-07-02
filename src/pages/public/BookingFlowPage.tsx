@@ -26,7 +26,7 @@ import type { Staff } from "@/components/shared/StaffCard";
 import { createBooking, confirmBookingPayment } from "@/lib/bookings.functions";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 import { OfflineBanner, OfflinePill } from "@/components/shared/OfflineBanner";
-import { OfflineSyncStatus } from "@/components/shared/OfflineSyncStatus";
+import { QueuedBookingsList } from "@/components/shared/QueuedBookingsList";
 import { useOnlineStatus } from "@/hooks/use-online-status";
 import {
   enqueueCreateAndConfirmBooking,
