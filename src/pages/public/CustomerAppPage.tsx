@@ -91,6 +91,13 @@ export default function CustomerAppPage() {
       setDismissed(true);
     }
 
+    // Use the global capture so the deferred prompt survives navigation
+    // between routes. Falls back to a local listener as a safety net.
+    initInstallPromptCapture();
+    const unsubGlobal = subscribeInstallPrompt((evt) => {
+      setDeferred((evt as unknown as BeforeInstallPromptEvent) ?? null);
+    });
+
     const onPrompt = (e: Event) => {
       e.preventDefault();
       setDeferred(e as BeforeInstallPromptEvent);
