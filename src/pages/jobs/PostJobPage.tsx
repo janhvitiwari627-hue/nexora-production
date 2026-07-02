@@ -517,8 +517,10 @@ export function PostJobPage() {
           </aside>
         </div>
       </div>
+      )}
 
       {/* Mobile sticky bottom action */}
+      {!publishedJob && (
       <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-2 border-t border-border bg-card/95 p-3 shadow-2xl backdrop-blur md:hidden">
         <button
           type="button"
