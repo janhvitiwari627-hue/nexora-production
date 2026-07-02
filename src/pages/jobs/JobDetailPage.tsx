@@ -106,7 +106,23 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [coverNote, setCoverNote] = useState("");
-  const [errors, setErrors] = useState<{ fullName?: string; email?: string; phone?: string }>({});
+  const [portfolioUrl, setPortfolioUrl] = useState("");
+  const [instagramHandle, setInstagramHandle] = useState("");
+  const [resumeUrl, setResumeUrl] = useState("");
+  const [errors, setErrors] = useState<{
+    fullName?: string;
+    email?: string;
+    phone?: string;
+    portfolioUrl?: string;
+    instagramHandle?: string;
+  }>({});
+
+  const portfolioMeta = job ? parseRequirementsMeta(job.rawRequirements).portfolio : "";
+  const portfolioRequired = portfolioMeta === "Portfolio required";
+  const instagramRequired = portfolioMeta === "Instagram profile required";
+  const resumePreferred = portfolioMeta === "Resume preferred";
+  const noPortfolio = portfolioMeta === "No portfolio needed";
+
 
   useEffect(() => {
     let alive = true;
