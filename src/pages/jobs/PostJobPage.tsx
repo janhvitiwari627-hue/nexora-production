@@ -1049,6 +1049,40 @@ const inputCls =
 const inputErrCls =
   "w-full rounded-lg border border-destructive bg-background px-3 py-2.5 text-sm outline-none focus:border-destructive";
 
+const QUICK_START_TEMPLATES: { label: string; body: string }[] = [
+  {
+    label: "Hair salon role",
+    body:
+      "We are looking for a skilled [Specific Job Role] to join our salon team. The candidate should be confident in haircutting, styling, client consultation and maintaining a professional salon experience.",
+  },
+  {
+    label: "Beauty parlour role",
+    body:
+      "We are looking for a professional [Specific Job Role] who is experienced in beauty services, client consultation, hygiene and customer satisfaction.",
+  },
+  {
+    label: "Spa role",
+    body:
+      "We are looking for a skilled [Specific Job Role] who can deliver quality spa and wellness services while maintaining a premium client experience.",
+  },
+  {
+    label: "Nail studio role",
+    body:
+      "We are looking for a creative [Specific Job Role] who is skilled in nail extensions, nail art, hygiene and client consultation.",
+  },
+  {
+    label: "Bridal service role",
+    body:
+      "We are looking for a talented [Specific Job Role] with strong knowledge of bridal, party or professional makeup services and client handling.",
+  },
+  {
+    label: "Freelancer role",
+    body:
+      "We are looking for a passionate freelance [Specific Job Role] who can deliver quality services on-demand while managing bookings, hygiene and client satisfaction.",
+  },
+  { label: "Write my own", body: "" },
+];
+
 function DetailsStep({
   form,
   update,
@@ -1058,6 +1092,7 @@ function DetailsStep({
   update: (p: Partial<Form>) => void;
   errors: FormErrors;
 }) {
+
   const GENERAL_ROLES = [
     "Senior Beauty Professional",
     "Junior Beauty Professional",
