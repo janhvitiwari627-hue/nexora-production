@@ -75,6 +75,20 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
   const isInitialized = useAuthStore((s) => s.isInitialized);
   const signOut = useAuthStore((s) => s.signOut);
   const navigate = useNavigate();
+  const isOwner = roles.some((r) => r === "owner" || r === "shop_owner" || r === "shop_manager");
+
+  const switchToCustomer = () => {
+    try {
+      sessionStorage.setItem("nexora:browseAsCustomer", "1");
+    } catch { /* ignore */ }
+    navigate({ to: "/customer/home", search: { as: "customer" } as never });
+  };
+  const switchToOwner = () => {
+    try {
+      sessionStorage.removeItem("nexora:browseAsCustomer");
+    } catch { /* ignore */ }
+    navigate({ to: "/owner/dashboard" });
+  };
 
   // Only trust auth state after the component is mounted AND the auth store
   // has finished bootstrapping the session from storage.
