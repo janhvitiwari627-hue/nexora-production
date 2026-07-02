@@ -101,6 +101,7 @@ export function PostJobPage() {
   const [saving, setSaving] = useState<"draft" | "publish" | null>(null);
   const [skillsInput, setSkillsInput] = useState(initialDraft?.skillsInput ?? "");
   const [draftRestored, setDraftRestored] = useState<boolean>(!!initialDraft && (initialDraft.step > 0 || initialDraft.form.title.length > 0));
+  const [publishError, setPublishError] = useState<string | null>(null);
 
   // Persist wizard state to localStorage so it survives session expiry / re-login.
   useEffect(() => {
