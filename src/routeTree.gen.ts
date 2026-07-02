@@ -76,6 +76,7 @@ import { Route as OwnerBookingsRouteImport } from './routes/owner.bookings'
 import { Route as OwnerAnalyticsRouteImport } from './routes/owner.analytics'
 import { Route as JobsSearchRouteImport } from './routes/jobs.search'
 import { Route as JobsProfileRouteImport } from './routes/jobs.profile'
+import { Route as JobsApplicationsRouteImport } from './routes/jobs.applications'
 import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
 import { Route as HirePostJobRouteImport } from './routes/hire.post-job'
 import { Route as DistrictBusinessPartnerSlugRouteImport } from './routes/district-business-partner.$slug'
@@ -461,6 +462,11 @@ const JobsProfileRoute = JobsProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => JobsRoute,
 } as any)
+const JobsApplicationsRoute = JobsApplicationsRouteImport.update({
+  id: '/applications',
+  path: '/applications',
+  getParentRoute: () => JobsRoute,
+} as any)
 const JobsJobIdRoute = JobsJobIdRouteImport.update({
   id: '/$jobId',
   path: '/$jobId',
@@ -777,6 +783,7 @@ export interface FileRoutesByFullPath {
   '/district-business-partner/$slug': typeof DistrictBusinessPartnerSlugRoute
   '/hire/post-job': typeof HirePostJobRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
+  '/jobs/applications': typeof JobsApplicationsRoute
   '/jobs/profile': typeof JobsProfileRoute
   '/jobs/search': typeof JobsSearchRoute
   '/owner/analytics': typeof OwnerAnalyticsRoute
@@ -892,6 +899,7 @@ export interface FileRoutesByTo {
   '/district-business-partner/$slug': typeof DistrictBusinessPartnerSlugRoute
   '/hire/post-job': typeof HirePostJobRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
+  '/jobs/applications': typeof JobsApplicationsRoute
   '/jobs/profile': typeof JobsProfileRoute
   '/jobs/search': typeof JobsSearchRoute
   '/owner/analytics': typeof OwnerAnalyticsRoute
@@ -1011,6 +1019,7 @@ export interface FileRoutesById {
   '/district-business-partner/$slug': typeof DistrictBusinessPartnerSlugRoute
   '/hire/post-job': typeof HirePostJobRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
+  '/jobs/applications': typeof JobsApplicationsRoute
   '/jobs/profile': typeof JobsProfileRoute
   '/jobs/search': typeof JobsSearchRoute
   '/owner/analytics': typeof OwnerAnalyticsRoute
@@ -1131,6 +1140,7 @@ export interface FileRouteTypes {
     | '/district-business-partner/$slug'
     | '/hire/post-job'
     | '/jobs/$jobId'
+    | '/jobs/applications'
     | '/jobs/profile'
     | '/jobs/search'
     | '/owner/analytics'
@@ -1246,6 +1256,7 @@ export interface FileRouteTypes {
     | '/district-business-partner/$slug'
     | '/hire/post-job'
     | '/jobs/$jobId'
+    | '/jobs/applications'
     | '/jobs/profile'
     | '/jobs/search'
     | '/owner/analytics'
@@ -1364,6 +1375,7 @@ export interface FileRouteTypes {
     | '/district-business-partner/$slug'
     | '/hire/post-job'
     | '/jobs/$jobId'
+    | '/jobs/applications'
     | '/jobs/profile'
     | '/jobs/search'
     | '/owner/analytics'
@@ -1956,6 +1968,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JobsProfileRouteImport
       parentRoute: typeof JobsRoute
     }
+    '/jobs/applications': {
+      id: '/jobs/applications'
+      path: '/applications'
+      fullPath: '/jobs/applications'
+      preLoaderRoute: typeof JobsApplicationsRouteImport
+      parentRoute: typeof JobsRoute
+    }
     '/jobs/$jobId': {
       id: '/jobs/$jobId'
       path: '/$jobId'
@@ -2409,12 +2428,14 @@ const HireRouteWithChildren = HireRoute._addFileChildren(HireRouteChildren)
 
 interface JobsRouteChildren {
   JobsJobIdRoute: typeof JobsJobIdRoute
+  JobsApplicationsRoute: typeof JobsApplicationsRoute
   JobsProfileRoute: typeof JobsProfileRoute
   JobsSearchRoute: typeof JobsSearchRoute
 }
 
 const JobsRouteChildren: JobsRouteChildren = {
   JobsJobIdRoute: JobsJobIdRoute,
+  JobsApplicationsRoute: JobsApplicationsRoute,
   JobsProfileRoute: JobsProfileRoute,
   JobsSearchRoute: JobsSearchRoute,
 }
