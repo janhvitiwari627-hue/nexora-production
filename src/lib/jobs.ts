@@ -124,6 +124,17 @@ export async function saveJob(params: {
   return data as JobRow;
 }
 
+export async function getMyShopId(userId: string): Promise<string | null> {
+  const { data, error } = await table("salon_owners")
+    .select("salon_id")
+    .eq("user_id", userId)
+    .eq("is_approved", true)
+    .limit(1)
+    .maybeSingle();
+  if (error) return null;
+  return (data?.salon_id as string | undefined) ?? null;
+}
+
 export async function listPublishedJobs(limit = 50): Promise<JobRow[]> {
   const { data, error } = await table("jobs")
     .select("*, employer:employer_profiles(*)")
