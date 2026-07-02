@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { PaymentCountdown } from "@/components/shared/PaymentCountdown";
 import { OfflineBanner } from "@/components/shared/OfflineBanner";
 import { useOnlineStatus } from "@/hooks/use-online-status";
-import { toast } from "sonner";
+
 import {
   Check,
   CreditCard,
@@ -275,25 +275,26 @@ export function Step4Payment({
 
         <OfflineBanner
           className="mt-5"
-          message="You're offline — payment is unavailable"
-          hint="You can still review your booking. Reconnect to complete payment and confirm."
+          message="You're offline — we'll queue this booking"
+          hint="Tap the button to save it on this device. We'll confirm automatically when you're back online."
         />
 
         <motion.button
           type="button"
-          whileTap={{ scale: online ? 0.98 : 1 }}
+          whileTap={{ scale: 0.98 }}
           onClick={() => {
             if (!online) {
-              toast.error("You're offline. Reconnect to complete payment.");
+              // Skip the QR upload step entirely — parent enqueues on onPay().
+              onPay();
               return;
             }
             setQrOpen(true);
           }}
-          disabled={!online}
-          aria-disabled={!online}
-          className="bg-gradient-cta text-primary-foreground mt-3 inline-flex w-full items-center justify-center rounded-[var(--radius-button)] px-4 py-3.5 text-sm font-bold shadow-[var(--shadow-glow)] hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
+          className="bg-gradient-cta text-primary-foreground mt-3 inline-flex w-full items-center justify-center rounded-[var(--radius-button)] px-4 py-3.5 text-sm font-bold shadow-[var(--shadow-glow)] hover:brightness-110"
         >
-          {online ? `Pay ${formatINR(advance)} to confirm` : "Payment unavailable offline"}
+          {online
+            ? `Pay ${formatINR(advance)} to confirm`
+            : `Save booking (${formatINR(advance)} — sync when online)`}
         </motion.button>
         <p className="text-muted-foreground mt-3 inline-flex items-center gap-1.5 text-[11px]">
 

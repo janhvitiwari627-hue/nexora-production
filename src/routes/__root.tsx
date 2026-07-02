@@ -140,6 +140,10 @@ function RootComponent() {
 
     registerServiceWorker();
 
+    void import("@/lib/booking-offline-sync").then(({ initBookingOfflineSync }) => {
+      initBookingOfflineSync();
+    });
+
     return () => {
       if (timer) clearTimeout(timer);
       unsubscribe?.();

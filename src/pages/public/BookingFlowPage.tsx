@@ -26,7 +26,12 @@ import type { Staff } from "@/components/shared/StaffCard";
 import { createBooking, confirmBookingPayment } from "@/lib/bookings.functions";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 import { OfflineBanner, OfflinePill } from "@/components/shared/OfflineBanner";
+import { OfflineSyncStatus } from "@/components/shared/OfflineSyncStatus";
 import { useOnlineStatus } from "@/hooks/use-online-status";
+import {
+  enqueueCreateAndConfirmBooking,
+  TASK_CREATE_AND_CONFIRM_BOOKING,
+} from "@/lib/booking-offline-sync";
 
 export type RealSalonRef = {
   id: string;
@@ -148,7 +153,34 @@ export function BookingFlowPage({ salon }: { salon?: RealSalonRef } = {}) {
   const onPay = () => {
     if (paying) return;
     if (!online) {
-      toast.error("You're offline. Reconnect to complete payment.");
+      // Queue for background sync when the connection returns.
+      if (!salon || !isUuid(salon.id)) {
+        toast.error("You're offline. Reconnect to complete this booking.");
+        return;
+      }
+      if (!booking.date || !booking.time) {
+        toast.error("Pick a date and time first.");
+        return;
+      }
+      const selected = selectedServices(booking);
+      if (selected.length === 0) {
+        toast.error("Pick at least one service.");
+        return;
+      }
+      const totalPrice = selected.reduce((sum, s) => sum + (s.offer_price ?? s.price), 0);
+      enqueueCreateAndConfirmBooking({
+        salon_id: salon.id,
+        service_name:
+          selected
+            .map((s) => s.name)
+            .join(", ")
+            .slice(0, 200) || selected[0].name,
+        price: totalPrice,
+        booking_date: booking.date,
+        booking_time: booking.time,
+        advance_amount: Math.round(totalPrice * 0.25 * 100) / 100,
+      });
+      toast.success("Saved offline — we'll confirm your booking automatically once you're back online.");
       return;
     }
     setPaying(true);
@@ -183,19 +215,20 @@ export function BookingFlowPage({ salon }: { salon?: RealSalonRef } = {}) {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 pt-4 md:px-6">
+      <div className="mx-auto max-w-7xl space-y-3 px-4 pt-4 md:px-6">
         <OfflineBanner
           message={
             step === 3
-              ? "You're offline — payment is paused"
-              : "You're offline — you can keep picking, but you'll need internet to confirm"
+              ? "You're offline — we'll save your booking and confirm it when you're back"
+              : "You're offline — keep going, we'll finish the booking once you're back online"
           }
           hint={
             step === 3
-              ? "Reconnect to complete payment. Your selections are saved on this device."
-              : "Selections are saved locally. Come back online for staff availability and payment."
+              ? "Tap Pay to queue this booking. It syncs automatically the moment your connection returns."
+              : "Selections are saved on this device. Staff availability updates when you reconnect."
           }
         />
+        <OfflineSyncStatus type={TASK_CREATE_AND_CONFIRM_BOOKING} itemLabel="booking" />
       </div>
 
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 md:px-6 md:py-10 lg:grid-cols-[1fr_320px]">
