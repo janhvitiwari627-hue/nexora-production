@@ -2301,34 +2301,66 @@ function SalaryStep({
           </select>
         </Field>
       </div>
-      <div>
-        <span className="text-heading mb-2 block text-sm font-semibold">Benefits</span>
-        <div className="flex flex-wrap gap-2">
-          {BENEFITS.map((b) => {
-            const on = form.benefits.includes(b);
-
-            return (
-              <button
-                type="button"
-                key={b}
-                onClick={() =>
-                  update({
-                    benefits: on ? form.benefits.filter((x) => x !== b) : [...form.benefits, b],
-                  })
-                }
-                className={cn(
-                  "rounded-full border px-3 py-1.5 text-xs font-semibold transition",
-                  on
-                    ? "bg-gradient-cta border-transparent text-primary-foreground"
-                    : "border-border bg-card text-heading",
-                )}
-              >
-                {b}
-              </button>
-            );
-          })}
+      <div className="space-y-3">
+        <div>
+          <span className="text-heading mb-2 block text-sm font-semibold">Benefit bundles</span>
+          <div className="flex flex-wrap gap-2">
+            {BENEFIT_BUNDLES.map((bundle) => {
+              const allSelected = bundle.items.every((i) => form.benefits.includes(i));
+              return (
+                <button
+                  type="button"
+                  key={bundle.label}
+                  onClick={() => {
+                    // Add all missing bundle items; never remove existing selections.
+                    const merged = Array.from(new Set([...form.benefits, ...bundle.items]));
+                    update({ benefits: merged });
+                  }}
+                  aria-pressed={allSelected}
+                  className={chipCls(allSelected)}
+                  title={bundle.items.join(", ")}
+                >
+                  {bundle.label}
+                </button>
+              );
+            })}
+          </div>
+          <p className="text-muted-foreground mt-1 text-[11px]">
+            Bundles add all their benefits. Active only when every benefit inside is selected.
+          </p>
+        </div>
+        <div>
+          <span className="text-heading mb-2 block text-sm font-semibold">Benefits</span>
+          <div className="flex flex-wrap gap-2">
+            {BENEFITS.map((b) => {
+              const on = form.benefits.includes(b);
+              return (
+                <button
+                  type="button"
+                  key={b}
+                  onClick={() =>
+                    update({
+                      benefits: on
+                        ? form.benefits.filter((x) => x !== b)
+                        : [...form.benefits, b],
+                    })
+                  }
+                  aria-pressed={on}
+                  className={cn(
+                    "rounded-full border px-3 py-1.5 text-xs font-semibold transition",
+                    on
+                      ? "bg-gradient-cta border-transparent text-primary-foreground"
+                      : "border-border bg-card text-heading",
+                  )}
+                >
+                  {b}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
+
     </div>
   );
 }
