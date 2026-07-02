@@ -15,10 +15,12 @@ import {
   XCircle,
   Eye,
   Plus,
+  Send,
+  RotateCcw,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthStore } from "@/stores/authStore";
-import { listMyJobPosts, closeJobPost, type MyJobPost } from "@/lib/jobs";
+import { listMyJobPosts, closeJobPost, setJobStatus, type MyJobPost } from "@/lib/jobs";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 const STATUS_TONE: Record<string, string> = {
