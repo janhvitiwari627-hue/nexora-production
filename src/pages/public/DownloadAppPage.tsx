@@ -19,7 +19,7 @@ const BENEFITS = [
 // Left as a placeholder — replace when the app is live.
 const EXTERNAL_APP_URL = "https://app.nexorasalonos.com";
 
-export default function CustomerAppPage() {
+export default function DownloadAppPage() {
   const [email, setEmail] = useState("");
   const [joined, setJoined] = useState(false);
 
