@@ -516,9 +516,9 @@ const JobsJobIdRoute = JobsJobIdRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const HirePostJobRoute = HirePostJobRouteImport.update({
-  id: '/hire/post-job',
-  path: '/hire/post-job',
-  getParentRoute: () => rootRouteImport,
+  id: '/post-job',
+  path: '/post-job',
+  getParentRoute: () => HireRoute,
 } as any)
 const DistrictBusinessPartnerSlugRoute =
   DistrictBusinessPartnerSlugRouteImport.update({
@@ -1566,7 +1566,6 @@ export interface RootRouteChildren {
   BrandSlugRoute: typeof BrandSlugRoute
   CategorySlugRoute: typeof CategorySlugRoute
   DistributorSlugRoute: typeof DistributorSlugRoute
-  HirePostJobRoute: typeof HirePostJobRoute
   JobsJobIdRoute: typeof JobsJobIdRoute
   JobsApplicationsRoute: typeof JobsApplicationsRoute
   JobsProfileRoute: typeof JobsProfileRoute
@@ -2141,10 +2140,10 @@ declare module '@tanstack/react-router' {
     }
     '/hire/post-job': {
       id: '/hire/post-job'
-      path: '/hire/post-job'
+      path: '/post-job'
       fullPath: '/hire/post-job'
       preLoaderRoute: typeof HirePostJobRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof HireRoute
     }
     '/district-business-partner/$slug': {
       id: '/district-business-partner/$slug'
@@ -2692,7 +2691,6 @@ const rootRouteChildren: RootRouteChildren = {
   BrandSlugRoute: BrandSlugRoute,
   CategorySlugRoute: CategorySlugRoute,
   DistributorSlugRoute: DistributorSlugRoute,
-  HirePostJobRoute: HirePostJobRoute,
   JobsJobIdRoute: JobsJobIdRoute,
   JobsApplicationsRoute: JobsApplicationsRoute,
   JobsProfileRoute: JobsProfileRoute,
@@ -2734,3 +2732,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
