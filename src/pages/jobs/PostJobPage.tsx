@@ -233,6 +233,8 @@ export function PostJobPage() {
           </div>
         )}
         {/* Progress */}
+        <div className="mb-6">
+
 
           <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground">
             <span>
