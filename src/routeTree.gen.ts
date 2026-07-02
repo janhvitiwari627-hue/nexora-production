@@ -30,6 +30,7 @@ import { Route as HireRouteImport } from './routes/hire'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ForOwnersRouteImport } from './routes/for-owners'
+import { Route as DownloadAppRouteImport } from './routes/download-app'
 import { Route as DistrictBusinessPartnerRouteImport } from './routes/district-business-partner'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -230,6 +231,11 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
 const ForOwnersRoute = ForOwnersRouteImport.update({
   id: '/for-owners',
   path: '/for-owners',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DownloadAppRoute = DownloadAppRouteImport.update({
+  id: '/download-app',
+  path: '/download-app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DistrictBusinessPartnerRoute = DistrictBusinessPartnerRouteImport.update({
@@ -729,6 +735,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
+  '/download-app': typeof DownloadAppRoute
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/help': typeof HelpRoute
@@ -847,6 +854,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
   '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
+  '/download-app': typeof DownloadAppRoute
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/help': typeof HelpRoute
@@ -965,6 +973,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
+  '/download-app': typeof DownloadAppRoute
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/help': typeof HelpRoute
@@ -1086,6 +1095,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/district-business-partner'
+    | '/download-app'
     | '/for-owners'
     | '/forgot-password'
     | '/help'
@@ -1204,6 +1214,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/contact'
     | '/district-business-partner'
+    | '/download-app'
     | '/for-owners'
     | '/forgot-password'
     | '/help'
@@ -1321,6 +1332,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/dashboard'
     | '/district-business-partner'
+    | '/download-app'
     | '/for-owners'
     | '/forgot-password'
     | '/help'
@@ -1441,6 +1453,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   DistrictBusinessPartnerRoute: typeof DistrictBusinessPartnerRouteWithChildren
+  DownloadAppRoute: typeof DownloadAppRoute
   ForOwnersRoute: typeof ForOwnersRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   HelpRoute: typeof HelpRoute
@@ -1644,6 +1657,13 @@ declare module '@tanstack/react-router' {
       path: '/for-owners'
       fullPath: '/for-owners'
       preLoaderRoute: typeof ForOwnersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/download-app': {
+      id: '/download-app'
+      path: '/download-app'
+      fullPath: '/download-app'
+      preLoaderRoute: typeof DownloadAppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/district-business-partner': {
@@ -2523,6 +2543,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
   DistrictBusinessPartnerRoute: DistrictBusinessPartnerRouteWithChildren,
+  DownloadAppRoute: DownloadAppRoute,
   ForOwnersRoute: ForOwnersRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   HelpRoute: HelpRoute,
