@@ -31,7 +31,7 @@ function BookingFlowPage() {
     } else {
       // Placeholder confirmation ID until backend is wired.
       const bookingId = `BK-${Date.now().toString(36).toUpperCase()}`;
-      navigate({ to: "/customer/bookings/$bookingId", params: { bookingId } });
+      navigate({ to: "/dashboard/bookings/$id", params: { id: bookingId } });
     }
   };
 
