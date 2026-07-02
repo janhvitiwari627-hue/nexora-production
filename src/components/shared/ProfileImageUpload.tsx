@@ -19,6 +19,8 @@ export type ProfileImageUploadProps = {
   accept?: string;
   className?: string;
   disabled?: boolean;
+  /** External error message (e.g. from the parent's upload handler). */
+  error?: string | null;
 };
 
 /**
