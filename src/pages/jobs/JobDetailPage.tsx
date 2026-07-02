@@ -106,8 +106,8 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
     };
   }, [jobId]);
 
-  async function handleApply() {
-    if (!isInitialized || applying || !job) return;
+  function openApply() {
+    if (!isInitialized || !job) return;
     if (!user) {
       try {
         sessionStorage.setItem("nexora:postLoginRedirect", `/jobs/${jobId}`);
@@ -117,16 +117,41 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
       navigate({ to: "/login", search: { redirect: `/jobs/${jobId}` } as never });
       return;
     }
-    if (!job.isReal) {
-      toast.success("Application submitted (demo listing)");
+    setCoverNote("");
+    setApplyOpen(true);
+  }
+
+  async function handleSubmitApply(e: React.FormEvent) {
+    e.preventDefault();
+    if (applying || !job || !user) return;
+    // The route param is the source of truth for the backend payload.
+    const payloadJobId = jobId;
+    const note = coverNote.trim() || null;
+
+    if (!isRealJobId(payloadJobId)) {
+      // Demo listing — log the intended payload for transparency, skip backend
+      // (job_applications.job_id is a UUID FK and can't accept demo IDs).
+      console.info("[apply] demo submission payload:", { jobId: payloadJobId, coverNote: note });
+      toast.success(`Application submitted (demo · ${payloadJobId})`);
+      setApplyOpen(false);
       setSuccessMode("demo");
       setSuccessOpen(true);
       return;
     }
+
     setApplying(true);
     try {
-      await applyToJob({ jobId: job.id, applicantId: user.id });
+      const app = await applyToJob({
+        jobId: payloadJobId,
+        applicantId: user.id,
+        coverNote: note,
+      });
+      if (app.job_id !== payloadJobId) {
+        // Defensive: surface any mismatch instead of silently succeeding.
+        throw new Error(`Server recorded jobId ${app.job_id}, expected ${payloadJobId}`);
+      }
       toast.success("Application submitted");
+      setApplyOpen(false);
       setSuccessMode("real");
       setSuccessOpen(true);
     } catch (err) {
