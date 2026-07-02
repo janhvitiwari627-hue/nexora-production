@@ -26,6 +26,7 @@ import { Modal } from "@/components/shared/Modal";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/stores/authStore";
 import { applyToJob, isRealJobId, type JobRow } from "@/lib/jobs";
+import { parseRequirementsMeta } from "@/pages/jobs/PostJobPage";
 
 type DetailView = {
   id: string;
