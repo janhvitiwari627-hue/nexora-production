@@ -1,9 +1,9 @@
 {
-  "id": "/customer/home?source=pwa",
-  "name": "Nexora Customer App",
+  "id": "/customer/home",
+  "name": "Nexora SalonOS Customer App",
   "short_name": "Nexora",
   "description": "Book salons, earn rewards, and manage your visits with the Nexora Customer App.",
-  "start_url": "/customer/home?source=pwa",
+  "start_url": "/customer/home",
   "scope": "/customer/",
   "display": "standalone",
   "orientation": "portrait",
