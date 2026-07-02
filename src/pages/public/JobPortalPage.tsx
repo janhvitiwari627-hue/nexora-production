@@ -4,7 +4,7 @@ import { Briefcase, GraduationCap, MapPin, Search, Sparkles, Star, TrendingUp } 
 import { cn } from "@/lib/utils";
 import { BackButton } from "@/components/shared/BackButton";
 import { useAuthStore } from "@/stores/authStore";
-import { getMyEmployerProfile, listPublishedJobs, type JobRow } from "@/lib/jobs";
+import { listPublishedJobs, type JobRow } from "@/lib/jobs";
 import { EmployerSetupModal } from "@/pages/jobs/EmployerSetupModal";
 
 const JOBS = [
@@ -165,23 +165,21 @@ export function JobPortalPage({ initialRole = "seeker" }: { initialRole?: "seeke
   const featured = allJobs.filter((j) => j.featured).slice(0, 6);
   const featuredForDisplay = featured.length > 0 ? featured : allJobs.slice(0, 6);
 
-  async function handlePostJob() {
-    if (!isInitialized) return;
-    if (!user) {
+  function handlePostJob() {
+    // If auth hasn't hydrated yet, still route to the post-job page.
+    // That page runs its own auth + employer-profile checks and will
+    // redirect to /login (with a redirect back) if the user is signed out,
+    // or open the employer setup modal if the profile is missing.
+    if (!user && isInitialized) {
       try {
         sessionStorage.setItem("nexora:postLoginRedirect", "/hire/post-job");
       } catch {
-        // ignore
+        // ignore storage failures (private mode, etc.)
       }
       navigate({ to: "/login", search: { redirect: "/hire/post-job" } as never });
       return;
     }
-    const profile = await getMyEmployerProfile(user.id).catch(() => null);
-    if (profile) {
-      navigate({ to: "/hire/post-job" });
-    } else {
-      setShowEmployerModal(true);
-    }
+    navigate({ to: "/hire/post-job" });
   }
 
   return (
@@ -261,10 +259,12 @@ export function JobPortalPage({ initialRole = "seeker" }: { initialRole?: "seeke
           ) : (
             <div className="mt-8 text-center">
               <button
+                type="button"
                 onClick={handlePostJob}
-                className="bg-gradient-cta text-primary-foreground rounded-[var(--radius-button)] px-6 py-3 text-sm font-bold shadow-[var(--shadow-glow)]"
+                disabled={!isInitialized}
+                className="bg-gradient-cta text-primary-foreground rounded-[var(--radius-button)] px-6 py-3 text-sm font-bold shadow-[var(--shadow-glow)] disabled:cursor-not-allowed disabled:opacity-70"
               >
-                Post a job free
+                {isInitialized ? "Post a job free" : "Loading…"}
               </button>
               {!user && isInitialized && (
                 <p className="text-muted-foreground mt-3 text-xs">
