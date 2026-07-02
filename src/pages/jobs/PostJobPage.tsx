@@ -502,6 +502,9 @@ type UiOnlyFields = {
   start_time?: string;
   end_time?: string;
   flexible_schedule?: boolean;
+  joining_availability?: string;
+  salary_type?: string;
+  salary_range_preset?: string;
 };
 
 type Form = Required<
