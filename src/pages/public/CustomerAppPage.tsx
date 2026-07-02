@@ -246,7 +246,65 @@ export default function CustomerAppPage() {
               Nearby verified salons, transparent prices, 60-second booking and QR rewards.
             </p>
 
+            {embedded && !installed && (
+              <Alert className="mt-5 border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100">
+                <Info className="h-4 w-4" />
+                <AlertTitle>Install prompt blocked in this preview</AlertTitle>
+                <AlertDescription>
+                  <p className="mt-1 text-sm">
+                    Browsers only fire the PWA <code className="rounded bg-black/5 px-1 py-0.5 text-[11px] dark:bg-white/10">beforeinstallprompt</code> event in a <b>top-level tab</b>. This page is inside the Lovable editor iframe, so the native "Install" button can't appear here. Open the live site in a new tab and install from there:
+                  </p>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <Button
+                      size="sm"
+                      asChild
+                      className="bg-amber-600 hover:bg-amber-700 text-white"
+                    >
+                      <a href={LIVE_APP_URL} target="_blank" rel="noopener noreferrer">
+                        Open live site in new tab
+                        <ExternalLink className="ml-2 h-3.5 w-3.5" />
+                      </a>
+                    </Button>
+                    <code className="rounded bg-black/5 px-2 py-1 text-[11px] dark:bg-white/10">
+                      {LIVE_APP_URL}
+                    </code>
+                  </div>
+                  <div className="mt-4 text-sm">
+                    <div className="font-semibold">
+                      {platform === "ios" && <>Next: install on iPhone / iPad (Safari)</>}
+                      {platform === "android" && <>Next: install on Android (Chrome)</>}
+                      {platform === "desktop" && <>Next: install on desktop (Chrome / Edge / Brave)</>}
+                    </div>
+                    {platform === "ios" && (
+                      <ol className="mt-2 list-decimal space-y-1 pl-5">
+                        <li>Open the new tab in <b>Safari</b> (Chrome on iOS can't install PWAs).</li>
+                        <li>Tap <Share className="inline h-3.5 w-3.5" /> <b>Share</b> in the bottom bar.</li>
+                        <li>Scroll and tap <Plus className="inline h-3.5 w-3.5" /> <b>Add to Home Screen</b>.</li>
+                        <li>Tap <b>Add</b> — Nexora appears on your home screen.</li>
+                      </ol>
+                    )}
+                    {platform === "android" && (
+                      <ol className="mt-2 list-decimal space-y-1 pl-5">
+                        <li>Open the new tab in <b>Chrome</b>.</li>
+                        <li>Wait 2–3 seconds — an <b>Install app</b> banner may appear at the bottom.</li>
+                        <li>Otherwise tap <MoreVertical className="inline h-3.5 w-3.5" /> menu → <b>Install app</b> / <b>Add to Home screen</b>.</li>
+                        <li>Confirm <b>Install</b> — Nexora is added to your app drawer.</li>
+                      </ol>
+                    )}
+                    {platform === "desktop" && (
+                      <ol className="mt-2 list-decimal space-y-1 pl-5">
+                        <li>Open the new tab in <Chrome className="inline h-3.5 w-3.5" /> <b>Chrome</b>, <b>Edge</b> or <b>Brave</b>.</li>
+                        <li>Look for the <Download className="inline h-3.5 w-3.5" /> install icon at the right end of the address bar.</li>
+                        <li>Click it, then click <b>Install</b> in the popup — Nexora opens in its own window.</li>
+                      </ol>
+                    )}
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
+
             <div className="mt-6 flex flex-wrap gap-3">
+
               {showInstallCTA && (
                 <>
                   <Button size="lg" onClick={handleInstall}>
