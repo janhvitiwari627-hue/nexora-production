@@ -262,7 +262,20 @@ export default function CustomerAppPage() {
                       size="sm"
                       className="bg-emerald-600 text-white hover:bg-emerald-700"
                     >
-                      <Link to="/customer/home">
+                      <Link
+                        to="/customer/home"
+                        replace
+                        preload="intent"
+                        onClick={(e) => {
+                          // Force a synchronous swap to the customer app so
+                          // the marketing shell (this page) never repaints
+                          // during the transition. `replace` also drops
+                          // /customer-app from history — back navigation
+                          // won't briefly re-render the website.
+                          e.preventDefault();
+                          window.location.replace("/customer/home");
+                        }}
+                      >
                         <Smartphone className="mr-2 h-3.5 w-3.5" />
                         Open Nexora App
                       </Link>
