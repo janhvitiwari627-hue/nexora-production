@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Camera, Check, ChevronsUpDown, Loader2, Upload } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { PROFILE } from "./mockSettings";
 import { INDIAN_STATES, getDistricts, getBlocks } from "./indiaGeo";
@@ -8,6 +8,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
+import { ProfileImageUpload } from "@/components/shared/ProfileImageUpload";
 
 function slugifyUsername(name: string) {
   return name
