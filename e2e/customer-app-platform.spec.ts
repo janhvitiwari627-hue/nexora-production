@@ -38,6 +38,7 @@ test.describe("CustomerAppPage platform-aware install fallback", () => {
       ...devices["iPhone 13"],
       userAgent: IOS_UA,
     });
+    await suppressBeforeInstallPrompt(context);
     const page = await context.newPage();
     await page.goto("/customer-app");
 
@@ -66,6 +67,7 @@ test.describe("CustomerAppPage platform-aware install fallback", () => {
       ...devices["Pixel 7"],
       userAgent: ANDROID_UA,
     });
+    await suppressBeforeInstallPrompt(context);
     const page = await context.newPage();
     await page.goto("/customer-app");
 
@@ -87,6 +89,7 @@ test.describe("CustomerAppPage platform-aware install fallback", () => {
 
   test("Desktop: shows address-bar hint and desktop install steps", async ({ browser }) => {
     const context = await browser.newContext({ userAgent: DESKTOP_UA });
+    await suppressBeforeInstallPrompt(context);
     const page = await context.newPage();
     await page.goto("/customer-app");
 
@@ -110,7 +113,8 @@ test.describe("CustomerAppPage platform-aware install fallback", () => {
   test("Coming Soon store buttons stay disabled on every platform", async ({ browser }) => {
     for (const ua of [IOS_UA, ANDROID_UA, DESKTOP_UA]) {
       const context = await browser.newContext({ userAgent: ua });
-      const page = await context.newPage();
+      await suppressBeforeInstallPrompt(context);
+    const page = await context.newPage();
       await page.goto("/customer-app");
       await expect(page.getByRole("button", { name: /Get it on Google Play/i })).toBeDisabled();
       await expect(page.getByRole("button", { name: /Download on the App Store/i })).toBeDisabled();
