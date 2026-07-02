@@ -158,10 +158,19 @@ export function PostJobPage() {
       .then((p) => {
         setProfile(p);
         if (!p) setShowSetup(true);
-        else if (!form.city) setForm((f) => ({ ...f, city: p.city }));
+        else {
+          setForm((f) => ({
+            ...f,
+            city: f.city || p.city,
+            contact_mobile: f.contact_mobile || p.phone || "",
+            contact_person: f.contact_person || p.business_name || "",
+            whatsapp_number: f.whatsapp_number || p.phone || "",
+          }));
+        }
       })
       .catch(() => {})
       .finally(() => setLoadingProfile(false));
+    getMyShopId(user.id).then((sid) => setShopId(sid)).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitialized, user]);
 
