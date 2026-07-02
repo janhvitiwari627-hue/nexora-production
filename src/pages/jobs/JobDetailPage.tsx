@@ -26,6 +26,7 @@ import { Modal } from "@/components/shared/Modal";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/stores/authStore";
 import { applyToJob, isRealJobId, type JobRow } from "@/lib/jobs";
+import { parseRequirementsMeta, stripRequirementsMeta } from "@/pages/jobs/PostJobPage";
 
 type DetailView = {
   id: string;
@@ -43,6 +44,7 @@ type DetailView = {
   responsibilities: string[];
   requirements: string[];
   benefits: string[];
+  rawRequirements: string | null;
   isReal: boolean;
 };
 
@@ -74,8 +76,12 @@ function fromRealJob(j: JobRow & { employer?: { business_name: string } | null }
     category: j.category,
     description: j.description,
     responsibilities: [],
-    requirements: j.requirements ? [j.requirements] : [],
+    requirements: (() => {
+      const cleaned = stripRequirementsMeta(j.requirements);
+      return cleaned ? [cleaned] : [];
+    })(),
     benefits: j.benefits ?? [],
+    rawRequirements: j.requirements ?? null,
     isReal: true,
   };
 }
@@ -103,7 +109,23 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [coverNote, setCoverNote] = useState("");
-  const [errors, setErrors] = useState<{ fullName?: string; email?: string; phone?: string }>({});
+  const [portfolioUrl, setPortfolioUrl] = useState("");
+  const [instagramHandle, setInstagramHandle] = useState("");
+  const [resumeUrl, setResumeUrl] = useState("");
+  const [errors, setErrors] = useState<{
+    fullName?: string;
+    email?: string;
+    phone?: string;
+    portfolioUrl?: string;
+    instagramHandle?: string;
+  }>({});
+
+  const portfolioMeta = job ? parseRequirementsMeta(job.rawRequirements).portfolio : "";
+  const portfolioRequired = portfolioMeta === "Portfolio required";
+  const instagramRequired = portfolioMeta === "Instagram profile required";
+  const resumePreferred = portfolioMeta === "Resume preferred";
+  const noPortfolio = portfolioMeta === "No portfolio needed";
+
 
   useEffect(() => {
     let alive = true;
@@ -123,7 +145,7 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
       }
       const mock = MOCK_JOBS.find((j) => j.id === jobId) ?? MOCK_JOBS[0];
       if (!alive) return;
-      setJob({ ...mock, isReal: false });
+      setJob({ ...mock, rawRequirements: null, isReal: false });
       setLoading(false);
     }
     run();
@@ -173,6 +195,9 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
     setEmail(profile?.email ?? user.email ?? "");
     setPhone(profile?.mobile ?? user.user_metadata?.mobile ?? "");
     setCoverNote("");
+    setPortfolioUrl("");
+    setInstagramHandle("");
+    setResumeUrl("");
     setErrors({});
     setApplyOpen(true);
   }
@@ -182,6 +207,10 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
     if (!fullName.trim()) next.fullName = "Enter your full name";
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) next.email = "Enter a valid email";
     if (!/^[0-9+()\-\s]{7,15}$/.test(phone.trim())) next.phone = "Enter a valid phone number";
+    if (portfolioRequired && !portfolioUrl.trim())
+      next.portfolioUrl = "Portfolio link is required for this job";
+    if (instagramRequired && !instagramHandle.trim())
+      next.instagramHandle = "Instagram profile is required for this job";
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -197,6 +226,9 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
       `Email: ${email.trim()}`,
       `Phone: ${phone.trim()}`,
     ];
+    if (portfolioUrl.trim()) notePieces.push(`Portfolio: ${portfolioUrl.trim()}`);
+    if (instagramHandle.trim()) notePieces.push(`Instagram: ${instagramHandle.trim()}`);
+    if (resumeUrl.trim()) notePieces.push(`Resume: ${resumeUrl.trim()}`);
     if (coverNote.trim()) notePieces.push("", coverNote.trim());
     const note = notePieces.join("\n");
 
@@ -451,6 +483,70 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
             />
             {errors.phone && <p className="text-destructive text-xs">{errors.phone}</p>}
           </div>
+
+          {portfolioRequired && (
+            <div className="space-y-1.5">
+              <Label htmlFor="apply-portfolio">Portfolio link</Label>
+              <Input
+                id="apply-portfolio"
+                type="url"
+                placeholder="https://…"
+                value={portfolioUrl}
+                onChange={(e) => setPortfolioUrl(e.target.value)}
+                disabled={applying}
+                aria-invalid={!!errors.portfolioUrl}
+              />
+              {errors.portfolioUrl && (
+                <p className="text-destructive text-xs">{errors.portfolioUrl}</p>
+              )}
+              <p className="text-muted-foreground text-[11px]">
+                This employer has marked portfolio as required.
+              </p>
+            </div>
+          )}
+
+          {instagramRequired && (
+            <div className="space-y-1.5">
+              <Label htmlFor="apply-instagram">Instagram profile</Label>
+              <Input
+                id="apply-instagram"
+                placeholder="@yourhandle or instagram.com/…"
+                value={instagramHandle}
+                onChange={(e) => setInstagramHandle(e.target.value)}
+                disabled={applying}
+                aria-invalid={!!errors.instagramHandle}
+              />
+              {errors.instagramHandle && (
+                <p className="text-destructive text-xs">{errors.instagramHandle}</p>
+              )}
+              <p className="text-muted-foreground text-[11px]">
+                This employer has marked Instagram profile as required.
+              </p>
+            </div>
+          )}
+
+          {resumePreferred && (
+            <div className="space-y-1.5">
+              <Label htmlFor="apply-resume">Resume link (preferred)</Label>
+              <Input
+                id="apply-resume"
+                type="url"
+                placeholder="Link to your resume (Drive, Dropbox…)"
+                value={resumeUrl}
+                onChange={(e) => setResumeUrl(e.target.value)}
+                disabled={applying}
+              />
+              <p className="text-muted-foreground text-[11px]">
+                Resume is preferred but not required.
+              </p>
+            </div>
+          )}
+
+          {noPortfolio && (
+            <p className="text-muted-foreground rounded-md border border-dashed border-border bg-muted/30 px-3 py-2 text-[11px]">
+              No portfolio is needed for this job — apply with your details and a short note.
+            </p>
+          )}
 
           <div className="space-y-1.5">
             <Label htmlFor="cover-note">Cover letter (optional)</Label>

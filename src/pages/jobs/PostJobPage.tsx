@@ -350,64 +350,65 @@ const ROLE_SUGGESTIONS: Record<string, string[]> = {
 // suggestions — it never removes already-selected skills.
 const SKILL_SUGGESTIONS: Record<string, string[]> = {
   "Hair Stylist": [
-    "Hair cutting",
-    "Blow dry",
-    "Hair colouring",
-    "Highlights",
+    "Haircut",
+    "Hair colour",
     "Balayage",
-    "Keratin treatment",
+    "Highlights",
+    "Keratin",
+    "Smoothening",
     "Hair spa",
-    "Straightening",
-    "Bridal hairstyling",
-    "Extensions",
+    "Blow dry",
+    "Styling",
+    "Bridal hair",
+    "Client consultation",
   ],
   Barber: [
-    "Classic cuts",
-    "Fade cuts",
-    "Beard trim",
-    "Beard shaping",
-    "Hot towel shave",
-    "Head massage",
-    "Beard colouring",
+    "Haircut",
+    "Beard styling",
+    "Fade cut",
+    "Shaving",
+    "Hair styling",
+    "Client consultation",
   ],
   "Makeup Artist": [
-    "HD makeup",
-    "Airbrush makeup",
     "Bridal makeup",
     "Party makeup",
-    "Contouring",
-    "Eye makeup",
-    "Draping",
-    "Hair styling",
+    "HD makeup",
+    "Airbrush makeup",
+    "Saree draping",
+    "Hairstyling",
+    "Client consultation",
+    "Product knowledge",
   ],
   "Nail Artist": [
-    "Manicure",
-    "Pedicure",
-    "Gel nails",
+    "Gel extensions",
     "Acrylic extensions",
     "Nail art",
-    "3D nail art",
+    "Nail shaping",
     "Chrome nails",
-    "Nail repair",
+    "French tips",
+    "Cat eye nails",
+    "Manicure",
+    "Pedicure",
+    "Nail hygiene",
   ],
   "Beauty Therapist": [
-    "Facials",
-    "Clean-up",
+    "Facial",
+    "Cleanup",
     "Waxing",
     "Threading",
-    "Bleach",
-    "Body polishing",
-    "D-Tan",
-    "Skin analysis",
+    "Manicure",
+    "Pedicure",
+    "Skin consultation",
+    "Client handling",
   ],
   "Spa Therapist": [
     "Swedish massage",
-    "Deep tissue",
+    "Deep tissue massage",
+    "Body therapy",
+    "Spa rituals",
     "Aromatherapy",
-    "Body scrub",
-    "Body wrap",
-    "Ayurvedic therapy",
-    "Shirodhara",
+    "Client consultation",
   ],
   "Massage Therapist": [
     "Swedish massage",
@@ -490,6 +491,77 @@ const SKILL_SUGGESTIONS: Record<string, string[]> = {
   ],
   Other: ["Customer service", "Hygiene", "Teamwork", "Punctuality"],
 };
+
+const CERTIFICATIONS = [
+  "No formal qualification required",
+  "Beauty course certificate",
+  "Diploma in cosmetology",
+  "Professional certification",
+  "Experience preferred",
+  "Other",
+];
+
+const LANGUAGES = [
+  "Hindi",
+  "English",
+  "Hinglish",
+  "Marathi",
+  "Gujarati",
+  "Punjabi",
+  "Tamil",
+  "Telugu",
+  "Bengali",
+  "Kannada",
+  "Malayalam",
+  "Other",
+];
+
+const PORTFOLIO_OPTIONS = [
+  "Portfolio required",
+  "Instagram profile required",
+  "Resume preferred",
+  "No portfolio needed",
+] as const;
+type PortfolioOption = (typeof PORTFOLIO_OPTIONS)[number];
+
+// Structured markers appended to the `requirements` text so the job detail
+// page and the candidate application form can parse these UI-only fields
+// without a schema change. Format: "Key: value" on its own line.
+const REQ_META_KEYS = {
+  certification: "Certification",
+  languages: "Languages",
+  portfolio: "Portfolio",
+} as const;
+
+function stripRequirementsMeta(raw: string | null | undefined): string {
+  if (!raw) return "";
+  const keys = Object.values(REQ_META_KEYS).join("|");
+  const re = new RegExp(`^\\s*(?:${keys}):\\s*.+$`, "gmi");
+  return raw.replace(re, "").replace(/\n{3,}/g, "\n\n").trim();
+}
+
+function parseRequirementsMeta(raw: string | null | undefined): {
+  certification: string;
+  languages: string[];
+  portfolio: PortfolioOption | "";
+} {
+  const out = { certification: "", languages: [] as string[], portfolio: "" as PortfolioOption | "" };
+  if (!raw) return out;
+  const certM = raw.match(/^\s*Certification:\s*(.+)$/mi);
+  if (certM) out.certification = certM[1].trim();
+  const langM = raw.match(/^\s*Languages:\s*(.+)$/mi);
+  if (langM) out.languages = langM[1].split(",").map((s) => s.trim()).filter(Boolean);
+  const portM = raw.match(/^\s*Portfolio:\s*(.+)$/mi);
+  if (portM) {
+    const val = portM[1].trim();
+    if ((PORTFOLIO_OPTIONS as readonly string[]).includes(val)) out.portfolio = val as PortfolioOption;
+  }
+  return out;
+}
+
+export { parseRequirementsMeta, stripRequirementsMeta, PORTFOLIO_OPTIONS };
+export type { PortfolioOption };
+
 
 // Ready-made job description starters shown under the Description field.
 // Templates change with Beauty Category; a generic set is used when no
@@ -689,6 +761,9 @@ type UiOnlyFields = {
   joining_availability?: string;
   salary_type?: string;
   salary_range_preset?: string;
+  certification?: string;
+  languages?: string[];
+  portfolio_option?: PortfolioOption | "";
 };
 
 type Form = Required<
@@ -730,6 +805,9 @@ const EMPTY: Form = {
   joining_availability: "",
   salary_type: "",
   salary_range_preset: "",
+  certification: "",
+  languages: [],
+  portfolio_option: "",
 };
 
 const DRAFT_STORAGE_KEY = "nexora:postJobWizard:v1";
@@ -839,7 +917,7 @@ export function PostJobPage() {
           salary_max: job.salary_max,
           salary_period: (job.salary_period as any) ?? "monthly",
           benefits: job.benefits ?? [],
-          requirements: job.requirements ?? "",
+          requirements: stripRequirementsMeta(job.requirements),
           skills: job.skills ?? [],
           openings: job.openings ?? 1,
           job_role: job.job_role ?? "",
@@ -858,6 +936,14 @@ export function PostJobPage() {
           start_time: "",
           end_time: "",
           flexible_schedule: /flexible/i.test(job.schedule ?? ""),
+          ...(() => {
+            const m = parseRequirementsMeta(job.requirements);
+            return {
+              certification: m.certification,
+              languages: m.languages,
+              portfolio_option: m.portfolio,
+            };
+          })(),
         });
         setSkillsInput((job.skills ?? []).join(", "));
       })
@@ -944,17 +1030,31 @@ export function PostJobPage() {
         joining_availability: _ja,
         salary_type: _sty,
         salary_range_preset: _srp,
+        certification: _cert,
+        languages: _lng,
+        portfolio_option: _po,
         ...dbForm
       } = form;
       void _bt; void _dp; void _cd; void _hp; void _st; void _et; void _fs;
-      void _ja; void _sty; void _srp;
+      void _ja; void _sty; void _srp; void _cert; void _lng; void _po;
+
+      // Encode meta into requirements text so job detail + apply form can read
+      // them without a schema change. Human-readable "Key: value" lines.
+      const baseReq = stripRequirementsMeta(dbForm.requirements);
+      const metaLines: string[] = [];
+      if (form.certification) metaLines.push(`Certification: ${form.certification}`);
+      if (form.languages && form.languages.length > 0)
+        metaLines.push(`Languages: ${form.languages.join(", ")}`);
+      if (form.portfolio_option) metaLines.push(`Portfolio: ${form.portfolio_option}`);
+      const composedReq = [baseReq, metaLines.join("\n")].filter(Boolean).join("\n\n").trim();
+
       const cleaned: JobDraftInput = {
         ...dbForm,
         area: dbForm.area || null,
         address: dbForm.address || null,
         schedule: dbForm.schedule || null,
         experience_level: dbForm.experience_level || null,
-        requirements: dbForm.requirements || null,
+        requirements: composedReq || null,
         salary_min: dbForm.salary_min ?? null,
         salary_max: dbForm.salary_max ?? null,
         openings: Math.min(50, Math.max(1, Number(dbForm.openings) || 1)),
@@ -2463,6 +2563,85 @@ function RequirementsStep({
           onChange={(e) => update({ requirements: e.target.value })}
         />
       </Field>
+
+      <Field label="Certification">
+        <div className="flex flex-wrap gap-2">
+          {CERTIFICATIONS.map((c) => {
+            const active = form.certification === c;
+            return (
+              <button
+                key={c}
+                type="button"
+                onClick={() => update({ certification: c })}
+                aria-pressed={active}
+                className={cn(
+                  "rounded-full border px-4 py-1.5 text-xs font-bold transition",
+                  active
+                    ? "border-transparent bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
+                    : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
+                )}
+              >
+                {c}
+              </button>
+            );
+          })}
+        </div>
+      </Field>
+
+      <Field label="Language preferences" hint="Select all that apply.">
+        <div className="flex flex-wrap gap-2">
+          {LANGUAGES.map((l) => {
+            const active = (form.languages ?? []).includes(l);
+            return (
+              <button
+                key={l}
+                type="button"
+                onClick={() =>
+                  update({
+                    languages: active
+                      ? (form.languages ?? []).filter((x) => x !== l)
+                      : [...(form.languages ?? []), l],
+                  })
+                }
+                aria-pressed={active}
+                className={cn(
+                  "rounded-full border px-3 py-1.5 text-xs font-semibold transition",
+                  active
+                    ? "bg-gradient-cta border-transparent text-primary-foreground"
+                    : "border-border bg-card text-heading hover:border-primary/50",
+                )}
+              >
+                {l}
+              </button>
+            );
+          })}
+        </div>
+      </Field>
+
+      <Field label="Portfolio requirement">
+        <div className="flex flex-wrap gap-2">
+          {PORTFOLIO_OPTIONS.map((p) => {
+            const active = form.portfolio_option === p;
+            return (
+              <button
+                key={p}
+                type="button"
+                onClick={() => update({ portfolio_option: p })}
+                aria-pressed={active}
+                className={cn(
+                  "rounded-full border px-4 py-1.5 text-xs font-bold transition",
+                  active
+                    ? "border-transparent bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
+                    : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
+                )}
+              >
+                {p}
+              </button>
+            );
+          })}
+        </div>
+      </Field>
+
       <Field label="Interview mode" hint="How would you like to interview shortlisted candidates?">
         <div className="flex flex-wrap gap-2">
           {INTERVIEW_MODES.map((m) => {
