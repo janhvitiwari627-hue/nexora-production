@@ -126,31 +126,57 @@ export function MyApplicationsPage() {
   const [error, setError] = useState<string | null>(null);
   const [refreshTick, setRefreshTick] = useState(0);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [retryAttempt, setRetryAttempt] = useState(0);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
+  const MAX_RETRIES = 3;
 
   useEffect(() => {
     if (!isInitialized || !user) return;
     const controller = new AbortController();
     let alive = true;
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
     setError(null);
-    listMyApplications(user.id, { signal: controller.signal })
-      .then((rows) => {
-        if (alive) setApps(rows);
-      })
-      .catch((e) => {
-        if (!alive) return;
-        // Suppress any error that stems from an aborted fetch — no error UI.
-        if (controller.signal.aborted) return;
-        const name = (e as { name?: string } | null)?.name;
-        const code = (e as { code?: string } | null)?.code;
-        const msg = e instanceof Error ? e.message : String(e ?? "");
-        if (name === "AbortError" || code === "20" || /abort/i.test(msg)) return;
-        setError(e instanceof Error ? e.message : "Failed to load applications");
-      });
+
+    const isAbort = (e: unknown) => {
+      if (controller.signal.aborted) return true;
+      const name = (e as { name?: string } | null)?.name;
+      const code = (e as { code?: string } | null)?.code;
+      const msg = e instanceof Error ? e.message : String(e ?? "");
+      return name === "AbortError" || code === "20" || /abort/i.test(msg);
+    };
+
+    const attempt = (n: number) => {
+      listMyApplications(user.id, { signal: controller.signal })
+        .then((rows) => {
+          if (alive) setApps(rows);
+        })
+        .catch((e) => {
+          if (!alive) return;
+          // Silently ignore aborts — they are not real failures.
+          if (isAbort(e)) return;
+          if (n < MAX_RETRIES) {
+            // Exponential backoff: 500ms, 1s, 2s. Only real network/server
+            // failures reach here, so retrying is safe.
+            const delay = 500 * 2 ** n;
+            retryTimer = setTimeout(() => {
+              if (!alive) return;
+              setRetryAttempt(n + 1);
+              attempt(n + 1);
+            }, delay);
+            return;
+          }
+          setError(e instanceof Error ? e.message : "Failed to load applications");
+        });
+    };
+
+    setRetryAttempt(0);
+    attempt(0);
+
     return () => {
       alive = false;
       controller.abort();
+      if (retryTimer) clearTimeout(retryTimer);
     };
     // Aborts the in-flight fetch when the user changes filter/query, so a late
     // response can't overwrite freshly filtered state.
@@ -305,7 +331,15 @@ export function MyApplicationsPage() {
 
         {error && (
           <Card>
-            <CardContent className="p-6 text-sm text-rose-600">{error}</CardContent>
+            <CardContent className="flex flex-wrap items-center justify-between gap-3 p-6 text-sm">
+              <span className="text-rose-600">
+                {error}
+                {retryAttempt > 0 && ` (after ${retryAttempt} ${retryAttempt === 1 ? "retry" : "retries"})`}
+              </span>
+              <Button size="sm" variant="outline" onClick={() => setRefreshTick((t) => t + 1)}>
+                <RefreshCw className="mr-2 h-4 w-4" /> Try again
+              </Button>
+            </CardContent>
           </Card>
         )}
 
