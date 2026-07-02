@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 const PAGE_SIZE = 10;
 import { Link, getRouteApi, useNavigate } from "@tanstack/react-router";
+import type { ApplicationsSearch } from "@/routes/jobs.applications";
 
 const applicationsRoute = getRouteApi("/jobs/applications");
 import { Card, CardContent } from "@/components/ui/card";
