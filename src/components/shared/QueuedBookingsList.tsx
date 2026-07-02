@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouter } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, CloudUpload, Loader2, RefreshCw, Save, Trash2, TriangleAlert, X } from "lucide-react";
 import { flush, removeTask, type QueueTask, type QueueTaskStatus } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/lib/offline-queue.hooks";
