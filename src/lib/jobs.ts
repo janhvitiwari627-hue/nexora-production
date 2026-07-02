@@ -34,6 +34,13 @@ export type JobRow = {
   requirements: string | null;
   skills: string[] | null;
   openings: number;
+  job_role: string | null;
+  work_location: string | null;
+  contact_person: string | null;
+  contact_mobile: string | null;
+  whatsapp_number: string | null;
+  interview_mode: string | null;
+  shop_id: string | null;
   status: "draft" | "published" | "closed";
   published_at: string | null;
   applicants_count: number;
