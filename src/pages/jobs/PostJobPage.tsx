@@ -102,6 +102,7 @@ export function PostJobPage() {
   const [skillsInput, setSkillsInput] = useState(initialDraft?.skillsInput ?? "");
   const [draftRestored, setDraftRestored] = useState<boolean>(!!initialDraft && (initialDraft.step > 0 || initialDraft.form.title.length > 0));
   const [publishError, setPublishError] = useState<string | null>(null);
+  const [attempted, setAttempted] = useState<Set<number>>(new Set());
 
   // Persist wizard state to localStorage so it survives session expiry / re-login.
   useEffect(() => {
@@ -135,14 +136,32 @@ export function PostJobPage() {
 
   const update = (patch: Partial<Form>) => setForm((f) => ({ ...f, ...patch }));
 
-  const canContinue = useMemo(() => {
-    if (step === 0)
-      return form.title.trim().length > 2 && form.description.trim().length > 10 && !!form.category && !!form.job_type;
-    if (step === 1) return form.city.trim().length >= 2;
-    if (step === 2) return true;
-    if (step === 3) return true;
-    return true;
-  }, [step, form]);
+  const errors = useMemo(() => validateForm(form), [form]);
+  const markAttempted = (i: number) =>
+    setAttempted((prev) => (prev.has(i) ? prev : new Set(prev).add(i)));
+
+  const stepInvalid = (i: number) => {
+    if (i === 0) return !!(errors.title || errors.description);
+    if (i === 1) return !!errors.city;
+    if (i === 2) return !!(errors.salary_min || errors.salary_max);
+    return false;
+  };
+
+  const canContinue = !stepInvalid(step);
+
+  function tryContinue() {
+    if (stepInvalid(step)) {
+      markAttempted(step);
+      return;
+    }
+    setStep((s) => Math.min(STEPS.length - 1, s + 1));
+  }
+
+  function firstInvalidStep(): number | null {
+    for (let i = 0; i <= 3; i++) if (stepInvalid(i)) return i;
+    return null;
+  }
+
 
   async function persist(publish: boolean) {
     if (!user || !profile) {
