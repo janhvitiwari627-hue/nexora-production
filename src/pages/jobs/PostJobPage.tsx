@@ -512,7 +512,9 @@ export function PostJobPage() {
 
 export type FormErrors = {
   title?: string;
+  category?: string;
   description?: string;
+  openings?: string;
   city?: string;
   salary_min?: string;
   salary_max?: string;
@@ -525,9 +527,19 @@ function validateForm(form: Form): FormErrors {
   else if (title.length < 3) errs.title = "Job title must be at least 3 characters.";
   else if (title.length > 80) errs.title = "Job title must be 80 characters or fewer.";
 
+  if (!form.category || !form.category.trim())
+    errs.category = "Please pick a beauty category.";
+
   const desc = form.description.trim();
   if (desc.length === 0) errs.description = "Description is required.";
   else if (desc.length < 10) errs.description = "Description must be at least 10 characters.";
+
+  const openings = form.openings;
+  if (openings === undefined || openings === null || Number.isNaN(openings))
+    errs.openings = "Number of openings is required.";
+  else if (!Number.isInteger(openings)) errs.openings = "Openings must be a whole number.";
+  else if (openings < 1) errs.openings = "There must be at least 1 opening.";
+  else if (openings > 50) errs.openings = "Openings cannot exceed 50.";
 
   const city = form.city.trim();
   if (city.length === 0) errs.city = "City is required.";
