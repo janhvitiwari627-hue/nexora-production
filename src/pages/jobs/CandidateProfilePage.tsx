@@ -300,7 +300,9 @@ export function CandidateProfilePage() {
         name: payload.full_name || "Candidate",
         completion: computeCompletion(),
       });
-      toast.success("Profile submitted successfully. You can now apply for jobs.");
+      toast.success("Profile submitted successfully.", {
+        description: "You can now apply for jobs.",
+      });
     } catch (err) {
       console.error("[candidate profile submit]", err);
       const msg =
