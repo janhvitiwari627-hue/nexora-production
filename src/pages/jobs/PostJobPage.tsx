@@ -468,10 +468,21 @@ const STEPS = [
   { key: "review", label: "Review & publish" },
 ] as const;
 
+// UI-only fields (persisted to draft, stripped before Supabase save).
+type UiOnlyFields = {
+  business_type?: string;
+  days_preset?: DayPreset | "";
+  custom_days?: string[];
+  hours_preset?: string;
+  start_time?: string;
+  end_time?: string;
+  flexible_schedule?: boolean;
+};
+
 type Form = Required<
   Pick<JobDraftInput, "title" | "category" | "description" | "job_type" | "city">
 > &
-  JobDraftInput & { benefits: string[]; skills: string[] };
+  JobDraftInput & { benefits: string[]; skills: string[] } & UiOnlyFields;
 
 const EMPTY: Form = {
   title: "",
@@ -497,6 +508,13 @@ const EMPTY: Form = {
   whatsapp_number: "",
   interview_mode: INTERVIEW_MODES[0],
   shop_id: null,
+  business_type: "",
+  days_preset: "",
+  custom_days: [],
+  hours_preset: "",
+  start_time: "",
+  end_time: "",
+  flexible_schedule: false,
 };
 
 const DRAFT_STORAGE_KEY = "nexora:postJobWizard:v1";
