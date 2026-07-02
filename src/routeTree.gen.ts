@@ -83,6 +83,7 @@ import { Route as OwnerBookingsRouteImport } from './routes/owner.bookings'
 import { Route as OwnerAnalyticsRouteImport } from './routes/owner.analytics'
 import { Route as JobsSearchRouteImport } from './routes/jobs.search'
 import { Route as JobsProfileRouteImport } from './routes/jobs.profile'
+import { Route as JobsMyPostsRouteImport } from './routes/jobs.my-posts'
 import { Route as JobsMyApplicationsRouteImport } from './routes/jobs.my-applications'
 import { Route as JobsApplicationsRouteImport } from './routes/jobs.applications'
 import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
@@ -506,6 +507,11 @@ const JobsProfileRoute = JobsProfileRouteImport.update({
   path: '/jobs/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const JobsMyPostsRoute = JobsMyPostsRouteImport.update({
+  id: '/jobs/my-posts',
+  path: '/jobs/my-posts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const JobsMyApplicationsRoute = JobsMyApplicationsRouteImport.update({
   id: '/jobs/my-applications',
   path: '/jobs/my-applications',
@@ -842,6 +848,7 @@ export interface FileRoutesByFullPath {
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs/applications': typeof JobsApplicationsRoute
   '/jobs/my-applications': typeof JobsMyApplicationsRoute
+  '/jobs/my-posts': typeof JobsMyPostsRoute
   '/jobs/profile': typeof JobsProfileRoute
   '/jobs/search': typeof JobsSearchRoute
   '/owner/analytics': typeof OwnerAnalyticsRoute
@@ -967,6 +974,7 @@ export interface FileRoutesByTo {
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs/applications': typeof JobsApplicationsRoute
   '/jobs/my-applications': typeof JobsMyApplicationsRoute
+  '/jobs/my-posts': typeof JobsMyPostsRoute
   '/jobs/profile': typeof JobsProfileRoute
   '/jobs/search': typeof JobsSearchRoute
   '/owner/analytics': typeof OwnerAnalyticsRoute
@@ -1096,6 +1104,7 @@ export interface FileRoutesById {
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs/applications': typeof JobsApplicationsRoute
   '/jobs/my-applications': typeof JobsMyApplicationsRoute
+  '/jobs/my-posts': typeof JobsMyPostsRoute
   '/jobs/profile': typeof JobsProfileRoute
   '/jobs/search': typeof JobsSearchRoute
   '/owner/analytics': typeof OwnerAnalyticsRoute
@@ -1226,6 +1235,7 @@ export interface FileRouteTypes {
     | '/jobs/$jobId'
     | '/jobs/applications'
     | '/jobs/my-applications'
+    | '/jobs/my-posts'
     | '/jobs/profile'
     | '/jobs/search'
     | '/owner/analytics'
@@ -1351,6 +1361,7 @@ export interface FileRouteTypes {
     | '/jobs/$jobId'
     | '/jobs/applications'
     | '/jobs/my-applications'
+    | '/jobs/my-posts'
     | '/jobs/profile'
     | '/jobs/search'
     | '/owner/analytics'
@@ -1479,6 +1490,7 @@ export interface FileRouteTypes {
     | '/jobs/$jobId'
     | '/jobs/applications'
     | '/jobs/my-applications'
+    | '/jobs/my-posts'
     | '/jobs/profile'
     | '/jobs/search'
     | '/owner/analytics'
@@ -1582,6 +1594,7 @@ export interface RootRouteChildren {
   JobsJobIdRoute: typeof JobsJobIdRoute
   JobsApplicationsRoute: typeof JobsApplicationsRoute
   JobsMyApplicationsRoute: typeof JobsMyApplicationsRoute
+  JobsMyPostsRoute: typeof JobsMyPostsRoute
   JobsProfileRoute: typeof JobsProfileRoute
   JobsSearchRoute: typeof JobsSearchRoute
   PortalBusinessPagesRoute: typeof PortalBusinessPagesRoute
@@ -2136,6 +2149,13 @@ declare module '@tanstack/react-router' {
       path: '/jobs/profile'
       fullPath: '/jobs/profile'
       preLoaderRoute: typeof JobsProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jobs/my-posts': {
+      id: '/jobs/my-posts'
+      path: '/jobs/my-posts'
+      fullPath: '/jobs/my-posts'
+      preLoaderRoute: typeof JobsMyPostsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/jobs/my-applications': {
@@ -2716,6 +2736,7 @@ const rootRouteChildren: RootRouteChildren = {
   JobsJobIdRoute: JobsJobIdRoute,
   JobsApplicationsRoute: JobsApplicationsRoute,
   JobsMyApplicationsRoute: JobsMyApplicationsRoute,
+  JobsMyPostsRoute: JobsMyPostsRoute,
   JobsProfileRoute: JobsProfileRoute,
   JobsSearchRoute: JobsSearchRoute,
   PortalBusinessPagesRoute: PortalBusinessPagesRoute,

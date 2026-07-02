@@ -205,3 +205,42 @@ export async function withdrawApplication(applicationId: string, applicantId: st
     .eq("applicant_id", applicantId);
   if (error) throw error;
 }
+
+export type MyJobPost = JobRow & {
+  total_applications: number;
+  new_applications: number;
+};
+
+export async function listMyJobPosts(userId: string): Promise<MyJobPost[]> {
+  const { data: jobs, error } = await table("jobs")
+    .select("*")
+    .eq("posted_by", userId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  const rows = (jobs ?? []) as JobRow[];
+  if (rows.length === 0) return [];
+  const ids = rows.map((j) => j.id);
+  const { data: apps } = await table("job_applications")
+    .select("job_id,status")
+    .in("job_id", ids);
+  const counts = new Map<string, { total: number; fresh: number }>();
+  for (const a of (apps ?? []) as { job_id: string; status: string }[]) {
+    const c = counts.get(a.job_id) ?? { total: 0, fresh: 0 };
+    c.total += 1;
+    if (a.status === "submitted") c.fresh += 1;
+    counts.set(a.job_id, c);
+  }
+  return rows.map((j) => ({
+    ...j,
+    total_applications: counts.get(j.id)?.total ?? 0,
+    new_applications: counts.get(j.id)?.fresh ?? 0,
+  }));
+}
+
+export async function closeJobPost(jobId: string, userId: string): Promise<void> {
+  const { error } = await table("jobs")
+    .update({ status: "closed" })
+    .eq("id", jobId)
+    .eq("posted_by", userId);
+  if (error) throw error;
+}
