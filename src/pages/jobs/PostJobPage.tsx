@@ -16,8 +16,71 @@ import { EmployerSetupModal } from "@/pages/jobs/EmployerSetupModal";
 import { BackButton } from "@/components/shared/BackButton";
 import { cn } from "@/lib/utils";
 
-const WORK_LOCATIONS = ["Onsite", "Remote", "Hybrid"];
+const WORK_LOCATIONS = [
+  "At salon / studio",
+  "At client location",
+  "Hybrid",
+  "Remote consultation",
+];
+const LEGACY_WORK_LOCATION_MAP: Record<string, string> = {
+  Onsite: "At salon / studio",
+  Remote: "Remote consultation",
+  Hybrid: "Hybrid",
+};
 const INTERVIEW_MODES = ["In-person", "Phone call", "Video call", "WhatsApp"];
+
+const BUSINESS_TYPES = [
+  "Salon",
+  "Beauty Parlour",
+  "Barber Shop",
+  "Spa",
+  "Nail Studio",
+  "Makeup Studio",
+  "Tattoo Studio",
+  "Wellness Center",
+  "Home Service Business",
+  "Other",
+];
+
+const CITY_QUICK_OPTIONS = [
+  "Jaipur",
+  "Delhi",
+  "Mumbai",
+  "Bengaluru",
+  "Pune",
+  "Hyderabad",
+  "Ahmedabad",
+  "Kolkata",
+  "Chennai",
+  "Other city",
+];
+
+const DAY_PRESETS = ["Mon–Sat", "Tue–Sun", "All days", "Weekends only", "Custom days"] as const;
+type DayPreset = (typeof DAY_PRESETS)[number];
+const WEEK_DAYS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+] as const;
+const DAYS_FOR_PRESET: Record<Exclude<DayPreset, "Custom days">, string[]> = {
+  "Mon–Sat": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+  "Tue–Sun": ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+  "All days": [...WEEK_DAYS],
+  "Weekends only": ["Saturday", "Sunday"],
+};
+
+const HOUR_PRESETS: { label: string; start?: string; end?: string; flexible?: boolean }[] = [
+  { label: "9 AM – 6 PM", start: "9 AM", end: "6 PM" },
+  { label: "10 AM – 7 PM", start: "10 AM", end: "7 PM" },
+  { label: "11 AM – 8 PM", start: "11 AM", end: "8 PM" },
+  { label: "12 PM – 9 PM", start: "12 PM", end: "9 PM" },
+  { label: "Flexible hours", flexible: true },
+  { label: "Custom time" },
+];
 
 const CATEGORIES = [
   "Hair Stylist",
@@ -405,10 +468,21 @@ const STEPS = [
   { key: "review", label: "Review & publish" },
 ] as const;
 
+// UI-only fields (persisted to draft, stripped before Supabase save).
+type UiOnlyFields = {
+  business_type?: string;
+  days_preset?: DayPreset | "";
+  custom_days?: string[];
+  hours_preset?: string;
+  start_time?: string;
+  end_time?: string;
+  flexible_schedule?: boolean;
+};
+
 type Form = Required<
   Pick<JobDraftInput, "title" | "category" | "description" | "job_type" | "city">
 > &
-  JobDraftInput & { benefits: string[]; skills: string[] };
+  JobDraftInput & { benefits: string[]; skills: string[] } & UiOnlyFields;
 
 const EMPTY: Form = {
   title: "",
@@ -434,6 +508,13 @@ const EMPTY: Form = {
   whatsapp_number: "",
   interview_mode: INTERVIEW_MODES[0],
   shop_id: null,
+  business_type: "",
+  days_preset: "",
+  custom_days: [],
+  hours_preset: "",
+  start_time: "",
+  end_time: "",
+  flexible_schedule: false,
 };
 
 const DRAFT_STORAGE_KEY = "nexora:postJobWizard:v1";
@@ -547,12 +628,21 @@ export function PostJobPage() {
           skills: job.skills ?? [],
           openings: job.openings ?? 1,
           job_role: job.job_role ?? "",
-          work_location: job.work_location ?? WORK_LOCATIONS[0],
+          work_location:
+            (job.work_location && (LEGACY_WORK_LOCATION_MAP[job.work_location] ?? job.work_location)) ||
+            WORK_LOCATIONS[0],
           contact_person: job.contact_person ?? "",
           contact_mobile: job.contact_mobile ?? "",
           whatsapp_number: job.whatsapp_number ?? "",
           interview_mode: job.interview_mode ?? INTERVIEW_MODES[0],
           shop_id: job.shop_id ?? null,
+          business_type: "",
+          days_preset: "",
+          custom_days: [],
+          hours_preset: "",
+          start_time: "",
+          end_time: "",
+          flexible_schedule: /flexible/i.test(job.schedule ?? ""),
         });
         setSkillsInput((job.skills ?? []).join(", "));
       })
@@ -627,23 +717,35 @@ export function PostJobPage() {
 
     let createdJobId: string | undefined;
     try {
+      // Strip UI-only fields — they belong to the draft, not the DB.
+      const {
+        business_type: _bt,
+        days_preset: _dp,
+        custom_days: _cd,
+        hours_preset: _hp,
+        start_time: _st,
+        end_time: _et,
+        flexible_schedule: _fs,
+        ...dbForm
+      } = form;
+      void _bt; void _dp; void _cd; void _hp; void _st; void _et; void _fs;
       const cleaned: JobDraftInput = {
-        ...form,
-        area: form.area || null,
-        address: form.address || null,
-        schedule: form.schedule || null,
-        experience_level: form.experience_level || null,
-        requirements: form.requirements || null,
-        salary_min: form.salary_min ?? null,
-        salary_max: form.salary_max ?? null,
-        openings: Math.min(50, Math.max(1, Number(form.openings) || 1)),
-        job_role: form.job_role?.trim() || null,
-        specific_role: form.job_role?.trim() || null,
-        work_location: form.work_location || null,
-        contact_person: form.contact_person?.trim() || null,
-        contact_mobile: form.contact_mobile?.trim() || null,
-        whatsapp_number: form.whatsapp_number?.trim() || null,
-        interview_mode: form.interview_mode || null,
+        ...dbForm,
+        area: dbForm.area || null,
+        address: dbForm.address || null,
+        schedule: dbForm.schedule || null,
+        experience_level: dbForm.experience_level || null,
+        requirements: dbForm.requirements || null,
+        salary_min: dbForm.salary_min ?? null,
+        salary_max: dbForm.salary_max ?? null,
+        openings: Math.min(50, Math.max(1, Number(dbForm.openings) || 1)),
+        job_role: dbForm.job_role?.trim() || null,
+        specific_role: dbForm.job_role?.trim() || null,
+        work_location: dbForm.work_location || null,
+        contact_person: dbForm.contact_person?.trim() || null,
+        contact_mobile: dbForm.contact_mobile?.trim() || null,
+        whatsapp_number: dbForm.whatsapp_number?.trim() || null,
+        interview_mode: dbForm.interview_mode || null,
         shop_id: shopId,
       };
       const row = await saveJob({
@@ -1542,9 +1644,98 @@ function LocationStep({
   update: (p: Partial<Form>) => void;
   errors: FormErrors;
 }) {
+  const chipCls = (active: boolean) =>
+    cn(
+      "rounded-full border px-4 py-1.5 text-xs font-bold transition",
+      active
+        ? "border-transparent bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
+        : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
+    );
+
+  // Compose schedule text from days + hours whenever they change.
+  const composeSchedule = (patch: Partial<Form>) => {
+    const next = { ...form, ...patch };
+    const preset = next.days_preset ?? "";
+    let daysText = "";
+    if (preset === "Custom days") {
+      daysText = (next.custom_days ?? []).join(", ");
+    } else if (preset) {
+      daysText = preset;
+    }
+    let hoursText = "";
+    if (next.flexible_schedule) hoursText = "Flexible hours";
+    else if (next.start_time && next.end_time) hoursText = `${next.start_time} – ${next.end_time}`;
+    const schedule = [daysText, hoursText].filter(Boolean).join(" • ");
+    update({ ...patch, schedule });
+  };
+
+  const selectDaysPreset = (preset: DayPreset) => {
+    if (preset === "Custom days") {
+      composeSchedule({ days_preset: preset });
+      return;
+    }
+    composeSchedule({ days_preset: preset, custom_days: DAYS_FOR_PRESET[preset] });
+  };
+
+  const toggleCustomDay = (day: string) => {
+    const current = new Set(form.custom_days ?? []);
+    if (current.has(day)) current.delete(day);
+    else current.add(day);
+    // Preserve week order.
+    const ordered = WEEK_DAYS.filter((d) => current.has(d));
+    composeSchedule({ days_preset: "Custom days", custom_days: ordered });
+  };
+
+  const selectHoursPreset = (label: string) => {
+    const preset = HOUR_PRESETS.find((h) => h.label === label);
+    if (!preset) return;
+    if (preset.flexible) {
+      composeSchedule({
+        hours_preset: label,
+        flexible_schedule: true,
+        start_time: "",
+        end_time: "",
+      });
+      return;
+    }
+    if (preset.start && preset.end) {
+      composeSchedule({
+        hours_preset: label,
+        flexible_schedule: false,
+        start_time: preset.start,
+        end_time: preset.end,
+      });
+      return;
+    }
+    // Custom time — keep manual inputs, clear flexible.
+    composeSchedule({ hours_preset: label, flexible_schedule: false });
+  };
+
+  const [cityFocused, setCityFocused] = useState(false);
+
   return (
     <div className="space-y-4">
       <h2 className="text-heading text-xl font-bold">Location & schedule</h2>
+
+      <Field label="Business type">
+        <div className="flex flex-wrap gap-2">
+          {BUSINESS_TYPES.map((b) => {
+            const active = form.business_type === b;
+            return (
+              <button
+                key={b}
+                type="button"
+                onClick={() => update({ business_type: b })}
+                aria-pressed={active}
+                className={chipCls(active)}
+              >
+                {b}
+              </button>
+            );
+          })}
+        </div>
+      </Field>
+
       <div className="grid gap-4 md:grid-cols-2">
         <Field label="City" error={errors.city}>
           <input
@@ -1552,7 +1743,29 @@ function LocationStep({
             aria-invalid={!!errors.city}
             value={form.city}
             onChange={(e) => update({ city: e.target.value })}
+            onFocus={() => setCityFocused(true)}
+            onBlur={() => window.setTimeout(() => setCityFocused(false), 150)}
           />
+          {cityFocused && (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {CITY_QUICK_OPTIONS.map((c) => {
+                const active = form.city === c;
+                return (
+                  <button
+                    key={c}
+                    type="button"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      update({ city: c === "Other city" ? "" : c });
+                    }}
+                    className={chipCls(active)}
+                  >
+                    {c}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </Field>
         <Field label="Area / locality">
           <input
@@ -1562,6 +1775,7 @@ function LocationStep({
           />
         </Field>
       </div>
+
       <Field label="Address (optional)">
         <input
           className={inputCls}
@@ -1569,13 +1783,7 @@ function LocationStep({
           onChange={(e) => update({ address: e.target.value })}
         />
       </Field>
-      <Field label="Schedule" hint="e.g. Mon–Sat, 10 AM – 8 PM">
-        <input
-          className={inputCls}
-          value={form.schedule ?? ""}
-          onChange={(e) => update({ schedule: e.target.value })}
-        />
-      </Field>
+
       <Field label="Work location">
         <div className="flex flex-wrap gap-2">
           {WORK_LOCATIONS.map((w) => {
@@ -1586,12 +1794,7 @@ function LocationStep({
                 type="button"
                 onClick={() => update({ work_location: w })}
                 aria-pressed={active}
-                className={cn(
-                  "rounded-full border px-4 py-1.5 text-xs font-bold transition",
-                  active
-                    ? "border-transparent bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
-                    : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
-                )}
+                className={chipCls(active)}
               >
                 {w}
               </button>
@@ -1599,6 +1802,84 @@ function LocationStep({
           })}
         </div>
       </Field>
+
+      <Field label="Working days">
+        <div className="flex flex-wrap gap-2">
+          {DAY_PRESETS.map((p) => {
+            const active = form.days_preset === p;
+            return (
+              <button
+                key={p}
+                type="button"
+                onClick={() => selectDaysPreset(p)}
+                aria-pressed={active}
+                className={chipCls(active)}
+              >
+                {p}
+              </button>
+            );
+          })}
+        </div>
+        {form.days_preset === "Custom days" && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {WEEK_DAYS.map((d) => {
+              const active = (form.custom_days ?? []).includes(d);
+              return (
+                <button
+                  key={d}
+                  type="button"
+                  onClick={() => toggleCustomDay(d)}
+                  aria-pressed={active}
+                  className={chipCls(active)}
+                >
+                  {d}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </Field>
+
+      <Field label="Working hours">
+        <div className="flex flex-wrap gap-2">
+          {HOUR_PRESETS.map((h) => {
+            const active = form.hours_preset === h.label;
+            return (
+              <button
+                key={h.label}
+                type="button"
+                onClick={() => selectHoursPreset(h.label)}
+                aria-pressed={active}
+                className={chipCls(active)}
+              >
+                {h.label}
+              </button>
+            );
+          })}
+        </div>
+        {form.hours_preset === "Custom time" && (
+          <div className="mt-3 grid gap-3 md:grid-cols-2">
+            <input
+              className={inputCls}
+              placeholder="Start time (e.g. 10 AM)"
+              value={form.start_time ?? ""}
+              onChange={(e) => composeSchedule({ start_time: e.target.value })}
+            />
+            <input
+              className={inputCls}
+              placeholder="End time (e.g. 8 PM)"
+              value={form.end_time ?? ""}
+              onChange={(e) => composeSchedule({ end_time: e.target.value })}
+            />
+          </div>
+        )}
+        {form.schedule && (
+          <p className="text-muted-foreground mt-2 text-xs">
+            Preview: <span className="text-heading font-semibold">{form.schedule}</span>
+          </p>
+        )}
+      </Field>
+
       <div className="mt-2 border-t border-border pt-4">
         <h3 className="text-heading mb-3 text-sm font-bold uppercase tracking-wide text-muted-foreground">
           Contact details
