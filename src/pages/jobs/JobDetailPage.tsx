@@ -78,6 +78,7 @@ function fromRealJob(j: JobRow & { employer?: { business_name: string } | null }
     responsibilities: [],
     requirements: j.requirements ? [j.requirements] : [],
     benefits: j.benefits ?? [],
+    rawRequirements: j.requirements ?? null,
     isReal: true,
   };
 }
