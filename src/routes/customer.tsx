@@ -85,6 +85,7 @@ export const Route = createFileRoute("/customer")({
 });
 
 function CustomerLayout() {
+  useOpenExternalInStandalone();
   const navigate = useNavigate();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const isBrowsingAsCustomer =
