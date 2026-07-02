@@ -476,35 +476,91 @@ export function PostJobPage() {
 
 // ---------- Steps ----------
 
+export type FormErrors = {
+  title?: string;
+  description?: string;
+  city?: string;
+  salary_min?: string;
+  salary_max?: string;
+};
+
+function validateForm(form: Form): FormErrors {
+  const errs: FormErrors = {};
+  const title = form.title.trim();
+  if (title.length === 0) errs.title = "Job title is required.";
+  else if (title.length < 3) errs.title = "Job title must be at least 3 characters.";
+  else if (title.length > 100) errs.title = "Job title must be 100 characters or fewer.";
+
+  const desc = form.description.trim();
+  if (desc.length === 0) errs.description = "Description is required.";
+  else if (desc.length < 10) errs.description = "Description must be at least 10 characters.";
+
+  const city = form.city.trim();
+  if (city.length === 0) errs.city = "City is required.";
+  else if (city.length < 2) errs.city = "Enter a valid city.";
+
+  const min = form.salary_min;
+  const max = form.salary_max;
+  const hasMin = typeof min === "number" && !Number.isNaN(min);
+  const hasMax = typeof max === "number" && !Number.isNaN(max);
+  if (hasMin && (min as number) < 0) errs.salary_min = "Salary can't be negative.";
+  if (hasMax && (max as number) < 0) errs.salary_max = "Salary can't be negative.";
+  if (hasMin && !hasMax) errs.salary_max = "Enter a maximum, or clear the minimum.";
+  if (!hasMin && hasMax) errs.salary_min = "Enter a minimum, or clear the maximum.";
+  if (hasMin && hasMax && (max as number) < (min as number))
+    errs.salary_max = "Maximum must be greater than or equal to minimum.";
+
+  return errs;
+}
+
 function Field({
   label,
   hint,
+  error,
   children,
 }: {
   label: string;
   hint?: string;
+  error?: string;
   children: React.ReactNode;
 }) {
   return (
     <label className="block">
       <span className="text-heading mb-1 block text-sm font-semibold">{label}</span>
       {children}
-      {hint && <span className="mt-1 block text-xs text-muted-foreground">{hint}</span>}
+      {error ? (
+        <span role="alert" className="mt-1 block text-xs font-semibold text-destructive">
+          {error}
+        </span>
+      ) : (
+        hint && <span className="mt-1 block text-xs text-muted-foreground">{hint}</span>
+      )}
     </label>
   );
 }
 
 const inputCls =
   "w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary";
+const inputErrCls =
+  "w-full rounded-lg border border-destructive bg-background px-3 py-2.5 text-sm outline-none focus:border-destructive";
 
-function DetailsStep({ form, update }: { form: Form; update: (p: Partial<Form>) => void }) {
+function DetailsStep({
+  form,
+  update,
+  errors,
+}: {
+  form: Form;
+  update: (p: Partial<Form>) => void;
+  errors: FormErrors;
+}) {
   return (
     <div className="space-y-4">
       <h2 className="text-heading text-xl font-bold">Job details</h2>
-      <Field label="Job title">
+      <Field label="Job title" error={errors.title}>
         <input
-          className={inputCls}
+          className={errors.title ? inputErrCls : inputCls}
           placeholder="e.g. Senior Hair Stylist"
+          aria-invalid={!!errors.title}
           value={form.title}
           onChange={(e) => update({ title: e.target.value })}
         />
@@ -533,9 +589,14 @@ function DetailsStep({ form, update }: { form: Form; update: (p: Partial<Form>) 
           </select>
         </Field>
       </div>
-      <Field label="Description" hint="Describe the role, day-to-day work, and your salon culture.">
+      <Field
+        label="Description"
+        hint="Describe the role, day-to-day work, and your salon culture."
+        error={errors.description}
+      >
         <textarea
-          className={cn(inputCls, "min-h-[140px] resize-y")}
+          className={cn(errors.description ? inputErrCls : inputCls, "min-h-[140px] resize-y")}
+          aria-invalid={!!errors.description}
           value={form.description}
           onChange={(e) => update({ description: e.target.value })}
         />
@@ -544,14 +605,23 @@ function DetailsStep({ form, update }: { form: Form; update: (p: Partial<Form>) 
   );
 }
 
-function LocationStep({ form, update }: { form: Form; update: (p: Partial<Form>) => void }) {
+function LocationStep({
+  form,
+  update,
+  errors,
+}: {
+  form: Form;
+  update: (p: Partial<Form>) => void;
+  errors: FormErrors;
+}) {
   return (
     <div className="space-y-4">
       <h2 className="text-heading text-xl font-bold">Location & schedule</h2>
       <div className="grid gap-4 md:grid-cols-2">
-        <Field label="City">
+        <Field label="City" error={errors.city}>
           <input
-            className={inputCls}
+            className={errors.city ? inputErrCls : inputCls}
+            aria-invalid={!!errors.city}
             value={form.city}
             onChange={(e) => update({ city: e.target.value })}
           />
@@ -582,27 +652,37 @@ function LocationStep({ form, update }: { form: Form; update: (p: Partial<Form>)
   );
 }
 
-function SalaryStep({ form, update }: { form: Form; update: (p: Partial<Form>) => void }) {
+function SalaryStep({
+  form,
+  update,
+  errors,
+}: {
+  form: Form;
+  update: (p: Partial<Form>) => void;
+  errors: FormErrors;
+}) {
   return (
     <div className="space-y-4">
       <h2 className="text-heading text-xl font-bold">Salary & benefits</h2>
       <div className="grid gap-4 md:grid-cols-3">
-        <Field label="Min">
+        <Field label="Min" error={errors.salary_min}>
           <input
             type="number"
             min={0}
-            className={inputCls}
+            className={errors.salary_min ? inputErrCls : inputCls}
+            aria-invalid={!!errors.salary_min}
             value={form.salary_min ?? ""}
             onChange={(e) =>
               update({ salary_min: e.target.value === "" ? null : Number(e.target.value) })
             }
           />
         </Field>
-        <Field label="Max">
+        <Field label="Max" error={errors.salary_max}>
           <input
             type="number"
             min={0}
-            className={inputCls}
+            className={errors.salary_max ? inputErrCls : inputCls}
+            aria-invalid={!!errors.salary_max}
             value={form.salary_max ?? ""}
             onChange={(e) =>
               update({ salary_max: e.target.value === "" ? null : Number(e.target.value) })
@@ -628,6 +708,7 @@ function SalaryStep({ form, update }: { form: Form; update: (p: Partial<Form>) =
         <div className="flex flex-wrap gap-2">
           {BENEFITS.map((b) => {
             const on = form.benefits.includes(b);
+
             return (
               <button
                 type="button"
