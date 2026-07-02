@@ -316,7 +316,17 @@ export function PostJobPage() {
                   setSkillsInput={setSkillsInput}
                 />
               )}
-              {step === 4 && <ReviewStep form={form} profile={profile} />}
+              {step === 4 && (
+                <ReviewStep
+                  form={form}
+                  profile={profile}
+                  publishError={publishError}
+                  onRetry={retryPublish}
+                  onDismissError={() => setPublishError(null)}
+                  retrying={saving === "publish"}
+                  hasSavedJob={!!jobId}
+                />
+              )}
             </div>
 
             {/* Desktop action row */}
