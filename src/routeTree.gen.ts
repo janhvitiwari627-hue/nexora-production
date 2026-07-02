@@ -77,6 +77,7 @@ import { Route as OwnerAnalyticsRouteImport } from './routes/owner.analytics'
 import { Route as JobsSearchRouteImport } from './routes/jobs.search'
 import { Route as JobsProfileRouteImport } from './routes/jobs.profile'
 import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
+import { Route as HirePostJobRouteImport } from './routes/hire.post-job'
 import { Route as DistrictBusinessPartnerSlugRouteImport } from './routes/district-business-partner.$slug'
 import { Route as DistributorSlugRouteImport } from './routes/distributor.$slug'
 import { Route as DashboardWalletRouteImport } from './routes/dashboard.wallet'
@@ -465,6 +466,11 @@ const JobsJobIdRoute = JobsJobIdRouteImport.update({
   path: '/$jobId',
   getParentRoute: () => JobsRoute,
 } as any)
+const HirePostJobRoute = HirePostJobRouteImport.update({
+  id: '/post-job',
+  path: '/post-job',
+  getParentRoute: () => HireRoute,
+} as any)
 const DistrictBusinessPartnerSlugRoute =
   DistrictBusinessPartnerSlugRouteImport.update({
     id: '/$slug',
@@ -720,7 +726,7 @@ export interface FileRoutesByFullPath {
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/help': typeof HelpRoute
-  '/hire': typeof HireRoute
+  '/hire': typeof HireRouteWithChildren
   '/jobs': typeof JobsRouteWithChildren
   '/login': typeof LoginRoute
   '/membership': typeof MembershipRoute
@@ -769,6 +775,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/distributor/$slug': typeof DistributorSlugRoute
   '/district-business-partner/$slug': typeof DistrictBusinessPartnerSlugRoute
+  '/hire/post-job': typeof HirePostJobRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs/profile': typeof JobsProfileRoute
   '/jobs/search': typeof JobsSearchRoute
@@ -836,7 +843,7 @@ export interface FileRoutesByTo {
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/help': typeof HelpRoute
-  '/hire': typeof HireRoute
+  '/hire': typeof HireRouteWithChildren
   '/jobs': typeof JobsRouteWithChildren
   '/login': typeof LoginRoute
   '/membership': typeof MembershipRoute
@@ -883,6 +890,7 @@ export interface FileRoutesByTo {
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/distributor/$slug': typeof DistributorSlugRoute
   '/district-business-partner/$slug': typeof DistrictBusinessPartnerSlugRoute
+  '/hire/post-job': typeof HirePostJobRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs/profile': typeof JobsProfileRoute
   '/jobs/search': typeof JobsSearchRoute
@@ -952,7 +960,7 @@ export interface FileRoutesById {
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/help': typeof HelpRoute
-  '/hire': typeof HireRoute
+  '/hire': typeof HireRouteWithChildren
   '/jobs': typeof JobsRouteWithChildren
   '/login': typeof LoginRoute
   '/membership': typeof MembershipRoute
@@ -1001,6 +1009,7 @@ export interface FileRoutesById {
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/distributor/$slug': typeof DistributorSlugRoute
   '/district-business-partner/$slug': typeof DistrictBusinessPartnerSlugRoute
+  '/hire/post-job': typeof HirePostJobRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs/profile': typeof JobsProfileRoute
   '/jobs/search': typeof JobsSearchRoute
@@ -1120,6 +1129,7 @@ export interface FileRouteTypes {
     | '/dashboard/wallet'
     | '/distributor/$slug'
     | '/district-business-partner/$slug'
+    | '/hire/post-job'
     | '/jobs/$jobId'
     | '/jobs/profile'
     | '/jobs/search'
@@ -1234,6 +1244,7 @@ export interface FileRouteTypes {
     | '/dashboard/wallet'
     | '/distributor/$slug'
     | '/district-business-partner/$slug'
+    | '/hire/post-job'
     | '/jobs/$jobId'
     | '/jobs/profile'
     | '/jobs/search'
@@ -1351,6 +1362,7 @@ export interface FileRouteTypes {
     | '/dashboard/wallet'
     | '/distributor/$slug'
     | '/district-business-partner/$slug'
+    | '/hire/post-job'
     | '/jobs/$jobId'
     | '/jobs/profile'
     | '/jobs/search'
@@ -1420,7 +1432,7 @@ export interface RootRouteChildren {
   ForOwnersRoute: typeof ForOwnersRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   HelpRoute: typeof HelpRoute
-  HireRoute: typeof HireRoute
+  HireRoute: typeof HireRouteWithChildren
   JobsRoute: typeof JobsRouteWithChildren
   LoginRoute: typeof LoginRoute
   MembershipRoute: typeof MembershipRoute
@@ -1951,6 +1963,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JobsJobIdRouteImport
       parentRoute: typeof JobsRoute
     }
+    '/hire/post-job': {
+      id: '/hire/post-job'
+      path: '/post-job'
+      fullPath: '/hire/post-job'
+      preLoaderRoute: typeof HirePostJobRouteImport
+      parentRoute: typeof HireRoute
+    }
     '/district-business-partner/$slug': {
       id: '/district-business-partner/$slug'
       path: '/$slug'
@@ -2378,6 +2397,16 @@ const DistrictBusinessPartnerRouteWithChildren =
     DistrictBusinessPartnerRouteChildren,
   )
 
+interface HireRouteChildren {
+  HirePostJobRoute: typeof HirePostJobRoute
+}
+
+const HireRouteChildren: HireRouteChildren = {
+  HirePostJobRoute: HirePostJobRoute,
+}
+
+const HireRouteWithChildren = HireRoute._addFileChildren(HireRouteChildren)
+
 interface JobsRouteChildren {
   JobsJobIdRoute: typeof JobsJobIdRoute
   JobsProfileRoute: typeof JobsProfileRoute
@@ -2476,7 +2505,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForOwnersRoute: ForOwnersRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   HelpRoute: HelpRoute,
-  HireRoute: HireRoute,
+  HireRoute: HireRouteWithChildren,
   JobsRoute: JobsRouteWithChildren,
   LoginRoute: LoginRoute,
   MembershipRoute: MembershipRoute,
