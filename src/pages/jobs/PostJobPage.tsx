@@ -1049,6 +1049,40 @@ const inputCls =
 const inputErrCls =
   "w-full rounded-lg border border-destructive bg-background px-3 py-2.5 text-sm outline-none focus:border-destructive";
 
+const QUICK_START_TEMPLATES: { label: string; body: string }[] = [
+  {
+    label: "Hair salon role",
+    body:
+      "We are looking for a skilled [Specific Job Role] to join our salon team. The candidate should be confident in haircutting, styling, client consultation and maintaining a professional salon experience.",
+  },
+  {
+    label: "Beauty parlour role",
+    body:
+      "We are looking for a professional [Specific Job Role] who is experienced in beauty services, client consultation, hygiene and customer satisfaction.",
+  },
+  {
+    label: "Spa role",
+    body:
+      "We are looking for a skilled [Specific Job Role] who can deliver quality spa and wellness services while maintaining a premium client experience.",
+  },
+  {
+    label: "Nail studio role",
+    body:
+      "We are looking for a creative [Specific Job Role] who is skilled in nail extensions, nail art, hygiene and client consultation.",
+  },
+  {
+    label: "Bridal service role",
+    body:
+      "We are looking for a talented [Specific Job Role] with strong knowledge of bridal, party or professional makeup services and client handling.",
+  },
+  {
+    label: "Freelancer role",
+    body:
+      "We are looking for a passionate freelance [Specific Job Role] who can deliver quality services on-demand while managing bookings, hygiene and client satisfaction.",
+  },
+  { label: "Write my own", body: "" },
+];
+
 function DetailsStep({
   form,
   update,
@@ -1058,6 +1092,7 @@ function DetailsStep({
   update: (p: Partial<Form>) => void;
   errors: FormErrors;
 }) {
+
   const GENERAL_ROLES = [
     "Senior Beauty Professional",
     "Junior Beauty Professional",
@@ -1073,6 +1108,33 @@ function DetailsStep({
   const selectedRole = (form.job_role ?? "").trim();
   const titleValue = form.title.trim();
   const titleMatchesRole = selectedRole.length > 0 && titleValue === selectedRole;
+  const [pendingTemplate, setPendingTemplate] = useState<{ label: string; body: string } | null>(null);
+  const [activeQuickTemplate, setActiveQuickTemplate] = useState<string | null>(null);
+
+  function fillQuickTemplate(t: { label: string; body: string }) {
+    const roleForTemplate =
+      (form.specific_role ?? "").trim() ||
+      selectedRole ||
+      form.category ||
+      "beauty professional";
+    const filled = t.body.replace(/\[Specific Job Role\]/g, roleForTemplate);
+    update({ description: filled });
+    setActiveQuickTemplate(t.label);
+  }
+
+  function onQuickTemplateClick(t: { label: string; body: string }) {
+    if (t.body === "") {
+      // "Write my own" — clear selection, do not touch description.
+      setActiveQuickTemplate(t.label);
+      return;
+    }
+    if (form.description.trim().length === 0) {
+      fillQuickTemplate(t);
+    } else {
+      setPendingTemplate(t);
+    }
+  }
+
 
   function pickRole(role: string) {
     const next = selectedRole === role ? "" : role;
@@ -1308,6 +1370,68 @@ function DetailsStep({
           value={form.description}
           onChange={(e) => update({ description: e.target.value })}
         />
+        <div className="mt-3">
+          <p className="text-heading mb-2 text-xs font-semibold">Start with a template</p>
+          <div className="flex flex-wrap gap-2">
+            {QUICK_START_TEMPLATES.map((t) => {
+              const active = activeQuickTemplate === t.label;
+              return (
+                <button
+                  key={t.label}
+                  type="button"
+                  onClick={() => onQuickTemplateClick(t)}
+                  className={cn(
+                    "rounded-full border px-3 py-1.5 text-xs font-semibold transition",
+                    active
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
+                  )}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        {pendingTemplate && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ backgroundColor: "rgba(10,37,64,0.5)" }}
+            onClick={() => setPendingTemplate(null)}
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              onClick={(e) => e.stopPropagation()}
+              className="bg-card w-full max-w-md rounded-2xl p-6 shadow-[var(--shadow-float)]"
+            >
+              <h3 className="text-heading text-lg font-bold">Replace current description?</h3>
+              <p className="text-muted-foreground mt-2 text-sm">
+                You already have a job description. Do you want to replace it with this template?
+              </p>
+              <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={() => setPendingTemplate(null)}
+                  className="border-border text-heading hover:bg-muted rounded-lg border px-4 py-2 text-sm font-semibold"
+                >
+                  Keep my description
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    fillQuickTemplate(pendingTemplate);
+                    setPendingTemplate(null);
+                  }}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 text-sm font-semibold"
+                >
+                  Replace description
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {(() => {
           const rawTemplates =
             (form.category && DESCRIPTION_TEMPLATES[form.category]) ||
