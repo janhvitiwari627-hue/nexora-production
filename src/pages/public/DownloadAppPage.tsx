@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Smartphone, Sparkles, Calendar, QrCode, Wallet, Gift, Bell, Star, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { PublicHeader } from "@/components/layout/PublicHeader";
+import { CustomerAppHeader } from "@/components/pwa/CustomerAppHeader";
 import { InstallBanner } from "@/components/pwa/InstallBanner";
 
 const FEATURES = [
