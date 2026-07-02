@@ -179,6 +179,7 @@ export function BookingFlowPage({ salon }: { salon?: RealSalonRef } = {}) {
         booking_date: booking.date,
         booking_time: booking.time,
         advance_amount: Math.round(totalPrice * 0.25 * 100) / 100,
+        shop_name: booking.shopName,
       });
       toast.success("Saved offline — we'll confirm your booking automatically once you're back online.");
       return;
