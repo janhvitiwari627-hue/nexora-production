@@ -71,9 +71,19 @@ export const Route = createFileRoute("/customer")({
 });
 
 function CustomerLayout() {
+  const navigate = useNavigate();
   const isBrowsingAsCustomer =
     typeof window !== "undefined" &&
     sessionStorage.getItem(BROWSE_AS_CUSTOMER_KEY) === "1";
+
+  const exitCustomerMode = () => {
+    try {
+      sessionStorage.removeItem(BROWSE_AS_CUSTOMER_KEY);
+    } catch {
+      /* ignore */
+    }
+    navigate({ to: "/owner/dashboard" });
+  };
 
   return (
     <>
@@ -105,7 +115,20 @@ function CustomerLayout() {
           <div className="mx-auto flex max-w-7xl items-center gap-2 px-4 py-3">
             <BackButton size="icon" className="shrink-0" />
             <span className="text-sm font-semibold text-heading">Nexora</span>
-            <div className="ml-auto">
+            <div className="ml-auto flex items-center gap-2">
+              {isBrowsingAsCustomer && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-1.5"
+                  onClick={exitCustomerMode}
+                  aria-label="Exit customer mode and return to owner dashboard"
+                >
+                  <LogOut className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Exit customer mode</span>
+                  <span className="sm:hidden">Exit</span>
+                </Button>
+              )}
               <ViewSwitcher mode="customer" />
             </div>
           </div>
@@ -117,3 +140,4 @@ function CustomerLayout() {
     </>
   );
 }
+
