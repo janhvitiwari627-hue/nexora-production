@@ -310,8 +310,73 @@ test.describe("/hire/post-job", () => {
     await expect(
       page.getByRole("heading", { name: jobTitle }),
     ).toBeVisible({ timeout: 15_000 });
+
+  test("Publishing the job shows title, location, and price range on the detail page", async ({ page }) => {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await page.evaluate(() => {
+      window.localStorage.removeItem("nexora:postJobWizard:v1");
+    });
+
+    await seedSession(page);
+    await page.goto("/hire/post-job", { waitUntil: "networkidle" });
+
+    const jobTitle = `Senior Hair Stylist ${Date.now()}`;
+    const city = "Mumbai";
+    const area = "Bandra West";
+
+    // Step 1: Job details
+    await page.getByRole("textbox", { name: "Job title" }).fill(jobTitle);
+    await page
+      .getByRole("textbox", { name: "Description" })
+      .fill("Own the chair, deliver amazing cuts, and mentor junior stylists.");
+    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+
+    // Step 2: Location & schedule
+    await expect(
+      page.getByRole("heading", { name: "Location & schedule" }),
+    ).toBeVisible({ timeout: 10_000 });
+    await page.getByRole("textbox", { name: "City" }).fill(city);
+    await page.getByRole("textbox", { name: "Area / locality" }).fill(area);
+    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+
+    // Step 3: Salary & benefits — fill min/max so the detail page renders a range.
+    await expect(
+      page.getByRole("heading", { name: "Salary & benefits" }),
+    ).toBeVisible({ timeout: 10_000 });
+    await page.getByRole("spinbutton", { name: "Min" }).fill("30000");
+    await page.getByRole("spinbutton", { name: "Max" }).fill("50000");
+    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+
+    // Step 4: Requirements
+    await expect(
+      page.getByRole("heading", { name: "Requirements" }),
+    ).toBeVisible({ timeout: 10_000 });
+    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+
+    // Step 5: Publish
+    await expect(
+      page.getByRole("heading", { name: "Review & publish" }),
+    ).toBeVisible({ timeout: 10_000 });
+    await page.getByRole("button", { name: /^Publish job$/ }).first().click();
+
+    await page.waitForURL(
+      /\/jobs\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+      { timeout: 15_000 },
+    );
+
+    // Title renders on the detail page.
+    await expect(
+      page.getByRole("heading", { name: jobTitle }),
+    ).toBeVisible({ timeout: 15_000 });
+
+    // Location badge renders "{area}, {city}".
+    await expect(page.getByText(`${area}, ${city}`)).toBeVisible();
+
+    // Price range — fmtSalary renders "₹30k–50k/mo" (en dash separator).
+    await expect(page.getByText("₹30k–50k/mo")).toBeVisible();
   });
 });
+
 
 
 
