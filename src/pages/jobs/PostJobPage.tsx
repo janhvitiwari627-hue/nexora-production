@@ -1659,7 +1659,7 @@ function LocationStep({
     let daysText = "";
     if (preset === "Custom days") {
       daysText = (next.custom_days ?? []).join(", ");
-    } else if (preset && preset !== "") {
+    } else if (preset) {
       daysText = preset;
     }
     let hoursText = "";
