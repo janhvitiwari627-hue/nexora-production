@@ -2232,16 +2232,16 @@ function SalaryStep({
         </div>
       </Field>
 
-      {form.salary_type === "Monthly salary" && (
-        <Field label="Monthly salary range">
+      {activeRanges && (
+        <Field label={rangeLabelFor(form.salary_type)}>
           <div className="flex flex-wrap gap-2">
-            {MONTHLY_SALARY_RANGES.map((r) => {
+            {activeRanges.map((r) => {
               const active = form.salary_range_preset === r.label;
               return (
                 <button
                   key={r.label}
                   type="button"
-                  onClick={() => selectRange(r)}
+                  onClick={() => selectRange(r, periodFor(form.salary_type))}
                   aria-pressed={active}
                   className={chipCls(active)}
                 >
@@ -2251,11 +2251,11 @@ function SalaryStep({
             })}
             <button
               type="button"
-              onClick={() => update({ salary_range_preset: "Custom amount" })}
-              aria-pressed={form.salary_range_preset === "Custom amount"}
-              className={chipCls(form.salary_range_preset === "Custom amount")}
+              onClick={() => update({ salary_range_preset: customLabelFor(form.salary_type) })}
+              aria-pressed={form.salary_range_preset === customLabelFor(form.salary_type)}
+              className={chipCls(form.salary_range_preset === customLabelFor(form.salary_type))}
             >
-              Custom amount
+              {customLabelFor(form.salary_type)}
             </button>
           </div>
         </Field>
