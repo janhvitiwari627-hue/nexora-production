@@ -128,10 +128,20 @@ function VerifyOtpPage() {
         setSmsConfigError(sendError.message);
         return;
       }
+      const retryAfter = parseRetryAfter(sendError.message);
+      if (retryAfter) {
+        setResendIn(retryAfter);
+        setRateLimitedUntil(Date.now() + retryAfter * 1000);
+        toast.error("Too many requests", {
+          description: `Try again in ${retryAfter}s. ${RATE_LIMIT_COPY[channel]}`,
+        });
+        return;
+      }
       toast.error("Couldn't resend OTP", { description: sendError.message });
       return;
     }
-    setResendIn(RESEND_SECONDS);
+    setResendIn(cooldown);
+    setRateLimitedUntil(null);
     toast("New code sent", { description: `Sent to ${destination}` });
   };
 
