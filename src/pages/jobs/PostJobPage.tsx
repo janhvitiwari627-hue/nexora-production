@@ -63,6 +63,29 @@ const BENEFITS = [
   "Travel allowance",
 ];
 
+// Quick-select role suggestions grouped by beauty category.
+// Selecting a chip fills the "Specific job role" field (single-choice) and, if
+// Job Title is empty, mirrors into Job Title. Manual typing stays available.
+const ROLE_SUGGESTIONS: Record<string, string[]> = {
+  "Hair Stylist": ["Senior Hair Stylist", "Junior Hair Stylist", "Hair Stylist Trainee", "Bridal Hair Specialist", "Hair Extensions Specialist"],
+  Barber: ["Senior Barber", "Junior Barber", "Master Barber", "Beard Grooming Specialist"],
+  "Makeup Artist": ["Senior Makeup Artist", "Junior Makeup Artist", "Party Makeup Artist", "HD Makeup Artist", "Airbrush Makeup Artist"],
+  "Bridal Makeup Artist": ["Senior Bridal Makeup Artist", "Bridal Hair & Makeup Artist", "South Indian Bridal Specialist", "Muslim Bridal Specialist"],
+  "Nail Artist": ["Senior Nail Technician", "Junior Nail Technician", "Nail Art Specialist", "Gel & Acrylic Specialist"],
+  "Beauty Therapist": ["Senior Beauty Therapist", "Junior Beauty Therapist", "Facial Specialist", "Waxing Specialist"],
+  "Spa Therapist": ["Senior Spa Therapist", "Junior Spa Therapist", "Ayurvedic Therapist", "Aromatherapy Specialist"],
+  "Massage Therapist": ["Senior Massage Therapist", "Deep Tissue Specialist", "Thai Massage Therapist", "Swedish Massage Therapist"],
+  "Skin Therapist": ["Senior Skin Therapist", "Advanced Facial Specialist", "Acne & Pigmentation Specialist", "Laser Skin Therapist"],
+  "Eyelash / Brow Artist": ["Lash Extension Specialist", "Brow Lamination Specialist", "Microblading Artist", "Lash Lift Specialist"],
+  "Tattoo Artist": ["Senior Tattoo Artist", "Junior Tattoo Artist", "Permanent Makeup Artist"],
+  "Hair Colourist": ["Senior Hair Colourist", "Balayage Specialist", "Global Colour Specialist", "Highlights Specialist"],
+  "Salon Manager": ["Salon Manager", "Assistant Salon Manager", "Operations Manager", "Branch Manager"],
+  Receptionist: ["Salon Receptionist", "Front Desk Executive", "Guest Relations Executive"],
+  "Salon Assistant": ["Salon Assistant", "Shampoo Assistant", "Beauty Assistant", "Trainee Assistant"],
+  Freelancer: ["Freelance Hair Stylist", "Freelance Makeup Artist", "Freelance Bridal Artist", "Freelance Nail Artist"],
+  Other: ["Trainer / Educator", "Photographer", "Content Creator"],
+};
+
 const STEPS = [
   { key: "details", label: "Job details" },
   { key: "location", label: "Location & schedule" },
@@ -723,6 +746,24 @@ function DetailsStep({
   update: (p: Partial<Form>) => void;
   errors: FormErrors;
 }) {
+  const roleOptions = ROLE_SUGGESTIONS[form.category ?? ""] ?? [];
+  const selectedRole = (form.job_role ?? "").trim();
+  const titleValue = form.title.trim();
+  const titleMatchesRole = selectedRole.length > 0 && titleValue === selectedRole;
+
+  function pickRole(role: string) {
+    const next = selectedRole === role ? "" : role;
+    const patch: Partial<Form> = { job_role: next };
+    // Auto-fill title only when empty, so we never overwrite manual input.
+    if (next && titleValue.length === 0) patch.title = next;
+    update(patch);
+  }
+
+  function applyRoleAsTitle() {
+    if (!selectedRole) return;
+    update({ title: selectedRole });
+  }
+
   return (
     <div className="space-y-4">
       <h2 className="text-heading text-xl font-bold">Job details</h2>
@@ -735,15 +776,20 @@ function DetailsStep({
           value={form.title}
           onChange={(e) => update({ title: e.target.value })}
         />
-      </Field>
-      <Field label="Specific job role" hint="Optional — e.g. Bridal Hair Specialist, Senior Nail Tech.">
-        <input
-          className={inputCls}
-          placeholder="Example: Bridal Hair Specialist"
-          maxLength={80}
-          value={form.job_role ?? ""}
-          onChange={(e) => update({ job_role: e.target.value })}
-        />
+        <div className="mt-1.5 flex flex-wrap items-center justify-between gap-2">
+          <p className="text-muted-foreground text-xs">
+            Select a beauty category and role below to fill this faster.
+          </p>
+          {selectedRole && !titleMatchesRole && (
+            <button
+              type="button"
+              onClick={applyRoleAsTitle}
+              className="text-primary text-xs font-semibold underline-offset-2 hover:underline"
+            >
+              Use selected role as job title
+            </button>
+          )}
+        </div>
       </Field>
       <Field
         label="Beauty category"
@@ -781,6 +827,45 @@ function DetailsStep({
           })}
         </div>
       </Field>
+      <Field
+        label="Specific job role"
+        hint={
+          form.category
+            ? "Tap a suggestion or type your own."
+            : "Optional — pick a category above to see quick suggestions."
+        }
+      >
+        <input
+          className={inputCls}
+          placeholder="Example: Bridal Hair Specialist"
+          maxLength={80}
+          value={form.job_role ?? ""}
+          onChange={(e) => update({ job_role: e.target.value })}
+        />
+        {roleOptions.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {roleOptions.map((role) => {
+              const active = selectedRole === role;
+              return (
+                <button
+                  key={role}
+                  type="button"
+                  onClick={() => pickRole(role)}
+                  aria-pressed={active}
+                  className={cn(
+                    "rounded-full border px-3 py-1.5 text-xs font-semibold transition",
+                    active
+                      ? "border-transparent bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
+                      : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
+                  )}
+                >
+                  {role}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </Field>
       <Field label="Employment type">
         <div className="flex flex-wrap gap-2">
           {JOB_TYPES.map((t) => {
@@ -799,6 +884,29 @@ function DetailsStep({
                 )}
               >
                 {t}
+              </button>
+            );
+          })}
+        </div>
+      </Field>
+      <Field label="Experience required" hint="Choose the level that best matches this role.">
+        <div className="flex flex-wrap gap-2">
+          {EXPERIENCE.map((e) => {
+            const active = (form.experience_level ?? EXPERIENCE[0]) === e;
+            return (
+              <button
+                key={e}
+                type="button"
+                onClick={() => update({ experience_level: e })}
+                aria-pressed={active}
+                className={cn(
+                  "rounded-full border px-4 py-1.5 text-xs font-bold transition",
+                  active
+                    ? "border-transparent bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
+                    : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
+                )}
+              >
+                {e}
               </button>
             );
           })}
@@ -858,7 +966,7 @@ function DetailsStep({
         </div>
       </Field>
       <Field
-        label="Description"
+        label="Job description"
         hint="Describe the role, day-to-day work, and your salon culture."
         error={errors.description}
       >
@@ -1083,17 +1191,6 @@ function RequirementsStep({
   return (
     <div className="space-y-4">
       <h2 className="text-heading text-xl font-bold">Requirements</h2>
-      <Field label="Experience level">
-        <select
-          className={inputCls}
-          value={form.experience_level ?? EXPERIENCE[0]}
-          onChange={(e) => update({ experience_level: e.target.value })}
-        >
-          {EXPERIENCE.map((e) => (
-            <option key={e}>{e}</option>
-          ))}
-        </select>
-      </Field>
       <Field label="Skills" hint="Press Enter to add.">
         <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-background p-2">
           {form.skills.map((s) => (
