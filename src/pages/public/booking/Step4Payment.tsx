@@ -335,6 +335,7 @@ function QrPaymentModal({
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const online = useOnlineStatus();
 
   const upiId = "nexora@upi";
   const payee = encodeURIComponent(booking.shopName || "Nexora");
