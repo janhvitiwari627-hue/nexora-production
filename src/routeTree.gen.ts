@@ -34,6 +34,7 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ForOwnersRouteImport } from './routes/for-owners'
 import { Route as DownloadAppRouteImport } from './routes/download-app'
 import { Route as DistrictBusinessPartnerRouteImport } from './routes/district-business-partner'
+import { Route as DistributorBrandPortalRouteImport } from './routes/distributor-brand-portal'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CustomerAppRouteImport } from './routes/customer-app'
 import { Route as CustomerRouteImport } from './routes/customer'
@@ -263,6 +264,11 @@ const DownloadAppRoute = DownloadAppRouteImport.update({
 const DistrictBusinessPartnerRoute = DistrictBusinessPartnerRouteImport.update({
   id: '/district-business-partner',
   path: '/district-business-partner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DistributorBrandPortalRoute = DistributorBrandPortalRouteImport.update({
+  id: '/distributor-brand-portal',
+  path: '/distributor-brand-portal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -809,6 +815,7 @@ export interface FileRoutesByFullPath {
   '/customer': typeof CustomerRouteWithChildren
   '/customer-app': typeof CustomerAppRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/distributor-brand-portal': typeof DistributorBrandPortalRoute
   '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
   '/download-app': typeof DownloadAppRoute
   '/for-owners': typeof ForOwnersRoute
@@ -940,6 +947,7 @@ export interface FileRoutesByTo {
   '/create-shop-website': typeof CreateShopWebsiteRoute
   '/customer': typeof CustomerRouteWithChildren
   '/customer-app': typeof CustomerAppRoute
+  '/distributor-brand-portal': typeof DistributorBrandPortalRoute
   '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
   '/download-app': typeof DownloadAppRoute
   '/for-owners': typeof ForOwnersRoute
@@ -1071,6 +1079,7 @@ export interface FileRoutesById {
   '/customer': typeof CustomerRouteWithChildren
   '/customer-app': typeof CustomerAppRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/distributor-brand-portal': typeof DistributorBrandPortalRoute
   '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
   '/download-app': typeof DownloadAppRoute
   '/for-owners': typeof ForOwnersRoute
@@ -1205,6 +1214,7 @@ export interface FileRouteTypes {
     | '/customer'
     | '/customer-app'
     | '/dashboard'
+    | '/distributor-brand-portal'
     | '/district-business-partner'
     | '/download-app'
     | '/for-owners'
@@ -1336,6 +1346,7 @@ export interface FileRouteTypes {
     | '/create-shop-website'
     | '/customer'
     | '/customer-app'
+    | '/distributor-brand-portal'
     | '/district-business-partner'
     | '/download-app'
     | '/for-owners'
@@ -1466,6 +1477,7 @@ export interface FileRouteTypes {
     | '/customer'
     | '/customer-app'
     | '/dashboard'
+    | '/distributor-brand-portal'
     | '/district-business-partner'
     | '/download-app'
     | '/for-owners'
@@ -1599,6 +1611,7 @@ export interface RootRouteChildren {
   CustomerRoute: typeof CustomerRouteWithChildren
   CustomerAppRoute: typeof CustomerAppRoute
   DashboardRoute: typeof DashboardRouteWithChildren
+  DistributorBrandPortalRoute: typeof DistributorBrandPortalRoute
   DistrictBusinessPartnerRoute: typeof DistrictBusinessPartnerRouteWithChildren
   DownloadAppRoute: typeof DownloadAppRoute
   ForOwnersRoute: typeof ForOwnersRoute
@@ -1835,6 +1848,13 @@ declare module '@tanstack/react-router' {
       path: '/district-business-partner'
       fullPath: '/district-business-partner'
       preLoaderRoute: typeof DistrictBusinessPartnerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/distributor-brand-portal': {
+      id: '/distributor-brand-portal'
+      path: '/distributor-brand-portal'
+      fullPath: '/distributor-brand-portal'
+      preLoaderRoute: typeof DistributorBrandPortalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -2801,6 +2821,7 @@ const rootRouteChildren: RootRouteChildren = {
   CustomerRoute: CustomerRouteWithChildren,
   CustomerAppRoute: CustomerAppRoute,
   DashboardRoute: DashboardRouteWithChildren,
+  DistributorBrandPortalRoute: DistributorBrandPortalRoute,
   DistrictBusinessPartnerRoute: DistrictBusinessPartnerRouteWithChildren,
   DownloadAppRoute: DownloadAppRoute,
   ForOwnersRoute: ForOwnersRoute,
