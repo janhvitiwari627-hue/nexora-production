@@ -18,6 +18,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { fetchUserRoles, type UserRole } from "@/lib/auth-redirect";
 import { logAnalyticsEvent } from "@/lib/analytics-events.functions";
+import { useOpenExternalInStandalone } from "@/lib/pwa-open-external";
 import { LayoutDashboard, LogOut } from "lucide-react";
 
 
@@ -84,6 +85,7 @@ export const Route = createFileRoute("/customer")({
 });
 
 function CustomerLayout() {
+  useOpenExternalInStandalone();
   const navigate = useNavigate();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const isBrowsingAsCustomer =
