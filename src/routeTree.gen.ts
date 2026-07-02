@@ -97,6 +97,7 @@ import { Route as DashboardMembershipRouteImport } from './routes/dashboard.memb
 import { Route as DashboardFavoritesRouteImport } from './routes/dashboard.favorites'
 import { Route as DashboardBookingsRouteImport } from './routes/dashboard.bookings'
 import { Route as DashboardActivityRouteImport } from './routes/dashboard.activity'
+import { Route as CustomerRewardsRouteImport } from './routes/customer.rewards'
 import { Route as CustomerHomeRouteImport } from './routes/customer.home'
 import { Route as CustomerBookingsRouteImport } from './routes/customer.bookings'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
@@ -573,6 +574,11 @@ const DashboardActivityRoute = DashboardActivityRouteImport.update({
   path: '/activity',
   getParentRoute: () => DashboardRoute,
 } as any)
+const CustomerRewardsRoute = CustomerRewardsRouteImport.update({
+  id: '/rewards',
+  path: '/rewards',
+  getParentRoute: () => CustomerRoute,
+} as any)
 const CustomerHomeRoute = CustomerHomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -801,6 +807,7 @@ export interface FileRoutesByFullPath {
   '/category/$slug': typeof CategorySlugRoute
   '/customer/bookings': typeof CustomerBookingsRoute
   '/customer/home': typeof CustomerHomeRoute
+  '/customer/rewards': typeof CustomerRewardsRoute
   '/dashboard/activity': typeof DashboardActivityRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
   '/dashboard/favorites': typeof DashboardFavoritesRoute
@@ -922,6 +929,7 @@ export interface FileRoutesByTo {
   '/category/$slug': typeof CategorySlugRoute
   '/customer/bookings': typeof CustomerBookingsRoute
   '/customer/home': typeof CustomerHomeRoute
+  '/customer/rewards': typeof CustomerRewardsRoute
   '/dashboard/activity': typeof DashboardActivityRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
   '/dashboard/favorites': typeof DashboardFavoritesRoute
@@ -1047,6 +1055,7 @@ export interface FileRoutesById {
   '/category/$slug': typeof CategorySlugRoute
   '/customer/bookings': typeof CustomerBookingsRoute
   '/customer/home': typeof CustomerHomeRoute
+  '/customer/rewards': typeof CustomerRewardsRoute
   '/dashboard/activity': typeof DashboardActivityRoute
   '/dashboard/bookings': typeof DashboardBookingsRouteWithChildren
   '/dashboard/favorites': typeof DashboardFavoritesRoute
@@ -1173,6 +1182,7 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/customer/bookings'
     | '/customer/home'
+    | '/customer/rewards'
     | '/dashboard/activity'
     | '/dashboard/bookings'
     | '/dashboard/favorites'
@@ -1294,6 +1304,7 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/customer/bookings'
     | '/customer/home'
+    | '/customer/rewards'
     | '/dashboard/activity'
     | '/dashboard/bookings'
     | '/dashboard/favorites'
@@ -1418,6 +1429,7 @@ export interface FileRouteTypes {
     | '/category/$slug'
     | '/customer/bookings'
     | '/customer/home'
+    | '/customer/rewards'
     | '/dashboard/activity'
     | '/dashboard/bookings'
     | '/dashboard/favorites'
@@ -2178,6 +2190,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardActivityRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/customer/rewards': {
+      id: '/customer/rewards'
+      path: '/rewards'
+      fullPath: '/customer/rewards'
+      preLoaderRoute: typeof CustomerRewardsRouteImport
+      parentRoute: typeof CustomerRoute
+    }
     '/customer/home': {
       id: '/customer/home'
       path: '/home'
@@ -2454,11 +2473,13 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 interface CustomerRouteChildren {
   CustomerBookingsRoute: typeof CustomerBookingsRoute
   CustomerHomeRoute: typeof CustomerHomeRoute
+  CustomerRewardsRoute: typeof CustomerRewardsRoute
 }
 
 const CustomerRouteChildren: CustomerRouteChildren = {
   CustomerBookingsRoute: CustomerBookingsRoute,
   CustomerHomeRoute: CustomerHomeRoute,
+  CustomerRewardsRoute: CustomerRewardsRoute,
 }
 
 const CustomerRouteWithChildren = CustomerRoute._addFileChildren(
