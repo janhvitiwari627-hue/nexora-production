@@ -86,7 +86,14 @@ export default function CustomerAppPage() {
     if (deferred) {
       await deferred.prompt();
       const { outcome } = await deferred.userChoice;
-      if (outcome === "accepted") setInstalled(true);
+      if (outcome === "accepted") {
+        setInstalled(true);
+        try { localStorage.setItem(INSTALLED_KEY, "1"); } catch { /* ignore */ }
+      } else {
+        // User dismissed the native prompt — respect that for the session.
+        setDismissed(true);
+        try { sessionStorage.setItem(SESSION_DISMISS_KEY, "1"); } catch { /* ignore */ }
+      }
       setDeferred(null);
       return;
     }
@@ -103,8 +110,15 @@ export default function CustomerAppPage() {
     }
   };
 
+  const handleDismiss = () => {
+    setDismissed(true);
+    setShowGuide(false);
+    try { sessionStorage.setItem(SESSION_DISMISS_KEY, "1"); } catch { /* ignore */ }
+  };
+
+  const showInstallCTA = !installed && !dismissed;
+
   const installLabel =
-    installed ? "App Installed" :
     deferred ? "Install Nexora App" :
     platform === "ios" ? "Show iOS Install Steps" :
     platform === "android" ? "Show Android Install Steps" :
