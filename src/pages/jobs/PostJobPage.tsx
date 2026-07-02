@@ -543,6 +543,9 @@ const EMPTY: Form = {
   start_time: "",
   end_time: "",
   flexible_schedule: false,
+  joining_availability: "",
+  salary_type: "",
+  salary_range_preset: "",
 };
 
 const DRAFT_STORAGE_KEY = "nexora:postJobWizard:v1";
