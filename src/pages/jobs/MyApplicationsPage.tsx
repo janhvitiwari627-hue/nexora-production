@@ -6,10 +6,33 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Briefcase, MapPin, Clock, Search, RefreshCw } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 import { listMyApplications, type JobApplication } from "@/lib/jobs";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
+
+function ApplicationSkeleton() {
+  return (
+    <Card>
+      <CardContent className="flex flex-wrap items-start justify-between gap-4 p-5">
+        <div className="min-w-0 flex-1 space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Skeleton className="h-5 w-48" />
+            <Skeleton className="h-5 w-20 rounded-full" />
+          </div>
+          <Skeleton className="h-4 w-40" />
+          <div className="flex flex-wrap gap-3">
+            <Skeleton className="h-3 w-20" />
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-3 w-28" />
+          </div>
+        </div>
+        <Skeleton className="h-8 w-24" />
+      </CardContent>
+    </Card>
+  );
+}
 
 const STATUS_TONE: Record<string, string> = {
   submitted: "bg-blue-100 text-blue-800",
