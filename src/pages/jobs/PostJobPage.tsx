@@ -452,6 +452,7 @@ export function PostJobPage() {
         </button>
         {step < STEPS.length - 1 ? (
           <button
+
             type="button"
             onClick={() => canContinue && setStep((s) => s + 1)}
             disabled={!canContinue}
