@@ -1,6 +1,9 @@
 import { useRef, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PaymentCountdown } from "@/components/shared/PaymentCountdown";
+import { OfflineBanner } from "@/components/shared/OfflineBanner";
+import { useOnlineStatus } from "@/hooks/use-online-status";
+import { toast } from "sonner";
 import {
   Check,
   CreditCard,
@@ -48,6 +51,7 @@ export function Step4Payment({
   const [couponError, setCouponError] = useState<string | null>(null);
   const [qrOpen, setQrOpen] = useState(false);
   const items = selectedServices(booking);
+  const online = useOnlineStatus();
 
 
   const handleApply = () => {
@@ -269,13 +273,27 @@ export function Step4Payment({
           muted
         />
 
+        <OfflineBanner
+          className="mt-5"
+          message="You're offline — payment is unavailable"
+          hint="You can still review your booking. Reconnect to complete payment and confirm."
+        />
+
         <motion.button
           type="button"
-          whileTap={{ scale: 0.98 }}
-          onClick={() => setQrOpen(true)}
-          className="bg-gradient-cta text-primary-foreground mt-5 inline-flex w-full items-center justify-center rounded-[var(--radius-button)] px-4 py-3.5 text-sm font-bold shadow-[var(--shadow-glow)] hover:brightness-110"
+          whileTap={{ scale: online ? 0.98 : 1 }}
+          onClick={() => {
+            if (!online) {
+              toast.error("You're offline. Reconnect to complete payment.");
+              return;
+            }
+            setQrOpen(true);
+          }}
+          disabled={!online}
+          aria-disabled={!online}
+          className="bg-gradient-cta text-primary-foreground mt-3 inline-flex w-full items-center justify-center rounded-[var(--radius-button)] px-4 py-3.5 text-sm font-bold shadow-[var(--shadow-glow)] hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
         >
-          Pay {formatINR(advance)} to confirm
+          {online ? `Pay ${formatINR(advance)} to confirm` : "Payment unavailable offline"}
         </motion.button>
         <p className="text-muted-foreground mt-3 inline-flex items-center gap-1.5 text-[11px]">
 
@@ -317,6 +335,7 @@ function QrPaymentModal({
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const online = useOnlineStatus();
 
   const upiId = "nexora@upi";
   const payee = encodeURIComponent(booking.shopName || "Nexora");
@@ -339,6 +358,7 @@ function QrPaymentModal({
   };
 
   const handleSubmit = () => {
+    if (!online) return setError("You're offline. Reconnect to submit payment.");
     if (!screenshot) return setError("Upload payment screenshot");
     if (txnId.trim().length < 6) return setError("Enter a valid transaction ID");
     setSubmitting(true);
@@ -395,6 +415,12 @@ function QrPaymentModal({
           Scan the QR with any UPI app, pay {formatINR(amount)}, then upload screenshot & transaction ID.
         </p>
 
+        <OfflineBanner
+          className="mt-3"
+          message="You're offline"
+          hint="Payment submission needs internet. Reconnect to submit your screenshot & UTR."
+        />
+
         <div className="mt-4 grid place-items-center rounded-[var(--radius-card)] border border-border bg-background p-4">
           <img src={qrSrc} alt="UPI QR code" className="h-56 w-56" />
           <div className="text-heading mt-2 text-sm font-bold">{upiId}</div>
@@ -449,11 +475,16 @@ function QrPaymentModal({
 
           <button
             type="button"
-            disabled={submitting}
+            disabled={submitting || !online}
+            aria-disabled={submitting || !online}
             onClick={handleSubmit}
-            className="bg-gradient-cta text-primary-foreground mt-2 w-full rounded-[var(--radius-button)] px-4 py-3 text-sm font-bold shadow-[var(--shadow-glow)] hover:brightness-110 disabled:opacity-60"
+            className="bg-gradient-cta text-primary-foreground mt-2 w-full rounded-[var(--radius-button)] px-4 py-3 text-sm font-bold shadow-[var(--shadow-glow)] hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
           >
-            {submitting ? "Submitting..." : "Submit for admin approval"}
+            {!online
+              ? "Offline — submit unavailable"
+              : submitting
+                ? "Submitting..."
+                : "Submit for admin approval"}
           </button>
           <p className="text-muted-foreground text-center text-[11px]">
             Your payment will be verified by admin within a few minutes.
