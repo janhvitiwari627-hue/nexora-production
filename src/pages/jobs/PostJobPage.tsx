@@ -102,6 +102,7 @@ export function PostJobPage() {
   const [skillsInput, setSkillsInput] = useState(initialDraft?.skillsInput ?? "");
   const [draftRestored, setDraftRestored] = useState<boolean>(!!initialDraft && (initialDraft.step > 0 || initialDraft.form.title.length > 0));
   const [publishError, setPublishError] = useState<string | null>(null);
+  const [attempted, setAttempted] = useState<Set<number>>(new Set());
 
   // Persist wizard state to localStorage so it survives session expiry / re-login.
   useEffect(() => {
@@ -135,22 +136,51 @@ export function PostJobPage() {
 
   const update = (patch: Partial<Form>) => setForm((f) => ({ ...f, ...patch }));
 
-  const canContinue = useMemo(() => {
-    if (step === 0)
-      return form.title.trim().length > 2 && form.description.trim().length > 10 && !!form.category && !!form.job_type;
-    if (step === 1) return form.city.trim().length >= 2;
-    if (step === 2) return true;
-    if (step === 3) return true;
-    return true;
-  }, [step, form]);
+  const errors = useMemo(() => validateForm(form), [form]);
+  const markAttempted = (i: number) =>
+    setAttempted((prev) => (prev.has(i) ? prev : new Set(prev).add(i)));
+
+  const stepInvalid = (i: number) => {
+    if (i === 0) return !!(errors.title || errors.description);
+    if (i === 1) return !!errors.city;
+    if (i === 2) return !!(errors.salary_min || errors.salary_max);
+    return false;
+  };
+
+  
+
+  function tryContinue() {
+    if (stepInvalid(step)) {
+      markAttempted(step);
+      return;
+    }
+    setStep((s) => Math.min(STEPS.length - 1, s + 1));
+  }
+
+  function firstInvalidStep(): number | null {
+    for (let i = 0; i <= 3; i++) if (stepInvalid(i)) return i;
+    return null;
+  }
+
 
   async function persist(publish: boolean) {
     if (!user || !profile) {
       setShowSetup(true);
       return;
     }
+    if (publish) {
+      const bad = firstInvalidStep();
+      if (bad !== null) {
+        // Reveal errors on every step up through the failing one and jump there.
+        setAttempted(new Set([0, 1, 2, 3]));
+        setStep(bad);
+        toast.error("Please fix the highlighted fields before publishing.");
+        return;
+      }
+    }
     setSaving(publish ? "publish" : "draft");
     if (publish) setPublishError(null);
+
     let createdJobId: string | undefined;
     try {
       const cleaned: JobDraftInput = {
@@ -305,9 +335,28 @@ export function PostJobPage() {
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <div className="rounded-[var(--radius-card)] border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-              {step === 0 && <DetailsStep form={form} update={update} />}
-              {step === 1 && <LocationStep form={form} update={update} />}
-              {step === 2 && <SalaryStep form={form} update={update} />}
+              {step === 0 && (
+                <DetailsStep
+                  form={form}
+                  update={update}
+                  errors={attempted.has(0) ? errors : {}}
+                />
+              )}
+              {step === 1 && (
+                <LocationStep
+                  form={form}
+                  update={update}
+                  errors={attempted.has(1) ? errors : {}}
+                />
+              )}
+              {step === 2 && (
+                <SalaryStep
+                  form={form}
+                  update={update}
+                  errors={attempted.has(2) ? errors : {}}
+                />
+              )}
+
               {step === 3 && (
                 <RequirementsStep
                   form={form}
@@ -351,12 +400,12 @@ export function PostJobPage() {
                 {step < STEPS.length - 1 ? (
                   <button
                     type="button"
-                    onClick={() => canContinue && setStep((s) => Math.min(STEPS.length - 1, s + 1))}
-                    disabled={!canContinue}
-                    className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-1 rounded-[var(--radius-button)] px-5 py-2.5 text-sm font-bold shadow-[var(--shadow-glow)] disabled:opacity-60"
+                    onClick={tryContinue}
+                    className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-1 rounded-[var(--radius-button)] px-5 py-2.5 text-sm font-bold shadow-[var(--shadow-glow)]"
                   >
                     Continue <ArrowRight className="h-4 w-4" />
                   </button>
+
                 ) : (
                   <button
                     type="button"
@@ -404,12 +453,12 @@ export function PostJobPage() {
         {step < STEPS.length - 1 ? (
           <button
             type="button"
-            onClick={() => canContinue && setStep((s) => s + 1)}
-            disabled={!canContinue}
-            className="bg-gradient-cta text-primary-foreground flex-1 rounded-[var(--radius-button)] px-4 py-2.5 text-sm font-bold disabled:opacity-60"
+            onClick={tryContinue}
+            className="bg-gradient-cta text-primary-foreground flex-1 rounded-[var(--radius-button)] px-4 py-2.5 text-sm font-bold"
           >
             Continue
           </button>
+
         ) : (
           <button
             type="button"
@@ -427,35 +476,91 @@ export function PostJobPage() {
 
 // ---------- Steps ----------
 
+export type FormErrors = {
+  title?: string;
+  description?: string;
+  city?: string;
+  salary_min?: string;
+  salary_max?: string;
+};
+
+function validateForm(form: Form): FormErrors {
+  const errs: FormErrors = {};
+  const title = form.title.trim();
+  if (title.length === 0) errs.title = "Job title is required.";
+  else if (title.length < 3) errs.title = "Job title must be at least 3 characters.";
+  else if (title.length > 100) errs.title = "Job title must be 100 characters or fewer.";
+
+  const desc = form.description.trim();
+  if (desc.length === 0) errs.description = "Description is required.";
+  else if (desc.length < 10) errs.description = "Description must be at least 10 characters.";
+
+  const city = form.city.trim();
+  if (city.length === 0) errs.city = "City is required.";
+  else if (city.length < 2) errs.city = "Enter a valid city.";
+
+  const min = form.salary_min;
+  const max = form.salary_max;
+  const hasMin = typeof min === "number" && !Number.isNaN(min);
+  const hasMax = typeof max === "number" && !Number.isNaN(max);
+  if (hasMin && (min as number) < 0) errs.salary_min = "Salary can't be negative.";
+  if (hasMax && (max as number) < 0) errs.salary_max = "Salary can't be negative.";
+  if (hasMin && !hasMax) errs.salary_max = "Enter a maximum, or clear the minimum.";
+  if (!hasMin && hasMax) errs.salary_min = "Enter a minimum, or clear the maximum.";
+  if (hasMin && hasMax && (max as number) < (min as number))
+    errs.salary_max = "Maximum must be greater than or equal to minimum.";
+
+  return errs;
+}
+
 function Field({
   label,
   hint,
+  error,
   children,
 }: {
   label: string;
   hint?: string;
+  error?: string;
   children: React.ReactNode;
 }) {
   return (
     <label className="block">
       <span className="text-heading mb-1 block text-sm font-semibold">{label}</span>
       {children}
-      {hint && <span className="mt-1 block text-xs text-muted-foreground">{hint}</span>}
+      {error ? (
+        <span role="alert" className="mt-1 block text-xs font-semibold text-destructive">
+          {error}
+        </span>
+      ) : (
+        hint && <span className="mt-1 block text-xs text-muted-foreground">{hint}</span>
+      )}
     </label>
   );
 }
 
 const inputCls =
   "w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary";
+const inputErrCls =
+  "w-full rounded-lg border border-destructive bg-background px-3 py-2.5 text-sm outline-none focus:border-destructive";
 
-function DetailsStep({ form, update }: { form: Form; update: (p: Partial<Form>) => void }) {
+function DetailsStep({
+  form,
+  update,
+  errors,
+}: {
+  form: Form;
+  update: (p: Partial<Form>) => void;
+  errors: FormErrors;
+}) {
   return (
     <div className="space-y-4">
       <h2 className="text-heading text-xl font-bold">Job details</h2>
-      <Field label="Job title">
+      <Field label="Job title" error={errors.title}>
         <input
-          className={inputCls}
+          className={errors.title ? inputErrCls : inputCls}
           placeholder="e.g. Senior Hair Stylist"
+          aria-invalid={!!errors.title}
           value={form.title}
           onChange={(e) => update({ title: e.target.value })}
         />
@@ -484,9 +589,14 @@ function DetailsStep({ form, update }: { form: Form; update: (p: Partial<Form>) 
           </select>
         </Field>
       </div>
-      <Field label="Description" hint="Describe the role, day-to-day work, and your salon culture.">
+      <Field
+        label="Description"
+        hint="Describe the role, day-to-day work, and your salon culture."
+        error={errors.description}
+      >
         <textarea
-          className={cn(inputCls, "min-h-[140px] resize-y")}
+          className={cn(errors.description ? inputErrCls : inputCls, "min-h-[140px] resize-y")}
+          aria-invalid={!!errors.description}
           value={form.description}
           onChange={(e) => update({ description: e.target.value })}
         />
@@ -495,14 +605,23 @@ function DetailsStep({ form, update }: { form: Form; update: (p: Partial<Form>) 
   );
 }
 
-function LocationStep({ form, update }: { form: Form; update: (p: Partial<Form>) => void }) {
+function LocationStep({
+  form,
+  update,
+  errors,
+}: {
+  form: Form;
+  update: (p: Partial<Form>) => void;
+  errors: FormErrors;
+}) {
   return (
     <div className="space-y-4">
       <h2 className="text-heading text-xl font-bold">Location & schedule</h2>
       <div className="grid gap-4 md:grid-cols-2">
-        <Field label="City">
+        <Field label="City" error={errors.city}>
           <input
-            className={inputCls}
+            className={errors.city ? inputErrCls : inputCls}
+            aria-invalid={!!errors.city}
             value={form.city}
             onChange={(e) => update({ city: e.target.value })}
           />
@@ -533,27 +652,37 @@ function LocationStep({ form, update }: { form: Form; update: (p: Partial<Form>)
   );
 }
 
-function SalaryStep({ form, update }: { form: Form; update: (p: Partial<Form>) => void }) {
+function SalaryStep({
+  form,
+  update,
+  errors,
+}: {
+  form: Form;
+  update: (p: Partial<Form>) => void;
+  errors: FormErrors;
+}) {
   return (
     <div className="space-y-4">
       <h2 className="text-heading text-xl font-bold">Salary & benefits</h2>
       <div className="grid gap-4 md:grid-cols-3">
-        <Field label="Min">
+        <Field label="Min" error={errors.salary_min}>
           <input
             type="number"
             min={0}
-            className={inputCls}
+            className={errors.salary_min ? inputErrCls : inputCls}
+            aria-invalid={!!errors.salary_min}
             value={form.salary_min ?? ""}
             onChange={(e) =>
               update({ salary_min: e.target.value === "" ? null : Number(e.target.value) })
             }
           />
         </Field>
-        <Field label="Max">
+        <Field label="Max" error={errors.salary_max}>
           <input
             type="number"
             min={0}
-            className={inputCls}
+            className={errors.salary_max ? inputErrCls : inputCls}
+            aria-invalid={!!errors.salary_max}
             value={form.salary_max ?? ""}
             onChange={(e) =>
               update({ salary_max: e.target.value === "" ? null : Number(e.target.value) })
@@ -579,6 +708,7 @@ function SalaryStep({ form, update }: { form: Form; update: (p: Partial<Form>) =
         <div className="flex flex-wrap gap-2">
           {BENEFITS.map((b) => {
             const on = form.benefits.includes(b);
+
             return (
               <button
                 type="button"
