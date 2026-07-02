@@ -104,11 +104,23 @@ export function MyApplicationsPage() {
       }),
       replace: false,
     });
-  const setQ = (value: string) =>
-    navigate({
-      search: (prev: ApplicationsSearch) => ({ ...prev, q: value }),
-      replace: true,
-    });
+  // Local input value; the URL `q` is only updated after the user pauses typing
+  // so we don't spam history entries or trigger a skeleton reload per keystroke.
+  const [qInput, setQInput] = useState<string>(q);
+  useEffect(() => {
+    // Keep the input in sync when q changes from elsewhere (back/forward, reset).
+    setQInput(q);
+  }, [q]);
+  useEffect(() => {
+    if (qInput === q) return;
+    const t = setTimeout(() => {
+      navigate({
+        search: (prev: ApplicationsSearch) => ({ ...prev, q: qInput }),
+        replace: true,
+      });
+    }, 300);
+    return () => clearTimeout(t);
+  }, [qInput, q, navigate]);
 
   const [apps, setApps] = useState<JobApplication[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -272,8 +284,8 @@ export function MyApplicationsPage() {
           <div className="relative ml-auto w-full max-w-xs">
             <Search className="text-muted-foreground pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2" />
             <Input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
+              value={qInput}
+              onChange={(e) => setQInput(e.target.value)}
               placeholder="Search title, employer, city…"
               className="pl-8"
             />
