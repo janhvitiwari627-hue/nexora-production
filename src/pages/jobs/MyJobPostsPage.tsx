@@ -204,10 +204,7 @@ export function MyJobPostsPage() {
                         disabled={!canEdit}
                         aria-disabled={!canEdit}
                       >
-                        <Link
-                          to="/hire/post-job"
-                          search={{ jobId: job.id }}
-                        >
+                        <Link to="/hire/post-job">
                           <Pencil className="mr-1.5 h-4 w-4" /> Edit Job
                         </Link>
                       </Button>
