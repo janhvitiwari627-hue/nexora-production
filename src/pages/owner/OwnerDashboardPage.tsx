@@ -497,6 +497,51 @@ function QuickActionsRow() {
     </Card>
   );
 }
+function ExitCustomerModeCard() {
+  const fetchStats = useServerFn(getMyEventStats);
+  const { data, isLoading } = useQuery({
+    queryKey: ["owner", "analytics", "exit-customer-mode", 7],
+    queryFn: () => fetchStats({ data: { event_name: "owner.exit_customer_mode", days: 7 } }),
+    staleTime: 60_000,
+  });
+  const total = data?.total ?? 0;
+  const daily = data?.daily ?? [];
+  const max = Math.max(1, ...daily.map((d) => d.count));
+  return (
+    <Card className="p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className="text-xs font-medium text-muted-foreground">Exits from customer mode</div>
+          <div className="mt-1 text-2xl font-bold text-heading">
+            {isLoading ? "—" : total}
+          </div>
+          <div className="text-[11px] text-muted-foreground">last 7 days</div>
+        </div>
+        <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
+          <UserCircle2 className="h-5 w-5" />
+        </span>
+      </div>
+      <div className="mt-4 flex h-12 items-end gap-1">
+        {daily.map((d) => (
+          <div key={d.date} className="flex flex-1 flex-col items-center gap-1">
+            <div
+              className="w-full rounded-sm bg-primary/70"
+              style={{ height: `${(d.count / max) * 100}%`, minHeight: d.count > 0 ? 2 : 0 }}
+              title={`${d.date}: ${d.count}`}
+            />
+          </div>
+        ))}
+      </div>
+      <div className="mt-1 flex gap-1 text-[10px] text-muted-foreground">
+        {daily.map((d) => (
+          <div key={d.date} className="flex-1 text-center">
+            {new Date(d.date).toLocaleDateString(undefined, { weekday: "narrow" })}
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
 
 export function OwnerDashboardPage() {
   const navigate = useNavigate();
