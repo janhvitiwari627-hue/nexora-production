@@ -145,6 +145,16 @@ export function CandidateProfilePage() {
           <CardContent className="space-y-4 p-6">
             {step === 0 && (
               <>
+                <Field label="Profile Image">
+                  <ProfileImageDropzone
+                    value={avatar}
+                    onFile={handleAvatarFile}
+                    onRemove={handleAvatarRemove}
+                    uploading={uploading}
+                    progress={uploadProgress}
+                    error={uploadError}
+                  />
+                </Field>
                 <Field label="Full Name">
                   <Input
                     value={personal.name}
