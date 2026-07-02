@@ -2,64 +2,88 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Download, Share, X } from "lucide-react";
 import { isPreviewOrDev } from "@/lib/pwa-guards";
+import { useAuthStore } from "@/stores/authStore";
 
 interface BIPEvent extends Event {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
-const DISMISS_KEY = "nexora_pwa_install_dismissed";
-const VISIT_KEY = "nexora_visit_count";
+// Session-only dismissal — do not annoy the user again this session.
+const SESSION_DISMISS_KEY = "nexora_pwa_install_dismissed_session";
+// Persistent flag set only after a successful install.
+const INSTALLED_KEY = "nexora_pwa_installed";
 
 export function PWAInstallPrompt() {
   const [deferred, setDeferred] = useState<BIPEvent | null>(null);
   const [show, setShow] = useState(false);
   const [iOS, setIOS] = useState(false);
+  const user = useAuthStore((s) => s.user);
+  const role = useAuthStore((s) => s.role);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
 
   useEffect(() => {
     if (typeof window === "undefined" || isPreviewOrDev()) return;
-    if (localStorage.getItem(DISMISS_KEY)) return;
+    if (sessionStorage.getItem(SESSION_DISMISS_KEY)) return;
+    if (localStorage.getItem(INSTALLED_KEY)) return;
 
-    // Detect iOS (no beforeinstallprompt support)
-    const ua = navigator.userAgent;
-    const isIOS = /iPhone|iPad|iPod/.test(ua) && !/CriOS|FxiOS|EdgiOS/.test(ua);
-    const standalone = window.matchMedia("(display-mode: standalone)").matches || (navigator as { standalone?: boolean }).standalone === true;
+    // Already installed / running standalone → skip.
+    const standalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (navigator as { standalone?: boolean }).standalone === true;
     if (standalone) return;
 
-    const visits = Number(localStorage.getItem(VISIT_KEY) ?? "0") + 1;
-    localStorage.setItem(VISIT_KEY, String(visits));
+    // Only show to signed-in customers.
+    if (!isInitialized) return;
+    if (!user) return;
+    if (role && role !== "customer") return;
+
+    // Detect iOS (no beforeinstallprompt support).
+    const ua = navigator.userAgent;
+    const isIOS = /iPhone|iPad|iPod/.test(ua) && !/CriOS|FxiOS|EdgiOS/.test(ua);
+
+    let shown = false;
+    const reveal = () => {
+      if (shown) return;
+      shown = true;
+      setShow(true);
+    };
 
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferred(e as BIPEvent);
-      // Show after 30s or on 2nd+ visit
-      const delay = visits >= 2 ? 1500 : 30_000;
-      setTimeout(() => setShow(true), delay);
+      // Small delay after login so it doesn't jump-scare the user.
+      setTimeout(reveal, 2000);
     };
     window.addEventListener("beforeinstallprompt", handler);
 
+    let iosTimer: ReturnType<typeof setTimeout> | undefined;
     if (isIOS) {
       setIOS(true);
-      const delay = visits >= 2 ? 1500 : 30_000;
-      setTimeout(() => setShow(true), delay);
+      iosTimer = setTimeout(reveal, 2500);
     }
 
-    return () => window.removeEventListener("beforeinstallprompt", handler);
-  }, []);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handler);
+      if (iosTimer) clearTimeout(iosTimer);
+    };
+  }, [user, role, isInitialized]);
 
   const install = async () => {
     if (!deferred) return;
     await deferred.prompt();
     const { outcome } = await deferred.userChoice;
+    setShow(false);
     if (outcome === "accepted") {
-      setShow(false);
-      localStorage.setItem(DISMISS_KEY, "installed");
+      localStorage.setItem(INSTALLED_KEY, "1");
+    } else {
+      sessionStorage.setItem(SESSION_DISMISS_KEY, "1");
     }
   };
 
   const dismiss = () => {
     setShow(false);
-    localStorage.setItem(DISMISS_KEY, "1");
+    sessionStorage.setItem(SESSION_DISMISS_KEY, "1");
   };
 
   if (!show) return null;
