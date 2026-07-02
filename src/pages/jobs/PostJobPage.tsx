@@ -344,7 +344,15 @@ export function PostJobPage() {
 
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <div className="rounded-[var(--radius-card)] border border-border bg-card p-6 shadow-[var(--shadow-card)]">
+            <div
+              ref={stepCardRef}
+              data-testid="wizard-step-card"
+              data-invalid-step={highlightInvalid ? "true" : "false"}
+              className={cn(
+                "rounded-[var(--radius-card)] border border-border bg-card p-6 shadow-[var(--shadow-card)] transition-shadow",
+                highlightInvalid && "ring-2 ring-destructive ring-offset-2 border-destructive",
+              )}
+            >
               {step === 0 && (
                 <DetailsStep
                   form={form}
