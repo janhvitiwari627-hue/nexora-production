@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+
 
 /**
  * /customer/login — pre-auth customer entry screen.
