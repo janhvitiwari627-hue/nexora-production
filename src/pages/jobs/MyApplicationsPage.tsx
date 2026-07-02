@@ -116,6 +116,34 @@ export function MyApplicationsPage() {
     });
   }, [apps, filter, q]);
 
+  // Reset pagination when filter/query/data changes
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [filter, q, refreshTick, apps]);
+
+  const visible = useMemo(
+    () => (filtered ? filtered.slice(0, visibleCount) : null),
+    [filtered, visibleCount],
+  );
+  const hasMore = !!filtered && visibleCount < filtered.length;
+
+  // Infinite scroll via IntersectionObserver
+  useEffect(() => {
+    if (!hasMore) return;
+    const el = sentinelRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setVisibleCount((c) => c + PAGE_SIZE);
+        }
+      },
+      { rootMargin: "300px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [hasMore, visible]);
+
   if (!isInitialized) {
     return (
       <>
