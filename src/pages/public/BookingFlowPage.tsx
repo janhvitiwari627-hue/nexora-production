@@ -215,19 +215,20 @@ export function BookingFlowPage({ salon }: { salon?: RealSalonRef } = {}) {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 pt-4 md:px-6">
+      <div className="mx-auto max-w-7xl space-y-3 px-4 pt-4 md:px-6">
         <OfflineBanner
           message={
             step === 3
-              ? "You're offline — payment is paused"
-              : "You're offline — you can keep picking, but you'll need internet to confirm"
+              ? "You're offline — we'll save your booking and confirm it when you're back"
+              : "You're offline — keep going, we'll finish the booking once you're back online"
           }
           hint={
             step === 3
-              ? "Reconnect to complete payment. Your selections are saved on this device."
-              : "Selections are saved locally. Come back online for staff availability and payment."
+              ? "Tap Pay to queue this booking. It syncs automatically the moment your connection returns."
+              : "Selections are saved on this device. Staff availability updates when you reconnect."
           }
         />
+        <OfflineSyncStatus type={TASK_CREATE_AND_CONFIRM_BOOKING} itemLabel="booking" />
       </div>
 
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 md:px-6 md:py-10 lg:grid-cols-[1fr_320px]">
