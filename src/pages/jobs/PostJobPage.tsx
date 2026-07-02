@@ -120,6 +120,31 @@ const PERIODS: { label: string; value: JobDraftInput["salary_period"] }[] = [
   { label: "per year", value: "yearly" },
   { label: "per hour", value: "hourly" },
 ];
+
+const JOINING_OPTIONS = [
+  "Immediately",
+  "Within 7 days",
+  "Within 15 days",
+  "Within 30 days",
+  "Flexible",
+];
+
+const SALARY_TYPES = [
+  "Monthly salary",
+  "Daily pay",
+  "Hourly pay",
+  "Per service / commission",
+  "Fixed + commission",
+  "Negotiable",
+];
+
+const MONTHLY_SALARY_RANGES: { label: string; min: number; max: number | null }[] = [
+  { label: "₹8,000 – ₹12,000", min: 8000, max: 12000 },
+  { label: "₹12,000 – ₹18,000", min: 12000, max: 18000 },
+  { label: "₹18,000 – ₹25,000", min: 18000, max: 25000 },
+  { label: "₹25,000 – ₹35,000", min: 25000, max: 35000 },
+  { label: "₹35,000+", min: 35000, max: null },
+];
 const BENEFITS = [
   "PF & ESI",
   "Health insurance",
