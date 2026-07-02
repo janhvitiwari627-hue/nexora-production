@@ -628,12 +628,21 @@ export function PostJobPage() {
           skills: job.skills ?? [],
           openings: job.openings ?? 1,
           job_role: job.job_role ?? "",
-          work_location: job.work_location ?? WORK_LOCATIONS[0],
+          work_location:
+            (job.work_location && (LEGACY_WORK_LOCATION_MAP[job.work_location] ?? job.work_location)) ||
+            WORK_LOCATIONS[0],
           contact_person: job.contact_person ?? "",
           contact_mobile: job.contact_mobile ?? "",
           whatsapp_number: job.whatsapp_number ?? "",
           interview_mode: job.interview_mode ?? INTERVIEW_MODES[0],
           shop_id: job.shop_id ?? null,
+          business_type: "",
+          days_preset: "",
+          custom_days: [],
+          hours_preset: "",
+          start_time: "",
+          end_time: "",
+          flexible_schedule: /flexible/i.test(job.schedule ?? ""),
         });
         setSkillsInput((job.skills ?? []).join(", "));
       })
