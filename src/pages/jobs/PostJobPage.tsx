@@ -214,6 +214,184 @@ const ROLE_SUGGESTIONS: Record<string, string[]> = {
   Other: ["Other Beauty Professional", "Custom Role"],
 };
 
+// Ready-made job description starters shown under the Description field.
+// Templates change with Beauty Category; a generic set is used when no
+// category is selected.
+const GENERAL_DESCRIPTION_TEMPLATES: { label: string; body: string }[] = [
+  {
+    label: "Standard role",
+    body:
+      "We are hiring a passionate beauty professional to join our team. You will deliver high-quality services, build long-term client relationships, and help our salon grow. Prior experience preferred; freshers with the right attitude are welcome.",
+  },
+  {
+    label: "Freshers welcome",
+    body:
+      "We're looking for enthusiastic beginners eager to build a career in the beauty industry. On-the-job training, mentorship, and a friendly team environment provided. Bring a positive attitude and a willingness to learn.",
+  },
+  {
+    label: "Experienced professional",
+    body:
+      "Seeking an experienced beauty professional with a strong client base and proven skills. You'll handle premium clients, mentor junior staff, and contribute to service quality and salon reputation. Attractive incentives and growth path.",
+  },
+];
+
+const DESCRIPTION_TEMPLATES: Record<string, { label: string; body: string }[]> = {
+  "Hair Stylist": [
+    {
+      label: "Senior stylist",
+      body:
+        "We are hiring a Senior Hair Stylist to deliver premium cuts, colours, styling, and hair treatments. You will manage regular clients, guide juniors, and maintain high service standards. 3+ years of salon experience preferred.",
+    },
+    {
+      label: "Junior stylist",
+      body:
+        "Looking for a Junior Hair Stylist to assist senior stylists, perform basic cuts, blow-dries, and shampoo services, and learn advanced techniques on the job. Freshers from reputed academies are welcome.",
+    },
+    {
+      label: "Bridal specialist",
+      body:
+        "Hiring a Bridal Hair Specialist for pre-wedding trials and wedding-day styling. You should be skilled in traditional and contemporary bridal looks, hair extensions, and long-lasting hold techniques.",
+    },
+  ],
+  Barber: [
+    {
+      label: "Senior barber",
+      body:
+        "We're hiring a Senior Barber skilled in classic and modern men's cuts, fades, beard shaping, and hot-towel shaves. You'll handle premium clients and maintain grooming standards across the salon.",
+    },
+    {
+      label: "Beard specialist",
+      body:
+        "Looking for a Beard Grooming Specialist experienced in beard trims, shaping, hot-towel shaves, and beard colour. Attention to detail and hygiene are essential.",
+    },
+  ],
+  "Makeup Artist": [
+    {
+      label: "Bridal MUA",
+      body:
+        "Hiring a Bridal Makeup Artist experienced in HD, airbrush, and traditional bridal looks. You'll handle trials, wedding-day services, and destination assignments. Portfolio required.",
+    },
+    {
+      label: "Party & studio MUA",
+      body:
+        "We're hiring a Makeup Artist for party, engagement, and studio shoots. Skills in HD makeup, contouring, and eye looks are essential. Prior salon or freelance experience preferred.",
+    },
+  ],
+  "Nail Artist": [
+    {
+      label: "Nail technician",
+      body:
+        "Hiring a Nail Technician skilled in manicures, pedicures, gel, acrylic extensions, and nail art. You should follow strict hygiene protocols and stay updated with current nail trends.",
+    },
+    {
+      label: "Nail art specialist",
+      body:
+        "Looking for a Nail Art Specialist with expertise in freehand art, stamping, chrome, and 3D designs. Ideal for premium clients and social-media-friendly work.",
+    },
+  ],
+  "Beauty Therapist": [
+    {
+      label: "Facial & waxing",
+      body:
+        "Hiring a Beauty Therapist for facials, clean-ups, waxing, threading, and body polishing. Certification from a recognised institute preferred; strong client-handling skills essential.",
+    },
+    {
+      label: "Advanced therapist",
+      body:
+        "Looking for a Senior Beauty Therapist with expertise in advanced facials, skin analysis, and product recommendation. You'll handle premium clients and mentor junior therapists.",
+    },
+  ],
+  "Spa Therapist": [
+    {
+      label: "Wellness therapist",
+      body:
+        "Hiring a Spa Therapist skilled in relaxation massages, body scrubs, wraps, and aromatherapy. Certification and a calm, professional demeanour are essential.",
+    },
+    {
+      label: "Ayurvedic therapist",
+      body:
+        "Looking for an Ayurvedic Spa Therapist trained in Abhyanga, Shirodhara, and traditional oil therapies. Prior wellness centre experience preferred.",
+    },
+  ],
+  "Massage Therapist": [
+    {
+      label: "Body massage",
+      body:
+        "Hiring a Body Massage Therapist experienced in Swedish, deep-tissue, and relaxation techniques. Formal training and a customer-first attitude are required.",
+    },
+  ],
+  "Skin Therapist": [
+    {
+      label: "Skin care specialist",
+      body:
+        "Hiring a Skin Therapist for advanced facials, chemical peels, and clinical skin routines. Familiarity with skin analysis tools and consultation-based selling is a plus.",
+    },
+  ],
+  "Eyelash / Brow Artist": [
+    {
+      label: "Lash & brow",
+      body:
+        "Looking for a Lash & Brow Artist skilled in extensions, lash lift, brow lamination, tinting, and microblading. Steady hands and portfolio required.",
+    },
+  ],
+  "Tattoo Artist": [
+    {
+      label: "Tattoo artist",
+      body:
+        "Hiring a Tattoo Artist with a strong portfolio in line work, shading, and colour realism. Hygiene, safety compliance, and client consultation skills are essential.",
+    },
+  ],
+  "Salon Manager": [
+    {
+      label: "Salon manager",
+      body:
+        "Hiring a Salon Manager to lead daily operations, staff scheduling, client retention, and revenue growth. 3+ years of salon operations experience preferred.",
+    },
+  ],
+  Receptionist: [
+    {
+      label: "Front desk",
+      body:
+        "Hiring a Salon Receptionist to manage appointments, greet clients, handle billing, and coordinate with staff. Good communication and basic computer skills required.",
+    },
+  ],
+  "Salon Assistant": [
+    {
+      label: "Salon assistant",
+      body:
+        "Looking for a Salon Assistant to support stylists and therapists, maintain hygiene, prepare tools, and assist with client comfort. Freshers welcome.",
+    },
+  ],
+  "Hair Colourist": [
+    {
+      label: "Hair colourist",
+      body:
+        "Hiring a Hair Colourist skilled in global colour, highlights, balayage, and colour correction. Knowledge of premium colour brands and consultation skills essential.",
+    },
+  ],
+  "Bridal Makeup Artist": [
+    {
+      label: "Bridal artist",
+      body:
+        "Hiring a Bridal Makeup Artist for HD, airbrush, and traditional bridal looks. Weekend availability and portfolio required.",
+    },
+  ],
+  Freelancer: [
+    {
+      label: "Freelance role",
+      body:
+        "We're onboarding freelance beauty professionals for on-demand bookings. Flexible schedule, per-service payouts, and platform support. Portfolio and hygiene compliance required.",
+    },
+  ],
+  Other: [
+    {
+      label: "Custom role",
+      body:
+        "Describe the role, key responsibilities, required experience, working hours, and any preferred skills or certifications.",
+    },
+  ],
+};
+
 const STEPS = [
   { key: "details", label: "Job details" },
   { key: "location", label: "Location & schedule" },
@@ -1122,6 +1300,43 @@ function DetailsStep({
           value={form.description}
           onChange={(e) => update({ description: e.target.value })}
         />
+        {(() => {
+          const templates =
+            (form.category && DESCRIPTION_TEMPLATES[form.category]) ||
+            GENERAL_DESCRIPTION_TEMPLATES;
+          if (!templates.length) return null;
+          const insert = (body: string) => {
+            const current = form.description.trim();
+            const next = current.length === 0 ? body : `${current}\n\n${body}`;
+            update({ description: next });
+          };
+          return (
+            <div className="mt-3">
+              <p className="text-heading mb-2 text-xs font-semibold">
+                Description templates
+                {form.category ? (
+                  <span className="text-muted-foreground font-normal"> · {form.category}</span>
+                ) : null}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {templates.map((t) => (
+                  <button
+                    key={t.label}
+                    type="button"
+                    onClick={() => insert(t.body)}
+                    title={t.body}
+                    className="border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading rounded-full border px-3 py-1.5 text-xs font-semibold transition"
+                  >
+                    + {t.label}
+                  </button>
+                ))}
+              </div>
+              <p className="text-muted-foreground mt-1.5 text-[11px]">
+                Tap a template to insert it. You can edit the text after inserting.
+              </p>
+            </div>
+          );
+        })()}
       </Field>
     </div>
   );
