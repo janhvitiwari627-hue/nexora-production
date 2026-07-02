@@ -273,13 +273,27 @@ export function Step4Payment({
           muted
         />
 
+        <OfflineBanner
+          className="mt-5"
+          message="You're offline — payment is unavailable"
+          hint="You can still review your booking. Reconnect to complete payment and confirm."
+        />
+
         <motion.button
           type="button"
-          whileTap={{ scale: 0.98 }}
-          onClick={() => setQrOpen(true)}
-          className="bg-gradient-cta text-primary-foreground mt-5 inline-flex w-full items-center justify-center rounded-[var(--radius-button)] px-4 py-3.5 text-sm font-bold shadow-[var(--shadow-glow)] hover:brightness-110"
+          whileTap={{ scale: online ? 0.98 : 1 }}
+          onClick={() => {
+            if (!online) {
+              toast.error("You're offline. Reconnect to complete payment.");
+              return;
+            }
+            setQrOpen(true);
+          }}
+          disabled={!online}
+          aria-disabled={!online}
+          className="bg-gradient-cta text-primary-foreground mt-3 inline-flex w-full items-center justify-center rounded-[var(--radius-button)] px-4 py-3.5 text-sm font-bold shadow-[var(--shadow-glow)] hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none"
         >
-          Pay {formatINR(advance)} to confirm
+          {online ? `Pay ${formatINR(advance)} to confirm` : "Payment unavailable offline"}
         </motion.button>
         <p className="text-muted-foreground mt-3 inline-flex items-center gap-1.5 text-[11px]">
 
