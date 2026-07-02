@@ -31,12 +31,10 @@ export default function DownloadAppPage() {
             <p className="mt-4 text-lg text-muted-foreground">
               Discover salons, book instantly, pay via QR, and earn rewards — all from one beautifully simple app that installs straight to your home screen.
             </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Button size="lg" asChild>
-                <a href="/customer-app" target="_blank" rel="noreferrer">
-                  <Download className="mr-2 h-4 w-4" /> Install App
-                </a>
-              </Button>
+            <div className="mt-6">
+              <InstallBanner />
+            </div>
+            <div className="mt-4 flex flex-wrap gap-3">
               <Button size="lg" variant="outline" asChild>
                 <Link to="/search">Browse Salons</Link>
               </Button>
