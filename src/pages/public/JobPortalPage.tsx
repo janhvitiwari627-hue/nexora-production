@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Briefcase, GraduationCap, Loader2, MapPin, Search, Sparkles, Star, TrendingUp } from "lucide-react";
+import { AlertCircle, Briefcase, GraduationCap, Loader2, MapPin, RefreshCw, Search, Sparkles, Star, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BackButton } from "@/components/shared/BackButton";
 import { useAuthStore } from "@/stores/authStore";
