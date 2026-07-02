@@ -761,6 +761,9 @@ type UiOnlyFields = {
   joining_availability?: string;
   salary_type?: string;
   salary_range_preset?: string;
+  certification?: string;
+  languages?: string[];
+  portfolio_option?: PortfolioOption | "";
 };
 
 type Form = Required<
