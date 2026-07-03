@@ -1,26 +1,69 @@
 import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  AlertCircle, ArrowRight, Ban, Building2, CalendarCheck, CheckCircle2, Crown,
-  IndianRupee, MapPin, MessageSquare, UserPlus, Users, XCircle, type LucideIcon,
+  AlertCircle, ArrowRight, Ban, Briefcase, Building2, CalendarCheck, CheckCircle2, Crown,
+  IndianRupee, Loader2, MapPin, MessageSquare, Star, UserPlus, Users, XCircle,
 } from "lucide-react";
 import {
   Area, AreaChart, Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer,
   Tooltip, XAxis, YAxis,
 } from "recharts";
 import {
-  ADMIN_KPIS, REVENUE_TREND, BOOKING_VOLUME, USER_GROWTH, PENDING_ACTIONS,
+  REVENUE_TREND, BOOKING_VOLUME, USER_GROWTH, PENDING_ACTIONS,
   RECENT_ACTIVITY, CITY_HEATMAP,
 } from "./mockAdmin";
+import { supabase } from "@/integrations/supabase/client";
 
-const ICONS: Record<string, LucideIcon> = {
+const ICONS: Record<string, typeof CheckCircle2> = {
   Building2, Users, CalendarCheck, IndianRupee, Crown, AlertCircle,
   CheckCircle2, Ban, MessageSquare, XCircle, UserPlus,
 };
 
 export function AdminDashboardPage() {
+  const kpiQ = useQuery({
+    queryKey: ["admin", "dashboard-kpis"],
+    queryFn: async () => {
+      const head = { count: "exact" as const, head: true };
+      const [users, salons, bookings, jobs, reviews, pendingOwners, pendingBookings, revenueRow] = await Promise.all([
+        supabase.from("profiles").select("*", head),
+        supabase.from("salons").select("*", head),
+        supabase.from("bookings").select("*", head),
+        supabase.from("jobs").select("*", head),
+        supabase.from("reviews").select("*", head),
+        supabase.from("owner_requests").select("*", head).eq("status", "pending"),
+        supabase.from("bookings").select("*", head).eq("status", "pending"),
+        supabase.from("payments").select("amount").eq("status", "SUCCESS"),
+      ]);
+      const revenue = (revenueRow.data ?? []).reduce((s, r) => s + Number(r.amount ?? 0), 0);
+      return {
+        users: users.count ?? 0,
+        salons: salons.count ?? 0,
+        bookings: bookings.count ?? 0,
+        jobs: jobs.count ?? 0,
+        reviews: reviews.count ?? 0,
+        pendingOwners: pendingOwners.count ?? 0,
+        pendingBookings: pendingBookings.count ?? 0,
+        revenue,
+      };
+    },
+    staleTime: 30_000,
+  });
+
+  const k = kpiQ.data;
+  const KPIS = [
+    { label: "Total Users", value: k?.users, icon: Users, color: "text-indigo-600" },
+    { label: "Businesses", value: k?.salons, icon: Building2, color: "text-fuchsia-600" },
+    { label: "Bookings", value: k?.bookings, icon: CalendarCheck, color: "text-emerald-600" },
+    { label: "Revenue", value: k ? `₹${k.revenue.toLocaleString("en-IN")}` : undefined, icon: IndianRupee, color: "text-amber-600" },
+    { label: "Active Jobs", value: k?.jobs, icon: Briefcase, color: "text-blue-600" },
+    { label: "Reviews", value: k?.reviews, icon: Star, color: "text-rose-600" },
+    { label: "Pending Owners", value: k?.pendingOwners, icon: UserPlus, color: "text-amber-600" },
+    { label: "Pending Bookings", value: k?.pendingBookings, icon: AlertCircle, color: "text-orange-600" },
+  ];
+
   return (
     <div className="container mx-auto max-w-7xl px-4 py-6 space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -41,27 +84,19 @@ export function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* KPIs */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-        {ADMIN_KPIS.map((k) => {
-          const Icon = ICONS[k.icon];
-          return (
-            <Card key={k.label}>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <Icon className="h-4 w-4 text-muted-foreground" />
-                  {k.delta && (
-                    <span className={`text-[11px] font-medium ${k.trend === "down" ? "text-amber-600" : "text-emerald-600"}`}>
-                      {k.delta}
-                    </span>
-                  )}
-                </div>
-                <div className="text-2xl font-bold mt-2">{k.value}</div>
-                <div className="text-xs text-muted-foreground">{k.label}</div>
-              </CardContent>
-            </Card>
-          );
-        })}
+      {/* KPIs — real counts */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8">
+        {KPIS.map((kpi) => (
+          <Card key={kpi.label}>
+            <CardContent className="p-4">
+              <kpi.icon className={`h-4 w-4 ${kpi.color}`} />
+              <div className="text-2xl font-bold mt-2">
+                {kpiQ.isLoading ? <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /> : (kpi.value ?? "—")}
+              </div>
+              <div className="text-xs text-muted-foreground">{kpi.label}</div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {/* Charts */}
