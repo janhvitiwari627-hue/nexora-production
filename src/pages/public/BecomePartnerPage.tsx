@@ -1,39 +1,11 @@
 import { useMemo, useState } from "react";
-import { motion } from "framer-motion";
 import { z } from "zod";
-import { Activity, ArrowRight, Award, BadgeCheck, CalendarClock, Crown, IndianRupee, LayoutDashboard, Rocket, Sparkles, Target, TrendingUp, Trophy, Users, Wallet, Zap } from "lucide-react";
+import { Activity, ArrowRight, BadgeCheck, Building2, CalendarClock, CheckCircle2, Crown, FileCheck, GraduationCap, Headphones as HeadphonesIcon, IndianRupee, LayoutDashboard, Rocket, ShieldCheck, Sparkles, Store, Target, TrendingUp, Trophy, UserCheck, Users, Wallet, Zap, Award } from "lucide-react";
 import rewardWelcomeKit from "@/assets/reward-welcome-kit.jpg";
 import rewardTabletBadge from "@/assets/reward-tablet-badge.jpg";
 import rewardLaptop from "@/assets/reward-laptop.jpg";
 import rewardCar from "@/assets/reward-car.jpg";
 
-const STEPS = [
-  { title: "Register your business", body: "Tell us about your salon — services, location, hours." },
-  { title: "Verify & onboard", body: "We verify your details and set up your dashboard in 24h." },
-  { title: "Go live", body: "Start receiving bookings, payments and reviews instantly." },
-  { title: "Grow with insights", body: "Use analytics & marketing tools to scale your business." },
-];
-
-const LEVELS = [
-  { name: "Bronze", min: 0, perk: "Standard listing", color: "from-amber-700 to-amber-900 text-amber-100" },
-  { name: "Silver", min: 50, perk: "Boosted in search", color: "from-slate-300 to-slate-500 text-slate-900" },
-  { name: "Gold", min: 200, perk: "Featured carousel + 2% lower commission", color: "from-amber-300 to-yellow-500 text-amber-950" },
-  { name: "Platinum", min: 500, perk: "Hall of Fame + priority support", color: "from-indigo-700 to-violet-500 text-white" },
-];
-
-const MILESTONES = [
-  { count: 50, reward: "₹2,000 marketing credit" },
-  { count: 100, reward: "Pro photography session" },
-  { count: 250, reward: "Branded merch kit" },
-  { count: 500, reward: "Free year of Growth plan" },
-  { count: 1000, reward: "Featured documentary feature" },
-];
-
-const HALL = [
-  { name: "Looks Unisex Salon", city: "Jaipur", bookings: 8420 },
-  { name: "Bliss Spa & Wellness", city: "Mumbai", bookings: 6210 },
-  { name: "The Barber Co.", city: "Delhi", bookings: 5870 },
-];
 
 const formSchema = z.object({
   ownerName: z.string().trim().min(2, "Name too short").max(80),
@@ -107,6 +79,85 @@ export function BecomePartnerPage() {
           </div>
         </div>
       </section>
+
+      {/* Trust — Why partner with Nexora */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <ShieldCheck className="h-3 w-3" /> Why Partner With Nexora
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            India's Trusted Beauty Industry OS
+          </h2>
+          <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-base">
+            Backed by real shops, real revenue and a transparent partner model — not a promise, a system.
+          </p>
+        </div>
+        <div className="mt-10 grid gap-4 md:grid-cols-4">
+          {[
+            { icon: Store, k: "12,000+", v: "Salons onboarded" },
+            { icon: Users, k: "2M+", v: "Customers reached" },
+            { icon: IndianRupee, k: "₹50Cr+", v: "GMV processed" },
+            { icon: Trophy, k: "38%", v: "Avg. shop growth" },
+          ].map((s) => (
+            <div key={s.v} className="border-border bg-card rounded-[var(--radius-card)] border p-6 text-center shadow-[var(--shadow-card)]">
+              <s.icon className="text-primary mx-auto h-6 w-6" />
+              <div className="text-heading mt-3 text-3xl font-black">{s.k}</div>
+              <div className="text-muted-foreground mt-1 text-xs font-bold uppercase tracking-wider">{s.v}</div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-6 grid gap-3 md:grid-cols-3">
+          {[
+            { icon: BadgeCheck, t: "Registered Indian company", b: "GST & MSME registered. Verified business entity." },
+            { icon: ShieldCheck, t: "Transparent 7-day payouts", b: "Every rupee traceable. No hidden deductions." },
+            { icon: FileCheck, t: "Written partner agreement", b: "Signed contract with clear terms and revenue share." },
+          ].map((t) => (
+            <div key={t.t} className="border-border bg-card flex items-start gap-3 rounded-[var(--radius-card)] border p-5">
+              <div className="bg-success/10 text-success grid h-10 w-10 shrink-0 place-items-center rounded-xl">
+                <t.icon className="h-5 w-5" />
+              </div>
+              <div>
+                <h4 className="text-heading font-bold">{t.t}</h4>
+                <p className="text-muted-foreground mt-1 text-sm">{t.b}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Ecosystem */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <Sparkles className="h-3 w-3" /> The Nexora Ecosystem
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            How the whole system works
+          </h2>
+          <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-base">
+            Growth Partners are the bridge between local salons and India's fastest-growing beauty marketplace.
+          </p>
+        </div>
+        <div className="mt-10 grid gap-4 md:grid-cols-4">
+          {[
+            { icon: Users, title: "Customers", body: "Discover, book & pay at trusted salons on the Nexora app." },
+            { icon: Store, title: "Salons & Shops", body: "Manage bookings, staff, payments and marketing in one place." },
+            { icon: UserCheck, title: "Growth Partners", body: "Onboard local shops, train them and earn on every booking." },
+            { icon: Building2, title: "Brands & Distributors", body: "Reach every partner shop through the Nexora portal." },
+          ].map((n, i) => (
+            <div key={n.title} className="border-border bg-card relative rounded-[var(--radius-card)] border p-6 shadow-[var(--shadow-card)]">
+              <div className="bg-gradient-cta text-primary-foreground grid h-11 w-11 place-items-center rounded-xl">
+                <n.icon className="h-5 w-5" />
+              </div>
+              <div className="text-muted-foreground mt-4 text-[11px] font-black uppercase tracking-wider">Layer {i + 1}</div>
+              <h3 className="text-heading mt-1 text-lg font-bold">{n.title}</h3>
+              <p className="text-muted-foreground mt-2 text-sm">{n.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
 
       {/* How Growth Partners Earn */}
       <section className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background py-20 md:py-28">
@@ -452,91 +503,122 @@ export function BecomePartnerPage() {
 
 
 
-      {/* Steps */}
+      {/* Responsibilities */}
       <section className="mx-auto max-w-6xl px-4 py-20 md:px-6">
-        <h2 className="text-heading text-center text-3xl font-black md:text-4xl">How to join in 4 steps</h2>
-        <div className="mt-12 grid gap-5 md:grid-cols-4">
-          {STEPS.map((s, i) => (
-            <motion.div key={s.title} initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }} className="border-border bg-card relative rounded-[var(--radius-card)] border p-6">
-              <span className="bg-gradient-cta text-primary-foreground absolute -top-4 left-6 grid h-9 w-9 place-items-center rounded-full text-sm font-black">{i + 1}</span>
-              <h3 className="text-heading mt-3 text-base font-bold">{s.title}</h3>
-              <p className="text-muted-foreground mt-2 text-sm">{s.body}</p>
-            </motion.div>
-          ))}
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <Target className="h-3 w-3" /> Partner Responsibilities
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            What a Growth Partner actually does
+          </h2>
+          <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-base">
+            Clear expectations. No gimmicks. This is the day-to-day of a successful district Growth Partner.
+          </p>
         </div>
-      </section>
-
-      {/* Benefits */}
-      <section className="bg-muted/30 border-y border-border py-16">
-        <div className="mx-auto max-w-6xl px-4 md:px-6">
-          <div className="grid gap-4 md:grid-cols-3">
-            {[
-              { icon: Users, title: "Reach 2M+ customers", body: "Be discovered on India's fastest-growing beauty marketplace." },
-              { icon: Trophy, title: "Boost visibility", body: "Level up to unlock featured slots, lower fees and Hall of Fame." },
-              { icon: BadgeCheck, title: "Verified trust badge", body: "Stand out with the trusted Nexora Verified badge on your listing." },
-            ].map((b) => (
-              <article key={b.title} className="border-border bg-card rounded-[var(--radius-card)] border p-6">
-                <div className="bg-gradient-cta text-primary-foreground grid h-11 w-11 place-items-center rounded-xl"><b.icon className="h-5 w-5" /></div>
-                <h3 className="text-heading mt-4 text-lg font-bold">{b.title}</h3>
-                <p className="text-muted-foreground mt-2 text-sm">{b.body}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Levels */}
-      <section className="mx-auto max-w-6xl px-4 py-20 md:px-6">
-        <h2 className="text-heading text-center text-3xl font-black md:text-4xl">Level up. Unlock more.</h2>
-        <p className="text-muted-foreground mt-2 text-center">Earn levels by completing bookings & maintaining 4.5+ ratings.</p>
-        <div className="mt-10 grid gap-4 md:grid-cols-4">
-          {LEVELS.map((l) => (
-            <div key={l.name} className={`relative overflow-hidden rounded-[20px] bg-gradient-to-br p-6 shadow-[var(--shadow-card)] ${l.color}`}>
-              <Crown className="h-7 w-7 opacity-90" />
-              <h3 className="mt-3 text-2xl font-black">{l.name}</h3>
-              <div className="mt-1 text-xs font-bold opacity-80">{l.min}+ bookings</div>
-              <p className="mt-3 text-sm opacity-90">{l.perk}</p>
+        <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[
+            { icon: Store, t: "Onboard local shops", b: "Identify salons, spas and barbershops in your district and help them go live on Nexora." },
+            { icon: GraduationCap, t: "Train shop owners", b: "Walk them through the app, POS, bookings and rewards system in the first week." },
+            { icon: Activity, t: "Ensure 15-day activation", b: "Support the shop until they cross their first 15 days of active revenue on Nexora." },
+            { icon: HeadphonesIcon, t: "First-line support", b: "Be the local point of contact for questions. Escalate to Nexora support when needed." },
+            { icon: TrendingUp, t: "Drive recurring growth", b: "Help shops run offers, collect reviews and stay active — this compounds your 7-day share." },
+            { icon: ShieldCheck, t: "Follow the code of conduct", b: "Represent Nexora with honesty. No false promises, no cash collection from shops." },
+          ].map((r) => (
+            <div key={r.t} className="border-border bg-card rounded-[var(--radius-card)] border p-6 shadow-[var(--shadow-card)]">
+              <div className="bg-primary/10 text-primary grid h-11 w-11 place-items-center rounded-xl">
+                <r.icon className="h-5 w-5" />
+              </div>
+              <h3 className="text-heading mt-4 font-bold">{r.t}</h3>
+              <p className="text-muted-foreground mt-2 text-sm">{r.b}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Milestones */}
-      <section className="bg-muted/30 border-y border-border py-16">
-        <div className="mx-auto max-w-5xl px-4 md:px-6">
-          <h2 className="text-heading text-center text-3xl font-black md:text-4xl">Milestone rewards</h2>
-          <div className="mt-10 relative">
-            <div className="bg-border absolute left-4 top-0 bottom-0 w-0.5 md:left-1/2" />
-            <ul className="space-y-6">
-              {MILESTONES.map((m, i) => (
-                <li key={m.count} className={`relative flex items-center gap-4 md:w-1/2 ${i % 2 ? "md:ml-auto md:pl-10" : "md:pr-10 md:text-right"}`}>
-                  <div className={`bg-gradient-cta text-primary-foreground absolute h-8 w-8 grid place-items-center rounded-full font-black text-xs ring-4 ring-background ${i % 2 ? "md:-left-4" : "md:-right-4 md:left-auto left-0"}`}><Award className="h-4 w-4" /></div>
-                  <div className="border-border bg-card ml-12 flex-1 rounded-[var(--radius-card)] border p-5 md:ml-0">
-                    <div className="text-primary text-xs font-black uppercase tracking-wider">{m.count} bookings</div>
-                    <div className="text-heading mt-1 text-lg font-bold">{m.reward}</div>
-                  </div>
-                </li>
+      {/* Training & Support */}
+      <section className="bg-muted/30 border-y border-border py-20">
+        <div className="mx-auto max-w-6xl px-4 md:px-6">
+          <div className="grid gap-10 md:grid-cols-2">
+            <div>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+                <GraduationCap className="h-3 w-3" /> Training & Support
+              </span>
+              <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+                You never work alone
+              </h2>
+              <p className="text-muted-foreground mt-3 text-base">
+                Every Growth Partner goes through a structured onboarding and gets lifetime access to
+                training, pitch decks, and a dedicated regional manager.
+              </p>
+              <ul className="mt-6 space-y-3">
+                {[
+                  "3-day onboarding bootcamp (online)",
+                  "Sales pitch deck & shop demo scripts",
+                  "WhatsApp partner community",
+                  "Weekly performance review calls",
+                  "Dedicated regional success manager",
+                  "Lifetime access to Nexora Academy",
+                ].map((t) => (
+                  <li key={t} className="flex items-start gap-3 text-sm">
+                    <CheckCircle2 className="text-success mt-0.5 h-5 w-5 shrink-0" />
+                    <span className="text-heading font-semibold">{t}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="grid gap-4">
+              {[
+                { day: "Day 0", t: "Application & KYC", b: "Submit ID, PAN and bank details. Verification in 24 hours." },
+                { day: "Day 1–3", t: "Onboarding bootcamp", b: "Product, pitch, dashboard and code-of-conduct training." },
+                { day: "Day 4+", t: "Field activation", b: "Start onboarding shops with your regional manager's guidance." },
+                { day: "Day 15+", t: "First payout", b: "Once your first shop clears 15-day active revenue, rewards go live." },
+              ].map((s) => (
+                <div key={s.day} className="border-border bg-card rounded-[var(--radius-card)] border p-5 shadow-[var(--shadow-card)]">
+                  <div className="text-primary text-xs font-black uppercase tracking-wider">{s.day}</div>
+                  <div className="text-heading mt-1 font-bold">{s.t}</div>
+                  <p className="text-muted-foreground mt-1 text-sm">{s.b}</p>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Hall of Fame */}
+      {/* Journey timeline */}
       <section className="mx-auto max-w-6xl px-4 py-20 md:px-6">
-        <h2 className="text-heading text-center text-3xl font-black md:text-4xl">Hall of Fame</h2>
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
-          {HALL.map((h, i) => (
-            <article key={h.name} className="from-amber-100 via-card to-rose-50 border-amber-200 rounded-[24px] border bg-gradient-to-br p-7 shadow-[var(--shadow-card)]">
-              <Crown className={`h-7 w-7 ${i === 0 ? "text-amber-500" : i === 1 ? "text-slate-400" : "text-amber-700"}`} />
-              <h3 className="text-heading mt-3 text-xl font-black">{h.name}</h3>
-              <div className="text-muted-foreground text-sm">{h.city}</div>
-              <div className="text-heading mt-4 text-3xl font-black">{h.bookings.toLocaleString("en-IN")}</div>
-              <div className="text-muted-foreground text-xs">lifetime bookings</div>
-            </article>
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <Rocket className="h-3 w-3" /> Your Journey
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            From visitor to active partner
+          </h2>
+        </div>
+        <div className="mt-12 grid gap-3 md:grid-cols-4 lg:grid-cols-7">
+          {[
+            { n: "1", t: "Visit", d: "Explore program" },
+            { n: "2", t: "Interested", d: "Try the calculator" },
+            { n: "3", t: "Trust", d: "Read our story" },
+            { n: "4", t: "Join", d: "Sign up in 2 min" },
+            { n: "5", t: "KYC", d: "Verified in 24h" },
+            { n: "6", t: "Training", d: "3-day bootcamp" },
+            { n: "7", t: "Active", d: "Earn on shops" },
+          ].map((s, i) => (
+            <div key={s.n} className="border-border bg-card relative rounded-[var(--radius-card)] border p-4 text-center shadow-[var(--shadow-card)]">
+              <div className="bg-gradient-cta text-primary-foreground mx-auto grid h-9 w-9 place-items-center rounded-full text-sm font-black shadow-[var(--shadow-glow)]">
+                {s.n}
+              </div>
+              <div className="text-heading mt-3 text-sm font-black">{s.t}</div>
+              <div className="text-muted-foreground mt-1 text-xs">{s.d}</div>
+              {i < 6 && (
+                <ArrowRight className="text-muted-foreground absolute -right-3 top-1/2 hidden h-4 w-4 -translate-y-1/2 lg:block" />
+              )}
+            </div>
           ))}
         </div>
       </section>
+
 
       {/* Registration form */}
       <section className="mx-auto max-w-2xl px-4 pb-20 md:px-6">
