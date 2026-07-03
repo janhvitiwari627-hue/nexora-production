@@ -80,6 +80,55 @@ export function BecomePartnerPage() {
         </div>
       </section>
 
+      {/* Who this is for — Target Personas */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <UserCheck className="h-3 w-3" /> Who This Is For
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            Built for people who already know the beauty industry
+          </h2>
+          <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-base">
+            If you already sell to, train, or work with salons — this program turns your existing
+            network into recurring monthly income.
+          </p>
+        </div>
+
+        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            { icon: Store, t: "Beauty Product Salesman", b: "Selling shampoos, colours or skincare into salons." },
+            { icon: Sparkles, t: "Cosmetic Sales Executive", b: "FMCG beauty field sales in your territory." },
+            { icon: Building2, t: "Distributor", b: "Local or regional distributor with an active shop route." },
+            { icon: BadgeCheck, t: "Brand Sales Representative", b: "Territory rep for a national or regional beauty brand." },
+            { icon: Headphones as unknown as typeof UserCheck, t: "Salon Consultant", b: "Advise salons on setup, branding or operations." },
+            { icon: GraduationCap, t: "Beauty Trainer", b: "Trainer or academy owner already close to shop owners." },
+            { icon: Users, t: "Existing Network Builder", b: "You already have a network of salon-owner relationships." },
+            { icon: Rocket, t: "Freelance Sales Professional", b: "Independent field sales looking for recurring income." },
+            { icon: Store, t: "Hair Salon Product Salesman", b: "Selling into hair salons and unisex studios." },
+            { icon: LayoutDashboard, t: "Salon Furniture Dealer", b: "Chairs, mirrors, stations — you already visit new shops." },
+            { icon: Sparkles, t: "Spa Product Representative", b: "Reps selling into spas, wellness and massage centres." },
+            { icon: Target, t: "Tattoo Supply Distributor", b: "Distributing inks, machines and consumables to studios." },
+            { icon: Award, t: "Nail Art Supplier", b: "Selling nail products into nail studios and salons." },
+          ].map((p) => (
+            <div key={p.t} className="border-border bg-card group flex items-start gap-3 rounded-[var(--radius-card)] border p-5 shadow-[var(--shadow-card)] transition hover:-translate-y-0.5">
+              <div className="bg-primary/10 text-primary grid h-10 w-10 shrink-0 place-items-center rounded-xl transition group-hover:bg-primary group-hover:text-primary-foreground">
+                <p.icon className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="text-heading font-bold">{p.t}</h3>
+                <p className="text-muted-foreground mt-1 text-sm">{p.b}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 rounded-[var(--radius-card)] border border-primary/30 bg-primary/5 p-5 text-center text-sm font-semibold text-heading">
+          Don't see your exact title? If you talk to salon owners every week — you qualify.
+        </div>
+      </section>
+
+
       {/* Trust — Why partner with Nexora */}
       <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
         <div className="text-center">
