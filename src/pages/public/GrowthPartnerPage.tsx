@@ -21,6 +21,7 @@ import {
   Users,
 } from "lucide-react";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
+import { JoinPartnerDialog } from "./JoinPartnerDialog";
 
 const TRUST_BADGES = [
   { icon: ShieldCheck, label: "Not a Job" },
