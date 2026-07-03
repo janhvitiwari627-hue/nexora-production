@@ -109,46 +109,48 @@ export default function GrowthPartnerRewardsSection() {
   const [selected, setSelected] = useState<Milestone | null>(null);
 
   return (
-    <section className="bg-white px-5 py-20 sm:px-8 lg:py-28">
+    <section className="bg-white px-4 py-14 sm:px-8 sm:py-20 lg:py-28">
       <div className="mx-auto max-w-[1240px]">
-        <p className="text-center text-[11px] font-bold uppercase tracking-[0.22em] text-[#4F46E5]">
+        <p className="text-center text-[10px] font-bold uppercase tracking-[0.2em] text-[#4F46E5] sm:text-[11px] sm:tracking-[0.22em]">
           Milestone Rewards
         </p>
 
-        <h2 className="mx-auto mt-4 max-w-3xl text-center text-4xl font-black leading-[1.05] tracking-tight text-[#0B1330] sm:text-5xl lg:text-[56px]">
+        <h2 className="mx-auto mt-3 max-w-3xl text-center text-[28px] font-black leading-[1.1] tracking-tight text-[#0B1330] sm:mt-4 sm:text-5xl sm:leading-[1.05] lg:text-[56px]">
           Grow more. Earn more. Get rewarded.
         </h2>
 
-        <p className="mx-auto mt-5 max-w-xl text-center text-[15px] text-slate-500">
+        <p className="mx-auto mt-4 max-w-xl text-center text-[13px] leading-relaxed text-slate-500 sm:mt-5 sm:text-[15px]">
           Sirf active revenue-generating shops count hoti hain. Kisi bhi card par tap karke full reward breakdown dekhein.
         </p>
 
-        <div className="mt-14 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-5">
-          {MILESTONES.map((m) => (
+        <div className="mt-8 grid grid-cols-2 gap-3 sm:mt-14 sm:grid-cols-3 sm:gap-5 lg:grid-cols-5">
+          {MILESTONES.map((m, idx) => (
             <button
               key={m.shops}
               type="button"
               onClick={() => setSelected(m)}
               aria-label={`${m.shops} active shops reward — ${m.title}. View breakdown`}
-              className={`${m.bg} group flex flex-col rounded-2xl p-6 text-left transition-transform duration-300 hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4F46E5] focus-visible:ring-offset-2`}
+              className={`${m.bg} group flex flex-col rounded-2xl p-4 text-left transition-transform duration-300 hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4F46E5] focus-visible:ring-offset-2 sm:p-5 lg:p-6 ${
+                idx === 4 ? "col-span-2 sm:col-span-3 lg:col-span-1" : ""
+              }`}
             >
-              <div className="grid h-10 w-10 place-items-center rounded-xl bg-white shadow-sm">
-                <m.Icon className={`h-5 w-5 ${m.iconColor}`} strokeWidth={2} />
+              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white shadow-sm sm:h-10 sm:w-10">
+                <m.Icon className={`h-4 w-4 sm:h-5 sm:w-5 ${m.iconColor}`} strokeWidth={2} />
               </div>
 
-              <div className="mt-8 text-4xl font-black tracking-tight text-[#0B1330]">
+              <div className="mt-5 text-3xl font-black tracking-tight text-[#0B1330] sm:mt-8 sm:text-4xl">
                 {m.shops}
               </div>
-              <div className="mt-1 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">
+              <div className="mt-1 text-[9px] font-bold uppercase tracking-[0.14em] text-slate-500 sm:text-[10px] sm:tracking-[0.15em]">
                 Active Shops
               </div>
 
-              <div className="mt-6 border-t border-white/70 pt-4">
-                <h3 className="text-sm font-bold text-[#0B1330]">{m.title}</h3>
-                <p className="mt-1 text-[12px] leading-snug text-slate-600">
+              <div className="mt-4 border-t border-white/70 pt-3 sm:mt-6 sm:pt-4">
+                <h3 className="text-[13px] font-bold leading-tight text-[#0B1330] sm:text-sm">{m.title}</h3>
+                <p className="mt-1 text-[11px] leading-snug text-slate-600 sm:text-[12px]">
                   {m.subtitle}
                 </p>
-                <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-bold text-[#4F46E5] opacity-0 transition-opacity group-hover:opacity-100">
+                <span className="mt-2 inline-flex items-center gap-1 text-[10px] font-bold text-[#4F46E5] transition-opacity sm:mt-3 sm:text-[11px] sm:opacity-0 sm:group-hover:opacity-100">
                   View breakdown <ArrowRight className="h-3 w-3" />
                 </span>
               </div>
@@ -156,10 +158,10 @@ export default function GrowthPartnerRewardsSection() {
           ))}
         </div>
 
-        <div className="mt-14 flex justify-center">
+        <div className="mt-10 flex justify-center sm:mt-14">
           <Link
             to="/growth-partner"
-            className="inline-flex h-12 items-center gap-2 rounded-full bg-[#0B1330] px-7 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#1E1B4B]"
+            className="inline-flex h-11 items-center gap-2 rounded-full bg-[#0B1330] px-6 text-[13px] font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#1E1B4B] sm:h-12 sm:px-7 sm:text-sm"
           >
             Join the Growth Partner Program
             <ArrowRight className="h-4 w-4" />
