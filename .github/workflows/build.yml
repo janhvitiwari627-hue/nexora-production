@@ -38,8 +38,8 @@ jobs:
           set -o pipefail
           bun run build 2>&1 | tee build-logs/build.log
 
-      - name: Capture TypeScript diagnostics on failure
-        if: failure()
+      - name: Capture TypeScript diagnostics
+        if: always()
         run: |
           mkdir -p build-logs
           bunx tsgo --noEmit 2>&1 | tee build-logs/typecheck.log || true
@@ -49,10 +49,11 @@ jobs:
             echo "bun:  $(bun -v 2>/dev/null || echo n/a)"
             echo "commit: ${GITHUB_SHA}"
             echo "ref:    ${GITHUB_REF}"
+            echo "status: ${{ job.status }}"
           } > build-logs/env.txt
 
       - name: Upload build logs
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: build-logs-${{ github.run_id }}-${{ github.run_attempt }}
