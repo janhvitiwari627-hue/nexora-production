@@ -112,6 +112,20 @@ export type JobDraftInput = {
   whatsapp_number?: string | null;
   interview_mode?: string | null;
   shop_id?: string | null;
+  business_type?: string | null;
+  location_type?: string | null;
+  working_days?: string[] | null;
+  start_time?: string | null;
+  end_time?: string | null;
+  flexible_schedule?: boolean | null;
+  joining_date_type?: string | null;
+  salary_type?: string | null;
+  certification_requirement?: string | null;
+  language_preferences?: string[] | null;
+  portfolio_required?: boolean | null;
+  portfolio_type?: string | null;
+  resume_preferred?: boolean | null;
+  screening_questions?: Array<{ q: string; t: string }> | null;
 };
 
 export async function saveJob(params: {
