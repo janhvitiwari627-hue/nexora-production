@@ -2,24 +2,35 @@ import { motion } from "framer-motion";
 import {
   ArrowRight,
   Award,
+  BadgeCheck,
   BarChart3,
+  BookOpen,
+  CalendarClock,
   CheckCircle2,
+  CircleDollarSign,
+  FileCheck2,
   GraduationCap,
   Handshake,
   IndianRupee,
+  KeyRound,
+  LayoutDashboard,
   LineChart,
+  MapPin,
   MessageCircle,
-  Network,
   PlayCircle,
+  Repeat,
   Scissors,
+  ShieldAlert,
   ShieldCheck,
+  Smartphone,
   Sparkles,
   Store,
-  TrendingUp,
+  Trophy,
   Truck,
   UserRound,
   Users,
   Wallet,
+  XCircle,
 } from "lucide-react";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 import { JoinPartnerDialog } from "./JoinPartnerDialog";
@@ -43,12 +54,14 @@ const IS_THIS = [
 ];
 
 const WHY_CARDS = [
-  { icon: Network, title: "Existing Network", body: "Aapke pass already salons, parlours aur beauty pros ka network hai — usi ko digital banayein." },
-  { icon: Handshake, title: "Existing Trust", body: "Log aap par pehle se bharosa karte hain. Nexora us trust ko growth me convert karta hai." },
-  { icon: Store, title: "Existing Market", body: "Aapka district, aapka market. Koi cold calling nahi — sirf apne logon ko onboard karein." },
-  { icon: TrendingUp, title: "Business Opportunity", body: "Recurring revenue share har active shop par. Ek asli business, side hustle nahi." },
-  { icon: Award, title: "Recognition", body: "Tiers, badges, leaderboard aur annual retreat — aapke kaam ko pehchan milti hai." },
-  { icon: Sparkles, title: "Long-Term Growth", body: "Beauty industry India me har saal badh rahi hai. Aap us growth ke partner banein." },
+  { icon: CheckCircle2, title: "Joining Fee Nahi", body: "Program 100% free — koi hidden charge nahi." },
+  { icon: Wallet, title: "Investment Nahi", body: "Apna paisa nahi lagana — sirf network aur time." },
+  { icon: GraduationCap, title: "Free Training", body: "Sales, pitch aur product training bilkul free." },
+  { icon: CalendarClock, title: "Weekly Payout", body: "Har hafte transparent payout seedha bank me." },
+  { icon: Trophy, title: "District Recognition", body: "Apne district me official Nexora identity." },
+  { icon: Repeat, title: "Long-Term Growth Share", body: "Recurring commission — ek baar ka nahi." },
+  { icon: Store, title: "Active Shops Par Earnings", body: "Har active shop ke revenue par share." },
+  { icon: Award, title: "Milestone Rewards", body: "Tier bonuses, badges aur retreats." },
 ];
 
 const ECOSYSTEM = [
@@ -74,9 +87,28 @@ const WHO_CAN_JOIN = [
 ];
 
 const HOW_STEPS = [
-  { n: "01", title: "Apply", body: "Free form bhariye — 2 minute me submit ho jata hai." },
-  { n: "02", title: "Onboard Salons", body: "Apne district ke salons ko Nexora par register karayein." },
-  { n: "03", title: "Earn Growth Share", body: "Har active shop par recurring share — weekly payout." },
+  { n: "01", title: "Apply", body: "Free form bhariye — 2 minute me submit.", icon: FileCheck2 },
+  { n: "02", title: "Mobile Verification", body: "OTP se apna number verify karein.", icon: Smartphone },
+  { n: "03", title: "KYC Upload", body: "Aadhaar / PAN upload — secure aur encrypted.", icon: ShieldCheck },
+  { n: "04", title: "District Selection", body: "Apna target district choose karein.", icon: MapPin },
+  { n: "05", title: "Training Complete", body: "Free training modules complete karein.", icon: BookOpen },
+  { n: "06", title: "Admin Approval", body: "Team review karti hai — 24–48 hrs me approval.", icon: BadgeCheck },
+  { n: "07", title: "Dashboard Activated", body: "Partner dashboard live — leads, shops, payout.", icon: LayoutDashboard },
+  { n: "08", title: "Start Onboarding Salons", body: "Salons onboard karein aur earning start.", icon: Store },
+];
+
+const PARTNER_DO = [
+  "Salon owners ko Nexora explain karna",
+  "Shop onboarding karwana",
+  "Website setup me help karna",
+  "QR / payment system samjhana",
+  "Shop ko active revenue-generating business banana",
+];
+
+const PARTNER_DONT = [
+  "Cash collect nahi karega",
+  "Salary employee nahi hoga",
+  "Fake promise nahi karega",
 ];
 
 const DASH_STATS = [
@@ -292,7 +324,7 @@ export function GrowthPartnerPage() {
         </div>
       </section>
 
-      {/* 4. HOW IT WORKS */}
+      {/* 4. HOW IT WORKS — 8 step onboarding */}
       <section className="border-y border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-6 py-28">
           <div className="mx-auto max-w-2xl text-center">
@@ -300,29 +332,201 @@ export function GrowthPartnerPage() {
               How it works
             </span>
             <h2 className="mt-4 text-4xl font-black tracking-tight text-[#0B1330] md:text-5xl" style={{ letterSpacing: "-0.02em" }}>
-              3 simple steps to start earning.
+              8 steps to activate your partner dashboard.
             </h2>
           </div>
-          <div className="mt-16 grid gap-6 md:grid-cols-3">
+          <div className="mt-16 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {HOW_STEPS.map((s, i) => (
               <motion.div
                 key={s.n}
                 initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
-                className="relative rounded-3xl border border-slate-200/70 bg-[#FAFBFF] p-8"
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ delay: i * 0.04 }}
+                className="relative rounded-2xl border border-slate-200/70 bg-[#FAFBFF] p-6"
               >
-                <div className="text-5xl font-black tracking-tighter text-[#4F46E5]/20">
-                  {s.n}
+                <div className="flex items-center justify-between">
+                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-white text-[#4F46E5] ring-1 ring-slate-200/70">
+                    <s.icon className="h-4 w-4" />
+                  </div>
+                  <span className="text-xs font-black tracking-widest text-[#4F46E5]/40">
+                    {s.n}
+                  </span>
                 </div>
-                <h3 className="mt-2 text-2xl font-bold tracking-tight text-[#0B1330]">
+                <h3 className="mt-5 text-base font-bold tracking-tight text-[#0B1330]">
                   {s.title}
                 </h3>
-                <p className="mt-2 text-[15px] leading-relaxed text-slate-600">{s.body}</p>
+                <p className="mt-1.5 text-sm leading-relaxed text-slate-600">{s.body}</p>
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* 4b. PARTNER WORK */}
+      <section className="mx-auto max-w-7xl px-6 py-28">
+        <div className="mx-auto max-w-2xl text-center">
+          <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#4F46E5]">
+            Partner Work
+          </span>
+          <h2 className="mt-4 text-4xl font-black tracking-tight text-[#0B1330] md:text-5xl" style={{ letterSpacing: "-0.02em" }}>
+            Partner ka kaam kya hai.
+          </h2>
+          <p className="mt-5 text-lg text-slate-600">
+            Clear scope — kya karna hai, kya nahi karna hai.
+          </p>
+        </div>
+        <div className="mt-14 grid gap-6 md:grid-cols-2">
+          <div className="rounded-3xl border border-slate-200/70 bg-white p-8">
+            <div className="inline-flex items-center gap-2 rounded-full bg-[#ECFDF5] px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[#059669]">
+              <CheckCircle2 className="h-3.5 w-3.5" /> Karna hai
+            </div>
+            <ul className="mt-6 space-y-4">
+              {PARTNER_DO.map((t) => (
+                <li key={t} className="flex items-start gap-3 text-[15px] text-[#0B1330]">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#22C55E]" />
+                  <span className="font-medium">{t}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="rounded-3xl border border-slate-200/70 bg-white p-8">
+            <div className="inline-flex items-center gap-2 rounded-full bg-red-50 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-red-600">
+              <ShieldAlert className="h-3.5 w-3.5" /> Nahi karna hai
+            </div>
+            <ul className="mt-6 space-y-4">
+              {PARTNER_DONT.map((t) => (
+                <li key={t} className="flex items-start gap-3 text-[15px] text-[#0B1330]">
+                  <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
+                  <span className="font-medium">Partner {t}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* 4c. EARNING MODEL */}
+      <section className="border-y border-slate-200 bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-28">
+          <div className="mx-auto max-w-2xl text-center">
+            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#4F46E5]">
+              Earning Model
+            </span>
+            <h2 className="mt-4 text-4xl font-black tracking-tight text-[#0B1330] md:text-5xl" style={{ letterSpacing: "-0.02em" }}>
+              No Collection = No Commission.
+            </h2>
+            <p className="mt-5 text-lg text-slate-600">
+              Real Collection = Real Partner Earning. Sirf verified, published, active aur
+              revenue-generating shops par commission.
+            </p>
+          </div>
+
+          <div className="mt-14 grid gap-5 md:grid-cols-3">
+            {[
+              { icon: BadgeCheck, title: "Verified", body: "Shop KYC aur listing verified honi chahiye." },
+              { icon: Store, title: "Published & Active", body: "Shop live aur customers ko book kar rahi ho." },
+              { icon: CircleDollarSign, title: "Revenue-Generating", body: "Nexora platform par asli revenue aana chahiye." },
+            ].map((c) => (
+              <div
+                key={c.title}
+                className="rounded-3xl border border-slate-200/70 bg-[#FAFBFF] p-7"
+              >
+                <div className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-[#4F46E5] to-[#6366F1] text-white">
+                  <c.icon className="h-5 w-5" />
+                </div>
+                <h3 className="mt-5 text-lg font-bold tracking-tight text-[#0B1330]">
+                  {c.title}
+                </h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-slate-600">{c.body}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-4 py-2 font-bold text-red-600">
+              <XCircle className="h-4 w-4" /> No Collection = No Commission
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#ECFDF5] px-4 py-2 font-bold text-[#059669]">
+              <CheckCircle2 className="h-4 w-4" /> Real Collection = Real Earning
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* 4d. ONE-TIME ACTIVATION COMMISSION */}
+      <section className="mx-auto max-w-7xl px-6 py-28">
+        <div className="grid gap-10 md:grid-cols-[1fr_1fr] md:items-center">
+          <div>
+            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#4F46E5]">
+              Activation Commission
+            </span>
+            <h2 className="mt-4 text-4xl font-black tracking-tight text-[#0B1330] md:text-5xl" style={{ letterSpacing: "-0.02em" }}>
+              10% one-time activation commission.
+            </h2>
+            <p className="mt-5 text-lg text-slate-600">
+              Aapke dwara onboard ki gayi shop ke <strong className="text-[#0B1330]">first 15 days</strong>{" "}
+              ke active Nexora platform revenue par 10% one-time activation commission.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EEF2FF] px-4 py-2 text-xs font-bold text-[#4F46E5]">
+                <KeyRound className="h-3.5 w-3.5" /> First 15 Days
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EEF2FF] px-4 py-2 text-xs font-bold text-[#4F46E5]">
+                <IndianRupee className="h-3.5 w-3.5" /> 10% Commission
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EEF2FF] px-4 py-2 text-xs font-bold text-[#4F46E5]">
+                <Repeat className="h-3.5 w-3.5" /> Per Shop
+              </span>
+            </div>
+          </div>
+
+          {/* Example calculator card */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="relative rounded-3xl border border-slate-200/80 bg-white p-7 shadow-[0_30px_80px_-30px_rgba(15,23,42,0.2)]"
+          >
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+              Live Example
+            </div>
+            <div className="mt-4 space-y-3">
+              {[
+                { k: "Shop Nexora revenue", v: "₹100 / day" },
+                { k: "15 days revenue", v: "₹1,500" },
+                { k: "Activation commission (10%)", v: "₹150" },
+              ].map((r) => (
+                <div
+                  key={r.k}
+                  className="flex items-center justify-between rounded-xl border border-slate-100 bg-[#FAFBFF] px-4 py-3"
+                >
+                  <span className="text-sm text-slate-600">{r.k}</span>
+                  <span className="text-sm font-bold text-[#0B1330]">{r.v}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 rounded-2xl bg-[#0B1330] p-5 text-white">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-[11px] font-semibold uppercase tracking-wider text-white/60">
+                    100 shops onboarded
+                  </div>
+                  <div className="mt-1 text-3xl font-black">₹15,000</div>
+                  <div className="mt-0.5 text-xs text-white/60">
+                    ₹150 × 100 shops · one-time activation
+                  </div>
+                </div>
+                <div className="grid h-12 w-12 place-items-center rounded-2xl bg-white/10">
+                  <IndianRupee className="h-5 w-5" />
+                </div>
+              </div>
+            </div>
+            <p className="mt-4 text-[11px] leading-relaxed text-slate-500">
+              *Recurring growth-share commission is separate. Numbers illustrative — actual
+              earnings depend on shop revenue.
+            </p>
+          </motion.div>
         </div>
       </section>
 
