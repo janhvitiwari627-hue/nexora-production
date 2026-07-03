@@ -62,6 +62,7 @@ import { Route as PortalBusinessPagesRouteImport } from './routes/portal.busines
 import { Route as PartnerShopsRouteImport } from './routes/partner.shops'
 import { Route as PartnerLeadsRouteImport } from './routes/partner.leads'
 import { Route as PartnerDashboardRouteImport } from './routes/partner.dashboard'
+import { Route as PartnerCommissionRouteImport } from './routes/partner.commission'
 import { Route as OwnerWebsiteRouteImport } from './routes/owner.website'
 import { Route as OwnerTemplatesRouteImport } from './routes/owner.templates'
 import { Route as OwnerStaffRouteImport } from './routes/owner.staff'
@@ -399,6 +400,11 @@ const PartnerLeadsRoute = PartnerLeadsRouteImport.update({
 const PartnerDashboardRoute = PartnerDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => PartnerRoute,
+} as any)
+const PartnerCommissionRoute = PartnerCommissionRouteImport.update({
+  id: '/commission',
+  path: '/commission',
   getParentRoute: () => PartnerRoute,
 } as any)
 const OwnerWebsiteRoute = OwnerWebsiteRouteImport.update({
@@ -860,6 +866,7 @@ export interface FileRoutesByFullPath {
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
+  '/partner/commission': typeof PartnerCommissionRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
   '/partner/leads': typeof PartnerLeadsRoute
   '/partner/shops': typeof PartnerShopsRoute
@@ -985,6 +992,7 @@ export interface FileRoutesByTo {
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
+  '/partner/commission': typeof PartnerCommissionRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
   '/partner/leads': typeof PartnerLeadsRoute
   '/partner/shops': typeof PartnerShopsRoute
@@ -1114,6 +1122,7 @@ export interface FileRoutesById {
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
+  '/partner/commission': typeof PartnerCommissionRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
   '/partner/leads': typeof PartnerLeadsRoute
   '/partner/shops': typeof PartnerShopsRoute
@@ -1244,6 +1253,7 @@ export interface FileRouteTypes {
     | '/owner/staff'
     | '/owner/templates'
     | '/owner/website'
+    | '/partner/commission'
     | '/partner/dashboard'
     | '/partner/leads'
     | '/partner/shops'
@@ -1369,6 +1379,7 @@ export interface FileRouteTypes {
     | '/owner/staff'
     | '/owner/templates'
     | '/owner/website'
+    | '/partner/commission'
     | '/partner/dashboard'
     | '/partner/leads'
     | '/partner/shops'
@@ -1497,6 +1508,7 @@ export interface FileRouteTypes {
     | '/owner/staff'
     | '/owner/templates'
     | '/owner/website'
+    | '/partner/commission'
     | '/partner/dashboard'
     | '/partner/leads'
     | '/partner/shops'
@@ -1988,6 +2000,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/partner/dashboard'
       preLoaderRoute: typeof PartnerDashboardRouteImport
+      parentRoute: typeof PartnerRoute
+    }
+    '/partner/commission': {
+      id: '/partner/commission'
+      path: '/commission'
+      fullPath: '/partner/commission'
+      preLoaderRoute: typeof PartnerCommissionRouteImport
       parentRoute: typeof PartnerRoute
     }
     '/owner/website': {
@@ -2644,6 +2663,7 @@ const OwnerRouteChildren: OwnerRouteChildren = {
 const OwnerRouteWithChildren = OwnerRoute._addFileChildren(OwnerRouteChildren)
 
 interface PartnerRouteChildren {
+  PartnerCommissionRoute: typeof PartnerCommissionRoute
   PartnerDashboardRoute: typeof PartnerDashboardRoute
   PartnerLeadsRoute: typeof PartnerLeadsRoute
   PartnerShopsRoute: typeof PartnerShopsRoute
@@ -2651,6 +2671,7 @@ interface PartnerRouteChildren {
 }
 
 const PartnerRouteChildren: PartnerRouteChildren = {
+  PartnerCommissionRoute: PartnerCommissionRoute,
   PartnerDashboardRoute: PartnerDashboardRoute,
   PartnerLeadsRoute: PartnerLeadsRoute,
   PartnerShopsRoute: PartnerShopsRoute,
