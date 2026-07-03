@@ -981,6 +981,8 @@ export function PostJobPage() {
               certification: m.certification,
               languages: m.languages,
               portfolio_option: m.portfolio,
+              screening_questions: m.screening,
+
             };
           })(),
         });
