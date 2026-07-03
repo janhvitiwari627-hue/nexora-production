@@ -740,7 +740,8 @@ export function BecomePartnerPage() {
 
 
       {/* Registration form */}
-      <section className="mx-auto max-w-2xl px-4 pb-20 md:px-6">
+      <section id="join" className="mx-auto max-w-2xl px-4 pb-24 md:px-6 scroll-mt-24">
+        <div id="talk" />
         <div className="border-border bg-card rounded-[24px] border p-7 shadow-[var(--shadow-card)]">
           <h2 className="text-heading text-2xl font-black">Get started</h2>
           <p className="text-muted-foreground mt-1 text-sm">Our partner success team will reach out within 24 hours.</p>
