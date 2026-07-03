@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { Activity, ArrowRight, BadgeCheck, Building2, CalendarClock, CheckCircle2, Crown, FileCheck, GraduationCap, Headphones as HeadphonesIcon, IndianRupee, LayoutDashboard, PlayCircle, Rocket, ShieldCheck, Sparkles, Store, Target, TrendingUp, Trophy, UserCheck, Users, Wallet, Zap, Award } from "lucide-react";
 import rewardWelcomeKit from "@/assets/reward-welcome-kit.jpg";
