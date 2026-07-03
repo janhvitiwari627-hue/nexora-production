@@ -132,6 +132,26 @@ export function PersonalInfoPanel() {
     }
   }
 
+  function isBucketMissingError(err: any): boolean {
+    const raw = (err?.message || err?.error || "").toString().toLowerCase();
+    const status = Number(err?.statusCode ?? err?.status ?? 0);
+    return (
+      raw.includes("bucket not found") ||
+      raw.includes("bucket does not exist") ||
+      raw.includes("no such bucket") ||
+      (status === 404 && raw.includes("bucket"))
+    );
+  }
+
+  async function fileToDataUrl(f: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ""));
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(f);
+    });
+  }
+
   async function handleAvatarFile(f: File) {
     if (!user) {
       const msg = "Please sign in to upload a photo";
@@ -147,27 +167,55 @@ export function PersonalInfoPanel() {
     try {
       const ext = f.name.split(".").pop()?.toLowerCase() || "jpg";
       const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+      let url: string | null = null;
+
       const { error: upErr } = await supabase.storage
         .from("avatars")
         .upload(path, f, { upsert: true, contentType: f.type });
-      if (upErr) throw upErr;
-      stage = "sign";
-      const { data: signed, error: signErr } = await supabase.storage
-        .from("avatars")
-        .createSignedUrl(path, 60 * 60 * 24 * 365);
-      if (signErr) throw signErr;
-      const url = signed.signedUrl;
+
+      if (upErr) {
+        // Graceful fallback: if the bucket is missing, save a data URL to
+        // the profile so editing never gets blocked by storage config.
+        if (isBucketMissingError(upErr)) {
+          console.warn("[avatar upload] avatars bucket missing — falling back to inline data URL");
+          if (f.size > 512 * 1024) {
+            throw new Error(
+              "Storage isn't configured yet. Please choose an image under 500 KB, or ask an admin to create the 'avatars' bucket.",
+            );
+          }
+          url = await fileToDataUrl(f);
+          toast.message("Storage not configured — saved photo inline.", {
+            description: "Ask an admin to enable the 'avatars' bucket for permanent hosting.",
+          });
+        } else {
+          throw upErr;
+        }
+      } else {
+        stage = "sign";
+        const { data: signed, error: signErr } = await supabase.storage
+          .from("avatars")
+          .createSignedUrl(path, 60 * 60 * 24 * 365);
+        if (signErr) throw signErr;
+        url = signed.signedUrl;
+      }
+
       stage = "profile";
       const { error: updErr } = await supabase
         .from("profiles")
         .update({ avatar_url: url })
         .eq("id", user.id);
       if (updErr) throw updErr;
-      setAvatar(url);
+      if (url) setAvatar(url);
       await refreshProfile();
-      toast.success("Profile photo updated");
+      if (stage === "profile" && url && !url.startsWith("data:")) {
+        toast.success("Profile photo updated");
+      } else if (url?.startsWith("data:")) {
+        toast.success("Profile photo saved");
+      }
     } catch (err: any) {
-      const msg = friendlyUploadError(err, stage);
+      const msg = err?.message?.includes("Storage isn't configured")
+        ? err.message
+        : friendlyUploadError(err, stage);
       console.error("[avatar upload] stage=", stage, err);
       setUploadError(msg);
       toast.error(msg);
