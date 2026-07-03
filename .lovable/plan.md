@@ -1,47 +1,100 @@
-## Goal
-Stop expanding scope. Lock V1 to the four items your own "Final Recommendation" lists, ship them to production-ready quality, and pilot in Jaipur before touching anything else on the gap list.
+## Problem
 
-## In Scope (V1 — ship these only)
+Admin panel ke saare 12 options open toh ho rahe hain, lekin andar ke features properly kaam nahi kar rahe:
 
-1. **Supabase schema + RLS hardening** (already ~90% done)
-   - Audit existing tables against SSOT; confirm RLS on every public table.
-   - Add only the 3 truly-blocking operational tables: `audit_events`, `system_settings`, `notification_queue`. Everything else on the "missing modules" list is deferred.
-   - Re-run security scanner; fix any findings.
+- Most pages **mock data** (`useState` + hardcoded arrays) use kar rahe hain — actual website ka data show nahi hota
+- Buttons (Approve, Reject, Suspend, Save, Delete) sirf `toast` message dikhate hain, real DB update nahi karte
+- Kuch pages incomplete hain (missing filters, empty tabs, no detail views)
+- Cross-linking missing hai (e.g. Business row se User profile ya bookings tak jump)
 
-2. **30-Minute White-Label Website Builder** (wizard already shipped last turn)
-   - Lock template gallery to the 3 approved templates: Luxury Salon (royal-luxe), Modern Professional (modern-salon), Spa & Wellness (professional-beauty).
-   - Verify: content persists across template switches, live preview works, mobile-first, "Powered by Nexora" only in footer, Nexora QR block present, no owner QR anywhere.
-   - Add a publish checklist gate (re-use `markSalonSetupComplete`).
+Yaani admin ke paas "full control" abhi sirf UI level pe hai — real backend ke saath wired nahi.
 
-3. **60-Second Booking Flow** (already wired)
-   - Verify Search → Business → Service → Staff → Date → Time → Confirm → WhatsApp end-to-end on mobile.
-   - Add: booking slot buffer (configurable, default 0), 90-day max advance window (already enforced as 30; bump to 90), min cancellation window (24h already), review eligibility = completed bookings only.
-   - WhatsApp deep link confirmation after booking.
+## Scope: 12 admin pages — page by page
 
-4. **Nexora QR + Daily 10 PM Settlement**
-   - Confirm only Nexora QR is rendered on public sites / booking confirmation (remove any owner-QR paths).
-   - Schedule `process_pending_settlements` via pg_cron at 22:00 IST daily.
-   - Owner wallet shows daily settlement entries.
+Har page pe (a) real Lovable Cloud data pull karna hai, (b) actions ko real DB writes se jodna hai, (c) missing features complete karne hain.
 
-## Explicitly Deferred (NOT in V1)
+### 1. Dashboard (`/admin/dashboard`)
+- Real KPIs: total users, businesses, bookings, revenue, active jobs — DB counts se
+- Recent activity feed real bookings/signups/reviews se
+- Pending actions live count (approvals waiting)
+- Quick-jump links har KPI se relevant page tak
 
-Everything else in your message:
-- Legal/help/status/press pages (stub with placeholder routes only if missing)
-- 16 operational DB modules beyond the 3 above
-- Owner Referral 2%/8% split, District Partner 10/5/2% commission ladder, Distributor portal expansion, Super Admin fraud/AI suite
-- AI Marketing / Posters / Content / Revenue Advisor / Return Manager
-- 30 enterprise doc volumes
-- Search ranking algorithm, idempotency standard, correlation IDs, webhook management API, feature flags, support tickets, media processing jobs
+### 2. Users (`/admin/users`)
+- Real user list `profiles` + `user_roles` se
+- Filters: role, status, city, signup date, search
+- Actions: role assign/revoke, suspend, delete, reset password, view bookings
+- Detail drawer: profile, roles, activity, membership, reviews
 
-These re-enter scope **after** the Jaipur pilot validates V1.
+### 3. Businesses (`/admin/businesses`)
+- Real salon list; approve/reject pending owner registrations (already partial)
+- Suspend/verify/feature toggle — DB write
+- View business detail: staff, services, bookings, revenue, reviews
+- Bulk actions
 
-## Execution Order
-1. Run security scan → fix blockers (1 turn)
-2. Template gallery audit + publish-checklist gate (1 turn)
-3. Booking flow rule tweaks (buffer, 90-day window, review gating) (1 turn)
-4. pg_cron 22:00 IST settlement job + owner wallet verification (1 turn)
-5. Add `audit_events`, `system_settings`, `notification_queue` tables with RLS (1 migration)
-6. End-to-end Playwright smoke on mobile viewport, then publish "Nexora SalonOS V1 — Jaipur Pilot"
+### 4. Jobs & Hiring (`/admin/jobs`)
+- Real jobs from `jobs` table (currently mock)
+- Applications tab wired to real applicants table
+- Interview requests + Hire requests real
+- Approve/close/flag job, approve/reject applications — DB write
+- Candidate profile view
+
+### 5. Partner Applications (`/admin/partner-applications`)
+- Pehle se real hai — polish: bulk actions, notes, contact log
+
+### 6. Payments (`/admin/payments`)
+- UPI/QR management from DB (not local state)
+- Pending payment verifications: approve screenshot → mark booking paid
+- Settlements table with real aggregates
+- Transactions with filters (date, amount, status, method)
+- Refund action
+
+### 7. Advertising (`/admin/advertising`)
+- Listing + Video campaigns real from DB
+- Create/edit campaign → DB write, upload creative
+- Approve pending campaigns, pause/resume, budget edits
+- Performance metrics (impressions/clicks) from analytics events
+
+### 8. Rewards (`/admin/rewards`)
+- Reward rules CRUD (points per booking, referral bonus, etc.)
+- Redemption requests approve/reject
+- Reward transactions log
+- Manual points adjustment for a user
+
+### 9. Reviews (`/admin/reviews`)
+- Real reviews list with filters (rating, business, flagged)
+- Approve/reject/hide, delete, reply as admin
+- Flagged reviews queue
+
+### 10. Rankings (`/admin/rankings`)
+- Featured shops management: pin/unpin, order, expiry
+- Sponsored slots CRUD
+- Category-wise top shops override
+
+### 11. Analytics (`/admin/analytics`)
+- Real charts: revenue trend, bookings/day, user growth, top cities, top categories
+- Date range picker, export CSV
+- Cohort/funnel basics
+
+### 12. Settings (`/admin/settings`)
+- Platform settings (commission %, min payout, feature flags) persisted in a `platform_settings` table
+- Contact email, support phone
+- Terms/Privacy content editors
+- Maintenance mode toggle
+
+## Approach
+
+Because ye 12 pages ka bada kaam hai, main **do phases** mein karunga taaki har turn pe ek clean shippable slice mile:
+
+**Phase 1 — Data wiring (real DB reads):**
+Har page ke lists/tables ko real Lovable Cloud queries se jodna. Jo tables missing hain (jaise `platform_settings`, `reward_rules`, `ad_campaigns`) unke migrations create karna with RLS + GRANTs.
+
+**Phase 2 — Action wiring:**
+Har button/toggle/form ko real mutation se jodna (RPC ya server function), success/error handling, optimistic updates, react-query invalidation.
+
+Ek turn mein 2–3 pages complete karunga end-to-end, phir agla batch. Aap priority bata sakte hain — konsa page pehle chahiye.
 
 ## Confirm before I start
-Reply **"go V1"** to proceed exactly as above, or tell me which of the deferred items must move into V1 (each one added pushes pilot launch).
+
+1. **Priority order** — konsa page sabse pehle chahiye? (default order: Jobs → Payments → Businesses → Users → baaki)
+2. **Missing tables banane ki permission** — Rewards, Ads, Platform Settings, Rankings ke liye naye tables chahiye. OK?
+3. **Kya kuch page abhi mock hi rehne dena hai** (agar aap chahte ho ki sirf UI dikh jaaye MVP ke liye)?
