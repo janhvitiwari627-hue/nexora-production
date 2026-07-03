@@ -1011,6 +1011,8 @@
 /* Gradient text → indigo-purple-blue */
 .partner-noir .text-transparent.bg-clip-text {
   background-image: linear-gradient(135deg, var(--pn-indigo) 0%, var(--pn-purple) 50%, var(--pn-blue) 100%) !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
 }
 
 /* Hairline section dividers */
