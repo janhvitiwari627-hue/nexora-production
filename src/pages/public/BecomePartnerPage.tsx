@@ -557,6 +557,142 @@ export function BecomePartnerPage() {
         </div>
       </section>
 
+      {/* Section 10 — Milestone Rewards */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <Trophy className="h-3 w-3" /> Milestone Rewards
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            Every milestone unlocks something bigger
+          </h2>
+          <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-base">
+            Tangible rewards, status upgrades, and long-term recognition — the more salons you activate, the more you unlock.
+          </p>
+        </div>
+
+        {/* Timeline */}
+        <div className="relative mt-12">
+          {/* Track */}
+          <div className="pointer-events-none absolute left-0 right-0 top-6 hidden h-1 rounded-full bg-gradient-to-r from-primary/20 via-primary/50 to-primary md:block" />
+
+          <div className="grid gap-6 md:grid-cols-4">
+            {[
+              {
+                count: "25",
+                label: "Shops",
+                tier: "Recognition",
+                icon: Award,
+                rewards: ["Welcome Kit", "Official T-Shirt"],
+                accent: "from-slate-500/10 to-slate-500/5",
+                iconBg: "bg-slate-500/15 text-slate-600 dark:text-slate-300",
+              },
+              {
+                count: "100",
+                label: "Shops",
+                tier: "Growth Builder",
+                icon: BadgeCheck,
+                rewards: ["Nexora Tablet", "Growth Builder Badge"],
+                accent: "from-primary/15 to-primary/5",
+                iconBg: "bg-primary/15 text-primary",
+              },
+              {
+                count: "500",
+                label: "Shops",
+                tier: "Platinum Partner",
+                icon: Crown,
+                rewards: ["Branded Laptop", "Platinum Partner Status"],
+                accent: "from-violet-500/15 to-violet-500/5",
+                iconBg: "bg-violet-500/15 text-violet-600 dark:text-violet-300",
+              },
+              {
+                count: "1000",
+                label: "Shops",
+                tier: "Leadership Circle",
+                icon: Trophy,
+                rewards: [
+                  "District Leader Status",
+                  "Leadership Circle",
+                  "Hall of Fame",
+                  "Car Reward Program (as per company policy)",
+                ],
+                accent: "from-amber-500/20 to-amber-500/5",
+                iconBg: "bg-amber-500/20 text-amber-600 dark:text-amber-300",
+                elite: true,
+              },
+            ].map((m, i) => (
+              <div key={m.count} className="relative">
+                {/* Node dot on the track (desktop) */}
+                <div className="absolute left-1/2 top-4 hidden -translate-x-1/2 md:block">
+                  <div className={`grid h-5 w-5 place-items-center rounded-full border-2 border-background shadow-md ${m.elite ? "bg-amber-500" : "bg-primary"}`}>
+                    <div className="h-1.5 w-1.5 rounded-full bg-white" />
+                  </div>
+                </div>
+
+                <div
+                  className={`group relative mt-0 overflow-hidden rounded-[var(--radius-card)] border p-5 shadow-[var(--shadow-card)] transition-all hover:-translate-y-1 hover:shadow-lg md:mt-14 ${
+                    m.elite
+                      ? "border-amber-400/50 bg-gradient-to-br from-[#1a1006] via-[#3a2410] to-[#0A2540] text-white"
+                      : "border-border bg-card"
+                  }`}
+                >
+                  {/* Ambient glow */}
+                  <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${m.accent} opacity-60`} />
+
+                  <div className="relative">
+                    <div className="flex items-center gap-3">
+                      <div className={`grid h-11 w-11 place-items-center rounded-xl ${m.elite ? "bg-white/15 text-amber-300" : m.iconBg}`}>
+                        <m.icon className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <div className={`text-[10px] font-bold uppercase tracking-wider ${m.elite ? "text-amber-300" : "text-primary"}`}>
+                          Tier {i + 1} · {m.tier}
+                        </div>
+                        <div className="flex items-baseline gap-1">
+                          <span className={`text-3xl font-black ${m.elite ? "text-white" : "text-heading"}`}>{m.count}</span>
+                          <span className={`text-xs font-bold uppercase tracking-wider ${m.elite ? "text-white/70" : "text-muted-foreground"}`}>
+                            {m.label}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 space-y-2">
+                      {m.rewards.map((r) => (
+                        <div
+                          key={r}
+                          className={`flex items-start gap-2 rounded-lg px-2.5 py-2 text-xs ${
+                            m.elite ? "bg-white/10" : "bg-muted/50"
+                          }`}
+                        >
+                          <BadgeCheck className={`mt-0.5 h-3.5 w-3.5 shrink-0 ${m.elite ? "text-amber-300" : "text-primary"}`} />
+                          <span className={`font-semibold ${m.elite ? "text-white" : "text-heading"}`}>{r}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {m.elite && (
+                      <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-amber-300/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-300">
+                        <Crown className="h-3 w-3" /> Elite tier
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-6 flex items-start justify-center gap-2 rounded-lg border border-amber-300/40 bg-amber-50/60 p-3 text-xs text-amber-900 dark:bg-amber-950/30 dark:text-amber-200">
+          <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+          <span>
+            Illustrative rewards shown. All milestone thresholds and rewards load dynamically from Admin-configured backend values — the Car Reward Program is subject to company policy.
+          </span>
+        </div>
+      </section>
+
+
+
 
       {/* Trust — Why partner with Nexora */}
       <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
