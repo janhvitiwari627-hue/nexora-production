@@ -1123,34 +1123,48 @@ export type Database = {
           area: string | null
           benefits: string[] | null
           business_name: string | null
+          business_type: string | null
           category: string
+          certification_requirement: string | null
           city: string
           contact_mobile: string | null
           contact_person: string | null
           created_at: string
           description: string
           employer_id: string
+          end_time: string | null
           experience_level: string | null
+          flexible_schedule: boolean
           id: string
           interview_mode: string | null
           job_role: string | null
           job_type: string
+          joining_date_type: string | null
+          language_preferences: Json
+          location_type: string | null
           openings: number
+          portfolio_required: boolean
+          portfolio_type: string | null
           posted_by: string
           published_at: string | null
           requirements: string | null
+          resume_preferred: boolean
           salary_max: number | null
           salary_min: number | null
           salary_period: string | null
+          salary_type: string | null
           schedule: string | null
+          screening_questions: Json
           shop_id: string | null
           skills: string[] | null
           specific_role: string | null
+          start_time: string | null
           status: string
           title: string
           updated_at: string
           whatsapp_number: string | null
           work_location: string | null
+          working_days: Json
         }
         Insert: {
           address?: string | null
@@ -1158,34 +1172,48 @@ export type Database = {
           area?: string | null
           benefits?: string[] | null
           business_name?: string | null
+          business_type?: string | null
           category: string
+          certification_requirement?: string | null
           city: string
           contact_mobile?: string | null
           contact_person?: string | null
           created_at?: string
           description: string
           employer_id: string
+          end_time?: string | null
           experience_level?: string | null
+          flexible_schedule?: boolean
           id?: string
           interview_mode?: string | null
           job_role?: string | null
           job_type: string
+          joining_date_type?: string | null
+          language_preferences?: Json
+          location_type?: string | null
           openings?: number
+          portfolio_required?: boolean
+          portfolio_type?: string | null
           posted_by: string
           published_at?: string | null
           requirements?: string | null
+          resume_preferred?: boolean
           salary_max?: number | null
           salary_min?: number | null
           salary_period?: string | null
+          salary_type?: string | null
           schedule?: string | null
+          screening_questions?: Json
           shop_id?: string | null
           skills?: string[] | null
           specific_role?: string | null
+          start_time?: string | null
           status?: string
           title: string
           updated_at?: string
           whatsapp_number?: string | null
           work_location?: string | null
+          working_days?: Json
         }
         Update: {
           address?: string | null
@@ -1193,34 +1221,48 @@ export type Database = {
           area?: string | null
           benefits?: string[] | null
           business_name?: string | null
+          business_type?: string | null
           category?: string
+          certification_requirement?: string | null
           city?: string
           contact_mobile?: string | null
           contact_person?: string | null
           created_at?: string
           description?: string
           employer_id?: string
+          end_time?: string | null
           experience_level?: string | null
+          flexible_schedule?: boolean
           id?: string
           interview_mode?: string | null
           job_role?: string | null
           job_type?: string
+          joining_date_type?: string | null
+          language_preferences?: Json
+          location_type?: string | null
           openings?: number
+          portfolio_required?: boolean
+          portfolio_type?: string | null
           posted_by?: string
           published_at?: string | null
           requirements?: string | null
+          resume_preferred?: boolean
           salary_max?: number | null
           salary_min?: number | null
           salary_period?: string | null
+          salary_type?: string | null
           schedule?: string | null
+          screening_questions?: Json
           shop_id?: string | null
           skills?: string[] | null
           specific_role?: string | null
+          start_time?: string | null
           status?: string
           title?: string
           updated_at?: string
           whatsapp_number?: string | null
           work_location?: string | null
+          working_days?: Json
         }
         Relationships: [
           {

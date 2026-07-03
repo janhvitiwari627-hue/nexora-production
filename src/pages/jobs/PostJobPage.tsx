@@ -968,21 +968,40 @@ export function PostJobPage() {
           whatsapp_number: job.whatsapp_number ?? "",
           interview_mode: job.interview_mode ?? INTERVIEW_MODES[0],
           shop_id: job.shop_id ?? null,
-          business_type: "",
+          business_type: (job as any).business_type ?? "",
           days_preset: "",
-          custom_days: [],
+          custom_days: Array.isArray((job as any).working_days) ? ((job as any).working_days as string[]) : [],
           hours_preset: "",
-          start_time: "",
-          end_time: "",
-          flexible_schedule: /flexible/i.test(job.schedule ?? ""),
+          start_time: (job as any).start_time ?? "",
+          end_time: (job as any).end_time ?? "",
+          flexible_schedule: (job as any).flexible_schedule ?? /flexible/i.test(job.schedule ?? ""),
+          joining_availability: (job as any).joining_date_type ?? "",
+          salary_type: (job as any).salary_type ?? "",
+          salary_range_preset: "",
           ...(() => {
             const m = parseRequirementsMeta(job.requirements);
+            const langs = Array.isArray((job as any).language_preferences) && ((job as any).language_preferences as string[]).length > 0
+              ? ((job as any).language_preferences as string[])
+              : m.languages;
+            const cert = ((job as any).certification_requirement as string | null) || m.certification;
+            const pType = (job as any).portfolio_type as string | null;
+            const pRequired = (job as any).portfolio_required as boolean | null;
+            const rPreferred = (job as any).resume_preferred as boolean | null;
+            const portfolio_option: PortfolioOption | "" =
+              pType === "instagram_required" ? "Instagram profile required" :
+              pType === "portfolio_required" ? "Portfolio required" :
+              pType === "none" ? "No portfolio needed" :
+              rPreferred ? "Resume preferred" :
+              pRequired ? "Portfolio required" :
+              m.portfolio;
+            const screening = Array.isArray((job as any).screening_questions) && ((job as any).screening_questions as any[]).length > 0
+              ? ((job as any).screening_questions as ScreeningQuestion[])
+              : m.screening;
             return {
-              certification: m.certification,
-              languages: m.languages,
-              portfolio_option: m.portfolio,
-              screening_questions: m.screening,
-
+              certification: cert,
+              languages: langs,
+              portfolio_option,
+              screening_questions: screening,
             };
           })(),
         });
@@ -1092,6 +1111,22 @@ export function PostJobPage() {
         metaLines.push(`Screening: ${JSON.stringify(form.screening_questions)}`);
       const composedReq = [baseReq, metaLines.join("\n")].filter(Boolean).join("\n\n").trim();
 
+      // Derive portfolio flags from the selected option.
+      const portfolioOpt = form.portfolio_option ?? "";
+      const portfolio_required =
+        portfolioOpt === "Portfolio required" || portfolioOpt === "Instagram profile required";
+      const portfolio_type =
+        portfolioOpt === "Instagram profile required" ? "instagram_required" :
+        portfolioOpt === "Portfolio required" ? "portfolio_required" :
+        portfolioOpt === "No portfolio needed" ? "none" :
+        portfolioOpt === "Resume preferred" ? "resume_preferred" : null;
+      const resume_preferred = portfolioOpt === "Resume preferred";
+
+      const working_days =
+        (form.custom_days && form.custom_days.length > 0)
+          ? form.custom_days
+          : (form.days_preset ? [form.days_preset] : []);
+
       const cleaned: JobDraftInput = {
         ...dbForm,
         area: dbForm.area || null,
@@ -1110,6 +1145,21 @@ export function PostJobPage() {
         whatsapp_number: dbForm.whatsapp_number?.trim() || null,
         interview_mode: dbForm.interview_mode || null,
         shop_id: shopId,
+        // Persist first-class columns for all quick-select values.
+        business_type: form.business_type || null,
+        location_type: dbForm.work_location || null,
+        working_days,
+        start_time: form.start_time || null,
+        end_time: form.end_time || null,
+        flexible_schedule: !!form.flexible_schedule,
+        joining_date_type: form.joining_availability || null,
+        salary_type: form.salary_type || null,
+        certification_requirement: form.certification || null,
+        language_preferences: form.languages ?? [],
+        portfolio_required,
+        portfolio_type,
+        resume_preferred,
+        screening_questions: form.screening_questions ?? [],
       };
       const row = await saveJob({
         jobId,
@@ -2009,7 +2059,8 @@ function LocationStep({
 }) {
   const chipCls = (active: boolean) =>
     cn(
-      "rounded-full border px-4 py-1.5 text-xs font-bold transition",
+      "cursor-pointer select-none rounded-full border px-4 py-2 text-xs font-bold transition min-h-9",
+      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
       active
         ? "border-transparent bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
         : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
@@ -2313,7 +2364,8 @@ function SalaryStep({
 }) {
   const chipCls = (active: boolean) =>
     cn(
-      "rounded-full border px-4 py-1.5 text-xs font-bold transition",
+      "cursor-pointer select-none rounded-full border px-4 py-2 text-xs font-bold transition min-h-9",
+      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
       active
         ? "border-transparent bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]"
         : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-heading",
