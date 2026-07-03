@@ -5,6 +5,14 @@ import rewardWelcomeKit from "@/assets/reward-welcome-kit.jpg";
 import rewardTabletBadge from "@/assets/reward-tablet-badge.jpg";
 import rewardLaptop from "@/assets/reward-laptop.jpg";
 import rewardCar from "@/assets/reward-car.jpg";
+import heroSalon from "@/assets/partner-hero-salon.jpg";
+import imgParlour from "@/assets/partner-beauty-parlour.jpg";
+import imgSpa from "@/assets/partner-spa.jpg";
+import imgBarber from "@/assets/partner-barber.jpg";
+import imgTattoo from "@/assets/partner-tattoo.jpg";
+import imgNail from "@/assets/partner-nailart.jpg";
+import imgJaipur from "@/assets/partner-jaipur.jpg";
+import imgCustomer from "@/assets/partner-customer.jpg";
 
 
 const formSchema = z.object({
