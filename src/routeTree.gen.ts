@@ -117,6 +117,7 @@ import { Route as AdminRewardsRouteImport } from './routes/admin.rewards'
 import { Route as AdminReviewsRouteImport } from './routes/admin.reviews'
 import { Route as AdminRankingsRouteImport } from './routes/admin.rankings'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
+import { Route as AdminPartnerApplicationsRouteImport } from './routes/admin.partner-applications'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
@@ -681,6 +682,12 @@ const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
   path: '/payments',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminPartnerApplicationsRoute =
+  AdminPartnerApplicationsRouteImport.update({
+    id: '/partner-applications',
+    path: '/partner-applications',
+    getParentRoute: () => AdminRoute,
+  } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -840,6 +847,7 @@ export interface FileRoutesByFullPath {
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/partner-applications': typeof AdminPartnerApplicationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/rankings': typeof AdminRankingsRoute
   '/admin/reviews': typeof AdminReviewsRoute
@@ -970,6 +978,7 @@ export interface FileRoutesByTo {
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/partner-applications': typeof AdminPartnerApplicationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/rankings': typeof AdminRankingsRoute
   '/admin/reviews': typeof AdminReviewsRoute
@@ -1104,6 +1113,7 @@ export interface FileRoutesById {
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/partner-applications': typeof AdminPartnerApplicationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/rankings': typeof AdminRankingsRoute
   '/admin/reviews': typeof AdminReviewsRoute
@@ -1239,6 +1249,7 @@ export interface FileRouteTypes {
     | '/admin/businesses'
     | '/admin/dashboard'
     | '/admin/login'
+    | '/admin/partner-applications'
     | '/admin/payments'
     | '/admin/rankings'
     | '/admin/reviews'
@@ -1369,6 +1380,7 @@ export interface FileRouteTypes {
     | '/admin/businesses'
     | '/admin/dashboard'
     | '/admin/login'
+    | '/admin/partner-applications'
     | '/admin/payments'
     | '/admin/rankings'
     | '/admin/reviews'
@@ -1502,6 +1514,7 @@ export interface FileRouteTypes {
     | '/admin/businesses'
     | '/admin/dashboard'
     | '/admin/login'
+    | '/admin/partner-applications'
     | '/admin/payments'
     | '/admin/rankings'
     | '/admin/reviews'
@@ -2435,6 +2448,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPaymentsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/partner-applications': {
+      id: '/admin/partner-applications'
+      path: '/partner-applications'
+      fullPath: '/admin/partner-applications'
+      preLoaderRoute: typeof AdminPartnerApplicationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/login': {
       id: '/admin/login'
       path: '/login'
@@ -2605,6 +2625,7 @@ interface AdminRouteChildren {
   AdminBusinessesRoute: typeof AdminBusinessesRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminPartnerApplicationsRoute: typeof AdminPartnerApplicationsRoute
   AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminRankingsRoute: typeof AdminRankingsRoute
   AdminReviewsRoute: typeof AdminReviewsRoute
@@ -2619,6 +2640,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminBusinessesRoute: AdminBusinessesRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminPartnerApplicationsRoute: AdminPartnerApplicationsRoute,
   AdminPaymentsRoute: AdminPaymentsRoute,
   AdminRankingsRoute: AdminRankingsRoute,
   AdminReviewsRoute: AdminReviewsRoute,
