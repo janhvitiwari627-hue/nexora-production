@@ -21,12 +21,13 @@ function slugifyUsername(name: string) {
 }
 
 export function PersonalInfoPanel() {
-  const { user, profile, refreshProfile } = useAuthStore();
+  const { user, profile, refreshProfile, setUser } = useAuthStore();
   const [avatar, setAvatar] = useState<string>(profile?.avatar_url || "");
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [usernameTouched, setUsernameTouched] = useState(false);
+  const [sessionChecked, setSessionChecked] = useState(false);
 
   const [form, setForm] = useState({
     fullName: profile?.full_name || "",
@@ -40,7 +41,33 @@ export function PersonalInfoPanel() {
   });
   const [pincodeError, setPincodeError] = useState<string | null>(null);
 
-  // Hydrate when profile arrives
+  // Fetch active Supabase session on mount and refresh profile from DB
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase.auth.getUser();
+        if (cancelled) return;
+        if (error || !data.user) {
+          setSessionChecked(true);
+          return;
+        }
+        if (!user) setUser(data.user);
+        await refreshProfile();
+      } catch (e) {
+        console.warn("[PersonalInfoPanel] session hydration failed", e);
+      } finally {
+        if (!cancelled) setSessionChecked(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // Run once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Hydrate form when profile arrives / changes
   useEffect(() => {
     if (!profile) return;
     setForm({
@@ -56,6 +83,9 @@ export function PersonalInfoPanel() {
     setAvatar(profile.avatar_url || "");
     setUsernameTouched(!!profile.username);
   }, [profile]);
+
+  // Silence unused-var lint for the diagnostic flag while still exposing it for future UI states
+  void sessionChecked;
 
   const districts = useMemo(() => getDistricts(form.state), [form.state]);
   const blocks = useMemo(() => getBlocks(form.state, form.district), [form.state, form.district]);
