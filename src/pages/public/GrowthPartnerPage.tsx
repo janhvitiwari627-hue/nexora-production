@@ -530,6 +530,175 @@ export function GrowthPartnerPage() {
         </div>
       </section>
 
+      {/* 4e. RECURRING GROWTH SHARE — commission ladder */}
+      <section className="border-y border-slate-200 bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-28">
+          <div className="mx-auto max-w-2xl text-center">
+            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#4F46E5]">
+              Recurring Growth Share
+            </span>
+            <h2 className="mt-4 text-4xl font-black tracking-tight text-[#0B1330] md:text-5xl" style={{ letterSpacing: "-0.02em" }}>
+              Long-term commission ladder.
+            </h2>
+            <p className="mt-5 text-lg text-slate-600">
+              Har onboarded shop par recurring share — jaisi shop chalti rahegi, waise
+              earning aati rahegi.
+            </p>
+          </div>
+
+          <div className="mt-14 grid gap-5 md:grid-cols-3">
+            {[
+              { tier: "First 6 Months", rate: "10%", tone: "from-[#4F46E5] to-[#6366F1]", ring: "ring-[#4F46E5]/20" },
+              { tier: "Month 7 – 12", rate: "5%", tone: "from-[#6366F1] to-[#818CF8]", ring: "ring-[#6366F1]/20" },
+              { tier: "After 12 Months", rate: "2%", tone: "from-[#818CF8] to-[#A5B4FC]", ring: "ring-[#818CF8]/20" },
+            ].map((t, i) => (
+              <motion.div
+                key={t.tier}
+                initial={{ opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ delay: i * 0.06 }}
+                className={`relative overflow-hidden rounded-3xl border border-slate-200/70 bg-white p-8 ring-1 ${t.ring}`}
+              >
+                <div className={`absolute -right-8 -top-8 h-32 w-32 rounded-full bg-gradient-to-br ${t.tone} opacity-10`} />
+                <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                  {t.tier}
+                </div>
+                <div className={`mt-3 bg-gradient-to-br ${t.tone} bg-clip-text text-6xl font-black tracking-tight text-transparent`} style={{ letterSpacing: "-0.03em" }}>
+                  {t.rate}
+                </div>
+                <div className="mt-1 text-sm font-semibold text-slate-500">
+                  of Nexora platform revenue
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="mx-auto mt-10 max-w-3xl rounded-2xl border border-amber-200 bg-amber-50 p-5">
+            <div className="flex items-start gap-3">
+              <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
+              <div className="text-sm leading-relaxed text-amber-900">
+                <p>
+                  <strong>Important:</strong> Ye commission Nexora ke platform revenue me
+                  se milega.
+                </p>
+                <p className="mt-1">
+                  Ye shop ke total bill amount me se <strong>nahi</strong> milega.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4f. WEEKLY PAYOUT — dashboard preview */}
+      <section className="mx-auto max-w-7xl px-6 py-28">
+        <div className="grid gap-12 md:grid-cols-[0.9fr_1.1fr] md:items-center">
+          <div>
+            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#4F46E5]">
+              Weekly Payout
+            </span>
+            <h2 className="mt-4 text-4xl font-black tracking-tight text-[#0B1330] md:text-5xl" style={{ letterSpacing: "-0.02em" }}>
+              Transparent dashboard. Weekly auto payout.
+            </h2>
+            <p className="mt-5 text-lg text-slate-600">
+              Partner commission daily dashboard me show hoga. Eligible commission har 7
+              days me auto payout hota hai — aur available balance ka withdrawal kabhi
+              bhi request kar sakte ho.
+            </p>
+            <ul className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {[
+                "Daily collection",
+                "Daily commission",
+                "Pending balance",
+                "Available balance",
+                "Weekly payout",
+                "Payout status",
+                "Statement download",
+              ].map((t) => (
+                <li key={t} className="flex items-center gap-2 text-sm font-semibold text-[#0B1330]">
+                  <CheckCircle2 className="h-4 w-4 text-[#22C55E]" />
+                  {t}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Right — payout dashboard mock */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="relative rounded-3xl border border-slate-200/80 bg-white p-6 shadow-[0_30px_80px_-30px_rgba(15,23,42,0.25)] md:p-7"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                  Payout Cycle
+                </div>
+                <div className="mt-0.5 text-base font-bold text-[#0B1330]">Mon 24 → Sun 30</div>
+              </div>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#ECFDF5] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#059669]">
+                <CalendarClock className="h-3 w-3" /> Auto · Weekly
+              </span>
+            </div>
+
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              {[
+                { label: "Daily Collection", value: "₹4,200", tint: "text-[#0B1330]" },
+                { label: "Daily Commission", value: "₹420", tint: "text-[#4F46E5]" },
+                { label: "Pending Balance", value: "₹1,180", tint: "text-amber-600" },
+                { label: "Available Balance", value: "₹12,480", tint: "text-[#059669]" },
+              ].map((s) => (
+                <div key={s.label} className="rounded-2xl border border-slate-100 bg-[#FAFBFF] p-4">
+                  <div className="text-[11px] font-medium text-slate-500">{s.label}</div>
+                  <div className={`mt-1 text-xl font-black ${s.tint}`}>{s.value}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-5 rounded-2xl border border-slate-100 bg-white p-4">
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-semibold text-slate-500">This week payout</div>
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#ECFDF5] px-2 py-0.5 text-[10px] font-bold text-[#059669]">
+                  Processed
+                </span>
+              </div>
+              <div className="mt-2 flex items-end justify-between">
+                <div className="text-2xl font-black text-[#0B1330]">₹8,650</div>
+                <div className="text-[11px] text-slate-500">Credited · Fri 3:12 PM</div>
+              </div>
+              <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                <motion.div
+                  initial={{ width: 0 }}
+                  whileInView={{ width: "100%" }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.9, ease: "easeOut" }}
+                  className="h-full rounded-full bg-gradient-to-r from-[#22C55E] to-[#059669]"
+                />
+              </div>
+            </div>
+
+            <div className="mt-4 flex gap-3">
+              <button
+                type="button"
+                className="flex-1 rounded-xl bg-[#0B1330] px-4 py-3 text-sm font-bold text-white"
+              >
+                Withdraw Balance
+              </button>
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-[#0B1330]"
+              >
+                <BarChart3 className="h-4 w-4" /> Statement
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+
       {/* 5. ECOSYSTEM */}
       <section className="mx-auto max-w-7xl px-6 py-28">
         <div className="mx-auto max-w-2xl text-center">
