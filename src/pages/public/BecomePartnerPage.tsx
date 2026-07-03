@@ -43,20 +43,42 @@ export function BecomePartnerPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero + calculator */}
+      {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[#0A2540] via-[#1a1060] to-[#635BFF] py-20 md:py-28">
         <div className="absolute inset-0 opacity-20 [background-image:radial-gradient(circle_at_2px_2px,white_1px,transparent_0)] [background-size:32px_32px]" />
-        <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 md:px-6 lg:grid-cols-2">
+        <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 md:px-6 lg:grid-cols-[1.15fr_1fr]">
           <div>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white">
-              <Sparkles className="h-3 w-3" /> Join Growth Partner Program
+              <Sparkles className="h-3 w-3" /> District Business Partner Program
             </span>
-            <h1 className="mt-4 text-4xl font-black tracking-tight text-white md:text-6xl" style={{ fontFamily: "Inter, sans-serif" }}>
-              Earn more. <br />Stress less.
+            <h1 className="mt-4 text-4xl font-black leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">
+              Apne District Ki Beauty Industry Ko{" "}
+              <span className="bg-gradient-to-r from-amber-300 to-orange-400 bg-clip-text text-transparent">
+                Digital Banaiye
+              </span>{" "}
+              Aur Us Growth Ka Hissa Baniye.
             </h1>
-            <p className="mt-4 max-w-md text-base text-white/85 md:text-lg">
-              Join 12,000+ salons growing 38% faster with Nexora. Zero setup. 24-hour onboarding.
+            <p className="mt-5 max-w-xl text-base text-white/85 md:text-lg">
+              Nexora SalonOS Jaipur ki Beauty Industry ka Digital Ecosystem hai. Agar aapke paas
+              salon owners ka network hai, to aap is digital transformation ka official Growth
+              Partner ban sakte hain.
             </p>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <a href="#join" className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-black shadow-[var(--shadow-glow)] transition hover:scale-[1.03]">
+                Join Free <ArrowRight className="h-4 w-4" />
+              </a>
+              <a href="#opportunity" className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 py-3.5 text-sm font-black text-white backdrop-blur transition hover:bg-white/20">
+                <PlayCircle className="h-4 w-4" /> Watch Opportunity
+              </a>
+              <a href="#talk" className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-transparent px-6 py-3.5 text-sm font-black text-white transition hover:bg-white/10">
+                <HeadphonesIcon className="h-4 w-4" /> Talk to Team
+              </a>
+            </div>
+            <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-semibold text-white/70">
+              <span className="inline-flex items-center gap-1.5"><BadgeCheck className="h-4 w-4 text-amber-300" /> No joining fee</span>
+              <span className="inline-flex items-center gap-1.5"><BadgeCheck className="h-4 w-4 text-amber-300" /> 24h KYC</span>
+              <span className="inline-flex items-center gap-1.5"><BadgeCheck className="h-4 w-4 text-amber-300" /> Weekly payouts</span>
+            </div>
           </div>
 
           <div className="border-white/20 bg-white/10 rounded-[24px] border p-6 backdrop-blur-lg text-white">
@@ -79,6 +101,41 @@ export function BecomePartnerPage() {
           </div>
         </div>
       </section>
+
+      {/* Section 2 — Why You? */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <UserCheck className="h-3 w-3" /> Why You?
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            Aapke paas already sab kuch hai
+          </h2>
+          <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-base">
+            Naya network banane ki zarurat nahi. Existing network ko digital growth me convert karna hai.
+          </p>
+        </div>
+        <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[
+            { icon: Users, t: "Existing Salon Network", b: "Aap already salon owners ke saath baat karte hain." },
+            { icon: ShieldCheck, t: "Existing Trust", b: "Shop owners aap par bharosa karte hain — trust already built hai." },
+            { icon: BadgeCheck, t: "Existing Relationships", b: "Regular visits, WhatsApp contact, personal rapport." },
+            { icon: Target, t: "Existing Market Knowledge", b: "Aap apne district ki beauty industry ko andar se jaante hain." },
+          ].map((w) => (
+            <div key={w.t} className="border-border bg-card rounded-[var(--radius-card)] border p-6 shadow-[var(--shadow-card)]">
+              <div className="bg-primary/10 text-primary grid h-11 w-11 place-items-center rounded-xl">
+                <w.icon className="h-5 w-5" />
+              </div>
+              <h3 className="text-heading mt-4 font-bold">{w.t}</h3>
+              <p className="text-muted-foreground mt-2 text-sm">{w.b}</p>
+            </div>
+          ))}
+        </div>
+        <blockquote className="border-primary bg-primary/5 text-heading mt-8 rounded-[var(--radius-card)] border-l-4 p-5 text-center text-base font-bold italic md:text-lg">
+          "Naya Network Banane Ki Zarurat Nahi. Existing Network Ko Digital Growth Me Convert Karna Hai."
+        </blockquote>
+      </section>
+
 
       {/* Who this is for — Target Personas */}
       <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
