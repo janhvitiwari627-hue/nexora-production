@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { z } from "zod";
-import { Activity, ArrowRight, Award, BadgeCheck, CalendarClock, Crown, IndianRupee, LayoutDashboard, Rocket, Sparkles, Target, TrendingUp, Trophy, Users, Wallet, Zap } from "lucide-react";
+import { Activity, ArrowRight, Award, BadgeCheck, Building2, CalendarClock, CheckCircle2, Crown, FileCheck, GraduationCap, HeadphonesIcon, IndianRupee, LayoutDashboard, Rocket, ShieldCheck, Sparkles, Star, Store, Target, TrendingUp, Trophy, UserCheck, Users, Wallet, Zap } from "lucide-react";
 import rewardWelcomeKit from "@/assets/reward-welcome-kit.jpg";
 import rewardTabletBadge from "@/assets/reward-tablet-badge.jpg";
 import rewardLaptop from "@/assets/reward-laptop.jpg";
