@@ -1850,3 +1850,25 @@ function StickyCTA() {
   );
 }
 
+function FaqItem({ q, a, defaultOpen = false }: { q: string; a: string; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className="border-border bg-card overflow-hidden rounded-[var(--radius-card)] border shadow-sm">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
+        aria-expanded={open}
+      >
+        <span className="text-heading text-sm font-black">{q}</span>
+        <ChevronDown className={`text-primary h-4 w-4 shrink-0 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="border-t border-border/60 bg-muted/20 px-5 py-4 text-sm text-muted-foreground animate-fade-in">
+          {a}
+        </div>
+      )}
+    </div>
+  );
+}
+
