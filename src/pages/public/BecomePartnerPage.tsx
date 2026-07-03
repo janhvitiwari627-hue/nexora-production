@@ -401,6 +401,185 @@ export function BecomePartnerPage() {
         </div>
       </section>
 
+      {/* Section 9 — Transparent Earnings Model */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <IndianRupee className="h-3 w-3" /> Transparent Earnings Model
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            Exactly how you earn — no hidden math
+          </h2>
+          <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-base">
+            Four income streams. Every rupee traceable in your dashboard, credited on a fixed schedule.
+          </p>
+        </div>
+
+        {/* 4 pillars */}
+        <div className="mt-10 grid gap-5 md:grid-cols-2">
+          {/* 1. Activation payout */}
+          <div className="border-border bg-card relative overflow-hidden rounded-[var(--radius-card)] border p-6 shadow-[var(--shadow-card)]">
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 text-primary grid h-11 w-11 place-items-center rounded-xl">
+                <Rocket className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="text-[11px] font-bold uppercase tracking-wider text-primary">Stream 1</div>
+                <h3 className="text-heading text-lg font-black">Activation Payout</h3>
+              </div>
+            </div>
+            <p className="text-muted-foreground mt-3 text-sm">
+              A fixed one-time payout for every salon you onboard, verified, and activated on Nexora.
+            </p>
+            <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+              <div className="rounded-lg bg-muted/50 p-3">
+                <div className="text-heading text-xl font-black">₹1,500</div>
+                <div className="text-muted-foreground mt-0.5 text-[10px] font-bold uppercase tracking-wider">Per salon</div>
+              </div>
+              <div className="rounded-lg bg-muted/50 p-3">
+                <div className="text-heading text-xl font-black">72 hrs</div>
+                <div className="text-muted-foreground mt-0.5 text-[10px] font-bold uppercase tracking-wider">Credit time</div>
+              </div>
+              <div className="rounded-lg bg-muted/50 p-3">
+                <div className="text-heading text-xl font-black">No cap</div>
+                <div className="text-muted-foreground mt-0.5 text-[10px] font-bold uppercase tracking-wider">Volume</div>
+              </div>
+            </div>
+            <div className="text-muted-foreground mt-3 text-xs">
+              Triggers when: KYC verified + website live + first booking or QR payment received.
+            </div>
+          </div>
+
+          {/* 2. 7-day revenue share */}
+          <div className="border-border bg-card relative overflow-hidden rounded-[var(--radius-card)] border p-6 shadow-[var(--shadow-card)]">
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 text-primary grid h-11 w-11 place-items-center rounded-xl">
+                <TrendingUp className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="text-[11px] font-bold uppercase tracking-wider text-primary">Stream 2</div>
+                <h3 className="text-heading text-lg font-black">7-Day Revenue Share</h3>
+              </div>
+            </div>
+            <p className="text-muted-foreground mt-3 text-sm">
+              A share of every salon's platform revenue, credited to your wallet <span className="font-bold text-heading">every 7 days</span> — recurring, for as long as the salon stays active.
+            </p>
+            <div className="mt-4 space-y-2 text-sm">
+              {[
+                { k: "Base share", v: "12%" },
+                { k: "After 10 active salons", v: "15%" },
+                { k: "After 25 active salons", v: "18%" },
+                { k: "Payout cycle", v: "Every Monday" },
+              ].map((r) => (
+                <div key={r.k} className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2">
+                  <span className="text-muted-foreground text-xs font-semibold">{r.k}</span>
+                  <span className="text-heading text-sm font-black">{r.v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 3. Milestone bonuses */}
+          <div className="border-border bg-card relative overflow-hidden rounded-[var(--radius-card)] border p-6 shadow-[var(--shadow-card)]">
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 text-primary grid h-11 w-11 place-items-center rounded-xl">
+                <Trophy className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="text-[11px] font-bold uppercase tracking-wider text-primary">Stream 3</div>
+                <h3 className="text-heading text-lg font-black">Milestone Bonuses</h3>
+              </div>
+            </div>
+            <p className="text-muted-foreground mt-3 text-sm">
+              Extra rewards as you hit onboarding milestones — on top of activation + revenue share.
+            </p>
+            <div className="mt-4 space-y-2">
+              {[
+                { m: "10 salons", r: "Welcome Kit + ₹10,000 bonus", i: Award },
+                { m: "25 salons", r: "Nexora Tablet + Verified Badge", i: BadgeCheck },
+                { m: "50 salons", r: "Laptop + Featured Partner status", i: Crown },
+                { m: "100 salons", r: "Car reward + District Head role", i: Trophy },
+              ].map((m) => (
+                <div key={m.m} className="flex items-center gap-3 rounded-lg border border-border/60 bg-muted/30 p-3">
+                  <m.i className="text-primary h-4 w-4 shrink-0" />
+                  <div className="flex flex-1 items-center justify-between gap-2">
+                    <span className="text-heading text-xs font-black">{m.m}</span>
+                    <span className="text-muted-foreground text-xs">{m.r}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 4. Dashboard benefits */}
+          <div className="relative overflow-hidden rounded-[var(--radius-card)] border border-primary/30 bg-gradient-to-br from-[#0A2540] via-[#1a1060] to-[#635BFF] p-6 text-white shadow-[var(--shadow-card)]">
+            <div className="flex items-center gap-3">
+              <div className="grid h-11 w-11 place-items-center rounded-xl bg-white/15">
+                <LayoutDashboard className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="text-[11px] font-bold uppercase tracking-wider text-amber-300">Stream 4 · Control</div>
+                <h3 className="text-lg font-black">Dashboard Benefits</h3>
+              </div>
+            </div>
+            <p className="mt-3 text-sm text-white/80">
+              Everything transparent, in real time. You always know what you've earned, what's pending, and what's next.
+            </p>
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              {[
+                { icon: Wallet, t: "Live earnings ledger" },
+                { icon: CalendarClock, t: "Pending & cleared split" },
+                { icon: Activity, t: "Salon-wise revenue view" },
+                { icon: Target, t: "Next milestone tracker" },
+                { icon: Users, t: "Onboarded salon list" },
+                { icon: FileCheck, t: "Payout invoices + TDS" },
+              ].map((d) => (
+                <div key={d.t} className="flex items-center gap-2 rounded-lg bg-white/10 p-2.5">
+                  <d.icon className="h-4 w-4 text-amber-300" />
+                  <span className="text-xs font-bold">{d.t}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Timeline strip */}
+        <div className="mt-8 rounded-[var(--radius-card)] border border-border bg-muted/40 p-6">
+          <div className="text-center text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            One salon · Full earnings timeline
+          </div>
+          <div className="mt-5 grid gap-4 md:grid-cols-4">
+            {[
+              { d: "Day 0", t: "Salon signs up", note: "You initiate onboarding", icon: FileCheck },
+              { d: "Day 3", t: "KYC + website live", note: "Activation ₹1,500 credited", icon: Rocket },
+              { d: "Day 7", t: "First revenue share", note: "12% of platform revenue", icon: TrendingUp },
+              { d: "Ongoing", t: "Every Monday", note: "Recurring payout to wallet", icon: Wallet },
+            ].map((s, i) => (
+              <div key={s.d} className="relative">
+                <div className="border-border bg-card rounded-[var(--radius-card)] border p-4 shadow-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="bg-primary/10 text-primary grid h-8 w-8 place-items-center rounded-lg">
+                      <s.icon className="h-4 w-4" />
+                    </div>
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-primary">{s.d}</div>
+                  </div>
+                  <div className="text-heading mt-3 text-sm font-black">{s.t}</div>
+                  <div className="text-muted-foreground mt-1 text-xs">{s.note}</div>
+                </div>
+                {i < 3 && (
+                  <ArrowRight className="text-muted-foreground/40 absolute -right-2 top-1/2 hidden h-4 w-4 -translate-y-1/2 md:block" />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+          <ShieldCheck className="h-4 w-4 text-primary" />
+          Every payout is auto-generated with an invoice + TDS breakdown. No manual claims, no negotiation.
+        </div>
+      </section>
+
       {/* Trust — Why partner with Nexora */}
       <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
         <div className="text-center">
