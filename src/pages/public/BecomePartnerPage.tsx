@@ -1,39 +1,11 @@
 import { useMemo, useState } from "react";
-import { motion } from "framer-motion";
 import { z } from "zod";
-import { Activity, ArrowRight, Award, BadgeCheck, Building2, CalendarClock, CheckCircle2, Crown, FileCheck, GraduationCap, HeadphonesIcon, IndianRupee, LayoutDashboard, Rocket, ShieldCheck, Sparkles, Star, Store, Target, TrendingUp, Trophy, UserCheck, Users, Wallet, Zap } from "lucide-react";
+import { Activity, ArrowRight, BadgeCheck, Building2, CalendarClock, CheckCircle2, Crown, FileCheck, GraduationCap, Headphones as HeadphonesIcon, IndianRupee, LayoutDashboard, Rocket, ShieldCheck, Sparkles, Store, Target, TrendingUp, Trophy, UserCheck, Users, Wallet, Zap, Award } from "lucide-react";
 import rewardWelcomeKit from "@/assets/reward-welcome-kit.jpg";
 import rewardTabletBadge from "@/assets/reward-tablet-badge.jpg";
 import rewardLaptop from "@/assets/reward-laptop.jpg";
 import rewardCar from "@/assets/reward-car.jpg";
 
-const STEPS = [
-  { title: "Register your business", body: "Tell us about your salon — services, location, hours." },
-  { title: "Verify & onboard", body: "We verify your details and set up your dashboard in 24h." },
-  { title: "Go live", body: "Start receiving bookings, payments and reviews instantly." },
-  { title: "Grow with insights", body: "Use analytics & marketing tools to scale your business." },
-];
-
-const LEVELS = [
-  { name: "Bronze", min: 0, perk: "Standard listing", color: "from-amber-700 to-amber-900 text-amber-100" },
-  { name: "Silver", min: 50, perk: "Boosted in search", color: "from-slate-300 to-slate-500 text-slate-900" },
-  { name: "Gold", min: 200, perk: "Featured carousel + 2% lower commission", color: "from-amber-300 to-yellow-500 text-amber-950" },
-  { name: "Platinum", min: 500, perk: "Hall of Fame + priority support", color: "from-indigo-700 to-violet-500 text-white" },
-];
-
-const MILESTONES = [
-  { count: 50, reward: "₹2,000 marketing credit" },
-  { count: 100, reward: "Pro photography session" },
-  { count: 250, reward: "Branded merch kit" },
-  { count: 500, reward: "Free year of Growth plan" },
-  { count: 1000, reward: "Featured documentary feature" },
-];
-
-const HALL = [
-  { name: "Looks Unisex Salon", city: "Jaipur", bookings: 8420 },
-  { name: "Bliss Spa & Wellness", city: "Mumbai", bookings: 6210 },
-  { name: "The Barber Co.", city: "Delhi", bookings: 5870 },
-];
 
 const formSchema = z.object({
   ownerName: z.string().trim().min(2, "Name too short").max(80),
