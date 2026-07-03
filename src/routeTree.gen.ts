@@ -120,6 +120,7 @@ import { Route as AdminRankingsRouteImport } from './routes/admin.rankings'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminPartnerApplicationsRouteImport } from './routes/admin.partner-applications'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminJobsRouteImport } from './routes/admin.jobs'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
@@ -699,6 +700,11 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminJobsRoute = AdminJobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -852,6 +858,7 @@ export interface FileRoutesByFullPath {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/jobs': typeof AdminJobsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/partner-applications': typeof AdminPartnerApplicationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
@@ -983,6 +990,7 @@ export interface FileRoutesByTo {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/jobs': typeof AdminJobsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/partner-applications': typeof AdminPartnerApplicationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
@@ -1119,6 +1127,7 @@ export interface FileRoutesById {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/jobs': typeof AdminJobsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/partner-applications': typeof AdminPartnerApplicationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
@@ -1256,6 +1265,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/businesses'
     | '/admin/dashboard'
+    | '/admin/jobs'
     | '/admin/login'
     | '/admin/partner-applications'
     | '/admin/payments'
@@ -1387,6 +1397,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/businesses'
     | '/admin/dashboard'
+    | '/admin/jobs'
     | '/admin/login'
     | '/admin/partner-applications'
     | '/admin/payments'
@@ -1522,6 +1533,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/businesses'
     | '/admin/dashboard'
+    | '/admin/jobs'
     | '/admin/login'
     | '/admin/partner-applications'
     | '/admin/payments'
@@ -2479,6 +2491,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/jobs': {
+      id: '/admin/jobs'
+      path: '/jobs'
+      fullPath: '/admin/jobs'
+      preLoaderRoute: typeof AdminJobsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/dashboard': {
       id: '/admin/dashboard'
       path: '/dashboard'
@@ -2641,6 +2660,7 @@ interface AdminRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminBusinessesRoute: typeof AdminBusinessesRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminJobsRoute: typeof AdminJobsRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminPartnerApplicationsRoute: typeof AdminPartnerApplicationsRoute
   AdminPaymentsRoute: typeof AdminPaymentsRoute
@@ -2657,6 +2677,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminBusinessesRoute: AdminBusinessesRoute,
   AdminDashboardRoute: AdminDashboardRoute,
+  AdminJobsRoute: AdminJobsRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminPartnerApplicationsRoute: AdminPartnerApplicationsRoute,
   AdminPaymentsRoute: AdminPaymentsRoute,
@@ -2897,13 +2918,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
