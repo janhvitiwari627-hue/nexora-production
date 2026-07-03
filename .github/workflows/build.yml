@@ -81,11 +81,24 @@ jobs:
 
 
 
+      - name: Compute artifact name
+        if: always()
+        id: artifact_name
+        run: |
+          if [ -n "${{ github.event.pull_request.number }}" ]; then
+            slug="pr-${{ github.event.pull_request.number }}"
+          else
+            ref="${GITHUB_REF_NAME:-${GITHUB_SHA}}"
+            slug="$(echo "$ref" | tr '/' '-' | tr -cd '[:alnum:]._-')"
+            slug="branch-${slug}"
+          fi
+          echo "name=build-logs-${slug}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> "$GITHUB_OUTPUT"
+
       - name: Upload build logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: build-logs-${{ github.run_id }}-${{ github.run_attempt }}
+          name: ${{ steps.artifact_name.outputs.name }}
           path: build-logs/
           retention-days: 14
           if-no-files-found: warn
