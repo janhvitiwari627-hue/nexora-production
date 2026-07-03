@@ -61,6 +61,7 @@ import { Route as PortalContactRouteImport } from './routes/portal.contact'
 import { Route as PortalBusinessPagesRouteImport } from './routes/portal.business-pages'
 import { Route as PartnerTrainingRouteImport } from './routes/partner.training'
 import { Route as PartnerShopsRouteImport } from './routes/partner.shops'
+import { Route as PartnerSettingsRouteImport } from './routes/partner.settings'
 import { Route as PartnerPayoutRouteImport } from './routes/partner.payout'
 import { Route as PartnerMilestonesRouteImport } from './routes/partner.milestones'
 import { Route as PartnerLeadsRouteImport } from './routes/partner.leads'
@@ -398,6 +399,11 @@ const PartnerTrainingRoute = PartnerTrainingRouteImport.update({
 const PartnerShopsRoute = PartnerShopsRouteImport.update({
   id: '/shops',
   path: '/shops',
+  getParentRoute: () => PartnerRoute,
+} as any)
+const PartnerSettingsRoute = PartnerSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => PartnerRoute,
 } as any)
 const PartnerPayoutRoute = PartnerPayoutRouteImport.update({
@@ -889,6 +895,7 @@ export interface FileRoutesByFullPath {
   '/partner/leads': typeof PartnerLeadsRoute
   '/partner/milestones': typeof PartnerMilestonesRoute
   '/partner/payout': typeof PartnerPayoutRoute
+  '/partner/settings': typeof PartnerSettingsRoute
   '/partner/shops': typeof PartnerShopsRoute
   '/partner/training': typeof PartnerTrainingRoute
   '/portal/business-pages': typeof PortalBusinessPagesRoute
@@ -1018,6 +1025,7 @@ export interface FileRoutesByTo {
   '/partner/leads': typeof PartnerLeadsRoute
   '/partner/milestones': typeof PartnerMilestonesRoute
   '/partner/payout': typeof PartnerPayoutRoute
+  '/partner/settings': typeof PartnerSettingsRoute
   '/partner/shops': typeof PartnerShopsRoute
   '/partner/training': typeof PartnerTrainingRoute
   '/portal/business-pages': typeof PortalBusinessPagesRoute
@@ -1151,6 +1159,7 @@ export interface FileRoutesById {
   '/partner/leads': typeof PartnerLeadsRoute
   '/partner/milestones': typeof PartnerMilestonesRoute
   '/partner/payout': typeof PartnerPayoutRoute
+  '/partner/settings': typeof PartnerSettingsRoute
   '/partner/shops': typeof PartnerShopsRoute
   '/partner/training': typeof PartnerTrainingRoute
   '/portal/business-pages': typeof PortalBusinessPagesRoute
@@ -1285,6 +1294,7 @@ export interface FileRouteTypes {
     | '/partner/leads'
     | '/partner/milestones'
     | '/partner/payout'
+    | '/partner/settings'
     | '/partner/shops'
     | '/partner/training'
     | '/portal/business-pages'
@@ -1414,6 +1424,7 @@ export interface FileRouteTypes {
     | '/partner/leads'
     | '/partner/milestones'
     | '/partner/payout'
+    | '/partner/settings'
     | '/partner/shops'
     | '/partner/training'
     | '/portal/business-pages'
@@ -1546,6 +1557,7 @@ export interface FileRouteTypes {
     | '/partner/leads'
     | '/partner/milestones'
     | '/partner/payout'
+    | '/partner/settings'
     | '/partner/shops'
     | '/partner/training'
     | '/portal/business-pages'
@@ -2029,6 +2041,13 @@ declare module '@tanstack/react-router' {
       path: '/shops'
       fullPath: '/partner/shops'
       preLoaderRoute: typeof PartnerShopsRouteImport
+      parentRoute: typeof PartnerRoute
+    }
+    '/partner/settings': {
+      id: '/partner/settings'
+      path: '/settings'
+      fullPath: '/partner/settings'
+      preLoaderRoute: typeof PartnerSettingsRouteImport
       parentRoute: typeof PartnerRoute
     }
     '/partner/payout': {
@@ -2725,6 +2744,7 @@ interface PartnerRouteChildren {
   PartnerLeadsRoute: typeof PartnerLeadsRoute
   PartnerMilestonesRoute: typeof PartnerMilestonesRoute
   PartnerPayoutRoute: typeof PartnerPayoutRoute
+  PartnerSettingsRoute: typeof PartnerSettingsRoute
   PartnerShopsRoute: typeof PartnerShopsRoute
   PartnerTrainingRoute: typeof PartnerTrainingRoute
   PartnerIndexRoute: typeof PartnerIndexRoute
@@ -2736,6 +2756,7 @@ const PartnerRouteChildren: PartnerRouteChildren = {
   PartnerLeadsRoute: PartnerLeadsRoute,
   PartnerMilestonesRoute: PartnerMilestonesRoute,
   PartnerPayoutRoute: PartnerPayoutRoute,
+  PartnerSettingsRoute: PartnerSettingsRoute,
   PartnerShopsRoute: PartnerShopsRoute,
   PartnerTrainingRoute: PartnerTrainingRoute,
   PartnerIndexRoute: PartnerIndexRoute,
