@@ -531,7 +531,24 @@ const REQ_META_KEYS = {
   certification: "Certification",
   languages: "Languages",
   portfolio: "Portfolio",
+  screening: "Screening",
 } as const;
+
+export type ScreeningQuestionType = "short" | "long" | "yesno" | "number";
+export type ScreeningQuestion = { q: string; t: ScreeningQuestionType };
+
+export const SUGGESTED_SCREENING_QUESTIONS: ScreeningQuestion[] = [
+  { q: "How many years of experience do you have?", t: "number" },
+  { q: "Are you available to join immediately?", t: "yesno" },
+  { q: "Which services are you most confident in?", t: "long" },
+  { q: "Please share your Instagram portfolio.", t: "short" },
+  { q: "What salary are you expecting?", t: "number" },
+  { q: "Do you have salon experience?", t: "yesno" },
+  { q: "Are you comfortable with weekend working?", t: "yesno" },
+  { q: "Can you work full-time?", t: "yesno" },
+  { q: "Do you have your own beauty kit?", t: "yesno" },
+  { q: "Have you worked with bridal clients before?", t: "yesno" },
+];
 
 function stripRequirementsMeta(raw: string | null | undefined): string {
   if (!raw) return "";
@@ -544,8 +561,14 @@ function parseRequirementsMeta(raw: string | null | undefined): {
   certification: string;
   languages: string[];
   portfolio: PortfolioOption | "";
+  screening: ScreeningQuestion[];
 } {
-  const out = { certification: "", languages: [] as string[], portfolio: "" as PortfolioOption | "" };
+  const out = {
+    certification: "",
+    languages: [] as string[],
+    portfolio: "" as PortfolioOption | "",
+    screening: [] as ScreeningQuestion[],
+  };
   if (!raw) return out;
   const certM = raw.match(/^\s*Certification:\s*(.+)$/mi);
   if (certM) out.certification = certM[1].trim();
@@ -556,11 +579,23 @@ function parseRequirementsMeta(raw: string | null | undefined): {
     const val = portM[1].trim();
     if ((PORTFOLIO_OPTIONS as readonly string[]).includes(val)) out.portfolio = val as PortfolioOption;
   }
+  const screenM = raw.match(/^\s*Screening:\s*(.+)$/mi);
+  if (screenM) {
+    try {
+      const parsed = JSON.parse(screenM[1].trim());
+      if (Array.isArray(parsed)) {
+        out.screening = parsed
+          .filter((x) => x && typeof x.q === "string" && typeof x.t === "string")
+          .map((x) => ({ q: String(x.q), t: (["short", "long", "yesno", "number"].includes(x.t) ? x.t : "short") as ScreeningQuestionType }));
+      }
+    } catch {}
+  }
   return out;
 }
 
 export { parseRequirementsMeta, stripRequirementsMeta, PORTFOLIO_OPTIONS };
 export type { PortfolioOption };
+
 
 
 // Ready-made job description starters shown under the Description field.
