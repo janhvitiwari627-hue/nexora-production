@@ -531,7 +531,24 @@ const REQ_META_KEYS = {
   certification: "Certification",
   languages: "Languages",
   portfolio: "Portfolio",
+  screening: "Screening",
 } as const;
+
+export type ScreeningQuestionType = "short" | "long" | "yesno" | "number";
+export type ScreeningQuestion = { q: string; t: ScreeningQuestionType };
+
+export const SUGGESTED_SCREENING_QUESTIONS: ScreeningQuestion[] = [
+  { q: "How many years of experience do you have?", t: "number" },
+  { q: "Are you available to join immediately?", t: "yesno" },
+  { q: "Which services are you most confident in?", t: "long" },
+  { q: "Please share your Instagram portfolio.", t: "short" },
+  { q: "What salary are you expecting?", t: "number" },
+  { q: "Do you have salon experience?", t: "yesno" },
+  { q: "Are you comfortable with weekend working?", t: "yesno" },
+  { q: "Can you work full-time?", t: "yesno" },
+  { q: "Do you have your own beauty kit?", t: "yesno" },
+  { q: "Have you worked with bridal clients before?", t: "yesno" },
+];
 
 function stripRequirementsMeta(raw: string | null | undefined): string {
   if (!raw) return "";
@@ -544,8 +561,14 @@ function parseRequirementsMeta(raw: string | null | undefined): {
   certification: string;
   languages: string[];
   portfolio: PortfolioOption | "";
+  screening: ScreeningQuestion[];
 } {
-  const out = { certification: "", languages: [] as string[], portfolio: "" as PortfolioOption | "" };
+  const out = {
+    certification: "",
+    languages: [] as string[],
+    portfolio: "" as PortfolioOption | "",
+    screening: [] as ScreeningQuestion[],
+  };
   if (!raw) return out;
   const certM = raw.match(/^\s*Certification:\s*(.+)$/mi);
   if (certM) out.certification = certM[1].trim();
@@ -556,11 +579,23 @@ function parseRequirementsMeta(raw: string | null | undefined): {
     const val = portM[1].trim();
     if ((PORTFOLIO_OPTIONS as readonly string[]).includes(val)) out.portfolio = val as PortfolioOption;
   }
+  const screenM = raw.match(/^\s*Screening:\s*(.+)$/mi);
+  if (screenM) {
+    try {
+      const parsed = JSON.parse(screenM[1].trim());
+      if (Array.isArray(parsed)) {
+        out.screening = parsed
+          .filter((x) => x && typeof x.q === "string" && typeof x.t === "string")
+          .map((x) => ({ q: String(x.q), t: (["short", "long", "yesno", "number"].includes(x.t) ? x.t : "short") as ScreeningQuestionType }));
+      }
+    } catch {}
+  }
   return out;
 }
 
 export { parseRequirementsMeta, stripRequirementsMeta, PORTFOLIO_OPTIONS };
 export type { PortfolioOption };
+
 
 
 // Ready-made job description starters shown under the Description field.
@@ -764,6 +799,8 @@ type UiOnlyFields = {
   certification?: string;
   languages?: string[];
   portfolio_option?: PortfolioOption | "";
+  screening_questions?: ScreeningQuestion[];
+
 };
 
 type Form = Required<
@@ -808,6 +845,8 @@ const EMPTY: Form = {
   certification: "",
   languages: [],
   portfolio_option: "",
+  screening_questions: [],
+
 };
 
 const DRAFT_STORAGE_KEY = "nexora:postJobWizard:v1";
@@ -942,6 +981,8 @@ export function PostJobPage() {
               certification: m.certification,
               languages: m.languages,
               portfolio_option: m.portfolio,
+              screening_questions: m.screening,
+
             };
           })(),
         });
@@ -1033,10 +1074,11 @@ export function PostJobPage() {
         certification: _cert,
         languages: _lng,
         portfolio_option: _po,
+        screening_questions: _sq,
         ...dbForm
       } = form;
       void _bt; void _dp; void _cd; void _hp; void _st; void _et; void _fs;
-      void _ja; void _sty; void _srp; void _cert; void _lng; void _po;
+      void _ja; void _sty; void _srp; void _cert; void _lng; void _po; void _sq;
 
       // Encode meta into requirements text so job detail + apply form can read
       // them without a schema change. Human-readable "Key: value" lines.
@@ -1046,6 +1088,8 @@ export function PostJobPage() {
       if (form.languages && form.languages.length > 0)
         metaLines.push(`Languages: ${form.languages.join(", ")}`);
       if (form.portfolio_option) metaLines.push(`Portfolio: ${form.portfolio_option}`);
+      if (form.screening_questions && form.screening_questions.length > 0)
+        metaLines.push(`Screening: ${JSON.stringify(form.screening_questions)}`);
       const composedReq = [baseReq, metaLines.join("\n")].filter(Boolean).join("\n\n").trim();
 
       const cleaned: JobDraftInput = {
@@ -2665,9 +2709,162 @@ function RequirementsStep({
           })}
         </div>
       </Field>
+
+      <ScreeningQuestionsField
+        value={form.screening_questions ?? []}
+        onChange={(next) => update({ screening_questions: next })}
+      />
     </div>
   );
 }
+
+const SCREENING_TYPE_LABELS: Record<ScreeningQuestionType, string> = {
+  short: "Short answer",
+  long: "Long answer",
+  yesno: "Yes / No",
+  number: "Number",
+};
+
+function ScreeningQuestionsField({
+  value,
+  onChange,
+}: {
+  value: ScreeningQuestion[];
+  onChange: (next: ScreeningQuestion[]) => void;
+}) {
+  const [draft, setDraft] = useState("");
+  const [draftType, setDraftType] = useState<ScreeningQuestionType>("short");
+
+  const has = (q: string) => value.some((x) => x.q.trim().toLowerCase() === q.trim().toLowerCase());
+
+  const addSuggested = (sq: ScreeningQuestion) => {
+    if (has(sq.q)) return;
+    onChange([...value, { q: sq.q, t: sq.t }]);
+  };
+
+  const addCustom = () => {
+    const q = draft.trim();
+    if (!q || has(q)) {
+      setDraft("");
+      return;
+    }
+    onChange([...value, { q, t: draftType }]);
+    setDraft("");
+    setDraftType("short");
+  };
+
+  const updateAt = (i: number, patch: Partial<ScreeningQuestion>) => {
+    onChange(value.map((x, idx) => (idx === i ? { ...x, ...patch } : x)));
+  };
+  const removeAt = (i: number) => onChange(value.filter((_, idx) => idx !== i));
+
+  return (
+    <Field label="Screening questions" hint="Ask candidates a few quick questions when they apply.">
+      <div className="space-y-4">
+        <div>
+          <p className="text-muted-foreground mb-2 text-[11px] uppercase tracking-wide font-semibold">
+            Suggested questions
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {SUGGESTED_SCREENING_QUESTIONS.map((sq) => {
+              const on = has(sq.q);
+              return (
+                <button
+                  key={sq.q}
+                  type="button"
+                  onClick={() => addSuggested(sq)}
+                  disabled={on}
+                  aria-pressed={on}
+                  className={cn(
+                    "rounded-full border px-3 py-1.5 text-xs font-semibold transition",
+                    on
+                      ? "border-transparent bg-gradient-cta text-primary-foreground opacity-70"
+                      : "border-border bg-card text-heading hover:border-primary/50",
+                  )}
+                >
+                  {on ? "✓ " : "+ "}
+                  {sq.q}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {value.length > 0 && (
+          <div className="space-y-2">
+            {value.map((q, i) => (
+              <div
+                key={i}
+                className="flex flex-col gap-2 rounded-lg border border-border bg-background p-3 sm:flex-row sm:items-center"
+              >
+                <input
+                  className={cn(inputCls, "flex-1")}
+                  value={q.q}
+                  onChange={(e) => updateAt(i, { q: e.target.value })}
+                  placeholder="Question"
+                />
+                <select
+                  className={cn(inputCls, "sm:w-44")}
+                  value={q.t}
+                  onChange={(e) => updateAt(i, { t: e.target.value as ScreeningQuestionType })}
+                >
+                  {(Object.keys(SCREENING_TYPE_LABELS) as ScreeningQuestionType[]).map((k) => (
+                    <option key={k} value={k}>
+                      {SCREENING_TYPE_LABELS[k]}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => removeAt(i)}
+                  className="text-muted-foreground hover:text-destructive rounded-md px-2 py-1 text-xs font-semibold"
+                  aria-label="Remove question"
+                >
+                  Delete
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <input
+            className={cn(inputCls, "flex-1")}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addCustom();
+              }
+            }}
+            placeholder="Write a custom question"
+          />
+          <select
+            className={cn(inputCls, "sm:w-44")}
+            value={draftType}
+            onChange={(e) => setDraftType(e.target.value as ScreeningQuestionType)}
+          >
+            {(Object.keys(SCREENING_TYPE_LABELS) as ScreeningQuestionType[]).map((k) => (
+              <option key={k} value={k}>
+                {SCREENING_TYPE_LABELS[k]}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={addCustom}
+            disabled={!draft.trim()}
+            className="rounded-[var(--radius-button)] border border-border bg-card px-4 py-2 text-sm font-semibold disabled:opacity-50"
+          >
+            Add question
+          </button>
+        </div>
+      </div>
+    </Field>
+  );
+}
+
 
 function ReviewStep({
   form,
