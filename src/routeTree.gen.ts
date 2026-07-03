@@ -61,6 +61,7 @@ import { Route as PortalContactRouteImport } from './routes/portal.contact'
 import { Route as PortalBusinessPagesRouteImport } from './routes/portal.business-pages'
 import { Route as PartnerShopsRouteImport } from './routes/partner.shops'
 import { Route as PartnerPayoutRouteImport } from './routes/partner.payout'
+import { Route as PartnerMilestonesRouteImport } from './routes/partner.milestones'
 import { Route as PartnerLeadsRouteImport } from './routes/partner.leads'
 import { Route as PartnerDashboardRouteImport } from './routes/partner.dashboard'
 import { Route as PartnerCommissionRouteImport } from './routes/partner.commission'
@@ -396,6 +397,11 @@ const PartnerShopsRoute = PartnerShopsRouteImport.update({
 const PartnerPayoutRoute = PartnerPayoutRouteImport.update({
   id: '/payout',
   path: '/payout',
+  getParentRoute: () => PartnerRoute,
+} as any)
+const PartnerMilestonesRoute = PartnerMilestonesRouteImport.update({
+  id: '/milestones',
+  path: '/milestones',
   getParentRoute: () => PartnerRoute,
 } as any)
 const PartnerLeadsRoute = PartnerLeadsRouteImport.update({
@@ -875,6 +881,7 @@ export interface FileRoutesByFullPath {
   '/partner/commission': typeof PartnerCommissionRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
   '/partner/leads': typeof PartnerLeadsRoute
+  '/partner/milestones': typeof PartnerMilestonesRoute
   '/partner/payout': typeof PartnerPayoutRoute
   '/partner/shops': typeof PartnerShopsRoute
   '/portal/business-pages': typeof PortalBusinessPagesRoute
@@ -1002,6 +1009,7 @@ export interface FileRoutesByTo {
   '/partner/commission': typeof PartnerCommissionRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
   '/partner/leads': typeof PartnerLeadsRoute
+  '/partner/milestones': typeof PartnerMilestonesRoute
   '/partner/payout': typeof PartnerPayoutRoute
   '/partner/shops': typeof PartnerShopsRoute
   '/portal/business-pages': typeof PortalBusinessPagesRoute
@@ -1133,6 +1141,7 @@ export interface FileRoutesById {
   '/partner/commission': typeof PartnerCommissionRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
   '/partner/leads': typeof PartnerLeadsRoute
+  '/partner/milestones': typeof PartnerMilestonesRoute
   '/partner/payout': typeof PartnerPayoutRoute
   '/partner/shops': typeof PartnerShopsRoute
   '/portal/business-pages': typeof PortalBusinessPagesRoute
@@ -1265,6 +1274,7 @@ export interface FileRouteTypes {
     | '/partner/commission'
     | '/partner/dashboard'
     | '/partner/leads'
+    | '/partner/milestones'
     | '/partner/payout'
     | '/partner/shops'
     | '/portal/business-pages'
@@ -1392,6 +1402,7 @@ export interface FileRouteTypes {
     | '/partner/commission'
     | '/partner/dashboard'
     | '/partner/leads'
+    | '/partner/milestones'
     | '/partner/payout'
     | '/partner/shops'
     | '/portal/business-pages'
@@ -1522,6 +1533,7 @@ export interface FileRouteTypes {
     | '/partner/commission'
     | '/partner/dashboard'
     | '/partner/leads'
+    | '/partner/milestones'
     | '/partner/payout'
     | '/partner/shops'
     | '/portal/business-pages'
@@ -2005,6 +2017,13 @@ declare module '@tanstack/react-router' {
       path: '/payout'
       fullPath: '/partner/payout'
       preLoaderRoute: typeof PartnerPayoutRouteImport
+      parentRoute: typeof PartnerRoute
+    }
+    '/partner/milestones': {
+      id: '/partner/milestones'
+      path: '/milestones'
+      fullPath: '/partner/milestones'
+      preLoaderRoute: typeof PartnerMilestonesRouteImport
       parentRoute: typeof PartnerRoute
     }
     '/partner/leads': {
@@ -2685,6 +2704,7 @@ interface PartnerRouteChildren {
   PartnerCommissionRoute: typeof PartnerCommissionRoute
   PartnerDashboardRoute: typeof PartnerDashboardRoute
   PartnerLeadsRoute: typeof PartnerLeadsRoute
+  PartnerMilestonesRoute: typeof PartnerMilestonesRoute
   PartnerPayoutRoute: typeof PartnerPayoutRoute
   PartnerShopsRoute: typeof PartnerShopsRoute
   PartnerIndexRoute: typeof PartnerIndexRoute
@@ -2694,6 +2714,7 @@ const PartnerRouteChildren: PartnerRouteChildren = {
   PartnerCommissionRoute: PartnerCommissionRoute,
   PartnerDashboardRoute: PartnerDashboardRoute,
   PartnerLeadsRoute: PartnerLeadsRoute,
+  PartnerMilestonesRoute: PartnerMilestonesRoute,
   PartnerPayoutRoute: PartnerPayoutRoute,
   PartnerShopsRoute: PartnerShopsRoute,
   PartnerIndexRoute: PartnerIndexRoute,
