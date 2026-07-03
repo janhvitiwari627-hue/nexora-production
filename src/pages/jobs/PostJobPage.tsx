@@ -845,6 +845,8 @@ const EMPTY: Form = {
   certification: "",
   languages: [],
   portfolio_option: "",
+  screening_questions: [],
+
 };
 
 const DRAFT_STORAGE_KEY = "nexora:postJobWizard:v1";
