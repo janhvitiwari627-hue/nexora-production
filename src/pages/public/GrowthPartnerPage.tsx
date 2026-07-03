@@ -2,24 +2,35 @@ import { motion } from "framer-motion";
 import {
   ArrowRight,
   Award,
+  BadgeCheck,
   BarChart3,
+  BookOpen,
+  CalendarClock,
   CheckCircle2,
+  CircleDollarSign,
+  FileCheck2,
   GraduationCap,
   Handshake,
   IndianRupee,
+  KeyRound,
+  LayoutDashboard,
   LineChart,
+  MapPin,
   MessageCircle,
-  Network,
   PlayCircle,
+  Repeat,
   Scissors,
+  ShieldAlert,
   ShieldCheck,
+  Smartphone,
   Sparkles,
   Store,
-  TrendingUp,
+  Trophy,
   Truck,
   UserRound,
   Users,
   Wallet,
+  XCircle,
 } from "lucide-react";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 import { JoinPartnerDialog } from "./JoinPartnerDialog";
@@ -43,12 +54,14 @@ const IS_THIS = [
 ];
 
 const WHY_CARDS = [
-  { icon: Network, title: "Existing Network", body: "Aapke pass already salons, parlours aur beauty pros ka network hai — usi ko digital banayein." },
-  { icon: Handshake, title: "Existing Trust", body: "Log aap par pehle se bharosa karte hain. Nexora us trust ko growth me convert karta hai." },
-  { icon: Store, title: "Existing Market", body: "Aapka district, aapka market. Koi cold calling nahi — sirf apne logon ko onboard karein." },
-  { icon: TrendingUp, title: "Business Opportunity", body: "Recurring revenue share har active shop par. Ek asli business, side hustle nahi." },
-  { icon: Award, title: "Recognition", body: "Tiers, badges, leaderboard aur annual retreat — aapke kaam ko pehchan milti hai." },
-  { icon: Sparkles, title: "Long-Term Growth", body: "Beauty industry India me har saal badh rahi hai. Aap us growth ke partner banein." },
+  { icon: CheckCircle2, title: "Joining Fee Nahi", body: "Program 100% free — koi hidden charge nahi." },
+  { icon: Wallet, title: "Investment Nahi", body: "Apna paisa nahi lagana — sirf network aur time." },
+  { icon: GraduationCap, title: "Free Training", body: "Sales, pitch aur product training bilkul free." },
+  { icon: CalendarClock, title: "Weekly Payout", body: "Har hafte transparent payout seedha bank me." },
+  { icon: Trophy, title: "District Recognition", body: "Apne district me official Nexora identity." },
+  { icon: Repeat, title: "Long-Term Growth Share", body: "Recurring commission — ek baar ka nahi." },
+  { icon: Store, title: "Active Shops Par Earnings", body: "Har active shop ke revenue par share." },
+  { icon: Award, title: "Milestone Rewards", body: "Tier bonuses, badges aur retreats." },
 ];
 
 const ECOSYSTEM = [
@@ -74,9 +87,28 @@ const WHO_CAN_JOIN = [
 ];
 
 const HOW_STEPS = [
-  { n: "01", title: "Apply", body: "Free form bhariye — 2 minute me submit ho jata hai." },
-  { n: "02", title: "Onboard Salons", body: "Apne district ke salons ko Nexora par register karayein." },
-  { n: "03", title: "Earn Growth Share", body: "Har active shop par recurring share — weekly payout." },
+  { n: "01", title: "Apply", body: "Free form bhariye — 2 minute me submit.", icon: FileCheck2 },
+  { n: "02", title: "Mobile Verification", body: "OTP se apna number verify karein.", icon: Smartphone },
+  { n: "03", title: "KYC Upload", body: "Aadhaar / PAN upload — secure aur encrypted.", icon: ShieldCheck },
+  { n: "04", title: "District Selection", body: "Apna target district choose karein.", icon: MapPin },
+  { n: "05", title: "Training Complete", body: "Free training modules complete karein.", icon: BookOpen },
+  { n: "06", title: "Admin Approval", body: "Team review karti hai — 24–48 hrs me approval.", icon: BadgeCheck },
+  { n: "07", title: "Dashboard Activated", body: "Partner dashboard live — leads, shops, payout.", icon: LayoutDashboard },
+  { n: "08", title: "Start Onboarding Salons", body: "Salons onboard karein aur earning start.", icon: Store },
+];
+
+const PARTNER_DO = [
+  "Salon owners ko Nexora explain karna",
+  "Shop onboarding karwana",
+  "Website setup me help karna",
+  "QR / payment system samjhana",
+  "Shop ko active revenue-generating business banana",
+];
+
+const PARTNER_DONT = [
+  "Cash collect nahi karega",
+  "Salary employee nahi hoga",
+  "Fake promise nahi karega",
 ];
 
 const DASH_STATS = [
