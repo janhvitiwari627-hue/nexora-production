@@ -87,9 +87,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/232256ad-c4f3-4f72-84f1-0c97aa408c63/id-preview-d451d0e4--822fe342-2aa4-466c-8092-9280657c85a5.lovable.app-1781852479510.png" },
     ],
     links: [
-      { rel: "icon", href: nexoraLogo.url, type: "image/jpeg" },
+      { rel: "icon", href: nexoraLogo.url, type: "image/jpeg", sizes: "any" },
       { rel: "shortcut icon", href: nexoraLogo.url, type: "image/jpeg" },
-      { rel: "apple-touch-icon", href: nexoraLogo.url },
+      { rel: "apple-touch-icon", href: nexoraLogo.url, sizes: "180x180" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+
 
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
