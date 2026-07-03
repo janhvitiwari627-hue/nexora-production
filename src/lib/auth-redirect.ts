@@ -25,9 +25,9 @@ const ROLE_ROUTES: Record<UserRole, string> = {
   shop_manager: "/owner/dashboard",
   staff: "/owner/dashboard",
   brand: "/portal/brands",
-  distributor: "/partner/dashboard",
-  district_partner: "/partner/dashboard",
-  growth_partner: "/partner/dashboard",
+  distributor: "/",
+  district_partner: "/",
+  growth_partner: "/",
   customer: "/",
 };
 

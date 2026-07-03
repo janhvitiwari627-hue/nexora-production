@@ -19,14 +19,12 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ReferralsRouteImport } from './routes/referrals'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as PartnerRouteImport } from './routes/partner'
 import { Route as OwnerSignupRouteImport } from './routes/owner-signup'
 import { Route as OwnerRouteImport } from './routes/owner'
 import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HelpRouteImport } from './routes/help'
-import { Route as GrowthPartnerRouteImport } from './routes/growth-partner'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ForOwnersRouteImport } from './routes/for-owners'
 import { Route as DownloadAppRouteImport } from './routes/download-app'
@@ -41,7 +39,6 @@ import { Route as AcademyRouteImport } from './routes/academy'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
-import { Route as PartnerIndexRouteImport } from './routes/partner.index'
 import { Route as OwnerIndexRouteImport } from './routes/owner.index'
 import { Route as JobsIndexRouteImport } from './routes/jobs.index'
 import { Route as HireIndexRouteImport } from './routes/hire.index'
@@ -60,9 +57,6 @@ import { Route as PortalLeadsRouteImport } from './routes/portal.leads'
 import { Route as PortalDashboardRouteImport } from './routes/portal.dashboard'
 import { Route as PortalContactRouteImport } from './routes/portal.contact'
 import { Route as PortalBusinessPagesRouteImport } from './routes/portal.business-pages'
-import { Route as PartnerGrowthRouteImport } from './routes/partner.growth'
-import { Route as PartnerDistrictRouteImport } from './routes/partner.district'
-import { Route as PartnerDistributorRouteImport } from './routes/partner.distributor'
 import { Route as OwnerWebsiteRouteImport } from './routes/owner.website'
 import { Route as OwnerTemplatesRouteImport } from './routes/owner.templates'
 import { Route as OwnerStaffRouteImport } from './routes/owner.staff'
@@ -189,11 +183,6 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PartnerRoute = PartnerRouteImport.update({
-  id: '/partner',
-  path: '/partner',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const OwnerSignupRoute = OwnerSignupRouteImport.update({
   id: '/owner-signup',
   path: '/owner-signup',
@@ -222,11 +211,6 @@ const LoginRoute = LoginRouteImport.update({
 const HelpRoute = HelpRouteImport.update({
   id: '/help',
   path: '/help',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GrowthPartnerRoute = GrowthPartnerRouteImport.update({
-  id: '/growth-partner',
-  path: '/growth-partner',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
@@ -298,11 +282,6 @@ const PortalIndexRoute = PortalIndexRouteImport.update({
   id: '/portal/',
   path: '/portal/',
   getParentRoute: () => rootRouteImport,
-} as any)
-const PartnerIndexRoute = PartnerIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => PartnerRoute,
 } as any)
 const OwnerIndexRoute = OwnerIndexRouteImport.update({
   id: '/',
@@ -393,21 +372,6 @@ const PortalBusinessPagesRoute = PortalBusinessPagesRouteImport.update({
   id: '/portal/business-pages',
   path: '/portal/business-pages',
   getParentRoute: () => rootRouteImport,
-} as any)
-const PartnerGrowthRoute = PartnerGrowthRouteImport.update({
-  id: '/growth',
-  path: '/growth',
-  getParentRoute: () => PartnerRoute,
-} as any)
-const PartnerDistrictRoute = PartnerDistrictRouteImport.update({
-  id: '/district',
-  path: '/district',
-  getParentRoute: () => PartnerRoute,
-} as any)
-const PartnerDistributorRoute = PartnerDistributorRouteImport.update({
-  id: '/distributor',
-  path: '/distributor',
-  getParentRoute: () => PartnerRoute,
 } as any)
 const OwnerWebsiteRoute = OwnerWebsiteRouteImport.update({
   id: '/website',
@@ -807,14 +771,12 @@ export interface FileRoutesByFullPath {
   '/download-app': typeof DownloadAppRoute
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
-  '/growth-partner': typeof GrowthPartnerRoute
   '/help': typeof HelpRoute
   '/login': typeof LoginRoute
   '/membership': typeof MembershipRoute
   '/offline': typeof OfflineRoute
   '/owner': typeof OwnerRouteWithChildren
   '/owner-signup': typeof OwnerSignupRoute
-  '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
@@ -882,9 +844,6 @@ export interface FileRoutesByFullPath {
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
-  '/partner/distributor': typeof PartnerDistributorRoute
-  '/partner/district': typeof PartnerDistrictRoute
-  '/partner/growth': typeof PartnerGrowthRoute
   '/portal/business-pages': typeof PortalBusinessPagesRoute
   '/portal/contact': typeof PortalContactRoute
   '/portal/dashboard': typeof PortalDashboardRoute
@@ -903,7 +862,6 @@ export interface FileRoutesByFullPath {
   '/hire/': typeof HireIndexRoute
   '/jobs/': typeof JobsIndexRoute
   '/owner/': typeof OwnerIndexRoute
-  '/partner/': typeof PartnerIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
@@ -937,7 +895,6 @@ export interface FileRoutesByTo {
   '/download-app': typeof DownloadAppRoute
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
-  '/growth-partner': typeof GrowthPartnerRoute
   '/help': typeof HelpRoute
   '/login': typeof LoginRoute
   '/membership': typeof MembershipRoute
@@ -1010,9 +967,6 @@ export interface FileRoutesByTo {
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
-  '/partner/distributor': typeof PartnerDistributorRoute
-  '/partner/district': typeof PartnerDistrictRoute
-  '/partner/growth': typeof PartnerGrowthRoute
   '/portal/business-pages': typeof PortalBusinessPagesRoute
   '/portal/contact': typeof PortalContactRoute
   '/portal/dashboard': typeof PortalDashboardRoute
@@ -1031,7 +985,6 @@ export interface FileRoutesByTo {
   '/hire': typeof HireIndexRoute
   '/jobs': typeof JobsIndexRoute
   '/owner': typeof OwnerIndexRoute
-  '/partner': typeof PartnerIndexRoute
   '/portal': typeof PortalIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
@@ -1067,14 +1020,12 @@ export interface FileRoutesById {
   '/download-app': typeof DownloadAppRoute
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
-  '/growth-partner': typeof GrowthPartnerRoute
   '/help': typeof HelpRoute
   '/login': typeof LoginRoute
   '/membership': typeof MembershipRoute
   '/offline': typeof OfflineRoute
   '/owner': typeof OwnerRouteWithChildren
   '/owner-signup': typeof OwnerSignupRoute
-  '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
@@ -1142,9 +1093,6 @@ export interface FileRoutesById {
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
-  '/partner/distributor': typeof PartnerDistributorRoute
-  '/partner/district': typeof PartnerDistrictRoute
-  '/partner/growth': typeof PartnerGrowthRoute
   '/portal/business-pages': typeof PortalBusinessPagesRoute
   '/portal/contact': typeof PortalContactRoute
   '/portal/dashboard': typeof PortalDashboardRoute
@@ -1163,7 +1111,6 @@ export interface FileRoutesById {
   '/hire/': typeof HireIndexRoute
   '/jobs/': typeof JobsIndexRoute
   '/owner/': typeof OwnerIndexRoute
-  '/partner/': typeof PartnerIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
@@ -1200,14 +1147,12 @@ export interface FileRouteTypes {
     | '/download-app'
     | '/for-owners'
     | '/forgot-password'
-    | '/growth-partner'
     | '/help'
     | '/login'
     | '/membership'
     | '/offline'
     | '/owner'
     | '/owner-signup'
-    | '/partner'
     | '/privacy'
     | '/profile'
     | '/referrals'
@@ -1275,9 +1220,6 @@ export interface FileRouteTypes {
     | '/owner/staff'
     | '/owner/templates'
     | '/owner/website'
-    | '/partner/distributor'
-    | '/partner/district'
-    | '/partner/growth'
     | '/portal/business-pages'
     | '/portal/contact'
     | '/portal/dashboard'
@@ -1296,7 +1238,6 @@ export interface FileRouteTypes {
     | '/hire/'
     | '/jobs/'
     | '/owner/'
-    | '/partner/'
     | '/portal/'
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
@@ -1330,7 +1271,6 @@ export interface FileRouteTypes {
     | '/download-app'
     | '/for-owners'
     | '/forgot-password'
-    | '/growth-partner'
     | '/help'
     | '/login'
     | '/membership'
@@ -1403,9 +1343,6 @@ export interface FileRouteTypes {
     | '/owner/staff'
     | '/owner/templates'
     | '/owner/website'
-    | '/partner/distributor'
-    | '/partner/district'
-    | '/partner/growth'
     | '/portal/business-pages'
     | '/portal/contact'
     | '/portal/dashboard'
@@ -1424,7 +1361,6 @@ export interface FileRouteTypes {
     | '/hire'
     | '/jobs'
     | '/owner'
-    | '/partner'
     | '/portal'
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
@@ -1459,14 +1395,12 @@ export interface FileRouteTypes {
     | '/download-app'
     | '/for-owners'
     | '/forgot-password'
-    | '/growth-partner'
     | '/help'
     | '/login'
     | '/membership'
     | '/offline'
     | '/owner'
     | '/owner-signup'
-    | '/partner'
     | '/privacy'
     | '/profile'
     | '/referrals'
@@ -1534,9 +1468,6 @@ export interface FileRouteTypes {
     | '/owner/staff'
     | '/owner/templates'
     | '/owner/website'
-    | '/partner/distributor'
-    | '/partner/district'
-    | '/partner/growth'
     | '/portal/business-pages'
     | '/portal/contact'
     | '/portal/dashboard'
@@ -1555,7 +1486,6 @@ export interface FileRouteTypes {
     | '/hire/'
     | '/jobs/'
     | '/owner/'
-    | '/partner/'
     | '/portal/'
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
@@ -1591,14 +1521,12 @@ export interface RootRouteChildren {
   DownloadAppRoute: typeof DownloadAppRoute
   ForOwnersRoute: typeof ForOwnersRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
-  GrowthPartnerRoute: typeof GrowthPartnerRoute
   HelpRoute: typeof HelpRoute
   LoginRoute: typeof LoginRoute
   MembershipRoute: typeof MembershipRoute
   OfflineRoute: typeof OfflineRoute
   OwnerRoute: typeof OwnerRouteWithChildren
   OwnerSignupRoute: typeof OwnerSignupRoute
-  PartnerRoute: typeof PartnerRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   ReferralsRoute: typeof ReferralsRoute
@@ -1727,13 +1655,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/partner': {
-      id: '/partner'
-      path: '/partner'
-      fullPath: '/partner'
-      preLoaderRoute: typeof PartnerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/owner-signup': {
       id: '/owner-signup'
       path: '/owner-signup'
@@ -1774,13 +1695,6 @@ declare module '@tanstack/react-router' {
       path: '/help'
       fullPath: '/help'
       preLoaderRoute: typeof HelpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/growth-partner': {
-      id: '/growth-partner'
-      path: '/growth-partner'
-      fullPath: '/growth-partner'
-      preLoaderRoute: typeof GrowthPartnerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forgot-password': {
@@ -1880,13 +1794,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/portal/'
       preLoaderRoute: typeof PortalIndexRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/partner/': {
-      id: '/partner/'
-      path: '/'
-      fullPath: '/partner/'
-      preLoaderRoute: typeof PartnerIndexRouteImport
-      parentRoute: typeof PartnerRoute
     }
     '/owner/': {
       id: '/owner/'
@@ -2013,27 +1920,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/portal/business-pages'
       preLoaderRoute: typeof PortalBusinessPagesRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/partner/growth': {
-      id: '/partner/growth'
-      path: '/growth'
-      fullPath: '/partner/growth'
-      preLoaderRoute: typeof PartnerGrowthRouteImport
-      parentRoute: typeof PartnerRoute
-    }
-    '/partner/district': {
-      id: '/partner/district'
-      path: '/district'
-      fullPath: '/partner/district'
-      preLoaderRoute: typeof PartnerDistrictRouteImport
-      parentRoute: typeof PartnerRoute
-    }
-    '/partner/distributor': {
-      id: '/partner/distributor'
-      path: '/distributor'
-      fullPath: '/partner/distributor'
-      preLoaderRoute: typeof PartnerDistributorRouteImport
-      parentRoute: typeof PartnerRoute
     }
     '/owner/website': {
       id: '/owner/website'
@@ -2718,23 +2604,6 @@ const OwnerRouteChildren: OwnerRouteChildren = {
 
 const OwnerRouteWithChildren = OwnerRoute._addFileChildren(OwnerRouteChildren)
 
-interface PartnerRouteChildren {
-  PartnerDistributorRoute: typeof PartnerDistributorRoute
-  PartnerDistrictRoute: typeof PartnerDistrictRoute
-  PartnerGrowthRoute: typeof PartnerGrowthRoute
-  PartnerIndexRoute: typeof PartnerIndexRoute
-}
-
-const PartnerRouteChildren: PartnerRouteChildren = {
-  PartnerDistributorRoute: PartnerDistributorRoute,
-  PartnerDistrictRoute: PartnerDistrictRoute,
-  PartnerGrowthRoute: PartnerGrowthRoute,
-  PartnerIndexRoute: PartnerIndexRoute,
-}
-
-const PartnerRouteWithChildren =
-  PartnerRoute._addFileChildren(PartnerRouteChildren)
-
 interface JobsApplicationsRouteChildren {
   JobsApplicationsJobIdRoute: typeof JobsApplicationsJobIdRoute
 }
@@ -2760,14 +2629,12 @@ const rootRouteChildren: RootRouteChildren = {
   DownloadAppRoute: DownloadAppRoute,
   ForOwnersRoute: ForOwnersRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
-  GrowthPartnerRoute: GrowthPartnerRoute,
   HelpRoute: HelpRoute,
   LoginRoute: LoginRoute,
   MembershipRoute: MembershipRoute,
   OfflineRoute: OfflineRoute,
   OwnerRoute: OwnerRouteWithChildren,
   OwnerSignupRoute: OwnerSignupRoute,
-  PartnerRoute: PartnerRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   ReferralsRoute: ReferralsRoute,
@@ -2827,13 +2694,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

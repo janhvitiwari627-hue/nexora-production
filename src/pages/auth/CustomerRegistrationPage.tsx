@@ -427,7 +427,7 @@ export default function CustomerRegistrationPage() {
         if (accountType === "owner") {
           navigate({ to: "/owner/pending" });
         } else if (accountType === "district_partner") {
-          navigate({ to: "/partner/district" });
+          navigate({ to: "/" });
         } else {
           const redirectTo = await resolvePostLoginRedirect(session.user.id);
           navigate({ to: redirectTo });

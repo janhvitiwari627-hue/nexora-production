@@ -42,7 +42,6 @@ const NAV = [
   { to: "/", label: "Home", icon: null },
   { to: "/search", label: "Explore", icon: null },
   { to: "/jobs", label: "Job Portal", icon: Briefcase },
-  { to: "/partner/growth", label: "Partner Growth", icon: TrendingUp },
   { to: "/owner/templates", label: "Create Shop Website", icon: null },
   { to: "/download-app", label: "Download App", icon: Smartphone },
 ] as const;
