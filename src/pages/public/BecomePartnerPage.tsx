@@ -51,61 +51,105 @@ export function BecomePartnerPage() {
 
   return (
     <div className="partner-noir min-h-screen">
-      {/* Hero */}
-      <section className="partner-hero relative overflow-hidden py-24 md:py-32">
-        <img src={heroSalon} alt="" aria-hidden width={1920} height={1280} className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-25 mix-blend-luminosity" />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#08070a]/60 via-[#08070a]/70 to-[#08070a]" />
-        <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 md:px-6 lg:grid-cols-[1.15fr_1fr]">
-          <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white">
-              <Sparkles className="h-3 w-3" /> District Business Partner Program
-            </span>
-            <h1 className="mt-4 text-4xl font-black leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">
-              Apne District Ki Beauty Industry Ko{" "}
-              <span className="bg-gradient-to-r from-amber-300 to-orange-400 bg-clip-text text-transparent">
-                Digital Banaiye
-              </span>{" "}
-              Aur Us Growth Ka Hissa Baniye.
-            </h1>
-            <p className="mt-5 max-w-xl text-base text-white/85 md:text-lg">
-              Nexora SalonOS Jaipur ki Beauty Industry ka Digital Ecosystem hai. Agar aapke paas
-              salon owners ka network hai, to aap is digital transformation ka official Growth
-              Partner ban sakte hain.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <a href="#join" className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-black shadow-[var(--shadow-glow)] transition hover:scale-[1.03]">
-                Join Free <ArrowRight className="h-4 w-4" />
-              </a>
-              <a href="#opportunity" className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 py-3.5 text-sm font-black text-white backdrop-blur transition hover:bg-white/20">
-                <PlayCircle className="h-4 w-4" /> Watch Opportunity
-              </a>
-              <a href="#talk" className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-transparent px-6 py-3.5 text-sm font-black text-white transition hover:bg-white/10">
-                <HeadphonesIcon className="h-4 w-4" /> Talk to Team
-              </a>
+      {/* Hero — Poster Style */}
+      <section className="partner-hero relative overflow-hidden">
+        <img src={heroSalon} alt="" aria-hidden width={1920} height={1280} className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-15 mix-blend-luminosity" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(212,177,85,0.18),transparent_60%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#08070a]/70 via-[#08070a]/85 to-[#08070a]" />
+
+        <div className="relative mx-auto max-w-6xl px-4 pt-14 pb-10 md:px-6 md:pt-20">
+          {/* Top row: Logo badge + Title + Trophy badge */}
+          <div className="grid items-center gap-6 md:grid-cols-[auto_1fr_auto]">
+            <div className="mx-auto flex h-24 w-24 flex-col items-center justify-center rounded-full border-2 border-amber-300/70 bg-black/60 text-center shadow-[0_0_40px_-8px_rgba(212,177,85,0.6)] md:h-28 md:w-28">
+              <Crown className="h-6 w-6 text-amber-300" />
+              <div className="mt-1 text-[10px] font-black tracking-widest text-amber-300">NEXORA</div>
+              <div className="text-[8px] font-semibold uppercase text-white/60">Salons</div>
             </div>
-            <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-semibold text-white/70">
-              <span className="inline-flex items-center gap-1.5"><BadgeCheck className="h-4 w-4 text-amber-300" /> No joining fee</span>
-              <span className="inline-flex items-center gap-1.5"><BadgeCheck className="h-4 w-4 text-amber-300" /> 24h KYC</span>
-              <span className="inline-flex items-center gap-1.5"><BadgeCheck className="h-4 w-4 text-amber-300" /> Weekly payouts</span>
+            <div className="text-center">
+              <div className="text-xs font-bold uppercase tracking-[0.3em] text-amber-300/80">Nexora Presents</div>
+              <h1 className="mt-1 text-4xl font-black leading-[0.95] tracking-tight text-white md:text-6xl lg:text-7xl">
+                DISTRICT BUSINESS
+                <br />
+                <span className="bg-gradient-to-r from-amber-200 via-amber-300 to-amber-500 bg-clip-text text-transparent">PARTNER PROGRAM</span>
+              </h1>
+            </div>
+            <div className="mx-auto flex h-24 w-24 flex-col items-center justify-center rounded-full border-2 border-amber-300/70 bg-black/60 text-center md:h-28 md:w-28">
+              <Trophy className="h-6 w-6 text-amber-300" />
+              <div className="mt-1 px-2 text-[8px] font-bold uppercase leading-tight text-white/90">District Leader Circle</div>
             </div>
           </div>
 
-          <div className="border-white/20 bg-white/10 rounded-[24px] border p-6 backdrop-blur-lg text-white">
-            <h3 className="flex items-center gap-2 text-lg font-bold"><IndianRupee className="h-5 w-5" /> Earnings calculator</h3>
-            <div className="mt-5 space-y-5">
+          {/* Yellow banner */}
+          <div className="mx-auto mt-8 max-w-3xl">
+            <div className="relative rounded-md bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 px-6 py-3 text-center shadow-[0_0_30px_-5px_rgba(251,191,36,0.5)]">
+              <div className="text-lg font-black uppercase tracking-wider text-black md:text-2xl">
+                Salary Nahi, Growth Share!
+              </div>
+              <div className="absolute inset-y-0 left-0 w-3 bg-black/80" style={{ clipPath: "polygon(0 0, 100% 50%, 0 100%)" }} />
+              <div className="absolute inset-y-0 right-0 w-3 bg-black/80" style={{ clipPath: "polygon(100% 0, 0 50%, 100% 100%)" }} />
+            </div>
+            <div className="mt-3 flex flex-wrap justify-center gap-x-6 gap-y-2 text-[11px] font-bold uppercase tracking-wider text-white/80 md:text-xs">
+              <span className="inline-flex items-center gap-1.5"><Store className="h-3.5 w-3.5 text-amber-300" /> Shop Add Karo</span>
+              <span className="inline-flex items-center gap-1.5"><TrendingUp className="h-3.5 w-3.5 text-amber-300" /> Business Grow Karo</span>
+              <span className="inline-flex items-center gap-1.5"><Crown className="h-3.5 w-3.5 text-amber-300" /> District Leader Bano</span>
+            </div>
+            <div className="mt-2 text-center text-sm font-bold text-amber-300 md:text-base">
+              Nexora Ko Grow Karo, Khud Grow Karo
+            </div>
+          </div>
+
+          {/* 5 Benefit Strip */}
+          <div className="mt-10 rounded-2xl border border-amber-300/25 bg-black/40 p-4 backdrop-blur md:p-6">
+            <div className="mb-4 text-center text-[11px] font-black uppercase tracking-[0.25em] text-amber-300">Partner Benefits</div>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4">
+              {[
+                { icon: Zap, title: "One-Time", sub: "Activation Reward", note: "15 din baad ek baar" },
+                { icon: CalendarClock, title: "7-Day", sub: "Growth Share", note: "Har 7 din me earning" },
+                { icon: Trophy, title: "Hall of Fame", sub: "Recognition", note: "Nehnat seane" },
+                { icon: Crown, title: "Leadership", sub: "Status", note: "Apoit baro" },
+                { icon: Rocket, title: "Long-Term", sub: "Opportunity", note: "Loar bano" },
+              ].map((b) => (
+                <div key={b.title} className="group rounded-xl border border-amber-300/20 bg-gradient-to-b from-white/[0.04] to-transparent p-4 text-center transition hover:border-amber-300/60">
+                  <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-amber-300/15 ring-1 ring-amber-300/40">
+                    <b.icon className="h-5 w-5 text-amber-300" />
+                  </div>
+                  <div className="mt-3 text-sm font-black uppercase tracking-wide text-white">{b.title}</div>
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-amber-300/90">{b.sub}</div>
+                  <div className="mt-1 text-[10px] text-white/50">{b.note}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* CTA row */}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <a href="#join" className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-300 to-amber-500 px-7 py-3.5 text-sm font-black uppercase tracking-wider text-black shadow-[0_10px_40px_-10px_rgba(212,177,85,0.8)] transition hover:scale-[1.03]">
+              Join Free <ArrowRight className="h-4 w-4" />
+            </a>
+            <a href="#opportunity" className="inline-flex items-center gap-2 rounded-full border border-amber-300/40 bg-white/5 px-7 py-3.5 text-sm font-black uppercase tracking-wider text-white backdrop-blur transition hover:bg-white/10">
+              <PlayCircle className="h-4 w-4" /> Watch Opportunity
+            </a>
+          </div>
+
+          {/* Earnings calculator (compact, poster-integrated) */}
+          <div className="mx-auto mt-12 max-w-3xl rounded-2xl border border-amber-300/25 bg-gradient-to-b from-white/[0.05] to-transparent p-6 backdrop-blur">
+            <h3 className="flex items-center justify-center gap-2 text-center text-sm font-black uppercase tracking-[0.2em] text-amber-300">
+              <IndianRupee className="h-4 w-4" /> Earnings Calculator
+            </h3>
+            <div className="mt-5 grid gap-5 md:grid-cols-2">
               <div>
-                <div className="flex justify-between text-sm font-semibold"><span>Monthly bookings</span><span>{bookings}</span></div>
-                <input type="range" min={10} max={1000} step={10} value={bookings} onChange={(e) => setBookings(+e.target.value)} className="mt-2 w-full accent-white" />
+                <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-white/80"><span>Monthly bookings</span><span className="text-amber-300">{bookings}</span></div>
+                <input type="range" min={10} max={1000} step={10} value={bookings} onChange={(e) => setBookings(+e.target.value)} className="mt-2 w-full accent-amber-400" />
               </div>
               <div>
-                <div className="flex justify-between text-sm font-semibold"><span>Average ticket size</span><span>₹{avg}</span></div>
-                <input type="range" min={300} max={5000} step={100} value={avg} onChange={(e) => setAvg(+e.target.value)} className="mt-2 w-full accent-white" />
+                <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-white/80"><span>Avg ticket</span><span className="text-amber-300">₹{avg}</span></div>
+                <input type="range" min={300} max={5000} step={100} value={avg} onChange={(e) => setAvg(+e.target.value)} className="mt-2 w-full accent-amber-400" />
               </div>
             </div>
-            <div className="border-white/20 mt-6 grid grid-cols-3 gap-2 border-t pt-4 text-center sm:gap-3">
-              <div><div className="text-[10px] text-white/70 sm:text-xs">Monthly</div><div className="text-base font-black sm:text-lg">₹{(projected.monthly/1000).toFixed(0)}k</div></div>
-              <div><div className="text-[10px] text-white/70 sm:text-xs">Platform fee</div><div className="text-base font-black sm:text-lg">₹{(projected.platformFee/1000).toFixed(1)}k</div></div>
-              <div><div className="text-[10px] text-white/70 sm:text-xs">Your earnings</div><div className="text-xl font-black text-amber-300 sm:text-2xl">₹{(projected.earnings/1000).toFixed(0)}k</div></div>
+            <div className="mt-6 grid grid-cols-3 gap-3 border-t border-amber-300/20 pt-4 text-center">
+              <div><div className="text-[10px] uppercase tracking-wider text-white/60">Monthly</div><div className="text-lg font-black text-white">₹{(projected.monthly/1000).toFixed(0)}k</div></div>
+              <div><div className="text-[10px] uppercase tracking-wider text-white/60">Platform fee</div><div className="text-lg font-black text-white">₹{(projected.platformFee/1000).toFixed(1)}k</div></div>
+              <div><div className="text-[10px] uppercase tracking-wider text-amber-300">Your share</div><div className="text-2xl font-black text-amber-300">₹{(projected.earnings/1000).toFixed(0)}k</div></div>
             </div>
           </div>
         </div>
