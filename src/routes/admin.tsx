@@ -3,7 +3,6 @@ import { Link } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
 import { BackButton } from "@/components/shared/BackButton";
 import { supabase } from "@/integrations/supabase/client";
-import { fetchUserRoles } from "@/lib/auth-redirect";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -14,8 +13,11 @@ export const Route = createFileRoute("/admin")({
     if (error || !data.user) {
       throw redirect({ to: "/admin/login" });
     }
-    const roles = await fetchUserRoles(data.user.id);
-    if (!roles.includes("admin")) {
+    const [{ data: isAdmin }, { data: isSuper }] = await Promise.all([
+      supabase.rpc("has_role", { _user_id: data.user.id, _role: "admin" }),
+      supabase.rpc("has_role", { _user_id: data.user.id, _role: "super_admin" }),
+    ]);
+    if (!isAdmin && !isSuper) {
       throw redirect({ to: "/admin/login" });
     }
   },
