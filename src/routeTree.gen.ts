@@ -19,6 +19,7 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ReferralsRouteImport } from './routes/referrals'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PartnerRouteImport } from './routes/partner'
 import { Route as OwnerSignupRouteImport } from './routes/owner-signup'
 import { Route as OwnerRouteImport } from './routes/owner'
 import { Route as OfflineRouteImport } from './routes/offline'
@@ -39,6 +40,7 @@ import { Route as AcademyRouteImport } from './routes/academy'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
+import { Route as PartnerIndexRouteImport } from './routes/partner.index'
 import { Route as OwnerIndexRouteImport } from './routes/owner.index'
 import { Route as JobsIndexRouteImport } from './routes/jobs.index'
 import { Route as HireIndexRouteImport } from './routes/hire.index'
@@ -57,6 +59,14 @@ import { Route as PortalLeadsRouteImport } from './routes/portal.leads'
 import { Route as PortalDashboardRouteImport } from './routes/portal.dashboard'
 import { Route as PortalContactRouteImport } from './routes/portal.contact'
 import { Route as PortalBusinessPagesRouteImport } from './routes/portal.business-pages'
+import { Route as PartnerTrainingRouteImport } from './routes/partner.training'
+import { Route as PartnerShopsRouteImport } from './routes/partner.shops'
+import { Route as PartnerSettingsRouteImport } from './routes/partner.settings'
+import { Route as PartnerPayoutRouteImport } from './routes/partner.payout'
+import { Route as PartnerMilestonesRouteImport } from './routes/partner.milestones'
+import { Route as PartnerLeadsRouteImport } from './routes/partner.leads'
+import { Route as PartnerDashboardRouteImport } from './routes/partner.dashboard'
+import { Route as PartnerCommissionRouteImport } from './routes/partner.commission'
 import { Route as OwnerWebsiteRouteImport } from './routes/owner.website'
 import { Route as OwnerTemplatesRouteImport } from './routes/owner.templates'
 import { Route as OwnerStaffRouteImport } from './routes/owner.staff'
@@ -181,6 +191,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartnerRoute = PartnerRouteImport.update({
+  id: '/partner',
+  path: '/partner',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OwnerSignupRoute = OwnerSignupRouteImport.update({
   id: '/owner-signup',
   path: '/owner-signup',
@@ -281,6 +296,11 @@ const PortalIndexRoute = PortalIndexRouteImport.update({
   path: '/portal/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartnerIndexRoute = PartnerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PartnerRoute,
+} as any)
 const OwnerIndexRoute = OwnerIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -370,6 +390,46 @@ const PortalBusinessPagesRoute = PortalBusinessPagesRouteImport.update({
   id: '/portal/business-pages',
   path: '/portal/business-pages',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PartnerTrainingRoute = PartnerTrainingRouteImport.update({
+  id: '/training',
+  path: '/training',
+  getParentRoute: () => PartnerRoute,
+} as any)
+const PartnerShopsRoute = PartnerShopsRouteImport.update({
+  id: '/shops',
+  path: '/shops',
+  getParentRoute: () => PartnerRoute,
+} as any)
+const PartnerSettingsRoute = PartnerSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => PartnerRoute,
+} as any)
+const PartnerPayoutRoute = PartnerPayoutRouteImport.update({
+  id: '/payout',
+  path: '/payout',
+  getParentRoute: () => PartnerRoute,
+} as any)
+const PartnerMilestonesRoute = PartnerMilestonesRouteImport.update({
+  id: '/milestones',
+  path: '/milestones',
+  getParentRoute: () => PartnerRoute,
+} as any)
+const PartnerLeadsRoute = PartnerLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => PartnerRoute,
+} as any)
+const PartnerDashboardRoute = PartnerDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => PartnerRoute,
+} as any)
+const PartnerCommissionRoute = PartnerCommissionRouteImport.update({
+  id: '/commission',
+  path: '/commission',
+  getParentRoute: () => PartnerRoute,
 } as any)
 const OwnerWebsiteRoute = OwnerWebsiteRouteImport.update({
   id: '/website',
@@ -764,6 +824,7 @@ export interface FileRoutesByFullPath {
   '/offline': typeof OfflineRoute
   '/owner': typeof OwnerRouteWithChildren
   '/owner-signup': typeof OwnerSignupRoute
+  '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
@@ -829,6 +890,14 @@ export interface FileRoutesByFullPath {
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
+  '/partner/commission': typeof PartnerCommissionRoute
+  '/partner/dashboard': typeof PartnerDashboardRoute
+  '/partner/leads': typeof PartnerLeadsRoute
+  '/partner/milestones': typeof PartnerMilestonesRoute
+  '/partner/payout': typeof PartnerPayoutRoute
+  '/partner/settings': typeof PartnerSettingsRoute
+  '/partner/shops': typeof PartnerShopsRoute
+  '/partner/training': typeof PartnerTrainingRoute
   '/portal/business-pages': typeof PortalBusinessPagesRoute
   '/portal/contact': typeof PortalContactRoute
   '/portal/dashboard': typeof PortalDashboardRoute
@@ -847,6 +916,7 @@ export interface FileRoutesByFullPath {
   '/hire/': typeof HireIndexRoute
   '/jobs/': typeof JobsIndexRoute
   '/owner/': typeof OwnerIndexRoute
+  '/partner/': typeof PartnerIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
@@ -950,6 +1020,14 @@ export interface FileRoutesByTo {
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
+  '/partner/commission': typeof PartnerCommissionRoute
+  '/partner/dashboard': typeof PartnerDashboardRoute
+  '/partner/leads': typeof PartnerLeadsRoute
+  '/partner/milestones': typeof PartnerMilestonesRoute
+  '/partner/payout': typeof PartnerPayoutRoute
+  '/partner/settings': typeof PartnerSettingsRoute
+  '/partner/shops': typeof PartnerShopsRoute
+  '/partner/training': typeof PartnerTrainingRoute
   '/portal/business-pages': typeof PortalBusinessPagesRoute
   '/portal/contact': typeof PortalContactRoute
   '/portal/dashboard': typeof PortalDashboardRoute
@@ -968,6 +1046,7 @@ export interface FileRoutesByTo {
   '/hire': typeof HireIndexRoute
   '/jobs': typeof JobsIndexRoute
   '/owner': typeof OwnerIndexRoute
+  '/partner': typeof PartnerIndexRoute
   '/portal': typeof PortalIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
@@ -1009,6 +1088,7 @@ export interface FileRoutesById {
   '/offline': typeof OfflineRoute
   '/owner': typeof OwnerRouteWithChildren
   '/owner-signup': typeof OwnerSignupRoute
+  '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
@@ -1074,6 +1154,14 @@ export interface FileRoutesById {
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
+  '/partner/commission': typeof PartnerCommissionRoute
+  '/partner/dashboard': typeof PartnerDashboardRoute
+  '/partner/leads': typeof PartnerLeadsRoute
+  '/partner/milestones': typeof PartnerMilestonesRoute
+  '/partner/payout': typeof PartnerPayoutRoute
+  '/partner/settings': typeof PartnerSettingsRoute
+  '/partner/shops': typeof PartnerShopsRoute
+  '/partner/training': typeof PartnerTrainingRoute
   '/portal/business-pages': typeof PortalBusinessPagesRoute
   '/portal/contact': typeof PortalContactRoute
   '/portal/dashboard': typeof PortalDashboardRoute
@@ -1092,6 +1180,7 @@ export interface FileRoutesById {
   '/hire/': typeof HireIndexRoute
   '/jobs/': typeof JobsIndexRoute
   '/owner/': typeof OwnerIndexRoute
+  '/partner/': typeof PartnerIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
@@ -1134,6 +1223,7 @@ export interface FileRouteTypes {
     | '/offline'
     | '/owner'
     | '/owner-signup'
+    | '/partner'
     | '/privacy'
     | '/profile'
     | '/referrals'
@@ -1199,6 +1289,14 @@ export interface FileRouteTypes {
     | '/owner/staff'
     | '/owner/templates'
     | '/owner/website'
+    | '/partner/commission'
+    | '/partner/dashboard'
+    | '/partner/leads'
+    | '/partner/milestones'
+    | '/partner/payout'
+    | '/partner/settings'
+    | '/partner/shops'
+    | '/partner/training'
     | '/portal/business-pages'
     | '/portal/contact'
     | '/portal/dashboard'
@@ -1217,6 +1315,7 @@ export interface FileRouteTypes {
     | '/hire/'
     | '/jobs/'
     | '/owner/'
+    | '/partner/'
     | '/portal/'
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
@@ -1320,6 +1419,14 @@ export interface FileRouteTypes {
     | '/owner/staff'
     | '/owner/templates'
     | '/owner/website'
+    | '/partner/commission'
+    | '/partner/dashboard'
+    | '/partner/leads'
+    | '/partner/milestones'
+    | '/partner/payout'
+    | '/partner/settings'
+    | '/partner/shops'
+    | '/partner/training'
     | '/portal/business-pages'
     | '/portal/contact'
     | '/portal/dashboard'
@@ -1338,6 +1445,7 @@ export interface FileRouteTypes {
     | '/hire'
     | '/jobs'
     | '/owner'
+    | '/partner'
     | '/portal'
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
@@ -1378,6 +1486,7 @@ export interface FileRouteTypes {
     | '/offline'
     | '/owner'
     | '/owner-signup'
+    | '/partner'
     | '/privacy'
     | '/profile'
     | '/referrals'
@@ -1443,6 +1552,14 @@ export interface FileRouteTypes {
     | '/owner/staff'
     | '/owner/templates'
     | '/owner/website'
+    | '/partner/commission'
+    | '/partner/dashboard'
+    | '/partner/leads'
+    | '/partner/milestones'
+    | '/partner/payout'
+    | '/partner/settings'
+    | '/partner/shops'
+    | '/partner/training'
     | '/portal/business-pages'
     | '/portal/contact'
     | '/portal/dashboard'
@@ -1461,6 +1578,7 @@ export interface FileRouteTypes {
     | '/hire/'
     | '/jobs/'
     | '/owner/'
+    | '/partner/'
     | '/portal/'
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
@@ -1502,6 +1620,7 @@ export interface RootRouteChildren {
   OfflineRoute: typeof OfflineRoute
   OwnerRoute: typeof OwnerRouteWithChildren
   OwnerSignupRoute: typeof OwnerSignupRoute
+  PartnerRoute: typeof PartnerRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   ReferralsRoute: typeof ReferralsRoute
@@ -1628,6 +1747,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partner': {
+      id: '/partner'
+      path: '/partner'
+      fullPath: '/partner'
+      preLoaderRoute: typeof PartnerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/owner-signup': {
@@ -1770,6 +1896,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/partner/': {
+      id: '/partner/'
+      path: '/'
+      fullPath: '/partner/'
+      preLoaderRoute: typeof PartnerIndexRouteImport
+      parentRoute: typeof PartnerRoute
+    }
     '/owner/': {
       id: '/owner/'
       path: '/'
@@ -1895,6 +2028,62 @@ declare module '@tanstack/react-router' {
       fullPath: '/portal/business-pages'
       preLoaderRoute: typeof PortalBusinessPagesRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/partner/training': {
+      id: '/partner/training'
+      path: '/training'
+      fullPath: '/partner/training'
+      preLoaderRoute: typeof PartnerTrainingRouteImport
+      parentRoute: typeof PartnerRoute
+    }
+    '/partner/shops': {
+      id: '/partner/shops'
+      path: '/shops'
+      fullPath: '/partner/shops'
+      preLoaderRoute: typeof PartnerShopsRouteImport
+      parentRoute: typeof PartnerRoute
+    }
+    '/partner/settings': {
+      id: '/partner/settings'
+      path: '/settings'
+      fullPath: '/partner/settings'
+      preLoaderRoute: typeof PartnerSettingsRouteImport
+      parentRoute: typeof PartnerRoute
+    }
+    '/partner/payout': {
+      id: '/partner/payout'
+      path: '/payout'
+      fullPath: '/partner/payout'
+      preLoaderRoute: typeof PartnerPayoutRouteImport
+      parentRoute: typeof PartnerRoute
+    }
+    '/partner/milestones': {
+      id: '/partner/milestones'
+      path: '/milestones'
+      fullPath: '/partner/milestones'
+      preLoaderRoute: typeof PartnerMilestonesRouteImport
+      parentRoute: typeof PartnerRoute
+    }
+    '/partner/leads': {
+      id: '/partner/leads'
+      path: '/leads'
+      fullPath: '/partner/leads'
+      preLoaderRoute: typeof PartnerLeadsRouteImport
+      parentRoute: typeof PartnerRoute
+    }
+    '/partner/dashboard': {
+      id: '/partner/dashboard'
+      path: '/dashboard'
+      fullPath: '/partner/dashboard'
+      preLoaderRoute: typeof PartnerDashboardRouteImport
+      parentRoute: typeof PartnerRoute
+    }
+    '/partner/commission': {
+      id: '/partner/commission'
+      path: '/commission'
+      fullPath: '/partner/commission'
+      preLoaderRoute: typeof PartnerCommissionRouteImport
+      parentRoute: typeof PartnerRoute
     }
     '/owner/website': {
       id: '/owner/website'
@@ -2549,6 +2738,33 @@ const OwnerRouteChildren: OwnerRouteChildren = {
 
 const OwnerRouteWithChildren = OwnerRoute._addFileChildren(OwnerRouteChildren)
 
+interface PartnerRouteChildren {
+  PartnerCommissionRoute: typeof PartnerCommissionRoute
+  PartnerDashboardRoute: typeof PartnerDashboardRoute
+  PartnerLeadsRoute: typeof PartnerLeadsRoute
+  PartnerMilestonesRoute: typeof PartnerMilestonesRoute
+  PartnerPayoutRoute: typeof PartnerPayoutRoute
+  PartnerSettingsRoute: typeof PartnerSettingsRoute
+  PartnerShopsRoute: typeof PartnerShopsRoute
+  PartnerTrainingRoute: typeof PartnerTrainingRoute
+  PartnerIndexRoute: typeof PartnerIndexRoute
+}
+
+const PartnerRouteChildren: PartnerRouteChildren = {
+  PartnerCommissionRoute: PartnerCommissionRoute,
+  PartnerDashboardRoute: PartnerDashboardRoute,
+  PartnerLeadsRoute: PartnerLeadsRoute,
+  PartnerMilestonesRoute: PartnerMilestonesRoute,
+  PartnerPayoutRoute: PartnerPayoutRoute,
+  PartnerSettingsRoute: PartnerSettingsRoute,
+  PartnerShopsRoute: PartnerShopsRoute,
+  PartnerTrainingRoute: PartnerTrainingRoute,
+  PartnerIndexRoute: PartnerIndexRoute,
+}
+
+const PartnerRouteWithChildren =
+  PartnerRoute._addFileChildren(PartnerRouteChildren)
+
 interface JobsApplicationsRouteChildren {
   JobsApplicationsJobIdRoute: typeof JobsApplicationsJobIdRoute
 }
@@ -2580,6 +2796,7 @@ const rootRouteChildren: RootRouteChildren = {
   OfflineRoute: OfflineRoute,
   OwnerRoute: OwnerRouteWithChildren,
   OwnerSignupRoute: OwnerSignupRoute,
+  PartnerRoute: PartnerRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   ReferralsRoute: ReferralsRoute,
