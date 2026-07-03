@@ -195,6 +195,8 @@ export const useAuthStore = create<AuthStore>((set, get) => {
             sessionStorage.setItem(flagKey, "1");
             setTimeout(async () => {
               try {
+                const { data: { session: s } } = await supabase.auth.getSession();
+                if (!s?.access_token) return;
                 const { recordLoginEvent } = await import("@/lib/security.functions");
                 await recordLoginEvent({
                   data: {
@@ -205,7 +207,8 @@ export const useAuthStore = create<AuthStore>((set, get) => {
               } catch {
                 // non-fatal; auditing should never block login
               }
-            }, 0);
+            }, 500);
+
           }
         }
       }
