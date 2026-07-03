@@ -2709,9 +2709,162 @@ function RequirementsStep({
           })}
         </div>
       </Field>
+
+      <ScreeningQuestionsField
+        value={form.screening_questions ?? []}
+        onChange={(next) => update({ screening_questions: next })}
+      />
     </div>
   );
 }
+
+const SCREENING_TYPE_LABELS: Record<ScreeningQuestionType, string> = {
+  short: "Short answer",
+  long: "Long answer",
+  yesno: "Yes / No",
+  number: "Number",
+};
+
+function ScreeningQuestionsField({
+  value,
+  onChange,
+}: {
+  value: ScreeningQuestion[];
+  onChange: (next: ScreeningQuestion[]) => void;
+}) {
+  const [draft, setDraft] = useState("");
+  const [draftType, setDraftType] = useState<ScreeningQuestionType>("short");
+
+  const has = (q: string) => value.some((x) => x.q.trim().toLowerCase() === q.trim().toLowerCase());
+
+  const addSuggested = (sq: ScreeningQuestion) => {
+    if (has(sq.q)) return;
+    onChange([...value, { q: sq.q, t: sq.t }]);
+  };
+
+  const addCustom = () => {
+    const q = draft.trim();
+    if (!q || has(q)) {
+      setDraft("");
+      return;
+    }
+    onChange([...value, { q, t: draftType }]);
+    setDraft("");
+    setDraftType("short");
+  };
+
+  const updateAt = (i: number, patch: Partial<ScreeningQuestion>) => {
+    onChange(value.map((x, idx) => (idx === i ? { ...x, ...patch } : x)));
+  };
+  const removeAt = (i: number) => onChange(value.filter((_, idx) => idx !== i));
+
+  return (
+    <Field label="Screening questions" hint="Ask candidates a few quick questions when they apply.">
+      <div className="space-y-4">
+        <div>
+          <p className="text-muted-foreground mb-2 text-[11px] uppercase tracking-wide font-semibold">
+            Suggested questions
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {SUGGESTED_SCREENING_QUESTIONS.map((sq) => {
+              const on = has(sq.q);
+              return (
+                <button
+                  key={sq.q}
+                  type="button"
+                  onClick={() => addSuggested(sq)}
+                  disabled={on}
+                  aria-pressed={on}
+                  className={cn(
+                    "rounded-full border px-3 py-1.5 text-xs font-semibold transition",
+                    on
+                      ? "border-transparent bg-gradient-cta text-primary-foreground opacity-70"
+                      : "border-border bg-card text-heading hover:border-primary/50",
+                  )}
+                >
+                  {on ? "✓ " : "+ "}
+                  {sq.q}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {value.length > 0 && (
+          <div className="space-y-2">
+            {value.map((q, i) => (
+              <div
+                key={i}
+                className="flex flex-col gap-2 rounded-lg border border-border bg-background p-3 sm:flex-row sm:items-center"
+              >
+                <input
+                  className={cn(inputCls, "flex-1")}
+                  value={q.q}
+                  onChange={(e) => updateAt(i, { q: e.target.value })}
+                  placeholder="Question"
+                />
+                <select
+                  className={cn(inputCls, "sm:w-44")}
+                  value={q.t}
+                  onChange={(e) => updateAt(i, { t: e.target.value as ScreeningQuestionType })}
+                >
+                  {(Object.keys(SCREENING_TYPE_LABELS) as ScreeningQuestionType[]).map((k) => (
+                    <option key={k} value={k}>
+                      {SCREENING_TYPE_LABELS[k]}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => removeAt(i)}
+                  className="text-muted-foreground hover:text-destructive rounded-md px-2 py-1 text-xs font-semibold"
+                  aria-label="Remove question"
+                >
+                  Delete
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <input
+            className={cn(inputCls, "flex-1")}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addCustom();
+              }
+            }}
+            placeholder="Write a custom question"
+          />
+          <select
+            className={cn(inputCls, "sm:w-44")}
+            value={draftType}
+            onChange={(e) => setDraftType(e.target.value as ScreeningQuestionType)}
+          >
+            {(Object.keys(SCREENING_TYPE_LABELS) as ScreeningQuestionType[]).map((k) => (
+              <option key={k} value={k}>
+                {SCREENING_TYPE_LABELS[k]}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={addCustom}
+            disabled={!draft.trim()}
+            className="rounded-[var(--radius-button)] border border-border bg-card px-4 py-2 text-sm font-semibold disabled:opacity-50"
+          >
+            Add question
+          </button>
+        </div>
+      </div>
+    </Field>
+  );
+}
+
 
 function ReviewStep({
   form,
