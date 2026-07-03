@@ -833,22 +833,29 @@
 .hide-scrollbar::-webkit-scrollbar { display: none; }
 .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* ===== Partner Page — Premium Noir & Gold theme (scoped) ===== */
+/* ===== Partner Page — Nexora SalonOS SaaS theme (Stripe × Apple × Airbnb) ===== */
+/* Kept `.partner-noir` classname to avoid rewiring the page — palette is now
+   Deep Indigo / Premium Purple / Electric Blue on Soft Light Grey. */
 .partner-noir {
-  --pn-bg: #08070a;
-  --pn-bg-2: #0f0d13;
-  --pn-surface: #131017;
-  --pn-surface-2: #1b1720;
-  --pn-border: rgba(201, 168, 76, 0.16);
-  --pn-border-strong: rgba(201, 168, 76, 0.32);
-  --pn-text: #f5eedc;
-  --pn-text-muted: rgba(245, 238, 220, 0.62);
-  --pn-gold: #d4b155;
-  --pn-gold-2: #f0d78c;
-  --pn-gold-glow: 0 0 0 1px rgba(212, 177, 85, 0.35), 0 20px 60px -20px rgba(212, 177, 85, 0.35);
+  --pn-bg: #f6f7fb;              /* soft light grey */
+  --pn-bg-2: #eef0f7;
+  --pn-surface: #ffffff;         /* pure white cards */
+  --pn-surface-2: #fafbff;
+  --pn-border: rgba(15, 23, 42, 0.08);
+  --pn-border-strong: rgba(79, 70, 229, 0.22);
+  --pn-text: #0b1220;             /* dark navy */
+  --pn-text-muted: #4b5563;
+  --pn-indigo: #4f46e5;           /* primary — deep indigo */
+  --pn-indigo-2: #6366f1;
+  --pn-purple: #7c3aed;           /* secondary — premium purple */
+  --pn-blue: #2563eb;             /* accent — electric blue */
+  --pn-ring: 0 1px 2px rgba(15,23,42,0.04), 0 8px 24px -12px rgba(15,23,42,0.10);
+  --pn-ring-strong: 0 10px 30px -12px rgba(79,70,229,0.28);
   background: var(--pn-bg);
   color: var(--pn-text);
-  font-family: "Instrument Serif", "Playfair Display", ui-serif, Georgia, serif;
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "cv11", "ss01", "ss03";
+  -webkit-font-smoothing: antialiased;
 }
 .partner-noir p,
 .partner-noir span,
@@ -857,20 +864,35 @@
 .partner-noir input,
 .partner-noir label,
 .partner-noir li,
-.partner-noir div {
-  font-family: "Work Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+.partner-noir div,
+.partner-noir h1,
+.partner-noir h2,
+.partner-noir h3,
+.partner-noir h4 {
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 .partner-noir h1,
 .partner-noir h2,
 .partner-noir h3 {
-  font-family: "Instrument Serif", "Playfair Display", ui-serif, Georgia, serif;
-  letter-spacing: -0.01em;
-  font-weight: 500;
+  color: var(--pn-text);
+  letter-spacing: -0.025em;
+  font-weight: 700;
 }
-.partner-noir h1 { font-weight: 500; }
+.partner-noir h1 {
+  font-weight: 800;
+  font-size: clamp(2.25rem, 4.6vw, 4rem);
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+}
+.partner-noir h2 {
+  font-size: clamp(1.75rem, 3vw, 2.75rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+.partner-noir h3 { font-size: clamp(1.15rem, 1.6vw, 1.5rem); }
 
-/* Kill the light backgrounds/muted greys from base tokens */
-.partner-noir .bg-background,
+/* Neutralize base tokens to the light SaaS palette */
+.partner-noir .bg-background { background-color: var(--pn-bg) !important; }
 .partner-noir .bg-card,
 .partner-noir .bg-white,
 .partner-noir .bg-muted,
@@ -885,9 +907,11 @@
 .partner-noir .bg-amber-50,
 .partner-noir .bg-amber-50\/60,
 .partner-noir .bg-amber-50\/70,
-.partner-noir .bg-orange-50 {
-  background-color: rgba(212, 177, 85, 0.08) !important;
-  color: var(--pn-text) !important;
+.partner-noir .bg-orange-50,
+.partner-noir .bg-yellow-50,
+.partner-noir .bg-yellow-100 {
+  background-color: rgba(79, 70, 229, 0.06) !important;
+  color: var(--pn-indigo) !important;
 }
 .partner-noir .border,
 .partner-noir .border-t,
@@ -895,14 +919,18 @@
 .partner-noir .border-l,
 .partner-noir .border-r,
 .partner-noir .border-border,
-.partner-noir .border-border\/60 {
+.partner-noir .border-border\/60,
+.partner-noir .border-amber-500\/30,
+.partner-noir .border-amber-400\/40,
+.partner-noir .border-yellow-400\/40 {
   border-color: var(--pn-border) !important;
 }
 .partner-noir .text-foreground,
 .partner-noir .text-heading,
 .partner-noir .text-slate-900,
 .partner-noir .text-neutral-900,
-.partner-noir .text-black {
+.partner-noir .text-black,
+.partner-noir .text-white {
   color: var(--pn-text) !important;
 }
 .partner-noir .text-muted-foreground,
@@ -911,100 +939,122 @@
 .partner-noir .text-neutral-500,
 .partner-noir .text-neutral-600,
 .partner-noir .text-gray-500,
-.partner-noir .text-gray-600 {
+.partner-noir .text-gray-600,
+.partner-noir .text-white\/70,
+.partner-noir .text-white\/80 {
   color: var(--pn-text-muted) !important;
 }
 .partner-noir .text-primary,
 .partner-noir .text-indigo-600,
 .partner-noir .text-violet-600,
 .partner-noir .text-purple-600,
-.partner-noir .text-blue-600 {
-  color: var(--pn-gold) !important;
+.partner-noir .text-blue-600,
+.partner-noir .text-amber-500,
+.partner-noir .text-amber-400,
+.partner-noir .text-yellow-400,
+.partner-noir .text-yellow-300 {
+  color: var(--pn-indigo) !important;
 }
 .partner-noir .bg-primary\/10,
 .partner-noir .bg-indigo-100,
 .partner-noir .bg-violet-100,
 .partner-noir .bg-purple-100,
 .partner-noir .bg-blue-100 {
-  background-color: rgba(212, 177, 85, 0.12) !important;
-  color: var(--pn-gold) !important;
+  background-color: rgba(79, 70, 229, 0.10) !important;
+  color: var(--pn-indigo) !important;
 }
 .partner-noir .bg-gradient-cta,
 .partner-noir [class*="bg-gradient-to-r"],
 .partner-noir [class*="bg-gradient-to-br"] {
-  background-image: linear-gradient(135deg, #d4b155 0%, #f0d78c 50%, #b8912d 100%) !important;
-  color: #1a1006 !important;
+  background-image: linear-gradient(135deg, var(--pn-indigo) 0%, var(--pn-purple) 55%, var(--pn-blue) 100%) !important;
+  color: #ffffff !important;
 }
-.partner-noir .text-primary-foreground { color: #1a1006 !important; }
+.partner-noir .text-primary-foreground { color: #ffffff !important; }
 
-/* Card surface upgrade */
+/* Card surface — Stripe-style flat white with soft shadow */
 .partner-noir .rounded-xl,
 .partner-noir .rounded-2xl,
 .partner-noir .rounded-\[var\(--radius-card-lg\)\],
 .partner-noir .rounded-\[24px\] {
   background-color: var(--pn-surface) !important;
   border: 1px solid var(--pn-border) !important;
-  box-shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 20px 40px -30px rgba(0,0,0,0.6);
+  box-shadow: var(--pn-ring);
+  transition: box-shadow 200ms ease, border-color 200ms ease, transform 200ms ease;
 }
 .partner-noir .rounded-xl:hover,
 .partner-noir .rounded-2xl:hover {
   border-color: var(--pn-border-strong) !important;
+  box-shadow: var(--pn-ring-strong);
 }
 
-/* Gold-tinted gradient text */
+/* Gradient text → indigo-purple-blue */
 .partner-noir .text-transparent.bg-clip-text {
-  background-image: linear-gradient(135deg, #f0d78c 0%, #d4b155 50%, #b8912d 100%) !important;
+  background-image: linear-gradient(135deg, var(--pn-indigo) 0%, var(--pn-purple) 50%, var(--pn-blue) 100%) !important;
 }
 
-/* Section spacing lift */
+/* Hairline section dividers */
 .partner-noir section { position: relative; }
-.partner-noir section::before {
-  content: "";
-  position: absolute; inset: 0 auto auto 0;
-  width: 100%; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(212,177,85,0.18), transparent);
-  pointer-events: none;
-}
-.partner-noir section:first-of-type::before { display: none; }
+.partner-noir section + section { border-top: 1px solid var(--pn-border); }
+.partner-noir section::before { content: none !important; }
+.partner-noir section::after { content: none !important; }
 
-/* Hero override */
+/* Hero — light, airy, Stripe/Apple */
 .partner-noir .partner-hero {
   background:
-    radial-gradient(ellipse at 20% 20%, rgba(212,177,85,0.18), transparent 55%),
-    radial-gradient(ellipse at 80% 80%, rgba(212,177,85,0.10), transparent 55%),
-    linear-gradient(180deg, #08070a 0%, #0f0d13 100%) !important;
+    radial-gradient(1200px 500px at 15% 0%, rgba(79,70,229,0.10), transparent 60%),
+    radial-gradient(900px 400px at 85% 20%, rgba(124,58,237,0.08), transparent 60%),
+    linear-gradient(180deg, #ffffff 0%, var(--pn-bg) 100%) !important;
+  color: var(--pn-text) !important;
 }
 .partner-noir .partner-hero::after {
   content: "";
   position: absolute; inset: 0;
-  background-image: radial-gradient(circle at 1px 1px, rgba(212,177,85,0.14) 1px, transparent 0);
-  background-size: 36px 36px;
-  mask-image: radial-gradient(ellipse at center, black 40%, transparent 75%);
+  background-image:
+    linear-gradient(rgba(15,23,42,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15,23,42,0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse at center top, black 30%, transparent 75%);
   pointer-events: none;
+  opacity: 0.5;
 }
 
-/* Buttons */
+/* Buttons — pill outline switches to indigo hairline */
 .partner-noir .rounded-full.border {
-  border-color: rgba(212,177,85,0.4) !important;
+  border-color: var(--pn-border) !important;
   color: var(--pn-text) !important;
-  background: rgba(255,255,255,0.02) !important;
+  background: var(--pn-surface) !important;
 }
 .partner-noir .rounded-full.border:hover {
-  background: rgba(212,177,85,0.08) !important;
+  border-color: var(--pn-indigo) !important;
+  color: var(--pn-indigo) !important;
+  background: rgba(79,70,229,0.04) !important;
 }
 
-/* Range inputs → gold */
-.partner-noir input[type="range"] { accent-color: var(--pn-gold); }
+/* Range inputs → indigo */
+.partner-noir input[type="range"] { accent-color: var(--pn-indigo); }
 
-/* Chips / pill labels stay gold */
+/* Eyebrow / chip labels */
 .partner-noir .uppercase.tracking-wider,
 .partner-noir .uppercase.tracking-wide {
-  color: var(--pn-gold) !important;
-  letter-spacing: 0.22em !important;
-  font-family: "Work Sans", sans-serif !important;
+  color: var(--pn-indigo) !important;
+  letter-spacing: 0.18em !important;
+  font-family: "Inter", sans-serif !important;
   font-weight: 600 !important;
+  font-size: 0.72rem !important;
 }
 
-/* Emphasized big headings */
-.partner-noir h1 { font-size: clamp(2.5rem, 5vw, 4.75rem); line-height: 1.02; }
-.partner-noir h2 { font-size: clamp(1.9rem, 3.2vw, 3rem); line-height: 1.08; }
+/* Generous whitespace */
+.partner-noir section { padding-top: clamp(4rem, 8vw, 7rem); padding-bottom: clamp(4rem, 8vw, 7rem); }
+
+/* Kill any leftover black backdrops the old theme relied on */
+.partner-noir .bg-black,
+.partner-noir .bg-black\/40,
+.partner-noir .bg-black\/60,
+.partner-noir .bg-neutral-900,
+.partner-noir .bg-neutral-950,
+.partner-noir .bg-slate-900,
+.partner-noir .bg-slate-950,
+.partner-noir .bg-zinc-900 {
+  background-color: var(--pn-surface) !important;
+  color: var(--pn-text) !important;
+}
