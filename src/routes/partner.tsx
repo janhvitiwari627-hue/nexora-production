@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { PartnerAppLayout } from "@/pages/partner/PartnerAppLayout";
 
 export const Route = createFileRoute("/partner")({
@@ -9,9 +9,5 @@ export const Route = createFileRoute("/partner")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  component: () => (
-    <PartnerAppLayout>
-      <Outlet />
-    </PartnerAppLayout>
-  ),
+  component: PartnerAppLayout,
 });
