@@ -141,9 +141,11 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
             <BackButton size="icon" className="shrink-0" aria-label="Go back" />
           )}
           <Link to="/" className="flex items-center gap-2">
-            <div className="bg-gradient-cta grid h-9 w-9 place-items-center rounded-xl text-primary-foreground shadow-[var(--shadow-glow)]">
-              <Sparkles className="h-4 w-4" />
-            </div>
+            <img
+              src={nexoraLogo.url}
+              alt="Nexora SalonOS"
+              className="h-10 w-10 rounded-xl object-cover shadow-[var(--shadow-glow)]"
+            />
             <span className="text-gradient-brand text-xl font-extrabold tracking-tight">
               Nexora
             </span>
