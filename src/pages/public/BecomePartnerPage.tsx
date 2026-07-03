@@ -111,6 +111,52 @@ export function BecomePartnerPage() {
         </div>
       </section>
 
+      {/* Visual Showcase — Premium Indian beauty industry */}
+      <section className="mx-auto max-w-7xl px-4 pt-16 md:px-6 md:pt-24">
+        <div className="mb-8 flex items-end justify-between gap-6">
+          <div>
+            <span className="uppercase tracking-wider text-[11px] font-bold">The Category</span>
+            <h2 className="mt-3 max-w-2xl">India's beauty industry, finally worthy of the screen.</h2>
+          </div>
+          <p className="text-muted-foreground hidden max-w-sm text-sm md:block">
+            From luxury Jaipur parlours to modern barber studios — every category, one operating system.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+          {[
+            { src: imgParlour, label: "Beauty Parlours", tall: true },
+            { src: imgBarber, label: "Modern Barber Shops" },
+            { src: imgSpa, label: "Spa Interiors" },
+            { src: imgNail, label: "Nail Art Studios" },
+            { src: imgTattoo, label: "Tattoo Studios", tall: true },
+            { src: imgCustomer, label: "Happy Customers" },
+            { src: imgJaipur, label: "Rooted in Jaipur" },
+          ].map((it, i) => (
+            <figure
+              key={i}
+              className={`group relative overflow-hidden rounded-2xl border border-[rgba(212,177,85,0.16)] ${it.tall ? "row-span-2 aspect-[3/4] md:aspect-[3/5]" : "aspect-[4/5]"}`}
+            >
+              <img
+                src={it.src}
+                alt={it.label}
+                loading="lazy"
+                className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]"
+              />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+              <figcaption className="absolute inset-x-0 bottom-0 flex items-center justify-between p-3 md:p-4">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#f0d78c] md:text-xs">{it.label}</span>
+                <ArrowRight className="h-4 w-4 text-white/80 transition group-hover:translate-x-1" />
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+
+        <p className="text-muted-foreground mt-6 max-w-2xl text-sm md:hidden">
+          Every category, one operating system — from luxury Jaipur parlours to modern barber studios.
+        </p>
+      </section>
+
       {/* Section 2 — Why You? */}
       <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
         <div className="text-center">
