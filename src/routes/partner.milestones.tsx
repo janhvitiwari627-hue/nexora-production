@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PartnerSubPage } from "@/pages/partner/PartnerSubPage";
+import { PartnerMilestonesPage } from "@/pages/partner/PartnerMilestonesPage";
 
 export const Route = createFileRoute("/partner/milestones")({
-  component: () => <PartnerSubPage slug="milestones" />,
+  component: PartnerMilestonesPage,
 });
