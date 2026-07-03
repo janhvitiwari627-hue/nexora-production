@@ -1263,6 +1263,7 @@ export function HomePage() {
         <SmartPicks />
         <WebsiteBuilder />
         <MembershipCards />
+        <GrowthPartnerRewardsSection />
         <FinalCTA />
       </main>
       <Footer />
