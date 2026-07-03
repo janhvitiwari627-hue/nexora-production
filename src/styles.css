@@ -1046,15 +1046,39 @@
 /* Generous whitespace */
 .partner-noir section { padding-top: clamp(4rem, 8vw, 7rem); padding-bottom: clamp(4rem, 8vw, 7rem); }
 
-/* Kill any leftover black backdrops the old theme relied on */
+/* Kill any leftover dark backdrops the old theme relied on */
 .partner-noir .bg-black,
-.partner-noir .bg-black\/40,
-.partner-noir .bg-black\/60,
+.partner-noir [class*="bg-black\/"],
 .partner-noir .bg-neutral-900,
 .partner-noir .bg-neutral-950,
 .partner-noir .bg-slate-900,
 .partner-noir .bg-slate-950,
 .partner-noir .bg-zinc-900 {
-  background-color: var(--pn-surface) !important;
+  background-color: rgba(15,23,42,0.04) !important;
   color: var(--pn-text) !important;
+  box-shadow: none !important;
+}
+/* The hero has a dark absolute overlay gradient — hide it, our .partner-hero background handles it */
+.partner-noir .partner-hero > .absolute.inset-0[class*="bg-gradient-to-b"],
+.partner-noir .partner-hero > .pointer-events-none.absolute.inset-0 {
+  display: none !important;
+}
+/* Stripe-style dark indigo hero cards (from-[#0A2540] via-[#1a1060] to-[#635BFF]) — keep dark, ensure white text/borders stay clean */
+.partner-noir [class*="from-[#0A2540]"] {
+  background-image: linear-gradient(135deg, #0A2540 0%, #1a1060 55%, #635BFF 100%) !important;
+  color: #ffffff !important;
+  border-color: rgba(255,255,255,0.10) !important;
+}
+.partner-noir [class*="from-[#0A2540]"] * {
+  color: inherit !important;
+}
+.partner-noir [class*="from-[#0A2540]"] .text-white\/70,
+.partner-noir [class*="from-[#0A2540]"] .text-white\/80 {
+  color: rgba(255,255,255,0.75) !important;
+}
+/* Yellow "salary nahi" ribbon → indigo/purple ribbon */
+.partner-noir [class*="from-amber-400"],
+.partner-noir [class*="from-yellow-"] {
+  background-image: linear-gradient(90deg, var(--pn-indigo), var(--pn-purple), var(--pn-blue)) !important;
+  color: #ffffff !important;
 }
