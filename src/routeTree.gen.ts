@@ -60,6 +60,7 @@ import { Route as PortalDashboardRouteImport } from './routes/portal.dashboard'
 import { Route as PortalContactRouteImport } from './routes/portal.contact'
 import { Route as PortalBusinessPagesRouteImport } from './routes/portal.business-pages'
 import { Route as PartnerDashboardRouteImport } from './routes/partner.dashboard'
+import { Route as PartnerSubMetaRouteImport } from './routes/partner._sub-meta'
 import { Route as OwnerWebsiteRouteImport } from './routes/owner.website'
 import { Route as OwnerTemplatesRouteImport } from './routes/owner.templates'
 import { Route as OwnerStaffRouteImport } from './routes/owner.staff'
@@ -387,6 +388,10 @@ const PortalBusinessPagesRoute = PortalBusinessPagesRouteImport.update({
 const PartnerDashboardRoute = PartnerDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => PartnerRoute,
+} as any)
+const PartnerSubMetaRoute = PartnerSubMetaRouteImport.update({
+  id: '/_sub-meta',
   getParentRoute: () => PartnerRoute,
 } as any)
 const OwnerWebsiteRoute = OwnerWebsiteRouteImport.update({
@@ -782,7 +787,7 @@ export interface FileRoutesByFullPath {
   '/offline': typeof OfflineRoute
   '/owner': typeof OwnerRouteWithChildren
   '/owner-signup': typeof OwnerSignupRoute
-  '/partner': typeof PartnerRouteWithChildren
+  '/partner': typeof PartnerSubMetaRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
@@ -971,6 +976,7 @@ export interface FileRoutesByTo {
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
+  '/partner': typeof PartnerIndexRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
   '/portal/business-pages': typeof PortalBusinessPagesRoute
   '/portal/contact': typeof PortalContactRoute
@@ -990,7 +996,6 @@ export interface FileRoutesByTo {
   '/hire': typeof HireIndexRoute
   '/jobs': typeof JobsIndexRoute
   '/owner': typeof OwnerIndexRoute
-  '/partner': typeof PartnerIndexRoute
   '/portal': typeof PortalIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
@@ -1098,6 +1103,7 @@ export interface FileRoutesById {
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
+  '/partner/_sub-meta': typeof PartnerSubMetaRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
   '/portal/business-pages': typeof PortalBusinessPagesRoute
   '/portal/contact': typeof PortalContactRoute
@@ -1349,6 +1355,7 @@ export interface FileRouteTypes {
     | '/owner/staff'
     | '/owner/templates'
     | '/owner/website'
+    | '/partner'
     | '/partner/dashboard'
     | '/portal/business-pages'
     | '/portal/contact'
@@ -1368,7 +1375,6 @@ export interface FileRouteTypes {
     | '/hire'
     | '/jobs'
     | '/owner'
-    | '/partner'
     | '/portal'
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
@@ -1475,6 +1481,7 @@ export interface FileRouteTypes {
     | '/owner/staff'
     | '/owner/templates'
     | '/owner/website'
+    | '/partner/_sub-meta'
     | '/partner/dashboard'
     | '/portal/business-pages'
     | '/portal/contact'
@@ -1950,6 +1957,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/partner/dashboard'
       preLoaderRoute: typeof PartnerDashboardRouteImport
+      parentRoute: typeof PartnerRoute
+    }
+    '/partner/_sub-meta': {
+      id: '/partner/_sub-meta'
+      path: ''
+      fullPath: '/partner'
+      preLoaderRoute: typeof PartnerSubMetaRouteImport
       parentRoute: typeof PartnerRoute
     }
     '/owner/website': {
@@ -2606,11 +2620,13 @@ const OwnerRouteChildren: OwnerRouteChildren = {
 const OwnerRouteWithChildren = OwnerRoute._addFileChildren(OwnerRouteChildren)
 
 interface PartnerRouteChildren {
+  PartnerSubMetaRoute: typeof PartnerSubMetaRoute
   PartnerDashboardRoute: typeof PartnerDashboardRoute
   PartnerIndexRoute: typeof PartnerIndexRoute
 }
 
 const PartnerRouteChildren: PartnerRouteChildren = {
+  PartnerSubMetaRoute: PartnerSubMetaRoute,
   PartnerDashboardRoute: PartnerDashboardRoute,
   PartnerIndexRoute: PartnerIndexRoute,
 }
