@@ -108,6 +108,85 @@ export function BecomePartnerPage() {
         </div>
       </section>
 
+      {/* Trust — Why partner with Nexora */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <ShieldCheck className="h-3 w-3" /> Why Partner With Nexora
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            India's Trusted Beauty Industry OS
+          </h2>
+          <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-base">
+            Backed by real shops, real revenue and a transparent partner model — not a promise, a system.
+          </p>
+        </div>
+        <div className="mt-10 grid gap-4 md:grid-cols-4">
+          {[
+            { icon: Store, k: "12,000+", v: "Salons onboarded" },
+            { icon: Users, k: "2M+", v: "Customers reached" },
+            { icon: IndianRupee, k: "₹50Cr+", v: "GMV processed" },
+            { icon: Trophy, k: "38%", v: "Avg. shop growth" },
+          ].map((s) => (
+            <div key={s.v} className="border-border bg-card rounded-[var(--radius-card)] border p-6 text-center shadow-[var(--shadow-card)]">
+              <s.icon className="text-primary mx-auto h-6 w-6" />
+              <div className="text-heading mt-3 text-3xl font-black">{s.k}</div>
+              <div className="text-muted-foreground mt-1 text-xs font-bold uppercase tracking-wider">{s.v}</div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-6 grid gap-3 md:grid-cols-3">
+          {[
+            { icon: BadgeCheck, t: "Registered Indian company", b: "GST & MSME registered. Verified business entity." },
+            { icon: ShieldCheck, t: "Transparent 7-day payouts", b: "Every rupee traceable. No hidden deductions." },
+            { icon: FileCheck, t: "Written partner agreement", b: "Signed contract with clear terms and revenue share." },
+          ].map((t) => (
+            <div key={t.t} className="border-border bg-card flex items-start gap-3 rounded-[var(--radius-card)] border p-5">
+              <div className="bg-success/10 text-success grid h-10 w-10 shrink-0 place-items-center rounded-xl">
+                <t.icon className="h-5 w-5" />
+              </div>
+              <div>
+                <h4 className="text-heading font-bold">{t.t}</h4>
+                <p className="text-muted-foreground mt-1 text-sm">{t.b}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Ecosystem */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <Sparkles className="h-3 w-3" /> The Nexora Ecosystem
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            How the whole system works
+          </h2>
+          <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-base">
+            Growth Partners are the bridge between local salons and India's fastest-growing beauty marketplace.
+          </p>
+        </div>
+        <div className="mt-10 grid gap-4 md:grid-cols-4">
+          {[
+            { icon: Users, title: "Customers", body: "Discover, book & pay at trusted salons on the Nexora app." },
+            { icon: Store, title: "Salons & Shops", body: "Manage bookings, staff, payments and marketing in one place." },
+            { icon: UserCheck, title: "Growth Partners", body: "Onboard local shops, train them and earn on every booking." },
+            { icon: Building2, title: "Brands & Distributors", body: "Reach every partner shop through the Nexora portal." },
+          ].map((n, i) => (
+            <div key={n.title} className="border-border bg-card relative rounded-[var(--radius-card)] border p-6 shadow-[var(--shadow-card)]">
+              <div className="bg-gradient-cta text-primary-foreground grid h-11 w-11 place-items-center rounded-xl">
+                <n.icon className="h-5 w-5" />
+              </div>
+              <div className="text-muted-foreground mt-4 text-[11px] font-black uppercase tracking-wider">Layer {i + 1}</div>
+              <h3 className="text-heading mt-1 text-lg font-bold">{n.title}</h3>
+              <p className="text-muted-foreground mt-2 text-sm">{n.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+
       {/* How Growth Partners Earn */}
       <section className="relative overflow-hidden bg-gradient-to-b from-background via-muted/30 to-background py-20 md:py-28">
         <div className="mx-auto max-w-6xl px-4 md:px-6">
