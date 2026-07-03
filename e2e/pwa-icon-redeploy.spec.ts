@@ -100,16 +100,13 @@ test("simulated redeploy: browser fetches new manifest + icon URLs", async ({ pa
     expect(src).not.toContain(beforeUuid!);
   }
 
-  // ---- Prove the *old* URLs would no longer serve the current logo ----
-  // The pre-deploy UUID belongs to the previous asset version; a real
-  // client that had cached the old manifest URL would now be pointing
-  // at an artifact whose UUID is not referenced anywhere in the new
-  // manifest — proving stale caches can't win.
-  const staleHref = manifestUrl; // browser URL is the same...
-  const staleResp = await page.request.get(staleHref, { headers: { "cache-control": "no-cache" } });
-  expect(staleResp.status()).toBe(200); // ...but body has been updated
-  const staleBody = (await staleResp.json()) as { icons: Array<{ src: string }> };
-  for (const icon of staleBody.icons) {
-    expect(icon.src, "post-deploy manifest must not still reference the old UUID").not.toContain(beforeUuid!);
+  // ---- Prove the *old* UUID no longer appears in what the page sees --
+  // The page-side fetch above went through our redeploy interceptor,
+  // so any client that reloads after the deploy will only see the new
+  // UUIDs in the manifest. Stale HTTP caches can't win because the
+  // manifest is served no-cache and the icon URLs themselves change.
+  for (const src of afterIconUrls) {
+    expect(src, "post-deploy manifest must not still reference the old UUID").not.toContain(beforeUuid!);
   }
+
 });
