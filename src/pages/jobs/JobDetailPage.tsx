@@ -26,7 +26,8 @@ import { Modal } from "@/components/shared/Modal";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/stores/authStore";
 import { applyToJob, isRealJobId, type JobRow } from "@/lib/jobs";
-import { parseRequirementsMeta, stripRequirementsMeta } from "@/pages/jobs/PostJobPage";
+import { parseRequirementsMeta, stripRequirementsMeta } from "@/lib/jobRequirementsMeta";
+import type { Job } from "./mockJobs";
 
 type DetailView = {
   id: string;
@@ -86,11 +87,24 @@ function fromRealJob(j: JobRow & { employer?: { business_name: string } | null }
   };
 }
 
+function fromMockJob(j: Job): DetailView {
+  return { ...j, rawRequirements: null, isReal: false };
+}
+
+function findMockJob(jobId: string): Job {
+  const normalized = jobId.trim().toLowerCase();
+  const shortMatch = /^j(\d+)$/.exec(normalized);
+  const aliases = new Set([normalized]);
+  if (shortMatch) aliases.add(`job-${shortMatch[1]}`);
+  return MOCK_JOBS.find((j) => aliases.has(j.id.toLowerCase())) ?? MOCK_JOBS[0];
+}
+
 export function JobDetailPage({ jobId }: { jobId: string }) {
   const navigate = useNavigate();
   const { user, profile } = useAuthStore();
-  const [job, setJob] = useState<DetailView | null>(null);
-  const [loading, setLoading] = useState(true);
+  const initialMockJob = !isRealJobId(jobId) ? fromMockJob(findMockJob(jobId)) : null;
+  const [job, setJob] = useState<DetailView | null>(initialMockJob);
+  const [loading, setLoading] = useState(() => isRealJobId(jobId));
   const [applying, setApplying] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
   const [successMode, setSuccessMode] = useState<"real" | "demo">("real");
@@ -130,7 +144,14 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
   useEffect(() => {
     let alive = true;
     async function run() {
-      if (isRealJobId(jobId)) {
+      if (!isRealJobId(jobId)) {
+        setJob(fromMockJob(findMockJob(jobId)));
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      try {
         const { data, error } = await supabase
           .from("jobs")
           .select("*, employer:employer_profiles(*)")
@@ -142,10 +163,11 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
           setLoading(false);
           return;
         }
+      } catch {
+        // Fall through to the safe not-found state below.
       }
-      const mock = MOCK_JOBS.find((j) => j.id === jobId) ?? MOCK_JOBS[0];
       if (!alive) return;
-      setJob({ ...mock, rawRequirements: null, isReal: false });
+      setJob(null);
       setLoading(false);
     }
     run();
