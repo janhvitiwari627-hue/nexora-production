@@ -78,7 +78,7 @@ async function fillStep1(page: Page) {
   await pickChip(page, "Part-time");
   await pickChip(page, "1–2 years");
   // Description template chip fills the textarea (empty description path).
-  await pickChip(page, "Salon Job");
+  await pickChip(page, "Hair salon role");
   await expect(page.getByRole("textbox", { name: "Description" })).not.toHaveValue("");
   await page.getByRole("button", { name: /^Continue$/ }).first().click();
   await expect(page.getByRole("heading", { name: "Location & schedule" })).toBeVisible({
@@ -147,7 +147,7 @@ test.describe("/hire/post-job quick-select chips", () => {
     await pickChip(page, "1–2 years");
     await waitForForm(page, (f) => f.experience_level === "1–2 years");
 
-    await pickChip(page, "Salon Job");
+    await pickChip(page, "Hair salon role");
     await waitForForm(page, (f) => typeof f.description === "string" && (f.description as string).length > 20);
 
     await page.getByRole("button", { name: /^Continue$/ }).first().click();
