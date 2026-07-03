@@ -58,19 +58,27 @@ jobs:
       - name: Annotate TypeScript errors
         if: always()
         run: |
-          if [ ! -s build-logs/typecheck.log ]; then
+          # Emit ::error file=,line=,col=,title=:: annotations parsed from tsc-style
+          # diagnostics in BOTH the build log and the typecheck log, deduped so
+          # errors surfaced by both phases don't double-annotate the PR.
+          logs=""
+          [ -s build-logs/build.log ] && logs="$logs build-logs/build.log"
+          [ -s build-logs/typecheck.log ] && logs="$logs build-logs/typecheck.log"
+          if [ -z "$logs" ]; then
             exit 0
           fi
-          # Emit ::error file=,line=,col=,title=:: annotations parsed from tsc output.
-          awk '
+          # shellcheck disable=SC2086
+          cat $logs | awk '
             match($0, /^([^ (]+)[(:]([0-9]+)[,:]([0-9]+)\)?:? *-? *(error|warning) +(TS[0-9]+): *(.*)$/, m) {
               sev = (m[4] == "warning") ? "warning" : "error"
-              # Escape %, \r, \n per GitHub workflow command spec
               msg = m[6]
               gsub(/%/, "%25", msg); gsub(/\r/, "%0D", msg); gsub(/\n/, "%0A", msg)
-              printf "::%s file=%s,line=%s,col=%s,title=%s::%s\n", sev, m[1], m[2], m[3], m[5], msg
+              printf "%s|%s|%s|%s|%s|%s\n", sev, m[1], m[2], m[3], m[5], msg
             }
-          ' build-logs/typecheck.log
+          ' | sort -u | awk -F'|' '{
+            printf "::%s file=%s,line=%s,col=%s,title=%s::%s\n", $1, $2, $3, $4, $5, $6
+          }'
+
 
 
       - name: Upload build logs
