@@ -29,6 +29,7 @@ import {
   Layers,
 } from "lucide-react";
 import Footer from "@/components/nexora-design/sections/Footer";
+import GrowthPartnerRewardsSection from "@/components/sections/GrowthPartnerRewardsSection";
 import { PublicHeader } from "@/components/layout/PublicHeader";
 import { shopsQueryOptions } from "@/lib/shops.queries";
 import { getCategoryCounts, getMockBusinesses, type MockBusiness } from "@/lib/mock-businesses";
