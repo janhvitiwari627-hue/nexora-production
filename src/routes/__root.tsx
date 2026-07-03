@@ -11,6 +11,8 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import nexoraLogo from "@/assets/nexora-logo.jpg.asset.json";
+
 
 import { NotFoundPage } from "@/pages/public/NotFoundPage";
 import { Toaster } from "@/components/ui/sonner";
