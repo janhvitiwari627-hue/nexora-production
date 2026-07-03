@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,81 +9,147 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Briefcase, Users, CheckCircle2, XCircle, Eye, Search, CalendarClock,
-  UserCheck, TrendingUp, Ban,
+  Briefcase, Users, CheckCircle2, XCircle, Search, CalendarClock,
+  UserCheck, TrendingUp, Ban, Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
-import { MOCK_JOBS, MOCK_APPLICANTS, type Applicant } from "@/pages/jobs/mockJobs";
+import { supabase } from "@/integrations/supabase/client";
 
-type AppStatus = Applicant["stage"];
+type JobRow = {
+  id: string;
+  title: string | null;
+  business_name: string | null;
+  city: string | null;
+  status: string | null;
+  applicants_count: number | null;
+  created_at: string;
+  posted_by: string | null;
+};
 
-const STATUS_STYLES: Record<AppStatus, string> = {
-  Applied: "bg-slate-100 text-slate-700",
-  Screening: "bg-blue-100 text-blue-700",
-  Interview: "bg-amber-100 text-amber-700",
-  Offer: "bg-violet-100 text-violet-700",
-  Hired: "bg-emerald-100 text-emerald-700",
-  Rejected: "bg-rose-100 text-rose-700",
+type AppRow = {
+  id: string;
+  job_id: string;
+  applicant_id: string;
+  status: string;
+  created_at: string;
+  cover_note: string | null;
+  jobs: { title: string | null; business_name: string | null } | null;
+  candidate_profiles: { full_name: string | null; city: string | null; experience_years: number | null } | null;
+};
+
+const JOB_STATUS_STYLES: Record<string, string> = {
+  published: "bg-emerald-100 text-emerald-700",
+  draft: "bg-slate-100 text-slate-700",
+  paused: "bg-amber-100 text-amber-700",
+  closed: "bg-rose-100 text-rose-700",
+  flagged: "bg-rose-100 text-rose-700",
+  pending_approval: "bg-amber-100 text-amber-700",
+};
+
+const APP_STATUS_STYLES: Record<string, string> = {
+  applied: "bg-slate-100 text-slate-700",
+  screening: "bg-blue-100 text-blue-700",
+  interview: "bg-amber-100 text-amber-700",
+  offer: "bg-violet-100 text-violet-700",
+  hired: "bg-emerald-100 text-emerald-700",
+  rejected: "bg-rose-100 text-rose-700",
 };
 
 export function AdminJobsPage() {
-  const [applicants, setApplicants] = useState(MOCK_APPLICANTS);
-  const [jobs, setJobs] = useState(
-    MOCK_JOBS.map((j, i) => ({
-      ...j,
-      status: (i % 5 === 0 ? "pending" : i % 7 === 0 ? "flagged" : "active") as
-        | "active" | "pending" | "flagged" | "closed",
-    })),
-  );
+  const qc = useQueryClient();
   const [q, setQ] = useState("");
 
-  const stats = useMemo(() => {
-    const totalApplicants = applicants.length;
-    return {
-      totalJobs: jobs.length,
-      activeJobs: jobs.filter((j) => j.status === "active").length,
-      pendingJobs: jobs.filter((j) => j.status === "pending").length,
-      totalApplicants,
-      interviews: applicants.filter((a) => a.stage === "Interview").length,
-      offers: applicants.filter((a) => a.stage === "Offer").length,
-      hired: applicants.filter((a) => a.stage === "Hired").length,
-    };
-  }, [jobs, applicants]);
+  const jobsQ = useQuery({
+    queryKey: ["admin", "jobs"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("jobs")
+        .select("id,title,business_name,city,status,applicants_count,created_at,posted_by")
+        .order("created_at", { ascending: false })
+        .limit(500);
+      if (error) throw error;
+      return (data ?? []) as JobRow[];
+    },
+  });
 
-  const setJobStatus = (id: string, s: (typeof jobs)[number]["status"]) => {
-    setJobs((prev) => prev.map((j) => (j.id === id ? { ...j, status: s } : j)));
-    toast.success(`Job ${s}`);
-  };
+  const appsQ = useQuery({
+    queryKey: ["admin", "job_applications"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("job_applications")
+        .select(
+          "id,job_id,applicant_id,status,created_at,cover_note,jobs(title,business_name),candidate_profiles(full_name,city,experience_years)",
+        )
+        .order("created_at", { ascending: false })
+        .limit(500);
+      if (error) throw error;
+      return (data ?? []) as unknown as AppRow[];
+    },
+  });
 
-  const setAppStage = (id: string, s: AppStatus) => {
-    setApplicants((prev) => prev.map((a) => (a.id === id ? { ...a, stage: s } : a)));
-    toast.success(`Application marked ${s}`);
-  };
+  const jobs = jobsQ.data ?? [];
+  const apps = appsQ.data ?? [];
 
-  const filteredJobs = jobs.filter(
-    (j) =>
-      !q ||
-      j.title.toLowerCase().includes(q.toLowerCase()) ||
-      j.business.toLowerCase().includes(q.toLowerCase()) ||
-      j.city.toLowerCase().includes(q.toLowerCase()),
-  );
+  const stats = useMemo(() => ({
+    totalJobs: jobs.length,
+    activeJobs: jobs.filter((j) => j.status === "published").length,
+    pendingJobs: jobs.filter((j) => j.status === "pending_approval" || j.status === "draft").length,
+    totalApplicants: apps.length,
+    interviews: apps.filter((a) => a.status === "interview" || a.status === "screening").length,
+    offers: apps.filter((a) => a.status === "offer").length,
+    hired: apps.filter((a) => a.status === "hired").length,
+  }), [jobs, apps]);
+
+  const updateJob = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const { error } = await supabase.from("jobs").update({ status }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: (_d, v) => {
+      toast.success(`Job marked ${v.status}`);
+      qc.invalidateQueries({ queryKey: ["admin", "jobs"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const updateApp = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const { error } = await supabase.from("job_applications").update({ status }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: (_d, v) => {
+      toast.success(`Application marked ${v.status}`);
+      qc.invalidateQueries({ queryKey: ["admin", "job_applications"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const filteredJobs = jobs.filter((j) => {
+    if (!q) return true;
+    const s = q.toLowerCase();
+    return (
+      (j.title ?? "").toLowerCase().includes(s) ||
+      (j.business_name ?? "").toLowerCase().includes(s) ||
+      (j.city ?? "").toLowerCase().includes(s)
+    );
+  });
 
   const KPIS = [
     { label: "Total Jobs", value: stats.totalJobs, icon: Briefcase, color: "text-indigo-600" },
-    { label: "Active Postings", value: stats.activeJobs, icon: TrendingUp, color: "text-emerald-600" },
+    { label: "Published", value: stats.activeJobs, icon: TrendingUp, color: "text-emerald-600" },
     { label: "Pending Approval", value: stats.pendingJobs, icon: CalendarClock, color: "text-amber-600" },
-    { label: "Total Applicants", value: stats.totalApplicants, icon: Users, color: "text-violet-600" },
-    { label: "Interview Requests", value: stats.interviews, icon: CalendarClock, color: "text-blue-600" },
-    { label: "Hire Requests", value: stats.offers, icon: UserCheck, color: "text-fuchsia-600" },
+    { label: "Applicants", value: stats.totalApplicants, icon: Users, color: "text-violet-600" },
+    { label: "Interviews", value: stats.interviews, icon: CalendarClock, color: "text-blue-600" },
+    { label: "Offers", value: stats.offers, icon: UserCheck, color: "text-fuchsia-600" },
     { label: "Hired", value: stats.hired, icon: CheckCircle2, color: "text-emerald-600" },
   ];
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Jobs & Hiring Control</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Jobs &amp; Hiring Control</h1>
         <p className="text-sm text-muted-foreground">
-          Full control over job postings, applications, interview & hire requests across the platform.
+          Live view of every job posting, application, interview and hire request across the platform.
         </p>
       </div>
 
@@ -121,81 +188,87 @@ export function AdminJobsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Business</TableHead>
-                    <TableHead>City</TableHead>
-                    <TableHead>Applicants</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredJobs.map((j) => (
-                    <TableRow key={j.id}>
-                      <TableCell className="font-medium">{j.title}</TableCell>
-                      <TableCell>{j.business}</TableCell>
-                      <TableCell>{j.city}</TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">{j.applicants}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          className={
-                            j.status === "active"
-                              ? "bg-emerald-100 text-emerald-700"
-                              : j.status === "pending"
-                                ? "bg-amber-100 text-amber-700"
-                                : j.status === "flagged"
-                                  ? "bg-rose-100 text-rose-700"
-                                  : "bg-slate-100 text-slate-700"
-                          }
-                        >
-                          {j.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="inline-flex gap-1">
-                          <Button size="sm" variant="ghost" onClick={() => toast.info(`Viewing ${j.title}`)}>
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          {j.status === "pending" && (
-                            <Button size="sm" variant="ghost" className="text-emerald-600" onClick={() => setJobStatus(j.id, "active")}>
-                              <CheckCircle2 className="h-4 w-4" />
-                            </Button>
-                          )}
-                          <Button size="sm" variant="ghost" className="text-rose-600" onClick={() => setJobStatus(j.id, "closed")}>
-                            <Ban className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
+              {jobsQ.isLoading ? (
+                <div className="flex items-center gap-2 py-8 text-sm text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" /> Loading jobs…
+                </div>
+              ) : jobsQ.error ? (
+                <div className="py-8 text-sm text-rose-600">Failed to load jobs.</div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Business</TableHead>
+                      <TableHead>City</TableHead>
+                      <TableHead>Applicants</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredJobs.map((j) => (
+                      <TableRow key={j.id}>
+                        <TableCell className="font-medium">{j.title ?? "—"}</TableCell>
+                        <TableCell>{j.business_name ?? "—"}</TableCell>
+                        <TableCell>{j.city ?? "—"}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">{j.applicants_count ?? 0}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={JOB_STATUS_STYLES[j.status ?? ""] ?? "bg-slate-100 text-slate-700"}>
+                            {j.status ?? "unknown"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="inline-flex gap-1">
+                            {j.status !== "published" && (
+                              <Button size="sm" variant="ghost" className="text-emerald-600" onClick={() => updateJob.mutate({ id: j.id, status: "published" })}>
+                                <CheckCircle2 className="h-4 w-4" />
+                              </Button>
+                            )}
+                            {j.status !== "closed" && (
+                              <Button size="sm" variant="ghost" className="text-rose-600" onClick={() => updateJob.mutate({ id: j.id, status: "closed" })}>
+                                <Ban className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {filteredJobs.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={6} className="py-8 text-center text-sm text-muted-foreground">
+                          No jobs found.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
 
         <TabsContent value="applications" className="mt-4">
-          <ApplicationsTable applicants={applicants} onSet={setAppStage} />
+          <ApplicationsTable data={apps} loading={appsQ.isLoading} onSet={(id, s) => updateApp.mutate({ id, status: s })} />
         </TabsContent>
 
         <TabsContent value="interviews" className="mt-4">
           <ApplicationsTable
-            applicants={applicants.filter((a) => a.stage === "Interview" || a.stage === "Screening")}
-            onSet={setAppStage}
+            data={apps.filter((a) => a.status === "interview" || a.status === "screening")}
+            loading={appsQ.isLoading}
+            onSet={(id, s) => updateApp.mutate({ id, status: s })}
             title="Interview requests awaiting admin action"
           />
         </TabsContent>
 
         <TabsContent value="hires" className="mt-4">
           <ApplicationsTable
-            applicants={applicants.filter((a) => a.stage === "Offer" || a.stage === "Hired")}
-            onSet={setAppStage}
-            title="Hire requests & confirmed hires"
+            data={apps.filter((a) => a.status === "offer" || a.status === "hired")}
+            loading={appsQ.isLoading}
+            onSet={(id, s) => updateApp.mutate({ id, status: s })}
+            title="Hire requests &amp; confirmed hires"
           />
         </TabsContent>
       </Tabs>
@@ -204,12 +277,14 @@ export function AdminJobsPage() {
 }
 
 function ApplicationsTable({
-  applicants,
+  data,
+  loading,
   onSet,
   title = "All applications",
 }: {
-  applicants: Applicant[];
-  onSet: (id: string, s: AppStatus) => void;
+  data: AppRow[];
+  loading: boolean;
+  onSet: (id: string, status: string) => void;
   title?: string;
 }) {
   return (
@@ -218,51 +293,70 @@ function ApplicationsTable({
         <CardTitle className="text-base">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Candidate</TableHead>
-              <TableHead>City</TableHead>
-              <TableHead>Experience</TableHead>
-              <TableHead>Rating</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {applicants.map((a) => (
-              <TableRow key={a.id}>
-                <TableCell className="font-medium">{a.name}</TableCell>
-                <TableCell>{a.city}</TableCell>
-                <TableCell>{a.experience}</TableCell>
-                <TableCell>{"★".repeat(a.rating)}</TableCell>
-                <TableCell>
-                  <Badge className={STATUS_STYLES[a.stage]}>{a.stage}</Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="inline-flex gap-1">
-                    <Button size="sm" variant="ghost" className="text-blue-600" onClick={() => onSet(a.id, "Interview")}>
-                      Interview
-                    </Button>
-                    <Button size="sm" variant="ghost" className="text-emerald-600" onClick={() => onSet(a.id, "Hired")}>
-                      <CheckCircle2 className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="ghost" className="text-rose-600" onClick={() => onSet(a.id, "Rejected")}>
-                      <XCircle className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-            {applicants.length === 0 && (
+        {loading ? (
+          <div className="flex items-center gap-2 py-8 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading applications…
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-sm text-muted-foreground py-8">
-                  No applications in this bucket.
-                </TableCell>
+                <TableHead>Candidate</TableHead>
+                <TableHead>City</TableHead>
+                <TableHead>Experience</TableHead>
+                <TableHead>Applied For</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {data.map((a) => (
+                <TableRow key={a.id}>
+                  <TableCell className="font-medium">
+                    {a.candidate_profiles?.full_name ?? a.applicant_id.slice(0, 8)}
+                  </TableCell>
+                  <TableCell>{a.candidate_profiles?.city ?? "—"}</TableCell>
+                  <TableCell>
+                    {a.candidate_profiles?.experience_years != null
+                      ? `${a.candidate_profiles.experience_years} yrs`
+                      : "—"}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {a.jobs?.title ?? "—"}
+                    {a.jobs?.business_name ? (
+                      <span className="text-muted-foreground"> · {a.jobs.business_name}</span>
+                    ) : null}
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={APP_STATUS_STYLES[a.status] ?? "bg-slate-100 text-slate-700"}>
+                      {a.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="inline-flex gap-1">
+                      <Button size="sm" variant="ghost" className="text-blue-600" onClick={() => onSet(a.id, "interview")}>
+                        Interview
+                      </Button>
+                      <Button size="sm" variant="ghost" className="text-emerald-600" onClick={() => onSet(a.id, "hired")}>
+                        <CheckCircle2 className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" className="text-rose-600" onClick={() => onSet(a.id, "rejected")}>
+                        <XCircle className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {data.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={6} className="py-8 text-center text-sm text-muted-foreground">
+                    No applications in this bucket.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        )}
       </CardContent>
     </Card>
   );
