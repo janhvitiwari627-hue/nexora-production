@@ -230,6 +230,177 @@ export function BecomePartnerPage() {
         </div>
       </section>
 
+      {/* Section 5 — Partner Role */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <Target className="h-3 w-3" /> Partner Role
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            What a District Partner actually does
+          </h2>
+          <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-base">
+            A clear, repeatable playbook — no cold calls, no guesswork.
+          </p>
+        </div>
+
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { icon: Users, t: "Connect with salon owners", d: "Tap your existing network." },
+            { icon: Sparkles, t: "Nexora introduction", d: "Share the opportunity in 5 min." },
+            { icon: PlayCircle, t: "Product demo", d: "Show the live salon dashboard." },
+            { icon: FileCheck, t: "Registration help", d: "Assist owner sign-up + KYC." },
+            { icon: Rocket, t: "Website activation", d: "Go-live their white-label site." },
+            { icon: Zap, t: "QR setup", d: "Deploy booking + payment QR." },
+            { icon: CalendarClock, t: "Follow-up", d: "Weekly check-ins, drive adoption." },
+            { icon: HeadphonesIcon, t: "Relationship management", d: "Long-term account owner." },
+          ].map((p, i) => (
+            <div
+              key={p.t}
+              className="border-border bg-card rounded-[var(--radius-card)] border p-5 shadow-[var(--shadow-card)] transition hover:-translate-y-1 hover:border-primary/40 animate-fade-in"
+              style={{ animationDelay: `${i * 50}ms`, animationFillMode: "both" }}
+            >
+              <div className="bg-primary/10 text-primary grid h-11 w-11 place-items-center rounded-xl">
+                <p.icon className="h-5 w-5" />
+              </div>
+              <h3 className="text-heading mt-4 text-sm font-black leading-snug">{p.t}</h3>
+              <p className="text-muted-foreground mt-1 text-xs">{p.d}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 rounded-[var(--radius-card)] border border-border bg-muted/40 p-5">
+          <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Supported salon categories</div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {["Hair Salons", "Barber Shops", "Beauty Parlours", "Spa", "Tattoo", "Massage", "Nail Art"].map((c) => (
+              <span key={c} className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs font-semibold text-heading">
+                <CheckCircle2 className="h-3 w-3 text-primary" /> {c}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Section 6 — Salon Benefits */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <Store className="h-3 w-3" /> What Salons Get
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            A complete digital upgrade — free to start
+          </h2>
+          <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-base">
+            Every salon you onboard receives the full Nexora stack. This is your pitch.
+          </p>
+        </div>
+        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            { icon: LayoutDashboard, t: "Free white-label website" },
+            { icon: CalendarClock, t: "Online booking system" },
+            { icon: Users, t: "Customer CRM" },
+            { icon: UserCheck, t: "Staff management" },
+            { icon: Zap, t: "WhatsApp automation" },
+            { icon: BadgeCheck, t: "Smart reminders" },
+            { icon: IndianRupee, t: "QR payment ecosystem" },
+            { icon: Award, t: "Loyalty program & rewards" },
+            { icon: Sparkles, t: "AI marketing tools" },
+            { icon: TrendingUp, t: "Repeat customer engine" },
+            { icon: Activity, t: "Analytics dashboard" },
+            { icon: Rocket, t: "Complete digital presence" },
+          ].map((b, i) => (
+            <div
+              key={b.t}
+              className="border-border bg-card flex items-center gap-3 rounded-[var(--radius-card)] border p-4 shadow-[var(--shadow-card)] animate-fade-in"
+              style={{ animationDelay: `${i * 40}ms`, animationFillMode: "both" }}
+            >
+              <div className="bg-primary/10 text-primary grid h-10 w-10 shrink-0 place-items-center rounded-lg">
+                <b.icon className="h-5 w-5" />
+              </div>
+              <span className="text-heading text-sm font-bold">{b.t}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Section 7 — Customer Benefits */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <Users className="h-3 w-3" /> What Customers Get
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            Why customers choose Nexora salons
+          </h2>
+          <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-base">
+            Demand comes from customers. Here's what pulls them in.
+          </p>
+        </div>
+        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          {[
+            { icon: Target, t: "Nearby search" },
+            { icon: CalendarClock, t: "Online booking" },
+            { icon: Zap, t: "No waiting" },
+            { icon: UserCheck, t: "Favourite staff" },
+            { icon: BadgeCheck, t: "Smart reminders" },
+            { icon: Award, t: "Reward points" },
+            { icon: Crown, t: "Membership" },
+            { icon: Users, t: "Referral program" },
+            { icon: ShieldCheck, t: "Verified salons" },
+            { icon: Sparkles, t: "Digital beauty experience" },
+          ].map((b, i) => (
+            <div
+              key={b.t}
+              className="border-border bg-card rounded-[var(--radius-card)] border p-4 text-center shadow-[var(--shadow-card)] animate-fade-in"
+              style={{ animationDelay: `${i * 40}ms`, animationFillMode: "both" }}
+            >
+              <b.icon className="text-primary mx-auto h-5 w-5" />
+              <div className="text-heading mt-2 text-xs font-bold leading-snug">{b.t}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Section 8 — Partner Benefits */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <Crown className="h-3 w-3" /> Your Benefits
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            What you get as a District Business Partner
+          </h2>
+          <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-base">
+            Recognition, tools, and long-term growth — not just commissions.
+          </p>
+        </div>
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            { icon: BadgeCheck, t: "Official Partner Status", d: "District Business Partner ID + verified badge." },
+            { icon: Crown, t: "Featured profile", d: "Public profile on Nexora directory." },
+            { icon: TrendingUp, t: "Sponsored visibility", d: "Boosted reach in your district." },
+            { icon: Rocket, t: "Business promotion", d: "Co-branded campaigns and creatives." },
+            { icon: Sparkles, t: "AI marketing tools", d: "Ready-made assets, scripts, reels." },
+            { icon: Users, t: "Referral system", d: "Earn from every salon and sub-partner." },
+            { icon: Trophy, t: "Leaderboard", d: "District, state and national rankings." },
+            { icon: Award, t: "Recognition program", d: "Awards, rewards, feature stories." },
+            { icon: Activity, t: "Long-term growth", d: "Recurring revenue as your salons grow." },
+          ].map((b, i) => (
+            <div
+              key={b.t}
+              className="border-border bg-card rounded-[var(--radius-card)] border p-5 shadow-[var(--shadow-card)] transition hover:-translate-y-1 hover:border-primary/40 animate-fade-in"
+              style={{ animationDelay: `${i * 50}ms`, animationFillMode: "both" }}
+            >
+              <div className="bg-gradient-cta text-primary-foreground grid h-11 w-11 place-items-center rounded-xl">
+                <b.icon className="h-5 w-5" />
+              </div>
+              <h3 className="text-heading mt-4 text-sm font-black leading-snug">{b.t}</h3>
+              <p className="text-muted-foreground mt-1 text-xs">{b.d}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Trust — Why partner with Nexora */}
       <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
         <div className="text-center">
