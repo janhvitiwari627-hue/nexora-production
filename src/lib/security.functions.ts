@@ -9,10 +9,28 @@ const RecordLoginInput = z.object({
 });
 
 export const recordLoginEvent = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => RecordLoginInput.parse(d ?? {}))
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
+  .handler(async ({ data }) => {
+    // Manually resolve the caller — do NOT throw when unauthenticated
+    // (this fn fires right after sign-in and auditing must never block login).
+    const { getRequestHeader } = await import("@tanstack/react-start/server");
+    const authHeader = getRequestHeader("authorization") ?? getRequestHeader("Authorization");
+    const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+    if (!token) return { id: null, skipped: true as const };
+
+    const { createClient } = await import("@supabase/supabase-js");
+    const supabase = createClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_PUBLISHABLE_KEY!,
+      {
+        global: { headers: { Authorization: `Bearer ${token}` } },
+        auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+      },
+    );
+    const { data: userRes } = await supabase.auth.getUser();
+    const userId = userRes?.user?.id;
+    if (!userId) return { id: null, skipped: true as const };
+
     const { data: row, error } = await supabase
       .from("login_events")
       .insert({
@@ -23,9 +41,10 @@ export const recordLoginEvent = createServerFn({ method: "POST" })
       })
       .select("id")
       .single();
-    if (error) throw new Error(error.message);
-    return { id: row.id };
+    if (error) return { id: null, skipped: true as const };
+    return { id: row.id, skipped: false as const };
   });
+
 
 export const listMyLoginEvents = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
