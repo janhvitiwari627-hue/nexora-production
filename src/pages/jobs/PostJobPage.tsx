@@ -1092,6 +1092,22 @@ export function PostJobPage() {
         metaLines.push(`Screening: ${JSON.stringify(form.screening_questions)}`);
       const composedReq = [baseReq, metaLines.join("\n")].filter(Boolean).join("\n\n").trim();
 
+      // Derive portfolio flags from the selected option.
+      const portfolioOpt = form.portfolio_option ?? "";
+      const portfolio_required =
+        portfolioOpt === "Portfolio required" || portfolioOpt === "Instagram profile required";
+      const portfolio_type =
+        portfolioOpt === "Instagram profile required" ? "instagram_required" :
+        portfolioOpt === "Portfolio required" ? "portfolio_required" :
+        portfolioOpt === "No portfolio needed" ? "none" :
+        portfolioOpt === "Resume preferred" ? "resume_preferred" : null;
+      const resume_preferred = portfolioOpt === "Resume preferred";
+
+      const working_days =
+        (form.custom_days && form.custom_days.length > 0)
+          ? form.custom_days
+          : (form.days_preset ? [form.days_preset] : []);
+
       const cleaned: JobDraftInput = {
         ...dbForm,
         area: dbForm.area || null,
@@ -1110,6 +1126,21 @@ export function PostJobPage() {
         whatsapp_number: dbForm.whatsapp_number?.trim() || null,
         interview_mode: dbForm.interview_mode || null,
         shop_id: shopId,
+        // Persist first-class columns for all quick-select values.
+        business_type: form.business_type || null,
+        location_type: dbForm.work_location || null,
+        working_days,
+        start_time: form.start_time || null,
+        end_time: form.end_time || null,
+        flexible_schedule: !!form.flexible_schedule,
+        joining_date_type: form.joining_availability || null,
+        salary_type: form.salary_type || null,
+        certification_requirement: form.certification || null,
+        language_preferences: form.languages ?? [],
+        portfolio_required,
+        portfolio_type,
+        resume_preferred,
+        screening_questions: form.screening_questions ?? [],
       };
       const row = await saveJob({
         jobId,
