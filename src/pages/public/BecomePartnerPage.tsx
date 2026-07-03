@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { z } from "zod";
-import { Activity, ArrowRight, BadgeCheck, Building2, CalendarClock, CheckCircle2, Crown, FileCheck, GraduationCap, Headphones as HeadphonesIcon, IndianRupee, LayoutDashboard, Rocket, ShieldCheck, Sparkles, Store, Target, TrendingUp, Trophy, UserCheck, Users, Wallet, Zap, Award } from "lucide-react";
+import { Activity, ArrowRight, BadgeCheck, Building2, CalendarClock, CheckCircle2, Crown, FileCheck, GraduationCap, Headphones as HeadphonesIcon, IndianRupee, LayoutDashboard, PlayCircle, Rocket, ShieldCheck, Sparkles, Store, Target, TrendingUp, Trophy, UserCheck, Users, Wallet, Zap, Award } from "lucide-react";
 import rewardWelcomeKit from "@/assets/reward-welcome-kit.jpg";
 import rewardTabletBadge from "@/assets/reward-tablet-badge.jpg";
 import rewardLaptop from "@/assets/reward-laptop.jpg";
