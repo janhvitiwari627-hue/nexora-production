@@ -968,21 +968,40 @@ export function PostJobPage() {
           whatsapp_number: job.whatsapp_number ?? "",
           interview_mode: job.interview_mode ?? INTERVIEW_MODES[0],
           shop_id: job.shop_id ?? null,
-          business_type: "",
+          business_type: (job as any).business_type ?? "",
           days_preset: "",
-          custom_days: [],
+          custom_days: Array.isArray((job as any).working_days) ? ((job as any).working_days as string[]) : [],
           hours_preset: "",
-          start_time: "",
-          end_time: "",
-          flexible_schedule: /flexible/i.test(job.schedule ?? ""),
+          start_time: (job as any).start_time ?? "",
+          end_time: (job as any).end_time ?? "",
+          flexible_schedule: (job as any).flexible_schedule ?? /flexible/i.test(job.schedule ?? ""),
+          joining_availability: (job as any).joining_date_type ?? "",
+          salary_type: (job as any).salary_type ?? "",
+          salary_range_preset: "",
           ...(() => {
             const m = parseRequirementsMeta(job.requirements);
+            const langs = Array.isArray((job as any).language_preferences) && ((job as any).language_preferences as string[]).length > 0
+              ? ((job as any).language_preferences as string[])
+              : m.languages;
+            const cert = ((job as any).certification_requirement as string | null) || m.certification;
+            const pType = (job as any).portfolio_type as string | null;
+            const pRequired = (job as any).portfolio_required as boolean | null;
+            const rPreferred = (job as any).resume_preferred as boolean | null;
+            const portfolio_option: PortfolioOption | "" =
+              pType === "instagram_required" ? "Instagram profile required" :
+              pType === "portfolio_required" ? "Portfolio required" :
+              pType === "none" ? "No portfolio needed" :
+              rPreferred ? "Resume preferred" :
+              pRequired ? "Portfolio required" :
+              m.portfolio;
+            const screening = Array.isArray((job as any).screening_questions) && ((job as any).screening_questions as any[]).length > 0
+              ? ((job as any).screening_questions as ScreeningQuestion[])
+              : m.screening;
             return {
-              certification: m.certification,
-              languages: m.languages,
-              portfolio_option: m.portfolio,
-              screening_questions: m.screening,
-
+              certification: cert,
+              languages: langs,
+              portfolio_option,
+              screening_questions: screening,
             };
           })(),
         });
