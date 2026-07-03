@@ -21,6 +21,7 @@ import {
   stripRequirementsMeta,
   type PortfolioOption,
   type ScreeningQuestion,
+  type ScreeningQuestionType,
 } from "@/lib/jobRequirementsMeta";
 
 const WORK_LOCATIONS = [
