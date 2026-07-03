@@ -28,7 +28,6 @@ import { Route as HelpRouteImport } from './routes/help'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ForOwnersRouteImport } from './routes/for-owners'
 import { Route as DownloadAppRouteImport } from './routes/download-app'
-import { Route as DistrictBusinessPartnerRouteImport } from './routes/district-business-partner'
 import { Route as DistributorBrandPortalRouteImport } from './routes/distributor-brand-portal'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CustomerAppRouteImport } from './routes/customer-app'
@@ -83,7 +82,6 @@ import { Route as JobsMyApplicationsRouteImport } from './routes/jobs.my-applica
 import { Route as JobsApplicationsRouteImport } from './routes/jobs.applications'
 import { Route as JobsJobIdRouteImport } from './routes/jobs.$jobId'
 import { Route as HirePostJobRouteImport } from './routes/hire.post-job'
-import { Route as DistrictBusinessPartnerSlugRouteImport } from './routes/district-business-partner.$slug'
 import { Route as DistributorSlugRouteImport } from './routes/distributor.$slug'
 import { Route as DashboardWalletRouteImport } from './routes/dashboard.wallet'
 import { Route as DashboardSupportRouteImport } from './routes/dashboard.support'
@@ -108,7 +106,6 @@ import { Route as AdminRewardsRouteImport } from './routes/admin.rewards'
 import { Route as AdminReviewsRouteImport } from './routes/admin.reviews'
 import { Route as AdminRankingsRouteImport } from './routes/admin.rankings'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
-import { Route as AdminPartnersRouteImport } from './routes/admin.partners'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
@@ -226,11 +223,6 @@ const ForOwnersRoute = ForOwnersRouteImport.update({
 const DownloadAppRoute = DownloadAppRouteImport.update({
   id: '/download-app',
   path: '/download-app',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DistrictBusinessPartnerRoute = DistrictBusinessPartnerRouteImport.update({
-  id: '/district-business-partner',
-  path: '/district-business-partner',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DistributorBrandPortalRoute = DistributorBrandPortalRouteImport.update({
@@ -503,12 +495,6 @@ const HirePostJobRoute = HirePostJobRouteImport.update({
   path: '/hire/post-job',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DistrictBusinessPartnerSlugRoute =
-  DistrictBusinessPartnerSlugRouteImport.update({
-    id: '/$slug',
-    path: '/$slug',
-    getParentRoute: () => DistrictBusinessPartnerRoute,
-  } as any)
 const DistributorSlugRoute = DistributorSlugRouteImport.update({
   id: '/distributor/$slug',
   path: '/distributor/$slug',
@@ -627,11 +613,6 @@ const AdminRankingsRoute = AdminRankingsRouteImport.update({
 const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
   id: '/payments',
   path: '/payments',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminPartnersRoute = AdminPartnersRouteImport.update({
-  id: '/partners',
-  path: '/partners',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
@@ -767,7 +748,6 @@ export interface FileRoutesByFullPath {
   '/customer-app': typeof CustomerAppRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/distributor-brand-portal': typeof DistributorBrandPortalRoute
-  '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
   '/download-app': typeof DownloadAppRoute
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -792,7 +772,6 @@ export interface FileRoutesByFullPath {
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/login': typeof AdminLoginRoute
-  '/admin/partners': typeof AdminPartnersRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/rankings': typeof AdminRankingsRoute
   '/admin/reviews': typeof AdminReviewsRoute
@@ -817,7 +796,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/support': typeof DashboardSupportRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/distributor/$slug': typeof DistributorSlugRoute
-  '/district-business-partner/$slug': typeof DistrictBusinessPartnerSlugRoute
   '/hire/post-job': typeof HirePostJobRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs/applications': typeof JobsApplicationsRouteWithChildren
@@ -891,7 +869,6 @@ export interface FileRoutesByTo {
   '/create-shop-website': typeof CreateShopWebsiteRoute
   '/customer-app': typeof CustomerAppRoute
   '/distributor-brand-portal': typeof DistributorBrandPortalRoute
-  '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
   '/download-app': typeof DownloadAppRoute
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -915,7 +892,6 @@ export interface FileRoutesByTo {
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/login': typeof AdminLoginRoute
-  '/admin/partners': typeof AdminPartnersRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/rankings': typeof AdminRankingsRoute
   '/admin/reviews': typeof AdminReviewsRoute
@@ -940,7 +916,6 @@ export interface FileRoutesByTo {
   '/dashboard/support': typeof DashboardSupportRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/distributor/$slug': typeof DistributorSlugRoute
-  '/district-business-partner/$slug': typeof DistrictBusinessPartnerSlugRoute
   '/hire/post-job': typeof HirePostJobRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs/applications': typeof JobsApplicationsRouteWithChildren
@@ -1016,7 +991,6 @@ export interface FileRoutesById {
   '/customer-app': typeof CustomerAppRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/distributor-brand-portal': typeof DistributorBrandPortalRoute
-  '/district-business-partner': typeof DistrictBusinessPartnerRouteWithChildren
   '/download-app': typeof DownloadAppRoute
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -1041,7 +1015,6 @@ export interface FileRoutesById {
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/login': typeof AdminLoginRoute
-  '/admin/partners': typeof AdminPartnersRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/rankings': typeof AdminRankingsRoute
   '/admin/reviews': typeof AdminReviewsRoute
@@ -1066,7 +1039,6 @@ export interface FileRoutesById {
   '/dashboard/support': typeof DashboardSupportRoute
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/distributor/$slug': typeof DistributorSlugRoute
-  '/district-business-partner/$slug': typeof DistrictBusinessPartnerSlugRoute
   '/hire/post-job': typeof HirePostJobRoute
   '/jobs/$jobId': typeof JobsJobIdRoute
   '/jobs/applications': typeof JobsApplicationsRouteWithChildren
@@ -1143,7 +1115,6 @@ export interface FileRouteTypes {
     | '/customer-app'
     | '/dashboard'
     | '/distributor-brand-portal'
-    | '/district-business-partner'
     | '/download-app'
     | '/for-owners'
     | '/forgot-password'
@@ -1168,7 +1139,6 @@ export interface FileRouteTypes {
     | '/admin/businesses'
     | '/admin/dashboard'
     | '/admin/login'
-    | '/admin/partners'
     | '/admin/payments'
     | '/admin/rankings'
     | '/admin/reviews'
@@ -1193,7 +1163,6 @@ export interface FileRouteTypes {
     | '/dashboard/support'
     | '/dashboard/wallet'
     | '/distributor/$slug'
-    | '/district-business-partner/$slug'
     | '/hire/post-job'
     | '/jobs/$jobId'
     | '/jobs/applications'
@@ -1267,7 +1236,6 @@ export interface FileRouteTypes {
     | '/create-shop-website'
     | '/customer-app'
     | '/distributor-brand-portal'
-    | '/district-business-partner'
     | '/download-app'
     | '/for-owners'
     | '/forgot-password'
@@ -1291,7 +1259,6 @@ export interface FileRouteTypes {
     | '/admin/businesses'
     | '/admin/dashboard'
     | '/admin/login'
-    | '/admin/partners'
     | '/admin/payments'
     | '/admin/rankings'
     | '/admin/reviews'
@@ -1316,7 +1283,6 @@ export interface FileRouteTypes {
     | '/dashboard/support'
     | '/dashboard/wallet'
     | '/distributor/$slug'
-    | '/district-business-partner/$slug'
     | '/hire/post-job'
     | '/jobs/$jobId'
     | '/jobs/applications'
@@ -1391,7 +1357,6 @@ export interface FileRouteTypes {
     | '/customer-app'
     | '/dashboard'
     | '/distributor-brand-portal'
-    | '/district-business-partner'
     | '/download-app'
     | '/for-owners'
     | '/forgot-password'
@@ -1416,7 +1381,6 @@ export interface FileRouteTypes {
     | '/admin/businesses'
     | '/admin/dashboard'
     | '/admin/login'
-    | '/admin/partners'
     | '/admin/payments'
     | '/admin/rankings'
     | '/admin/reviews'
@@ -1441,7 +1405,6 @@ export interface FileRouteTypes {
     | '/dashboard/support'
     | '/dashboard/wallet'
     | '/distributor/$slug'
-    | '/district-business-partner/$slug'
     | '/hire/post-job'
     | '/jobs/$jobId'
     | '/jobs/applications'
@@ -1517,7 +1480,6 @@ export interface RootRouteChildren {
   CustomerAppRoute: typeof CustomerAppRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   DistributorBrandPortalRoute: typeof DistributorBrandPortalRoute
-  DistrictBusinessPartnerRoute: typeof DistrictBusinessPartnerRouteWithChildren
   DownloadAppRoute: typeof DownloadAppRoute
   ForOwnersRoute: typeof ForOwnersRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -1716,13 +1678,6 @@ declare module '@tanstack/react-router' {
       path: '/download-app'
       fullPath: '/download-app'
       preLoaderRoute: typeof DownloadAppRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/district-business-partner': {
-      id: '/district-business-partner'
-      path: '/district-business-partner'
-      fullPath: '/district-business-partner'
-      preLoaderRoute: typeof DistrictBusinessPartnerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/distributor-brand-portal': {
@@ -2103,13 +2058,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HirePostJobRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/district-business-partner/$slug': {
-      id: '/district-business-partner/$slug'
-      path: '/$slug'
-      fullPath: '/district-business-partner/$slug'
-      preLoaderRoute: typeof DistrictBusinessPartnerSlugRouteImport
-      parentRoute: typeof DistrictBusinessPartnerRoute
-    }
     '/distributor/$slug': {
       id: '/distributor/$slug'
       path: '/distributor/$slug'
@@ -2276,13 +2224,6 @@ declare module '@tanstack/react-router' {
       path: '/payments'
       fullPath: '/admin/payments'
       preLoaderRoute: typeof AdminPaymentsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/partners': {
-      id: '/admin/partners'
-      path: '/partners'
-      fullPath: '/admin/partners'
-      preLoaderRoute: typeof AdminPartnersRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/login': {
@@ -2455,7 +2396,6 @@ interface AdminRouteChildren {
   AdminBusinessesRoute: typeof AdminBusinessesRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminLoginRoute: typeof AdminLoginRoute
-  AdminPartnersRoute: typeof AdminPartnersRoute
   AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminRankingsRoute: typeof AdminRankingsRoute
   AdminReviewsRoute: typeof AdminReviewsRoute
@@ -2470,7 +2410,6 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminBusinessesRoute: AdminBusinessesRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminLoginRoute: AdminLoginRoute,
-  AdminPartnersRoute: AdminPartnersRoute,
   AdminPaymentsRoute: AdminPaymentsRoute,
   AdminRankingsRoute: AdminRankingsRoute,
   AdminReviewsRoute: AdminReviewsRoute,
@@ -2529,20 +2468,6 @@ const DashboardRouteChildren: DashboardRouteChildren = {
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
   DashboardRouteChildren,
 )
-
-interface DistrictBusinessPartnerRouteChildren {
-  DistrictBusinessPartnerSlugRoute: typeof DistrictBusinessPartnerSlugRoute
-}
-
-const DistrictBusinessPartnerRouteChildren: DistrictBusinessPartnerRouteChildren =
-  {
-    DistrictBusinessPartnerSlugRoute: DistrictBusinessPartnerSlugRoute,
-  }
-
-const DistrictBusinessPartnerRouteWithChildren =
-  DistrictBusinessPartnerRoute._addFileChildren(
-    DistrictBusinessPartnerRouteChildren,
-  )
 
 interface OwnerJobsRouteChildren {
   OwnerJobsNewRoute: typeof OwnerJobsNewRoute
@@ -2625,7 +2550,6 @@ const rootRouteChildren: RootRouteChildren = {
   CustomerAppRoute: CustomerAppRoute,
   DashboardRoute: DashboardRouteWithChildren,
   DistributorBrandPortalRoute: DistributorBrandPortalRoute,
-  DistrictBusinessPartnerRoute: DistrictBusinessPartnerRouteWithChildren,
   DownloadAppRoute: DownloadAppRoute,
   ForOwnersRoute: ForOwnersRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
