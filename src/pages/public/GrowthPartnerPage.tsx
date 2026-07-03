@@ -119,12 +119,16 @@ export function GrowthPartnerPage() {
               transparent system aur ek real business opportunity.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                to="/contact"
-                className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-2 rounded-[var(--radius-button)] px-6 py-3 text-sm font-bold shadow-[var(--shadow-glow)]"
-              >
-                Join Free <ArrowRight className="h-4 w-4" />
-              </Link>
+              <JoinPartnerDialog
+                trigger={
+                  <button
+                    type="button"
+                    className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-2 rounded-[var(--radius-button)] px-6 py-3 text-sm font-bold shadow-[var(--shadow-glow)]"
+                  >
+                    Join Free <ArrowRight className="h-4 w-4" />
+                  </button>
+                }
+              />
               <button
                 type="button"
                 className="inline-flex items-center gap-2 rounded-[var(--radius-button)] border border-white/30 px-6 py-3 text-sm font-bold text-white hover:bg-white/10"
