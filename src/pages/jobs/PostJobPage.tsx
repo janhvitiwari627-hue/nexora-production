@@ -799,6 +799,8 @@ type UiOnlyFields = {
   certification?: string;
   languages?: string[];
   portfolio_option?: PortfolioOption | "";
+  screening_questions?: ScreeningQuestion[];
+
 };
 
 type Form = Required<
