@@ -1,106 +1,120 @@
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Check, EyeOff, Flag, Star, Trash2 } from "lucide-react";
+import { Loader2, Star, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
-type Review = {
-  id: string; user: string; shop: string; rating: number; text: string;
-  date: string; fakeScore: number; status: "pending" | "approved" | "hidden";
+type ReviewRow = {
+  id: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+  user_id: string;
+  salon_id: string;
+  profiles: { full_name: string | null; avatar_url: string | null } | null;
+  salons: { name: string | null } | null;
 };
-const REVIEWS: Review[] = Array.from({ length: 14 }).map((_, i) => ({
-  id: `rv${i + 1}`,
-  user: ["Aarav", "Priya", "Rohan", "Sneha", "Vikram"][i % 5] + " M.",
-  shop: ["Luxe Hair", "Glow Spa", "QuickCuts", "Bridal Bliss"][i % 4],
-  rating: (i % 5) + 1,
-  text: ["Amazing experience, staff was great!", "Not worth the money.", "Best salon in town!!! 5 stars!!!", "Average service."][i % 4],
-  date: `${i + 1}d ago`,
-  fakeScore: (i * 17) % 100,
-  status: "pending" as const,
-}));
-
-const scoreColor = (s: number) =>
-  s < 30 ? "bg-emerald-500" : s < 60 ? "bg-amber-500" : s < 80 ? "bg-orange-500" : "bg-red-500";
 
 export function ReviewModerationPage() {
-  const [reviews, setReviews] = useState(REVIEWS);
-  const [tab, setTab] = useState<"pending" | "approved" | "hidden">("pending");
-  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const qc = useQueryClient();
 
-  const filtered = reviews.filter(r => r.status === tab);
-  const toggle = (id: string) => { const s = new Set(selected); s.has(id) ? s.delete(id) : s.add(id); setSelected(s); };
+  const reviewsQ = useQuery({
+    queryKey: ["admin", "reviews"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("reviews")
+        .select("id,rating,comment,created_at,user_id,salon_id,profiles(full_name,avatar_url),salons(name)")
+        .order("created_at", { ascending: false })
+        .limit(500);
+      if (error) throw error;
+      return (data ?? []) as unknown as ReviewRow[];
+    },
+  });
 
-  const setStatus = (ids: string[], status: Review["status"]) => {
-    setReviews(p => p.map(r => ids.includes(r.id) ? { ...r, status } : r));
-    setSelected(new Set());
-    toast.success(`${ids.length} review(s) ${status}`);
-  };
+  const del = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("reviews").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Review deleted");
+      qc.invalidateQueries({ queryKey: ["admin", "reviews"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const reviews = reviewsQ.data ?? [];
+  const [minRating, setMinRating] = useState<number>(0);
+  const filtered = reviews.filter((r) => r.rating >= minRating);
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 p-6">
       <header>
-        <h1 className="text-heading text-2xl font-bold">Review Moderation</h1>
-        <p className="text-muted-foreground text-sm">AI-assisted fake review detection</p>
+        <h1 className="text-2xl font-bold">Review Moderation</h1>
+        <p className="text-muted-foreground text-sm">All customer reviews across the platform ({reviews.length} total).</p>
       </header>
 
-      <div className="flex items-center justify-between">
-        <Tabs value={tab} onValueChange={v => setTab(v as typeof tab)}>
-          <TabsList>
-            <TabsTrigger value="pending">Pending</TabsTrigger>
-            <TabsTrigger value="approved">Approved</TabsTrigger>
-            <TabsTrigger value="hidden">Hidden</TabsTrigger>
-          </TabsList>
-        </Tabs>
-        {selected.size > 0 && (
-          <div className="flex gap-2">
-            <Button size="sm" onClick={() => setStatus([...selected], "approved")}><Check className="h-4 w-4" /> Approve {selected.size}</Button>
-            <Button size="sm" variant="destructive" onClick={() => setStatus([...selected], "hidden")}><EyeOff className="h-4 w-4" /> Hide {selected.size}</Button>
-          </div>
-        )}
+      <div className="flex flex-wrap gap-2">
+        {[0, 1, 2, 3, 4, 5].map((r) => (
+          <Button key={r} size="sm" variant={minRating === r ? "default" : "outline"} onClick={() => setMinRating(r)}>
+            {r === 0 ? "All ratings" : `${r}★ +`}
+          </Button>
+        ))}
       </div>
 
-      <div className="space-y-3">
-        {filtered.map(r => (
-          <Card key={r.id}>
-            <CardContent className="flex gap-4 p-4">
-              <Checkbox checked={selected.has(r.id)} onCheckedChange={() => toggle(r.id)} className="mt-1" />
-              <Avatar><AvatarFallback>{r.user.slice(0, 2)}</AvatarFallback></Avatar>
-              <div className="flex-1 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-medium">{r.user} <span className="text-muted-foreground font-normal">on {r.shop}</span></div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <div className="flex">{Array.from({ length: 5 }).map((_, i) => <Star key={i} className={`h-3.5 w-3.5 ${i < r.rating ? "fill-amber-400 text-amber-400" : "text-muted-foreground"}`} />)}</div>
-                      <span className="text-muted-foreground">· {r.date}</span>
+      {reviewsQ.isLoading ? (
+        <div className="flex items-center gap-2 py-8 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" /> Loading reviews…
+        </div>
+      ) : reviewsQ.error ? (
+        <div className="py-8 text-sm text-rose-600">Failed to load reviews.</div>
+      ) : (
+        <div className="space-y-3">
+          {filtered.map((r) => (
+            <Card key={r.id}>
+              <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex flex-1 items-start gap-3">
+                  <Avatar className="h-10 w-10">
+                    <AvatarFallback>{(r.profiles?.full_name ?? "?").slice(0, 2).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-medium">{r.profiles?.full_name ?? "Anonymous"}</span>
+                      <span className="text-muted-foreground text-xs">on {r.salons?.name ?? "unknown shop"}</span>
+                      <span className="text-muted-foreground text-xs">· {new Date(r.created_at).toLocaleDateString()}</span>
                     </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <div className="text-muted-foreground text-xs">AI Fake Score</div>
-                    <div className="flex items-center gap-2">
-                      <div className="bg-muted h-2 w-24 overflow-hidden rounded-full">
-                        <div className={`h-full ${scoreColor(r.fakeScore)}`} style={{ width: `${r.fakeScore}%` }} />
-                      </div>
-                      <span className="w-8 text-right text-sm font-medium">{r.fakeScore}</span>
+                    <div className="flex items-center gap-0.5">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`h-4 w-4 ${i < r.rating ? "fill-amber-400 text-amber-400" : "text-muted-foreground"}`}
+                        />
+                      ))}
                     </div>
+                    <p className="text-sm">{r.comment ?? <span className="text-muted-foreground italic">(no comment)</span>}</p>
                   </div>
                 </div>
-                <p className="text-sm">{r.text}</p>
                 <div className="flex gap-2">
-                  <Button size="sm" variant="outline" onClick={() => setStatus([r.id], "approved")}><Check className="h-3.5 w-3.5" /> Approve</Button>
-                  <Button size="sm" variant="outline" onClick={() => setStatus([r.id], "hidden")}><EyeOff className="h-3.5 w-3.5" /> Hide</Button>
-                  <Button size="sm" variant="ghost"><Flag className="h-3.5 w-3.5" /> Flag</Button>
-                  <Button size="sm" variant="ghost" onClick={() => { setReviews(p => p.filter(x => x.id !== r.id)); toast.success("Deleted"); }}><Trash2 className="text-destructive h-3.5 w-3.5" /></Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => del.mutate(r.id)}
+                    disabled={del.isPending}
+                  >
+                    <Trash2 className="mr-1 h-3.5 w-3.5" /> Delete
+                  </Button>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-        {filtered.length === 0 && <Card><CardContent className="text-muted-foreground p-12 text-center">No reviews in this queue</CardContent></Card>}
-      </div>
+              </CardContent>
+            </Card>
+          ))}
+          {filtered.length === 0 && (
+            <div className="py-8 text-center text-sm text-muted-foreground">No reviews match.</div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
