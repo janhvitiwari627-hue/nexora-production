@@ -936,15 +936,23 @@
 .partner-noir .text-white {
   color: var(--pn-text) !important;
 }
-.partner-noir [class*="from-[#0A2540]"] .text-white,
-.partner-noir [class*="from-[#0A2540]"] .text-white\/70,
-.partner-noir [class*="from-[#0A2540]"] .text-white\/80,
-.partner-noir .bg-gradient-cta .text-white,
-.partner-noir [class*="bg-gradient-to-r"] .text-white,
-.partner-noir [class*="bg-gradient-to-r"] > .text-white,
+.partner-noir [class*="from-[#0A2540]"],
+.partner-noir [class*="from-[#0A2540]"] *,
+.partner-noir [class*="from-amber-400"],
+.partner-noir [class*="from-amber-400"] *,
+.partner-noir [class*="from-yellow-"],
+.partner-noir [class*="from-yellow-"] *,
+.partner-noir .bg-gradient-cta,
+.partner-noir .bg-gradient-cta *,
 .partner-noir button[class*="bg-gradient-to-r"],
-.partner-noir a[class*="bg-gradient-to-r"] {
+.partner-noir button[class*="bg-gradient-to-r"] *,
+.partner-noir a[class*="bg-gradient-to-r"],
+.partner-noir a[class*="bg-gradient-to-r"] * {
   color: #ffffff !important;
+}
+.partner-noir [class*="from-[#0A2540]"] .text-white\/70,
+.partner-noir [class*="from-[#0A2540]"] .text-white\/80 {
+  color: rgba(255,255,255,0.78) !important;
 }
 .partner-noir .text-muted-foreground,
 .partner-noir .text-slate-500,
