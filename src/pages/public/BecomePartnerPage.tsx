@@ -137,45 +137,90 @@ export function BecomePartnerPage() {
       </section>
 
 
-      {/* Who this is for — Target Personas */}
+      {/* Section 3 — Nexora Ecosystem (animated flow) */}
       <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
         <div className="text-center">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
-            <UserCheck className="h-3 w-3" /> Who This Is For
+            <Sparkles className="h-3 w-3" /> The Nexora Ecosystem
+          </span>
+          <h2 className="text-heading mx-auto mt-4 max-w-3xl text-3xl font-black leading-tight tracking-tight md:text-4xl">
+            "Nexora Sirf Salon Software Nahi Hai. Nexora Beauty Industry Ka Complete Digital Ecosystem Hai."
+          </h2>
+        </div>
+
+        <div className="mt-12 overflow-hidden rounded-[var(--radius-card-lg)] border border-border/60 bg-gradient-to-br from-[#0A2540] via-[#1a1060] to-[#635BFF] p-6 shadow-[var(--shadow-card)] md:p-10">
+          <div className="grid gap-3 md:grid-cols-4 lg:grid-cols-8">
+            {[
+              { icon: Users, title: "Customers" },
+              { icon: Store, title: "Salon Owners" },
+              { icon: UserCheck, title: "Beauty Staff" },
+              { icon: GraduationCap, title: "Beauty Academies" },
+              { icon: BadgeCheck, title: "Brands" },
+              { icon: Building2, title: "Distributors" },
+              { icon: Trophy, title: "District Partners" },
+              { icon: Rocket, title: "Nexora Platform" },
+            ].map((n, i) => (
+              <div
+                key={n.title}
+                className="group relative rounded-[var(--radius-card)] border border-white/15 bg-white/10 p-4 text-center text-white backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/20 animate-fade-in"
+                style={{ animationDelay: `${i * 90}ms`, animationFillMode: "both" }}
+              >
+                <div className="mx-auto grid h-11 w-11 place-items-center rounded-xl bg-white/15 transition group-hover:bg-amber-300 group-hover:text-slate-900">
+                  <n.icon className="h-5 w-5" />
+                </div>
+                <div className="mt-3 text-[11px] font-black uppercase tracking-wider text-white/70">
+                  Node {i + 1}
+                </div>
+                <div className="mt-1 text-sm font-black">{n.title}</div>
+                {i < 7 && (
+                  <ArrowRight
+                    className="text-amber-300 absolute -right-2 top-1/2 hidden h-4 w-4 -translate-y-1/2 lg:block animate-pulse"
+                    aria-hidden
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+          <p className="mt-6 text-center text-sm font-semibold text-white/85 md:text-base">
+            Ek connected ecosystem — jahan har layer ek doosre se juda hua hai.
+          </p>
+        </div>
+      </section>
+
+      {/* Section 4 — Who Can Join */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <UserCheck className="h-3 w-3" /> Who Can Join
           </span>
           <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
-            Built for people who already know the beauty industry
+            Eligible partner categories
           </h2>
           <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-base">
-            If you already sell to, train, or work with salons — this program turns your existing
-            network into recurring monthly income.
+            If you already work with salon owners in any of these roles — you're eligible.
           </p>
         </div>
 
-        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { icon: Store, t: "Beauty Product Salesman", b: "Selling shampoos, colours or skincare into salons." },
-            { icon: Sparkles, t: "Cosmetic Sales Executive", b: "FMCG beauty field sales in your territory." },
-            { icon: Building2, t: "Distributor", b: "Local or regional distributor with an active shop route." },
-            { icon: BadgeCheck, t: "Brand Sales Representative", b: "Territory rep for a national or regional beauty brand." },
-            { icon: HeadphonesIcon, t: "Salon Consultant", b: "Advise salons on setup, branding or operations." },
-            { icon: GraduationCap, t: "Beauty Trainer", b: "Trainer or academy owner already close to shop owners." },
-            { icon: Users, t: "Existing Network Builder", b: "You already have a network of salon-owner relationships." },
-            { icon: Rocket, t: "Freelance Sales Professional", b: "Independent field sales looking for recurring income." },
-            { icon: Store, t: "Hair Salon Product Salesman", b: "Selling into hair salons and unisex studios." },
-            { icon: LayoutDashboard, t: "Salon Furniture Dealer", b: "Chairs, mirrors, stations — you already visit new shops." },
-            { icon: Sparkles, t: "Spa Product Representative", b: "Reps selling into spas, wellness and massage centres." },
-            { icon: Target, t: "Tattoo Supply Distributor", b: "Distributing inks, machines and consumables to studios." },
-            { icon: Award, t: "Nail Art Supplier", b: "Selling nail products into nail studios and salons." },
-          ].map((p) => (
-            <div key={p.t} className="border-border bg-card group flex items-start gap-3 rounded-[var(--radius-card)] border p-5 shadow-[var(--shadow-card)] transition hover:-translate-y-0.5">
-              <div className="bg-primary/10 text-primary grid h-10 w-10 shrink-0 place-items-center rounded-xl transition group-hover:bg-primary group-hover:text-primary-foreground">
+            { icon: Store, t: "Hair Salon Product Salesman" },
+            { icon: Sparkles, t: "Cosmetic Sales Executive" },
+            { icon: Building2, t: "Beauty Product Distributor" },
+            { icon: LayoutDashboard, t: "Salon Furniture Dealer" },
+            { icon: HeadphonesIcon, t: "Spa Product Representative" },
+            { icon: Target, t: "Tattoo Supply Distributor" },
+            { icon: Award, t: "Nail Art Supplier" },
+            { icon: GraduationCap, t: "Beauty Consultant" },
+          ].map((p, i) => (
+            <div
+              key={p.t}
+              className="border-border bg-card group rounded-[var(--radius-card)] border p-5 text-center shadow-[var(--shadow-card)] transition hover:-translate-y-1 hover:border-primary/40 animate-fade-in"
+              style={{ animationDelay: `${i * 60}ms`, animationFillMode: "both" }}
+            >
+              <div className="bg-primary/10 text-primary mx-auto grid h-12 w-12 place-items-center rounded-xl transition group-hover:bg-gradient-cta group-hover:text-primary-foreground">
                 <p.icon className="h-5 w-5" />
               </div>
-              <div>
-                <h3 className="text-heading font-bold">{p.t}</h3>
-                <p className="text-muted-foreground mt-1 text-sm">{p.b}</p>
-              </div>
+              <h3 className="text-heading mt-4 text-sm font-black leading-snug">{p.t}</h3>
             </div>
           ))}
         </div>
@@ -184,7 +229,6 @@ export function BecomePartnerPage() {
           Don't see your exact title? If you talk to salon owners every week — you qualify.
         </div>
       </section>
-
 
       {/* Trust — Why partner with Nexora */}
       <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
@@ -232,37 +276,6 @@ export function BecomePartnerPage() {
         </div>
       </section>
 
-      {/* Ecosystem */}
-      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
-        <div className="text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
-            <Sparkles className="h-3 w-3" /> The Nexora Ecosystem
-          </span>
-          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
-            How the whole system works
-          </h2>
-          <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-base">
-            Growth Partners are the bridge between local salons and India's fastest-growing beauty marketplace.
-          </p>
-        </div>
-        <div className="mt-10 grid gap-4 md:grid-cols-4">
-          {[
-            { icon: Users, title: "Customers", body: "Discover, book & pay at trusted salons on the Nexora app." },
-            { icon: Store, title: "Salons & Shops", body: "Manage bookings, staff, payments and marketing in one place." },
-            { icon: UserCheck, title: "Growth Partners", body: "Onboard local shops, train them and earn on every booking." },
-            { icon: Building2, title: "Brands & Distributors", body: "Reach every partner shop through the Nexora portal." },
-          ].map((n, i) => (
-            <div key={n.title} className="border-border bg-card relative rounded-[var(--radius-card)] border p-6 shadow-[var(--shadow-card)]">
-              <div className="bg-gradient-cta text-primary-foreground grid h-11 w-11 place-items-center rounded-xl">
-                <n.icon className="h-5 w-5" />
-              </div>
-              <div className="text-muted-foreground mt-4 text-[11px] font-black uppercase tracking-wider">Layer {i + 1}</div>
-              <h3 className="text-heading mt-1 text-lg font-bold">{n.title}</h3>
-              <p className="text-muted-foreground mt-2 text-sm">{n.body}</p>
-            </div>
-          ))}
-        </div>
-      </section>
 
 
       {/* How Growth Partners Earn */}
