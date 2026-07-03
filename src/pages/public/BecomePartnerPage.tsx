@@ -775,6 +775,39 @@ export function BecomePartnerPage() {
           )}
         </div>
       </section>
+
+      <StickyCTA />
     </div>
   );
 }
+
+function StickyCTA() {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 600);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return (
+    <div
+      className={`fixed inset-x-0 bottom-0 z-40 border-t border-border/60 bg-background/95 backdrop-blur transition-transform duration-300 md:bottom-4 md:left-1/2 md:right-auto md:w-auto md:-translate-x-1/2 md:rounded-full md:border md:shadow-[var(--shadow-card)] ${visible ? "translate-y-0" : "translate-y-full md:translate-y-[200%]"}`}
+      aria-hidden={!visible}
+    >
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 md:px-4">
+        <div className="hidden text-sm font-black text-heading md:block">
+          District Business Partner Program
+        </div>
+        <div className="flex flex-1 items-center gap-2 md:flex-none">
+          <a href="#join" className="bg-gradient-cta text-primary-foreground inline-flex flex-1 items-center justify-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-black shadow-[var(--shadow-glow)] md:flex-none">
+            Join Free <ArrowRight className="h-4 w-4" />
+          </a>
+          <a href="#talk" className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-black text-heading md:flex-none">
+            <HeadphonesIcon className="h-4 w-4" /> Talk to Team
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
