@@ -19,7 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const ICONS: Record<string, typeof CheckCircle2> = {
   Building2, Users, CalendarCheck, IndianRupee, Crown, AlertCircle,
-  CheckCircle2, Ban, MessageSquace: MessageSquare, MessageSquare, XCircle, UserPlus,
+  CheckCircle2, Ban, MessageSquare, XCircle, UserPlus,
 };
 
 export function AdminDashboardPage() {
