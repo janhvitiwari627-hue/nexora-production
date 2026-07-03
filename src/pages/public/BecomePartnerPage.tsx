@@ -401,184 +401,162 @@ export function BecomePartnerPage() {
         </div>
       </section>
 
-      {/* Section 9 — Transparent Earnings Model */}
+      {/* Section 9 — How Partners Earn (Interactive Earnings Model) */}
       <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
         <div className="text-center">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
-            <IndianRupee className="h-3 w-3" /> Transparent Earnings Model
+            <IndianRupee className="h-3 w-3" /> How Partners Earn
           </span>
           <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
-            Exactly how you earn — no hidden math
+            Interactive Earnings Model
           </h2>
           <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-base">
-            Four income streams. Every rupee traceable in your dashboard, credited on a fixed schedule.
+            Two clear income streams. Fully transparent, admin-configurable, and tied to real salon activity.
           </p>
         </div>
 
-        {/* 4 pillars */}
-        <div className="mt-10 grid gap-5 md:grid-cols-2">
-          {/* 1. Activation payout */}
-          <div className="border-border bg-card relative overflow-hidden rounded-[var(--radius-card)] border p-6 shadow-[var(--shadow-card)]">
-            <div className="flex items-center gap-3">
-              <div className="bg-primary/10 text-primary grid h-11 w-11 place-items-center rounded-xl">
-                <Rocket className="h-5 w-5" />
-              </div>
-              <div>
-                <div className="text-[11px] font-bold uppercase tracking-wider text-primary">Stream 1</div>
-                <h3 className="text-heading text-lg font-black">Activation Payout</h3>
-              </div>
+        {/* A. Activation Reward */}
+        <div className="mt-10 border-border bg-card rounded-[var(--radius-card)] border p-6 shadow-[var(--shadow-card)] md:p-8">
+          <div className="flex items-center gap-3">
+            <div className="bg-primary/10 text-primary grid h-11 w-11 place-items-center rounded-xl">
+              <Rocket className="h-5 w-5" />
             </div>
-            <p className="text-muted-foreground mt-3 text-sm">
-              A fixed one-time payout for every salon you onboard, verified, and activated on Nexora.
-            </p>
-            <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-              <div className="rounded-lg bg-muted/50 p-3">
-                <div className="text-heading text-xl font-black">₹1,500</div>
-                <div className="text-muted-foreground mt-0.5 text-[10px] font-bold uppercase tracking-wider">Per salon</div>
-              </div>
-              <div className="rounded-lg bg-muted/50 p-3">
-                <div className="text-heading text-xl font-black">72 hrs</div>
-                <div className="text-muted-foreground mt-0.5 text-[10px] font-bold uppercase tracking-wider">Credit time</div>
-              </div>
-              <div className="rounded-lg bg-muted/50 p-3">
-                <div className="text-heading text-xl font-black">No cap</div>
-                <div className="text-muted-foreground mt-0.5 text-[10px] font-bold uppercase tracking-wider">Volume</div>
-              </div>
-            </div>
-            <div className="text-muted-foreground mt-3 text-xs">
-              Triggers when: KYC verified + website live + first booking or QR payment received.
+            <div>
+              <div className="text-[11px] font-bold uppercase tracking-wider text-primary">A · Activation Reward</div>
+              <h3 className="text-heading text-lg font-black md:text-xl">One-time reward per activated salon</h3>
             </div>
           </div>
 
-          {/* 2. 7-day revenue share */}
-          <div className="border-border bg-card relative overflow-hidden rounded-[var(--radius-card)] border p-6 shadow-[var(--shadow-card)]">
-            <div className="flex items-center gap-3">
-              <div className="bg-primary/10 text-primary grid h-11 w-11 place-items-center rounded-xl">
-                <TrendingUp className="h-5 w-5" />
-              </div>
-              <div>
-                <div className="text-[11px] font-bold uppercase tracking-wider text-primary">Stream 2</div>
-                <h3 className="text-heading text-lg font-black">7-Day Revenue Share</h3>
-              </div>
-            </div>
-            <p className="text-muted-foreground mt-3 text-sm">
-              A share of every salon's platform revenue, credited to your wallet <span className="font-bold text-heading">every 7 days</span> — recurring, for as long as the salon stays active.
-            </p>
-            <div className="mt-4 space-y-2 text-sm">
-              {[
-                { k: "Base share", v: "12%" },
-                { k: "After 10 active salons", v: "15%" },
-                { k: "After 25 active salons", v: "18%" },
-                { k: "Payout cycle", v: "Every Monday" },
-              ].map((r) => (
-                <div key={r.k} className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2">
-                  <span className="text-muted-foreground text-xs font-semibold">{r.k}</span>
-                  <span className="text-heading text-sm font-black">{r.v}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 3. Milestone bonuses */}
-          <div className="border-border bg-card relative overflow-hidden rounded-[var(--radius-card)] border p-6 shadow-[var(--shadow-card)]">
-            <div className="flex items-center gap-3">
-              <div className="bg-primary/10 text-primary grid h-11 w-11 place-items-center rounded-xl">
-                <Trophy className="h-5 w-5" />
-              </div>
-              <div>
-                <div className="text-[11px] font-bold uppercase tracking-wider text-primary">Stream 3</div>
-                <h3 className="text-heading text-lg font-black">Milestone Bonuses</h3>
-              </div>
-            </div>
-            <p className="text-muted-foreground mt-3 text-sm">
-              Extra rewards as you hit onboarding milestones — on top of activation + revenue share.
-            </p>
-            <div className="mt-4 space-y-2">
-              {[
-                { m: "10 salons", r: "Welcome Kit + ₹10,000 bonus", i: Award },
-                { m: "25 salons", r: "Nexora Tablet + Verified Badge", i: BadgeCheck },
-                { m: "50 salons", r: "Laptop + Featured Partner status", i: Crown },
-                { m: "100 salons", r: "Car reward + District Head role", i: Trophy },
-              ].map((m) => (
-                <div key={m.m} className="flex items-center gap-3 rounded-lg border border-border/60 bg-muted/30 p-3">
-                  <m.i className="text-primary h-4 w-4 shrink-0" />
-                  <div className="flex flex-1 items-center justify-between gap-2">
-                    <span className="text-heading text-xs font-black">{m.m}</span>
-                    <span className="text-muted-foreground text-xs">{m.r}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 4. Dashboard benefits */}
-          <div className="relative overflow-hidden rounded-[var(--radius-card)] border border-primary/30 bg-gradient-to-br from-[#0A2540] via-[#1a1060] to-[#635BFF] p-6 text-white shadow-[var(--shadow-card)]">
-            <div className="flex items-center gap-3">
-              <div className="grid h-11 w-11 place-items-center rounded-xl bg-white/15">
-                <LayoutDashboard className="h-5 w-5" />
-              </div>
-              <div>
-                <div className="text-[11px] font-bold uppercase tracking-wider text-amber-300">Stream 4 · Control</div>
-                <h3 className="text-lg font-black">Dashboard Benefits</h3>
-              </div>
-            </div>
-            <p className="mt-3 text-sm text-white/80">
-              Everything transparent, in real time. You always know what you've earned, what's pending, and what's next.
-            </p>
-            <div className="mt-4 grid gap-2 sm:grid-cols-2">
-              {[
-                { icon: Wallet, t: "Live earnings ledger" },
-                { icon: CalendarClock, t: "Pending & cleared split" },
-                { icon: Activity, t: "Salon-wise revenue view" },
-                { icon: Target, t: "Next milestone tracker" },
-                { icon: Users, t: "Onboarded salon list" },
-                { icon: FileCheck, t: "Payout invoices + TDS" },
-              ].map((d) => (
-                <div key={d.t} className="flex items-center gap-2 rounded-lg bg-white/10 p-2.5">
-                  <d.icon className="h-4 w-4 text-amber-300" />
-                  <span className="text-xs font-bold">{d.t}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Timeline strip */}
-        <div className="mt-8 rounded-[var(--radius-card)] border border-border bg-muted/40 p-6">
-          <div className="text-center text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-            One salon · Full earnings timeline
-          </div>
-          <div className="mt-5 grid gap-4 md:grid-cols-4">
+          {/* Flow */}
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
             {[
-              { d: "Day 0", t: "Salon signs up", note: "You initiate onboarding", icon: FileCheck },
-              { d: "Day 3", t: "KYC + website live", note: "Activation ₹1,500 credited", icon: Rocket },
-              { d: "Day 7", t: "First revenue share", note: "12% of platform revenue", icon: TrendingUp },
-              { d: "Ongoing", t: "Every Monday", note: "Recurring payout to wallet", icon: Wallet },
+              { t: "Salon Registration", d: "Partner onboards a new salon on Nexora", icon: FileCheck },
+              { t: "15 Days Active Revenue", d: "Salon generates verified revenue for 15 days", icon: Activity },
+              { t: "Reward Eligible", d: "Activation reward auto-credited to partner wallet", icon: BadgeCheck },
             ].map((s, i) => (
-              <div key={s.d} className="relative">
-                <div className="border-border bg-card rounded-[var(--radius-card)] border p-4 shadow-sm">
-                  <div className="flex items-center gap-2">
-                    <div className="bg-primary/10 text-primary grid h-8 w-8 place-items-center rounded-lg">
-                      <s.icon className="h-4 w-4" />
-                    </div>
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-primary">{s.d}</div>
-                  </div>
-                  <div className="text-heading mt-3 text-sm font-black">{s.t}</div>
-                  <div className="text-muted-foreground mt-1 text-xs">{s.note}</div>
+              <div key={s.t} className="relative rounded-[var(--radius-card)] border border-border/60 bg-muted/30 p-4">
+                <div className="flex items-center gap-2">
+                  <s.icon className="text-primary h-4 w-4" />
+                  <div className="text-heading text-sm font-black">{s.t}</div>
                 </div>
-                {i < 3 && (
+                <div className="text-muted-foreground mt-1 text-xs">{s.d}</div>
+                {i < 2 && (
                   <ArrowRight className="text-muted-foreground/40 absolute -right-2 top-1/2 hidden h-4 w-4 -translate-y-1/2 md:block" />
                 )}
               </div>
             ))}
           </div>
+
+          {/* Two examples */}
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {/* Single salon */}
+            <div className="rounded-[var(--radius-card)] border border-border/60 bg-muted/20 p-5">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                Illustrative example · Single salon
+              </div>
+              <div className="mt-3 space-y-2 text-sm">
+                {[
+                  { k: "Salon Revenue", v: "₹15,000" },
+                  { k: "Nexora Revenue (10%)", v: "₹1,500" },
+                  { k: "Partner Activation Reward (10% of Nexora revenue)", v: "₹150" },
+                ].map((r, idx) => (
+                  <div
+                    key={r.k}
+                    className={`flex items-center justify-between rounded-lg px-3 py-2 ${idx === 2 ? "bg-primary/10" : "bg-muted/50"}`}
+                  >
+                    <span className="text-muted-foreground text-xs font-semibold">{r.k}</span>
+                    <span className={`text-sm font-black ${idx === 2 ? "text-primary" : "text-heading"}`}>{r.v}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Scale */}
+            <div className="rounded-[var(--radius-card)] border border-primary/30 bg-gradient-to-br from-[#0A2540] via-[#1a1060] to-[#635BFF] p-5 text-white">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-amber-300">
+                Illustrative example · Scale (100 active shops)
+              </div>
+              <div className="mt-3 space-y-2 text-sm">
+                {[
+                  { k: "Revenue Generated", v: "₹15,00,000" },
+                  { k: "Nexora Revenue", v: "₹1,50,000" },
+                  { k: "Partner Activation Rewards", v: "₹15,000" },
+                ].map((r, idx) => (
+                  <div
+                    key={r.k}
+                    className={`flex items-center justify-between rounded-lg px-3 py-2 ${idx === 2 ? "bg-white/20" : "bg-white/10"}`}
+                  >
+                    <span className="text-xs font-semibold text-white/80">{r.k}</span>
+                    <span className={`text-sm font-black ${idx === 2 ? "text-amber-300" : "text-white"}`}>{r.v}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 flex items-start gap-2 rounded-lg border border-amber-300/40 bg-amber-50/60 p-3 text-xs text-amber-900 dark:bg-amber-950/30 dark:text-amber-200">
+            <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+            <span>
+              Illustrative figures only. Actual percentages and amounts load dynamically from Admin-configured backend values — nothing is hardcoded in the frontend or business logic.
+            </span>
+          </div>
         </div>
 
-        <div className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground">
-          <ShieldCheck className="h-4 w-4 text-primary" />
-          Every payout is auto-generated with an invoice + TDS breakdown. No manual claims, no negotiation.
+        {/* B. Weekly Growth Share */}
+        <div className="mt-6 border-border bg-card rounded-[var(--radius-card)] border p-6 shadow-[var(--shadow-card)] md:p-8">
+          <div className="flex items-center gap-3">
+            <div className="bg-primary/10 text-primary grid h-11 w-11 place-items-center rounded-xl">
+              <TrendingUp className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="text-[11px] font-bold uppercase tracking-wider text-primary">B · Weekly Growth Share</div>
+              <h3 className="text-heading text-lg font-black md:text-xl">Recurring share, paid every 7 days</h3>
+            </div>
+          </div>
+
+          <p className="text-muted-foreground mt-3 text-sm">
+            Earn a share of every <span className="text-heading font-bold">active</span> salon's platform revenue on a fixed 7-day cycle. Only active salons qualify — inactive salons generate no partner share.
+          </p>
+
+          {/* Commission tiers */}
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
+            {[
+              { p: "First 6 Months", r: "10%", note: "Highest share during ramp-up" },
+              { p: "Month 7 – 12", r: "5%", note: "Sustained recurring income" },
+              { p: "After 12 Months", r: "2%", note: "Long-tail passive earnings" },
+            ].map((t) => (
+              <div key={t.p} className="rounded-[var(--radius-card)] border border-border/60 bg-muted/30 p-4">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{t.p}</div>
+                <div className="text-heading mt-2 text-3xl font-black">{t.r}</div>
+                <div className="text-muted-foreground mt-1 text-xs">{t.note}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            <div className="flex items-start gap-2 rounded-lg bg-muted/40 p-3 text-xs">
+              <CalendarClock className="text-primary mt-0.5 h-4 w-4 shrink-0" />
+              <span className="text-muted-foreground">
+                <span className="text-heading font-bold">Payout cycle:</span> Every 7 days, auto-credited to your partner wallet.
+              </span>
+            </div>
+            <div className="flex items-start gap-2 rounded-lg bg-muted/40 p-3 text-xs">
+              <Activity className="text-primary mt-0.5 h-4 w-4 shrink-0" />
+              <span className="text-muted-foreground">
+                <span className="text-heading font-bold">Business rule:</span> Only active salons qualify. Inactive salons generate no partner share.
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-4 flex items-start gap-2 rounded-lg border border-amber-300/40 bg-amber-50/60 p-3 text-xs text-amber-900 dark:bg-amber-950/30 dark:text-amber-200">
+            <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+            <span>
+              Example / default config shown. All commission percentages are Admin-configurable — the frontend reads live values from backend settings, never hardcoded.
+            </span>
+          </div>
         </div>
       </section>
+
 
       {/* Trust — Why partner with Nexora */}
       <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
