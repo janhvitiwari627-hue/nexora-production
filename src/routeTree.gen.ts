@@ -59,6 +59,7 @@ import { Route as PortalLeadsRouteImport } from './routes/portal.leads'
 import { Route as PortalDashboardRouteImport } from './routes/portal.dashboard'
 import { Route as PortalContactRouteImport } from './routes/portal.contact'
 import { Route as PortalBusinessPagesRouteImport } from './routes/portal.business-pages'
+import { Route as PartnerLeadsRouteImport } from './routes/partner.leads'
 import { Route as PartnerDashboardRouteImport } from './routes/partner.dashboard'
 import { Route as OwnerWebsiteRouteImport } from './routes/owner.website'
 import { Route as OwnerTemplatesRouteImport } from './routes/owner.templates'
@@ -383,6 +384,11 @@ const PortalBusinessPagesRoute = PortalBusinessPagesRouteImport.update({
   id: '/portal/business-pages',
   path: '/portal/business-pages',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PartnerLeadsRoute = PartnerLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => PartnerRoute,
 } as any)
 const PartnerDashboardRoute = PartnerDashboardRouteImport.update({
   id: '/dashboard',
@@ -849,6 +855,7 @@ export interface FileRoutesByFullPath {
   '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
+  '/partner/leads': typeof PartnerLeadsRoute
   '/portal/business-pages': typeof PortalBusinessPagesRoute
   '/portal/contact': typeof PortalContactRoute
   '/portal/dashboard': typeof PortalDashboardRoute
@@ -972,6 +979,7 @@ export interface FileRoutesByTo {
   '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
+  '/partner/leads': typeof PartnerLeadsRoute
   '/portal/business-pages': typeof PortalBusinessPagesRoute
   '/portal/contact': typeof PortalContactRoute
   '/portal/dashboard': typeof PortalDashboardRoute
@@ -1099,6 +1107,7 @@ export interface FileRoutesById {
   '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
+  '/partner/leads': typeof PartnerLeadsRoute
   '/portal/business-pages': typeof PortalBusinessPagesRoute
   '/portal/contact': typeof PortalContactRoute
   '/portal/dashboard': typeof PortalDashboardRoute
@@ -1227,6 +1236,7 @@ export interface FileRouteTypes {
     | '/owner/templates'
     | '/owner/website'
     | '/partner/dashboard'
+    | '/partner/leads'
     | '/portal/business-pages'
     | '/portal/contact'
     | '/portal/dashboard'
@@ -1350,6 +1360,7 @@ export interface FileRouteTypes {
     | '/owner/templates'
     | '/owner/website'
     | '/partner/dashboard'
+    | '/partner/leads'
     | '/portal/business-pages'
     | '/portal/contact'
     | '/portal/dashboard'
@@ -1476,6 +1487,7 @@ export interface FileRouteTypes {
     | '/owner/templates'
     | '/owner/website'
     | '/partner/dashboard'
+    | '/partner/leads'
     | '/portal/business-pages'
     | '/portal/contact'
     | '/portal/dashboard'
@@ -1944,6 +1956,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/portal/business-pages'
       preLoaderRoute: typeof PortalBusinessPagesRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/partner/leads': {
+      id: '/partner/leads'
+      path: '/leads'
+      fullPath: '/partner/leads'
+      preLoaderRoute: typeof PartnerLeadsRouteImport
+      parentRoute: typeof PartnerRoute
     }
     '/partner/dashboard': {
       id: '/partner/dashboard'
@@ -2607,11 +2626,13 @@ const OwnerRouteWithChildren = OwnerRoute._addFileChildren(OwnerRouteChildren)
 
 interface PartnerRouteChildren {
   PartnerDashboardRoute: typeof PartnerDashboardRoute
+  PartnerLeadsRoute: typeof PartnerLeadsRoute
   PartnerIndexRoute: typeof PartnerIndexRoute
 }
 
 const PartnerRouteChildren: PartnerRouteChildren = {
   PartnerDashboardRoute: PartnerDashboardRoute,
+  PartnerLeadsRoute: PartnerLeadsRoute,
   PartnerIndexRoute: PartnerIndexRoute,
 }
 
