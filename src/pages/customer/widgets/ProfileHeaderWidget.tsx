@@ -22,8 +22,9 @@ export function ProfileHeaderWidget() {
 
   const displayName =
     profile?.full_name ||
-    (user?.email ? user.email.split("@")[0] : mockUser.name);
-  const avatar = profile?.avatar_url || mockUser.avatar;
+    profile?.username ||
+    (user?.email ? user.email.split("@")[0] : user ? "Member" : "Guest");
+  const avatar = profile?.avatar_url || (user ? "" : mockUser.avatar);
   const initials =
     displayName
       .split(" ")
