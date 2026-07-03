@@ -671,6 +671,135 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_messages: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string | null
+          is_read: boolean | null
+          message_text: string | null
+          message_type: string | null
+          sender_id: string | null
+          sender_role: string
+          thread_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_read?: boolean | null
+          message_text?: string | null
+          message_type?: string | null
+          sender_id?: string | null
+          sender_role: string
+          thread_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_read?: boolean | null
+          message_text?: string | null
+          message_type?: string | null
+          sender_id?: string | null
+          sender_role?: string
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_quick_replies: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean | null
+          is_default: boolean | null
+          reply_text: string
+          shop_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          is_default?: boolean | null
+          reply_text: string
+          shop_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          is_default?: boolean | null
+          reply_text?: string
+          shop_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_quick_replies_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_threads: {
+        Row: {
+          booking_id: string | null
+          created_at: string
+          customer_id: string | null
+          customer_unread_count: number | null
+          id: string
+          last_message: string | null
+          last_message_at: string | null
+          owner_id: string | null
+          owner_unread_count: number | null
+          shop_id: string
+          status: string | null
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string
+          customer_id?: string | null
+          customer_unread_count?: number | null
+          id?: string
+          last_message?: string | null
+          last_message_at?: string | null
+          owner_id?: string | null
+          owner_unread_count?: number | null
+          shop_id: string
+          status?: string | null
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string
+          customer_id?: string | null
+          customer_unread_count?: number | null
+          id?: string
+          last_message?: string | null
+          last_message_at?: string | null
+          owner_id?: string | null
+          owner_unread_count?: number | null
+          shop_id?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_threads_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_insights: {
         Row: {
           avg_booking_frequency: number | null
