@@ -32,6 +32,9 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Register TypeScript problem matcher
+        run: echo "::add-matcher::.github/matchers/tsc.json"
+
       - name: Build
         run: |
           mkdir -p build-logs
@@ -42,7 +45,7 @@ jobs:
         if: always()
         run: |
           mkdir -p build-logs
-          bunx tsgo --noEmit 2>&1 | tee build-logs/typecheck.log || true
+          bunx tsgo --noEmit --pretty false 2>&1 | tee build-logs/typecheck.log || true
           {
             echo "## Environment"
             echo "node: $(node -v 2>/dev/null || echo n/a)"
@@ -51,6 +54,24 @@ jobs:
             echo "ref:    ${GITHUB_REF}"
             echo "status: ${{ job.status }}"
           } > build-logs/env.txt
+
+      - name: Annotate TypeScript errors
+        if: always()
+        run: |
+          if [ ! -s build-logs/typecheck.log ]; then
+            exit 0
+          fi
+          # Emit ::error file=,line=,col=,title=:: annotations parsed from tsc output.
+          awk '
+            match($0, /^([^ (]+)[(:]([0-9]+)[,:]([0-9]+)\)?:? *-? *(error|warning) +(TS[0-9]+): *(.*)$/, m) {
+              sev = (m[4] == "warning") ? "warning" : "error"
+              # Escape %, \r, \n per GitHub workflow command spec
+              msg = m[6]
+              gsub(/%/, "%25", msg); gsub(/\r/, "%0D", msg); gsub(/\n/, "%0A", msg)
+              printf "::%s file=%s,line=%s,col=%s,title=%s::%s\n", sev, m[1], m[2], m[3], m[5], msg
+            }
+          ' build-logs/typecheck.log
+
 
       - name: Upload build logs
         if: always()
