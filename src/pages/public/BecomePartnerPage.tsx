@@ -691,7 +691,581 @@ export function BecomePartnerPage() {
         </div>
       </section>
 
+      {/* Section 11 — Dashboard Preview */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <LayoutDashboard className="h-3 w-3" /> Dashboard Preview
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            Your entire partnership — in one screen
+          </h2>
+          <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-base">
+            A live preview of the Partner Dashboard. Signed-in partners are taken to their real dashboard — this is only the marketing snapshot.
+          </p>
+        </div>
 
+        <div className="mt-10 rounded-[var(--radius-card)] border border-border bg-gradient-to-br from-[#0A2540] via-[#1a1060] to-[#635BFF] p-6 text-white shadow-[var(--shadow-card)] md:p-8">
+          {/* Metric cards */}
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              { icon: Store, t: "Shops Added", v: "128", d: "+6 this week" },
+              { icon: CheckCircle2, t: "Active Shops", v: "94", d: "73% activation rate" },
+              { icon: UserCheck, t: "Leads", v: "312", d: "42 in demo stage" },
+              { icon: IndianRupee, t: "Revenue Generated", v: "₹18.4L", d: "By your onboarded salons" },
+              { icon: Rocket, t: "Activation Rewards", v: "₹14,100", d: "Lifetime unlocked" },
+              { icon: TrendingUp, t: "Weekly Growth Share", v: "₹4,820", d: "This week's cycle" },
+              { icon: CalendarClock, t: "Pending Earnings", v: "₹2,150", d: "Clears next Monday" },
+              { icon: Wallet, t: "Wallet", v: "₹16,870", d: "Available balance" },
+              { icon: Trophy, t: "Lifetime Earnings", v: "₹1,42,320", d: "Since Day 1" },
+            ].map((c) => (
+              <div key={c.t} className="rounded-[var(--radius-card)] bg-white/10 p-4 backdrop-blur-sm">
+                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-300">
+                  <c.icon className="h-4 w-4" /> {c.t}
+                </div>
+                <div className="mt-2 text-2xl font-black">{c.v}</div>
+                <div className="mt-0.5 text-[11px] text-white/70">{c.d}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Chart tiles */}
+          <div className="mt-4 grid gap-3 md:grid-cols-3">
+            {[
+              { icon: BarChart3, t: "Monthly Performance", d: "Shops onboarded per month" },
+              { icon: TrendingUp, t: "Growth Trend", d: "Revenue trend across salons" },
+              { icon: Trophy, t: "District Rank", d: "Your position in the leaderboard" },
+            ].map((c) => (
+              <div key={c.t} className="rounded-[var(--radius-card)] bg-white/10 p-4">
+                <div className="flex items-center gap-2 text-xs font-bold text-amber-300">
+                  <c.icon className="h-4 w-4" /> {c.t}
+                </div>
+                {/* Sparkline placeholder */}
+                <svg viewBox="0 0 200 60" className="mt-3 h-14 w-full">
+                  <defs>
+                    <linearGradient id={`g-${c.t}`} x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.6" />
+                      <stop offset="100%" stopColor="#fbbf24" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M0,45 L25,38 L50,42 L75,28 L100,32 L125,20 L150,24 L175,12 L200,16 L200,60 L0,60 Z" fill={`url(#g-${c.t})`} />
+                  <path d="M0,45 L25,38 L50,42 L75,28 L100,32 L125,20 L150,24 L175,12 L200,16" fill="none" stroke="#fbbf24" strokeWidth="2" />
+                </svg>
+                <div className="mt-1 text-[11px] text-white/70">{c.d}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-card)] bg-white/5 p-4">
+            <div className="flex items-center gap-2 text-xs text-white/80">
+              <ShieldCheck className="h-4 w-4 text-amber-300" />
+              Signed-in partners are auto-redirected to their real live dashboard.
+            </div>
+            <a href="#join" className="inline-flex items-center gap-1.5 rounded-full bg-amber-300 px-4 py-2 text-xs font-black text-[#0A2540]">
+              Open my dashboard <ArrowRight className="h-3.5 w-3.5" />
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 12 — Profile Page */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <UserCheck className="h-3 w-3" /> Partner Profile
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            Your official partner identity
+          </h2>
+        </div>
+
+        <div className="mt-10 grid gap-6 lg:grid-cols-3">
+          {/* Identity card */}
+          <div className="border-border bg-card rounded-[var(--radius-card)] border p-6 shadow-[var(--shadow-card)] lg:col-span-1">
+            <div className="flex items-center gap-4">
+              <div className="bg-gradient-cta text-primary-foreground grid h-16 w-16 place-items-center rounded-full text-xl font-black shadow-[var(--shadow-glow)]">
+                RS
+              </div>
+              <div>
+                <div className="text-heading text-lg font-black">Ravi Sharma</div>
+                <div className="text-muted-foreground text-xs font-semibold">Partner ID · NX-DBP-0428</div>
+                <div className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-success">
+                  <BadgeCheck className="h-3 w-3" /> Verified
+                </div>
+              </div>
+            </div>
+            <div className="mt-5 space-y-2 text-xs">
+              <div className="flex items-center justify-between rounded-lg bg-muted/50 px-3 py-2">
+                <span className="text-muted-foreground font-semibold">KYC Status</span>
+                <span className="text-success font-black">Approved</span>
+              </div>
+              <div className="flex items-center justify-between rounded-lg bg-muted/50 px-3 py-2">
+                <span className="text-muted-foreground font-semibold">Territory</span>
+                <span className="text-heading font-black">Jaipur · District</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Details grid */}
+          <div className="grid gap-3 sm:grid-cols-2 lg:col-span-2">
+            {[
+              { icon: CreditCard, t: "Bank Details", d: "HDFC •••• 4291", s: "Verified" },
+              { icon: Zap, t: "UPI", d: "ravi@upi", s: "Primary" },
+              { icon: FileText, t: "PAN", d: "•••• PN 3421", s: "Verified" },
+              { icon: ShieldCheck, t: "Aadhaar", d: "•••• 8842", s: "eKYC done" },
+              { icon: Lock, t: "Security", d: "2FA enabled", s: "Active" },
+              { icon: Sparkles, t: "Settings", d: "Notifications · Language · Theme", s: "Manage" },
+            ].map((c) => (
+              <div key={c.t} className="border-border bg-card rounded-[var(--radius-card)] border p-4">
+                <div className="flex items-center gap-2 text-primary text-[11px] font-bold uppercase tracking-wider">
+                  <c.icon className="h-4 w-4" /> {c.t}
+                </div>
+                <div className="text-heading mt-2 text-sm font-black">{c.d}</div>
+                <div className="text-muted-foreground mt-0.5 text-xs">{c.s}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Section 13 — Referral Center */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <Share2 className="h-3 w-3" /> Referral Center
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            One link. Every channel. Full analytics.
+          </h2>
+        </div>
+
+        <div className="mt-10 grid gap-6 md:grid-cols-3">
+          {/* Link + QR */}
+          <div className="border-border bg-card rounded-[var(--radius-card)] border p-6 shadow-[var(--shadow-card)] md:col-span-2">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-primary">Your referral link</div>
+            <div className="mt-3 flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-2">
+              <code className="text-heading flex-1 truncate text-sm font-semibold">nexora.app/join/NX-DBP-0428</code>
+              <button className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-black text-primary">
+                <Copy className="h-3.5 w-3.5" /> Copy
+              </button>
+              <button className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-black text-primary">
+                <Download className="h-3.5 w-3.5" /> QR
+              </button>
+            </div>
+            <div className="mt-5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Share to</div>
+            <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6">
+              {["WhatsApp", "Facebook", "Instagram", "Telegram", "LinkedIn", "X"].map((n) => (
+                <button key={n} className="flex flex-col items-center gap-1 rounded-[var(--radius-card)] border border-border/60 bg-muted/30 p-3 text-xs font-bold text-heading hover:border-primary/40">
+                  <Share2 className="h-4 w-4 text-primary" />
+                  {n}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Analytics */}
+          <div className="border-border bg-card rounded-[var(--radius-card)] border p-6 shadow-[var(--shadow-card)]">
+            <div className="flex items-center gap-2 text-primary text-[11px] font-bold uppercase tracking-wider">
+              <BarChart3 className="h-3 w-3" /> Referral analytics
+            </div>
+            <div className="mt-4 space-y-3">
+              {[
+                { t: "Clicks", v: "1,842", i: Send },
+                { t: "Registrations", v: "146", i: UserCheck },
+                { t: "Conversions", v: "84", i: BadgeCheck },
+              ].map((s) => (
+                <div key={s.t} className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2.5">
+                  <span className="flex items-center gap-2 text-muted-foreground text-xs font-semibold">
+                    <s.i className="h-4 w-4 text-primary" /> {s.t}
+                  </span>
+                  <span className="text-heading text-lg font-black">{s.v}</span>
+                </div>
+              ))}
+            </div>
+            <div className="text-muted-foreground mt-3 flex items-center gap-1 text-[10px]">
+              <QrCode className="h-3 w-3 text-primary" /> Also available as a downloadable QR poster.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 14 — AI Marketing Center */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <Sparkles className="h-3 w-3" /> AI Marketing Center
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            Generate every marketing asset in one click
+          </h2>
+          <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-base">
+            Custom-branded posters, videos, reels, WhatsApp campaigns and sales scripts — powered by Nexora AI.
+          </p>
+        </div>
+
+        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { icon: FileText, t: "Posters", d: "Salon-branded posters in seconds" },
+            { icon: Video, t: "Videos", d: "Short promo videos, ready to post" },
+            { icon: PlayCircle, t: "Reels", d: "Vertical reels for Instagram" },
+            { icon: Sparkles, t: "Social Posts", d: "Captions + creatives" },
+            { icon: MessageCircle, t: "WhatsApp Campaigns", d: "Broadcast-ready templates" },
+            { icon: BookOpen, t: "Sales Scripts", d: "Salon pitch that converts" },
+            { icon: Send, t: "Follow-up Messages", d: "Sequenced re-engagement" },
+            { icon: Zap, t: "Instant Localization", d: "Hindi + English + regional" },
+          ].map((c) => (
+            <div key={c.t} className="border-border bg-card group rounded-[var(--radius-card)] border p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
+              <div className="bg-gradient-cta text-primary-foreground grid h-10 w-10 place-items-center rounded-xl shadow-[var(--shadow-glow)]">
+                <c.icon className="h-5 w-5" />
+              </div>
+              <div className="text-heading mt-3 text-sm font-black">{c.t}</div>
+              <div className="text-muted-foreground mt-1 text-xs">{c.d}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Section 15 — Lead Management */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <UserCheck className="h-3 w-3" /> Lead Management
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            Track every salon from first call to activation
+          </h2>
+        </div>
+
+        <div className="mt-10 overflow-x-auto">
+          <div className="flex min-w-max items-stretch gap-3">
+            {[
+              { t: "Add Lead", d: "Capture salon details", c: "12", tone: "bg-muted/40 border-border" },
+              { t: "Lead Status", d: "New / Contacted", c: "8", tone: "bg-primary/10 border-primary/30" },
+              { t: "Demo Scheduled", d: "Live product demo booked", c: "5", tone: "bg-primary/15 border-primary/40" },
+              { t: "Follow-up", d: "Nurture & re-engage", c: "6", tone: "bg-amber-500/10 border-amber-500/30" },
+              { t: "Converted", d: "Onboarded to Nexora", c: "9", tone: "bg-success/10 border-success/30" },
+              { t: "Lost Lead", d: "Archived with reason", c: "3", tone: "bg-danger/10 border-danger/30" },
+            ].map((s, i) => (
+              <div key={s.t} className="relative">
+                <div className={`w-60 rounded-[var(--radius-card)] border p-4 shadow-sm ${s.tone}`}>
+                  <div className="flex items-center justify-between">
+                    <div className="text-heading text-sm font-black">{s.t}</div>
+                    <span className="rounded-full bg-background px-2 py-0.5 text-[10px] font-black text-primary">{s.c}</span>
+                  </div>
+                  <div className="text-muted-foreground mt-1 text-xs">{s.d}</div>
+                  <div className="mt-3 space-y-1.5">
+                    {[1, 2].map((n) => (
+                      <div key={n} className="rounded-md bg-background/70 px-2 py-1.5 text-[11px] text-muted-foreground">
+                        Salon #{i}-{n} · {["Jaipur", "Kota", "Ajmer", "Alwar"][n % 4]}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {i < 5 && (
+                  <ArrowRight className="text-muted-foreground/40 absolute -right-4 top-1/2 hidden h-4 w-4 -translate-y-1/2 md:block" />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Section 16 — Training Center */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <GraduationCap className="h-3 w-3" /> Training Center
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            Learn, certify, level up
+          </h2>
+        </div>
+
+        <div className="mt-10 grid gap-6 md:grid-cols-2">
+          {/* Modules */}
+          <div className="border-border bg-card rounded-[var(--radius-card)] border p-6 shadow-[var(--shadow-card)]">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-primary">Modules</div>
+            <div className="mt-4 space-y-2">
+              {[
+                { t: "Nexora Basics", d: "Platform, ecosystem, positioning", icon: Sparkles },
+                { t: "Product Knowledge", d: "Every feature, every use-case", icon: BookOpen },
+                { t: "Demo Process", d: "Live demo playbook", icon: PlayCircle },
+                { t: "Sales Training", d: "Convert leads confidently", icon: TrendingUp },
+                { t: "Objection Handling", d: "Turn 'no' into 'yes'", icon: MessageCircle },
+                { t: "Leadership", d: "Grow into a district head", icon: Crown },
+              ].map((m) => (
+                <div key={m.t} className="flex items-center gap-3 rounded-lg border border-border/60 bg-muted/30 p-3">
+                  <div className="bg-primary/10 text-primary grid h-8 w-8 place-items-center rounded-lg">
+                    <m.icon className="h-4 w-4" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-heading text-xs font-black">{m.t}</div>
+                    <div className="text-muted-foreground text-[11px]">{m.d}</div>
+                  </div>
+                  <PlayCircle className="text-primary h-4 w-4" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Certifications */}
+          <div className="rounded-[var(--radius-card)] border border-primary/30 bg-gradient-to-br from-[#0A2540] via-[#1a1060] to-[#635BFF] p-6 text-white shadow-[var(--shadow-card)]">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-amber-300">Certification Tiers</div>
+            <div className="mt-4 space-y-2.5">
+              {[
+                { t: "Bronze", d: "Complete Basics + Demo", color: "bg-amber-700/30 text-amber-200" },
+                { t: "Silver", d: "Pass Sales Training", color: "bg-slate-400/30 text-slate-100" },
+                { t: "Gold", d: "Clear Objection Handling", color: "bg-yellow-400/30 text-yellow-100" },
+                { t: "Platinum", d: "Leadership module cleared", color: "bg-white/25 text-white" },
+                { t: "Diamond", d: "Master trainer status", color: "bg-cyan-300/30 text-cyan-100" },
+              ].map((c) => (
+                <div key={c.t} className="flex items-center justify-between rounded-lg bg-white/10 p-3">
+                  <div className="flex items-center gap-3">
+                    <div className={`grid h-9 w-9 place-items-center rounded-full text-[10px] font-black uppercase ${c.color}`}>
+                      <Award className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-black">{c.t}</div>
+                      <div className="text-[11px] text-white/70">{c.d}</div>
+                    </div>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-amber-300" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 17 — Resource Center */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <Download className="h-3 w-3" /> Resource Center
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            Everything you need — downloadable, ready to use
+          </h2>
+        </div>
+
+        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { t: "Posters", d: "Print-ready A3/A4", icon: FileText },
+            { t: "Flyers", d: "Handout material", icon: FileText },
+            { t: "Brochures", d: "Multi-page product brochure", icon: BookOpen },
+            { t: "Sales Deck", d: "Client pitch deck", icon: PlayCircle },
+            { t: "Demo Videos", d: "Product walkthroughs", icon: Video },
+            { t: "Logo Kit", d: "Nexora logos + partner lockups", icon: Sparkles },
+            { t: "Brand Guidelines", d: "Colors, typography, spacing", icon: BookOpen },
+            { t: "WhatsApp Templates", d: "Pre-approved BSP templates", icon: MessageCircle },
+          ].map((r) => (
+            <div key={r.t} className="border-border bg-card group flex items-center justify-between rounded-[var(--radius-card)] border p-4 transition-all hover:border-primary/50 hover:shadow-md">
+              <div className="flex items-center gap-3">
+                <div className="bg-primary/10 text-primary grid h-10 w-10 place-items-center rounded-xl">
+                  <r.icon className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="text-heading text-sm font-black">{r.t}</div>
+                  <div className="text-muted-foreground text-[11px]">{r.d}</div>
+                </div>
+              </div>
+              <Download className="text-primary h-4 w-4 opacity-60 group-hover:opacity-100" />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Section 18 — Leaderboard */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <Trophy className="h-3 w-3" /> Leaderboard
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            Compete. Get recognized. Win.
+          </h2>
+        </div>
+
+        <div className="mt-10 grid gap-6 lg:grid-cols-3">
+          {/* Level filter */}
+          <div className="border-border bg-card rounded-[var(--radius-card)] border p-6 shadow-[var(--shadow-card)]">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-primary">Levels</div>
+            <div className="mt-4 space-y-2">
+              {[
+                { icon: MapPin, t: "City", d: "Compete inside your city" },
+                { icon: Target, t: "District", d: "District-wide ranking" },
+                { icon: Building2, t: "State", d: "Statewide leaderboard" },
+              ].map((l) => (
+                <div key={l.t} className="flex items-center gap-3 rounded-lg border border-border/60 bg-muted/30 p-3">
+                  <l.icon className="text-primary h-4 w-4" />
+                  <div className="flex-1">
+                    <div className="text-heading text-xs font-black">{l.t}</div>
+                    <div className="text-muted-foreground text-[11px]">{l.d}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-5 text-[11px] font-bold uppercase tracking-wider text-primary">Recognition</div>
+            <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-bold">
+              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-primary"><Trophy className="h-3 w-3" /> Top Referrer</span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-primary"><TrendingUp className="h-3 w-3" /> Top Growth Partner</span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-1 text-amber-700 dark:text-amber-300"><Crown className="h-3 w-3" /> Hall of Fame</span>
+            </div>
+          </div>
+
+          {/* Top partners */}
+          <div className="border-border bg-card rounded-[var(--radius-card)] border p-6 shadow-[var(--shadow-card)] lg:col-span-2">
+            <div className="flex items-center justify-between">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-primary">Top partners · This month</div>
+              <span className="text-[10px] text-muted-foreground">Live ranking</span>
+            </div>
+            <div className="mt-4 space-y-2">
+              {[
+                { r: 1, n: "Ravi Sharma", city: "Jaipur", s: 128 },
+                { r: 2, n: "Priya Verma", city: "Kota", s: 112 },
+                { r: 3, n: "Amit Singh", city: "Ajmer", s: 96 },
+                { r: 4, n: "Nikita R.", city: "Alwar", s: 84 },
+                { r: 5, n: "Deepak M.", city: "Udaipur", s: 71 },
+              ].map((p) => (
+                <div key={p.r} className={`flex items-center gap-3 rounded-lg border p-3 ${p.r <= 3 ? "border-primary/30 bg-primary/5" : "border-border/60 bg-muted/30"}`}>
+                  <div className={`grid h-8 w-8 place-items-center rounded-full text-xs font-black ${p.r === 1 ? "bg-amber-400 text-amber-900" : p.r === 2 ? "bg-slate-300 text-slate-800" : p.r === 3 ? "bg-amber-700 text-amber-100" : "bg-muted text-muted-foreground"}`}>
+                    {p.r}
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-heading text-sm font-black">{p.n}</div>
+                    <div className="text-muted-foreground text-[11px]">{p.city}</div>
+                  </div>
+                  <div className="text-heading text-sm font-black">{p.s} <span className="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider">shops</span></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 19 — Support Center */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <HeadphonesIcon className="h-3 w-3" /> Support Center
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            Help, exactly when you need it
+          </h2>
+        </div>
+
+        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            { icon: MessageCircle, t: "Live Chat", d: "In-app chat, 9am–9pm" },
+            { icon: MessageCircle, t: "WhatsApp", d: "Fastest response channel" },
+            { icon: FileText, t: "Ticket System", d: "Track every issue end-to-end" },
+            { icon: Video, t: "Video Tutorials", d: "Step-by-step walkthroughs" },
+            { icon: HelpCircle, t: "FAQs", d: "Common questions, quick answers" },
+            { icon: BookOpen, t: "Knowledge Base", d: "Deep-dive articles + guides" },
+          ].map((s) => (
+            <div key={s.t} className="border-border bg-card rounded-[var(--radius-card)] border p-5 shadow-sm">
+              <div className="bg-primary/10 text-primary grid h-10 w-10 place-items-center rounded-xl">
+                <s.icon className="h-5 w-5" />
+              </div>
+              <div className="text-heading mt-3 text-sm font-black">{s.t}</div>
+              <div className="text-muted-foreground mt-1 text-xs">{s.d}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Section 20 — Governance & Policy Center */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <ShieldCheck className="h-3 w-3" /> Governance & Policy
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            Transparent policies, signed agreements
+          </h2>
+        </div>
+
+        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            "Commission Policy",
+            "Reward Policy",
+            "Territory Policy",
+            "QR Policy",
+            "Referral Policy",
+            "Brand Usage Policy",
+            "Code of Conduct",
+            "Partner Agreement",
+            "Privacy Policy",
+            "Refund Policy",
+          ].map((p) => (
+            <a key={p} href="#" className="border-border bg-card group flex items-center justify-between rounded-[var(--radius-card)] border p-4 transition-all hover:border-primary/50">
+              <div className="flex items-center gap-3">
+                <FileText className="text-primary h-4 w-4" />
+                <span className="text-heading text-sm font-black">{p}</span>
+              </div>
+              <ArrowRight className="text-muted-foreground group-hover:text-primary h-4 w-4" />
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {/* Section 21 — FAQ */}
+      <section className="mx-auto max-w-3xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <HelpCircle className="h-3 w-3" /> FAQ
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            Frequently asked questions
+          </h2>
+          <p className="text-muted-foreground mt-3 text-sm">
+            General partner questions — for formal terms see the Governance & Policy Center above.
+          </p>
+        </div>
+
+        <div className="mt-10 space-y-3">
+          {[
+            { q: "Do I need to invest any money to become a partner?", a: "No. The District Business Partner Program is completely free to join. You earn on the salons you help onboard." },
+            { q: "How soon can I start earning?", a: "The first Activation Reward triggers once a salon completes 15 days of active revenue. Weekly Growth Share begins from the first eligible weekly cycle." },
+            { q: "Can I work part-time?", a: "Yes. Most partners start part-time using their existing salon-owner network before scaling up." },
+            { q: "Is there any territory restriction?", a: "Territories are assigned per the Territory Policy. Verified partners get priority in their assigned district." },
+            { q: "What happens if a salon becomes inactive?", a: "Only active salons qualify for the Weekly Growth Share. Inactive salons pause the recurring share until they reactivate." },
+            { q: "How are payouts made?", a: "All payouts are auto-credited to your registered bank/UPI on a fixed cycle, with invoice + TDS breakdown available in the dashboard." },
+          ].map((f, i) => (
+            <FaqItem key={f.q} q={f.q} a={f.a} defaultOpen={i === 0} />
+          ))}
+        </div>
+      </section>
+
+      {/* Section 22 — Final CTA */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="relative overflow-hidden rounded-[24px] border border-primary/30 bg-gradient-to-br from-[#0A2540] via-[#1a1060] to-[#635BFF] p-8 text-white shadow-[var(--shadow-card)] md:p-14">
+          <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-amber-300/20 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-20 -left-10 h-72 w-72 rounded-full bg-primary/40 blur-3xl" />
+          <div className="relative text-center">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-amber-300">
+              <Sparkles className="h-3 w-3" /> Become a Nexora District Business Partner
+            </span>
+            <h2 className="mt-5 text-3xl font-black tracking-tight md:text-5xl">
+              Connect Salons. Build Networks. <span className="text-amber-300">Grow Together.</span>
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-sm text-white/80 md:text-base">
+              Turn your existing salon-owner network into recurring monthly income — with a transparent, backed-by-policy partner program.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <a href="#join" className="inline-flex items-center gap-2 rounded-full bg-amber-300 px-6 py-3 text-sm font-black text-[#0A2540] shadow-lg transition-transform hover:scale-105">
+                Join Free <ArrowRight className="h-4 w-4" />
+              </a>
+              <a href="#join" className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black text-[#0A2540] transition-transform hover:scale-105">
+                Apply Now <Rocket className="h-4 w-4" />
+              </a>
+              <a href="#talk" className="inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/10 px-6 py-3 text-sm font-black text-white backdrop-blur transition-colors hover:bg-white/20">
+                <HeadphonesIcon className="h-4 w-4" /> Contact Support
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
 
 
       {/* Trust — Why partner with Nexora */}
