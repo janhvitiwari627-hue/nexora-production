@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   CircleDollarSign,
   FileCheck2,
+  Gift,
   GraduationCap,
   Handshake,
   IndianRupee,
@@ -774,6 +775,172 @@ export function GrowthPartnerPage() {
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* 9. MILESTONE REWARDS */}
+      <section className="border-y border-slate-200 bg-gradient-to-b from-white to-[#FAFBFF]">
+        <div className="mx-auto max-w-7xl px-6 py-28">
+          <div className="mx-auto max-w-2xl text-center">
+            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#4F46E5]">
+              Milestone Rewards
+            </span>
+            <h2 className="mt-4 text-4xl font-black tracking-tight text-[#0B1330] md:text-5xl" style={{ letterSpacing: "-0.02em" }}>
+              Grow more. Earn more. Get rewarded.
+            </h2>
+            <p className="mt-5 text-lg text-slate-600">
+              Sirf active revenue-generating shops count hoti hain.
+            </p>
+          </div>
+
+          <div className="mt-16 grid gap-4 md:grid-cols-3 lg:grid-cols-5">
+            {[
+              { count: "25", reward: "Welcome Kit", icon: Gift, tint: "from-[#EEF2FF] to-white", accent: "text-[#4F46E5]" },
+              { count: "50", reward: "Official Nexora T-Shirt", icon: BadgeCheck, tint: "from-[#F0FDF4] to-white", accent: "text-[#16A34A]" },
+              { count: "100", reward: "Tablet Reward", icon: Sparkles, tint: "from-[#FEF3C7] to-white", accent: "text-[#B45309]" },
+              { count: "500", reward: "Branded Laptop", icon: Award, tint: "from-[#FCE7F3] to-white", accent: "text-[#BE185D]" },
+              { count: "1000", reward: "District Partner + Car", icon: Trophy, tint: "from-[#DBEAFE] to-white", accent: "text-[#1D4ED8]" },
+            ].map((m, i) => (
+              <motion.div
+                key={m.count}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
+                className={`relative overflow-hidden rounded-2xl border border-slate-200/70 bg-gradient-to-b ${m.tint} p-6 transition-transform hover:-translate-y-1`}
+              >
+                <div className={`grid h-11 w-11 place-items-center rounded-xl bg-white shadow-sm ring-1 ring-slate-200/70 ${m.accent}`}>
+                  <m.icon className="h-5 w-5" />
+                </div>
+                <div className="mt-5 text-4xl font-black tracking-tight text-[#0B1330]" style={{ letterSpacing: "-0.02em" }}>
+                  {m.count}
+                </div>
+                <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Active Shops</div>
+                <div className="mt-4 text-sm font-bold text-[#0B1330]">{m.reward}</div>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="mt-14 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-[#4F46E5]" />
+              <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#4F46E5]">
+                Active Shop Definition
+              </span>
+            </div>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {[
+                "Business verified",
+                "Website published",
+                "Nexora QR/payment active",
+                "Successful collection in last 30 days",
+                "Not suspended",
+                "Fraud-free",
+              ].map((c) => (
+                <div key={c} className="flex items-start gap-3 rounded-xl bg-[#FAFBFF] p-4 ring-1 ring-slate-200/70">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#16A34A]" />
+                  <span className="text-sm font-medium text-slate-700">{c}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 10. APPLY FORM */}
+      <section className="mx-auto max-w-7xl px-6 py-28">
+        <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+          <div>
+            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#4F46E5]">
+              Apply Form
+            </span>
+            <h2 className="mt-4 text-4xl font-black tracking-tight text-[#0B1330] md:text-5xl" style={{ letterSpacing: "-0.02em" }}>
+              Ready to become a Growth Partner?
+            </h2>
+            <p className="mt-5 text-lg text-slate-600">
+              Apni details submit karo. Nexora team KYC verify karke aapka Growth Partner
+              dashboard activate karegi.
+            </p>
+            <div className="mt-8 space-y-3">
+              {[
+                "Free joining — no investment",
+                "Verification in 24–48 hours",
+                "Instant dashboard access after approval",
+                "Weekly payout on eligible commission",
+              ].map((p) => (
+                <div key={p} className="flex items-center gap-3">
+                  <CheckCircle2 className="h-4 w-4 text-[#16A34A]" />
+                  <span className="text-sm font-medium text-slate-700">{p}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-3xl border border-slate-200 bg-white p-8 shadow-[0_30px_60px_-30px_rgba(11,19,48,0.25)]"
+          >
+            <div className="flex items-center justify-between">
+              <div className="text-sm font-bold text-[#0B1330]">Growth Partner Application</div>
+              <span className="rounded-full bg-[#EEF2FF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#4F46E5]">
+                Free
+              </span>
+            </div>
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              {[
+                "Full Name",
+                "Mobile Number",
+                "WhatsApp Number",
+                "Email",
+                "State",
+                "District",
+                "City",
+                "Current Work Type",
+                "Beauty Industry Experience",
+                "Salons in Network",
+              ].map((f) => (
+                <div key={f} className="rounded-xl border border-slate-200 bg-[#FAFBFF] px-4 py-3">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    {f}
+                  </div>
+                  <div className="mt-1 h-4 rounded bg-slate-200/70" />
+                </div>
+              ))}
+              <div className="sm:col-span-2 rounded-xl border border-dashed border-slate-300 bg-[#FAFBFF] px-4 py-5 text-center">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  ID / KYC Upload
+                </div>
+                <div className="mt-1 text-sm font-medium text-slate-600">
+                  Aadhaar / PAN / Business proof
+                </div>
+              </div>
+              <label className="sm:col-span-2 flex items-start gap-3 rounded-xl bg-[#FAFBFF] p-4 ring-1 ring-slate-200/70">
+                <input type="checkbox" className="mt-1 h-4 w-4 rounded border-slate-300 text-[#4F46E5]" />
+                <span className="text-xs text-slate-600">
+                  Main Nexora Growth Partner Agreement ke terms accept karta/karti hoon.
+                </span>
+              </label>
+            </div>
+
+            <div className="mt-6">
+              <JoinPartnerDialog
+                trigger={
+                  <button
+                    type="button"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0B1330] px-6 py-3.5 text-sm font-bold text-white transition-transform hover:-translate-y-0.5"
+                  >
+                    Submit Application <ArrowRight className="h-4 w-4" />
+                  </button>
+                }
+              />
+              <p className="mt-3 text-center text-[11px] text-slate-500">
+                Application submitted successfully. Nexora team verify karke dashboard activate karegi.
+              </p>
+            </div>
+          </motion.div>
         </div>
       </section>
 
