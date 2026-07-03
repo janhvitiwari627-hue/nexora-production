@@ -138,19 +138,24 @@ export function GrowthPartnerPage() {
         <div className="relative mx-auto grid max-w-7xl gap-16 px-6 pb-24 pt-20 md:grid-cols-[1.05fr_0.95fr] md:items-center md:pt-28 md:pb-32">
           <div>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-[#4F46E5]/20 bg-[#EEF2FF] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#4F46E5]">
-              <Sparkles className="h-3 w-3" /> Nexora Growth Partner Program
+              <Sparkles className="h-3 w-3" /> Now Onboarding · India
             </span>
             <h1
-              className="mt-6 text-[44px] font-black leading-[1.02] tracking-tight text-[#0B1330] md:text-[68px]"
-              style={{ fontFamily: "Inter, sans-serif", letterSpacing: "-0.02em" }}
+              className="mt-6 text-[38px] font-black leading-[1.02] tracking-tight text-[#0B1330] md:text-[60px]"
+              style={{ fontFamily: "Inter, sans-serif", letterSpacing: "-0.025em" }}
             >
-              Salary Nahi.
+              <span className="bg-gradient-to-r from-[#4F46E5] via-[#6366F1] to-[#2563EB] bg-clip-text text-transparent">
+                NEXORA GROWTH
+              </span>
               <br />
               <span className="bg-gradient-to-r from-[#4F46E5] via-[#6366F1] to-[#2563EB] bg-clip-text text-transparent">
-                Growth Share.
+                PARTNER PROGRAM
               </span>
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-slate-600 md:text-xl">
+            <p className="mt-5 text-2xl font-semibold tracking-tight text-[#0B1330] md:text-3xl">
+              Salary Nahi. <span className="text-[#4F46E5]">Growth Share.</span>
+            </p>
+            <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-600 md:text-lg">
               Beauty industry me apna network use karo, salons onboard karo, aur Nexora
               ke saath long-term growth banao.
             </p>
