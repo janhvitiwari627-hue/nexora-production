@@ -41,7 +41,7 @@ export async function requireRole(allowed: AllowedRole[], currentPath: string) {
   }
 
   const shouldAllowOwnerMembership = allowed.some((role) => normalizeRole(role) === "owner");
-  const [roles, ownerLink] = await Promise.all([
+  const [roles, ownerLink, adminRpc, superAdminRpc] = await Promise.all([
     fetchUserRoles(data.user.id),
     shouldAllowOwnerMembership
       ? supabase
@@ -51,6 +51,8 @@ export async function requireRole(allowed: AllowedRole[], currentPath: string) {
         .eq("is_approved", true)
         .limit(1)
       : Promise.resolve({ data: null, error: null }),
+    supabase.rpc("has_role", { _user_id: data.user.id, _role: "admin" }),
+    supabase.rpc("has_role", { _user_id: data.user.id, _role: "super_admin" as UserRole }),
   ]);
   const normalized = new Set(allowed.map(normalizeRole));
   // Treat shop_owner/shop_manager DB roles as equivalent to "owner" guard.
@@ -62,6 +64,9 @@ export async function requireRole(allowed: AllowedRole[], currentPath: string) {
     effectiveRoles.add("owner");
   }
   if (roles.includes("super_admin" as UserRole)) effectiveRoles.add("admin");
+  // RPC fallback — works even if direct SELECT on user_roles is blocked by grants/RLS timing.
+  if (adminRpc.data === true) effectiveRoles.add("admin");
+  if (superAdminRpc.data === true) effectiveRoles.add("admin");
   const ok = Array.from(normalized).some((r) => effectiveRoles.has(r));
   if (!ok) {
     // Redirect users to their own home surface when they hit the wrong dashboard.
