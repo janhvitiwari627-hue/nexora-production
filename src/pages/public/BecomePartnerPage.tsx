@@ -101,7 +101,7 @@ export function BecomePartnerPage() {
             { icon: Sparkles, t: "Cosmetic Sales Executive", b: "FMCG beauty field sales in your territory." },
             { icon: Building2, t: "Distributor", b: "Local or regional distributor with an active shop route." },
             { icon: BadgeCheck, t: "Brand Sales Representative", b: "Territory rep for a national or regional beauty brand." },
-            { icon: Headphones as unknown as typeof UserCheck, t: "Salon Consultant", b: "Advise salons on setup, branding or operations." },
+            { icon: HeadphonesIcon, t: "Salon Consultant", b: "Advise salons on setup, branding or operations." },
             { icon: GraduationCap, t: "Beauty Trainer", b: "Trainer or academy owner already close to shop owners." },
             { icon: Users, t: "Existing Network Builder", b: "You already have a network of salon-owner relationships." },
             { icon: Rocket, t: "Freelance Sales Professional", b: "Independent field sales looking for recurring income." },
