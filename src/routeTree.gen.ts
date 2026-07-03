@@ -45,6 +45,7 @@ import { Route as OwnerIndexRouteImport } from './routes/owner.index'
 import { Route as JobsIndexRouteImport } from './routes/jobs.index'
 import { Route as HireIndexRouteImport } from './routes/hire.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as TemplatePreviewKeyRouteImport } from './routes/template-preview.$key'
 import { Route as StaffDashboardRouteImport } from './routes/staff.dashboard'
 import { Route as SiteBusinessSlugRouteImport } from './routes/site.$businessSlug'
@@ -321,6 +322,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const TemplatePreviewKeyRoute = TemplatePreviewKeyRouteImport.update({
   id: '/template-preview/$key',
@@ -920,6 +926,7 @@ export interface FileRoutesByFullPath {
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/staff/dashboard': typeof StaffDashboardRoute
   '/template-preview/$key': typeof TemplatePreviewKeyRoute
+  '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/hire/': typeof HireIndexRoute
   '/jobs/': typeof JobsIndexRoute
@@ -949,7 +956,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/academy': typeof AcademyRoute
-  '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
   '/create-shop-website': typeof CreateShopWebsiteRoute
   '/customer-app': typeof CustomerAppRoute
@@ -1051,6 +1057,7 @@ export interface FileRoutesByTo {
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/staff/dashboard': typeof StaffDashboardRoute
   '/template-preview/$key': typeof TemplatePreviewKeyRoute
+  '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/hire': typeof HireIndexRoute
   '/jobs': typeof JobsIndexRoute
@@ -1186,6 +1193,7 @@ export interface FileRoutesById {
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/staff/dashboard': typeof StaffDashboardRoute
   '/template-preview/$key': typeof TemplatePreviewKeyRoute
+  '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/hire/': typeof HireIndexRoute
   '/jobs/': typeof JobsIndexRoute
@@ -1322,6 +1330,7 @@ export interface FileRouteTypes {
     | '/site/$businessSlug'
     | '/staff/dashboard'
     | '/template-preview/$key'
+    | '/admin/'
     | '/dashboard/'
     | '/hire/'
     | '/jobs/'
@@ -1351,7 +1360,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/academy'
-    | '/admin'
     | '/contact'
     | '/create-shop-website'
     | '/customer-app'
@@ -1453,6 +1461,7 @@ export interface FileRouteTypes {
     | '/site/$businessSlug'
     | '/staff/dashboard'
     | '/template-preview/$key'
+    | '/admin'
     | '/dashboard'
     | '/hire'
     | '/jobs'
@@ -1587,6 +1596,7 @@ export interface FileRouteTypes {
     | '/site/$businessSlug'
     | '/staff/dashboard'
     | '/template-preview/$key'
+    | '/admin/'
     | '/dashboard/'
     | '/hire/'
     | '/jobs/'
@@ -1943,6 +1953,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/template-preview/$key': {
       id: '/template-preview/$key'
@@ -2632,6 +2649,7 @@ interface AdminRouteChildren {
   AdminRewardsRoute: typeof AdminRewardsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -2647,6 +2665,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminRewardsRoute: AdminRewardsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
@@ -2878,3 +2897,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
