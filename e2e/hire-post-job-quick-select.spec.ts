@@ -78,7 +78,8 @@ async function fillStep1(page: Page) {
   await pickChip(page, "Part-time");
   await pickChip(page, "1–2 years");
   // Description template chip fills the textarea (empty description path).
-  await pickChip(page, "Hair salon role");
+  // Template buttons don't carry aria-pressed, so click without pickChip's assertion.
+  await page.getByRole("button", { name: "Hair salon role", exact: true }).click();
   await expect(page.getByRole("textbox", { name: "Description" })).not.toHaveValue("");
   await page.getByRole("button", { name: /^Continue$/ }).first().click();
   await expect(page.getByRole("heading", { name: "Location & schedule" })).toBeVisible({
