@@ -53,6 +53,8 @@ export function BecomePartnerPage() {
     <div className="partner-noir min-h-screen">
       {/* Hero */}
       <section className="partner-hero relative overflow-hidden py-24 md:py-32">
+        <img src={heroSalon} alt="" aria-hidden width={1920} height={1280} className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-25 mix-blend-luminosity" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#08070a]/60 via-[#08070a]/70 to-[#08070a]" />
         <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 md:px-6 lg:grid-cols-[1.15fr_1fr]">
           <div>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white">
