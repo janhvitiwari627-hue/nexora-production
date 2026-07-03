@@ -28,8 +28,8 @@ import {
 } from "@/lib/owner.functions";
 
 const CATEGORIES = [
-  "Hair Salon", "Barber Shop", "Beauty Parlour", "Spa",
-  "Massage Center", "Tattoo Studio", "Nail Art Studio",
+  "Hire Cute Shop", "Barber Shop", "Salon", "Beauty Parlour", "Spa",
+  "Tattoo Studio", "Massage Center", "Nail Art Studio", "Unisex",
 ];
 
 const DAYS = [
