@@ -1074,10 +1074,11 @@ export function PostJobPage() {
         certification: _cert,
         languages: _lng,
         portfolio_option: _po,
+        screening_questions: _sq,
         ...dbForm
       } = form;
       void _bt; void _dp; void _cd; void _hp; void _st; void _et; void _fs;
-      void _ja; void _sty; void _srp; void _cert; void _lng; void _po;
+      void _ja; void _sty; void _srp; void _cert; void _lng; void _po; void _sq;
 
       // Encode meta into requirements text so job detail + apply form can read
       // them without a schema change. Human-readable "Key: value" lines.
@@ -1087,6 +1088,8 @@ export function PostJobPage() {
       if (form.languages && form.languages.length > 0)
         metaLines.push(`Languages: ${form.languages.join(", ")}`);
       if (form.portfolio_option) metaLines.push(`Portfolio: ${form.portfolio_option}`);
+      if (form.screening_questions && form.screening_questions.length > 0)
+        metaLines.push(`Screening: ${JSON.stringify(form.screening_questions)}`);
       const composedReq = [baseReq, metaLines.join("\n")].filter(Boolean).join("\n\n").trim();
 
       const cleaned: JobDraftInput = {
