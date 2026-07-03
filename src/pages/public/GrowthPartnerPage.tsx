@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   CircleDollarSign,
   FileCheck2,
+  Gift,
   GraduationCap,
   Handshake,
   IndianRupee,
