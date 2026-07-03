@@ -301,12 +301,16 @@ export function GrowthPartnerPage() {
         </div>
 
         <div className="mt-16 text-center">
-          <Link
-            to="/contact"
-            className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-2 rounded-[var(--radius-button)] px-7 py-3.5 text-sm font-bold shadow-[var(--shadow-glow)]"
-          >
-            Join the program — Free <ArrowRight className="h-4 w-4" />
-          </Link>
+          <JoinPartnerDialog
+            trigger={
+              <button
+                type="button"
+                className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-2 rounded-[var(--radius-button)] px-7 py-3.5 text-sm font-bold shadow-[var(--shadow-glow)]"
+              >
+                Join the program — Free <ArrowRight className="h-4 w-4" />
+              </button>
+            }
+          />
         </div>
       </section>
     </div>
