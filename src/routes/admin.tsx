@@ -20,6 +20,9 @@ export const Route = createFileRoute("/admin")({
     if (!isAdmin && !isSuper) {
       throw redirect({ to: "/admin/login" });
     }
+    if (location.pathname === "/admin") {
+      throw redirect({ to: "/admin/dashboard" });
+    }
   },
   component: AdminLayout,
 });
