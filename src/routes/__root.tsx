@@ -83,8 +83,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Nexora SalonOS is a comprehensive platform for salon discovery, booking, and management." },
       { property: "og:description", content: "Nexora SalonOS is a comprehensive platform for salon discovery, booking, and management." },
       { name: "twitter:description", content: "Nexora SalonOS is a comprehensive platform for salon discovery, booking, and management." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/232256ad-c4f3-4f72-84f1-0c97aa408c63/id-preview-d451d0e4--822fe342-2aa4-466c-8092-9280657c85a5.lovable.app-1781852479510.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/232256ad-c4f3-4f72-84f1-0c97aa408c63/id-preview-d451d0e4--822fe342-2aa4-466c-8092-9280657c85a5.lovable.app-1781852479510.png" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/da4bf8e9-fc45-4add-8224-b9561fb25cd4" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/da4bf8e9-fc45-4add-8224-b9561fb25cd4" },
     ],
     links: [
       { rel: "icon", href: nexoraLogo.url, type: "image/jpeg", sizes: "any" },
