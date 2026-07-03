@@ -28,9 +28,17 @@ export function AdminDashboardPage() {
           <h1 className="text-2xl font-bold tracking-tight">Platform Overview</h1>
           <p className="text-sm text-muted-foreground">Live snapshot across all businesses and users.</p>
         </div>
-        <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
-          ● All systems normal
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Button asChild variant="outline" size="sm">
+            <Link to="/admin/partner-applications">
+              <UserPlus className="mr-1.5 h-4 w-4" />
+              Partner Applications
+            </Link>
+          </Button>
+          <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+            ● All systems normal
+          </Badge>
+        </div>
       </div>
 
       {/* KPIs */}
