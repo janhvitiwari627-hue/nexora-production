@@ -40,6 +40,7 @@ import { Route as AcademyRouteImport } from './routes/academy'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
+import { Route as PartnerIndexRouteImport } from './routes/partner.index'
 import { Route as OwnerIndexRouteImport } from './routes/owner.index'
 import { Route as JobsIndexRouteImport } from './routes/jobs.index'
 import { Route as HireIndexRouteImport } from './routes/hire.index'
@@ -286,6 +287,11 @@ const PortalIndexRoute = PortalIndexRouteImport.update({
   id: '/portal/',
   path: '/portal/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PartnerIndexRoute = PartnerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PartnerRoute,
 } as any)
 const OwnerIndexRoute = OwnerIndexRouteImport.update({
   id: '/',
@@ -770,7 +776,7 @@ export interface FileRoutesByFullPath {
   '/offline': typeof OfflineRoute
   '/owner': typeof OwnerRouteWithChildren
   '/owner-signup': typeof OwnerSignupRoute
-  '/partner': typeof PartnerRoute
+  '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
@@ -854,6 +860,7 @@ export interface FileRoutesByFullPath {
   '/hire/': typeof HireIndexRoute
   '/jobs/': typeof JobsIndexRoute
   '/owner/': typeof OwnerIndexRoute
+  '/partner/': typeof PartnerIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
@@ -892,7 +899,6 @@ export interface FileRoutesByTo {
   '/membership': typeof MembershipRoute
   '/offline': typeof OfflineRoute
   '/owner-signup': typeof OwnerSignupRoute
-  '/partner': typeof PartnerRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
@@ -976,6 +982,7 @@ export interface FileRoutesByTo {
   '/hire': typeof HireIndexRoute
   '/jobs': typeof JobsIndexRoute
   '/owner': typeof OwnerIndexRoute
+  '/partner': typeof PartnerIndexRoute
   '/portal': typeof PortalIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
@@ -1017,7 +1024,7 @@ export interface FileRoutesById {
   '/offline': typeof OfflineRoute
   '/owner': typeof OwnerRouteWithChildren
   '/owner-signup': typeof OwnerSignupRoute
-  '/partner': typeof PartnerRoute
+  '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/referrals': typeof ReferralsRoute
@@ -1101,6 +1108,7 @@ export interface FileRoutesById {
   '/hire/': typeof HireIndexRoute
   '/jobs/': typeof JobsIndexRoute
   '/owner/': typeof OwnerIndexRoute
+  '/partner/': typeof PartnerIndexRoute
   '/portal/': typeof PortalIndexRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
@@ -1227,6 +1235,7 @@ export interface FileRouteTypes {
     | '/hire/'
     | '/jobs/'
     | '/owner/'
+    | '/partner/'
     | '/portal/'
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
@@ -1265,7 +1274,6 @@ export interface FileRouteTypes {
     | '/membership'
     | '/offline'
     | '/owner-signup'
-    | '/partner'
     | '/privacy'
     | '/profile'
     | '/referrals'
@@ -1349,6 +1357,7 @@ export interface FileRouteTypes {
     | '/hire'
     | '/jobs'
     | '/owner'
+    | '/partner'
     | '/portal'
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
@@ -1473,6 +1482,7 @@ export interface FileRouteTypes {
     | '/hire/'
     | '/jobs/'
     | '/owner/'
+    | '/partner/'
     | '/portal/'
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
@@ -1514,7 +1524,7 @@ export interface RootRouteChildren {
   OfflineRoute: typeof OfflineRoute
   OwnerRoute: typeof OwnerRouteWithChildren
   OwnerSignupRoute: typeof OwnerSignupRoute
-  PartnerRoute: typeof PartnerRoute
+  PartnerRoute: typeof PartnerRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   ReferralsRoute: typeof ReferralsRoute
@@ -1789,6 +1799,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/portal/'
       preLoaderRoute: typeof PortalIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/partner/': {
+      id: '/partner/'
+      path: '/'
+      fullPath: '/partner/'
+      preLoaderRoute: typeof PartnerIndexRouteImport
+      parentRoute: typeof PartnerRoute
     }
     '/owner/': {
       id: '/owner/'
@@ -2569,6 +2586,17 @@ const OwnerRouteChildren: OwnerRouteChildren = {
 
 const OwnerRouteWithChildren = OwnerRoute._addFileChildren(OwnerRouteChildren)
 
+interface PartnerRouteChildren {
+  PartnerIndexRoute: typeof PartnerIndexRoute
+}
+
+const PartnerRouteChildren: PartnerRouteChildren = {
+  PartnerIndexRoute: PartnerIndexRoute,
+}
+
+const PartnerRouteWithChildren =
+  PartnerRoute._addFileChildren(PartnerRouteChildren)
+
 interface JobsApplicationsRouteChildren {
   JobsApplicationsJobIdRoute: typeof JobsApplicationsJobIdRoute
 }
@@ -2600,7 +2628,7 @@ const rootRouteChildren: RootRouteChildren = {
   OfflineRoute: OfflineRoute,
   OwnerRoute: OwnerRouteWithChildren,
   OwnerSignupRoute: OwnerSignupRoute,
-  PartnerRoute: PartnerRoute,
+  PartnerRoute: PartnerRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   ReferralsRoute: ReferralsRoute,
