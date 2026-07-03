@@ -17,30 +17,37 @@ import {
 } from "./mockAdmin";
 import { supabase } from "@/integrations/supabase/client";
 
-async function count(table: string, filter?: (q: ReturnType<typeof supabase.from>) => unknown) {
-  const base = supabase.from(table).select("*", { count: "exact", head: true });
-  const q = filter ? (filter(base) as typeof base) : base;
-  const { count: c, error } = await q;
-  if (error) throw error;
-  return c ?? 0;
-}
+const ICONS: Record<string, typeof CheckCircle2> = {
+  Building2, Users, CalendarCheck, IndianRupee, Crown, AlertCircle,
+  CheckCircle2, Ban, MessageSquace: MessageSquare, MessageSquare, XCircle, UserPlus,
+};
 
 export function AdminDashboardPage() {
   const kpiQ = useQuery({
     queryKey: ["admin", "dashboard-kpis"],
     queryFn: async () => {
+      const head = { count: "exact" as const, head: true };
       const [users, salons, bookings, jobs, reviews, pendingOwners, pendingBookings, revenueRow] = await Promise.all([
-        count("profiles"),
-        count("salons"),
-        count("bookings"),
-        count("jobs"),
-        count("reviews"),
-        count("owner_requests", (q) => q.eq("status", "pending")),
-        count("bookings", (q) => q.eq("status", "pending")),
+        supabase.from("profiles").select("*", head),
+        supabase.from("salons").select("*", head),
+        supabase.from("bookings").select("*", head),
+        supabase.from("jobs").select("*", head),
+        supabase.from("reviews").select("*", head),
+        supabase.from("owner_requests").select("*", head).eq("status", "pending"),
+        supabase.from("bookings").select("*", head).eq("status", "pending"),
         supabase.from("payments").select("amount").eq("status", "SUCCESS"),
       ]);
       const revenue = (revenueRow.data ?? []).reduce((s, r) => s + Number(r.amount ?? 0), 0);
-      return { users, salons, bookings, jobs, reviews, pendingOwners, pendingBookings, revenue };
+      return {
+        users: users.count ?? 0,
+        salons: salons.count ?? 0,
+        bookings: bookings.count ?? 0,
+        jobs: jobs.count ?? 0,
+        reviews: reviews.count ?? 0,
+        pendingOwners: pendingOwners.count ?? 0,
+        pendingBookings: pendingBookings.count ?? 0,
+        revenue,
+      };
     },
     staleTime: 30_000,
   });
