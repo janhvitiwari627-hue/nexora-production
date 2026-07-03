@@ -33,4 +33,30 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Build
-        run: bun run build
+        run: |
+          mkdir -p build-logs
+          set -o pipefail
+          bun run build 2>&1 | tee build-logs/build.log
+
+      - name: Capture TypeScript diagnostics on failure
+        if: failure()
+        run: |
+          mkdir -p build-logs
+          bunx tsgo --noEmit 2>&1 | tee build-logs/typecheck.log || true
+          {
+            echo "## Environment"
+            echo "node: $(node -v 2>/dev/null || echo n/a)"
+            echo "bun:  $(bun -v 2>/dev/null || echo n/a)"
+            echo "commit: ${GITHUB_SHA}"
+            echo "ref:    ${GITHUB_REF}"
+          } > build-logs/env.txt
+
+      - name: Upload build logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build-logs/
+          retention-days: 14
+          if-no-files-found: warn
+
