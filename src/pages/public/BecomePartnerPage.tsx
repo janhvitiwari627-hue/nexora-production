@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
-import { Activity, ArrowRight, BadgeCheck, Building2, CalendarClock, CheckCircle2, Crown, FileCheck, GraduationCap, Headphones as HeadphonesIcon, IndianRupee, LayoutDashboard, Rocket, ShieldCheck, Sparkles, Store, Target, TrendingUp, Trophy, UserCheck, Users, Wallet, Zap, Award } from "lucide-react";
+import { Activity, ArrowRight, BadgeCheck, Building2, CalendarClock, CheckCircle2, Crown, FileCheck, GraduationCap, Headphones as HeadphonesIcon, IndianRupee, LayoutDashboard, PlayCircle, Rocket, ShieldCheck, Sparkles, Store, Target, TrendingUp, Trophy, UserCheck, Users, Wallet, Zap, Award } from "lucide-react";
 import rewardWelcomeKit from "@/assets/reward-welcome-kit.jpg";
 import rewardTabletBadge from "@/assets/reward-tablet-badge.jpg";
 import rewardLaptop from "@/assets/reward-laptop.jpg";
@@ -43,20 +43,42 @@ export function BecomePartnerPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero + calculator */}
+      {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[#0A2540] via-[#1a1060] to-[#635BFF] py-20 md:py-28">
         <div className="absolute inset-0 opacity-20 [background-image:radial-gradient(circle_at_2px_2px,white_1px,transparent_0)] [background-size:32px_32px]" />
-        <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 md:px-6 lg:grid-cols-2">
+        <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 md:px-6 lg:grid-cols-[1.15fr_1fr]">
           <div>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white">
-              <Sparkles className="h-3 w-3" /> Join Growth Partner Program
+              <Sparkles className="h-3 w-3" /> District Business Partner Program
             </span>
-            <h1 className="mt-4 text-4xl font-black tracking-tight text-white md:text-6xl" style={{ fontFamily: "Inter, sans-serif" }}>
-              Earn more. <br />Stress less.
+            <h1 className="mt-4 text-4xl font-black leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">
+              Apne District Ki Beauty Industry Ko{" "}
+              <span className="bg-gradient-to-r from-amber-300 to-orange-400 bg-clip-text text-transparent">
+                Digital Banaiye
+              </span>{" "}
+              Aur Us Growth Ka Hissa Baniye.
             </h1>
-            <p className="mt-4 max-w-md text-base text-white/85 md:text-lg">
-              Join 12,000+ salons growing 38% faster with Nexora. Zero setup. 24-hour onboarding.
+            <p className="mt-5 max-w-xl text-base text-white/85 md:text-lg">
+              Nexora SalonOS Jaipur ki Beauty Industry ka Digital Ecosystem hai. Agar aapke paas
+              salon owners ka network hai, to aap is digital transformation ka official Growth
+              Partner ban sakte hain.
             </p>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <a href="#join" className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-black shadow-[var(--shadow-glow)] transition hover:scale-[1.03]">
+                Join Free <ArrowRight className="h-4 w-4" />
+              </a>
+              <a href="#opportunity" className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 py-3.5 text-sm font-black text-white backdrop-blur transition hover:bg-white/20">
+                <PlayCircle className="h-4 w-4" /> Watch Opportunity
+              </a>
+              <a href="#talk" className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-transparent px-6 py-3.5 text-sm font-black text-white transition hover:bg-white/10">
+                <HeadphonesIcon className="h-4 w-4" /> Talk to Team
+              </a>
+            </div>
+            <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-semibold text-white/70">
+              <span className="inline-flex items-center gap-1.5"><BadgeCheck className="h-4 w-4 text-amber-300" /> No joining fee</span>
+              <span className="inline-flex items-center gap-1.5"><BadgeCheck className="h-4 w-4 text-amber-300" /> 24h KYC</span>
+              <span className="inline-flex items-center gap-1.5"><BadgeCheck className="h-4 w-4 text-amber-300" /> Weekly payouts</span>
+            </div>
           </div>
 
           <div className="border-white/20 bg-white/10 rounded-[24px] border p-6 backdrop-blur-lg text-white">
@@ -80,45 +102,125 @@ export function BecomePartnerPage() {
         </div>
       </section>
 
-      {/* Who this is for — Target Personas */}
+      {/* Section 2 — Why You? */}
       <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
         <div className="text-center">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
-            <UserCheck className="h-3 w-3" /> Who This Is For
+            <UserCheck className="h-3 w-3" /> Why You?
           </span>
           <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
-            Built for people who already know the beauty industry
+            Aapke paas already sab kuch hai
           </h2>
           <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-base">
-            If you already sell to, train, or work with salons — this program turns your existing
-            network into recurring monthly income.
+            Naya network banane ki zarurat nahi. Existing network ko digital growth me convert karna hai.
+          </p>
+        </div>
+        <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[
+            { icon: Users, t: "Existing Salon Network", b: "Aap already salon owners ke saath baat karte hain." },
+            { icon: ShieldCheck, t: "Existing Trust", b: "Shop owners aap par bharosa karte hain — trust already built hai." },
+            { icon: BadgeCheck, t: "Existing Relationships", b: "Regular visits, WhatsApp contact, personal rapport." },
+            { icon: Target, t: "Existing Market Knowledge", b: "Aap apne district ki beauty industry ko andar se jaante hain." },
+          ].map((w) => (
+            <div key={w.t} className="border-border bg-card rounded-[var(--radius-card)] border p-6 shadow-[var(--shadow-card)]">
+              <div className="bg-primary/10 text-primary grid h-11 w-11 place-items-center rounded-xl">
+                <w.icon className="h-5 w-5" />
+              </div>
+              <h3 className="text-heading mt-4 font-bold">{w.t}</h3>
+              <p className="text-muted-foreground mt-2 text-sm">{w.b}</p>
+            </div>
+          ))}
+        </div>
+        <blockquote className="border-primary bg-primary/5 text-heading mt-8 rounded-[var(--radius-card)] border-l-4 p-5 text-center text-base font-bold italic md:text-lg">
+          "Naya Network Banane Ki Zarurat Nahi. Existing Network Ko Digital Growth Me Convert Karna Hai."
+        </blockquote>
+      </section>
+
+
+      {/* Section 3 — Nexora Ecosystem (animated flow) */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <Sparkles className="h-3 w-3" /> The Nexora Ecosystem
+          </span>
+          <h2 className="text-heading mx-auto mt-4 max-w-3xl text-3xl font-black leading-tight tracking-tight md:text-4xl">
+            "Nexora Sirf Salon Software Nahi Hai. Nexora Beauty Industry Ka Complete Digital Ecosystem Hai."
+          </h2>
+        </div>
+
+        <div className="mt-12 overflow-hidden rounded-[var(--radius-card-lg)] border border-border/60 bg-gradient-to-br from-[#0A2540] via-[#1a1060] to-[#635BFF] p-6 shadow-[var(--shadow-card)] md:p-10">
+          <div className="grid gap-3 md:grid-cols-4 lg:grid-cols-8">
+            {[
+              { icon: Users, title: "Customers" },
+              { icon: Store, title: "Salon Owners" },
+              { icon: UserCheck, title: "Beauty Staff" },
+              { icon: GraduationCap, title: "Beauty Academies" },
+              { icon: BadgeCheck, title: "Brands" },
+              { icon: Building2, title: "Distributors" },
+              { icon: Trophy, title: "District Partners" },
+              { icon: Rocket, title: "Nexora Platform" },
+            ].map((n, i) => (
+              <div
+                key={n.title}
+                className="group relative rounded-[var(--radius-card)] border border-white/15 bg-white/10 p-4 text-center text-white backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/20 animate-fade-in"
+                style={{ animationDelay: `${i * 90}ms`, animationFillMode: "both" }}
+              >
+                <div className="mx-auto grid h-11 w-11 place-items-center rounded-xl bg-white/15 transition group-hover:bg-amber-300 group-hover:text-slate-900">
+                  <n.icon className="h-5 w-5" />
+                </div>
+                <div className="mt-3 text-[11px] font-black uppercase tracking-wider text-white/70">
+                  Node {i + 1}
+                </div>
+                <div className="mt-1 text-sm font-black">{n.title}</div>
+                {i < 7 && (
+                  <ArrowRight
+                    className="text-amber-300 absolute -right-2 top-1/2 hidden h-4 w-4 -translate-y-1/2 lg:block animate-pulse"
+                    aria-hidden
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+          <p className="mt-6 text-center text-sm font-semibold text-white/85 md:text-base">
+            Ek connected ecosystem — jahan har layer ek doosre se juda hua hai.
+          </p>
+        </div>
+      </section>
+
+      {/* Section 4 — Who Can Join */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <UserCheck className="h-3 w-3" /> Who Can Join
+          </span>
+          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            Eligible partner categories
+          </h2>
+          <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-base">
+            If you already work with salon owners in any of these roles — you're eligible.
           </p>
         </div>
 
-        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { icon: Store, t: "Beauty Product Salesman", b: "Selling shampoos, colours or skincare into salons." },
-            { icon: Sparkles, t: "Cosmetic Sales Executive", b: "FMCG beauty field sales in your territory." },
-            { icon: Building2, t: "Distributor", b: "Local or regional distributor with an active shop route." },
-            { icon: BadgeCheck, t: "Brand Sales Representative", b: "Territory rep for a national or regional beauty brand." },
-            { icon: HeadphonesIcon, t: "Salon Consultant", b: "Advise salons on setup, branding or operations." },
-            { icon: GraduationCap, t: "Beauty Trainer", b: "Trainer or academy owner already close to shop owners." },
-            { icon: Users, t: "Existing Network Builder", b: "You already have a network of salon-owner relationships." },
-            { icon: Rocket, t: "Freelance Sales Professional", b: "Independent field sales looking for recurring income." },
-            { icon: Store, t: "Hair Salon Product Salesman", b: "Selling into hair salons and unisex studios." },
-            { icon: LayoutDashboard, t: "Salon Furniture Dealer", b: "Chairs, mirrors, stations — you already visit new shops." },
-            { icon: Sparkles, t: "Spa Product Representative", b: "Reps selling into spas, wellness and massage centres." },
-            { icon: Target, t: "Tattoo Supply Distributor", b: "Distributing inks, machines and consumables to studios." },
-            { icon: Award, t: "Nail Art Supplier", b: "Selling nail products into nail studios and salons." },
-          ].map((p) => (
-            <div key={p.t} className="border-border bg-card group flex items-start gap-3 rounded-[var(--radius-card)] border p-5 shadow-[var(--shadow-card)] transition hover:-translate-y-0.5">
-              <div className="bg-primary/10 text-primary grid h-10 w-10 shrink-0 place-items-center rounded-xl transition group-hover:bg-primary group-hover:text-primary-foreground">
+            { icon: Store, t: "Hair Salon Product Salesman" },
+            { icon: Sparkles, t: "Cosmetic Sales Executive" },
+            { icon: Building2, t: "Beauty Product Distributor" },
+            { icon: LayoutDashboard, t: "Salon Furniture Dealer" },
+            { icon: HeadphonesIcon, t: "Spa Product Representative" },
+            { icon: Target, t: "Tattoo Supply Distributor" },
+            { icon: Award, t: "Nail Art Supplier" },
+            { icon: GraduationCap, t: "Beauty Consultant" },
+          ].map((p, i) => (
+            <div
+              key={p.t}
+              className="border-border bg-card group rounded-[var(--radius-card)] border p-5 text-center shadow-[var(--shadow-card)] transition hover:-translate-y-1 hover:border-primary/40 animate-fade-in"
+              style={{ animationDelay: `${i * 60}ms`, animationFillMode: "both" }}
+            >
+              <div className="bg-primary/10 text-primary mx-auto grid h-12 w-12 place-items-center rounded-xl transition group-hover:bg-gradient-cta group-hover:text-primary-foreground">
                 <p.icon className="h-5 w-5" />
               </div>
-              <div>
-                <h3 className="text-heading font-bold">{p.t}</h3>
-                <p className="text-muted-foreground mt-1 text-sm">{p.b}</p>
-              </div>
+              <h3 className="text-heading mt-4 text-sm font-black leading-snug">{p.t}</h3>
             </div>
           ))}
         </div>
@@ -127,7 +229,6 @@ export function BecomePartnerPage() {
           Don't see your exact title? If you talk to salon owners every week — you qualify.
         </div>
       </section>
-
 
       {/* Trust — Why partner with Nexora */}
       <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
@@ -175,37 +276,6 @@ export function BecomePartnerPage() {
         </div>
       </section>
 
-      {/* Ecosystem */}
-      <section className="mx-auto max-w-6xl px-4 pt-20 md:px-6">
-        <div className="text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
-            <Sparkles className="h-3 w-3" /> The Nexora Ecosystem
-          </span>
-          <h2 className="text-heading mt-4 text-3xl font-black tracking-tight md:text-4xl">
-            How the whole system works
-          </h2>
-          <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-base">
-            Growth Partners are the bridge between local salons and India's fastest-growing beauty marketplace.
-          </p>
-        </div>
-        <div className="mt-10 grid gap-4 md:grid-cols-4">
-          {[
-            { icon: Users, title: "Customers", body: "Discover, book & pay at trusted salons on the Nexora app." },
-            { icon: Store, title: "Salons & Shops", body: "Manage bookings, staff, payments and marketing in one place." },
-            { icon: UserCheck, title: "Growth Partners", body: "Onboard local shops, train them and earn on every booking." },
-            { icon: Building2, title: "Brands & Distributors", body: "Reach every partner shop through the Nexora portal." },
-          ].map((n, i) => (
-            <div key={n.title} className="border-border bg-card relative rounded-[var(--radius-card)] border p-6 shadow-[var(--shadow-card)]">
-              <div className="bg-gradient-cta text-primary-foreground grid h-11 w-11 place-items-center rounded-xl">
-                <n.icon className="h-5 w-5" />
-              </div>
-              <div className="text-muted-foreground mt-4 text-[11px] font-black uppercase tracking-wider">Layer {i + 1}</div>
-              <h3 className="text-heading mt-1 text-lg font-bold">{n.title}</h3>
-              <p className="text-muted-foreground mt-2 text-sm">{n.body}</p>
-            </div>
-          ))}
-        </div>
-      </section>
 
 
       {/* How Growth Partners Earn */}
@@ -670,7 +740,8 @@ export function BecomePartnerPage() {
 
 
       {/* Registration form */}
-      <section className="mx-auto max-w-2xl px-4 pb-20 md:px-6">
+      <section id="join" className="mx-auto max-w-2xl px-4 pb-24 md:px-6 scroll-mt-24">
+        <div id="talk" />
         <div className="border-border bg-card rounded-[24px] border p-7 shadow-[var(--shadow-card)]">
           <h2 className="text-heading text-2xl font-black">Get started</h2>
           <p className="text-muted-foreground mt-1 text-sm">Our partner success team will reach out within 24 hours.</p>
@@ -705,6 +776,39 @@ export function BecomePartnerPage() {
           )}
         </div>
       </section>
+
+      <StickyCTA />
     </div>
   );
 }
+
+function StickyCTA() {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 600);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return (
+    <div
+      className={`fixed inset-x-0 bottom-0 z-40 border-t border-border/60 bg-background/95 backdrop-blur transition-transform duration-300 md:bottom-4 md:left-1/2 md:right-auto md:w-auto md:-translate-x-1/2 md:rounded-full md:border md:shadow-[var(--shadow-card)] ${visible ? "translate-y-0" : "translate-y-full md:translate-y-[200%]"}`}
+      aria-hidden={!visible}
+    >
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 md:px-4">
+        <div className="hidden text-sm font-black text-heading md:block">
+          District Business Partner Program
+        </div>
+        <div className="flex flex-1 items-center gap-2 md:flex-none">
+          <a href="#join" className="bg-gradient-cta text-primary-foreground inline-flex flex-1 items-center justify-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-black shadow-[var(--shadow-glow)] md:flex-none">
+            Join Free <ArrowRight className="h-4 w-4" />
+          </a>
+          <a href="#talk" className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-black text-heading md:flex-none">
+            <HeadphonesIcon className="h-4 w-4" /> Talk to Team
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
