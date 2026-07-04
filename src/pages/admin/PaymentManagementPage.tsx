@@ -23,6 +23,55 @@ import { Label } from "@/components/ui/label";
 import { Check, X, RefreshCcw, Search, Loader2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+
+// ---------- Typed update payload helpers ----------
+// These narrow the shape of admin-issued updates so we never pass a bare
+// Record<string, unknown> into Supabase's typed `.update()` (which surfaces
+// as a RejectExcessProperties error). Each helper returns the exact
+// `Tables<>["Update"]` slice its mutation writes.
+type PaymentUpdate = Database["public"]["Tables"]["payments"]["Update"];
+type PendingPaymentUpdate = Database["public"]["Tables"]["pending_payments"]["Update"];
+type WithdrawalUpdate = Database["public"]["Tables"]["withdrawals"]["Update"];
+
+type PaymentStatus = "CREATED" | "PENDING" | "SUCCESS" | "FAILED" | "REFUNDED" | "CANCELLED";
+type PendingStatus = "approved" | "rejected";
+type WithdrawalStatus = "PENDING" | "APPROVED" | "COMPLETED" | "REJECTED";
+
+function buildRefundPayload(reason: string): PaymentUpdate {
+  return {
+    status: "REFUNDED",
+    failure_reason: reason,
+    processed_at: new Date().toISOString(),
+  };
+}
+
+function buildPaymentStatusPayload(status: PaymentStatus, reason?: string): PaymentUpdate {
+  const patch: PaymentUpdate = {
+    status,
+    processed_at: new Date().toISOString(),
+  };
+  if (reason) patch.failure_reason = reason;
+  return patch;
+}
+
+function buildPendingStatusPayload(status: PendingStatus): PendingPaymentUpdate {
+  return {
+    status,
+    updated_at: new Date().toISOString(),
+  };
+}
+
+function buildWithdrawalStatusPayload(status: WithdrawalStatus): WithdrawalUpdate {
+  const patch: WithdrawalUpdate = {
+    status,
+    updated_at: new Date().toISOString(),
+  };
+  if (status === "COMPLETED" || status === "REJECTED") {
+    patch.processed_at = new Date().toISOString();
+  }
+  return patch;
+}
 
 type Payment = {
   id: string;
