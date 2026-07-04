@@ -17,6 +17,7 @@ import nexoraLogo from "@/assets/nexora-logo.jpg.asset.json";
 import { NotFoundPage } from "@/pages/public/NotFoundPage";
 import { Toaster } from "@/components/ui/sonner";
 import { useApplicationStatusNotifications } from "@/hooks/useApplicationStatusNotifications";
+import { ReferralWelcomePopup } from "@/components/referral/ReferralWelcomePopup";
 
 function NotFoundComponent() {
   return <NotFoundPage />;
@@ -167,6 +168,7 @@ function RootComponent() {
       <AppSideEffects />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      <ReferralWelcomePopup />
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );
