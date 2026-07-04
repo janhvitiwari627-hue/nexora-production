@@ -4,11 +4,9 @@ import { test, expect, type Page } from "@playwright/test";
  * A signed-in partner (growth_partner / district_partner) must NOT be
  * able to open the owner or admin profile-edit routes by typing the URL
  * directly. `requireRole` in `src/lib/route-guards.ts` should redirect
- * them away before the `/dashboard/settings` redirect runs.
- *
- * Requires a partner-scoped Supabase session. When the injected session
- * belongs to a different role (or env vars are missing), the test skips
- * so the suite stays green in sandboxes signed in as another user.
+ * them away BEFORE the route's own `/dashboard/settings` redirect runs,
+ * so `/dashboard/settings` must never appear — not even as a transient
+ * hop.
  */
 
 const STORAGE_KEY = process.env.LOVABLE_BROWSER_SUPABASE_STORAGE_KEY;
@@ -16,13 +14,10 @@ const SESSION_JSON = process.env.LOVABLE_BROWSER_SUPABASE_SESSION_JSON;
 
 const FORBIDDEN_ROUTES = ["/owner/profile", "/admin/profile"] as const;
 
-// Where `requireRole` may legitimately send a partner: `/login` when the
-// guard rejects, or a partner-appropriate landing.
-const ALLOWED_LANDINGS = [
-  "/login",
-  "/partner/dashboard",
-  "/",
-];
+// `requireRole` sends a rejected partner to `/` (no owner/admin fallback);
+// `/login` is acceptable if the session lapsed. A partner-appropriate
+// landing is also fine.
+const ALLOWED_LANDINGS = ["/login", "/partner/dashboard", "/partner", "/"];
 
 async function seedPartnerSession(page: Page) {
   await page.goto("/", { waitUntil: "domcontentloaded" });
@@ -36,16 +31,10 @@ async function seedPartnerSession(page: Page) {
 }
 
 async function isPartnerSession(page: Page): Promise<boolean> {
-  // Ask the app's Supabase client for the current user's roles. This
-  // routes through the same client the route guard uses, so if the guard
-  // will treat the user as a partner, so will this check.
   return await page.evaluate(async () => {
-    // Access the module the app already loaded to avoid a second client.
     const mod = await import("/src/integrations/supabase/client.ts").catch(
       () => null as unknown as { supabase: unknown } | null,
     );
-    // Fallback: use window-attached client if present, else give up.
-    // The app doesn't expose one, so rely on the module import above.
     const supabase = (mod as { supabase: {
       auth: { getUser: () => Promise<{ data: { user: { id: string } | null } }> };
       from: (t: string) => {
@@ -62,6 +51,15 @@ async function isPartnerSession(page: Page): Promise<boolean> {
       .select("role")
       .eq("user_id", data.user.id);
     const roles = (res.data ?? []).map((r) => r.role);
+    // Exclude admins/owners so this stays partner-scoped.
+    const elevated = [
+      "admin",
+      "super_admin",
+      "owner",
+      "shop_owner",
+      "shop_manager",
+    ];
+    if (roles.some((r) => elevated.includes(r))) return false;
     return roles.includes("growth_partner") || roles.includes("district_partner");
   });
 }
@@ -82,7 +80,16 @@ test.describe("Partner cannot open owner/admin profile edit routes", () => {
   });
 
   for (const route of FORBIDDEN_ROUTES) {
-    test(`direct navigation to ${route} is blocked for a partner`, async ({ page }) => {
+    test(`direct navigation to ${route} is blocked for a partner and never lands on /dashboard/settings`, async ({ page }) => {
+      // Track every URL the browser visits so we can assert
+      // /dashboard/settings was NEVER reached — not even for a frame.
+      const visited: string[] = [];
+      page.on("framenavigated", (frame) => {
+        if (frame === page.mainFrame()) {
+          visited.push(new URL(frame.url()).pathname);
+        }
+      });
+
       await page.goto(route);
 
       // The guard must redirect off the forbidden URL.
@@ -92,17 +99,23 @@ test.describe("Partner cannot open owner/admin profile edit routes", () => {
         { timeout: 10_000 },
       );
 
+      // Give trailing redirects a beat to settle.
+      await page.waitForTimeout(500);
+
       const landed = new URL(page.url()).pathname;
 
       // Not still on the forbidden route.
       expect(landed.startsWith(route)).toBe(false);
 
-      // Guard must fire BEFORE the route's own redirect to
-      // `/dashboard/settings`. Landing there would mean a partner reached
-      // the owner/admin edit surface through the back door.
+      // Guard must fire BEFORE the route's own /dashboard/settings
+      // redirect — neither final landing nor transient hop.
       expect(landed.startsWith("/dashboard/settings")).toBe(false);
+      expect(
+        visited.some((p) => p.startsWith("/dashboard/settings")),
+        `unexpected /dashboard/settings hop; visited=${JSON.stringify(visited)}`,
+      ).toBe(false);
 
-      // Landing is a partner-appropriate destination.
+      // Landing must be partner-appropriate.
       expect(
         ALLOWED_LANDINGS.some((t) => landed === t || landed.startsWith(t + "/")),
       ).toBe(true);
