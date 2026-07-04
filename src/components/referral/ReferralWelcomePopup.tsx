@@ -13,6 +13,7 @@ export function ReferralWelcomePopup() {
   const profile = useAuthStore((s) => s.profile);
   const isInitialized = useAuthStore((s) => s.isInitialized);
   const [open, setOpen] = useState(false);
+  const [howOpen, setHowOpen] = useState(false);
 
   const code = profile?.referral_code ?? null;
   const link = code ? `${ORIGIN}/signup?ref=${code}` : "";
