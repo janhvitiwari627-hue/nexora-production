@@ -6,10 +6,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Check, X, RefreshCcw, Search, Loader2 } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Check, X, RefreshCcw, Search, Loader2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -49,6 +60,21 @@ type Withdrawal = {
   created_at: string;
 };
 
+type RejectTarget =
+  | { kind: "payment"; id: string; label: string }
+  | { kind: "pending"; id: string; label: string }
+  | { kind: "withdrawal"; id: string; label: string };
+
+type ConfirmTarget = {
+  title: string;
+  description: string;
+  confirmLabel: string;
+  destructive?: boolean;
+  onConfirm: () => void;
+};
+
+const MIN_REASON = 5;
+
 function fmtINR(n: number) {
   return `₹${Number(n).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
 }
@@ -70,8 +96,16 @@ export function PaymentManagementPage() {
   const [tab, setTab] = useState("txn");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+
   const [refundTarget, setRefundTarget] = useState<Payment | null>(null);
   const [refundReason, setRefundReason] = useState("");
+  const [refundReasonError, setRefundReasonError] = useState<string | null>(null);
+
+  const [rejectTarget, setRejectTarget] = useState<RejectTarget | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
+  const [rejectReasonError, setRejectReasonError] = useState<string | null>(null);
+
+  const [confirmTarget, setConfirmTarget] = useState<ConfirmTarget | null>(null);
 
   // ---------- Queries ----------
   const paymentsQ = useQuery({
@@ -118,7 +152,7 @@ export function PaymentManagementPage() {
         .from("payments")
         .update({
           status: "REFUNDED",
-          failure_reason: reason || "Refunded by admin",
+          failure_reason: reason,
           processed_at: new Date().toISOString(),
         })
         .eq("id", id);
@@ -127,18 +161,19 @@ export function PaymentManagementPage() {
     onSuccess: () => {
       toast.success("Payment refunded");
       qc.invalidateQueries({ queryKey: ["admin-payments"] });
-      setRefundTarget(null);
-      setRefundReason("");
+      closeRefund();
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const markPaymentStatus = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const { error } = await supabase
-        .from("payments")
-        .update({ status, processed_at: new Date().toISOString() })
-        .eq("id", id);
+    mutationFn: async ({ id, status, reason }: { id: string; status: string; reason?: string }) => {
+      const patch: { status: string; processed_at: string; failure_reason?: string } = {
+        status,
+        processed_at: new Date().toISOString(),
+      };
+      if (reason) patch.failure_reason = reason;
+      const { error } = await supabase.from("payments").update(patch).eq("id", id);
       if (error) throw error;
     },
     onSuccess: (_d, v) => {
@@ -149,7 +184,7 @@ export function PaymentManagementPage() {
   });
 
   const setPendingStatus = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: "approved" | "rejected" }) => {
+    mutationFn: async ({ id, status }: { id: string; status: "approved" | "rejected"; reason?: string }) => {
       const { error } = await supabase
         .from("pending_payments")
         .update({ status, updated_at: new Date().toISOString() })
@@ -157,30 +192,81 @@ export function PaymentManagementPage() {
       if (error) throw error;
     },
     onSuccess: (_d, v) => {
-      toast.success(v.status === "approved" ? "Payment approved" : "Payment rejected");
+      toast.success(
+        v.status === "approved"
+          ? "Payment approved"
+          : `Payment rejected${v.reason ? ` — reason recorded` : ""}`,
+      );
       qc.invalidateQueries({ queryKey: ["admin-pending-payments"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const setWithdrawalStatus = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const patch = {
+    mutationFn: async ({ id, status }: { id: string; status: string; reason?: string }) => {
+      const patch: { status: string; updated_at: string; processed_at?: string } = {
         status,
         updated_at: new Date().toISOString(),
-        ...(status === "COMPLETED" || status === "REJECTED"
-          ? { processed_at: new Date().toISOString() }
-          : {}),
       };
+      if (status === "COMPLETED" || status === "REJECTED") {
+        patch.processed_at = new Date().toISOString();
+      }
       const { error } = await supabase.from("withdrawals").update(patch).eq("id", id);
       if (error) throw error;
     },
     onSuccess: (_d, v) => {
-      toast.success(`Withdrawal ${v.status.toLowerCase()}`);
+      toast.success(`Withdrawal ${v.status.toLowerCase()}${v.reason ? " — reason recorded" : ""}`);
       qc.invalidateQueries({ queryKey: ["admin-withdrawals"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  // ---------- Helpers ----------
+  function closeRefund() {
+    setRefundTarget(null);
+    setRefundReason("");
+    setRefundReasonError(null);
+  }
+  function closeReject() {
+    setRejectTarget(null);
+    setRejectReason("");
+    setRejectReasonError(null);
+  }
+
+  function submitRefund() {
+    if (!refundTarget) return;
+    const trimmed = refundReason.trim();
+    if (trimmed.length < MIN_REASON) {
+      setRefundReasonError(`Please provide a reason (at least ${MIN_REASON} characters).`);
+      return;
+    }
+    refundPayment.mutate({ id: refundTarget.id, reason: trimmed });
+  }
+
+  function submitReject() {
+    if (!rejectTarget) return;
+    const trimmed = rejectReason.trim();
+    if (trimmed.length < MIN_REASON) {
+      setRejectReasonError(`Rejection reason is required (at least ${MIN_REASON} characters).`);
+      return;
+    }
+    if (rejectTarget.kind === "payment") {
+      markPaymentStatus.mutate(
+        { id: rejectTarget.id, status: "FAILED", reason: trimmed },
+        { onSuccess: () => closeReject() },
+      );
+    } else if (rejectTarget.kind === "pending") {
+      setPendingStatus.mutate(
+        { id: rejectTarget.id, status: "rejected", reason: trimmed },
+        { onSuccess: () => closeReject() },
+      );
+    } else {
+      setWithdrawalStatus.mutate(
+        { id: rejectTarget.id, status: "REJECTED", reason: trimmed },
+        { onSuccess: () => closeReject() },
+      );
+    }
+  }
 
   // ---------- Derived ----------
   const filteredPayments = useMemo(() => {
@@ -208,6 +294,9 @@ export function PaymentManagementPage() {
       withdrawalsPending: (withdrawalsQ.data ?? []).filter((w) => w.status === "PENDING").length,
     };
   }, [paymentsQ.data, pendingQ.data, withdrawalsQ.data]);
+
+  const rejectMutating =
+    markPaymentStatus.isPending || setPendingStatus.isPending || setWithdrawalStatus.isPending;
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 p-6">
@@ -312,14 +401,28 @@ export function PaymentManagementPage() {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => markPaymentStatus.mutate({ id: p.id, status: "SUCCESS" })}
+                                onClick={() =>
+                                  setConfirmTarget({
+                                    title: "Mark payment as Success?",
+                                    description: `Transaction ${p.transaction_id} (${fmtINR(Number(p.amount))}) will be marked SUCCESS. This releases funds and cannot be silently undone.`,
+                                    confirmLabel: "Mark Success",
+                                    onConfirm: () =>
+                                      markPaymentStatus.mutate({ id: p.id, status: "SUCCESS" }),
+                                  })
+                                }
                               >
                                 Mark Success
                               </Button>
                               <Button
                                 size="sm"
                                 variant="ghost"
-                                onClick={() => markPaymentStatus.mutate({ id: p.id, status: "FAILED" })}
+                                onClick={() =>
+                                  setRejectTarget({
+                                    kind: "payment",
+                                    id: p.id,
+                                    label: `${p.transaction_id} (${fmtINR(Number(p.amount))})`,
+                                  })
+                                }
                               >
                                 Mark Failed
                               </Button>
@@ -376,14 +479,28 @@ export function PaymentManagementPage() {
                             <>
                               <Button
                                 size="sm"
-                                onClick={() => setPendingStatus.mutate({ id: p.id, status: "approved" })}
+                                onClick={() =>
+                                  setConfirmTarget({
+                                    title: "Approve this payment?",
+                                    description: `Verify that transaction ${p.transaction_id} was received before approving. This will mark the payment as approved.`,
+                                    confirmLabel: "Approve Payment",
+                                    onConfirm: () =>
+                                      setPendingStatus.mutate({ id: p.id, status: "approved" }),
+                                  })
+                                }
                               >
                                 <Check className="h-4 w-4" /> Approve
                               </Button>
                               <Button
                                 size="sm"
                                 variant="destructive"
-                                onClick={() => setPendingStatus.mutate({ id: p.id, status: "rejected" })}
+                                onClick={() =>
+                                  setRejectTarget({
+                                    kind: "pending",
+                                    id: p.id,
+                                    label: p.transaction_id,
+                                  })
+                                }
                               >
                                 <X className="h-4 w-4" /> Reject
                               </Button>
@@ -424,10 +541,11 @@ export function PaymentManagementPage() {
                       const bank = (w.bank_account_details ?? {}) as {
                         accountName?: string; accountNumber?: string; ifsc?: string;
                       };
+                      const amountLabel = fmtINR(Number(w.amount));
                       return (
                         <TableRow key={w.id}>
                           <TableCell className="font-mono text-xs">{w.salon_id.slice(0, 8)}…</TableCell>
-                          <TableCell className="font-semibold">{fmtINR(Number(w.amount))}</TableCell>
+                          <TableCell className="font-semibold">{amountLabel}</TableCell>
                           <TableCell className="text-xs">
                             {bank.accountName ?? "—"}<br />
                             <span className="text-muted-foreground">
@@ -441,7 +559,15 @@ export function PaymentManagementPage() {
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => setWithdrawalStatus.mutate({ id: w.id, status: "PROCESSING" })}
+                                onClick={() =>
+                                  setConfirmTarget({
+                                    title: "Approve withdrawal?",
+                                    description: `Move ${amountLabel} to PROCESSING for salon ${w.salon_id.slice(0, 8)}…. You can then mark it Paid once the transfer is completed.`,
+                                    confirmLabel: "Approve",
+                                    onConfirm: () =>
+                                      setWithdrawalStatus.mutate({ id: w.id, status: "PROCESSING" }),
+                                  })
+                                }
                               >
                                 Approve
                               </Button>
@@ -450,14 +576,28 @@ export function PaymentManagementPage() {
                               <>
                                 <Button
                                   size="sm"
-                                  onClick={() => setWithdrawalStatus.mutate({ id: w.id, status: "COMPLETED" })}
+                                  onClick={() =>
+                                    setConfirmTarget({
+                                      title: "Mark withdrawal as Paid?",
+                                      description: `Confirm that ${amountLabel} has been transferred to ${bank.accountName ?? "the salon"}${bank.accountNumber ? ` (A/C ${bank.accountNumber})` : ""}. This action is final.`,
+                                      confirmLabel: "Mark Paid",
+                                      onConfirm: () =>
+                                        setWithdrawalStatus.mutate({ id: w.id, status: "COMPLETED" }),
+                                    })
+                                  }
                                 >
                                   Mark Paid
                                 </Button>
                                 <Button
                                   size="sm"
                                   variant="destructive"
-                                  onClick={() => setWithdrawalStatus.mutate({ id: w.id, status: "REJECTED" })}
+                                  onClick={() =>
+                                    setRejectTarget({
+                                      kind: "withdrawal",
+                                      id: w.id,
+                                      label: `${amountLabel} · ${w.salon_id.slice(0, 8)}…`,
+                                    })
+                                  }
                                 >
                                   Reject
                                 </Button>
@@ -476,9 +616,16 @@ export function PaymentManagementPage() {
       </Tabs>
 
       {/* Refund dialog */}
-      <Dialog open={!!refundTarget} onOpenChange={(o) => !o && setRefundTarget(null)}>
+      <Dialog open={!!refundTarget} onOpenChange={(o) => !o && closeRefund()}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Refund Payment</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" /> Refund Payment
+            </DialogTitle>
+            <DialogDescription>
+              Refunds are permanent and will be visible to the customer. Please provide a clear reason for audit.
+            </DialogDescription>
+          </DialogHeader>
           <div className="space-y-3 text-sm">
             <div>
               <span className="text-muted-foreground">Transaction: </span>
@@ -488,23 +635,135 @@ export function PaymentManagementPage() {
               <span className="text-muted-foreground">Amount: </span>
               <span className="font-semibold">{refundTarget ? fmtINR(Number(refundTarget.amount)) : ""}</span>
             </div>
-            <Textarea
-              placeholder="Reason for refund (optional)"
-              value={refundReason}
-              onChange={(e) => setRefundReason(e.target.value)}
-            />
+            <div className="space-y-1.5">
+              <Label htmlFor="refund-reason">
+                Refund reason <span className="text-destructive">*</span>
+              </Label>
+              <Textarea
+                id="refund-reason"
+                placeholder="Explain why this payment is being refunded (min 5 characters)"
+                value={refundReason}
+                onChange={(e) => {
+                  setRefundReason(e.target.value);
+                  if (refundReasonError) setRefundReasonError(null);
+                }}
+                maxLength={500}
+                aria-invalid={!!refundReasonError}
+              />
+              <div className="flex justify-between text-xs">
+                <span className={refundReasonError ? "text-destructive" : "text-muted-foreground"}>
+                  {refundReasonError ?? `Required, minimum ${MIN_REASON} characters.`}
+                </span>
+                <span className="text-muted-foreground">{refundReason.trim().length}/500</span>
+              </div>
+            </div>
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setRefundTarget(null)}>Cancel</Button>
+            <Button variant="ghost" onClick={closeRefund} disabled={refundPayment.isPending}>
+              Cancel
+            </Button>
             <Button
-              onClick={() => refundTarget && refundPayment.mutate({ id: refundTarget.id, reason: refundReason })}
-              disabled={refundPayment.isPending}
+              variant="destructive"
+              onClick={submitRefund}
+              disabled={refundPayment.isPending || refundReason.trim().length < MIN_REASON}
             >
               {refundPayment.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Confirm Refund"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Reject dialog (shared) */}
+      <Dialog open={!!rejectTarget} onOpenChange={(o) => !o && !rejectMutating && closeReject()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="text-destructive h-5 w-5" />
+              {rejectTarget?.kind === "payment"
+                ? "Mark payment as Failed"
+                : rejectTarget?.kind === "withdrawal"
+                  ? "Reject Withdrawal"
+                  : "Reject Payment Verification"}
+            </DialogTitle>
+            <DialogDescription>
+              This action is destructive and cannot be silently reversed. A reason is required and will be
+              recorded for audit.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 text-sm">
+            {rejectTarget && (
+              <div>
+                <span className="text-muted-foreground">Target: </span>
+                <span className="font-mono">{rejectTarget.label}</span>
+              </div>
+            )}
+            <div className="space-y-1.5">
+              <Label htmlFor="reject-reason">
+                Reason <span className="text-destructive">*</span>
+              </Label>
+              <Textarea
+                id="reject-reason"
+                placeholder="Explain why this is being rejected (min 5 characters)"
+                value={rejectReason}
+                onChange={(e) => {
+                  setRejectReason(e.target.value);
+                  if (rejectReasonError) setRejectReasonError(null);
+                }}
+                maxLength={500}
+                aria-invalid={!!rejectReasonError}
+                autoFocus
+              />
+              <div className="flex justify-between text-xs">
+                <span className={rejectReasonError ? "text-destructive" : "text-muted-foreground"}>
+                  {rejectReasonError ?? `Required, minimum ${MIN_REASON} characters.`}
+                </span>
+                <span className="text-muted-foreground">{rejectReason.trim().length}/500</span>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={closeReject} disabled={rejectMutating}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={submitReject}
+              disabled={rejectMutating || rejectReason.trim().length < MIN_REASON}
+            >
+              {rejectMutating ? <Loader2 className="h-4 w-4 animate-spin" /> : "Confirm"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Generic confirm dialog for non-destructive / positive actions */}
+      <AlertDialog
+        open={!!confirmTarget}
+        onOpenChange={(o) => !o && setConfirmTarget(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{confirmTarget?.title}</AlertDialogTitle>
+            <AlertDialogDescription>{confirmTarget?.description}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                confirmTarget?.onConfirm();
+                setConfirmTarget(null);
+              }}
+              className={
+                confirmTarget?.destructive
+                  ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  : undefined
+              }
+            >
+              {confirmTarget?.confirmLabel ?? "Confirm"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
