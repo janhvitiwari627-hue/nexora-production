@@ -71,7 +71,16 @@ export default function SignupPage() {
     password: "",
     confirm_password: "",
   });
-  const referredBy = (search?.ref ?? "").trim().slice(0, 20);
+  const urlRef = (search?.ref ?? "").trim().slice(0, 20);
+  const referredBy = useMemo(() => {
+    if (typeof window === "undefined") return urlRef;
+    const KEY = "nexora_pending_ref";
+    if (urlRef) {
+      try { window.sessionStorage.setItem(KEY, urlRef); } catch { /* ignore */ }
+      return urlRef;
+    }
+    try { return (window.sessionStorage.getItem(KEY) ?? "").slice(0, 20); } catch { return ""; }
+  }, [urlRef]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [resetSubmitting, setResetSubmitting] = useState(false);
