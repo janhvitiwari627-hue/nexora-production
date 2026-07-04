@@ -63,6 +63,7 @@ import { Route as PortalBusinessPagesRouteImport } from './routes/portal.busines
 import { Route as PartnerTrainingRouteImport } from './routes/partner.training'
 import { Route as PartnerShopsRouteImport } from './routes/partner.shops'
 import { Route as PartnerSettingsRouteImport } from './routes/partner.settings'
+import { Route as PartnerProfileRouteImport } from './routes/partner.profile'
 import { Route as PartnerPayoutRouteImport } from './routes/partner.payout'
 import { Route as PartnerMilestonesRouteImport } from './routes/partner.milestones'
 import { Route as PartnerLeadsRouteImport } from './routes/partner.leads'
@@ -75,6 +76,7 @@ import { Route as OwnerSetupWizardRouteImport } from './routes/owner.setup-wizar
 import { Route as OwnerServicesRouteImport } from './routes/owner.services'
 import { Route as OwnerReviewsRouteImport } from './routes/owner.reviews'
 import { Route as OwnerRegisterBusinessRouteImport } from './routes/owner.register-business'
+import { Route as OwnerProfileRouteImport } from './routes/owner.profile'
 import { Route as OwnerPendingRouteImport } from './routes/owner.pending'
 import { Route as OwnerPaymentsRouteImport } from './routes/owner.payments'
 import { Route as OwnerOnboardingRouteImport } from './routes/owner.onboarding'
@@ -117,6 +119,7 @@ import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminRewardsRouteImport } from './routes/admin.rewards'
 import { Route as AdminReviewsRouteImport } from './routes/admin.reviews'
 import { Route as AdminRankingsRouteImport } from './routes/admin.rankings'
+import { Route as AdminProfileRouteImport } from './routes/admin.profile'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminPartnerApplicationsRouteImport } from './routes/admin.partner-applications'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
@@ -415,6 +418,11 @@ const PartnerSettingsRoute = PartnerSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => PartnerRoute,
 } as any)
+const PartnerProfileRoute = PartnerProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => PartnerRoute,
+} as any)
 const PartnerPayoutRoute = PartnerPayoutRouteImport.update({
   id: '/payout',
   path: '/payout',
@@ -473,6 +481,11 @@ const OwnerReviewsRoute = OwnerReviewsRouteImport.update({
 const OwnerRegisterBusinessRoute = OwnerRegisterBusinessRouteImport.update({
   id: '/register-business',
   path: '/register-business',
+  getParentRoute: () => OwnerRoute,
+} as any)
+const OwnerProfileRoute = OwnerProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => OwnerRoute,
 } as any)
 const OwnerPendingRoute = OwnerPendingRouteImport.update({
@@ -685,6 +698,11 @@ const AdminRankingsRoute = AdminRankingsRouteImport.update({
   path: '/rankings',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminProfileRoute = AdminProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
   id: '/payments',
   path: '/payments',
@@ -869,6 +887,7 @@ export interface FileRoutesByFullPath {
   '/admin/login': typeof AdminLoginRoute
   '/admin/partner-applications': typeof AdminPartnerApplicationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/profile': typeof AdminProfileRoute
   '/admin/rankings': typeof AdminRankingsRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/rewards': typeof AdminRewardsRoute
@@ -911,6 +930,7 @@ export interface FileRoutesByFullPath {
   '/owner/onboarding': typeof OwnerOnboardingRoute
   '/owner/payments': typeof OwnerPaymentsRoute
   '/owner/pending': typeof OwnerPendingRoute
+  '/owner/profile': typeof OwnerProfileRoute
   '/owner/register-business': typeof OwnerRegisterBusinessRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
@@ -923,6 +943,7 @@ export interface FileRoutesByFullPath {
   '/partner/leads': typeof PartnerLeadsRoute
   '/partner/milestones': typeof PartnerMilestonesRoute
   '/partner/payout': typeof PartnerPayoutRoute
+  '/partner/profile': typeof PartnerProfileRoute
   '/partner/settings': typeof PartnerSettingsRoute
   '/partner/shops': typeof PartnerShopsRoute
   '/partner/training': typeof PartnerTrainingRoute
@@ -1002,6 +1023,7 @@ export interface FileRoutesByTo {
   '/admin/login': typeof AdminLoginRoute
   '/admin/partner-applications': typeof AdminPartnerApplicationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/profile': typeof AdminProfileRoute
   '/admin/rankings': typeof AdminRankingsRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/rewards': typeof AdminRewardsRoute
@@ -1044,6 +1066,7 @@ export interface FileRoutesByTo {
   '/owner/onboarding': typeof OwnerOnboardingRoute
   '/owner/payments': typeof OwnerPaymentsRoute
   '/owner/pending': typeof OwnerPendingRoute
+  '/owner/profile': typeof OwnerProfileRoute
   '/owner/register-business': typeof OwnerRegisterBusinessRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
@@ -1056,6 +1079,7 @@ export interface FileRoutesByTo {
   '/partner/leads': typeof PartnerLeadsRoute
   '/partner/milestones': typeof PartnerMilestonesRoute
   '/partner/payout': typeof PartnerPayoutRoute
+  '/partner/profile': typeof PartnerProfileRoute
   '/partner/settings': typeof PartnerSettingsRoute
   '/partner/shops': typeof PartnerShopsRoute
   '/partner/training': typeof PartnerTrainingRoute
@@ -1140,6 +1164,7 @@ export interface FileRoutesById {
   '/admin/login': typeof AdminLoginRoute
   '/admin/partner-applications': typeof AdminPartnerApplicationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/profile': typeof AdminProfileRoute
   '/admin/rankings': typeof AdminRankingsRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/rewards': typeof AdminRewardsRoute
@@ -1182,6 +1207,7 @@ export interface FileRoutesById {
   '/owner/onboarding': typeof OwnerOnboardingRoute
   '/owner/payments': typeof OwnerPaymentsRoute
   '/owner/pending': typeof OwnerPendingRoute
+  '/owner/profile': typeof OwnerProfileRoute
   '/owner/register-business': typeof OwnerRegisterBusinessRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
@@ -1194,6 +1220,7 @@ export interface FileRoutesById {
   '/partner/leads': typeof PartnerLeadsRoute
   '/partner/milestones': typeof PartnerMilestonesRoute
   '/partner/payout': typeof PartnerPayoutRoute
+  '/partner/profile': typeof PartnerProfileRoute
   '/partner/settings': typeof PartnerSettingsRoute
   '/partner/shops': typeof PartnerShopsRoute
   '/partner/training': typeof PartnerTrainingRoute
@@ -1279,6 +1306,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/partner-applications'
     | '/admin/payments'
+    | '/admin/profile'
     | '/admin/rankings'
     | '/admin/reviews'
     | '/admin/rewards'
@@ -1321,6 +1349,7 @@ export interface FileRouteTypes {
     | '/owner/onboarding'
     | '/owner/payments'
     | '/owner/pending'
+    | '/owner/profile'
     | '/owner/register-business'
     | '/owner/reviews'
     | '/owner/services'
@@ -1333,6 +1362,7 @@ export interface FileRouteTypes {
     | '/partner/leads'
     | '/partner/milestones'
     | '/partner/payout'
+    | '/partner/profile'
     | '/partner/settings'
     | '/partner/shops'
     | '/partner/training'
@@ -1412,6 +1442,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/partner-applications'
     | '/admin/payments'
+    | '/admin/profile'
     | '/admin/rankings'
     | '/admin/reviews'
     | '/admin/rewards'
@@ -1454,6 +1485,7 @@ export interface FileRouteTypes {
     | '/owner/onboarding'
     | '/owner/payments'
     | '/owner/pending'
+    | '/owner/profile'
     | '/owner/register-business'
     | '/owner/reviews'
     | '/owner/services'
@@ -1466,6 +1498,7 @@ export interface FileRouteTypes {
     | '/partner/leads'
     | '/partner/milestones'
     | '/partner/payout'
+    | '/partner/profile'
     | '/partner/settings'
     | '/partner/shops'
     | '/partner/training'
@@ -1549,6 +1582,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/partner-applications'
     | '/admin/payments'
+    | '/admin/profile'
     | '/admin/rankings'
     | '/admin/reviews'
     | '/admin/rewards'
@@ -1591,6 +1625,7 @@ export interface FileRouteTypes {
     | '/owner/onboarding'
     | '/owner/payments'
     | '/owner/pending'
+    | '/owner/profile'
     | '/owner/register-business'
     | '/owner/reviews'
     | '/owner/services'
@@ -1603,6 +1638,7 @@ export interface FileRouteTypes {
     | '/partner/leads'
     | '/partner/milestones'
     | '/partner/payout'
+    | '/partner/profile'
     | '/partner/settings'
     | '/partner/shops'
     | '/partner/training'
@@ -2104,6 +2140,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PartnerSettingsRouteImport
       parentRoute: typeof PartnerRoute
     }
+    '/partner/profile': {
+      id: '/partner/profile'
+      path: '/profile'
+      fullPath: '/partner/profile'
+      preLoaderRoute: typeof PartnerProfileRouteImport
+      parentRoute: typeof PartnerRoute
+    }
     '/partner/payout': {
       id: '/partner/payout'
       path: '/payout'
@@ -2186,6 +2229,13 @@ declare module '@tanstack/react-router' {
       path: '/register-business'
       fullPath: '/owner/register-business'
       preLoaderRoute: typeof OwnerRegisterBusinessRouteImport
+      parentRoute: typeof OwnerRoute
+    }
+    '/owner/profile': {
+      id: '/owner/profile'
+      path: '/profile'
+      fullPath: '/owner/profile'
+      preLoaderRoute: typeof OwnerProfileRouteImport
       parentRoute: typeof OwnerRoute
     }
     '/owner/pending': {
@@ -2482,6 +2532,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRankingsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/profile': {
+      id: '/admin/profile'
+      path: '/profile'
+      fullPath: '/admin/profile'
+      preLoaderRoute: typeof AdminProfileRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/payments': {
       id: '/admin/payments'
       path: '/payments'
@@ -2684,6 +2741,7 @@ interface AdminRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   AdminPartnerApplicationsRoute: typeof AdminPartnerApplicationsRoute
   AdminPaymentsRoute: typeof AdminPaymentsRoute
+  AdminProfileRoute: typeof AdminProfileRoute
   AdminRankingsRoute: typeof AdminRankingsRoute
   AdminReviewsRoute: typeof AdminReviewsRoute
   AdminRewardsRoute: typeof AdminRewardsRoute
@@ -2702,6 +2760,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   AdminPartnerApplicationsRoute: AdminPartnerApplicationsRoute,
   AdminPaymentsRoute: AdminPaymentsRoute,
+  AdminProfileRoute: AdminProfileRoute,
   AdminRankingsRoute: AdminRankingsRoute,
   AdminReviewsRoute: AdminReviewsRoute,
   AdminRewardsRoute: AdminRewardsRoute,
@@ -2786,6 +2845,7 @@ interface OwnerRouteChildren {
   OwnerOnboardingRoute: typeof OwnerOnboardingRoute
   OwnerPaymentsRoute: typeof OwnerPaymentsRoute
   OwnerPendingRoute: typeof OwnerPendingRoute
+  OwnerProfileRoute: typeof OwnerProfileRoute
   OwnerRegisterBusinessRoute: typeof OwnerRegisterBusinessRoute
   OwnerReviewsRoute: typeof OwnerReviewsRoute
   OwnerServicesRoute: typeof OwnerServicesRoute
@@ -2809,6 +2869,7 @@ const OwnerRouteChildren: OwnerRouteChildren = {
   OwnerOnboardingRoute: OwnerOnboardingRoute,
   OwnerPaymentsRoute: OwnerPaymentsRoute,
   OwnerPendingRoute: OwnerPendingRoute,
+  OwnerProfileRoute: OwnerProfileRoute,
   OwnerRegisterBusinessRoute: OwnerRegisterBusinessRoute,
   OwnerReviewsRoute: OwnerReviewsRoute,
   OwnerServicesRoute: OwnerServicesRoute,
@@ -2827,6 +2888,7 @@ interface PartnerRouteChildren {
   PartnerLeadsRoute: typeof PartnerLeadsRoute
   PartnerMilestonesRoute: typeof PartnerMilestonesRoute
   PartnerPayoutRoute: typeof PartnerPayoutRoute
+  PartnerProfileRoute: typeof PartnerProfileRoute
   PartnerSettingsRoute: typeof PartnerSettingsRoute
   PartnerShopsRoute: typeof PartnerShopsRoute
   PartnerTrainingRoute: typeof PartnerTrainingRoute
@@ -2839,6 +2901,7 @@ const PartnerRouteChildren: PartnerRouteChildren = {
   PartnerLeadsRoute: PartnerLeadsRoute,
   PartnerMilestonesRoute: PartnerMilestonesRoute,
   PartnerPayoutRoute: PartnerPayoutRoute,
+  PartnerProfileRoute: PartnerProfileRoute,
   PartnerSettingsRoute: PartnerSettingsRoute,
   PartnerShopsRoute: PartnerShopsRoute,
   PartnerTrainingRoute: PartnerTrainingRoute,
