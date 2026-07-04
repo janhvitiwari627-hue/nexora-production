@@ -43,19 +43,21 @@ export async function recordAdminAction(input: AdminAuditInput): Promise<void> {
     const { data: userRes } = await supabase.auth.getUser();
     const actorId = userRes.user?.id ?? null;
 
-    const metadata: Record<string, unknown> = {
-      reason: input.reason ?? null,
-      recorded_at: new Date().toISOString(),
-      ...(input.details ?? {}),
-    };
+    const metadata = JSON.parse(
+      JSON.stringify({
+        reason: input.reason ?? null,
+        recorded_at: new Date().toISOString(),
+        ...(input.details ?? {}),
+      }),
+    ) as Json;
 
     const { error } = await supabase.from("audit_logs").insert({
       actor_id: actorId,
       action: `${input.entity}.${input.action}`,
       entity_type: input.entity,
       entity_id: input.entityId,
-      metadata: metadata as unknown as Record<string, never>,
-    } as never);
+      metadata,
+    });
     if (error) {
       // eslint-disable-next-line no-console
       console.warn("[admin-audit] insert failed", error.message);
