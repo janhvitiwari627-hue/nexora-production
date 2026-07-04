@@ -500,7 +500,7 @@ export default function CustomerRegistrationPage() {
               </TabsTrigger>
               <TabsTrigger value="district_partner" className="gap-1.5 text-xs sm:text-sm">
                 <Crown className="h-3.5 w-3.5" />
-                District Partner
+                Growth Partner
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -509,7 +509,7 @@ export default function CustomerRegistrationPage() {
             <div className="space-y-4">
               <Alert>
                 <AlertDescription className="text-xs">
-                  District Business Partner application. After signup your application goes for
+                  Growth Partner application. After signup your application goes for
                   verification — no joining fee, no investment, performance-based rewards.
                 </AlertDescription>
               </Alert>
