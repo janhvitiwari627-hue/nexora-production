@@ -109,20 +109,29 @@ export function ReferralWelcomePopup() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="rounded-lg bg-muted/50 p-2">
-              <Gift className="mx-auto h-4 w-4 text-primary" />
-              <div className="mt-1 text-[10px] font-semibold">You get 100 pts</div>
-            </div>
-            <div className="rounded-lg bg-muted/50 p-2">
-              <Sparkles className="mx-auto h-4 w-4 text-primary" />
-              <div className="mt-1 text-[10px] font-semibold">Friend gets 100 pts</div>
-            </div>
-            <div className="rounded-lg bg-muted/50 p-2">
-              <Globe className="mx-auto h-4 w-4 text-primary" />
-              <div className="mt-1 text-[10px] font-semibold">Free website</div>
-            </div>
-          </div>
+          <ul className="space-y-2 rounded-lg bg-muted/40 p-3 text-sm">
+            <li className="flex items-start gap-2">
+              <Gift className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <span>
+                <strong className="font-semibold">You get 100 points</strong> when your friend signs
+                up with your code.
+              </span>
+            </li>
+            <li className="flex items-start gap-2">
+              <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <span>
+                <strong className="font-semibold">Your friend gets 100 points</strong> as a welcome
+                bonus.
+              </span>
+            </li>
+            <li className="flex items-start gap-2">
+              <Globe className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <span>
+                <strong className="font-semibold">Free salon website</strong> — they can build one
+                in minutes.
+              </span>
+            </li>
+          </ul>
 
           <div className="flex gap-2">
             <Button className="flex-1" onClick={share}>
