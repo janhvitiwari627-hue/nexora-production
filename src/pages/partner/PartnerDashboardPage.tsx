@@ -2,6 +2,8 @@ import { motion } from "framer-motion";
 import {
   ArrowUpRight,
   BadgeCheck,
+  Briefcase,
+  CalendarCheck,
   CalendarClock,
   CheckCircle2,
   Clock,
@@ -16,6 +18,43 @@ import {
 } from "lucide-react";
 import type { ComponentType } from "react";
 import { PartnerPageShell } from "./PartnerAppLayout";
+
+type Overview = {
+  icon: ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+  hint: string;
+  accent: string;
+  iconClass: string;
+};
+
+const OVERVIEW: Overview[] = [
+  {
+    icon: CalendarCheck,
+    label: "Appointments",
+    value: "—",
+    hint: "Coming soon",
+    accent: "from-[#4F46E5]/10 to-[#6366F1]/5",
+    iconClass: "bg-[#EEF2FF] text-[#4F46E5]",
+  },
+  {
+    icon: Briefcase,
+    label: "Jobs",
+    value: "—",
+    hint: "Coming soon",
+    accent: "from-[#0EA5E9]/10 to-[#38BDF8]/5",
+    iconClass: "bg-[#DBEAFE] text-[#1D4ED8]",
+  },
+  {
+    icon: IndianRupee,
+    label: "Earnings",
+    value: "₹0",
+    hint: "This month",
+    accent: "from-[#16A34A]/10 to-[#22C55E]/5",
+    iconClass: "bg-[#DCFCE7] text-[#16A34A]",
+  },
+];
+
 
 type Kpi = {
   icon: ComponentType<{ className?: string }>;
@@ -64,8 +103,36 @@ export function PartnerDashboardPage() {
       subtitle="Aapke district ki growth ek jagah."
       icon={LayoutDashboard}
     >
+      {/* Overview cards — appointments / jobs / earnings */}
+      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {OVERVIEW.map((o, i) => (
+          <motion.div
+            key={o.label}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05 }}
+            className={`relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br ${o.accent} p-5`}
+          >
+            <div className="flex items-center justify-between">
+              <div className={`grid h-10 w-10 place-items-center rounded-xl ${o.iconClass}`}>
+                <o.icon className="h-5 w-5" />
+              </div>
+              <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                {o.hint}
+              </span>
+            </div>
+            <div className="mt-4 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              {o.label}
+            </div>
+            <div className="mt-1 text-3xl font-black text-[#0B1330]">{o.value}</div>
+          </motion.div>
+        ))}
+      </div>
+
+
       {/* KPI Grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+
         {KPIS.map((s, i) => {
           const t = TONE[s.tone ?? "indigo"];
           return (
