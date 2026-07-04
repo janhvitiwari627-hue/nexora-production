@@ -1067,7 +1067,7 @@ export default function CustomerRegistrationPage() {
               {accountType === "owner"
                 ? "Register business"
                 : accountType === "district_partner"
-                  ? "Apply as District Partner"
+                  ? "Apply as Growth Partner"
                   : "Create account"}
             </Button>
           </form>
