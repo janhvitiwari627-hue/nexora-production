@@ -72,8 +72,6 @@ export function PaymentManagementPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [refundTarget, setRefundTarget] = useState<Payment | null>(null);
   const [refundReason, setRefundReason] = useState("");
-  const [rejectTarget, setRejectTarget] = useState<{ kind: "pending" | "withdrawal"; id: string } | null>(null);
-  const [rejectReason, setRejectReason] = useState("");
 
   // ---------- Queries ----------
   const paymentsQ = useQuery({
