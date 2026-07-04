@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Copy, Share2, Sparkles, Gift, Globe, HelpCircle, Send, UserPlus, Award, Wallet } from "lucide-react";
+import { Copy, Share2, Sparkles, Gift, Globe, HelpCircle, Send, UserPlus, Award, Wallet, ArrowRight } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -210,8 +211,16 @@ export function ReferralWelcomePopup() {
             </ul>
           </div>
 
-          <div className="flex justify-end">
-            <Button onClick={() => setHowOpen(false)}>Got it</Button>
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <Button variant="outline" onClick={() => setHowOpen(false)}>
+              Got it
+            </Button>
+            <Button asChild onClick={() => { setHowOpen(false); setOpen(false); }}>
+              <Link to="/dashboard/referrals">
+                Go to Referral Center
+                <ArrowRight className="ml-1.5 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
