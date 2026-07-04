@@ -168,6 +168,7 @@ function RootComponent() {
       <AppSideEffects />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      <ReferralWelcomePopup />
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );
