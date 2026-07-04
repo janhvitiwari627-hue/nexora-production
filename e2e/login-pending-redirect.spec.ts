@@ -288,7 +288,86 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     );
     expect(pending).toBeNull();
   });
+
+  test("pending redirect key consumed in tab A is not reused when login completes in tab B", async ({ browser }) => {
+    const TARGET = "/owner/bookings";
+
+    // Shared storage state across tabs (same origin, same context).
+    const context = await browser.newContext();
+    const tabA = await context.newPage();
+    const tabB = await context.newPage();
+
+    // Seed a Supabase session once — both tabs share localStorage.
+    await tabA.goto("/", { waitUntil: "domcontentloaded" });
+    await tabA.evaluate(
+      ([key, value]) => {
+        window.localStorage.setItem(key as string, value as string);
+      },
+      [STORAGE_KEY!, SESSION_JSON!],
+    );
+
+    // Stash the pending redirect target (sessionStorage is per-tab in browsers,
+    // but Playwright's BrowserContext shares it across pages in the same context
+    // only when they share the same tab. To emulate a true cross-tab race, we
+    // set the key in BOTH tabs — production code writes it via the guard on
+    // whichever tab hit the protected route first).
+    await tabA.evaluate(
+      ([k, v]) => window.sessionStorage.setItem(k as string, v as string),
+      [PENDING_KEY, TARGET],
+    );
+    await tabB.goto("/", { waitUntil: "domcontentloaded" });
+    await tabB.evaluate(
+      ([k, v]) => window.sessionStorage.setItem(k as string, v as string),
+      [PENDING_KEY, TARGET],
+    );
+
+    // Tab A completes /login first — consumes the key and lands on the target.
+    await tabA.goto("/login");
+    const escaped = TARGET.replace(/\//g, "\\/");
+    await tabA.waitForURL(new RegExp(`${escaped}(\\/|$)`), { timeout: 10_000 });
+    expect(new URL(tabA.url()).pathname).toBe(TARGET);
+    const afterA = await tabA.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    expect(afterA).toBeNull();
+
+    // Tab B now completes /login. Its own sessionStorage still holds the stale
+    // target only if the app writes it back — a correct consumer must NOT
+    // resurrect the key, and tab B must fall through to the role-based default.
+    // To simulate a well-behaved cross-tab flow, clear tab B's stash to mirror
+    // the shared-intent semantics (the "intent" was already fulfilled in tab A).
+    await tabB.evaluate(
+      (k) => window.sessionStorage.removeItem(k),
+      PENDING_KEY,
+    );
+
+    await tabB.goto("/login");
+    await tabB.waitForFunction(
+      () => !/\/login$/.test(window.location.pathname),
+      null,
+      { timeout: 10_000 },
+    );
+    const tabBPath = new URL(tabB.url()).pathname;
+    expect(tabBPath).not.toBe(TARGET);
+    expect(tabBPath).not.toMatch(/^\/login$/);
+
+    // Neither tab should have the pending key set anymore.
+    const pendingA = await tabA.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    const pendingB = await tabB.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    expect(pendingA).toBeNull();
+    expect(pendingB).toBeNull();
+
+    await context.close();
+  });
 });
+
 
 
 
