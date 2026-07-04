@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
+import { toast } from "sonner";
 import {
   Copy,
   Check,
@@ -14,6 +15,9 @@ import {
   Sparkles,
   Gift,
   Send,
+  Mail,
+  Twitter,
+  Facebook,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
