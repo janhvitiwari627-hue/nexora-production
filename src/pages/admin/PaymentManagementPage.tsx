@@ -23,6 +23,7 @@ import { Label } from "@/components/ui/label";
 import { Check, X, RefreshCcw, Search, Loader2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { recordAdminAction } from "@/lib/adminAudit";
 import type { Database } from "@/integrations/supabase/types";
 
 // ---------- Typed update payload helpers ----------
