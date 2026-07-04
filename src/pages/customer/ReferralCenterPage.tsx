@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
+import { toast } from "sonner";
 import {
   Copy,
   Check,
@@ -14,6 +15,9 @@ import {
   Sparkles,
   Gift,
   Send,
+  Mail,
+  Twitter,
+  Facebook,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -48,43 +52,92 @@ export function ReferralCenterPage() {
   const qrRef = useRef<HTMLDivElement>(null);
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [showFallback, setShowFallback] = useState(false);
 
-  const copy = (value: string, kind: "code" | "link") => {
-    navigator.clipboard?.writeText(value).catch(() => {});
+  const shareText = `Join me on Nexora and we both earn 100 points. Use code ${referralCode}: ${referralLink}`;
+
+  const writeToClipboard = async (value: string): Promise<boolean> => {
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(value);
+        return true;
+      }
+      // Legacy fallback for insecure contexts / older browsers
+      const ta = document.createElement("textarea");
+      ta.value = value;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return ok;
+    } catch {
+      return false;
+    }
+  };
+
+  const copy = async (value: string, kind: "code" | "link") => {
+    const ok = await writeToClipboard(value);
+    if (!ok) {
+      toast.error("Couldn't copy — please copy manually", { description: value });
+      return;
+    }
     if (kind === "code") {
       setCopiedCode(true);
       setTimeout(() => setCopiedCode(false), 1500);
+      toast.success("Referral code copied");
     } else {
       setCopiedLink(true);
       setTimeout(() => setCopiedLink(false), 1500);
+      toast.success("Referral link copied");
     }
   };
 
   const downloadQR = () => {
     const canvas = qrRef.current?.querySelector("canvas");
-    if (!canvas) return;
-    const link = document.createElement("a");
-    link.download = `nexora-referral-${referralCode}.png`;
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-  };
-
-  const shareNative = async () => {
-    const text = `Join me on Nexora and we both earn ₹100. Use code ${referralCode}: ${referralLink}`;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: "Join Nexora", text, url: referralLink });
-      } catch {
-        /* user cancelled */
-      }
-    } else {
-      copy(text, "link");
+    if (!canvas) {
+      toast.error("QR code not ready yet");
+      return;
+    }
+    try {
+      const link = document.createElement("a");
+      link.download = `nexora-referral-${referralCode}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+      toast.success("QR code downloaded");
+    } catch {
+      toast.error("Couldn't download QR code");
     }
   };
 
-  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(
-    `Try Nexora and we both earn ₹100. Use code ${referralCode}: ${referralLink}`,
-  )}`;
+  const shareNative = async () => {
+    if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+      try {
+        await navigator.share({ title: "Join Nexora", text: shareText, url: referralLink });
+        toast.success("Thanks for sharing!");
+        return;
+      } catch (err) {
+        // AbortError = user cancelled — stay silent
+        if ((err as DOMException)?.name === "AbortError") return;
+      }
+    }
+    // No native share → open fallback panel + copy the message so users have a shortcut
+    setShowFallback(true);
+    const copied = await writeToClipboard(shareText);
+    toast.message("Sharing not available on this device", {
+      description: copied
+        ? "We've copied your message — pick an app below to paste it."
+        : "Pick an app below to share your referral.",
+    });
+  };
+
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+  const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(shareText)}`;
+  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(referralLink)}`;
+  const emailUrl = `mailto:?subject=${encodeURIComponent("Join me on Nexora")}&body=${encodeURIComponent(shareText)}`;
 
   return (
     <div className="min-h-screen bg-background">
@@ -187,8 +240,59 @@ export function ReferralCenterPage() {
                   Share Other
                 </button>
               </div>
+
+              {/* Fallback share panel — shown when Web Share API isn't available */}
+              {showFallback && (
+                <div className="mt-3 rounded-2xl border border-dashed border-primary/40 bg-primary/5 p-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-semibold text-primary">
+                      Pick where to share
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setShowFallback(false)}
+                      className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground"
+                    >
+                      Close
+                    </button>
+                  </div>
+                  <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    <a
+                      href={telegramUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center justify-center gap-1.5 rounded-full border bg-background px-3 py-2 text-xs font-bold transition hover:border-primary/40 hover:bg-primary/5"
+                    >
+                      <Send className="h-3.5 w-3.5 text-sky-600" /> Telegram
+                    </a>
+                    <a
+                      href={twitterUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center justify-center gap-1.5 rounded-full border bg-background px-3 py-2 text-xs font-bold transition hover:border-primary/40 hover:bg-primary/5"
+                    >
+                      <Twitter className="h-3.5 w-3.5 text-sky-500" /> X / Twitter
+                    </a>
+                    <a
+                      href={facebookUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center justify-center gap-1.5 rounded-full border bg-background px-3 py-2 text-xs font-bold transition hover:border-primary/40 hover:bg-primary/5"
+                    >
+                      <Facebook className="h-3.5 w-3.5 text-blue-600" /> Facebook
+                    </a>
+                    <a
+                      href={emailUrl}
+                      className="inline-flex items-center justify-center gap-1.5 rounded-full border bg-background px-3 py-2 text-xs font-bold transition hover:border-primary/40 hover:bg-primary/5"
+                    >
+                      <Mail className="h-3.5 w-3.5 text-primary" /> Email
+                    </a>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
+
 
           {/* QR */}
           <div className="rounded-2xl border bg-card p-5 text-center shadow-sm">
