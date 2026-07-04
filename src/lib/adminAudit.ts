@@ -51,8 +51,8 @@ export async function recordAdminAction(input: AdminAuditInput): Promise<void> {
       action: `${input.entity}.${input.action}`,
       entity_type: input.entity,
       entity_id: input.entityId,
-      metadata,
-    });
+      metadata: metadata as unknown as Record<string, never>,
+    } as never);
     if (error) {
       // eslint-disable-next-line no-console
       console.warn("[admin-audit] insert failed", error.message);
