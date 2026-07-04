@@ -159,8 +159,6 @@ export function PaymentManagementPage() {
     onSuccess: (_d, v) => {
       toast.success(v.status === "approved" ? "Payment approved" : "Payment rejected");
       qc.invalidateQueries({ queryKey: ["admin-pending-payments"] });
-      setRejectTarget(null);
-      setRejectReason("");
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -180,8 +178,6 @@ export function PaymentManagementPage() {
     onSuccess: (_d, v) => {
       toast.success(`Withdrawal ${v.status.toLowerCase()}`);
       qc.invalidateQueries({ queryKey: ["admin-withdrawals"] });
-      setRejectTarget(null);
-      setRejectReason("");
     },
     onError: (e: Error) => toast.error(e.message),
   });
