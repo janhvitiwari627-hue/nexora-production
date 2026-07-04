@@ -112,11 +112,11 @@ export function ReferralWelcomePopup() {
           <div className="grid grid-cols-3 gap-2 text-center">
             <div className="rounded-lg bg-muted/50 p-2">
               <Gift className="mx-auto h-4 w-4 text-primary" />
-              <div className="mt-1 text-[10px] font-semibold">You get ₹100</div>
+              <div className="mt-1 text-[10px] font-semibold">You get 100 pts</div>
             </div>
             <div className="rounded-lg bg-muted/50 p-2">
               <Sparkles className="mx-auto h-4 w-4 text-primary" />
-              <div className="mt-1 text-[10px] font-semibold">Friend gets ₹100</div>
+              <div className="mt-1 text-[10px] font-semibold">Friend gets 100 pts</div>
             </div>
             <div className="rounded-lg bg-muted/50 p-2">
               <Globe className="mx-auto h-4 w-4 text-primary" />
