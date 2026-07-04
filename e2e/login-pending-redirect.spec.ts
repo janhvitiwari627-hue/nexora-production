@@ -172,7 +172,61 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     );
     expect(afterLogout).toBeNull();
   });
+
+  test("logout during the post-login redirect window does not land on the stashed target", async ({ page }) => {
+    const TARGET = "/owner/bookings";
+
+    // Stall the target route request so the redirect consumer's navigation
+    // stays "in flight" long enough for us to trigger signOut in the middle.
+    await page.route("**/owner/bookings*", async (route) => {
+      await new Promise((r) => setTimeout(r, 2500));
+      await route.continue();
+    });
+
+    await seedSession(page);
+    await page.evaluate(
+      ([k, v]) => window.sessionStorage.setItem(k as string, v as string),
+      [PENDING_KEY, TARGET],
+    );
+
+    // Kick off the login-side redirect consumer.
+    const navPromise = page.goto("/login").catch(() => null);
+
+    // Race: as soon as the pending key has been consumed (redirect started),
+    // sign the user out before the target actually finishes loading.
+    await page.waitForFunction(
+      (k) => window.sessionStorage.getItem(k) === null,
+      PENDING_KEY,
+      { timeout: 10_000 },
+    );
+    await page.evaluate(async () => {
+      // Mirror authStore.signOut(): clear supabase session + wipe sessionStorage.
+      const mod = await import("/src/integrations/supabase/client.ts");
+      await mod.supabase.auth.signOut().catch(() => {});
+      window.sessionStorage.clear();
+    });
+
+    await navPromise;
+
+    // The auth-state-change listener redirects signed-out users away from
+    // protected routes. Final URL must NOT be the stashed target.
+    await page.waitForFunction(
+      (t) => !window.location.pathname.startsWith(t),
+      TARGET,
+      { timeout: 10_000 },
+    );
+    const finalPath = new URL(page.url()).pathname;
+    expect(finalPath.startsWith(TARGET)).toBe(false);
+
+    // And the pending key must stay cleared — no ghost value to resurrect.
+    const pending = await page.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    expect(pending).toBeNull();
+  });
 });
+
 
 
 
