@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, ArrowLeftRight, Bell, Briefcase, Building2, ChevronDown, LayoutDashboard, LogOut, Megaphone, Menu, Package, Phone, Settings, Smartphone, Sparkles, Star, Tag, Target, TrendingUp, Truck, User, UserCircle2, Users } from "lucide-react";
+import { ArrowLeft, ArrowLeftRight, Bell, Briefcase, Building2, ChevronDown, LayoutDashboard, LogOut, Megaphone, Menu, Package, Phone, Settings, Sparkles, Star, Store, Tag, Target, TrendingUp, Truck, User, UserCircle2, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import nexoraLogo from "@/assets/nexora-logo.jpg.asset.json";
 import { Button } from "@/components/ui/button";
@@ -44,7 +44,7 @@ const NAV = [
   { to: "/jobs", label: "Job Portal", icon: Briefcase },
   { to: "/owner/templates", label: "Create Shop Website", icon: null },
   { to: "/growth-partner", label: "Growth Partner", icon: TrendingUp },
-  { to: "/download-app", label: "Download App", icon: Smartphone },
+  { to: "/owner/welcome", label: "Shop Owner", icon: Store },
 ] as const;
 
 const PORTAL_MENU = [
