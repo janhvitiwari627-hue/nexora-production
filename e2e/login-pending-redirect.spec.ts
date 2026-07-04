@@ -703,7 +703,62 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     );
     expect(pendingFinal).toBeNull();
   });
+
+  test("typing the stashed target URL after consume, reloading, then hitting /login falls through to the role-based default", async ({ page }) => {
+    const TARGET = "/owner/bookings";
+    const DEFAULT_A = process.env.LOVABLE_BROWSER_DEFAULT_REDIRECT ?? "/";
+
+    await seedSession(page);
+    await page.evaluate(
+      ([k, v]) => window.sessionStorage.setItem(k as string, v as string),
+      [PENDING_KEY, TARGET],
+    );
+
+    // Consume the pending key via /login.
+    await page.goto("/login");
+    const escaped = TARGET.replace(/\//g, "\\/");
+    await page.waitForURL(new RegExp(`${escaped}(\\/|$)`), { timeout: 10_000 });
+    expect(new URL(page.url()).pathname).toBe(TARGET);
+    expect(
+      await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY),
+    ).toBeNull();
+
+    // Simulate the user typing the same URL into the address bar. In
+    // Playwright, page.goto() is the address-bar equivalent — it performs a
+    // fresh navigation, not a client-side router push.
+    await page.goto(TARGET, { waitUntil: "domcontentloaded" });
+    expect(new URL(page.url()).pathname).toBe(TARGET);
+    expect(
+      await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY),
+    ).toBeNull();
+
+    // Reload the page — sessionStorage survives reloads, so any stale key
+    // written by the guard would still be present. It must NOT be.
+    await page.reload({ waitUntil: "domcontentloaded" });
+    expect(new URL(page.url()).pathname).toBe(TARGET);
+    expect(
+      await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY),
+    ).toBeNull();
+
+    // Finally, visit /login. With no stash, the app must fall through to the
+    // role-based default — never resurrect the previously-consumed TARGET.
+    await page.goto("/login");
+    await page.waitForFunction(
+      () => !/\/login$/.test(window.location.pathname),
+      null,
+      { timeout: 10_000 },
+    );
+    const landed = new URL(page.url()).pathname;
+    expect(landed).toBe(DEFAULT_A);
+    expect(landed).not.toBe(TARGET);
+    expect(landed).not.toMatch(/^\/login$/);
+
+    expect(
+      await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY),
+    ).toBeNull();
+  });
 });
+
 
 
 
