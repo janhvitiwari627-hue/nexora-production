@@ -320,7 +320,7 @@ export default function CustomerRegistrationPage() {
             accountType === "owner"
               ? "Salon Owner"
               : accountType === "district_partner"
-                ? "District Partner"
+                ? "Growth Partner"
                 : "Customer";
           setAlreadyRegisteredEmail(email);
           setServerError(roleConflictMessage(check.roleLabel, attemptedLabel));
