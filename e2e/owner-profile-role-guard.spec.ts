@@ -14,8 +14,8 @@ const SESSION_JSON = process.env.LOVABLE_BROWSER_SUPABASE_SESSION_JSON;
 const FORBIDDEN_ROUTES = ["/partner/profile", "/admin/profile"] as const;
 
 // `requireRole` sends an owner to `/owner/dashboard` when the guard
-// rejects; `/login` is acceptable if the session lapsed.
-const ALLOWED_LANDINGS = ["/owner/dashboard", "/owner", "/login", "/"];
+// rejects a forbidden route — that is the exact expected landing.
+const EXPECTED_LANDING = "/owner/dashboard";
 
 async function seedOwnerSession(page: Page) {
   await page.goto("/", { waitUntil: "domcontentloaded" });
