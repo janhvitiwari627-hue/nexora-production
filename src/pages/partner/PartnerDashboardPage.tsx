@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import {
   ArrowUpRight,
   BadgeCheck,
-  Briefcase,
-  CalendarCheck,
   CalendarClock,
   CheckCircle2,
   Clock,
@@ -18,42 +18,11 @@ import {
 } from "lucide-react";
 import type { ComponentType } from "react";
 import { PartnerPageShell } from "./PartnerAppLayout";
+import { getPartnerOverview } from "@/lib/partner.functions";
 
-type Overview = {
-  icon: ComponentType<{ className?: string }>;
-  label: string;
-  value: string;
-  hint: string;
-  accent: string;
-  iconClass: string;
-};
+const inr = (n: number) =>
+  new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(n);
 
-const OVERVIEW: Overview[] = [
-  {
-    icon: CalendarCheck,
-    label: "Appointments",
-    value: "—",
-    hint: "Coming soon",
-    accent: "from-[#4F46E5]/10 to-[#6366F1]/5",
-    iconClass: "bg-[#EEF2FF] text-[#4F46E5]",
-  },
-  {
-    icon: Briefcase,
-    label: "Jobs",
-    value: "—",
-    hint: "Coming soon",
-    accent: "from-[#0EA5E9]/10 to-[#38BDF8]/5",
-    iconClass: "bg-[#DBEAFE] text-[#1D4ED8]",
-  },
-  {
-    icon: IndianRupee,
-    label: "Earnings",
-    value: "₹0",
-    hint: "This month",
-    accent: "from-[#16A34A]/10 to-[#22C55E]/5",
-    iconClass: "bg-[#DCFCE7] text-[#16A34A]",
-  },
-];
 
 
 type Kpi = {
