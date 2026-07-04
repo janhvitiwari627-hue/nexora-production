@@ -130,7 +130,9 @@ export function PartnerDashboardPage() {
       </div>
 
 
+      {/* KPI Grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+
         {KPIS.map((s, i) => {
           const t = TONE[s.tone ?? "indigo"];
           return (
