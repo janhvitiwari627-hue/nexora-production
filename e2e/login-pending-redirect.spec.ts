@@ -225,7 +225,71 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     );
     expect(pending).toBeNull();
   });
+
+  test("after key is consumed, /login honors the new role-based default when the signed-in role changes", async ({ page }) => {
+    // Requires TWO seeded sessions with distinct role-based defaults.
+    // Session A: LOVABLE_BROWSER_SUPABASE_SESSION_JSON + LOVABLE_BROWSER_DEFAULT_REDIRECT (fallback "/")
+    // Session B: LOVABLE_BROWSER_SUPABASE_SESSION_JSON_B + LOVABLE_BROWSER_DEFAULT_REDIRECT_B (required)
+    const SESSION_B = process.env.LOVABLE_BROWSER_SUPABASE_SESSION_JSON_B;
+    const DEFAULT_B = process.env.LOVABLE_BROWSER_DEFAULT_REDIRECT_B;
+    test.skip(
+      !SESSION_B || !DEFAULT_B,
+      "Secondary session/role env vars not present; skipping role-change test.",
+    );
+
+    const DEFAULT_A = process.env.LOVABLE_BROWSER_DEFAULT_REDIRECT ?? "/";
+    expect(DEFAULT_A).not.toBe(DEFAULT_B); // otherwise the test proves nothing
+
+    // First visit as role A: stash + consume /dashboard, land on target.
+    await seedSession(page);
+    await page.evaluate(
+      ([k, v]) => window.sessionStorage.setItem(k as string, v as string),
+      [PENDING_KEY, "/dashboard"],
+    );
+    await page.goto("/login");
+    await page.waitForURL(/\/dashboard(\/|$)/, { timeout: 10_000 });
+    expect(new URL(page.url()).pathname).toBe("/dashboard");
+    const afterFirst = await page.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    expect(afterFirst).toBeNull();
+
+    // Swap the signed-in identity to role B: clear A's session, seed B.
+    await page.evaluate(async () => {
+      const mod = await import("/src/integrations/supabase/client.ts");
+      await mod.supabase.auth.signOut().catch(() => {});
+      window.localStorage.clear();
+      window.sessionStorage.clear();
+    });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await page.evaluate(
+      ([key, value]) => {
+        window.localStorage.setItem(key as string, value as string);
+      },
+      [STORAGE_KEY!, SESSION_B!],
+    );
+
+    // Second /login visit as role B: no stash → role B's default, not A's.
+    await page.goto("/login");
+    await page.waitForFunction(
+      () => !/\/login$/.test(window.location.pathname),
+      null,
+      { timeout: 10_000 },
+    );
+    const secondPath = new URL(page.url()).pathname;
+    expect(secondPath).toBe(DEFAULT_B);
+    expect(secondPath).not.toBe(DEFAULT_A);
+
+    // And the pending key must remain cleared.
+    const pending = await page.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    expect(pending).toBeNull();
+  });
 });
+
 
 
 
