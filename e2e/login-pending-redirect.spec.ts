@@ -366,7 +366,87 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
 
     await context.close();
   });
+
+  test("logout then immediate re-login as a different role carries no cross-session pending redirect", async ({ page }) => {
+    // Requires two seeded sessions with distinct role-based defaults.
+    const SESSION_B = process.env.LOVABLE_BROWSER_SUPABASE_SESSION_JSON_B;
+    const DEFAULT_B = process.env.LOVABLE_BROWSER_DEFAULT_REDIRECT_B;
+    test.skip(
+      !SESSION_B || !DEFAULT_B,
+      "Secondary session/role env vars not present; skipping cross-session logout+login test.",
+    );
+
+    const TARGET_A = "/owner/bookings";
+    const DEFAULT_A = process.env.LOVABLE_BROWSER_DEFAULT_REDIRECT ?? "/";
+    expect(DEFAULT_A).not.toBe(DEFAULT_B);
+
+    // --- Session A: sign in, stash a pending target, but DO NOT consume it. ---
+    await seedSession(page);
+    await page.evaluate(
+      ([k, v]) => window.sessionStorage.setItem(k as string, v as string),
+      [PENDING_KEY, TARGET_A],
+    );
+
+    // Land somewhere public so the header account menu is visible.
+    await page.goto("/");
+    const accountMenu = page.getByRole("button", { name: "Open account menu" });
+    await accountMenu.waitFor({ state: "visible", timeout: 10_000 });
+
+    // Sanity: stash present before logout.
+    const beforeLogout = await page.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    expect(beforeLogout).toBe(TARGET_A);
+
+    // Logout via the UI — authStore.signOut() must wipe sessionStorage.
+    await accountMenu.click();
+    await page.getByRole("menuitem", { name: /logout/i }).click();
+    await page.getByRole("button", { name: "Logout" }).click();
+    await page.waitForFunction(
+      (k) => window.sessionStorage.getItem(k) === null,
+      PENDING_KEY,
+      { timeout: 10_000 },
+    );
+
+    // --- Immediate re-login as role B (different identity). ---
+    // Clear any residual browser storage, then seed session B.
+    await page.evaluate(async () => {
+      const mod = await import("/src/integrations/supabase/client.ts");
+      await mod.supabase.auth.signOut().catch(() => {});
+      window.localStorage.clear();
+      window.sessionStorage.clear();
+    });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await page.evaluate(
+      ([key, value]) => {
+        window.localStorage.setItem(key as string, value as string);
+      },
+      [STORAGE_KEY!, SESSION_B!],
+    );
+
+    // Visit /login as role B. With no pending key, it must land on role B's
+    // default — never on role A's stashed target, never on role A's default.
+    await page.goto("/login");
+    await page.waitForFunction(
+      () => !/\/login$/.test(window.location.pathname),
+      null,
+      { timeout: 10_000 },
+    );
+    const landed = new URL(page.url()).pathname;
+    expect(landed).toBe(DEFAULT_B);
+    expect(landed).not.toBe(TARGET_A);
+    expect(landed).not.toBe(DEFAULT_A);
+
+    // And the pending key must remain cleared across the session swap.
+    const pending = await page.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    expect(pending).toBeNull();
+  });
 });
+
 
 
 
