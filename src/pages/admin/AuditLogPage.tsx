@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -41,6 +41,8 @@ const ENTITY_FILTERS = [
   "user",
 ] as const;
 
+const PAGE_SIZE = 50;
+
 function fmt(s: string) {
   return new Date(s).toLocaleString("en-IN", {
     dateStyle: "medium",
@@ -51,27 +53,34 @@ function fmt(s: string) {
 export function AuditLogPage() {
   const [entity, setEntity] = useState<(typeof ENTITY_FILTERS)[number]>("all");
   const [search, setSearch] = useState("");
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  const q = useQuery({
+  const q = useInfiniteQuery({
     queryKey: ["admin-audit-logs", entity],
-    queryFn: async () => {
+    initialPageParam: 0,
+    queryFn: async ({ pageParam }) => {
+      const from = (pageParam as number) * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
       let query = supabase
         .from("audit_logs")
         .select("*")
         .order("created_at", { ascending: false })
-        .limit(500);
+        .range(from, to);
       if (entity !== "all") query = query.eq("entity_type", entity);
       const { data, error } = await query;
       if (error) throw error;
       return (data ?? []) as AuditRow[];
     },
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length < PAGE_SIZE ? undefined : allPages.length,
   });
+
+  const rows = useMemo(() => q.data?.pages.flat() ?? [], [q.data]);
 
   const filtered = useMemo(() => {
     const s = search.trim().toLowerCase();
-    const list = q.data ?? [];
-    if (!s) return list;
-    return list.filter(
+    if (!s) return rows;
+    return rows.filter(
       (r) =>
         r.action.toLowerCase().includes(s) ||
         (r.entity_id ?? "").toLowerCase().includes(s) ||
@@ -80,7 +89,26 @@ export function AuditLogPage() {
           .toLowerCase()
           .includes(s),
     );
-  }, [q.data, search]);
+  }, [rows, search]);
+
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0]?.isIntersecting &&
+          q.hasNextPage &&
+          !q.isFetchingNextPage
+        ) {
+          void q.fetchNextPage();
+        }
+      },
+      { rootMargin: "200px" },
+    );
+    io.observe(node);
+    return () => io.disconnect();
+  }, [q.hasNextPage, q.isFetchingNextPage, q.fetchNextPage, q]);
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 p-6">
@@ -131,51 +159,67 @@ export function AuditLogPage() {
               No audit entries
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>When</TableHead>
-                  <TableHead>Action</TableHead>
-                  <TableHead>Entity</TableHead>
-                  <TableHead>Entity ID</TableHead>
-                  <TableHead>Operator</TableHead>
-                  <TableHead>Reason / Details</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.map((r) => {
-                  const meta = (r.metadata ?? {}) as Record<string, unknown>;
-                  const reason =
-                    typeof meta.reason === "string" ? meta.reason : null;
-                  return (
-                    <TableRow key={r.id}>
-                      <TableCell className="text-muted-foreground text-xs whitespace-nowrap">
-                        {fmt(r.created_at)}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{r.action}</Badge>
-                      </TableCell>
-                      <TableCell className="text-xs">{r.entity_type}</TableCell>
-                      <TableCell className="font-mono text-xs">
-                        {r.entity_id ? r.entity_id.slice(0, 8) + "…" : "—"}
-                      </TableCell>
-                      <TableCell className="font-mono text-xs">
-                        {r.actor_id ? r.actor_id.slice(0, 8) + "…" : "system"}
-                      </TableCell>
-                      <TableCell className="max-w-[420px] text-xs">
-                        {reason ? (
-                          <div className="whitespace-pre-wrap">{reason}</div>
-                        ) : (
-                          <code className="text-muted-foreground text-[11px]">
-                            {JSON.stringify(meta)}
-                          </code>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+            <>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>When</TableHead>
+                    <TableHead>Action</TableHead>
+                    <TableHead>Entity</TableHead>
+                    <TableHead>Entity ID</TableHead>
+                    <TableHead>Operator</TableHead>
+                    <TableHead>Reason / Details</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filtered.map((r) => {
+                    const meta = (r.metadata ?? {}) as Record<string, unknown>;
+                    const reason =
+                      typeof meta.reason === "string" ? meta.reason : null;
+                    return (
+                      <TableRow key={r.id}>
+                        <TableCell className="text-muted-foreground text-xs whitespace-nowrap">
+                          {fmt(r.created_at)}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{r.action}</Badge>
+                        </TableCell>
+                        <TableCell className="text-xs">{r.entity_type}</TableCell>
+                        <TableCell className="font-mono text-xs">
+                          {r.entity_id ? r.entity_id.slice(0, 8) + "…" : "—"}
+                        </TableCell>
+                        <TableCell className="font-mono text-xs">
+                          {r.actor_id ? r.actor_id.slice(0, 8) + "…" : "system"}
+                        </TableCell>
+                        <TableCell className="max-w-[420px] text-xs">
+                          {reason ? (
+                            <div className="whitespace-pre-wrap">{reason}</div>
+                          ) : (
+                            <code className="text-muted-foreground text-[11px]">
+                              {JSON.stringify(meta)}
+                            </code>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+              <div
+                ref={sentinelRef}
+                className="text-muted-foreground flex items-center justify-center p-4 text-xs"
+              >
+                {q.isFetchingNextPage ? (
+                  <span className="inline-flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" /> Loading more…
+                  </span>
+                ) : q.hasNextPage ? (
+                  "Scroll to load more"
+                ) : (
+                  `End of log — ${rows.length} entries`
+                )}
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
