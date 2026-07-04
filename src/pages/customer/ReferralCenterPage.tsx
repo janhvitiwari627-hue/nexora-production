@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { PublicHeader } from "@/components/layout/PublicHeader";
 import { PublicFooter } from "@/components/layout/PublicFooter";
 import { MyReferralsSection } from "@/components/referral/MyReferralsSection";
+import { useAuthStore } from "@/stores/authStore";
 import {
   mockReferralCode,
   mockReferralLink,
@@ -27,6 +28,9 @@ import {
   mockReferrals,
   type ReferralStatus,
 } from "./referral/mockReferral";
+
+const ORIGIN =
+  typeof window !== "undefined" ? window.location.origin : "https://meripahalfasthelp.online";
 
 const STATUS: Record<ReferralStatus, { label: string; classes: string }> = {
   joined: { label: "Joined", classes: "bg-sky-100 text-sky-700" },
