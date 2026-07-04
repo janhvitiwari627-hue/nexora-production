@@ -204,13 +204,13 @@ export function PaymentManagementPage() {
 
   const setWithdrawalStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string; reason?: string }) => {
-      const patch: Record<string, unknown> = {
+      const patch: { status: string; updated_at: string; processed_at?: string } = {
         status,
         updated_at: new Date().toISOString(),
-        ...(status === "COMPLETED" || status === "REJECTED"
-          ? { processed_at: new Date().toISOString() }
-          : {}),
       };
+      if (status === "COMPLETED" || status === "REJECTED") {
+        patch.processed_at = new Date().toISOString();
+      }
       const { error } = await supabase.from("withdrawals").update(patch).eq("id", id);
       if (error) throw error;
     },
