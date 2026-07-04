@@ -85,7 +85,7 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     });
     expect(new URL(page.url()).pathname).not.toMatch(/^\/login$/);
 
-  for (const target of ["/owner/bookings", "/partner/dashboard"]) {
+  for (const target of ["/dashboard", "/owner/bookings", "/partner/dashboard"]) {
     test(`pending redirect key for ${target} is consumed exactly once and not reused on next /login`, async ({ page }) => {
       await seedSession(page);
       await page.evaluate(
