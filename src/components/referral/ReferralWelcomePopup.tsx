@@ -70,7 +70,7 @@ export function ReferralWelcomePopup() {
             <div>
               <DialogHeader className="space-y-0.5">
                 <DialogTitle className="text-white text-lg font-bold">
-                  Refer & Earn ₹100 per friend
+                  Refer & Earn 100 points per friend
                 </DialogTitle>
                 <DialogDescription className="text-white/85 text-xs">
                   Share your link — friends sign up & build their own salon website.
