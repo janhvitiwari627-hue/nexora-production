@@ -168,7 +168,10 @@ export function PaymentManagementPage() {
 
   const markPaymentStatus = useMutation({
     mutationFn: async ({ id, status, reason }: { id: string; status: string; reason?: string }) => {
-      const patch: Record<string, unknown> = { status, processed_at: new Date().toISOString() };
+      const patch: { status: string; processed_at: string; failure_reason?: string } = {
+        status,
+        processed_at: new Date().toISOString(),
+      };
       if (reason) patch.failure_reason = reason;
       const { error } = await supabase.from("payments").update(patch).eq("id", id);
       if (error) throw error;
