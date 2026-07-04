@@ -642,7 +642,69 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     expect(pendingFinal).toBeNull();
     expect(new URL(page.url()).pathname).not.toMatch(/^\/login$/);
   });
+
+  test("direct navigation to the stashed target after consume does not restore a stale pending redirect", async ({ page }) => {
+    const TARGET = "/owner/bookings";
+
+    await seedSession(page);
+    await page.evaluate(
+      ([k, v]) => window.sessionStorage.setItem(k as string, v as string),
+      [PENDING_KEY, TARGET],
+    );
+
+    // Consume the key via /login.
+    await page.goto("/login");
+    const escaped = TARGET.replace(/\//g, "\\/");
+    await page.waitForURL(new RegExp(`${escaped}(\\/|$)`), { timeout: 10_000 });
+    expect(new URL(page.url()).pathname).toBe(TARGET);
+    const afterConsume = await page.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    expect(afterConsume).toBeNull();
+
+    // Navigate somewhere else so the next direct hit to TARGET is a fresh nav.
+    await page.goto("/");
+    await page.waitForLoadState("domcontentloaded");
+    const pendingBeforeDirect = await page.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    expect(pendingBeforeDirect).toBeNull();
+
+    // Directly navigate to the previously-stashed URL. This is a normal
+    // authenticated route hit — the guard must NOT write the pending key
+    // back into sessionStorage, and no /login bounce should occur.
+    await page.goto(TARGET);
+    await page.waitForLoadState("domcontentloaded");
+    expect(new URL(page.url()).pathname).toBe(TARGET);
+
+    const pendingAfterDirect = await page.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    expect(pendingAfterDirect).toBeNull();
+
+    // Now visit /login again: with no stash, it must fall through to the
+    // role-based default — NOT resurrect the previously-consumed TARGET.
+    await page.goto("/login");
+    await page.waitForFunction(
+      () => !/\/login$/.test(window.location.pathname),
+      null,
+      { timeout: 10_000 },
+    );
+    const landed = new URL(page.url()).pathname;
+    expect(landed).not.toBe(TARGET);
+    expect(landed).not.toMatch(/^\/login$/);
+
+    const pendingFinal = await page.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    expect(pendingFinal).toBeNull();
+  });
 });
+
 
 
 
