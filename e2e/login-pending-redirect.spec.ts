@@ -584,7 +584,66 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     expect(pendingFinal).toBeNull();
     expect(new URL(page.url()).pathname).not.toBe(TARGET);
   });
+
+  test("browser Forward after consuming the pending key does not reuse the stale target", async ({ page }) => {
+    const TARGET = "/owner/bookings";
+
+    await seedSession(page);
+    await page.evaluate(
+      ([k, v]) => window.sessionStorage.setItem(k as string, v as string),
+      [PENDING_KEY, TARGET],
+    );
+
+    // Build history: "/" -> "/login" -> TARGET (consumed) -> Back to /login
+    // (which falls through to a role-based default). Then press Forward.
+    await page.goto("/");
+    await page.goto("/login");
+    const escaped = TARGET.replace(/\//g, "\\/");
+    await page.waitForURL(new RegExp(`${escaped}(\\/|$)`), { timeout: 10_000 });
+    expect(new URL(page.url()).pathname).toBe(TARGET);
+    const afterConsume = await page.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    expect(afterConsume).toBeNull();
+
+    // Go Back — should land on the role-based default (not /login, not TARGET).
+    await page.goBack();
+    await page.waitForFunction(
+      () => !/\/login$/.test(window.location.pathname),
+      null,
+      { timeout: 10_000 },
+    );
+    const backLanded = new URL(page.url()).pathname;
+    expect(backLanded).not.toBe(TARGET);
+    expect(backLanded).not.toMatch(/^\/login$/);
+
+    // Now press Forward. The forward entry in history is TARGET itself —
+    // history navigation may replay it, which is fine because the URL was
+    // reached via a legitimate consume. What MUST NOT happen: a stale
+    // pending key resurrects and forces another redirect after Forward.
+    await page.goForward();
+    await page.waitForLoadState("domcontentloaded");
+
+    // Pending key must remain null across Forward.
+    const pendingAfterForward = await page.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    expect(pendingAfterForward).toBeNull();
+
+    // Forward once more (may be a no-op if history is exhausted). Either way,
+    // the pending key must stay cleared and we must not be stuck on /login.
+    await page.goForward().catch(() => {});
+    const pendingFinal = await page.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    expect(pendingFinal).toBeNull();
+    expect(new URL(page.url()).pathname).not.toMatch(/^\/login$/);
+  });
 });
+
 
 
 
