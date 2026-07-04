@@ -219,6 +219,7 @@ export default function SignupPage() {
       if (session) {
         useAuthStore.getState().setSession(session);
         await useAuthStore.getState().refreshProfile();
+        try { window.sessionStorage.removeItem("nexora_pending_ref"); } catch { /* ignore */ }
         setSuccess("signed_in");
         const redirectTo = await resolvePostLoginRedirect(session.user.id);
         setTimeout(() => navigate({ to: redirectTo, replace: true }), 600);
