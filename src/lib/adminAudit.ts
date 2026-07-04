@@ -1,4 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+
+type Json = Database["public"]["Tables"]["audit_logs"]["Insert"]["metadata"];
 
 export type AdminAuditAction =
   | "approve"
