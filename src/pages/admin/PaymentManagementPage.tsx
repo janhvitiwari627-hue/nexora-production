@@ -23,6 +23,7 @@ import { Label } from "@/components/ui/label";
 import { Check, X, RefreshCcw, Search, Loader2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { recordAdminAction } from "@/lib/adminAudit";
 import type { Database } from "@/integrations/supabase/types";
 
 // ---------- Typed update payload helpers ----------
@@ -202,6 +203,12 @@ export function PaymentManagementPage() {
         .update(buildRefundPayload(reason))
         .eq("id", id);
       if (error) throw error;
+      await recordAdminAction({
+        action: "refund",
+        entity: "payment",
+        entityId: id,
+        reason,
+      });
     },
     onSuccess: () => {
       toast.success("Payment refunded");
@@ -226,6 +233,18 @@ export function PaymentManagementPage() {
         .update(buildPaymentStatusPayload(status, reason))
         .eq("id", id);
       if (error) throw error;
+      await recordAdminAction({
+        action:
+          status === "SUCCESS"
+            ? "mark_success"
+            : status === "FAILED"
+              ? "mark_failed"
+              : "adjust",
+        entity: "payment",
+        entityId: id,
+        reason,
+        details: { status },
+      });
     },
     onSuccess: (_d, v) => {
       toast.success(`Marked ${v.status}`);
@@ -238,6 +257,7 @@ export function PaymentManagementPage() {
     mutationFn: async ({
       id,
       status,
+      reason,
     }: {
       id: string;
       status: PendingStatus;
@@ -248,6 +268,12 @@ export function PaymentManagementPage() {
         .update(buildPendingStatusPayload(status))
         .eq("id", id);
       if (error) throw error;
+      await recordAdminAction({
+        action: status === "approved" ? "approve" : "reject",
+        entity: "pending_payment",
+        entityId: id,
+        reason,
+      });
     },
     onSuccess: (_d, v) => {
       toast.success(
@@ -264,6 +290,7 @@ export function PaymentManagementPage() {
     mutationFn: async ({
       id,
       status,
+      reason,
     }: {
       id: string;
       status: WithdrawalStatus;
@@ -274,6 +301,18 @@ export function PaymentManagementPage() {
         .update(buildWithdrawalStatusPayload(status))
         .eq("id", id);
       if (error) throw error;
+      await recordAdminAction({
+        action:
+          status === "REJECTED"
+            ? "reject"
+            : status === "COMPLETED"
+              ? "mark_paid"
+              : "approve",
+        entity: "withdrawal",
+        entityId: id,
+        reason,
+        details: { status },
+      });
     },
     onSuccess: (_d, v) => {
       toast.success(`Withdrawal ${v.status.toLowerCase()}${v.reason ? " — reason recorded" : ""}`);
