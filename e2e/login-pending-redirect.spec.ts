@@ -534,7 +534,58 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
 
     await context.close();
   });
+
+  test("browser Back after consuming the pending key does not reuse the stale target", async ({ page }) => {
+    const TARGET = "/owner/bookings";
+
+    await seedSession(page);
+    await page.evaluate(
+      ([k, v]) => window.sessionStorage.setItem(k as string, v as string),
+      [PENDING_KEY, TARGET],
+    );
+
+    // Build history: "/" -> "/login" -> TARGET (consumed).
+    await page.goto("/");
+    await page.goto("/login");
+    const escaped = TARGET.replace(/\//g, "\\/");
+    await page.waitForURL(new RegExp(`${escaped}(\\/|$)`), { timeout: 10_000 });
+    expect(new URL(page.url()).pathname).toBe(TARGET);
+    const afterConsume = await page.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    expect(afterConsume).toBeNull();
+
+    // Press browser Back — previous entry is /login. If the consumer
+    // resurrects the stale key, it would bounce us back to TARGET.
+    // Correct behavior: /login falls through to the role-based default.
+    await page.goBack();
+    await page.waitForFunction(
+      () => !/\/login$/.test(window.location.pathname),
+      null,
+      { timeout: 10_000 },
+    );
+    const landed = new URL(page.url()).pathname;
+    expect(landed).not.toBe(TARGET);
+    expect(landed).not.toMatch(/^\/login$/);
+
+    const pendingAfterBack = await page.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    expect(pendingAfterBack).toBeNull();
+
+    // Back once more — no resurrection on subsequent navigations either.
+    await page.goBack().catch(() => {});
+    const pendingFinal = await page.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    expect(pendingFinal).toBeNull();
+    expect(new URL(page.url()).pathname).not.toBe(TARGET);
+  });
 });
+
 
 
 
