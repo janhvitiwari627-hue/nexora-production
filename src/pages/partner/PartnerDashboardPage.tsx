@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import {
   ArrowUpRight,
   BadgeCheck,
-  Briefcase,
-  CalendarCheck,
   CalendarClock,
   CheckCircle2,
   Clock,
@@ -18,42 +18,11 @@ import {
 } from "lucide-react";
 import type { ComponentType } from "react";
 import { PartnerPageShell } from "./PartnerAppLayout";
+import { getPartnerOverview } from "@/lib/partner.functions";
 
-type Overview = {
-  icon: ComponentType<{ className?: string }>;
-  label: string;
-  value: string;
-  hint: string;
-  accent: string;
-  iconClass: string;
-};
+const inr = (n: number) =>
+  new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(n);
 
-const OVERVIEW: Overview[] = [
-  {
-    icon: CalendarCheck,
-    label: "Appointments",
-    value: "—",
-    hint: "Coming soon",
-    accent: "from-[#4F46E5]/10 to-[#6366F1]/5",
-    iconClass: "bg-[#EEF2FF] text-[#4F46E5]",
-  },
-  {
-    icon: Briefcase,
-    label: "Jobs",
-    value: "—",
-    hint: "Coming soon",
-    accent: "from-[#0EA5E9]/10 to-[#38BDF8]/5",
-    iconClass: "bg-[#DBEAFE] text-[#1D4ED8]",
-  },
-  {
-    icon: IndianRupee,
-    label: "Earnings",
-    value: "₹0",
-    hint: "This month",
-    accent: "from-[#16A34A]/10 to-[#22C55E]/5",
-    iconClass: "bg-[#DCFCE7] text-[#16A34A]",
-  },
-];
 
 
 type Kpi = {
@@ -96,6 +65,46 @@ const MILESTONES = [
 
 export function PartnerDashboardPage() {
   const progressPct = 92;
+  const fetchOverview = useServerFn(getPartnerOverview);
+  const { data: overview, isLoading } = useQuery({
+    queryKey: ["partner", "overview"],
+    queryFn: () => fetchOverview({}),
+    staleTime: 30_000,
+  });
+
+  const cards: Array<{
+    icon: ComponentType<{ className?: string }>;
+    label: string;
+    value: string;
+    hint: string;
+    accent: string;
+    iconClass: string;
+  }> = [
+    {
+      icon: Store,
+      label: "Active Shops",
+      value: isLoading ? "…" : String(overview?.activeShops ?? 0),
+      hint: `${overview?.totalShops ?? 0} total`,
+      accent: "from-[#4F46E5]/10 to-[#6366F1]/5",
+      iconClass: "bg-[#EEF2FF] text-[#4F46E5]",
+    },
+    {
+      icon: Wallet,
+      label: "Pending Earnings",
+      value: isLoading ? "…" : `₹${inr(overview?.pendingEarnings ?? 0)}`,
+      hint: "Clearing",
+      accent: "from-[#0EA5E9]/10 to-[#38BDF8]/5",
+      iconClass: "bg-[#DBEAFE] text-[#1D4ED8]",
+    },
+    {
+      icon: IndianRupee,
+      label: "Lifetime Earnings",
+      value: isLoading ? "…" : `₹${inr(overview?.lifetimeEarnings ?? 0)}`,
+      hint: `₹${inr(overview?.currentMonthPayout ?? 0)} this month`,
+      accent: "from-[#16A34A]/10 to-[#22C55E]/5",
+      iconClass: "bg-[#DCFCE7] text-[#16A34A]",
+    },
+  ];
 
   return (
     <PartnerPageShell
@@ -103,9 +112,10 @@ export function PartnerDashboardPage() {
       subtitle="Aapke district ki growth ek jagah."
       icon={LayoutDashboard}
     >
-      {/* Overview cards — appointments / jobs / earnings */}
+      {/* Overview cards — live partner metrics */}
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {OVERVIEW.map((o, i) => (
+        {cards.map((o, i) => (
+
           <motion.div
             key={o.label}
             initial={{ opacity: 0, y: 10 }}
