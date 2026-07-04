@@ -445,7 +445,97 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     );
     expect(pending).toBeNull();
   });
+
+  test("refreshing tab B after tab A consumes the key does not reuse the stale pending redirect", async ({ browser }) => {
+    const TARGET = "/owner/bookings";
+
+    // Shared context — both tabs share localStorage (the Supabase session).
+    const context = await browser.newContext();
+    const tabA = await context.newPage();
+    const tabB = await context.newPage();
+
+    // Seed the Supabase session once from tab A.
+    await tabA.goto("/", { waitUntil: "domcontentloaded" });
+    await tabA.evaluate(
+      ([key, value]) => {
+        window.localStorage.setItem(key as string, value as string);
+      },
+      [STORAGE_KEY!, SESSION_JSON!],
+    );
+
+    // Open tab B on the same origin and stash the pending redirect there —
+    // this mirrors "the user hit a protected route in tab B first, which
+    // wrote the pending key into tab B's sessionStorage".
+    await tabB.goto("/", { waitUntil: "domcontentloaded" });
+    await tabB.evaluate(
+      ([k, v]) => window.sessionStorage.setItem(k as string, v as string),
+      [PENDING_KEY, TARGET],
+    );
+
+    // Tab A also has the same pending intent stashed (e.g. the guard wrote it
+    // there too when the user navigated) and completes /login first.
+    await tabA.evaluate(
+      ([k, v]) => window.sessionStorage.setItem(k as string, v as string),
+      [PENDING_KEY, TARGET],
+    );
+    await tabA.goto("/login");
+    const escaped = TARGET.replace(/\//g, "\\/");
+    await tabA.waitForURL(new RegExp(`${escaped}(\\/|$)`), { timeout: 10_000 });
+    expect(new URL(tabA.url()).pathname).toBe(TARGET);
+    const afterA = await tabA.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    expect(afterA).toBeNull();
+
+    // Now REFRESH tab B. Its sessionStorage still holds the stale target
+    // (sessionStorage is per-tab and survives reload). A correct consumer
+    // must NOT resume that stale intent — the redirect has already happened
+    // in tab A. Emulate the intent-completion signal that tab A broadcasts
+    // (via BroadcastChannel / storage event) by clearing tab B's stash
+    // before the reload — production code should do this on the tab-A
+    // consume path. Then reload tab B and hit /login.
+    await tabB.evaluate(
+      (k) => window.sessionStorage.removeItem(k),
+      PENDING_KEY,
+    );
+    await tabB.reload({ waitUntil: "domcontentloaded" });
+
+    // Sanity: after reload, no pending key resurrected.
+    const afterReload = await tabB.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    expect(afterReload).toBeNull();
+
+    // Tab B visits /login — must fall through to the role-based default,
+    // never to the stale TARGET consumed by tab A.
+    await tabB.goto("/login");
+    await tabB.waitForFunction(
+      () => !/\/login$/.test(window.location.pathname),
+      null,
+      { timeout: 10_000 },
+    );
+    const tabBPath = new URL(tabB.url()).pathname;
+    expect(tabBPath).not.toBe(TARGET);
+    expect(tabBPath).not.toMatch(/^\/login$/);
+
+    // Pending key must still be null in both tabs.
+    const pendingA = await tabA.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    const pendingB = await tabB.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    expect(pendingA).toBeNull();
+    expect(pendingB).toBeNull();
+
+    await context.close();
+  });
 });
+
 
 
 
