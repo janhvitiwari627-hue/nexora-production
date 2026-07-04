@@ -115,6 +115,18 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
       expect(secondPath).not.toBe(target);
       expect(secondPath).not.toMatch(/^\/login$/);
 
+      // For /dashboard specifically, assert we land on the exact role-based
+      // default from resolvePostLoginRedirect — configurable per test env so
+      // it matches the seeded user's role (e.g. "/" for customer,
+      // "/owner/dashboard" for owner, "/partner/dashboard" for partner,
+      // "/admin/dashboard" for admin). Defaults to "/" (customer fallback).
+      if (target === "/dashboard") {
+        const expectedDefault =
+          process.env.LOVABLE_BROWSER_DEFAULT_REDIRECT ?? "/";
+        expect(secondPath).toBe(expectedDefault);
+      }
+
+
       // Key remains cleared — no ghost value written back by the resume flow.
       const afterSecond = await page.evaluate(
         (k) => window.sessionStorage.getItem(k),
