@@ -119,6 +119,7 @@ import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminRewardsRouteImport } from './routes/admin.rewards'
 import { Route as AdminReviewsRouteImport } from './routes/admin.reviews'
 import { Route as AdminRankingsRouteImport } from './routes/admin.rankings'
+import { Route as AdminProfileRouteImport } from './routes/admin.profile'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminPartnerApplicationsRouteImport } from './routes/admin.partner-applications'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
@@ -697,6 +698,11 @@ const AdminRankingsRoute = AdminRankingsRouteImport.update({
   path: '/rankings',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminProfileRoute = AdminProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
   id: '/payments',
   path: '/payments',
@@ -881,6 +887,7 @@ export interface FileRoutesByFullPath {
   '/admin/login': typeof AdminLoginRoute
   '/admin/partner-applications': typeof AdminPartnerApplicationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/profile': typeof AdminProfileRoute
   '/admin/rankings': typeof AdminRankingsRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/rewards': typeof AdminRewardsRoute
@@ -1016,6 +1023,7 @@ export interface FileRoutesByTo {
   '/admin/login': typeof AdminLoginRoute
   '/admin/partner-applications': typeof AdminPartnerApplicationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/profile': typeof AdminProfileRoute
   '/admin/rankings': typeof AdminRankingsRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/rewards': typeof AdminRewardsRoute
@@ -1156,6 +1164,7 @@ export interface FileRoutesById {
   '/admin/login': typeof AdminLoginRoute
   '/admin/partner-applications': typeof AdminPartnerApplicationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/profile': typeof AdminProfileRoute
   '/admin/rankings': typeof AdminRankingsRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/rewards': typeof AdminRewardsRoute
@@ -1297,6 +1306,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/partner-applications'
     | '/admin/payments'
+    | '/admin/profile'
     | '/admin/rankings'
     | '/admin/reviews'
     | '/admin/rewards'
@@ -1432,6 +1442,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/partner-applications'
     | '/admin/payments'
+    | '/admin/profile'
     | '/admin/rankings'
     | '/admin/reviews'
     | '/admin/rewards'
@@ -1571,6 +1582,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/admin/partner-applications'
     | '/admin/payments'
+    | '/admin/profile'
     | '/admin/rankings'
     | '/admin/reviews'
     | '/admin/rewards'
@@ -2520,6 +2532,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRankingsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/profile': {
+      id: '/admin/profile'
+      path: '/profile'
+      fullPath: '/admin/profile'
+      preLoaderRoute: typeof AdminProfileRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/payments': {
       id: '/admin/payments'
       path: '/payments'
@@ -2722,6 +2741,7 @@ interface AdminRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   AdminPartnerApplicationsRoute: typeof AdminPartnerApplicationsRoute
   AdminPaymentsRoute: typeof AdminPaymentsRoute
+  AdminProfileRoute: typeof AdminProfileRoute
   AdminRankingsRoute: typeof AdminRankingsRoute
   AdminReviewsRoute: typeof AdminReviewsRoute
   AdminRewardsRoute: typeof AdminRewardsRoute
@@ -2740,6 +2760,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   AdminPartnerApplicationsRoute: AdminPartnerApplicationsRoute,
   AdminPaymentsRoute: AdminPaymentsRoute,
+  AdminProfileRoute: AdminProfileRoute,
   AdminRankingsRoute: AdminRankingsRoute,
   AdminReviewsRoute: AdminReviewsRoute,
   AdminRewardsRoute: AdminRewardsRoute,
