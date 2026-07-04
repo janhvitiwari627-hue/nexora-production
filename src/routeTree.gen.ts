@@ -69,6 +69,7 @@ import { Route as PartnerMilestonesRouteImport } from './routes/partner.mileston
 import { Route as PartnerLeadsRouteImport } from './routes/partner.leads'
 import { Route as PartnerDashboardRouteImport } from './routes/partner.dashboard'
 import { Route as PartnerCommissionRouteImport } from './routes/partner.commission'
+import { Route as OwnerWelcomeRouteImport } from './routes/owner.welcome'
 import { Route as OwnerWebsiteRouteImport } from './routes/owner.website'
 import { Route as OwnerTemplatesRouteImport } from './routes/owner.templates'
 import { Route as OwnerStaffRouteImport } from './routes/owner.staff'
@@ -447,6 +448,11 @@ const PartnerCommissionRoute = PartnerCommissionRouteImport.update({
   id: '/commission',
   path: '/commission',
   getParentRoute: () => PartnerRoute,
+} as any)
+const OwnerWelcomeRoute = OwnerWelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
+  getParentRoute: () => OwnerRoute,
 } as any)
 const OwnerWebsiteRoute = OwnerWebsiteRouteImport.update({
   id: '/website',
@@ -938,6 +944,7 @@ export interface FileRoutesByFullPath {
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
+  '/owner/welcome': typeof OwnerWelcomeRoute
   '/partner/commission': typeof PartnerCommissionRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
   '/partner/leads': typeof PartnerLeadsRoute
@@ -1074,6 +1081,7 @@ export interface FileRoutesByTo {
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
+  '/owner/welcome': typeof OwnerWelcomeRoute
   '/partner/commission': typeof PartnerCommissionRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
   '/partner/leads': typeof PartnerLeadsRoute
@@ -1215,6 +1223,7 @@ export interface FileRoutesById {
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
+  '/owner/welcome': typeof OwnerWelcomeRoute
   '/partner/commission': typeof PartnerCommissionRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
   '/partner/leads': typeof PartnerLeadsRoute
@@ -1357,6 +1366,7 @@ export interface FileRouteTypes {
     | '/owner/staff'
     | '/owner/templates'
     | '/owner/website'
+    | '/owner/welcome'
     | '/partner/commission'
     | '/partner/dashboard'
     | '/partner/leads'
@@ -1493,6 +1503,7 @@ export interface FileRouteTypes {
     | '/owner/staff'
     | '/owner/templates'
     | '/owner/website'
+    | '/owner/welcome'
     | '/partner/commission'
     | '/partner/dashboard'
     | '/partner/leads'
@@ -1633,6 +1644,7 @@ export interface FileRouteTypes {
     | '/owner/staff'
     | '/owner/templates'
     | '/owner/website'
+    | '/owner/welcome'
     | '/partner/commission'
     | '/partner/dashboard'
     | '/partner/leads'
@@ -2181,6 +2193,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/partner/commission'
       preLoaderRoute: typeof PartnerCommissionRouteImport
       parentRoute: typeof PartnerRoute
+    }
+    '/owner/welcome': {
+      id: '/owner/welcome'
+      path: '/welcome'
+      fullPath: '/owner/welcome'
+      preLoaderRoute: typeof OwnerWelcomeRouteImport
+      parentRoute: typeof OwnerRoute
     }
     '/owner/website': {
       id: '/owner/website'
@@ -2853,6 +2872,7 @@ interface OwnerRouteChildren {
   OwnerStaffRoute: typeof OwnerStaffRoute
   OwnerTemplatesRoute: typeof OwnerTemplatesRoute
   OwnerWebsiteRoute: typeof OwnerWebsiteRoute
+  OwnerWelcomeRoute: typeof OwnerWelcomeRoute
   OwnerIndexRoute: typeof OwnerIndexRoute
 }
 
@@ -2877,6 +2897,7 @@ const OwnerRouteChildren: OwnerRouteChildren = {
   OwnerStaffRoute: OwnerStaffRoute,
   OwnerTemplatesRoute: OwnerTemplatesRoute,
   OwnerWebsiteRoute: OwnerWebsiteRoute,
+  OwnerWelcomeRoute: OwnerWelcomeRoute,
   OwnerIndexRoute: OwnerIndexRoute,
 }
 
