@@ -85,39 +85,44 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     });
     expect(new URL(page.url()).pathname).not.toMatch(/^\/login$/);
 
-  test("pending redirect key is consumed exactly once and not reused on next /login", async ({ page }) => {
-    await seedSession(page);
-    await page.evaluate(
-      ([k, v]) => window.sessionStorage.setItem(k as string, v as string),
-      [PENDING_KEY, "/owner/bookings"],
-    );
+  for (const target of ["/owner/bookings", "/partner/dashboard"]) {
+    test(`pending redirect key for ${target} is consumed exactly once and not reused on next /login`, async ({ page }) => {
+      await seedSession(page);
+      await page.evaluate(
+        ([k, v]) => window.sessionStorage.setItem(k as string, v as string),
+        [PENDING_KEY, target],
+      );
 
-    // First /login visit: consumes the stash and lands on the target.
-    await page.goto("/login");
-    await page.waitForURL(/\/owner\/bookings(\/|$)/, { timeout: 10_000 });
-    const afterFirst = await page.evaluate(
-      (k) => window.sessionStorage.getItem(k),
-      PENDING_KEY,
-    );
-    expect(afterFirst).toBeNull();
+      // First /login visit: consumes the stash and lands on the target.
+      const escaped = target.replace(/\//g, "\\/");
+      await page.goto("/login");
+      await page.waitForURL(new RegExp(`${escaped}(\\/|$)`), { timeout: 10_000 });
+      expect(new URL(page.url()).pathname).toBe(target);
+      const afterFirst = await page.evaluate(
+        (k) => window.sessionStorage.getItem(k),
+        PENDING_KEY,
+      );
+      expect(afterFirst).toBeNull();
 
-    // Second /login visit: no stash present → role-based default, NOT the previous target.
-    await page.goto("/login");
-    await page.waitForFunction(
-      () => !/\/login$/.test(window.location.pathname),
-      null,
-      { timeout: 10_000 },
-    );
-    const secondPath = new URL(page.url()).pathname;
-    expect(secondPath).not.toBe("/owner/bookings");
-    expect(secondPath).not.toMatch(/^\/login$/);
+      // Second /login visit: no stash present → role-based default, NOT the previous target.
+      await page.goto("/login");
+      await page.waitForFunction(
+        () => !/\/login$/.test(window.location.pathname),
+        null,
+        { timeout: 10_000 },
+      );
+      const secondPath = new URL(page.url()).pathname;
+      expect(secondPath).not.toBe(target);
+      expect(secondPath).not.toMatch(/^\/login$/);
 
-    // Key remains cleared — no ghost value written back by the resume flow.
-    const afterSecond = await page.evaluate(
-      (k) => window.sessionStorage.getItem(k),
-      PENDING_KEY,
-    );
-    expect(afterSecond).toBeNull();
-  });
+      // Key remains cleared — no ghost value written back by the resume flow.
+      const afterSecond = await page.evaluate(
+        (k) => window.sessionStorage.getItem(k),
+        PENDING_KEY,
+      );
+      expect(afterSecond).toBeNull();
+    });
+  }
 });
+
 
