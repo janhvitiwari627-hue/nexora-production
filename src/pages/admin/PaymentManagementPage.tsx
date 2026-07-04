@@ -36,7 +36,7 @@ type WithdrawalUpdate = Database["public"]["Tables"]["withdrawals"]["Update"];
 
 type PaymentStatus = "CREATED" | "PENDING" | "SUCCESS" | "FAILED" | "REFUNDED" | "CANCELLED";
 type PendingStatus = "approved" | "rejected";
-type WithdrawalStatus = "PENDING" | "APPROVED" | "COMPLETED" | "REJECTED";
+type WithdrawalStatus = "PENDING" | "APPROVED" | "PROCESSING" | "COMPLETED" | "REJECTED";
 
 function buildRefundPayload(reason: string): PaymentUpdate {
   return {
