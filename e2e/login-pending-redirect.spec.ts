@@ -25,7 +25,13 @@ async function seedSession(page: Page) {
 }
 
 test.describe("Login — pending redirect stash (anonymous)", () => {
-  for (const target of ["/dashboard", "/partner/dashboard"]) {
+  for (const target of [
+    "/dashboard",
+    "/partner/dashboard",
+    "/owner/dashboard",
+    "/owner/bookings",
+    "/owner/analytics",
+  ]) {
     test(`hitting ${target} unauthenticated redirects to /login and stashes the path`, async ({ page }) => {
       await page.goto(target);
       await page.waitForURL(/\/login/);
@@ -44,26 +50,27 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     "Supabase session env vars not present; skipping authenticated resume test.",
   );
 
-  test("signed-in user landing on /login is redirected to the stashed path", async ({ page }) => {
-    await seedSession(page);
-    await page.evaluate(
-      ([k, v]) => window.sessionStorage.setItem(k as string, v as string),
-      [PENDING_KEY, "/dashboard"],
-    );
+  for (const target of ["/dashboard", "/owner/dashboard", "/owner/bookings"]) {
+    test(`signed-in user landing on /login resumes stashed path ${target}`, async ({ page }) => {
+      await seedSession(page);
+      await page.evaluate(
+        ([k, v]) => window.sessionStorage.setItem(k as string, v as string),
+        [PENDING_KEY, target],
+      );
 
-    await page.goto("/login");
-    // Login page detects the existing session, calls resolvePostLoginRedirect,
-    // and navigates to the stashed path.
-    await page.waitForURL(/\/dashboard(\/|$)/, { timeout: 10_000 });
-    expect(new URL(page.url()).pathname).toMatch(/^\/dashboard/);
+      await page.goto("/login");
+      const escaped = target.replace(/\//g, "\\/");
+      await page.waitForURL(new RegExp(`${escaped}(\\/|$)`), { timeout: 10_000 });
+      expect(new URL(page.url()).pathname).toBe(target);
 
-    // Pending key must be consumed exactly once.
-    const pending = await page.evaluate(
-      (k) => window.sessionStorage.getItem(k),
-      PENDING_KEY,
-    );
-    expect(pending).toBeNull();
-  });
+      // Pending key must be consumed exactly once.
+      const pending = await page.evaluate(
+        (k) => window.sessionStorage.getItem(k),
+        PENDING_KEY,
+      );
+      expect(pending).toBeNull();
+    });
+  }
 
   test("without a stashed path, signed-in user gets role-based redirect (not /login)", async ({ page }) => {
     await seedSession(page);
