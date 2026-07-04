@@ -142,8 +142,79 @@ export function ReferralWelcomePopup() {
               Later
             </Button>
           </div>
+
+          <button
+            type="button"
+            onClick={() => setHowOpen(true)}
+            className="mx-auto flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+          >
+            <HelpCircle className="h-3.5 w-3.5" />
+            How referrals work
+          </button>
         </div>
       </DialogContent>
+
+      <Dialog open={howOpen} onOpenChange={setHowOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <HelpCircle className="h-5 w-5 text-primary" />
+              How referrals work
+            </DialogTitle>
+            <DialogDescription>
+              Simple 4-step flow — earn 100 points every time a friend joins with your code.
+            </DialogDescription>
+          </DialogHeader>
+
+          <ol className="mt-2 space-y-3">
+            {[
+              {
+                icon: Send,
+                title: "1. Share your link or code",
+                desc: "Send your unique referral link (or code) to friends via WhatsApp, Instagram, SMS — anywhere.",
+              },
+              {
+                icon: UserPlus,
+                title: "2. Friend signs up",
+                desc: "They open your link and create their Nexora account. The code auto-applies at signup.",
+              },
+              {
+                icon: Award,
+                title: "3. You both get 100 points",
+                desc: "Points are credited instantly the moment their account is created and verified.",
+              },
+              {
+                icon: Wallet,
+                title: "4. Track & redeem",
+                desc: "See every referral (pending / converted) in your Referral Center and use points on bookings & services.",
+              },
+            ].map(({ icon: Icon, title, desc }) => (
+              <li key={title} className="flex gap-3 rounded-lg border bg-muted/30 p-3">
+                <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                  <Icon className="h-4 w-4" />
+                </div>
+                <div className="space-y-0.5">
+                  <div className="text-sm font-semibold">{title}</div>
+                  <div className="text-muted-foreground text-xs">{desc}</div>
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          <div className="rounded-md border border-primary/30 bg-primary/5 p-3 text-xs">
+            <div className="font-semibold text-primary">Where points are awarded</div>
+            <ul className="text-muted-foreground mt-1 list-disc space-y-0.5 pl-4">
+              <li>Referrer (you): +100 points on friend's successful signup</li>
+              <li>New user (friend): +100 welcome points once they sign up with your code</li>
+              <li>Status becomes <strong>Converted</strong> after their first booking</li>
+            </ul>
+          </div>
+
+          <div className="flex justify-end">
+            <Button onClick={() => setHowOpen(false)}>Got it</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }
