@@ -240,8 +240,59 @@ export function ReferralCenterPage() {
                   Share Other
                 </button>
               </div>
+
+              {/* Fallback share panel — shown when Web Share API isn't available */}
+              {showFallback && (
+                <div className="mt-3 rounded-2xl border border-dashed border-primary/40 bg-primary/5 p-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-semibold text-primary">
+                      Pick where to share
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setShowFallback(false)}
+                      className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground"
+                    >
+                      Close
+                    </button>
+                  </div>
+                  <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    <a
+                      href={telegramUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center justify-center gap-1.5 rounded-full border bg-background px-3 py-2 text-xs font-bold transition hover:border-primary/40 hover:bg-primary/5"
+                    >
+                      <Send className="h-3.5 w-3.5 text-sky-600" /> Telegram
+                    </a>
+                    <a
+                      href={twitterUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center justify-center gap-1.5 rounded-full border bg-background px-3 py-2 text-xs font-bold transition hover:border-primary/40 hover:bg-primary/5"
+                    >
+                      <Twitter className="h-3.5 w-3.5 text-sky-500" /> X / Twitter
+                    </a>
+                    <a
+                      href={facebookUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center justify-center gap-1.5 rounded-full border bg-background px-3 py-2 text-xs font-bold transition hover:border-primary/40 hover:bg-primary/5"
+                    >
+                      <Facebook className="h-3.5 w-3.5 text-blue-600" /> Facebook
+                    </a>
+                    <a
+                      href={emailUrl}
+                      className="inline-flex items-center justify-center gap-1.5 rounded-full border bg-background px-3 py-2 text-xs font-bold transition hover:border-primary/40 hover:bg-primary/5"
+                    >
+                      <Mail className="h-3.5 w-3.5 text-primary" /> Email
+                    </a>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
+
 
           {/* QR */}
           <div className="rounded-2xl border bg-card p-5 text-center shadow-sm">
