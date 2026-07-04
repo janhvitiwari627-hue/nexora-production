@@ -235,54 +235,8 @@ export function ReferralCenterPage() {
           </div>
         </section>
 
-        {/* History table */}
-        <section className="overflow-hidden rounded-2xl border bg-card shadow-sm">
-          <header className="border-b p-5">
-            <h3 className="text-sm font-bold">Referral history</h3>
-          </header>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/40 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
-                <tr>
-                  <th className="px-5 py-2.5 text-left">Friend</th>
-                  <th className="px-5 py-2.5 text-left">Date</th>
-                  <th className="px-5 py-2.5 text-right">Status</th>
-                  <th className="px-5 py-2.5 text-right">Reward</th>
-                </tr>
-              </thead>
-              <tbody>
-                {mockReferrals.map((r) => {
-                  const s = STATUS[r.status];
-                  return (
-                    <tr key={r.id} className="border-t">
-                      <td className="px-5 py-3 font-semibold">{r.friendName}</td>
-                      <td className="px-5 py-3 text-muted-foreground">
-                        {new Date(r.dateISO).toLocaleDateString("en-IN", {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </td>
-                      <td className="px-5 py-3 text-right">
-                        <span
-                          className={cn(
-                            "inline-block rounded-full px-2.5 py-1 text-[11px] font-bold",
-                            s.classes,
-                          )}
-                        >
-                          {s.label}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3 text-right font-bold text-emerald-600">
-                        {r.rewardAmount ? `+₹${r.rewardAmount}` : "—"}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        {/* Real referrals attribution */}
+        <MyReferralsSection />
       </main>
       <PublicFooter />
     </div>
