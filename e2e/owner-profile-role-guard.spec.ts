@@ -125,10 +125,10 @@ test.describe("Owner cannot open partner/admin profile edit routes", () => {
         `unexpected /dashboard/settings hop; visited=${JSON.stringify(visited)}`,
       ).toBe(false);
 
-      // Landing must be owner-appropriate.
-      expect(
-        ALLOWED_LANDINGS.some((t) => landed === t || landed.startsWith(t + "/")),
-      ).toBe(true);
+      // Landing must be EXACTLY the owner dashboard — the guard's declared
+      // owner destination. Anything else (home, login, a partner surface)
+      // means the redirect target regressed.
+      expect(landed).toBe(EXPECTED_LANDING);
     });
   }
 });
