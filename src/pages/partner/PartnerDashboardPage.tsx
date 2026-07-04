@@ -103,7 +103,33 @@ export function PartnerDashboardPage() {
       subtitle="Aapke district ki growth ek jagah."
       icon={LayoutDashboard}
     >
-      {/* KPI Grid */}
+      {/* Overview cards — appointments / jobs / earnings */}
+      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {OVERVIEW.map((o, i) => (
+          <motion.div
+            key={o.label}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05 }}
+            className={`relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br ${o.accent} p-5`}
+          >
+            <div className="flex items-center justify-between">
+              <div className={`grid h-10 w-10 place-items-center rounded-xl ${o.iconClass}`}>
+                <o.icon className="h-5 w-5" />
+              </div>
+              <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                {o.hint}
+              </span>
+            </div>
+            <div className="mt-4 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              {o.label}
+            </div>
+            <div className="mt-1 text-3xl font-black text-[#0B1330]">{o.value}</div>
+          </motion.div>
+        ))}
+      </div>
+
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {KPIS.map((s, i) => {
           const t = TONE[s.tone ?? "indigo"];
