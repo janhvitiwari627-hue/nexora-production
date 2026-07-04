@@ -40,6 +40,11 @@ const STATUS: Record<ReferralStatus, { label: string; classes: string }> = {
 };
 
 export function ReferralCenterPage() {
+  const profile = useAuthStore((s) => s.profile);
+  const referralCode = profile?.referral_code ?? mockReferralCode;
+  const referralLink = profile?.referral_code
+    ? `${ORIGIN}/signup?ref=${profile.referral_code}`
+    : mockReferralLink;
   const qrRef = useRef<HTMLDivElement>(null);
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
