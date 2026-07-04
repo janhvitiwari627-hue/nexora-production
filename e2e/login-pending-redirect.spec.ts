@@ -122,7 +122,45 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
       );
       expect(afterSecond).toBeNull();
     });
-  }
+
+  test("logout before completing redirect flow clears the pending redirect key", async ({ page }) => {
+    await seedSession(page);
+    await page.evaluate(
+      ([k, v]) => window.sessionStorage.setItem(k as string, v as string),
+      [PENDING_KEY, "/owner/bookings"],
+    );
+
+    // Land on a public page whose header shows the account menu when signed in.
+    await page.goto("/");
+    const accountMenu = page.getByRole("button", { name: "Open account menu" });
+    await accountMenu.waitFor({ state: "visible", timeout: 10_000 });
+
+    // Sanity: the pending key is still stashed at this point.
+    const beforeLogout = await page.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    expect(beforeLogout).toBe("/owner/bookings");
+
+    // Open account menu → Logout → confirm.
+    await accountMenu.click();
+    await page.getByRole("menuitem", { name: /logout/i }).click();
+    await page.getByRole("button", { name: "Logout" }).click();
+
+    // authStore.signOut() must clear sessionStorage so the stale target
+    // cannot resurrect on the next sign-in.
+    await page.waitForFunction(
+      (k) => window.sessionStorage.getItem(k) === null,
+      PENDING_KEY,
+      { timeout: 10_000 },
+    );
+    const afterLogout = await page.evaluate(
+      (k) => window.sessionStorage.getItem(k),
+      PENDING_KEY,
+    );
+    expect(afterLogout).toBeNull();
+  });
 });
+
 
 
