@@ -25,7 +25,13 @@ async function seedSession(page: Page) {
 }
 
 test.describe("Login — pending redirect stash (anonymous)", () => {
-  for (const target of ["/dashboard", "/partner/dashboard"]) {
+  for (const target of [
+    "/dashboard",
+    "/partner/dashboard",
+    "/owner/dashboard",
+    "/owner/bookings",
+    "/owner/analytics",
+  ]) {
     test(`hitting ${target} unauthenticated redirects to /login and stashes the path`, async ({ page }) => {
       await page.goto(target);
       await page.waitForURL(/\/login/);
