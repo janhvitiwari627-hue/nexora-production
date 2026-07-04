@@ -19,6 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import { PublicHeader } from "@/components/layout/PublicHeader";
 import { PublicFooter } from "@/components/layout/PublicFooter";
+import { MyReferralsSection } from "@/components/referral/MyReferralsSection";
 import {
   mockReferralCode,
   mockReferralLink,
