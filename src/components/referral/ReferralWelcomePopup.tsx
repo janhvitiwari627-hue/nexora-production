@@ -70,7 +70,7 @@ export function ReferralWelcomePopup() {
             <div>
               <DialogHeader className="space-y-0.5">
                 <DialogTitle className="text-white text-lg font-bold">
-                  Refer & Earn ₹100 per friend
+                  Refer & Earn 100 points per friend
                 </DialogTitle>
                 <DialogDescription className="text-white/85 text-xs">
                   Share your link — friends sign up & build their own salon website.
@@ -112,11 +112,11 @@ export function ReferralWelcomePopup() {
           <div className="grid grid-cols-3 gap-2 text-center">
             <div className="rounded-lg bg-muted/50 p-2">
               <Gift className="mx-auto h-4 w-4 text-primary" />
-              <div className="mt-1 text-[10px] font-semibold">You get ₹100</div>
+              <div className="mt-1 text-[10px] font-semibold">You get 100 pts</div>
             </div>
             <div className="rounded-lg bg-muted/50 p-2">
               <Sparkles className="mx-auto h-4 w-4 text-primary" />
-              <div className="mt-1 text-[10px] font-semibold">Friend gets ₹100</div>
+              <div className="mt-1 text-[10px] font-semibold">Friend gets 100 pts</div>
             </div>
             <div className="rounded-lg bg-muted/50 p-2">
               <Globe className="mx-auto h-4 w-4 text-primary" />
