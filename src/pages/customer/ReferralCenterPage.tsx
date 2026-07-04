@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { PublicHeader } from "@/components/layout/PublicHeader";
 import { PublicFooter } from "@/components/layout/PublicFooter";
 import { MyReferralsSection } from "@/components/referral/MyReferralsSection";
+import { useAuthStore } from "@/stores/authStore";
 import {
   mockReferralCode,
   mockReferralLink,
@@ -27,6 +28,9 @@ import {
   mockReferrals,
   type ReferralStatus,
 } from "./referral/mockReferral";
+
+const ORIGIN =
+  typeof window !== "undefined" ? window.location.origin : "https://meripahalfasthelp.online";
 
 const STATUS: Record<ReferralStatus, { label: string; classes: string }> = {
   joined: { label: "Joined", classes: "bg-sky-100 text-sky-700" },
@@ -36,6 +40,11 @@ const STATUS: Record<ReferralStatus, { label: string; classes: string }> = {
 };
 
 export function ReferralCenterPage() {
+  const profile = useAuthStore((s) => s.profile);
+  const referralCode = profile?.referral_code ?? mockReferralCode;
+  const referralLink = profile?.referral_code
+    ? `${ORIGIN}/signup?ref=${profile.referral_code}`
+    : mockReferralLink;
   const qrRef = useRef<HTMLDivElement>(null);
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
@@ -55,16 +64,16 @@ export function ReferralCenterPage() {
     const canvas = qrRef.current?.querySelector("canvas");
     if (!canvas) return;
     const link = document.createElement("a");
-    link.download = `nexora-referral-${mockReferralCode}.png`;
+    link.download = `nexora-referral-${referralCode}.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
   };
 
   const shareNative = async () => {
-    const text = `Join me on Nexora and we both earn ₹100. Use code ${mockReferralCode}: ${mockReferralLink}`;
+    const text = `Join me on Nexora and we both earn ₹100. Use code ${referralCode}: ${referralLink}`;
     if (navigator.share) {
       try {
-        await navigator.share({ title: "Join Nexora", text, url: mockReferralLink });
+        await navigator.share({ title: "Join Nexora", text, url: referralLink });
       } catch {
         /* user cancelled */
       }
@@ -74,7 +83,7 @@ export function ReferralCenterPage() {
   };
 
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(
-    `Try Nexora and we both earn ₹100. Use code ${mockReferralCode}: ${mockReferralLink}`,
+    `Try Nexora and we both earn ₹100. Use code ${referralCode}: ${referralLink}`,
   )}`;
 
   return (
@@ -98,11 +107,11 @@ export function ReferralCenterPage() {
               </p>
               <div className="relative mt-3 flex flex-wrap items-end gap-4">
                 <p className="font-mono text-5xl font-black tracking-[0.18em] sm:text-6xl">
-                  {mockReferralCode}
+                  {referralCode}
                 </p>
                 <button
                   type="button"
-                  onClick={() => copy(mockReferralCode, "code")}
+                  onClick={() => copy(referralCode, "code")}
                   className={cn(
                     "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold transition",
                     copiedCode
@@ -132,12 +141,12 @@ export function ReferralCenterPage() {
                 <LinkIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
                 <input
                   readOnly
-                  value={mockReferralLink}
+                  value={referralLink}
                   className="flex-1 truncate bg-transparent text-sm font-semibold outline-none"
                 />
                 <button
                   type="button"
-                  onClick={() => copy(mockReferralLink, "link")}
+                  onClick={() => copy(referralLink, "link")}
                   className={cn(
                     "shrink-0 inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold transition",
                     copiedLink
@@ -154,7 +163,7 @@ export function ReferralCenterPage() {
               <div className="mt-4 grid grid-cols-3 gap-2">
                 <button
                   type="button"
-                  onClick={() => copy(mockReferralLink, "link")}
+                  onClick={() => copy(referralLink, "link")}
                   className="inline-flex flex-col items-center gap-1 rounded-2xl border px-3 py-3 text-xs font-bold transition hover:border-primary/40 hover:bg-primary/5"
                 >
                   <LinkIcon className="h-4 w-4 text-primary" />
@@ -191,7 +200,7 @@ export function ReferralCenterPage() {
               ref={qrRef}
               className="mx-auto mt-4 w-fit rounded-2xl border bg-white p-4"
             >
-              <QRCodeCanvas value={mockReferralLink} size={180} level="H" />
+              <QRCodeCanvas value={referralLink} size={180} level="H" />
             </div>
             <button
               type="button"
