@@ -199,11 +199,7 @@ export function PaymentManagementPage() {
     mutationFn: async ({ id, reason }: { id: string; reason: string }) => {
       const { error } = await supabase
         .from("payments")
-        .update({
-          status: "REFUNDED",
-          failure_reason: reason,
-          processed_at: new Date().toISOString(),
-        })
+        .update(buildRefundPayload(reason))
         .eq("id", id);
       if (error) throw error;
     },
@@ -216,13 +212,19 @@ export function PaymentManagementPage() {
   });
 
   const markPaymentStatus = useMutation({
-    mutationFn: async ({ id, status, reason }: { id: string; status: string; reason?: string }) => {
-      const patch: { status: string; processed_at: string; failure_reason?: string } = {
-        status,
-        processed_at: new Date().toISOString(),
-      };
-      if (reason) patch.failure_reason = reason;
-      const { error } = await supabase.from("payments").update(patch).eq("id", id);
+    mutationFn: async ({
+      id,
+      status,
+      reason,
+    }: {
+      id: string;
+      status: PaymentStatus;
+      reason?: string;
+    }) => {
+      const { error } = await supabase
+        .from("payments")
+        .update(buildPaymentStatusPayload(status, reason))
+        .eq("id", id);
       if (error) throw error;
     },
     onSuccess: (_d, v) => {
@@ -233,10 +235,17 @@ export function PaymentManagementPage() {
   });
 
   const setPendingStatus = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: "approved" | "rejected"; reason?: string }) => {
+    mutationFn: async ({
+      id,
+      status,
+    }: {
+      id: string;
+      status: PendingStatus;
+      reason?: string;
+    }) => {
       const { error } = await supabase
         .from("pending_payments")
-        .update({ status, updated_at: new Date().toISOString() })
+        .update(buildPendingStatusPayload(status))
         .eq("id", id);
       if (error) throw error;
     },
@@ -252,15 +261,18 @@ export function PaymentManagementPage() {
   });
 
   const setWithdrawalStatus = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string; reason?: string }) => {
-      const patch: { status: string; updated_at: string; processed_at?: string } = {
-        status,
-        updated_at: new Date().toISOString(),
-      };
-      if (status === "COMPLETED" || status === "REJECTED") {
-        patch.processed_at = new Date().toISOString();
-      }
-      const { error } = await supabase.from("withdrawals").update(patch).eq("id", id);
+    mutationFn: async ({
+      id,
+      status,
+    }: {
+      id: string;
+      status: WithdrawalStatus;
+      reason?: string;
+    }) => {
+      const { error } = await supabase
+        .from("withdrawals")
+        .update(buildWithdrawalStatusPayload(status))
+        .eq("id", id);
       if (error) throw error;
     },
     onSuccess: (_d, v) => {
