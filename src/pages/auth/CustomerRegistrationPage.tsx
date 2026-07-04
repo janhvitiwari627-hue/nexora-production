@@ -320,7 +320,7 @@ export default function CustomerRegistrationPage() {
             accountType === "owner"
               ? "Salon Owner"
               : accountType === "district_partner"
-                ? "District Partner"
+                ? "Growth Partner"
                 : "Customer";
           setAlreadyRegisteredEmail(email);
           setServerError(roleConflictMessage(check.roleLabel, attemptedLabel));
@@ -500,7 +500,7 @@ export default function CustomerRegistrationPage() {
               </TabsTrigger>
               <TabsTrigger value="district_partner" className="gap-1.5 text-xs sm:text-sm">
                 <Crown className="h-3.5 w-3.5" />
-                District Partner
+                Growth Partner
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -509,7 +509,7 @@ export default function CustomerRegistrationPage() {
             <div className="space-y-4">
               <Alert>
                 <AlertDescription className="text-xs">
-                  District Business Partner application. After signup your application goes for
+                  Growth Partner application. After signup your application goes for
                   verification — no joining fee, no investment, performance-based rewards.
                 </AlertDescription>
               </Alert>
@@ -1067,7 +1067,7 @@ export default function CustomerRegistrationPage() {
               {accountType === "owner"
                 ? "Register business"
                 : accountType === "district_partner"
-                  ? "Apply as District Partner"
+                  ? "Apply as Growth Partner"
                   : "Create account"}
             </Button>
           </form>
