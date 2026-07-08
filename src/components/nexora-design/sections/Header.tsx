@@ -167,15 +167,15 @@ export default function Header() {
                 Shop Owner
               </p>
               {ownerLinks.map((item) => (
-                <a
+                <Link
                   key={item.href}
-                  href={item.href}
+                  to={item.href}
                   className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-white"
                   onClick={() => setOpen(false)}
                 >
                   <item.icon className="h-4 w-4 text-indigo-600" />
                   {item.label}
-                </a>
+                </Link>
               ))}
             </div>
 
