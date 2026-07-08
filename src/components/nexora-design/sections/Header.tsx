@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import {
   Menu,
   X,
@@ -87,10 +88,11 @@ export default function Header() {
                   className="absolute left-1/2 top-[calc(100%+0.5rem)] w-72 -translate-x-1/2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/70 ring-1 ring-slate-900/[0.02]"
                 >
                   {ownerLinks.map((item) => (
-                    <a
+                    <Link
                       key={item.href}
-                      href={item.href}
+                      to={item.href}
                       role="menuitem"
+                      onClick={() => setOwnerOpen(false)}
                       className="flex items-start gap-3 px-4 py-3 transition-colors hover:bg-slate-50"
                     >
                       <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
@@ -104,7 +106,7 @@ export default function Header() {
                           {item.description}
                         </p>
                       </div>
-                    </a>
+                    </Link>
                   ))}
                 </div>
               </>
@@ -165,15 +167,15 @@ export default function Header() {
                 Shop Owner
               </p>
               {ownerLinks.map((item) => (
-                <a
+                <Link
                   key={item.href}
-                  href={item.href}
+                  to={item.href}
                   className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-white"
                   onClick={() => setOpen(false)}
                 >
                   <item.icon className="h-4 w-4 text-indigo-600" />
                   {item.label}
-                </a>
+                </Link>
               ))}
             </div>
 
