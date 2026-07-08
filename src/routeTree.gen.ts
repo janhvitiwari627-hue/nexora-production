@@ -35,6 +35,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CustomerAppRouteImport } from './routes/customer-app'
 import { Route as CreateShopWebsiteRouteImport } from './routes/create-shop-website'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AuthNoticeRouteImport } from './routes/auth-notice'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AcademyRouteImport } from './routes/academy'
 import { Route as AboutRouteImport } from './routes/about'
@@ -277,6 +278,11 @@ const CreateShopWebsiteRoute = CreateShopWebsiteRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthNoticeRoute = AuthNoticeRouteImport.update({
+  id: '/auth-notice',
+  path: '/auth-notice',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -858,6 +864,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/academy': typeof AcademyRoute
   '/admin': typeof AdminRouteWithChildren
+  '/auth-notice': typeof AuthNoticeRoute
   '/contact': typeof ContactRoute
   '/create-shop-website': typeof CreateShopWebsiteRoute
   '/customer-app': typeof CustomerAppRoute
@@ -998,6 +1005,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/academy': typeof AcademyRoute
+  '/auth-notice': typeof AuthNoticeRoute
   '/contact': typeof ContactRoute
   '/create-shop-website': typeof CreateShopWebsiteRoute
   '/customer-app': typeof CustomerAppRoute
@@ -1137,6 +1145,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/academy': typeof AcademyRoute
   '/admin': typeof AdminRouteWithChildren
+  '/auth-notice': typeof AuthNoticeRoute
   '/contact': typeof ContactRoute
   '/create-shop-website': typeof CreateShopWebsiteRoute
   '/customer-app': typeof CustomerAppRoute
@@ -1280,6 +1289,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/academy'
     | '/admin'
+    | '/auth-notice'
     | '/contact'
     | '/create-shop-website'
     | '/customer-app'
@@ -1420,6 +1430,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/academy'
+    | '/auth-notice'
     | '/contact'
     | '/create-shop-website'
     | '/customer-app'
@@ -1558,6 +1569,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/academy'
     | '/admin'
+    | '/auth-notice'
     | '/contact'
     | '/create-shop-website'
     | '/customer-app'
@@ -1700,6 +1712,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AcademyRoute: typeof AcademyRoute
   AdminRoute: typeof AdminRouteWithChildren
+  AuthNoticeRoute: typeof AuthNoticeRoute
   ContactRoute: typeof ContactRoute
   CreateShopWebsiteRoute: typeof CreateShopWebsiteRoute
   CustomerAppRoute: typeof CustomerAppRoute
@@ -1954,6 +1967,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth-notice': {
+      id: '/auth-notice'
+      path: '/auth-notice'
+      fullPath: '/auth-notice'
+      preLoaderRoute: typeof AuthNoticeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -2948,6 +2968,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AcademyRoute: AcademyRoute,
   AdminRoute: AdminRouteWithChildren,
+  AuthNoticeRoute: AuthNoticeRoute,
   ContactRoute: ContactRoute,
   CreateShopWebsiteRoute: CreateShopWebsiteRoute,
   CustomerAppRoute: CustomerAppRoute,
@@ -3023,3 +3044,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
