@@ -47,7 +47,7 @@ export const Route = createFileRoute("/auth-notice")({
 function AuthNoticePage() {
   const { to, reason, delay } = Route.useSearch();
   const navigate = useNavigate();
-  const meta = REASONS[reason];
+  const meta = REASONS[reason as keyof typeof REASONS] ?? REASONS.default;
   const Icon = meta.icon;
 
   useEffect(() => {
