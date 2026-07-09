@@ -40,4 +40,17 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: bun run test:rls
+          RLS_LOG_DIR: ${{ github.workspace }}/rls-artifacts
+        run: |
+          mkdir -p "$RLS_LOG_DIR"
+          set -o pipefail
+          bun run test:rls 2>&1 | tee "$RLS_LOG_DIR/rls-output.log"
+
+      - name: Upload RLS failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rls-test-failure-${{ github.run_id }}-${{ github.run_attempt }}
+          path: rls-artifacts/
+          if-no-files-found: warn
+          retention-days: 14

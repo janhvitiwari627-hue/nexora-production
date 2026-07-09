@@ -18,6 +18,8 @@
  */
 import { createClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
+import { mkdirSync, createWriteStream } from "node:fs";
+import { join } from "node:path";
 
 const URL = process.env.SUPABASE_URL;
 const ANON = process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.SUPABASE_ANON_KEY;
@@ -30,18 +32,79 @@ if (!URL || !ANON || !SERVICE) {
   process.exit(2);
 }
 
-const admin = createClient(URL, SERVICE, {
+// Optional request/response log — enabled when RLS_LOG_DIR is set (CI artifact use).
+const LOG_DIR = process.env.RLS_LOG_DIR;
+let logStream = null;
+if (LOG_DIR) {
+  mkdirSync(LOG_DIR, { recursive: true });
+  logStream = createWriteStream(join(LOG_DIR, "supabase-requests.log"), { flags: "a" });
+}
+
+const REDACT_HEADERS = new Set(["authorization", "apikey", "x-connection-api-key", "cookie"]);
+function redactHeaders(headers) {
+  const out = {};
+  const h = headers instanceof Headers ? Object.fromEntries(headers.entries()) : headers ?? {};
+  for (const [k, v] of Object.entries(h)) {
+    out[k] = REDACT_HEADERS.has(k.toLowerCase()) ? "[redacted]" : v;
+  }
+  return out;
+}
+
+async function loggingFetch(input, init = {}) {
+  const started = Date.now();
+  const method = init.method ?? (typeof input === "object" && "method" in input ? input.method : "GET");
+  const url = typeof input === "string" ? input : input.url;
+  let res, err;
+  try {
+    res = await fetch(input, init);
+  } catch (e) {
+    err = e;
+  }
+  if (logStream) {
+    const duration = Date.now() - started;
+    let bodyPreview = "";
+    if (res) {
+      try {
+        const clone = res.clone();
+        const text = await clone.text();
+        bodyPreview = text.length > 2000 ? text.slice(0, 2000) + "…[truncated]" : text;
+      } catch {
+        bodyPreview = "[unreadable]";
+      }
+    }
+    logStream.write(
+      JSON.stringify({
+        ts: new Date().toISOString(),
+        method,
+        url,
+        status: res?.status ?? null,
+        duration_ms: duration,
+        request_headers: redactHeaders(init.headers),
+        response_body: bodyPreview,
+        error: err ? String(err) : undefined,
+      }) + "\n",
+    );
+  }
+  if (err) throw err;
+  return res;
+}
+
+const clientOpts = (extra = {}) => ({
   auth: { persistSession: false, autoRefreshToken: false },
+  global: { fetch: loggingFetch, ...(extra.global ?? {}) },
+  ...Object.fromEntries(Object.entries(extra).filter(([k]) => k !== "global")),
 });
 
-const anonClient = () =>
-  createClient(URL, ANON, { auth: { persistSession: false, autoRefreshToken: false } });
+const admin = createClient(URL, SERVICE, clientOpts());
+
+const anonClient = () => createClient(URL, ANON, clientOpts());
 
 const userClient = (accessToken) =>
-  createClient(URL, ANON, {
-    auth: { persistSession: false, autoRefreshToken: false },
-    global: { headers: { Authorization: `Bearer ${accessToken}` } },
-  });
+  createClient(
+    URL,
+    ANON,
+    clientOpts({ global: { headers: { Authorization: `Bearer ${accessToken}` } } }),
+  );
 
 let passed = 0;
 let failed = 0;
@@ -420,6 +483,7 @@ async function main() {
   }
 
   console.log(`\nResults: ${passed} passed, ${failed} failed`);
+  if (logStream) await new Promise((r) => logStream.end(r));
   if (failed > 0) {
     console.error("\nFailures:");
     for (const f of failures) console.error(`  - ${f.name}${f.detail ? ": " + f.detail : ""}`);
