@@ -407,12 +407,16 @@ async function main() {
       })(),
     ]);
   } finally {
-    // ---------- Cleanup ----------
-    if (cleanupIds.businesses.length)
-      await admin.from("businesses").delete().in("id", cleanupIds.businesses);
-    if (cleanupIds.salons.length)
-      await admin.from("salons").delete().in("id", cleanupIds.salons);
-    for (const id of createdUserIds) await cleanupUser(id);
+    // ---------- Cleanup (parallel) ----------
+    await Promise.all([
+      cleanupIds.businesses.length
+        ? admin.from("businesses").delete().in("id", cleanupIds.businesses)
+        : Promise.resolve(),
+      cleanupIds.salons.length
+        ? admin.from("salons").delete().in("id", cleanupIds.salons)
+        : Promise.resolve(),
+    ]);
+    await Promise.all(createdUserIds.map(cleanupUser));
   }
 
   console.log(`\nResults: ${passed} passed, ${failed} failed`);
