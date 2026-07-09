@@ -295,14 +295,15 @@ async function main() {
       );
     }
     {
+      // Approved salon_owner manager has full-row read via "Owners read full salon".
       const { data, error } = await asStaff
         .from("salons")
         .select("email")
         .eq("id", activeSalon.data.id)
         .maybeSingle();
       check(
-        "staff cannot select sensitive salon column (email)",
-        !!error || data?.email == null,
+        "approved manager can read sensitive salon column (email) — full-owner policy",
+        !error && data?.email === "secret-owner@example.com",
         `error=${error?.message} data=${JSON.stringify(data)}`,
       );
     }
