@@ -18,7 +18,7 @@
  */
 import { createClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
-import { mkdirSync, createWriteStream } from "node:fs";
+import { mkdirSync, createWriteStream, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const URL = process.env.SUPABASE_URL;
@@ -109,16 +109,61 @@ const userClient = (accessToken) =>
 let passed = 0;
 let failed = 0;
 const failures = [];
+const timings = [];
+const failureDetails = [];
 
-function check(name, ok, detail) {
+function check(name, ok, detail, ctx) {
   if (ok) {
     passed++;
     console.log(`  ✓ ${name}`);
   } else {
     failed++;
     failures.push({ name, detail });
+    failureDetails.push({
+      name,
+      detail: detail ?? null,
+      group: ctx?.group ?? null,
+      role: ctx?.role ?? null,
+      table: ctx?.table ?? null,
+      view: ctx?.view ?? null,
+      operation: ctx?.operation ?? "select",
+      columns: ctx?.columns ?? null,
+      filter: ctx?.filter ?? null,
+      expected: ctx?.expected ?? null,
+      data: ctx?.data ?? null,
+      error: ctx?.error
+        ? {
+            message: ctx.error.message ?? null,
+            code: ctx.error.code ?? null,
+            details: ctx.error.details ?? null,
+            hint: ctx.error.hint ?? null,
+          }
+        : null,
+      timestamp: new Date().toISOString(),
+    });
     console.log(`  ✗ ${name}${detail ? " — " + detail : ""}`);
   }
+}
+
+async function timed(name, fn) {
+  const start = Date.now();
+  let status = "passed";
+  let thrown = null;
+  const failedBefore = failed;
+  try {
+    await fn();
+  } catch (e) {
+    status = "errored";
+    thrown = e;
+  }
+  if (status !== "errored" && failed > failedBefore) status = "failed";
+  timings.push({
+    name,
+    durationMs: Date.now() - start,
+    status,
+    thrown: thrown ? String(thrown?.message ?? thrown) : null,
+  });
+  if (thrown) throw thrown;
 }
 
 async function createUser(label) {
@@ -264,164 +309,284 @@ async function main() {
     console.log("\nRunning assertions in parallel...");
     await Promise.all([
       // -------- [public_salon_cards / salons] anonymous access --------
-      (async () => {
+      timed("anon reads active salon via public_salon_cards view", async () => {
+        const q = {
+          role: "anon",
+          view: "public_salon_cards",
+          columns: "id, name, phone, whatsapp",
+          filter: { id: activeSalon.data.id },
+          group: "public_salon_cards / anonymous",
+        };
         const { data, error } = await anon
           .from("public_salon_cards")
-          .select("id, name, phone, whatsapp")
+          .select(q.columns)
           .eq("id", activeSalon.data.id)
           .maybeSingle();
         check(
           "anon can read active salon via public_salon_cards view",
           !error && data?.id === activeSalon.data.id,
           error?.message,
+          { ...q, data, error, expected: "row returned with matching id" },
         );
         check(
           "public view exposes masked public phone (not owner phone)",
           data?.phone === "8887776665",
           `got phone=${data?.phone}`,
+          { ...q, data, error, expected: 'phone === "8887776665"' },
         );
-      })(),
-      (async () => {
-        const { data } = await anon
+      }),
+      timed("anon cannot see inactive salon via public view", async () => {
+        const q = {
+          role: "anon",
+          view: "public_salon_cards",
+          columns: "id",
+          filter: { id: inactiveSalon.data.id },
+          group: "public_salon_cards / anonymous",
+        };
+        const { data, error } = await anon
           .from("public_salon_cards")
-          .select("id")
+          .select(q.columns)
           .eq("id", inactiveSalon.data.id)
           .maybeSingle();
-        check("anon cannot see inactive salon via public view", data === null);
-      })(),
-      (async () => {
-        const { error } = await anon
+        check("anon cannot see inactive salon via public view", data === null, undefined, {
+          ...q,
+          data,
+          error,
+          expected: "data === null",
+        });
+      }),
+      timed("anon cannot select sensitive salon columns", async () => {
+        const q = {
+          role: "anon",
+          table: "salons",
+          columns: "email, owner_name, upi_id, phone",
+          filter: { id: activeSalon.data.id },
+          group: "salons / column-level RLS",
+        };
+        const { data, error } = await anon
           .from("salons")
-          .select("email, owner_name, upi_id, phone")
+          .select(q.columns)
           .eq("id", activeSalon.data.id);
         check(
           "anon cannot select sensitive salon columns (email/owner_name/upi_id/phone)",
           !!error,
           error ? undefined : "query unexpectedly succeeded",
+          { ...q, data, error, expected: "PostgREST error from column privilege" },
         );
-      })(),
-      (async () => {
+      }),
+      timed("anon reads non-sensitive salon columns of active row", async () => {
+        const q = {
+          role: "anon",
+          table: "salons",
+          columns: "id, name, is_active",
+          filter: { id: activeSalon.data.id },
+          group: "salons / anonymous",
+        };
         const { data, error } = await anon
           .from("salons")
-          .select("id, name, is_active")
+          .select(q.columns)
           .eq("id", activeSalon.data.id)
           .maybeSingle();
         check(
           "anon can read non-sensitive salon columns of active row",
           !error && data?.id === activeSalon.data.id,
           error?.message,
+          { ...q, data, error, expected: "row returned with matching id" },
         );
-      })(),
+      }),
       // -------- [salons] role-based access --------
-      (async () => {
+      timed("owner reads full salon incl. sensitive columns", async () => {
+        const q = {
+          role: "owner",
+          table: "salons",
+          columns: "id, email, owner_name, upi_id, phone",
+          filter: { id: activeSalon.data.id },
+          group: "salons / owner",
+        };
         const { data, error } = await asOwner
           .from("salons")
-          .select("id, email, owner_name, upi_id, phone")
+          .select(q.columns)
           .eq("id", activeSalon.data.id)
           .maybeSingle();
         check(
           "owner can read full salon row including sensitive columns",
           !error && data?.email === "secret-owner@example.com" && data?.upi_id === "secret@upi",
           error?.message,
+          { ...q, data, error, expected: "email + upi_id populated" },
         );
-      })(),
-      (async () => {
+      }),
+      timed("staff reads assigned salon", async () => {
+        const q = {
+          role: "staff (manager)",
+          table: "salons",
+          columns: "id, name",
+          filter: { id: activeSalon.data.id },
+          group: "salons / staff",
+        };
         const { data, error } = await asStaff
           .from("salons")
-          .select("id, name")
+          .select(q.columns)
           .eq("id", activeSalon.data.id)
           .maybeSingle();
         check(
           "staff member can read assigned salon",
           !error && data?.id === activeSalon.data.id,
           error?.message,
+          { ...q, data, error, expected: "row returned with matching id" },
         );
-      })(),
-      (async () => {
+      }),
+      timed("approved manager reads sensitive salon column", async () => {
+        const q = {
+          role: "staff (manager)",
+          table: "salons",
+          columns: "email",
+          filter: { id: activeSalon.data.id },
+          group: "salons / manager sensitive",
+        };
         const { data, error } = await asStaff
           .from("salons")
-          .select("email")
+          .select(q.columns)
           .eq("id", activeSalon.data.id)
           .maybeSingle();
         check(
           "approved manager can read sensitive salon column (email) — full-owner policy",
           !error && data?.email === "secret-owner@example.com",
           `error=${error?.message} data=${JSON.stringify(data)}`,
+          { ...q, data, error, expected: 'email === "secret-owner@example.com"' },
         );
-      })(),
-      (async () => {
+      }),
+      timed("stranger cannot read inactive salon", async () => {
+        const q = {
+          role: "stranger",
+          table: "salons",
+          columns: "id, email",
+          filter: { id: inactiveSalon.data.id },
+          group: "salons / stranger",
+        };
         const { data, error } = await asStranger
           .from("salons")
-          .select("id, email")
+          .select(q.columns)
           .eq("id", inactiveSalon.data.id)
           .maybeSingle();
         check(
           "stranger cannot read inactive salon",
           data === null && !error,
           `data=${JSON.stringify(data)} error=${error?.message}`,
+          { ...q, data, error, expected: "data === null && no error" },
         );
-      })(),
-      (async () => {
+      }),
+      timed("admin reads inactive salon", async () => {
+        const q = {
+          role: "admin",
+          table: "salons",
+          columns: "id, email",
+          filter: { id: inactiveSalon.data.id },
+          group: "salons / admin",
+        };
         const { data, error } = await asAdmin
           .from("salons")
-          .select("id, email")
+          .select(q.columns)
           .eq("id", inactiveSalon.data.id)
           .maybeSingle();
         check(
           "admin can read inactive salon (full)",
           !error && data?.id === inactiveSalon.data.id,
           error?.message,
+          { ...q, data, error, expected: "row returned with matching id" },
         );
-      })(),
+      }),
       // -------- [businesses / public_businesses] anonymous access --------
-      (async () => {
+      timed("anon reads active business via public_businesses view", async () => {
+        const q = {
+          role: "anon",
+          view: "public_businesses",
+          columns: "id, business_name",
+          filter: { id: activeBiz.data.id },
+          group: "public_businesses / anonymous",
+        };
         const { data, error } = await anon
           .from("public_businesses")
-          .select("id, business_name")
+          .select(q.columns)
           .eq("id", activeBiz.data.id)
           .maybeSingle();
         check(
           "anon can read active business via public_businesses view",
           !error && data?.id === activeBiz.data.id,
           error?.message,
+          { ...q, data, error, expected: "row returned with matching id" },
         );
-      })(),
-      (async () => {
-        const { data } = await anon
+      }),
+      timed("anon cannot see pending business via public view", async () => {
+        const q = {
+          role: "anon",
+          view: "public_businesses",
+          columns: "id",
+          filter: { id: pendingBiz.data.id },
+          group: "public_businesses / anonymous",
+        };
+        const { data, error } = await anon
           .from("public_businesses")
-          .select("id")
+          .select(q.columns)
           .eq("id", pendingBiz.data.id)
           .maybeSingle();
-        check("anon cannot see pending business via public view", data === null);
-      })(),
-      (async () => {
-        const { error } = await anon
+        check("anon cannot see pending business via public view", data === null, undefined, {
+          ...q,
+          data,
+          error,
+          expected: "data === null",
+        });
+      }),
+      timed("anon cannot select phone/whatsapp from businesses", async () => {
+        const q = {
+          role: "anon",
+          table: "businesses",
+          columns: "phone, whatsapp_number",
+          filter: { id: activeBiz.data.id },
+          group: "businesses / column-level RLS",
+        };
+        const { data, error } = await anon
           .from("businesses")
-          .select("phone, whatsapp_number")
+          .select(q.columns)
           .eq("id", activeBiz.data.id);
         check(
           "anon cannot select phone/whatsapp_number from businesses base table",
           !!error,
           error ? undefined : "query unexpectedly succeeded",
+          { ...q, data, error, expected: "PostgREST error from column privilege" },
         );
-      })(),
-      (async () => {
+      }),
+      timed("anon cannot see pending business on base table", async () => {
+        const q = {
+          role: "anon",
+          table: "businesses",
+          columns: "id, business_name, status",
+          filter: { id: pendingBiz.data.id },
+          group: "businesses / anonymous",
+        };
         const { data, error } = await anon
           .from("businesses")
-          .select("id, business_name, status")
+          .select(q.columns)
           .eq("id", pendingBiz.data.id)
           .maybeSingle();
         check(
           "anon cannot see pending business row on base table",
           data === null && !error,
           `data=${JSON.stringify(data)} error=${error?.message}`,
+          { ...q, data, error, expected: "data === null && no error" },
         );
-      })(),
+      }),
       // -------- [businesses] role-based access --------
-      (async () => {
+      timed("owner reads own pending business", async () => {
+        const q = {
+          role: "owner",
+          table: "businesses",
+          columns: "id, phone, whatsapp_number, status",
+          filter: { id: pendingBiz.data.id },
+          group: "businesses / owner",
+        };
         const { data, error } = await asOwner
           .from("businesses")
-          .select("id, phone, whatsapp_number, status")
+          .select(q.columns)
           .eq("id", pendingBiz.data.id)
           .maybeSingle();
         check(
@@ -431,43 +596,68 @@ async function main() {
             data?.whatsapp_number === "5559997777" &&
             data?.status === "pending_verification",
           error?.message,
+          { ...q, data, error, expected: "phone/whatsapp/status match seed values" },
         );
-      })(),
-      (async () => {
+      }),
+      timed("stranger cannot read pending business", async () => {
+        const q = {
+          role: "stranger",
+          table: "businesses",
+          columns: "id",
+          filter: { id: pendingBiz.data.id },
+          group: "businesses / stranger",
+        };
         const { data, error } = await asStranger
           .from("businesses")
-          .select("id")
+          .select(q.columns)
           .eq("id", pendingBiz.data.id)
           .maybeSingle();
         check(
           "stranger cannot read pending business",
           data === null && !error,
           `data=${JSON.stringify(data)} error=${error?.message}`,
+          { ...q, data, error, expected: "data === null && no error" },
         );
-      })(),
-      (async () => {
+      }),
+      timed("stranger cannot read phone/whatsapp of active business", async () => {
+        const q = {
+          role: "stranger",
+          table: "businesses",
+          columns: "phone, whatsapp_number",
+          filter: { id: activeBiz.data.id },
+          group: "businesses / stranger row filter",
+        };
         const { data, error } = await asStranger
           .from("businesses")
-          .select("phone, whatsapp_number")
+          .select(q.columns)
           .eq("id", activeBiz.data.id);
         check(
           "stranger cannot read phone/whatsapp_number of active business (RLS filters row)",
           !error && Array.isArray(data) && data.length === 0,
           `error=${error?.message} data=${JSON.stringify(data)}`,
+          { ...q, data, error, expected: "empty array (row filtered by RLS)" },
         );
-      })(),
-      (async () => {
+      }),
+      timed("admin reads pending business", async () => {
+        const q = {
+          role: "admin",
+          table: "businesses",
+          columns: "id, phone",
+          filter: { id: pendingBiz.data.id },
+          group: "businesses / admin",
+        };
         const { data, error } = await asAdmin
           .from("businesses")
-          .select("id, phone")
+          .select(q.columns)
           .eq("id", pendingBiz.data.id)
           .maybeSingle();
         check(
           "admin can read pending business incl. phone",
           !error && data?.phone === "5559998888",
           error?.message,
+          { ...q, data, error, expected: 'phone === "5559998888"' },
         );
-      })(),
+      }),
     ]);
   } finally {
     // ---------- Cleanup (parallel) ----------
@@ -484,6 +674,40 @@ async function main() {
 
   console.log(`\nResults: ${passed} passed, ${failed} failed`);
   if (logStream) await new Promise((r) => logStream.end(r));
+
+  if (LOG_DIR) {
+    const sorted = [...timings].sort((a, b) => b.durationMs - a.durationMs);
+    const totalMs = timings.reduce((s, t) => s + t.durationMs, 0);
+    writeFileSync(
+      join(LOG_DIR, "assertion-timings.json"),
+      JSON.stringify(
+        {
+          generatedAt: new Date().toISOString(),
+          totalAssertions: timings.length,
+          totalDurationMs: totalMs,
+          slowestMs: sorted[0]?.durationMs ?? 0,
+          fastestMs: sorted[sorted.length - 1]?.durationMs ?? 0,
+          assertions: sorted,
+        },
+        null,
+        2,
+      ),
+    );
+    writeFileSync(
+      join(LOG_DIR, "failure-details.json"),
+      JSON.stringify(
+        {
+          generatedAt: new Date().toISOString(),
+          failed,
+          passed,
+          failures: failureDetails,
+        },
+        null,
+        2,
+      ),
+    );
+  }
+
   if (failed > 0) {
     console.error("\nFailures:");
     for (const f of failures) console.error(`  - ${f.name}${f.detail ? ": " + f.detail : ""}`);
