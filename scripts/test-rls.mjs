@@ -674,6 +674,40 @@ async function main() {
 
   console.log(`\nResults: ${passed} passed, ${failed} failed`);
   if (logStream) await new Promise((r) => logStream.end(r));
+
+  if (LOG_DIR) {
+    const sorted = [...timings].sort((a, b) => b.durationMs - a.durationMs);
+    const totalMs = timings.reduce((s, t) => s + t.durationMs, 0);
+    writeFileSync(
+      join(LOG_DIR, "assertion-timings.json"),
+      JSON.stringify(
+        {
+          generatedAt: new Date().toISOString(),
+          totalAssertions: timings.length,
+          totalDurationMs: totalMs,
+          slowestMs: sorted[0]?.durationMs ?? 0,
+          fastestMs: sorted[sorted.length - 1]?.durationMs ?? 0,
+          assertions: sorted,
+        },
+        null,
+        2,
+      ),
+    );
+    writeFileSync(
+      join(LOG_DIR, "failure-details.json"),
+      JSON.stringify(
+        {
+          generatedAt: new Date().toISOString(),
+          failed,
+          passed,
+          failures: failureDetails,
+        },
+        null,
+        2,
+      ),
+    );
+  }
+
   if (failed > 0) {
     console.error("\nFailures:");
     for (const f of failures) console.error(`  - ${f.name}${f.detail ? ": " + f.detail : ""}`);
