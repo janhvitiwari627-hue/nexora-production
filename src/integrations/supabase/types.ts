@@ -1779,6 +1779,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "owner_requests_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "public_businesses"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "owner_requests_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -3597,6 +3604,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "shop_members_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "public_businesses"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "shop_members_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -4477,6 +4491,67 @@ export type Database = {
             columns: ["partner_id"]
             isOneToOne: false
             referencedRelation: "district_business_partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      public_businesses: {
+        Row: {
+          area_locality: string | null
+          business_category: string | null
+          business_name: string | null
+          city: string | null
+          created_at: string | null
+          id: string | null
+          is_active: boolean | null
+          owner_id: string | null
+          salon_id: string | null
+          status: Database["public"]["Enums"]["business_status"] | null
+        }
+        Insert: {
+          area_locality?: string | null
+          business_category?: string | null
+          business_name?: string | null
+          city?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          owner_id?: string | null
+          salon_id?: string | null
+          status?: Database["public"]["Enums"]["business_status"] | null
+        }
+        Update: {
+          area_locality?: string | null
+          business_category?: string | null
+          business_name?: string | null
+          city?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          owner_id?: string | null
+          salon_id?: string | null
+          status?: Database["public"]["Enums"]["business_status"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "businesses_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "businesses_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "public_salon_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "businesses_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
             referencedColumns: ["id"]
           },
         ]
