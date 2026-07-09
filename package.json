@@ -17,7 +17,8 @@
     "prepare": "husky",
     "format": "prettier --write .",
     "test:e2e": "playwright test",
-    "test:e2e:headed": "playwright test --headed"
+    "test:e2e:headed": "playwright test --headed",
+    "test:rls": "node scripts/test-rls.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^2.0.51",
