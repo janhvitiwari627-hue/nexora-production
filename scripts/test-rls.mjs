@@ -18,7 +18,7 @@
  */
 import { createClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
-import { mkdirSync, createWriteStream } from "node:fs";
+import { mkdirSync, createWriteStream, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const URL = process.env.SUPABASE_URL;
