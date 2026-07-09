@@ -197,225 +197,215 @@ async function main() {
     const asStranger = userClient(stranger.accessToken);
     const asAdmin = userClient(admin1.accessToken);
 
-    // =====================================================================
-    console.log("\n[public_salon_cards / salons] anonymous access");
-    // =====================================================================
-    {
-      const { data, error } = await anon
-        .from("public_salon_cards")
-        .select("id, name, phone, whatsapp")
-        .eq("id", activeSalon.data.id)
-        .maybeSingle();
-      check(
-        "anon can read active salon via public_salon_cards view",
-        !error && data?.id === activeSalon.data.id,
-        error?.message,
-      );
-      check(
-        "public view exposes masked public phone (not owner phone)",
-        data?.phone === "8887776665",
-        `got phone=${data?.phone}`,
-      );
-    }
-    {
-      const { data } = await anon
-        .from("public_salon_cards")
-        .select("id")
-        .eq("id", inactiveSalon.data.id)
-        .maybeSingle();
-      check("anon cannot see inactive salon via public view", data === null);
-    }
-    {
-      // Direct base-table access to sensitive columns must fail (no column grant).
-      const { error } = await anon
-        .from("salons")
-        .select("email, owner_name, upi_id, phone")
-        .eq("id", activeSalon.data.id);
-      check(
-        "anon cannot select sensitive salon columns (email/owner_name/upi_id/phone)",
-        !!error,
-        error ? undefined : "query unexpectedly succeeded",
-      );
-    }
-    {
-      // Non-sensitive columns should still be readable directly (used by RPCs).
-      const { data, error } = await anon
-        .from("salons")
-        .select("id, name, is_active")
-        .eq("id", activeSalon.data.id)
-        .maybeSingle();
-      check(
-        "anon can read non-sensitive salon columns of active row",
-        !error && data?.id === activeSalon.data.id,
-        error?.message,
-      );
-    }
-
-    // =====================================================================
-    console.log("\n[salons] role-based access");
-    // =====================================================================
-    {
-      const { data, error } = await asOwner
-        .from("salons")
-        .select("id, email, owner_name, upi_id, phone")
-        .eq("id", activeSalon.data.id)
-        .maybeSingle();
-      check(
-        "owner can read full salon row including sensitive columns",
-        !error && data?.email === "secret-owner@example.com" && data?.upi_id === "secret@upi",
-        error?.message,
-      );
-    }
-    {
-      const { data, error } = await asStaff
-        .from("salons")
-        .select("id, name")
-        .eq("id", activeSalon.data.id)
-        .maybeSingle();
-      check(
-        "staff member can read assigned salon",
-        !error && data?.id === activeSalon.data.id,
-        error?.message,
-      );
-    }
-    {
-      // Approved salon_owner manager has full-row read via "Owners read full salon".
-      const { data, error } = await asStaff
-        .from("salons")
-        .select("email")
-        .eq("id", activeSalon.data.id)
-        .maybeSingle();
-      check(
-        "approved manager can read sensitive salon column (email) — full-owner policy",
-        !error && data?.email === "secret-owner@example.com",
-        `error=${error?.message} data=${JSON.stringify(data)}`,
-      );
-    }
-    {
-      const { data, error } = await asStranger
-        .from("salons")
-        .select("id, email")
-        .eq("id", inactiveSalon.data.id)
-        .maybeSingle();
-      check(
-        "stranger cannot read inactive salon",
-        data === null && !error,
-        `data=${JSON.stringify(data)} error=${error?.message}`,
-      );
-    }
-    {
-      const { data, error } = await asAdmin
-        .from("salons")
-        .select("id, email")
-        .eq("id", inactiveSalon.data.id)
-        .maybeSingle();
-      check(
-        "admin can read inactive salon (full)",
-        !error && data?.id === inactiveSalon.data.id,
-        error?.message,
-      );
-    }
-
-    // =====================================================================
-    console.log("\n[businesses / public_businesses] anonymous access");
-    // =====================================================================
-    {
-      const { data, error } = await anon
-        .from("public_businesses")
-        .select("id, business_name")
-        .eq("id", activeBiz.data.id)
-        .maybeSingle();
-      check(
-        "anon can read active business via public_businesses view",
-        !error && data?.id === activeBiz.data.id,
-        error?.message,
-      );
-    }
-    {
-      const { data } = await anon
-        .from("public_businesses")
-        .select("id")
-        .eq("id", pendingBiz.data.id)
-        .maybeSingle();
-      check("anon cannot see pending business via public view", data === null);
-    }
-    {
-      const { error } = await anon
-        .from("businesses")
-        .select("phone, whatsapp_number")
-        .eq("id", activeBiz.data.id);
-      check(
-        "anon cannot select phone/whatsapp_number from businesses base table",
-        !!error,
-        error ? undefined : "query unexpectedly succeeded",
-      );
-    }
-    {
-      const { data, error } = await anon
-        .from("businesses")
-        .select("id, business_name, status")
-        .eq("id", pendingBiz.data.id)
-        .maybeSingle();
-      check(
-        "anon cannot see pending business row on base table",
-        data === null && !error,
-        `data=${JSON.stringify(data)} error=${error?.message}`,
-      );
-    }
-
-    // =====================================================================
-    console.log("\n[businesses] role-based access");
-    // =====================================================================
-    {
-      const { data, error } = await asOwner
-        .from("businesses")
-        .select("id, phone, whatsapp_number, status")
-        .eq("id", pendingBiz.data.id)
-        .maybeSingle();
-      check(
-        "owner can read own pending business incl. phone/whatsapp",
-        !error &&
-          data?.phone === "5559998888" &&
-          data?.whatsapp_number === "5559997777" &&
-          data?.status === "pending_verification",
-        error?.message,
-      );
-    }
-    {
-      const { data, error } = await asStranger
-        .from("businesses")
-        .select("id")
-        .eq("id", pendingBiz.data.id)
-        .maybeSingle();
-      check(
-        "stranger cannot read pending business",
-        data === null && !error,
-        `data=${JSON.stringify(data)} error=${error?.message}`,
-      );
-    }
-    {
-      const { data, error } = await asStranger
-        .from("businesses")
-        .select("phone, whatsapp_number")
-        .eq("id", activeBiz.data.id);
-      check(
-        "stranger cannot read phone/whatsapp_number of active business (RLS filters row)",
-        !error && Array.isArray(data) && data.length === 0,
-        `error=${error?.message} data=${JSON.stringify(data)}`,
-      );
-    }
-    {
-      const { data, error } = await asAdmin
-        .from("businesses")
-        .select("id, phone")
-        .eq("id", pendingBiz.data.id)
-        .maybeSingle();
-      check(
-        "admin can read pending business incl. phone",
-        !error && data?.phone === "5559998888",
-        error?.message,
-      );
-    }
+    // All assertion reads are independent — run in parallel.
+    console.log("\nRunning assertions in parallel...");
+    await Promise.all([
+      // -------- [public_salon_cards / salons] anonymous access --------
+      (async () => {
+        const { data, error } = await anon
+          .from("public_salon_cards")
+          .select("id, name, phone, whatsapp")
+          .eq("id", activeSalon.data.id)
+          .maybeSingle();
+        check(
+          "anon can read active salon via public_salon_cards view",
+          !error && data?.id === activeSalon.data.id,
+          error?.message,
+        );
+        check(
+          "public view exposes masked public phone (not owner phone)",
+          data?.phone === "8887776665",
+          `got phone=${data?.phone}`,
+        );
+      })(),
+      (async () => {
+        const { data } = await anon
+          .from("public_salon_cards")
+          .select("id")
+          .eq("id", inactiveSalon.data.id)
+          .maybeSingle();
+        check("anon cannot see inactive salon via public view", data === null);
+      })(),
+      (async () => {
+        const { error } = await anon
+          .from("salons")
+          .select("email, owner_name, upi_id, phone")
+          .eq("id", activeSalon.data.id);
+        check(
+          "anon cannot select sensitive salon columns (email/owner_name/upi_id/phone)",
+          !!error,
+          error ? undefined : "query unexpectedly succeeded",
+        );
+      })(),
+      (async () => {
+        const { data, error } = await anon
+          .from("salons")
+          .select("id, name, is_active")
+          .eq("id", activeSalon.data.id)
+          .maybeSingle();
+        check(
+          "anon can read non-sensitive salon columns of active row",
+          !error && data?.id === activeSalon.data.id,
+          error?.message,
+        );
+      })(),
+      // -------- [salons] role-based access --------
+      (async () => {
+        const { data, error } = await asOwner
+          .from("salons")
+          .select("id, email, owner_name, upi_id, phone")
+          .eq("id", activeSalon.data.id)
+          .maybeSingle();
+        check(
+          "owner can read full salon row including sensitive columns",
+          !error && data?.email === "secret-owner@example.com" && data?.upi_id === "secret@upi",
+          error?.message,
+        );
+      })(),
+      (async () => {
+        const { data, error } = await asStaff
+          .from("salons")
+          .select("id, name")
+          .eq("id", activeSalon.data.id)
+          .maybeSingle();
+        check(
+          "staff member can read assigned salon",
+          !error && data?.id === activeSalon.data.id,
+          error?.message,
+        );
+      })(),
+      (async () => {
+        const { data, error } = await asStaff
+          .from("salons")
+          .select("email")
+          .eq("id", activeSalon.data.id)
+          .maybeSingle();
+        check(
+          "approved manager can read sensitive salon column (email) — full-owner policy",
+          !error && data?.email === "secret-owner@example.com",
+          `error=${error?.message} data=${JSON.stringify(data)}`,
+        );
+      })(),
+      (async () => {
+        const { data, error } = await asStranger
+          .from("salons")
+          .select("id, email")
+          .eq("id", inactiveSalon.data.id)
+          .maybeSingle();
+        check(
+          "stranger cannot read inactive salon",
+          data === null && !error,
+          `data=${JSON.stringify(data)} error=${error?.message}`,
+        );
+      })(),
+      (async () => {
+        const { data, error } = await asAdmin
+          .from("salons")
+          .select("id, email")
+          .eq("id", inactiveSalon.data.id)
+          .maybeSingle();
+        check(
+          "admin can read inactive salon (full)",
+          !error && data?.id === inactiveSalon.data.id,
+          error?.message,
+        );
+      })(),
+      // -------- [businesses / public_businesses] anonymous access --------
+      (async () => {
+        const { data, error } = await anon
+          .from("public_businesses")
+          .select("id, business_name")
+          .eq("id", activeBiz.data.id)
+          .maybeSingle();
+        check(
+          "anon can read active business via public_businesses view",
+          !error && data?.id === activeBiz.data.id,
+          error?.message,
+        );
+      })(),
+      (async () => {
+        const { data } = await anon
+          .from("public_businesses")
+          .select("id")
+          .eq("id", pendingBiz.data.id)
+          .maybeSingle();
+        check("anon cannot see pending business via public view", data === null);
+      })(),
+      (async () => {
+        const { error } = await anon
+          .from("businesses")
+          .select("phone, whatsapp_number")
+          .eq("id", activeBiz.data.id);
+        check(
+          "anon cannot select phone/whatsapp_number from businesses base table",
+          !!error,
+          error ? undefined : "query unexpectedly succeeded",
+        );
+      })(),
+      (async () => {
+        const { data, error } = await anon
+          .from("businesses")
+          .select("id, business_name, status")
+          .eq("id", pendingBiz.data.id)
+          .maybeSingle();
+        check(
+          "anon cannot see pending business row on base table",
+          data === null && !error,
+          `data=${JSON.stringify(data)} error=${error?.message}`,
+        );
+      })(),
+      // -------- [businesses] role-based access --------
+      (async () => {
+        const { data, error } = await asOwner
+          .from("businesses")
+          .select("id, phone, whatsapp_number, status")
+          .eq("id", pendingBiz.data.id)
+          .maybeSingle();
+        check(
+          "owner can read own pending business incl. phone/whatsapp",
+          !error &&
+            data?.phone === "5559998888" &&
+            data?.whatsapp_number === "5559997777" &&
+            data?.status === "pending_verification",
+          error?.message,
+        );
+      })(),
+      (async () => {
+        const { data, error } = await asStranger
+          .from("businesses")
+          .select("id")
+          .eq("id", pendingBiz.data.id)
+          .maybeSingle();
+        check(
+          "stranger cannot read pending business",
+          data === null && !error,
+          `data=${JSON.stringify(data)} error=${error?.message}`,
+        );
+      })(),
+      (async () => {
+        const { data, error } = await asStranger
+          .from("businesses")
+          .select("phone, whatsapp_number")
+          .eq("id", activeBiz.data.id);
+        check(
+          "stranger cannot read phone/whatsapp_number of active business (RLS filters row)",
+          !error && Array.isArray(data) && data.length === 0,
+          `error=${error?.message} data=${JSON.stringify(data)}`,
+        );
+      })(),
+      (async () => {
+        const { data, error } = await asAdmin
+          .from("businesses")
+          .select("id, phone")
+          .eq("id", pendingBiz.data.id)
+          .maybeSingle();
+        check(
+          "admin can read pending business incl. phone",
+          !error && data?.phone === "5559998888",
+          error?.message,
+        );
+      })(),
+    ]);
   } finally {
     // ---------- Cleanup ----------
     if (cleanupIds.businesses.length)
