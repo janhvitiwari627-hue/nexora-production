@@ -415,9 +415,9 @@ async function main() {
         .select("phone, whatsapp_number")
         .eq("id", activeBiz.data.id);
       check(
-        "stranger cannot select phone/whatsapp_number even for active business",
-        !!error,
-        error ? undefined : "query unexpectedly succeeded",
+        "stranger cannot read phone/whatsapp_number of active business (RLS filters row)",
+        !error && Array.isArray(data) && data.length === 0,
+        `error=${error?.message} data=${JSON.stringify(data)}`,
       );
     }
     {
