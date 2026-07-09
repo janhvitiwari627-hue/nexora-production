@@ -159,6 +159,7 @@ async function main() {
       const { error } = await admin.from("shop_staff").insert({
         profile_id: staff.id,
         shop_id: activeSalon.data.id,
+        full_name: "RLS Staff",
         is_active: true,
       });
       if (error) throw new Error(`shop_staff: ${error.message}`);
