@@ -156,13 +156,15 @@ async function main() {
       if (error) throw new Error(`salon_owners: ${error.message}`);
     }
     {
-      const { error } = await admin.from("shop_staff").insert({
-        profile_id: staff.id,
-        shop_id: activeSalon.data.id,
-        full_name: "RLS Staff",
-        is_active: true,
+      // Register `staff` as an approved member (staff role) of the active salon.
+      const { error } = await admin.from("salon_owners").insert({
+        user_id: staff.id,
+        salon_id: activeSalon.data.id,
+        role: "staff",
+        is_approved: true,
+        approved_at: new Date().toISOString(),
       });
-      if (error) throw new Error(`shop_staff: ${error.message}`);
+      if (error) throw new Error(`salon_owners staff: ${error.message}`);
     }
 
     // Active business owned by owner
