@@ -89,123 +89,107 @@ async function cleanupUser(id) {
 async function main() {
   console.log("RLS test suite — salons & businesses\n");
 
-  // ---------- Seed ----------
-  const owner = await createUser("owner");
-  const staff = await createUser("staff");
-  const stranger = await createUser("stranger");
-  const admin1 = await createUser("admin");
+  // ---------- Seed (parallelised) ----------
+  const [owner, staff, stranger, admin1] = await Promise.all([
+    createUser("owner"),
+    createUser("staff"),
+    createUser("stranger"),
+    createUser("admin"),
+  ]);
   const createdUserIds = [owner.id, staff.id, stranger.id, admin1.id];
 
   const cleanupIds = { salons: [], businesses: [] };
 
   try {
-    // Grant admin role
-    {
-      const { error } = await admin
-        .from("user_roles")
-        .insert({ user_id: admin1.id, role: "admin" });
-      if (error) throw new Error(`insert admin role: ${error.message}`);
-    }
-
-    // Public + active salon (owned by owner)
+    // Salons + admin role can all be created in parallel (no interdeps).
     const activeSlug = `rls-active-${randomUUID().slice(0, 8)}`;
-    const activeSalon = await admin
-      .from("salons")
-      .insert({
-        name: "RLS Active Salon",
-        slug: activeSlug,
-        is_active: true,
-        phone: "9990001111",
-        email: "secret-owner@example.com",
-        owner_name: "Owner Secret",
-        upi_id: "secret@upi",
-        business_public_phone: "8887776665",
-        business_public_whatsapp: "8887776665",
-        show_public_contact: true,
-        city: "Jaipur",
-        location: "C-Scheme",
-      })
-      .select("id")
-      .single();
+    const [roleRes, activeSalon, inactiveSalon] = await Promise.all([
+      admin.from("user_roles").insert({ user_id: admin1.id, role: "admin" }),
+      admin
+        .from("salons")
+        .insert({
+          name: "RLS Active Salon",
+          slug: activeSlug,
+          is_active: true,
+          phone: "9990001111",
+          email: "secret-owner@example.com",
+          owner_name: "Owner Secret",
+          upi_id: "secret@upi",
+          business_public_phone: "8887776665",
+          business_public_whatsapp: "8887776665",
+          show_public_contact: true,
+          city: "Jaipur",
+          location: "C-Scheme",
+        })
+        .select("id")
+        .single(),
+      admin
+        .from("salons")
+        .insert({
+          name: "RLS Inactive Salon",
+          slug: `rls-inactive-${randomUUID().slice(0, 8)}`,
+          is_active: false,
+          phone: "1112223333",
+        })
+        .select("id")
+        .single(),
+    ]);
+    if (roleRes.error) throw new Error(`insert admin role: ${roleRes.error.message}`);
     if (activeSalon.error) throw new Error(`seed active salon: ${activeSalon.error.message}`);
-    cleanupIds.salons.push(activeSalon.data.id);
-
-    // Inactive salon (should be hidden from anon)
-    const inactiveSalon = await admin
-      .from("salons")
-      .insert({
-        name: "RLS Inactive Salon",
-        slug: `rls-inactive-${randomUUID().slice(0, 8)}`,
-        is_active: false,
-        phone: "1112223333",
-      })
-      .select("id")
-      .single();
     if (inactiveSalon.error) throw new Error(`seed inactive salon: ${inactiveSalon.error.message}`);
-    cleanupIds.salons.push(inactiveSalon.data.id);
+    cleanupIds.salons.push(activeSalon.data.id, inactiveSalon.data.id);
 
-    // Salon ownership + staff link
-    {
-      const { error } = await admin.from("salon_owners").insert({
+    // Ownership links + businesses depend on activeSalon.id — parallel batch.
+    const nowIso = new Date().toISOString();
+    const [ownerLink, staffLink, activeBiz, pendingBiz] = await Promise.all([
+      admin.from("salon_owners").insert({
         user_id: owner.id,
         salon_id: activeSalon.data.id,
         role: "owner",
         is_approved: true,
-        approved_at: new Date().toISOString(),
-      });
-      if (error) throw new Error(`salon_owners: ${error.message}`);
-    }
-    {
-      // Register `staff` as an approved member (staff role) of the active salon.
-      const { error } = await admin.from("salon_owners").insert({
+        approved_at: nowIso,
+      }),
+      admin.from("salon_owners").insert({
         user_id: staff.id,
         salon_id: activeSalon.data.id,
         role: "manager",
         is_approved: true,
-        approved_at: new Date().toISOString(),
-      });
-      if (error) throw new Error(`salon_owners staff: ${error.message}`);
-    }
-
-    // Active business owned by owner
-    const activeBiz = await admin
-      .from("businesses")
-      .insert({
-        owner_id: owner.id,
-        salon_id: activeSalon.data.id,
-        business_name: "RLS Active Business",
-        business_category: "salon",
-        phone: "5551110000",
-        whatsapp_number: "5551112222",
-        city: "Jaipur",
-        area_locality: "C-Scheme",
-        status: "active",
-        is_active: true,
-      })
-      .select("id")
-      .single();
+        approved_at: nowIso,
+      }),
+      admin
+        .from("businesses")
+        .insert({
+          owner_id: owner.id,
+          salon_id: activeSalon.data.id,
+          business_name: "RLS Active Business",
+          business_category: "salon",
+          phone: "5551110000",
+          whatsapp_number: "5551112222",
+          city: "Jaipur",
+          area_locality: "C-Scheme",
+          status: "active",
+          is_active: true,
+        })
+        .select("id")
+        .single(),
+      admin
+        .from("businesses")
+        .insert({
+          owner_id: owner.id,
+          business_name: "RLS Pending Business",
+          phone: "5559998888",
+          whatsapp_number: "5559997777",
+          status: "pending_verification",
+          is_active: false,
+        })
+        .select("id")
+        .single(),
+    ]);
+    if (ownerLink.error) throw new Error(`salon_owners: ${ownerLink.error.message}`);
+    if (staffLink.error) throw new Error(`salon_owners staff: ${staffLink.error.message}`);
     if (activeBiz.error) throw new Error(`seed active biz: ${activeBiz.error.message}`);
-    cleanupIds.businesses.push(activeBiz.data.id);
-
-    // Pending business owned by owner (private)
-    const pendingBiz = await admin
-      .from("businesses")
-      .insert({
-        owner_id: owner.id,
-        business_name: "RLS Pending Business",
-        phone: "5559998888",
-        whatsapp_number: "5559997777",
-        status: "pending_verification",
-        is_active: false,
-      })
-      .select("id")
-      .single();
     if (pendingBiz.error) throw new Error(`seed pending biz: ${pendingBiz.error.message}`);
-    cleanupIds.businesses.push(pendingBiz.data.id);
-
-    // Register staff in shop_members for pending business (should NOT grant read
-    // when policy is scoped correctly? Actually shop_members grants member reads —
-    // we test that STRANGER cannot read pending business.)
+    cleanupIds.businesses.push(activeBiz.data.id, pendingBiz.data.id);
 
     const anon = anonClient();
     const asOwner = userClient(owner.accessToken);
