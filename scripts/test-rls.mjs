@@ -160,7 +160,7 @@ async function main() {
       const { error } = await admin.from("salon_owners").insert({
         user_id: staff.id,
         salon_id: activeSalon.data.id,
-        role: "staff",
+        role: "manager",
         is_approved: true,
         approved_at: new Date().toISOString(),
       });
