@@ -5,6 +5,12 @@ on:
   push:
     branches: [main]
 
+concurrency:
+  group: rls-tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+
+
 jobs:
   rls:
     runs-on: ubuntu-latest
