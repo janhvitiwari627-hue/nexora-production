@@ -67,8 +67,12 @@ async function createUser(label) {
     email_confirm: true,
   });
   if (error) throw new Error(`createUser ${label}: ${error.message}`);
-  const { data: sess, error: sErr } = await admin.auth.signInWithPassword({ email, password });
-  // signInWithPassword on admin client is fine; it returns a session.
+  // Use a fresh anon client for sign-in so we don't overwrite the admin
+  // client's service-role session with a user session.
+  const signIn = createClient(URL, ANON, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  const { data: sess, error: sErr } = await signIn.auth.signInWithPassword({ email, password });
   if (sErr || !sess?.session)
     throw new Error(`signIn ${label}: ${sErr?.message ?? "no session"}`);
   return { id: data.user.id, email, accessToken: sess.session.access_token };
