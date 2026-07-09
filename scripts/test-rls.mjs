@@ -483,6 +483,7 @@ async function main() {
   }
 
   console.log(`\nResults: ${passed} passed, ${failed} failed`);
+  if (logStream) await new Promise((r) => logStream.end(r));
   if (failed > 0) {
     console.error("\nFailures:");
     for (const f of failures) console.error(`  - ${f.name}${f.detail ? ": " + f.detail : ""}`);
