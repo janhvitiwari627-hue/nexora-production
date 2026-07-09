@@ -109,16 +109,61 @@ const userClient = (accessToken) =>
 let passed = 0;
 let failed = 0;
 const failures = [];
+const timings = [];
+const failureDetails = [];
 
-function check(name, ok, detail) {
+function check(name, ok, detail, ctx) {
   if (ok) {
     passed++;
     console.log(`  ✓ ${name}`);
   } else {
     failed++;
     failures.push({ name, detail });
+    failureDetails.push({
+      name,
+      detail: detail ?? null,
+      group: ctx?.group ?? null,
+      role: ctx?.role ?? null,
+      table: ctx?.table ?? null,
+      view: ctx?.view ?? null,
+      operation: ctx?.operation ?? "select",
+      columns: ctx?.columns ?? null,
+      filter: ctx?.filter ?? null,
+      expected: ctx?.expected ?? null,
+      data: ctx?.data ?? null,
+      error: ctx?.error
+        ? {
+            message: ctx.error.message ?? null,
+            code: ctx.error.code ?? null,
+            details: ctx.error.details ?? null,
+            hint: ctx.error.hint ?? null,
+          }
+        : null,
+      timestamp: new Date().toISOString(),
+    });
     console.log(`  ✗ ${name}${detail ? " — " + detail : ""}`);
   }
+}
+
+async function timed(name, fn) {
+  const start = Date.now();
+  let status = "passed";
+  let thrown = null;
+  const failedBefore = failed;
+  try {
+    await fn();
+  } catch (e) {
+    status = "errored";
+    thrown = e;
+  }
+  if (status !== "errored" && failed > failedBefore) status = "failed";
+  timings.push({
+    name,
+    durationMs: Date.now() - start,
+    status,
+    thrown: thrown ? String(thrown?.message ?? thrown) : null,
+  });
+  if (thrown) throw thrown;
 }
 
 async function createUser(label) {
