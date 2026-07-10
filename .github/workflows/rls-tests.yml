@@ -48,6 +48,7 @@ jobs:
 
       - name: Upload RLS failure artifacts
         if: failure()
+        id: upload_rls_artifacts
         uses: actions/upload-artifact@v4
         with:
           name: rls-test-failure-${{ github.run_id }}-${{ github.run_attempt }}
@@ -64,6 +65,9 @@ jobs:
           GITHUB_RUN_ID: ${{ github.run_id }}
           GITHUB_SERVER_URL: ${{ github.server_url }}
           GITHUB_REPOSITORY: ${{ github.repository }}
+          RLS_ARTIFACT_NAME: rls-test-failure-${{ github.run_id }}-${{ github.run_attempt }}
+          RLS_ARTIFACT_URL: ${{ steps.upload_rls_artifacts.outputs.artifact-url }}
+          RLS_ARTIFACT_ID: ${{ steps.upload_rls_artifacts.outputs.artifact-id }}
 
       - name: Comment failing RLS summary on PR
         if: failure() && github.event_name == 'pull_request' && steps.rls_summary.outputs.body_path != ''
