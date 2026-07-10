@@ -18,7 +18,8 @@
     "format": "prettier --write .",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
-    "test:rls": "node scripts/test-rls.mjs"
+    "test:rls": "node scripts/test-rls.mjs",
+    "test:rls:local": "bash scripts/run-rls-local.sh"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^2.0.51",
