@@ -54,3 +54,20 @@ jobs:
           path: rls-artifacts/
           if-no-files-found: warn
           retention-days: 14
+
+      - name: Build PR comment summary
+        if: failure() && github.event_name == 'pull_request'
+        id: rls_summary
+        run: node scripts/rls-pr-comment.mjs
+        env:
+          RLS_LOG_DIR: ${{ github.workspace }}/rls-artifacts
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+
+      - name: Comment failing RLS summary on PR
+        if: failure() && github.event_name == 'pull_request' && steps.rls_summary.outputs.body_path != ''
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: rls-test-failure
+          path: ${{ steps.rls_summary.outputs.body_path }}
