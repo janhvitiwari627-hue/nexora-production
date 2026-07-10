@@ -106,6 +106,56 @@ if (timings?.assertions?.length) {
   lines.push('');
 }
 
+// Artifact links. `actions/upload-artifact@v4` exposes an `artifact-url`
+// pointing at the run's artifact page — the closest thing to a direct
+// download link that GitHub offers for logged-in reviewers. Individual
+// files inside the zip cannot be linked directly, so we list them under
+// that URL to show what's inside.
+const artifactUrl = process.env.RLS_ARTIFACT_URL;
+const artifactName = process.env.RLS_ARTIFACT_NAME;
+if (artifactUrl || existsSync(dir)) {
+  lines.push('### Artifacts');
+  lines.push('');
+  if (artifactUrl) {
+    lines.push(
+      `📦 **[${artifactName ?? 'rls-artifacts'}](${artifactUrl})** — download the full \`rls-artifacts/\` bundle (sign-in required).`,
+    );
+    lines.push('');
+  }
+  try {
+    const files = readdirSync(dir)
+      .filter((f) => {
+        try {
+          return statSync(join(dir, f)).isFile();
+        } catch {
+          return false;
+        }
+      })
+      .sort();
+    if (files.length) {
+      lines.push('Files included:');
+      for (const f of files) {
+        const size = (() => {
+          try {
+            return statSync(join(dir, f)).size;
+          } catch {
+            return null;
+          }
+        })();
+        const sizeLabel = size != null ? ` _(${formatBytes(size)})_` : '';
+        lines.push(
+          artifactUrl
+            ? `- [\`${f}\`](${artifactUrl})${sizeLabel}`
+            : `- \`${f}\`${sizeLabel}`,
+        );
+      }
+      lines.push('');
+    }
+  } catch (err) {
+    console.error('Failed to list artifact files:', err.message);
+  }
+}
+
 lines.push('---');
 lines.push('_Full logs are attached as workflow artifacts._');
 
