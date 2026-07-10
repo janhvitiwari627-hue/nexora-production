@@ -156,6 +156,22 @@ if (artifactUrl || existsSync(dir)) {
   }
 }
 
+lines.push('### Reproduce locally');
+lines.push('');
+lines.push('Set the same env vars the CI job uses, then run the RLS suite:');
+lines.push('');
+lines.push('```bash');
+lines.push('export SUPABASE_URL="https://<your-project>.supabase.co"');
+lines.push('export SUPABASE_PUBLISHABLE_KEY="<publishable-key>"');
+lines.push('export SUPABASE_SERVICE_ROLE_KEY="<service-role-key>"');
+lines.push('export RLS_LOG_DIR="$(pwd)/rls-artifacts"');
+lines.push('mkdir -p "$RLS_LOG_DIR"');
+lines.push('bun install --frozen-lockfile');
+lines.push('bun run test:rls 2>&1 | tee "$RLS_LOG_DIR/rls-output.log"');
+lines.push('```');
+lines.push('');
+lines.push('After the run, inspect `$RLS_LOG_DIR/failure-details.json` and `$RLS_LOG_DIR/assertion-timings.json` for the same context shown above.');
+lines.push('');
 lines.push('---');
 lines.push('_Full logs are attached as workflow artifacts._');
 
