@@ -2,7 +2,7 @@
 // Generate a Markdown PR comment summarizing failing RLS assertions
 // and the slowest per-assertion timings. Writes the body to a file
 // and exposes its path via $GITHUB_OUTPUT (body_path=...).
-import { readFileSync, writeFileSync, existsSync, appendFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, appendFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const dir = process.env.RLS_LOG_DIR;
