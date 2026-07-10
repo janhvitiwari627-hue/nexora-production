@@ -158,11 +158,19 @@ if (artifactUrl || existsSync(dir)) {
 
 lines.push('### Reproduce locally');
 lines.push('');
-lines.push('Copy the example env file, fill in your Supabase credentials, and run the RLS suite:');
+lines.push('The fastest way to rerun the suite locally is with the bundled env helper:');
+lines.push('');
+lines.push('```bash');
+lines.push('cp scripts/rls.env.example .env');
+lines.push('# edit .env with your real SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, and SUPABASE_SERVICE_ROLE_KEY');
+lines.push('bun run test:rls:local');
+lines.push('```');
+lines.push('');
+lines.push('Or, if you prefer to manage the env file yourself:');
 lines.push('');
 lines.push('```bash');
 lines.push('cp scripts/rls.env.example scripts/rls.env');
-lines.push('# edit scripts/rls.env with your real SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, and SUPABASE_SERVICE_ROLE_KEY');
+lines.push('# edit scripts/rls.env with your real credentials');
 lines.push('source scripts/rls.env');
 lines.push('mkdir -p "$RLS_LOG_DIR"');
 lines.push('bun install --frozen-lockfile');
