@@ -2,7 +2,7 @@
 // Generate a Markdown PR comment summarizing failing RLS assertions
 // and the slowest per-assertion timings. Writes the body to a file
 // and exposes its path via $GITHUB_OUTPUT (body_path=...).
-import { readFileSync, writeFileSync, existsSync, appendFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, appendFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const dir = process.env.RLS_LOG_DIR;
@@ -106,6 +106,56 @@ if (timings?.assertions?.length) {
   lines.push('');
 }
 
+// Artifact links. `actions/upload-artifact@v4` exposes an `artifact-url`
+// pointing at the run's artifact page — the closest thing to a direct
+// download link that GitHub offers for logged-in reviewers. Individual
+// files inside the zip cannot be linked directly, so we list them under
+// that URL to show what's inside.
+const artifactUrl = process.env.RLS_ARTIFACT_URL;
+const artifactName = process.env.RLS_ARTIFACT_NAME;
+if (artifactUrl || existsSync(dir)) {
+  lines.push('### Artifacts');
+  lines.push('');
+  if (artifactUrl) {
+    lines.push(
+      `📦 **[${artifactName ?? 'rls-artifacts'}](${artifactUrl})** — download the full \`rls-artifacts/\` bundle (sign-in required).`,
+    );
+    lines.push('');
+  }
+  try {
+    const files = readdirSync(dir)
+      .filter((f) => {
+        try {
+          return statSync(join(dir, f)).isFile();
+        } catch {
+          return false;
+        }
+      })
+      .sort();
+    if (files.length) {
+      lines.push('Files included:');
+      for (const f of files) {
+        const size = (() => {
+          try {
+            return statSync(join(dir, f)).size;
+          } catch {
+            return null;
+          }
+        })();
+        const sizeLabel = size != null ? ` _(${formatBytes(size)})_` : '';
+        lines.push(
+          artifactUrl
+            ? `- [\`${f}\`](${artifactUrl})${sizeLabel}`
+            : `- \`${f}\`${sizeLabel}`,
+        );
+      }
+      lines.push('');
+    }
+  } catch (err) {
+    console.error('Failed to list artifact files:', err.message);
+  }
+}
+
 lines.push('---');
 lines.push('_Full logs are attached as workflow artifacts._');
 
@@ -123,4 +173,9 @@ function escapeMd(s) {
 }
 function escapeCell(s) {
   return escapeMd(s).replace(/\|/g, '\\|').replace(/\r?\n/g, ' ');
+}
+function formatBytes(n) {
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
 }
