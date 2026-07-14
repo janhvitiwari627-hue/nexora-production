@@ -15,6 +15,10 @@ import nexoraLogo from "@/assets/nexora-logo.jpg.asset.json";
 
 
 import { NotFoundPage } from "@/pages/public/NotFoundPage";
+import {
+  SupabaseErrorFallback,
+  detectSupabaseErrorKind,
+} from "@/components/shared/SupabaseErrorFallback";
 import { Toaster } from "@/components/ui/sonner";
 import { useApplicationStatusNotifications } from "@/hooks/useApplicationStatusNotifications";
 import { ReferralWelcomePopup } from "@/components/referral/ReferralWelcomePopup";
@@ -29,6 +33,20 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
+
+  const supabaseKind = detectSupabaseErrorKind(error);
+  if (supabaseKind) {
+    return (
+      <SupabaseErrorFallback
+        kind={supabaseKind}
+        error={error}
+        onRetry={() => {
+          router.invalidate();
+          reset();
+        }}
+      />
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
