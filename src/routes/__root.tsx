@@ -15,6 +15,10 @@ import nexoraLogo from "@/assets/nexora-logo.jpg.asset.json";
 
 
 import { NotFoundPage } from "@/pages/public/NotFoundPage";
+import {
+  SupabaseErrorFallback,
+  detectSupabaseErrorKind,
+} from "@/components/shared/SupabaseErrorFallback";
 import { Toaster } from "@/components/ui/sonner";
 import { useApplicationStatusNotifications } from "@/hooks/useApplicationStatusNotifications";
 import { ReferralWelcomePopup } from "@/components/referral/ReferralWelcomePopup";
