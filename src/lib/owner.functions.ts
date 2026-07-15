@@ -15,33 +15,36 @@ export const getMyOwnedSalons = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("salon_owners")
-      .select("role, is_approved, selected_template_id, selected_template_key, salon:salons(id, name, slug, image_url, location, address, phone, rating, reviews_count, website_created, selected_template_id, selected_template_key)")
+      .select(
+        "role, is_approved, selected_template_id, selected_template_key, salon:salons(id, name, slug, image_url, location, address, phone, rating, reviews_count, website_created, selected_template_id, selected_template_key)",
+      )
       .eq("user_id", userId)
       .eq("is_approved", true);
     if (error) throw new Error(error.message);
-    return (data ?? []).map((row) => ({
-      role: row.role as "owner" | "manager",
-      salon: row.salon,
-    })).filter((r) => !!r.salon);
+    return (data ?? [])
+      .map((row) => ({
+        role: row.role as "owner" | "manager",
+        salon: row.salon,
+      }))
+      .filter((r) => !!r.salon);
   });
 
 // ---------- Website templates: list active ones (public) ----------
-export const listWebsiteTemplates = createServerFn({ method: "GET" })
-  .handler(async () => {
-    const { createClient } = await import("@supabase/supabase-js");
-    const supabase = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_PUBLISHABLE_KEY!,
-      { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
-    );
-    const { data, error } = await supabase
-      .from("website_templates")
-      .select("id, template_key, template_name, theme_type, category, preview_image, template_slug, description, primary_color, secondary_color, background_color, card_color, text_color, hero_type, template_config_json, sort_order")
-      .eq("is_active", true)
-      .order("sort_order", { ascending: true });
-    if (error) throw new Error(error.message);
-    return data ?? [];
+export const listWebsiteTemplates = createServerFn({ method: "GET" }).handler(async () => {
+  const { createClient } = await import("@supabase/supabase-js");
+  const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
   });
+  const { data, error } = await supabase
+    .from("website_templates")
+    .select(
+      "id, template_key, template_name, theme_type, category, preview_image, template_slug, description, primary_color, secondary_color, background_color, card_color, text_color, hero_type, template_config_json, sort_order",
+    )
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true });
+  if (error) throw new Error(error.message);
+  return data ?? [];
+});
 
 // ---------- Owner selects a website template ----------
 const SelectTemplateInput = z.object({
@@ -69,15 +72,18 @@ export const selectWebsiteTemplate = createServerFn({ method: "POST" })
       .maybeSingle();
     if (templateError) throw new Error(templateError.message);
     if (!template) throw new Error("Template not found");
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error: ownerError } = await supabaseAdmin
+    const { error: ownerError } = await supabase
       .from("salon_owners")
       .update({ selected_template_id: template.id, selected_template_key: template.template_key })
       .eq("id", link.id);
     if (ownerError) throw new Error(ownerError.message);
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
       .from("salons")
-      .update({ selected_template_id: template.id, selected_template_key: template.template_key, website_created: true })
+      .update({
+        selected_template_id: template.id,
+        selected_template_key: template.template_key,
+        website_created: true,
+      })
       .eq("id", data.salon_id);
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -98,10 +104,12 @@ export const getMyOwnerApprovalStatus = createServerFn({ method: "GET" })
     return {
       hasAnyLink: links.length > 0,
       hasApprovedLink: links.some((l) => l.is_approved),
-      pending: links.filter((l) => !l.is_approved).map((l) => ({
-        id: l.id,
-        salon: l.salon,
-      })),
+      pending: links
+        .filter((l) => !l.is_approved)
+        .map((l) => ({
+          id: l.id,
+          salon: l.salon,
+        })),
     };
   });
 
@@ -121,14 +129,20 @@ export const validateReferralCode = createServerFn({ method: "GET" })
       { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
     );
     const { data: row } = await supabase
-      .from("profiles").select("full_name").eq("referral_code", data.code.toUpperCase()).maybeSingle();
+      .from("profiles")
+      .select("full_name")
+      .eq("referral_code", data.code.toUpperCase())
+      .maybeSingle();
     return { valid: !!row, referrerName: row?.full_name ?? null };
   });
 
 // ---------- Salon owner self-registration ----------
 const RegisterSalonInput = z.object({
   name: z.string().trim().min(2).max(120),
-  phone: z.string().trim().regex(/^[+]?[0-9]{10,15}$/),
+  phone: z
+    .string()
+    .trim()
+    .regex(/^[+]?[0-9]{10,15}$/),
   city: z.string().trim().min(2).max(80).optional(),
   address: z.string().trim().max(255).optional(),
 });
@@ -137,82 +151,51 @@ export const registerMySalon = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => RegisterSalonInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    // Slug = name kebab + short suffix
-    const base = data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "salon";
-    const suffix = Math.random().toString(36).slice(2, 7);
-    const slug = `${base}-${suffix}`;
-
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: salon, error: sErr } = await supabaseAdmin
-      .from("salons")
-      .insert({ name: data.name, slug, phone: data.phone, city: data.city, address: data.address, is_active: false })
-      .select().single();
-    if (sErr) throw new Error(sErr.message);
-
-    const { error: lErr } = await supabaseAdmin
-      .from("salon_owners")
-      .insert({ user_id: userId, salon_id: salon.id, role: "owner", is_approved: false });
-    if (lErr) throw new Error(lErr.message);
-
-    return { salon_id: salon.id, slug };
+    void userId;
+    const { data: salonId, error } = await supabase.rpc("register_owner_business", {
+      _shop_name: data.name,
+      _district: data.city ?? "Not provided",
+      _owner_name: "Salon owner",
+      _mobile: data.phone,
+      _address: data.address,
+    });
+    if (error) throw new Error(error.message);
+    return { salon_id: salonId };
   });
 
 // ---------- Admin: pending salon-owner approvals ----------
 export const listPendingOwnerApprovals = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data: isAdmin } = await context.supabase
-      .rpc("has_role", { _user_id: context.userId, _role: "admin" });
-    if (!isAdmin) throw new Error("Forbidden");
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: links, error } = await supabaseAdmin
-      .from("salon_owners")
-      .select("id, created_at, user_id, salon:salons(id, name, slug, city, phone)")
-      .eq("is_approved", false)
-      .order("created_at", { ascending: false });
+    const { data: rows, error } = await context.supabase.rpc("list_pending_owner_salons");
     if (error) throw new Error(error.message);
-    const rows = links ?? [];
-    const userIds = Array.from(new Set(rows.map((r) => r.user_id)));
-    if (userIds.length === 0) return rows.map((r) => ({ ...r, user: null }));
-    const { data: profiles } = await supabaseAdmin
-      .from("profiles")
-      .select("id, full_name, email, mobile")
-      .in("id", userIds);
-    const byId = new Map((profiles ?? []).map((p) => [p.id, p]));
-    return rows.map((r) => ({ ...r, user: byId.get(r.user_id) ?? null }));
+    return (Array.isArray(rows) ? rows : []) as Array<{
+      id: string;
+      created_at: string;
+      salon: { id: string; name: string; slug: string; city: string | null; phone: string | null };
+      user: {
+        id: string;
+        full_name: string | null;
+        email: string | null;
+        mobile: string | null;
+      } | null;
+    }>;
   });
 
 const ApprovalActionInput = z.object({
-  salon_owner_id: z.string().uuid(),
+  owner_request_id: z.string().uuid(),
   approve: z.boolean(),
 });
 export const setOwnerApproval = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => ApprovalActionInput.parse(d))
   .handler(async ({ data, context }) => {
-    const { data: isAdmin } = await context.supabase
-      .rpc("has_role", { _user_id: context.userId, _role: "admin" });
-    if (!isAdmin) throw new Error("Forbidden");
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    if (data.approve) {
-      const { error } = await supabaseAdmin
-        .from("salon_owners")
-        .update({ is_approved: true, approved_at: new Date().toISOString(), approved_by: context.userId })
-        .eq("id", data.salon_owner_id);
-      if (error) throw new Error(error.message);
-      // Activate salon when first owner is approved.
-      const { data: link } = await supabaseAdmin
-        .from("salon_owners").select("salon_id").eq("id", data.salon_owner_id).maybeSingle();
-      if (link?.salon_id) {
-        await supabaseAdmin.from("salons").update({ is_active: true }).eq("id", link.salon_id);
-      }
-    } else {
-      // Reject = delete the link (admin can re-add later).
-      const { error } = await supabaseAdmin
-        .from("salon_owners").delete().eq("id", data.salon_owner_id);
-      if (error) throw new Error(error.message);
-    }
-    return { ok: true };
+    const { data: result, error } = await context.supabase.rpc("review_owner_salon", {
+      _owner_request_id: data.owner_request_id,
+      _approve: data.approve,
+    });
+    if (error) throw new Error(error.message);
+    return result;
   });
 
 // ---------- Dashboard metrics ----------
@@ -223,24 +206,41 @@ export const getOwnerDashboardMetrics = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) => SalonInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
+    await assertOwnsSalon(supabase, context.userId, data.salon_id);
     const today = new Date();
-    const start = new Date(today); start.setHours(0, 0, 0, 0);
-    const sevenAgo = new Date(today); sevenAgo.setDate(sevenAgo.getDate() - 7);
-    const thirtyAgo = new Date(today); thirtyAgo.setDate(thirtyAgo.getDate() - 30);
+    const start = new Date(today);
+    start.setHours(0, 0, 0, 0);
+    const sevenAgo = new Date(today);
+    sevenAgo.setDate(sevenAgo.getDate() - 7);
+    const thirtyAgo = new Date(today);
+    thirtyAgo.setDate(thirtyAgo.getDate() - 30);
 
     const [todayRes, weekRes, monthRes, pendingRes] = await Promise.all([
-      supabase.from("bookings").select("id, price, advance_amount, status, payment_status")
-        .eq("salon_id", data.salon_id).gte("booking_date", start.toISOString().slice(0, 10)),
-      supabase.from("bookings").select("id, price, advance_amount, status")
-        .eq("salon_id", data.salon_id).gte("booking_date", sevenAgo.toISOString().slice(0, 10)),
-      supabase.from("bookings").select("id, price, advance_amount, status")
-        .eq("salon_id", data.salon_id).gte("booking_date", thirtyAgo.toISOString().slice(0, 10)),
-      supabase.from("bookings").select("id", { count: "exact", head: true })
-        .eq("salon_id", data.salon_id).eq("status", "pending"),
+      supabase
+        .from("bookings")
+        .select("id, price, advance_amount, status, payment_status")
+        .eq("salon_id", data.salon_id)
+        .gte("booking_date", start.toISOString().slice(0, 10)),
+      supabase
+        .from("bookings")
+        .select("id, price, advance_amount, status")
+        .eq("salon_id", data.salon_id)
+        .gte("booking_date", sevenAgo.toISOString().slice(0, 10)),
+      supabase
+        .from("bookings")
+        .select("id, price, advance_amount, status")
+        .eq("salon_id", data.salon_id)
+        .gte("booking_date", thirtyAgo.toISOString().slice(0, 10)),
+      supabase
+        .from("bookings")
+        .select("id", { count: "exact", head: true })
+        .eq("salon_id", data.salon_id)
+        .eq("status", "pending"),
     ]);
 
     const sumPaid = (rows: { price: number; status: string }[] | null) =>
-      (rows ?? []).filter((r) => r.status === "completed" || r.status === "confirmed")
+      (rows ?? [])
+        .filter((r) => r.status === "completed" || r.status === "confirmed")
         .reduce((acc, r) => acc + Number(r.price ?? 0), 0);
 
     return {
@@ -263,9 +263,12 @@ export const listOwnerBookings = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => ListBookingsInput.parse(d))
   .handler(async ({ data, context }) => {
+    await assertOwnsSalon(context.supabase, context.userId, data.salon_id);
     let q = context.supabase
       .from("bookings")
-      .select("id, user_id, service_name, booking_date, booking_time, price, advance_amount, status, payment_status, created_at")
+      .select(
+        "id, user_id, service_name, booking_date, booking_time, price, advance_amount, status, payment_status, created_at, proposed_date, proposed_time, proposal_status, proposal_note, service_mode, service_address, home_service_charge, customer:profiles(full_name, mobile)",
+      )
       .eq("salon_id", data.salon_id)
       .order("booking_date", { ascending: false })
       .order("booking_time", { ascending: false })
@@ -287,10 +290,43 @@ export const updateOwnerBookingStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => UpdateBookingStatusInput.parse(d))
   .handler(async ({ data, context }) => {
-    const patch: { status: typeof data.status; cancelled_at?: string } = { status: data.status };
-    if (data.status === "cancelled") patch.cancelled_at = new Date().toISOString();
-    const { data: row, error } = await context.supabase
-      .from("bookings").update(patch).eq("id", data.booking_id).select().single();
+    const action =
+      data.status === "confirmed"
+        ? "confirm"
+        : data.status === "cancelled"
+          ? "reject"
+          : data.status === "completed"
+            ? "complete"
+            : data.status === "no_show"
+              ? "no_show"
+              : null;
+    if (!action) throw new Error("Pending is not a valid owner action");
+    const { data: row, error } = await context.supabase.rpc("owner_transition_booking", {
+      _booking_id: data.booking_id,
+      _action: action,
+    });
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+const SuggestBookingTimeInput = z.object({
+  booking_id: z.string().uuid(),
+  proposed_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  proposed_time: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/),
+  note: z.string().trim().max(300).optional(),
+});
+
+export const suggestOwnerBookingTime = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => SuggestBookingTimeInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase.rpc("owner_transition_booking", {
+      _booking_id: data.booking_id,
+      _action: "suggest_time",
+      _proposed_date: data.proposed_date,
+      _proposed_time: data.proposed_time,
+      _note: data.note,
+    });
     if (error) throw new Error(error.message);
     return row;
   });
@@ -312,8 +348,11 @@ export const listOwnerServices = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => SalonInput.parse(d))
   .handler(async ({ data, context }) => {
+    await assertOwnsSalon(context.supabase, context.userId, data.salon_id);
     const { data: rows, error } = await context.supabase
-      .from("services").select("*").eq("salon_id", data.salon_id)
+      .from("services")
+      .select("*")
+      .eq("salon_id", data.salon_id)
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     return rows ?? [];
@@ -323,6 +362,7 @@ export const upsertOwnerService = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => ServiceUpsertInput.parse(d))
   .handler(async ({ data, context }) => {
+    await assertOwnsSalon(context.supabase, context.userId, data.salon_id);
     const { error, data: row } = data.id
       ? await context.supabase.from("services").update(data).eq("id", data.id).select().single()
       : await context.supabase.from("services").insert(data).select().single();
@@ -355,8 +395,11 @@ export const listOwnerStaff = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => SalonInput.parse(d))
   .handler(async ({ data, context }) => {
+    await assertOwnsSalon(context.supabase, context.userId, data.salon_id);
     const { data: rows, error } = await context.supabase
-      .from("staff").select("*").eq("salon_id", data.salon_id)
+      .from("staff")
+      .select("*")
+      .eq("salon_id", data.salon_id)
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     return rows ?? [];
@@ -366,6 +409,7 @@ export const upsertOwnerStaff = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => StaffUpsertInput.parse(d))
   .handler(async ({ data, context }) => {
+    await assertOwnsSalon(context.supabase, context.userId, data.salon_id);
     const { error, data: row } = data.id
       ? await context.supabase.from("staff").update(data).eq("id", data.id).select().single()
       : await context.supabase.from("staff").insert(data).select().single();
@@ -392,6 +436,7 @@ export const getOwnerAnalyticsTimeseries = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => AnalyticsInput.parse(d))
   .handler(async ({ data, context }) => {
+    await assertOwnsSalon(context.supabase, context.userId, data.salon_id);
     const from = new Date();
     from.setDate(from.getDate() - data.days);
     const { data: rows, error } = await context.supabase
@@ -402,7 +447,8 @@ export const getOwnerAnalyticsTimeseries = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     const byDay = new Map<string, { date: string; bookings: number; revenue: number }>();
     for (let i = 0; i < data.days; i++) {
-      const d = new Date(); d.setDate(d.getDate() - (data.days - 1 - i));
+      const d = new Date();
+      d.setDate(d.getDate() - (data.days - 1 - i));
       const key = d.toISOString().slice(0, 10);
       byDay.set(key, { date: key, bookings: 0, revenue: 0 });
     }
@@ -432,8 +478,12 @@ export const generateMarketingCopy = createServerFn({ method: "POST" })
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("Lovable AI is not configured.");
     const { data: salon } = await context.supabase
-      .from("salons").select("name, location, category").eq("id", data.salon_id).single();
-    const system = "You write short marketing messages for Indian beauty salons. Output JSON: { sms: string (<=160 chars), whatsapp: string (<=400 chars), email_subject: string, email_body: string }. Be warm, no emojis in SMS, use Rupee symbol ₹ when mentioning price. Reply with JSON only, no markdown.";
+      .from("salons")
+      .select("name, location, category")
+      .eq("id", data.salon_id)
+      .single();
+    const system =
+      "You write short marketing messages for Indian beauty salons. Output JSON: { sms: string (<=160 chars), whatsapp: string (<=400 chars), email_subject: string, email_body: string }. Be warm, no emojis in SMS, use Rupee symbol ₹ when mentioning price. Reply with JSON only, no markdown.";
     const user = `Salon: ${salon?.name ?? "Salon"} in ${salon?.location ?? "your city"} (${salon?.category ?? "beauty"}). Goal: ${data.goal}. Tone: ${data.tone}. Notes: ${data.extra ?? "none"}.`;
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -448,12 +498,18 @@ export const generateMarketingCopy = createServerFn({ method: "POST" })
       }),
     });
     if (res.status === 429) throw new Error("AI is busy. Please try again in a moment.");
-    if (res.status === 402) throw new Error("AI credits exhausted. Please top up in Settings → Plans.");
+    if (res.status === 402)
+      throw new Error("AI credits exhausted. Please top up in Settings → Plans.");
     if (!res.ok) throw new Error(`AI gateway error: ${res.status}`);
-    const json = await res.json() as { choices?: { message?: { content?: string } }[] };
+    const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
     const text = json.choices?.[0]?.message?.content ?? "{}";
     try {
-      return JSON.parse(text) as { sms: string; whatsapp: string; email_subject: string; email_body: string };
+      return JSON.parse(text) as {
+        sms: string;
+        whatsapp: string;
+        email_subject: string;
+        email_body: string;
+      };
     } catch {
       return { sms: text, whatsapp: text, email_subject: "", email_body: text };
     }
@@ -464,8 +520,12 @@ export const getOwnerSalonFull = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => SalonInput.parse(d))
   .handler(async ({ data, context }) => {
+    await assertOwnsSalon(context.supabase, context.userId, data.salon_id);
     const { data: row, error } = await context.supabase
-      .from("salons").select("*").eq("id", data.salon_id).single();
+      .from("salons")
+      .select("*")
+      .eq("id", data.salon_id)
+      .single();
     if (error) throw new Error(error.message);
     return row;
   });
@@ -476,10 +536,7 @@ const blankStringToNull = (value: unknown) => {
   return trimmed.length === 0 ? null : trimmed;
 };
 
-const nullableUrl = z.preprocess(
-  blankStringToNull,
-  z.string().url().nullable().optional(),
-);
+const nullableUrl = z.preprocess(blankStringToNull, z.string().url().nullable().optional());
 
 const nullableEmail = z.preprocess(
   blankStringToNull,
@@ -488,7 +545,12 @@ const nullableEmail = z.preprocess(
 
 const nullableUpiId = z.preprocess(
   blankStringToNull,
-  z.string().max(120).regex(/^[a-zA-Z0-9._-]+@[a-zA-Z]{2,64}$/).nullable().optional(),
+  z
+    .string()
+    .max(120)
+    .regex(/^[a-zA-Z0-9._-]+@[a-zA-Z]{2,64}$/)
+    .nullable()
+    .optional(),
 );
 
 const SalonUpdateInput = z.object({
@@ -499,11 +561,22 @@ const SalonUpdateInput = z.object({
     owner_name: z.string().max(120).nullable().optional(),
     tagline: z.string().max(200).nullable().optional(),
     description: z.string().max(2000).nullable().optional(),
+    about_us: z.string().max(4000).nullable().optional(),
     image_url: nullableUrl,
     logo_url: nullableUrl,
     cover_image_url: nullableUrl,
-    brand_primary: z.string().regex(/^#[0-9a-fA-F]{6}$/).nullable().optional(),
-    brand_secondary: z.string().regex(/^#[0-9a-fA-F]{6}$/).nullable().optional(),
+    owner_profile_image_url: nullableUrl,
+    video_url: nullableUrl,
+    brand_primary: z
+      .string()
+      .regex(/^#[0-9a-fA-F]{6}$/)
+      .nullable()
+      .optional(),
+    brand_secondary: z
+      .string()
+      .regex(/^#[0-9a-fA-F]{6}$/)
+      .nullable()
+      .optional(),
     theme: z.string().max(40).nullable().optional(),
     custom_css: z.string().max(20000).nullable().optional(),
     seo_title: z.string().max(120).nullable().optional(),
@@ -518,10 +591,21 @@ const SalonUpdateInput = z.object({
     latitude: z.number().min(-90).max(90).nullable().optional(),
     longitude: z.number().min(-180).max(180).nullable().optional(),
     upi_id: nullableUpiId,
-    hours: z.record(z.string(), z.object({
-      open: z.string(), close: z.string(), closed: z.boolean(),
-    })).nullable().optional(),
-    gallery_images: z.array(z.string().url()).max(50).optional(),
+    is_home_service: z.boolean().optional(),
+    home_service_charge: z.number().min(0).max(100_000).optional(),
+    home_service_radius_km: z.number().min(0).max(100).optional(),
+    hours: z
+      .record(
+        z.string(),
+        z.object({
+          open: z.string(),
+          close: z.string(),
+          closed: z.boolean(),
+        }),
+      )
+      .nullable()
+      .optional(),
+    gallery_images: z.array(z.string().url()).max(5).optional(),
   }),
 });
 
@@ -533,13 +617,20 @@ export const updateOwnerSalon = createServerFn({ method: "POST" })
       const fields = Array.from(new Set(parsed.error.issues.map((issue) => issue.path.join("."))))
         .filter(Boolean)
         .map((path) => path.replace(/^patch\./, ""));
-      throw new Error(`Invalid setup field${fields.length === 1 ? "" : "s"}: ${fields.join(", ") || "details"}`);
+      throw new Error(
+        `Invalid setup field${fields.length === 1 ? "" : "s"}: ${fields.join(", ") || "details"}`,
+      );
     }
     return parsed.data;
   })
   .handler(async ({ data, context }) => {
+    await assertOwnsSalon(context.supabase, context.userId, data.salon_id);
     const { error, data: row } = await context.supabase
-      .from("salons").update(data.patch as never).eq("id", data.salon_id).select().single();
+      .from("salons")
+      .update(data.patch as never)
+      .eq("id", data.salon_id)
+      .select()
+      .single();
     if (error) throw new Error(error.message);
     return row;
   });
@@ -548,40 +639,20 @@ export const markSalonSetupComplete = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => SalonInput.parse(d))
   .handler(async ({ data, context }) => {
-    const { userId } = context;
-    const { data: link } = await context.supabase
-      .from("salon_owners").select("id").eq("user_id", userId)
-      .eq("salon_id", data.salon_id).eq("is_approved", true).maybeSingle();
-    if (!link) throw new Error("Not authorized for this salon");
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: salon, error: gErr } = await supabaseAdmin
-      .from("salons")
-      .select("name, category, owner_name, phone, whatsapp, address, latitude, longitude, logo_url, cover_image_url, hours, upi_id")
-      .eq("id", data.salon_id).single();
-    if (gErr) throw new Error(gErr.message);
-    const missing: string[] = [];
-    if (!salon.name) missing.push("Business name");
-    if (!salon.category) missing.push("Category");
-    if (!salon.owner_name) missing.push("Owner name");
-    if (!salon.phone) missing.push("Mobile");
-    if (!salon.whatsapp) missing.push("WhatsApp");
-    if (!salon.address) missing.push("Address");
-    if (salon.latitude == null || salon.longitude == null) missing.push("Google Maps pin");
-    if (!salon.logo_url) missing.push("Logo");
-    if (!salon.cover_image_url) missing.push("Cover banner");
-    if (!salon.hours) missing.push("Working hours");
-    if (!salon.upi_id) missing.push("Nexora QR (UPI ID)");
-    const { count: servicesCount } = await supabaseAdmin
-      .from("services").select("id", { count: "exact", head: true })
-      .eq("salon_id", data.salon_id).eq("is_active", true);
-    if ((servicesCount ?? 0) < 5) missing.push(`Top 5 services (have ${servicesCount ?? 0})`);
-    if (missing.length > 0) return { ok: false as const, missing };
-    const { error: uErr } = await supabaseAdmin
-      .from("salons")
-      .update({ setup_completed_at: new Date().toISOString(), is_active: true, website_created: true })
-      .eq("id", data.salon_id);
-    if (uErr) throw new Error(uErr.message);
-    return { ok: true as const, missing: [] as string[] };
+    const { data: result, error } = await context.supabase.rpc("complete_owner_salon_setup", {
+      _salon_id: data.salon_id,
+    });
+    if (error) throw new Error(error.message);
+    const parsed = result as {
+      ok?: boolean;
+      missing?: string[];
+      awaiting_approval?: boolean;
+    } | null;
+    return {
+      ok: parsed?.ok === true,
+      missing: Array.isArray(parsed?.missing) ? parsed.missing : [],
+      awaitingApproval: parsed?.awaiting_approval === true,
+    };
   });
 
 // ---------- Wallet ----------
@@ -590,17 +661,27 @@ export const getOwnerWallet = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) => SalonInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
+    await assertOwnsSalon(supabase, context.userId, data.salon_id);
     let { data: wallet } = await supabase
-      .from("salon_wallets").select("*").eq("salon_id", data.salon_id).maybeSingle();
+      .from("salon_wallets")
+      .select("*")
+      .eq("salon_id", data.salon_id)
+      .maybeSingle();
     if (!wallet) {
       const { data: created, error } = await supabase
-        .from("salon_wallets").insert({ salon_id: data.salon_id }).select().single();
+        .from("salon_wallets")
+        .insert({ salon_id: data.salon_id })
+        .select()
+        .single();
       if (error) throw new Error(error.message);
       wallet = created;
     }
     const { data: txns } = await supabase
-      .from("wallet_transactions").select("*")
-      .order("created_at", { ascending: false }).limit(50);
+      .from("wallet_transactions")
+      .select("*")
+      .eq("salon_id", data.salon_id)
+      .order("created_at", { ascending: false })
+      .limit(50);
     return { wallet, transactions: txns ?? [] };
   });
 
@@ -616,17 +697,22 @@ export const requestOwnerWithdrawal = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => WithdrawalRequestInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
+    await assertOwnsSalon(supabase, context.userId, data.salon_id);
     if (data.amount < MIN_WITHDRAWAL_AMOUNT) {
       throw new Error(`Minimum withdrawal is ₹${MIN_WITHDRAWAL_AMOUNT}`);
     }
     const { data: wallet } = await supabase
-      .from("salon_wallets").select("available_balance").eq("salon_id", data.salon_id).maybeSingle();
+      .from("salon_wallets")
+      .select("available_balance")
+      .eq("salon_id", data.salon_id)
+      .maybeSingle();
     const available = Number(wallet?.available_balance ?? 0);
     if (data.amount > available) throw new Error("Insufficient balance");
 
     // Daily + monthly withdrawal caps (sum of non-rejected requests).
     const now = new Date();
-    const startOfDay = new Date(now); startOfDay.setHours(0, 0, 0, 0);
+    const startOfDay = new Date(now);
+    startOfDay.setHours(0, 0, 0, 0);
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const { data: recent } = await supabase
       .from("withdrawals")
@@ -634,14 +720,19 @@ export const requestOwnerWithdrawal = createServerFn({ method: "POST" })
       .eq("salon_id", data.salon_id)
       .neq("status", "REJECTED")
       .gte("created_at", startOfMonth.toISOString());
-    const dayTotal = (recent ?? []).filter((w) => new Date(w.created_at) >= startOfDay)
+    const dayTotal = (recent ?? [])
+      .filter((w) => new Date(w.created_at) >= startOfDay)
       .reduce((s, w) => s + Number(w.amount), 0);
     const monthTotal = (recent ?? []).reduce((s, w) => s + Number(w.amount), 0);
     if (dayTotal + data.amount > DAILY_WITHDRAWAL_LIMIT) {
-      throw new Error(`Daily withdrawal limit is ₹${DAILY_WITHDRAWAL_LIMIT.toLocaleString("en-IN")}`);
+      throw new Error(
+        `Daily withdrawal limit is ₹${DAILY_WITHDRAWAL_LIMIT.toLocaleString("en-IN")}`,
+      );
     }
     if (monthTotal + data.amount > MONTHLY_WITHDRAWAL_LIMIT) {
-      throw new Error(`Monthly withdrawal limit is ₹${MONTHLY_WITHDRAWAL_LIMIT.toLocaleString("en-IN")}`);
+      throw new Error(
+        `Monthly withdrawal limit is ₹${MONTHLY_WITHDRAWAL_LIMIT.toLocaleString("en-IN")}`,
+      );
     }
     const { data: row, error } = await supabase
       .from("withdrawals")
@@ -651,7 +742,8 @@ export const requestOwnerWithdrawal = createServerFn({ method: "POST" })
         bank_account_details: data.bank_account_details ?? null,
         status: "PENDING",
       })
-      .select().single();
+      .select()
+      .single();
     if (error) throw new Error(error.message);
     return row;
   });
@@ -660,8 +752,10 @@ export const listOwnerWithdrawals = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => SalonInput.parse(d))
   .handler(async ({ data, context }) => {
+    await assertOwnsSalon(context.supabase, context.userId, data.salon_id);
     const { data: rows, error } = await context.supabase
-      .from("withdrawals").select("*")
+      .from("withdrawals")
+      .select("*")
       .eq("salon_id", data.salon_id)
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
@@ -681,8 +775,10 @@ export const bulkUpdateServicePricing = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => BulkPricingInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
+    await assertOwnsSalon(supabase, context.userId, data.salon_id);
     const { data: rows, error } = await supabase
-      .from("services").select("id, price")
+      .from("services")
+      .select("id, price")
       .eq("salon_id", data.salon_id)
       .in("id", data.service_ids);
     if (error) throw new Error(error.message);
@@ -696,7 +792,9 @@ export const bulkUpdateServicePricing = createServerFn({ method: "POST" })
     });
     for (const u of updates) {
       const { error: upErr } = await supabase
-        .from("services").update({ price: u.price }).eq("id", u.id);
+        .from("services")
+        .update({ price: u.price })
+        .eq("id", u.id);
       if (upErr) throw new Error(upErr.message);
     }
     return { updated: updates.length };
@@ -729,7 +827,7 @@ export const getSalonGallery = createServerFn({ method: "GET" })
 
 const SetGalleryInput = z.object({
   salon_id: z.string().uuid(),
-  images: z.array(z.string().url()).max(20),
+  images: z.array(z.string().url()).max(5),
   cover: z.string().url().nullable().optional(),
 });
 export const setSalonGallery = createServerFn({ method: "POST" })
@@ -741,8 +839,7 @@ export const setSalonGallery = createServerFn({ method: "POST" })
       gallery_images: data.images,
     };
     if (data.cover !== undefined) patch.cover_image_url = data.cover;
-    const { error } = await context.supabase
-      .from("salons").update(patch).eq("id", data.salon_id);
+    const { error } = await context.supabase.from("salons").update(patch).eq("id", data.salon_id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });

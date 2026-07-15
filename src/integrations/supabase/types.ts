@@ -188,11 +188,18 @@ export type Database = {
           deleted_at: string | null
           deleted_by: string | null
           id: string
+          home_service_charge: number
           payment_deadline: string | null
           payment_status: string
           price: number
+          proposal_note: string | null
+          proposal_status: string | null
+          proposed_date: string | null
+          proposed_time: string | null
           refund_status: string | null
           salon_id: string
+          service_address: string | null
+          service_mode: string
           service_name: string
           status: string
           updated_at: string
@@ -210,11 +217,18 @@ export type Database = {
           deleted_at?: string | null
           deleted_by?: string | null
           id?: string
+          home_service_charge?: number
           payment_deadline?: string | null
           payment_status?: string
           price?: number
+          proposal_note?: string | null
+          proposal_status?: string | null
+          proposed_date?: string | null
+          proposed_time?: string | null
           refund_status?: string | null
           salon_id: string
+          service_address?: string | null
+          service_mode?: string
           service_name: string
           status?: string
           updated_at?: string
@@ -232,11 +246,18 @@ export type Database = {
           deleted_at?: string | null
           deleted_by?: string | null
           id?: string
+          home_service_charge?: number
           payment_deadline?: string | null
           payment_status?: string
           price?: number
+          proposal_note?: string | null
+          proposal_status?: string | null
+          proposed_date?: string | null
+          proposed_time?: string | null
           refund_status?: string | null
           salon_id?: string
+          service_address?: string | null
+          service_mode?: string
           service_name?: string
           status?: string
           updated_at?: string
@@ -3226,6 +3247,7 @@ export type Database = {
       salons: {
         Row: {
           address: string | null
+          about_us: string | null
           amenities: string[] | null
           brand_primary: string | null
           brand_secondary: string | null
@@ -3245,6 +3267,8 @@ export type Database = {
           email: string | null
           gallery_images: string[] | null
           hours: Json | null
+          home_service_charge: number
+          home_service_radius_km: number
           id: string
           image_url: string | null
           is_active: boolean
@@ -3257,6 +3281,7 @@ export type Database = {
           name: string
           nexora_score: number
           owner_name: string | null
+          owner_profile_image_url: string | null
           phone: string | null
           pincode: string | null
           price_range: string | null
@@ -3274,12 +3299,14 @@ export type Database = {
           theme: string | null
           updated_at: string
           upi_id: string | null
+          video_url: string | null
           website_created: boolean
           website_url: string | null
           whatsapp: string | null
         }
         Insert: {
           address?: string | null
+          about_us?: string | null
           amenities?: string[] | null
           brand_primary?: string | null
           brand_secondary?: string | null
@@ -3299,6 +3326,8 @@ export type Database = {
           email?: string | null
           gallery_images?: string[] | null
           hours?: Json | null
+          home_service_charge?: number
+          home_service_radius_km?: number
           id?: string
           image_url?: string | null
           is_active?: boolean
@@ -3311,6 +3340,7 @@ export type Database = {
           name: string
           nexora_score?: number
           owner_name?: string | null
+          owner_profile_image_url?: string | null
           phone?: string | null
           pincode?: string | null
           price_range?: string | null
@@ -3328,12 +3358,14 @@ export type Database = {
           theme?: string | null
           updated_at?: string
           upi_id?: string | null
+          video_url?: string | null
           website_created?: boolean
           website_url?: string | null
           whatsapp?: string | null
         }
         Update: {
           address?: string | null
+          about_us?: string | null
           amenities?: string[] | null
           brand_primary?: string | null
           brand_secondary?: string | null
@@ -3353,6 +3385,8 @@ export type Database = {
           email?: string | null
           gallery_images?: string[] | null
           hours?: Json | null
+          home_service_charge?: number
+          home_service_radius_km?: number
           id?: string
           image_url?: string | null
           is_active?: boolean
@@ -3365,6 +3399,7 @@ export type Database = {
           name?: string
           nexora_score?: number
           owner_name?: string | null
+          owner_profile_image_url?: string | null
           phone?: string | null
           pincode?: string | null
           price_range?: string | null
@@ -3382,6 +3417,7 @@ export type Database = {
           theme?: string | null
           updated_at?: string
           upi_id?: string | null
+          video_url?: string | null
           website_created?: boolean
           website_url?: string | null
           whatsapp?: string | null
@@ -4558,6 +4594,7 @@ export type Database = {
       }
       public_salon_cards: {
         Row: {
+          about_us: string | null
           address: string | null
           amenities: string[] | null
           brand_primary: string | null
@@ -4570,6 +4607,8 @@ export type Database = {
           discount: string | null
           gallery_images: string[] | null
           hours: Json | null
+          home_service_charge: number | null
+          home_service_radius_km: number | null
           id: string | null
           image_url: string | null
           is_active: boolean | null
@@ -4581,6 +4620,7 @@ export type Database = {
           longitude: number | null
           name: string | null
           nexora_score: number | null
+          owner_profile_image_url: string | null
           phone: string | null
           pincode: string | null
           price_range: string | null
@@ -4594,6 +4634,7 @@ export type Database = {
           theme: string | null
           website_created: boolean | null
           website_url: string | null
+          video_url: string | null
           whatsapp: string | null
         }
         Insert: {
@@ -4687,6 +4728,10 @@ export type Database = {
     }
     Functions: {
       auto_release_escrow: { Args: never; Returns: number }
+      complete_owner_salon_setup: {
+        Args: { _salon_id: string }
+        Returns: Json
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -4746,6 +4791,7 @@ export type Database = {
           salon_id: string
         }[]
       }
+      list_pending_owner_salons: { Args: never; Returns: Json }
       move_to_dlq: {
         Args: {
           dlq_name: string
@@ -4776,6 +4822,20 @@ export type Database = {
           rating: number
           reviews_count: number
         }[]
+      }
+      owner_transition_booking: {
+        Args: {
+          _action: string
+          _booking_id: string
+          _note?: string
+          _proposed_date?: string
+          _proposed_time?: string
+        }
+        Returns: Database["public"]["Tables"]["bookings"]["Row"]
+      }
+      review_owner_salon: {
+        Args: { _approve: boolean; _owner_request_id: string }
+        Returns: Json
       }
       process_pending_settlements: { Args: never; Returns: number }
       read_email_batch: {

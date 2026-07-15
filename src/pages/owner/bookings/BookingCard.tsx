@@ -1,4 +1,4 @@
-import { Phone, MessageCircle, Eye, Check, UserX, X as XIcon } from "lucide-react";
+import { Phone, MessageCircle, Eye, Check, UserX, X as XIcon, CalendarClock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { STATUS_META, type OwnerBooking, type OwnerBookingStatus } from "./mockOwnerBookings";
@@ -26,15 +26,20 @@ export function BookingCard({
   onSelect,
   onView,
   onAction,
+  onSuggest,
 }: {
   booking: OwnerBooking;
   selected: boolean;
   onSelect: (id: string, checked: boolean) => void;
   onView: (b: OwnerBooking) => void;
   onAction: (id: string, next: OwnerBookingStatus) => void;
+  onSuggest: (booking: OwnerBooking) => void;
 }) {
   const wa = `https://wa.me/91${booking.mobile}?text=Hi%20${encodeURIComponent(booking.customer)}`;
-  const isFinal = booking.status === "completed" || booking.status === "cancelled" || booking.status === "no_show";
+  const isFinal =
+    booking.status === "completed" ||
+    booking.status === "cancelled" ||
+    booking.status === "no_show";
   const can = {
     confirm: booking.status === "pending",
     complete: booking.status === "confirmed",
@@ -64,19 +69,39 @@ export function BookingCard({
                 {booking.customer}
                 <Phone className="h-3.5 w-3.5 md:hidden" />
               </a>
-              <div className="text-muted-foreground text-xs">{booking.id} · {booking.mobile}</div>
+              <div className="text-muted-foreground text-xs">
+                {booking.id} · {booking.mobile}
+              </div>
             </div>
             <StatusBadge status={booking.status} />
           </div>
           <div className="text-body mt-2 grid grid-cols-1 gap-1 text-sm sm:grid-cols-3">
-            <div><span className="text-muted-foreground">Service:</span> {booking.service}</div>
-            <div><span className="text-muted-foreground">Staff:</span> {booking.staff}</div>
-            <div><span className="text-muted-foreground">When:</span> {booking.date} · {booking.time}</div>
+            <div>
+              <span className="text-muted-foreground">Service:</span> {booking.service}
+            </div>
+            <div>
+              <span className="text-muted-foreground">Staff:</span> {booking.staff}
+            </div>
+            <div>
+              <span className="text-muted-foreground">When:</span> {booking.date} · {booking.time}
+            </div>
           </div>
           <div className="text-body mt-1 text-sm">
-            <span className="text-muted-foreground">Advance:</span> ₹{booking.advance.toLocaleString()}{" "}
-            <span className="text-muted-foreground">/ Total:</span> ₹{booking.total.toLocaleString()}
+            <span className="text-muted-foreground">Advance:</span> ₹
+            {booking.advance.toLocaleString()}{" "}
+            <span className="text-muted-foreground">/ Total:</span> ₹
+            {booking.total.toLocaleString()}
           </div>
+          {booking.serviceMode === "home" && booking.address && (
+            <div className="text-body mt-1 text-sm">
+              <span className="text-muted-foreground">Home service:</span> {booking.address}
+            </div>
+          )}
+          {booking.proposalStatus === "pending" && (
+            <div className="mt-2 rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-800">
+              Waiting for customer response to {booking.proposedDate} at {booking.proposedTime}.
+            </div>
+          )}
           <div className="mt-3 flex flex-wrap gap-2">
             {can.confirm && (
               <Button
@@ -85,6 +110,11 @@ export function BookingCard({
                 onClick={() => onAction(booking.id, "confirmed")}
               >
                 <Check className="h-4 w-4" /> Confirm
+              </Button>
+            )}
+            {can.confirm && (
+              <Button size="sm" variant="outline" onClick={() => onSuggest(booking)}>
+                <CalendarClock className="h-4 w-4" /> Suggest New Time
               </Button>
             )}
             {can.complete && (
@@ -97,11 +127,7 @@ export function BookingCard({
               </Button>
             )}
             {can.noShow && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => onAction(booking.id, "no_show")}
-              >
+              <Button size="sm" variant="outline" onClick={() => onAction(booking.id, "no_show")}>
                 <UserX className="h-4 w-4" /> No Show
               </Button>
             )}

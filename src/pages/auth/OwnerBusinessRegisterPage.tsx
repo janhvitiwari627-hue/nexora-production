@@ -12,19 +12,18 @@ import { BackButton } from "@/components/shared/BackButton";
 
 const mobileRe = /^(\+91)?[6-9]\d{9}$/;
 
-const schema = z
-  .object({
-    owner_name: z.string().trim().min(2, "Enter your full name").max(100),
-    mobile: z
-      .string()
-      .trim()
-      .transform((v) => v.replace(/[\s-]/g, ""))
-      .pipe(z.string().regex(mobileRe, "Enter a valid 10-digit mobile")),
-    district: z.string().trim().min(2, "District is required").max(80),
-    shop_name: z.string().trim().min(2, "Shop name is required").max(120),
-    email: z.string().trim().email("Invalid email").max(255),
-    password: z.string().min(8, "Min 8 characters").max(72),
-  });
+const schema = z.object({
+  owner_name: z.string().trim().min(2, "Enter your full name").max(100),
+  mobile: z
+    .string()
+    .trim()
+    .transform((v) => v.replace(/[\s-]/g, ""))
+    .pipe(z.string().regex(mobileRe, "Enter a valid 10-digit mobile")),
+  district: z.string().trim().min(2, "District is required").max(80),
+  shop_name: z.string().trim().min(2, "Shop name is required").max(120),
+  email: z.string().trim().email("Invalid email").max(255),
+  password: z.string().min(8, "Min 8 characters").max(72),
+});
 
 type FormState = {
   owner_name: string;
@@ -69,7 +68,8 @@ function parseErr(error: unknown): string {
     }
 
     if (e.code === "weak_password") return "Please choose a stronger password.";
-    if (e.code === "user_already_exists") return "This email is already registered. Please sign in instead.";
+    if (e.code === "user_already_exists")
+      return "This email is already registered. Please sign in instead.";
   }
   return GENERIC_ERROR;
 }
@@ -191,7 +191,7 @@ export default function OwnerBusinessRegisterPage() {
       }
 
       setSuccess(true);
-      setTimeout(() => navigate({ to: "/owner/templates", replace: true }), 600);
+      setTimeout(() => navigate({ to: "/owner/setup-wizard", replace: true }), 600);
     } catch (err) {
       setServerError(parseErr(err));
     } finally {
@@ -209,7 +209,7 @@ export default function OwnerBusinessRegisterPage() {
             </div>
             <CardTitle>Your shop is ready!</CardTitle>
             <CardDescription className="mt-2">
-              Taking you to template selection…
+              Your website was generated automatically. Taking you to the simple salon setup…
             </CardDescription>
           </CardHeader>
         </Card>
@@ -228,7 +228,7 @@ export default function OwnerBusinessRegisterPage() {
               <CardTitle className="text-2xl">Register your business</CardTitle>
             </div>
             <CardDescription>
-              Are you a salon / shop owner? Fill in the basics — you'll pick a website template right after.
+              Add the basics now. We will generate a clean booking website automatically.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -241,31 +241,62 @@ export default function OwnerBusinessRegisterPage() {
             <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="shop_name">Shop name *</Label>
-                <Input id="shop_name" value={form.shop_name} onChange={update("shop_name")} disabled={submitting} />
+                <Input
+                  id="shop_name"
+                  value={form.shop_name}
+                  onChange={update("shop_name")}
+                  disabled={submitting}
+                />
                 {errors.shop_name && <p className="text-xs text-destructive">{errors.shop_name}</p>}
               </div>
 
               <div className="space-y-1.5">
                 <Label htmlFor="owner_name">Shop owner name *</Label>
-                <Input id="owner_name" value={form.owner_name} onChange={update("owner_name")} disabled={submitting} />
-                {errors.owner_name && <p className="text-xs text-destructive">{errors.owner_name}</p>}
+                <Input
+                  id="owner_name"
+                  value={form.owner_name}
+                  onChange={update("owner_name")}
+                  disabled={submitting}
+                />
+                {errors.owner_name && (
+                  <p className="text-xs text-destructive">{errors.owner_name}</p>
+                )}
               </div>
 
               <div className="space-y-1.5">
                 <Label htmlFor="district">District *</Label>
-                <Input id="district" value={form.district} onChange={update("district")} disabled={submitting} />
+                <Input
+                  id="district"
+                  value={form.district}
+                  onChange={update("district")}
+                  disabled={submitting}
+                />
                 {errors.district && <p className="text-xs text-destructive">{errors.district}</p>}
               </div>
 
               <div className="space-y-1.5">
                 <Label htmlFor="mobile">Mobile *</Label>
-                <Input id="mobile" type="tel" placeholder="+91 9876543210" value={form.mobile} onChange={update("mobile")} disabled={submitting} />
+                <Input
+                  id="mobile"
+                  type="tel"
+                  placeholder="+91 9876543210"
+                  value={form.mobile}
+                  onChange={update("mobile")}
+                  disabled={submitting}
+                />
                 {errors.mobile && <p className="text-xs text-destructive">{errors.mobile}</p>}
               </div>
 
               <div className="space-y-1.5">
                 <Label htmlFor="email">Email *</Label>
-                <Input id="email" type="email" autoComplete="email" value={form.email} onChange={update("email")} disabled={submitting} />
+                <Input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  value={form.email}
+                  onChange={update("email")}
+                  disabled={submitting}
+                />
                 {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
               </div>
 
@@ -298,7 +329,7 @@ export default function OwnerBusinessRegisterPage() {
                   Create my shop
                 </Button>
                 <p className="mt-3 text-center text-xs text-muted-foreground">
-                  Category, address, WhatsApp & Google Maps can be added later in the setup wizard.
+                  No monthly fee. Nexora charges 10% only on successfully completed bookings.
                 </p>
                 <p className="mt-3 text-center text-sm text-muted-foreground">
                   Already have an account?{" "}

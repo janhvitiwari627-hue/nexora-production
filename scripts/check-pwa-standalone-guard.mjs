@@ -7,7 +7,7 @@
  * codebase, and it must NOT be recreated. Any reference is almost certainly
  * a stale import that will break the build.
  */
-import { execSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 
 const FILE = "src/lib/pwa-standalone-guard.ts";
@@ -31,22 +31,18 @@ const EXCLUDES = [
 ];
 
 if (INCLUDE_GLOBS.length > 0) {
-  try {
-    const out = execSync(
-      `rg -n --no-heading -S ${EXCLUDES.map((e) => `'${e}'`).join(" ")} -- '${TERM}' ${INCLUDE_GLOBS.join(" ")}`,
-      { stdio: ["ignore", "pipe", "pipe"] },
-    ).toString();
-    if (out.trim()) {
-      errors.push(
-        `Found stale reference(s) to \`${TERM}\` in source (module was deleted):\n${out}`,
-      );
-    }
-  } catch (err) {
-    // rg exits 1 when no matches — success.
-    if (err.status && err.status !== 1) {
-      console.error(`[pwa-standalone-guard] scan error:`, err.message);
-      process.exit(2);
-    }
+  const result = spawnSync(
+    "rg",
+    ["-n", "--no-heading", "-S", ...EXCLUDES, "--", TERM, ...INCLUDE_GLOBS],
+    { encoding: "utf8" },
+  );
+  if (result.status === 0 && result.stdout.trim()) {
+    errors.push(
+      `Found stale reference(s) to \`${TERM}\` in source (module was deleted):\n${result.stdout}`,
+    );
+  } else if (result.status !== 1) {
+    console.error(`[pwa-standalone-guard] scan error:`, result.stderr || result.error?.message);
+    process.exit(2);
   }
 }
 
