@@ -66,7 +66,7 @@ export const selectWebsiteTemplate = createServerFn({ method: "POST" })
     if (!link) throw new Error("Not authorized for this salon");
     const { data: template, error: templateError } = await supabase
       .from("website_templates")
-      .select("id, template_key")
+      .select("id, template_key, primary_color, secondary_color")
       .eq("id", data.template_id)
       .eq("is_active", true)
       .maybeSingle();
@@ -82,6 +82,8 @@ export const selectWebsiteTemplate = createServerFn({ method: "POST" })
       .update({
         selected_template_id: template.id,
         selected_template_key: template.template_key,
+        ...(template.primary_color ? { brand_primary: template.primary_color } : {}),
+        ...(template.secondary_color ? { brand_secondary: template.secondary_color } : {}),
         website_created: true,
       })
       .eq("id", data.salon_id);

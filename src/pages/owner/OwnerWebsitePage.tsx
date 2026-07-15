@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { HexColorPicker } from "react-colorful";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -10,12 +11,23 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ExternalLink, Eye, Loader2, Upload, X, Save, Trash2, Plus } from "lucide-react";
+import {
+  ExternalLink,
+  Eye,
+  Loader2,
+  Upload,
+  X,
+  Save,
+  Trash2,
+  Plus,
+  Paintbrush,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useOwnerContext } from "@/hooks/use-owner-context";
 import { ownerSalonFullQuery } from "@/lib/owner.queries";
 import { updateOwnerSalon } from "@/lib/owner.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { getTemplate } from "@/components/whiteLabelWebsite/templates";
 
 const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 type DayKey = (typeof DAYS)[number];
@@ -76,6 +88,7 @@ export function OwnerWebsitePage() {
 
   useEffect(() => {
     if (salon && !form) {
+      const templateDefaults = getTemplate(salon.selected_template_key);
       setForm({
         name: salon.name ?? "",
         tagline: salon.tagline ?? "",
@@ -84,8 +97,8 @@ export function OwnerWebsitePage() {
         cover_image_url: salon.cover_image_url ?? "",
         owner_profile_image_url: salon.owner_profile_image_url ?? "",
         video_url: salon.video_url ?? "",
-        brand_primary: salon.brand_primary ?? "#6366f1",
-        brand_secondary: salon.brand_secondary ?? "#ec4899",
+        brand_primary: salon.brand_primary ?? templateDefaults.colors.primary,
+        brand_secondary: salon.brand_secondary ?? templateDefaults.colors.secondary,
         phone: salon.phone ?? "",
         email: salon.email ?? "",
         address: salon.address ?? "",
@@ -101,7 +114,11 @@ export function OwnerWebsitePage() {
   const set = <K extends keyof Patch>(key: K, value: Patch[K]) =>
     setForm((f) => (f ? { ...f, [key]: value } : f));
 
-  const publicUrl = useMemo(() => (salon?.slug ? `/s/${salon.slug}` : ""), [salon?.slug]);
+  const publicUrl = useMemo(() => (salon?.slug ? `/site/${salon.slug}` : ""), [salon?.slug]);
+  const selectedTemplate = getTemplate(salon?.selected_template_key);
+  const previewUrl = salon?.is_active
+    ? publicUrl
+    : `/template-preview/${encodeURIComponent(selectedTemplate.key)}`;
 
   const handleSave = () => {
     if (!form) return;
@@ -210,8 +227,8 @@ export function OwnerWebsitePage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setPreview(true)} disabled={!publicUrl}>
-            <Eye className="h-4 w-4" /> Live Preview
+          <Button variant="outline" onClick={() => setPreview(true)} disabled={!previewUrl}>
+            <Eye className="h-4 w-4" /> Preview Website
           </Button>
           <Button
             onClick={handleSave}
@@ -250,6 +267,30 @@ export function OwnerWebsitePage() {
             </div>
             <div className="text-muted-foreground text-xs">Salon: {activeSalon?.name}</div>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
+          <div className="flex items-center gap-3">
+            <div
+              className="grid h-11 w-11 place-items-center rounded-xl text-white"
+              style={{ backgroundColor: selectedTemplate.colors.primary }}
+            >
+              <Paintbrush className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="font-semibold">Shop Template: {selectedTemplate.name}</div>
+              <p className="text-muted-foreground text-xs">
+                Change the design anytime. Your services, photos, bookings and content remain safe.
+              </p>
+            </div>
+          </div>
+          <Button variant="outline" asChild>
+            <Link to="/owner/templates">
+              <Paintbrush className="h-4 w-4" /> Choose or Change Template
+            </Link>
+          </Button>
         </CardContent>
       </Card>
 
@@ -641,7 +682,7 @@ export function OwnerWebsitePage() {
           <DialogHeader className="border-b px-4 py-3">
             <DialogTitle>Website Preview · {form.name}</DialogTitle>
           </DialogHeader>
-          <iframe src={publicUrl} title="preview" className="h-full w-full flex-1" />
+          <iframe src={previewUrl} title="preview" className="h-full w-full flex-1" />
         </DialogContent>
       </Dialog>
     </div>

@@ -7,7 +7,12 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { FilterPills } from "@/components/shared/FilterPills";
 import { BackButton } from "@/components/shared/BackButton";
@@ -49,7 +54,9 @@ export function CreateWebsitePage() {
         }
       });
     });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [navigate]);
   const { data: templates = [], isLoading } = useQuery(websiteTemplatesQuery());
   const [filter, setFilter] = useState("All");
@@ -67,29 +74,30 @@ export function CreateWebsitePage() {
     onSuccess: (_d, vars) => {
       const t = templates.find((x) => x.id === vars.template_id);
       qc.invalidateQueries({ queryKey: ["owner", "salons"] });
-      toast.success(`${t?.template_name ?? "Template"} applied. Now finish your website setup.`);
-      navigate({ to: "/owner/setup-wizard" });
+      if (activeSalonId) {
+        qc.invalidateQueries({ queryKey: ["owner", "salon-full", activeSalonId] });
+      }
+      const templateName = t?.template_name ?? "Template";
+      toast.success(`${templateName} applied to your shop website.`);
+      setConfirm({ open: true, templateName });
     },
     onError: (e: Error) => toast.error(e.message),
     onSettled: () => setPendingId(null),
   });
 
-
   const visible = useMemo(
-    () => filter === "All" ? templates : templates.filter((t) => t.category === filter),
+    () => (filter === "All" ? templates : templates.filter((t) => t.category === filter)),
     [templates, filter],
   );
-
-  
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8 space-y-8">
       <div className="space-y-3">
         <BackButton to="/owner/dashboard" label="Back to Dashboard" variant="ghost" size="sm" />
         <Badge className="border-0 bg-primary/10 text-primary gap-1.5">
-          <Sparkles className="h-3 w-3" /> Step 1 of setup
+          <Sparkles className="h-3 w-3" /> Shop website design
         </Badge>
-        <h1 className="text-3xl font-bold tracking-tight text-heading">Create Your Website</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-heading">Choose Shop Template</h1>
         <p className="text-base text-muted-foreground max-w-2xl">
           Choose a design for your booking website. Switch anytime — your content stays intact.
         </p>
@@ -103,8 +111,8 @@ export function CreateWebsitePage() {
           <div className="flex-1 min-w-0">
             <div className="text-sm font-semibold text-heading">Template Gallery</div>
             <p className="text-sm text-muted-foreground mt-1">
-              Browse professionally designed templates and pick the one that fits your business.
-              You can change templates anytime without losing content, services, staff, bookings,
+              Browse professionally designed templates and pick the one that fits your business. You
+              can change templates anytime without losing content, services, staff, bookings,
               reviews, images, videos, or settings.
             </p>
             <ul className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-1.5 text-xs text-body">
@@ -157,7 +165,10 @@ export function CreateWebsitePage() {
             const tags = asset?.tags ?? [t.theme_type ?? "Premium"];
             const features = asset?.features ?? ["Hero", "Services", "Booking"];
             return (
-              <Card key={t.id} className="overflow-hidden group relative flex flex-col border-2 hover:border-primary/40 hover:shadow-2xl transition-all duration-300">
+              <Card
+                key={t.id}
+                className="overflow-hidden group relative flex flex-col border-2 hover:border-primary/40 hover:shadow-2xl transition-all duration-300"
+              >
                 {isCurrent && (
                   <div className="absolute top-3 left-3 z-20">
                     <Badge className="bg-emerald-600 text-white gap-1 shadow-lg">
@@ -217,7 +228,10 @@ export function CreateWebsitePage() {
                           navigate({ to: "/owner/onboarding" });
                           return;
                         }
-                        if (isCurrent) { navigate({ to: "/owner/setup-wizard" }); return; }
+                        if (isCurrent) {
+                          navigate({ to: "/owner/website" });
+                          return;
+                        }
                         setPendingId(t.id);
                         mutate.mutate({ template_id: t.id });
                       }}
@@ -238,7 +252,9 @@ export function CreateWebsitePage() {
 
                   <div className="flex flex-wrap gap-1.5">
                     {tags.slice(0, 4).map((tag) => (
-                      <Badge key={tag} variant="secondary" className="text-[10px] font-medium">{tag}</Badge>
+                      <Badge key={tag} variant="secondary" className="text-[10px] font-medium">
+                        {tag}
+                      </Badge>
                     ))}
                   </div>
 
@@ -253,15 +269,26 @@ export function CreateWebsitePage() {
 
                   {/* Device support */}
                   <div className="flex items-center gap-3 text-[11px] text-muted-foreground border-t pt-3">
-                    <span className="inline-flex items-center gap-1"><Monitor className="h-3 w-3" /> Desktop</span>
-                    <span className="inline-flex items-center gap-1"><Tablet className="h-3 w-3" /> Tablet</span>
-                    <span className="inline-flex items-center gap-1"><Smartphone className="h-3 w-3" /> Mobile</span>
+                    <span className="inline-flex items-center gap-1">
+                      <Monitor className="h-3 w-3" /> Desktop
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <Tablet className="h-3 w-3" /> Tablet
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <Smartphone className="h-3 w-3" /> Mobile
+                    </span>
                   </div>
 
                   {/* Bottom buttons */}
                   <div className="grid grid-cols-2 gap-2 mt-1">
                     <Button variant="outline" size="sm" asChild>
-                      <a href={demoHref} target="_blank" rel="noreferrer" aria-label={`Live demo of ${t.template_name}`}>
+                      <a
+                        href={demoHref}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label={`Live demo of ${t.template_name}`}
+                      >
                         <Eye className="h-3.5 w-3.5" /> Live Demo
                       </a>
                     </Button>
@@ -275,13 +302,22 @@ export function CreateWebsitePage() {
                           navigate({ to: "/owner/onboarding" });
                           return;
                         }
-                        if (isCurrent) { navigate({ to: "/owner/setup-wizard" }); return; }
+                        if (isCurrent) {
+                          navigate({ to: "/owner/website" });
+                          return;
+                        }
                         setPendingId(t.id);
                         mutate.mutate({ template_id: t.id });
                       }}
                     >
                       <Zap className="h-3.5 w-3.5" />
-                      {ownerLoading ? "Loading…" : isCurrent ? "Edit & Go Live" : (pendingId === t.id ? "Applying…" : "Use This Template")}
+                      {ownerLoading
+                        ? "Loading…"
+                        : isCurrent
+                          ? "Edit Website"
+                          : pendingId === t.id
+                            ? "Applying…"
+                            : "Use This Template"}
                     </Button>
                   </div>
                 </div>
@@ -291,7 +327,6 @@ export function CreateWebsitePage() {
         </div>
       )}
 
-
       <Dialog open={confirm.open} onOpenChange={(o) => setConfirm((c) => ({ ...c, open: o }))}>
         <DialogContent>
           <DialogHeader>
@@ -299,8 +334,8 @@ export function CreateWebsitePage() {
               <ShieldCheck className="h-5 w-5 text-emerald-600" /> Website Template Selected
             </DialogTitle>
             <DialogDescription>
-              Your booking website has been created successfully using <b>{confirm.templateName}</b>.
-              You can customize it anytime from Website Settings.
+              <b>{confirm.templateName}</b> is now applied to your shop website. Your existing
+              services, content, photos and bookings are unchanged.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-2">
@@ -319,7 +354,7 @@ export function CreateWebsitePage() {
                 navigate({ to: "/owner/website" });
               }}
             >
-              Continue Setup
+              Edit Website Content
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -329,11 +364,24 @@ export function CreateWebsitePage() {
 }
 
 function TemplatePreviewCard({
-  name, primary, secondary, background, card,
-}: { name: string; primary: string; secondary: string; background: string; card: string }) {
+  name,
+  primary,
+  secondary,
+  background,
+  card,
+}: {
+  name: string;
+  primary: string;
+  secondary: string;
+  background: string;
+  card: string;
+}) {
   return (
     <div className="h-full w-full p-4" style={{ background }} aria-label={`${name} visual preview`}>
-      <div className="flex h-full flex-col gap-3 rounded-xl border p-3 shadow-sm" style={{ backgroundColor: card, borderColor: primary }}>
+      <div
+        className="flex h-full flex-col gap-3 rounded-xl border p-3 shadow-sm"
+        style={{ backgroundColor: card, borderColor: primary }}
+      >
         <div className="flex items-center justify-between gap-2">
           <span className="h-2 w-16 rounded-full" style={{ backgroundColor: primary }} />
           <span className="h-7 w-16 rounded-full" style={{ backgroundColor: secondary }} />
@@ -342,13 +390,25 @@ function TemplatePreviewCard({
           <div className="space-y-2 self-center">
             <span className="block h-3 w-20 rounded-full" style={{ backgroundColor: secondary }} />
             <span className="block h-6 w-full rounded-md" style={{ backgroundColor: primary }} />
-            <span className="block h-3 w-3/4 rounded-full opacity-50" style={{ backgroundColor: primary }} />
+            <span
+              className="block h-3 w-3/4 rounded-full opacity-50"
+              style={{ backgroundColor: primary }}
+            />
             <span className="block h-8 w-24 rounded-full" style={{ backgroundColor: primary }} />
           </div>
-          <div className="rounded-2xl" style={{ background: `linear-gradient(135deg, ${primary}, ${secondary})` }} />
+          <div
+            className="rounded-2xl"
+            style={{ background: `linear-gradient(135deg, ${primary}, ${secondary})` }}
+          />
         </div>
         <div className="grid grid-cols-3 gap-2">
-          {[0, 1, 2].map((i) => <span key={i} className="h-10 rounded-lg" style={{ backgroundColor: i === 1 ? secondary : primary, opacity: 0.28 }} />)}
+          {[0, 1, 2].map((i) => (
+            <span
+              key={i}
+              className="h-10 rounded-lg"
+              style={{ backgroundColor: i === 1 ? secondary : primary, opacity: 0.28 }}
+            />
+          ))}
         </div>
       </div>
     </div>

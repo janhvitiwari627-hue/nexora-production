@@ -16,7 +16,14 @@ export interface TemplateConfig {
   cardStyle: "ornate" | "sharp" | "soft";
   animation: "fade" | "slide" | "scale";
   gallery: "masonry" | "grid" | "portfolio";
-  colors: { primary: string; secondary: string; accent: string; bg: string; card: string; text: string };
+  colors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    bg: string;
+    card: string;
+    text: string;
+  };
   sectionOrder: SectionId[];
   bestFor: string[];
   features: string[];
@@ -37,8 +44,32 @@ export const TEMPLATES: Record<TemplateKey, TemplateConfig> = {
     cardStyle: "ornate",
     animation: "fade",
     gallery: "masonry",
-    colors: { primary: "#D4AF37", secondary: "#F5E6C8", accent: "#B8932F", bg: "#0B0B0B", card: "#161616", text: "#FFFFFF" },
-    sectionOrder: ["hero", "services", "staff", "beforeAfter", "packages", "membership", "reviews", "offers", "blog", "contact", "appointment", "whatsapp", "bookingBar"],
+    colors: {
+      primary: "#D4AF37",
+      secondary: "#F5E6C8",
+      accent: "#B8932F",
+      bg: "#0B0B0B",
+      card: "#161616",
+      text: "#FFFFFF",
+    },
+    sectionOrder: [
+      "hero",
+      "about",
+      "services",
+      "staff",
+      "gallery",
+      "beforeAfter",
+      "packages",
+      "membership",
+      "reviews",
+      "offers",
+      "blog",
+      "map",
+      "contact",
+      "appointment",
+      "whatsapp",
+      "bookingBar",
+    ],
     bestFor: ["Premium Salon", "Luxury Spa", "High-End Beauty Parlour"],
     features: ["Glassmorphism", "Luxury Animations", "Premium Feel", "Video Background"],
   },
@@ -56,10 +87,38 @@ export const TEMPLATES: Record<TemplateKey, TemplateConfig> = {
     cardStyle: "sharp",
     animation: "slide",
     gallery: "grid",
-    colors: { primary: "#C62828", secondary: "#FFFFFF", accent: "#212121", bg: "#FFFFFF", card: "#FAFAFA", text: "#212121" },
-    sectionOrder: ["hero", "map", "services", "staff", "rateCard", "appointment", "reviews", "loyalty", "referral", "contact", "whatsapp", "bookingBar"],
+    colors: {
+      primary: "#C62828",
+      secondary: "#FFFFFF",
+      accent: "#212121",
+      bg: "#FFFFFF",
+      card: "#FAFAFA",
+      text: "#212121",
+    },
+    sectionOrder: [
+      "hero",
+      "about",
+      "map",
+      "services",
+      "staff",
+      "gallery",
+      "rateCard",
+      "appointment",
+      "reviews",
+      "loyalty",
+      "referral",
+      "contact",
+      "whatsapp",
+      "bookingBar",
+    ],
     bestFor: ["Barber Shop", "Men's Salon", "Hair Studio", "Grooming Studio"],
-    features: ["Fast Booking UX", "Mobile First", "3 Click Booking", "Floating WhatsApp", "Floating Call Button"],
+    features: [
+      "Fast Booking UX",
+      "Mobile First",
+      "3 Click Booking",
+      "Floating WhatsApp",
+      "Floating Call Button",
+    ],
   },
   "professional-beauty": {
     key: "professional-beauty",
@@ -75,8 +134,29 @@ export const TEMPLATES: Record<TemplateKey, TemplateConfig> = {
     cardStyle: "soft",
     animation: "scale",
     gallery: "portfolio",
-    colors: { primary: "#E11D48", secondary: "#F9A8D4", accent: "#FFE4EC", bg: "#FFFDFD", card: "#FFFFFF", text: "#1F2937" },
-    sectionOrder: ["hero", "services", "staff", "gallery", "packages", "reviews", "faq", "contact", "appointment", "whatsapp", "bookingBar"],
+    colors: {
+      primary: "#E11D48",
+      secondary: "#F9A8D4",
+      accent: "#FFE4EC",
+      bg: "#FFFDFD",
+      card: "#FFFFFF",
+      text: "#1F2937",
+    },
+    sectionOrder: [
+      "hero",
+      "about",
+      "services",
+      "staff",
+      "gallery",
+      "packages",
+      "reviews",
+      "faq",
+      "map",
+      "contact",
+      "appointment",
+      "whatsapp",
+      "bookingBar",
+    ],
     bestFor: ["Makeup Artist", "Nail Studio", "Beauty Experts"],
     features: ["Elegant Design", "Beauty Industry Focused", "Portfolio Showcase"],
   },
@@ -97,4 +177,5 @@ export const normalizeTemplateKey = (key?: string | null): TemplateKey => {
   return TEMPLATE_ALIASES[key] ?? "royal-luxe";
 };
 
-export const getTemplate = (key?: string | null): TemplateConfig => TEMPLATES[normalizeTemplateKey(key)];
+export const getTemplate = (key?: string | null): TemplateConfig =>
+  TEMPLATES[normalizeTemplateKey(key)];
