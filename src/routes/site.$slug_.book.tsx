@@ -6,7 +6,7 @@ import { salonBySlugQueryOptions } from "@/lib/salons.queries";
 import { createPublicAppointment } from "@/lib/public-booking";
 import { sendBookingConfirmationEmail } from "@/lib/booking-email.functions";
 import { PublishedSiteShell } from "@/pages/public/site/PublishedSiteShell";
-import { BookingFlowPage } from "@/pages/public/BookingFlowPage";
+
 import { SalonNotFound } from "@/pages/public/site/SalonNotFound";
 
 const TIMES = [
