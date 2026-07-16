@@ -1,8 +1,26 @@
 import { useEffect, useState } from "react";
-import { Copy, Share2, Sparkles, Gift, Globe, HelpCircle, Send, UserPlus, Award, Wallet, ArrowRight } from "lucide-react";
+import {
+  Copy,
+  Share2,
+  Sparkles,
+  Gift,
+  Globe,
+  HelpCircle,
+  Send,
+  UserPlus,
+  Award,
+  Wallet,
+  ArrowRight,
+} from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -63,15 +81,15 @@ export function ReferralWelcomePopup() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-md overflow-hidden p-0">
+      <DialogContent className="max-h-[calc(100dvh-1.5rem)] w-[calc(100vw-1.5rem)] max-w-md overflow-x-hidden overflow-y-auto rounded-xl p-0">
         <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 px-6 py-6 text-white">
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 items-center gap-2 pr-5">
             <div className="grid h-10 w-10 place-items-center rounded-full bg-white/20 backdrop-blur">
               <Sparkles className="h-5 w-5" />
             </div>
-            <div>
+            <div className="min-w-0 flex-1">
               <DialogHeader className="space-y-0.5">
-                <DialogTitle className="text-white text-lg font-bold">
+                <DialogTitle className="text-balance text-lg font-bold leading-snug text-white">
                   Refer & Earn 100 points per friend
                 </DialogTitle>
                 <DialogDescription className="text-white/85 text-xs">
@@ -82,7 +100,7 @@ export function ReferralWelcomePopup() {
           </div>
         </div>
 
-        <div className="space-y-4 px-6 pb-6 pt-4">
+        <div className="min-w-0 space-y-4 px-4 pb-5 pt-4 sm:px-6 sm:pb-6">
           <div className="rounded-lg border-2 border-dashed border-primary/40 bg-primary/5 p-3">
             <div className="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider">
               Your referral code
@@ -99,8 +117,10 @@ export function ReferralWelcomePopup() {
             <div className="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider">
               Shareable link
             </div>
-            <div className="mt-1 flex items-center gap-2 rounded-md border bg-background px-3 py-2">
-              <span className="flex-1 truncate font-mono text-xs">{link}</span>
+            <div className="mt-1 flex min-w-0 items-center gap-2 rounded-md border bg-background px-3 py-2">
+              <span className="min-w-0 flex-1 truncate font-mono text-xs" title={link}>
+                {link}
+              </span>
               <button
                 onClick={() => copy(link, "Link")}
                 aria-label="Copy link"
@@ -135,11 +155,11 @@ export function ReferralWelcomePopup() {
             </li>
           </ul>
 
-          <div className="flex gap-2">
-            <Button className="flex-1" onClick={share}>
+          <div className="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+            <Button className="w-full min-w-0" onClick={share}>
               <Share2 className="mr-1.5 h-4 w-4" /> Share now
             </Button>
-            <Button variant="outline" onClick={() => setOpen(false)}>
+            <Button className="w-full sm:w-auto" variant="outline" onClick={() => setOpen(false)}>
               Later
             </Button>
           </div>
@@ -156,7 +176,7 @@ export function ReferralWelcomePopup() {
       </DialogContent>
 
       <Dialog open={howOpen} onOpenChange={setHowOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-h-[calc(100dvh-1.5rem)] w-[calc(100vw-1.5rem)] max-w-md overflow-x-hidden overflow-y-auto rounded-xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <HelpCircle className="h-5 w-5 text-primary" />
@@ -207,7 +227,9 @@ export function ReferralWelcomePopup() {
             <ul className="text-muted-foreground mt-1 list-disc space-y-0.5 pl-4">
               <li>Referrer (you): +100 points on friend's successful signup</li>
               <li>New user (friend): +100 welcome points once they sign up with your code</li>
-              <li>Status becomes <strong>Converted</strong> after their first booking</li>
+              <li>
+                Status becomes <strong>Converted</strong> after their first booking
+              </li>
             </ul>
           </div>
 
@@ -215,7 +237,13 @@ export function ReferralWelcomePopup() {
             <Button variant="outline" onClick={() => setHowOpen(false)}>
               Got it
             </Button>
-            <Button asChild onClick={() => { setHowOpen(false); setOpen(false); }}>
+            <Button
+              asChild
+              onClick={() => {
+                setHowOpen(false);
+                setOpen(false);
+              }}
+            >
               <Link to="/dashboard/referrals">
                 Go to Referral Center
                 <ArrowRight className="ml-1.5 h-4 w-4" />
