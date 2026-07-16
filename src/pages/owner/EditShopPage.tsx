@@ -161,9 +161,10 @@ export function EditShopPage() {
       }
       return updateFn({ data: { salon_id: activeSalonId, patch } });
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Shop details updated");
-      qc.invalidateQueries({ queryKey: ["owner"] });
+      await qc.invalidateQueries({ queryKey: ["owner"] });
+      navigate({ to: "/owner/welcome", replace: true });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Update failed"),
   });
@@ -307,7 +308,7 @@ export function EditShopPage() {
       </Card>
 
       <div className="flex justify-end gap-2">
-        <Button variant="outline" onClick={() => navigate({ to: "/owner/dashboard" })}>
+        <Button variant="outline" onClick={() => navigate({ to: "/owner/welcome" })}>
           Cancel
         </Button>
         <Button
