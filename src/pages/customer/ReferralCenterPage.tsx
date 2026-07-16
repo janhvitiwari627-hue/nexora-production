@@ -25,6 +25,7 @@ import { PublicHeader } from "@/components/layout/PublicHeader";
 import { PublicFooter } from "@/components/layout/PublicFooter";
 import { MyReferralsSection } from "@/components/referral/MyReferralsSection";
 import { useAuthStore } from "@/stores/authStore";
+import { buildReferralSignupUrl } from "@/lib/public-app-url";
 import {
   mockReferralCode,
   mockReferralLink,
@@ -32,9 +33,6 @@ import {
   mockReferrals,
   type ReferralStatus,
 } from "./referral/mockReferral";
-
-const ORIGIN =
-  typeof window !== "undefined" ? window.location.origin : "https://meripahalfasthelp.online";
 
 const STATUS: Record<ReferralStatus, { label: string; classes: string }> = {
   joined: { label: "Joined", classes: "bg-sky-100 text-sky-700" },
@@ -47,7 +45,7 @@ export function ReferralCenterPage() {
   const profile = useAuthStore((s) => s.profile);
   const referralCode = profile?.referral_code ?? mockReferralCode;
   const referralLink = profile?.referral_code
-    ? `${ORIGIN}/signup?ref=${profile.referral_code}`
+    ? buildReferralSignupUrl(profile.referral_code)
     : mockReferralLink;
   const qrRef = useRef<HTMLDivElement>(null);
   const [copiedCode, setCopiedCode] = useState(false);
@@ -207,7 +205,11 @@ export function ReferralCenterPage() {
                       : "bg-primary text-primary-foreground hover:opacity-90",
                   )}
                 >
-                  {copiedLink ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                  {copiedLink ? (
+                    <Check className="h-3.5 w-3.5" />
+                  ) : (
+                    <Copy className="h-3.5 w-3.5" />
+                  )}
                   {copiedLink ? "Copied" : "Copy"}
                 </button>
               </div>
@@ -245,9 +247,7 @@ export function ReferralCenterPage() {
               {showFallback && (
                 <div className="mt-3 rounded-2xl border border-dashed border-primary/40 bg-primary/5 p-3">
                   <div className="flex items-center justify-between">
-                    <p className="text-xs font-semibold text-primary">
-                      Pick where to share
-                    </p>
+                    <p className="text-xs font-semibold text-primary">Pick where to share</p>
                     <button
                       type="button"
                       onClick={() => setShowFallback(false)}
@@ -293,17 +293,13 @@ export function ReferralCenterPage() {
             </div>
           </div>
 
-
           {/* QR */}
           <div className="rounded-2xl border bg-card p-5 text-center shadow-sm">
             <h3 className="text-sm font-bold">Share via QR</h3>
             <p className="mt-1 text-xs text-muted-foreground">
               Friends scan to join with your code pre-filled.
             </p>
-            <div
-              ref={qrRef}
-              className="mx-auto mt-4 w-fit rounded-2xl border bg-white p-4"
-            >
+            <div ref={qrRef} className="mx-auto mt-4 w-fit rounded-2xl border bg-white p-4">
               <QRCodeCanvas value={referralLink} size={180} level="H" />
             </div>
             <button
@@ -318,10 +314,30 @@ export function ReferralCenterPage() {
 
         {/* Stats */}
         <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard label="Total Invites" value={mockReferralStats.totalInvites} Icon={Send} tint="bg-sky-100 text-sky-700" />
-          <StatCard label="Successful" value={mockReferralStats.successful} Icon={Users} tint="bg-indigo-100 text-indigo-700" />
-          <StatCard label="Rewards Earned" value={`₹${mockReferralStats.rewardsEarned}`} Icon={Trophy} tint="bg-emerald-100 text-emerald-700" />
-          <StatCard label="Pending Rewards" value={`₹${mockReferralStats.pending}`} Icon={Hourglass} tint="bg-amber-100 text-amber-700" />
+          <StatCard
+            label="Total Invites"
+            value={mockReferralStats.totalInvites}
+            Icon={Send}
+            tint="bg-sky-100 text-sky-700"
+          />
+          <StatCard
+            label="Successful"
+            value={mockReferralStats.successful}
+            Icon={Users}
+            tint="bg-indigo-100 text-indigo-700"
+          />
+          <StatCard
+            label="Rewards Earned"
+            value={`₹${mockReferralStats.rewardsEarned}`}
+            Icon={Trophy}
+            tint="bg-emerald-100 text-emerald-700"
+          />
+          <StatCard
+            label="Pending Rewards"
+            value={`₹${mockReferralStats.pending}`}
+            Icon={Hourglass}
+            tint="bg-amber-100 text-amber-700"
+          />
         </section>
 
         {/* How it works */}

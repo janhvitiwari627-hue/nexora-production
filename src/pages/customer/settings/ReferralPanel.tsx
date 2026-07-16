@@ -4,9 +4,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/stores/authStore";
-
-const ORIGIN =
-  typeof window !== "undefined" ? window.location.origin : "https://meripahalfasthelp.online";
+import { buildReferralSignupUrl } from "@/lib/public-app-url";
 
 export function ReferralPanel() {
   const user = useAuthStore((s) => s.user);
@@ -35,7 +33,7 @@ export function ReferralPanel() {
     };
   }, [user]);
 
-  const link = code ? `${ORIGIN}/signup?ref=${code}` : "";
+  const link = code ? buildReferralSignupUrl(code) : "";
 
   const copy = async (value: string, label: string) => {
     try {
