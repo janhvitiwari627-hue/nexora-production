@@ -7,46 +7,47 @@ const COLUMNS: Col[] = [
   {
     title: "Company",
     links: [
-      { label: "About us", to: "/" },
-      { label: "Careers", to: "/" },
-      { label: "Press", to: "/" },
-      { label: "Contact", to: "/" },
+      { label: "About us", to: "/about" },
+      { label: "Beauty jobs", to: "/jobs" },
+      { label: "Growth partner", to: "/growth-partner" },
+      { label: "Contact", to: "/contact" },
     ],
   },
   {
     title: "Services",
     links: [
-      { label: "Hair", to: "/search" },
-      { label: "Spa & wellness", to: "/search" },
-      { label: "Nails", to: "/search" },
-      { label: "Barber", to: "/search" },
-      { label: "Beauty", to: "/search" },
+      { label: "Explore salons", to: "/search" },
+      { label: "Customer app", to: "/customer-app" },
+      { label: "Booking flow", to: "/booking-flow" },
+      { label: "Membership rules", to: "/membership-rules" },
+      { label: "QR payment guide", to: "/qr-payments" },
     ],
   },
   {
     title: "For Owners",
     links: [
       { label: "Run your salon", to: "/for-owners" },
-      { label: "Pricing", to: "/for-owners" },
-      { label: "Owner login", to: "/login" },
+      { label: "Shop Owner App", to: "/shop-owner-app" },
+      { label: "Website builder", to: "/website-builder" },
+      { label: "Owner login", to: "/role-selection" },
     ],
   },
   {
     title: "Resources",
     links: [
-      { label: "Help center", to: "/" },
-      { label: "Nexora Academy", to: "/" },
-      { label: "Blog", to: "/" },
-      { label: "Status", to: "/" },
+      { label: "Help center", to: "/help" },
+      { label: "Nexora Academy", to: "/academy" },
+      { label: "Distributor app", to: "/distributor-app" },
+      { label: "Jobs app", to: "/jobs-app" },
     ],
   },
   {
     title: "Legal",
     links: [
-      { label: "Privacy", to: "/" },
-      { label: "Terms", to: "/" },
-      { label: "Cookies", to: "/" },
-      { label: "Refund policy", to: "/" },
+      { label: "Privacy", to: "/privacy" },
+      { label: "Terms", to: "/terms" },
+      { label: "Refund policy", to: "/refund-cancellation" },
+      { label: "Contact support", to: "/contact" },
     ],
   },
 ];
@@ -78,8 +79,8 @@ export function PublicFooter() {
               </span>
             </div>
             <p className="text-muted-foreground mt-3 text-sm">
-              The operating system for modern salons, spas & barbershops. Discover, book,
-              and grow — all in one place.
+              The operating system for modern salons, spas & barbershops. Discover, book, and grow —
+              all in one place.
             </p>
           </div>
 
@@ -113,10 +114,7 @@ export function PublicFooter() {
               <ul className="mt-4 space-y-2.5 text-sm">
                 {col.links.map((l) => (
                   <li key={l.label}>
-                    <Link
-                      to={l.to}
-                      className="text-muted-foreground hover:text-primary transition"
-                    >
+                    <Link to={l.to} className="text-muted-foreground hover:text-primary transition">
                       {l.label}
                     </Link>
                   </li>
@@ -132,9 +130,15 @@ export function PublicFooter() {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-muted-foreground md:flex-row md:px-6">
           <p>© {new Date().getFullYear()} Nexora SalonOS. Crafted in India.</p>
           <p className="flex items-center gap-4">
-            <Link to="/" className="hover:text-primary transition">Privacy</Link>
-            <Link to="/" className="hover:text-primary transition">Terms</Link>
-            <Link to="/" className="hover:text-primary transition">Cookies</Link>
+            <Link to="/privacy" className="hover:text-primary transition">
+              Privacy
+            </Link>
+            <Link to="/terms" className="hover:text-primary transition">
+              Terms
+            </Link>
+            <Link to="/refund-cancellation" className="hover:text-primary transition">
+              Refunds
+            </Link>
           </p>
         </div>
       </div>

@@ -9,32 +9,42 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WebsiteBuilderRouteImport } from './routes/website-builder'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as ShopOwnerAppRouteImport } from './routes/shop-owner-app'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SalonsRouteImport } from './routes/salons'
+import { Route as RoleSelectionRouteImport } from './routes/role-selection'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as RefundCancellationRouteImport } from './routes/refund-cancellation'
 import { Route as ReferralsRouteImport } from './routes/referrals'
+import { Route as QrPaymentsRouteImport } from './routes/qr-payments'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PartnerRouteImport } from './routes/partner'
 import { Route as OwnerSignupRouteImport } from './routes/owner-signup'
 import { Route as OwnerRouteImport } from './routes/owner'
 import { Route as OfflineRouteImport } from './routes/offline'
+import { Route as MembershipRulesRouteImport } from './routes/membership-rules'
 import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as JobsAppRouteImport } from './routes/jobs-app'
 import { Route as HelpRouteImport } from './routes/help'
+import { Route as GrowthPartnerAppRouteImport } from './routes/growth-partner-app'
 import { Route as GrowthPartnerRouteImport } from './routes/growth-partner'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ForOwnersRouteImport } from './routes/for-owners'
 import { Route as DownloadAppRouteImport } from './routes/download-app'
 import { Route as DistributorBrandPortalRouteImport } from './routes/distributor-brand-portal'
+import { Route as DistributorAppRouteImport } from './routes/distributor-app'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CustomerAppRouteImport } from './routes/customer-app'
 import { Route as CreateShopWebsiteRouteImport } from './routes/create-shop-website'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as BookingFlowRouteImport } from './routes/booking-flow'
 import { Route as AuthNoticeRouteImport } from './routes/auth-notice'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AcademyRouteImport } from './routes/academy'
@@ -153,6 +163,11 @@ import { Route as ApiPublicHooksRecomputeInsightsRouteImport } from './routes/ap
 import { Route as ApiPublicHooksProcessSettlementsRouteImport } from './routes/api/public/hooks/process-settlements'
 import { Route as ApiPublicAuthForgotPasswordRouteImport } from './routes/api/public/auth/forgot-password'
 
+const WebsiteBuilderRoute = WebsiteBuilderRouteImport.update({
+  id: '/website-builder',
+  path: '/website-builder',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -168,6 +183,11 @@ const SignupRoute = SignupRouteImport.update({
   path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShopOwnerAppRoute = ShopOwnerAppRouteImport.update({
+  id: '/shop-owner-app',
+  path: '/shop-owner-app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
@@ -176,6 +196,11 @@ const SearchRoute = SearchRouteImport.update({
 const SalonsRoute = SalonsRouteImport.update({
   id: '/salons',
   path: '/salons',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoleSelectionRoute = RoleSelectionRouteImport.update({
+  id: '/role-selection',
+  path: '/role-selection',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -188,9 +213,19 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RefundCancellationRoute = RefundCancellationRouteImport.update({
+  id: '/refund-cancellation',
+  path: '/refund-cancellation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReferralsRoute = ReferralsRouteImport.update({
   id: '/referrals',
   path: '/referrals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QrPaymentsRoute = QrPaymentsRouteImport.update({
+  id: '/qr-payments',
+  path: '/qr-payments',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -223,6 +258,11 @@ const OfflineRoute = OfflineRouteImport.update({
   path: '/offline',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MembershipRulesRoute = MembershipRulesRouteImport.update({
+  id: '/membership-rules',
+  path: '/membership-rules',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MembershipRoute = MembershipRouteImport.update({
   id: '/membership',
   path: '/membership',
@@ -233,9 +273,19 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const JobsAppRoute = JobsAppRouteImport.update({
+  id: '/jobs-app',
+  path: '/jobs-app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HelpRoute = HelpRouteImport.update({
   id: '/help',
   path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GrowthPartnerAppRoute = GrowthPartnerAppRouteImport.update({
+  id: '/growth-partner-app',
+  path: '/growth-partner-app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GrowthPartnerRoute = GrowthPartnerRouteImport.update({
@@ -263,6 +313,11 @@ const DistributorBrandPortalRoute = DistributorBrandPortalRouteImport.update({
   path: '/distributor-brand-portal',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DistributorAppRoute = DistributorAppRouteImport.update({
+  id: '/distributor-app',
+  path: '/distributor-app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -281,6 +336,11 @@ const CreateShopWebsiteRoute = CreateShopWebsiteRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookingFlowRoute = BookingFlowRouteImport.update({
+  id: '/booking-flow',
+  path: '/booking-flow',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthNoticeRoute = AuthNoticeRouteImport.update({
@@ -883,32 +943,42 @@ export interface FileRoutesByFullPath {
   '/academy': typeof AcademyRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth-notice': typeof AuthNoticeRoute
+  '/booking-flow': typeof BookingFlowRoute
   '/contact': typeof ContactRoute
   '/create-shop-website': typeof CreateShopWebsiteRoute
   '/customer-app': typeof CustomerAppRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/distributor-app': typeof DistributorAppRoute
   '/distributor-brand-portal': typeof DistributorBrandPortalRoute
   '/download-app': typeof DownloadAppRoute
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/growth-partner': typeof GrowthPartnerRoute
+  '/growth-partner-app': typeof GrowthPartnerAppRoute
   '/help': typeof HelpRoute
+  '/jobs-app': typeof JobsAppRoute
   '/login': typeof LoginRoute
   '/membership': typeof MembershipRoute
+  '/membership-rules': typeof MembershipRulesRoute
   '/offline': typeof OfflineRoute
   '/owner': typeof OwnerRouteWithChildren
   '/owner-signup': typeof OwnerSignupRoute
   '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
+  '/qr-payments': typeof QrPaymentsRoute
   '/referrals': typeof ReferralsRoute
+  '/refund-cancellation': typeof RefundCancellationRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/role-selection': typeof RoleSelectionRoute
   '/salons': typeof SalonsRoute
   '/search': typeof SearchRoute
+  '/shop-owner-app': typeof ShopOwnerAppRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/website-builder': typeof WebsiteBuilderRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -1027,29 +1097,39 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/academy': typeof AcademyRoute
   '/auth-notice': typeof AuthNoticeRoute
+  '/booking-flow': typeof BookingFlowRoute
   '/contact': typeof ContactRoute
   '/create-shop-website': typeof CreateShopWebsiteRoute
   '/customer-app': typeof CustomerAppRoute
+  '/distributor-app': typeof DistributorAppRoute
   '/distributor-brand-portal': typeof DistributorBrandPortalRoute
   '/download-app': typeof DownloadAppRoute
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/growth-partner': typeof GrowthPartnerRoute
+  '/growth-partner-app': typeof GrowthPartnerAppRoute
   '/help': typeof HelpRoute
+  '/jobs-app': typeof JobsAppRoute
   '/login': typeof LoginRoute
   '/membership': typeof MembershipRoute
+  '/membership-rules': typeof MembershipRulesRoute
   '/offline': typeof OfflineRoute
   '/owner-signup': typeof OwnerSignupRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
+  '/qr-payments': typeof QrPaymentsRoute
   '/referrals': typeof ReferralsRoute
+  '/refund-cancellation': typeof RefundCancellationRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/role-selection': typeof RoleSelectionRoute
   '/salons': typeof SalonsRoute
   '/search': typeof SearchRoute
+  '/shop-owner-app': typeof ShopOwnerAppRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/website-builder': typeof WebsiteBuilderRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -1170,32 +1250,42 @@ export interface FileRoutesById {
   '/academy': typeof AcademyRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth-notice': typeof AuthNoticeRoute
+  '/booking-flow': typeof BookingFlowRoute
   '/contact': typeof ContactRoute
   '/create-shop-website': typeof CreateShopWebsiteRoute
   '/customer-app': typeof CustomerAppRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/distributor-app': typeof DistributorAppRoute
   '/distributor-brand-portal': typeof DistributorBrandPortalRoute
   '/download-app': typeof DownloadAppRoute
   '/for-owners': typeof ForOwnersRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/growth-partner': typeof GrowthPartnerRoute
+  '/growth-partner-app': typeof GrowthPartnerAppRoute
   '/help': typeof HelpRoute
+  '/jobs-app': typeof JobsAppRoute
   '/login': typeof LoginRoute
   '/membership': typeof MembershipRoute
+  '/membership-rules': typeof MembershipRulesRoute
   '/offline': typeof OfflineRoute
   '/owner': typeof OwnerRouteWithChildren
   '/owner-signup': typeof OwnerSignupRoute
   '/partner': typeof PartnerRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
+  '/qr-payments': typeof QrPaymentsRoute
   '/referrals': typeof ReferralsRoute
+  '/refund-cancellation': typeof RefundCancellationRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/role-selection': typeof RoleSelectionRoute
   '/salons': typeof SalonsRoute
   '/search': typeof SearchRoute
+  '/shop-owner-app': typeof ShopOwnerAppRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/website-builder': typeof WebsiteBuilderRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -1317,32 +1407,42 @@ export interface FileRouteTypes {
     | '/academy'
     | '/admin'
     | '/auth-notice'
+    | '/booking-flow'
     | '/contact'
     | '/create-shop-website'
     | '/customer-app'
     | '/dashboard'
+    | '/distributor-app'
     | '/distributor-brand-portal'
     | '/download-app'
     | '/for-owners'
     | '/forgot-password'
     | '/growth-partner'
+    | '/growth-partner-app'
     | '/help'
+    | '/jobs-app'
     | '/login'
     | '/membership'
+    | '/membership-rules'
     | '/offline'
     | '/owner'
     | '/owner-signup'
     | '/partner'
     | '/privacy'
     | '/profile'
+    | '/qr-payments'
     | '/referrals'
+    | '/refund-cancellation'
     | '/register'
     | '/reset-password'
+    | '/role-selection'
     | '/salons'
     | '/search'
+    | '/shop-owner-app'
     | '/signup'
     | '/sitemap.xml'
     | '/terms'
+    | '/website-builder'
     | '/admin/advertising'
     | '/admin/analytics'
     | '/admin/audit'
@@ -1461,29 +1561,39 @@ export interface FileRouteTypes {
     | '/about'
     | '/academy'
     | '/auth-notice'
+    | '/booking-flow'
     | '/contact'
     | '/create-shop-website'
     | '/customer-app'
+    | '/distributor-app'
     | '/distributor-brand-portal'
     | '/download-app'
     | '/for-owners'
     | '/forgot-password'
     | '/growth-partner'
+    | '/growth-partner-app'
     | '/help'
+    | '/jobs-app'
     | '/login'
     | '/membership'
+    | '/membership-rules'
     | '/offline'
     | '/owner-signup'
     | '/privacy'
     | '/profile'
+    | '/qr-payments'
     | '/referrals'
+    | '/refund-cancellation'
     | '/register'
     | '/reset-password'
+    | '/role-selection'
     | '/salons'
     | '/search'
+    | '/shop-owner-app'
     | '/signup'
     | '/sitemap.xml'
     | '/terms'
+    | '/website-builder'
     | '/admin/advertising'
     | '/admin/analytics'
     | '/admin/audit'
@@ -1603,32 +1713,42 @@ export interface FileRouteTypes {
     | '/academy'
     | '/admin'
     | '/auth-notice'
+    | '/booking-flow'
     | '/contact'
     | '/create-shop-website'
     | '/customer-app'
     | '/dashboard'
+    | '/distributor-app'
     | '/distributor-brand-portal'
     | '/download-app'
     | '/for-owners'
     | '/forgot-password'
     | '/growth-partner'
+    | '/growth-partner-app'
     | '/help'
+    | '/jobs-app'
     | '/login'
     | '/membership'
+    | '/membership-rules'
     | '/offline'
     | '/owner'
     | '/owner-signup'
     | '/partner'
     | '/privacy'
     | '/profile'
+    | '/qr-payments'
     | '/referrals'
+    | '/refund-cancellation'
     | '/register'
     | '/reset-password'
+    | '/role-selection'
     | '/salons'
     | '/search'
+    | '/shop-owner-app'
     | '/signup'
     | '/sitemap.xml'
     | '/terms'
+    | '/website-builder'
     | '/admin/advertising'
     | '/admin/analytics'
     | '/admin/audit'
@@ -1749,32 +1869,42 @@ export interface RootRouteChildren {
   AcademyRoute: typeof AcademyRoute
   AdminRoute: typeof AdminRouteWithChildren
   AuthNoticeRoute: typeof AuthNoticeRoute
+  BookingFlowRoute: typeof BookingFlowRoute
   ContactRoute: typeof ContactRoute
   CreateShopWebsiteRoute: typeof CreateShopWebsiteRoute
   CustomerAppRoute: typeof CustomerAppRoute
   DashboardRoute: typeof DashboardRouteWithChildren
+  DistributorAppRoute: typeof DistributorAppRoute
   DistributorBrandPortalRoute: typeof DistributorBrandPortalRoute
   DownloadAppRoute: typeof DownloadAppRoute
   ForOwnersRoute: typeof ForOwnersRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   GrowthPartnerRoute: typeof GrowthPartnerRoute
+  GrowthPartnerAppRoute: typeof GrowthPartnerAppRoute
   HelpRoute: typeof HelpRoute
+  JobsAppRoute: typeof JobsAppRoute
   LoginRoute: typeof LoginRoute
   MembershipRoute: typeof MembershipRoute
+  MembershipRulesRoute: typeof MembershipRulesRoute
   OfflineRoute: typeof OfflineRoute
   OwnerRoute: typeof OwnerRouteWithChildren
   OwnerSignupRoute: typeof OwnerSignupRoute
   PartnerRoute: typeof PartnerRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
+  QrPaymentsRoute: typeof QrPaymentsRoute
   ReferralsRoute: typeof ReferralsRoute
+  RefundCancellationRoute: typeof RefundCancellationRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  RoleSelectionRoute: typeof RoleSelectionRoute
   SalonsRoute: typeof SalonsRoute
   SearchRoute: typeof SearchRoute
+  ShopOwnerAppRoute: typeof ShopOwnerAppRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  WebsiteBuilderRoute: typeof WebsiteBuilderRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   BookSlugRoute: typeof BookSlugRoute
   BrandSlugRoute: typeof BrandSlugRoute
@@ -1826,6 +1956,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/website-builder': {
+      id: '/website-builder'
+      path: '/website-builder'
+      fullPath: '/website-builder'
+      preLoaderRoute: typeof WebsiteBuilderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -1847,6 +1984,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shop-owner-app': {
+      id: '/shop-owner-app'
+      path: '/shop-owner-app'
+      fullPath: '/shop-owner-app'
+      preLoaderRoute: typeof ShopOwnerAppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/search': {
       id: '/search'
       path: '/search'
@@ -1859,6 +2003,13 @@ declare module '@tanstack/react-router' {
       path: '/salons'
       fullPath: '/salons'
       preLoaderRoute: typeof SalonsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/role-selection': {
+      id: '/role-selection'
+      path: '/role-selection'
+      fullPath: '/role-selection'
+      preLoaderRoute: typeof RoleSelectionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -1875,11 +2026,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/refund-cancellation': {
+      id: '/refund-cancellation'
+      path: '/refund-cancellation'
+      fullPath: '/refund-cancellation'
+      preLoaderRoute: typeof RefundCancellationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/referrals': {
       id: '/referrals'
       path: '/referrals'
       fullPath: '/referrals'
       preLoaderRoute: typeof ReferralsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qr-payments': {
+      id: '/qr-payments'
+      path: '/qr-payments'
+      fullPath: '/qr-payments'
+      preLoaderRoute: typeof QrPaymentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -1924,6 +2089,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OfflineRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/membership-rules': {
+      id: '/membership-rules'
+      path: '/membership-rules'
+      fullPath: '/membership-rules'
+      preLoaderRoute: typeof MembershipRulesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/membership': {
       id: '/membership'
       path: '/membership'
@@ -1938,11 +2110,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/jobs-app': {
+      id: '/jobs-app'
+      path: '/jobs-app'
+      fullPath: '/jobs-app'
+      preLoaderRoute: typeof JobsAppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/help': {
       id: '/help'
       path: '/help'
       fullPath: '/help'
       preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/growth-partner-app': {
+      id: '/growth-partner-app'
+      path: '/growth-partner-app'
+      fullPath: '/growth-partner-app'
+      preLoaderRoute: typeof GrowthPartnerAppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/growth-partner': {
@@ -1980,6 +2166,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DistributorBrandPortalRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/distributor-app': {
+      id: '/distributor-app'
+      path: '/distributor-app'
+      fullPath: '/distributor-app'
+      preLoaderRoute: typeof DistributorAppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -2006,6 +2199,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/booking-flow': {
+      id: '/booking-flow'
+      path: '/booking-flow'
+      fullPath: '/booking-flow'
+      preLoaderRoute: typeof BookingFlowRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth-notice': {
@@ -3029,32 +3229,42 @@ const rootRouteChildren: RootRouteChildren = {
   AcademyRoute: AcademyRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthNoticeRoute: AuthNoticeRoute,
+  BookingFlowRoute: BookingFlowRoute,
   ContactRoute: ContactRoute,
   CreateShopWebsiteRoute: CreateShopWebsiteRoute,
   CustomerAppRoute: CustomerAppRoute,
   DashboardRoute: DashboardRouteWithChildren,
+  DistributorAppRoute: DistributorAppRoute,
   DistributorBrandPortalRoute: DistributorBrandPortalRoute,
   DownloadAppRoute: DownloadAppRoute,
   ForOwnersRoute: ForOwnersRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   GrowthPartnerRoute: GrowthPartnerRoute,
+  GrowthPartnerAppRoute: GrowthPartnerAppRoute,
   HelpRoute: HelpRoute,
+  JobsAppRoute: JobsAppRoute,
   LoginRoute: LoginRoute,
   MembershipRoute: MembershipRoute,
+  MembershipRulesRoute: MembershipRulesRoute,
   OfflineRoute: OfflineRoute,
   OwnerRoute: OwnerRouteWithChildren,
   OwnerSignupRoute: OwnerSignupRoute,
   PartnerRoute: PartnerRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
+  QrPaymentsRoute: QrPaymentsRoute,
   ReferralsRoute: ReferralsRoute,
+  RefundCancellationRoute: RefundCancellationRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  RoleSelectionRoute: RoleSelectionRoute,
   SalonsRoute: SalonsRoute,
   SearchRoute: SearchRoute,
+  ShopOwnerAppRoute: ShopOwnerAppRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  WebsiteBuilderRoute: WebsiteBuilderRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   BookSlugRoute: BookSlugRoute,
   BrandSlugRoute: BrandSlugRoute,

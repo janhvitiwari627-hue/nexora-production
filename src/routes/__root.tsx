@@ -13,7 +13,6 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import nexoraLogo from "@/assets/nexora-logo.jpg.asset.json";
 
-
 import { NotFoundPage } from "@/pages/public/NotFoundPage";
 import {
   SupabaseErrorFallback,
@@ -22,6 +21,7 @@ import {
 import { Toaster } from "@/components/ui/sonner";
 import { useApplicationStatusNotifications } from "@/hooks/useApplicationStatusNotifications";
 import { ReferralWelcomePopup } from "@/components/referral/ReferralWelcomePopup";
+import { RolePwaManager } from "@/components/pwa/RolePwaManager";
 
 function NotFoundComponent() {
   return <NotFoundPage />;
@@ -99,18 +99,37 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Nexora — Book salons, spas & barbers near you" },
-      { name: "description", content: "Nexora SalonOS is a comprehensive platform for salon discovery, booking, and management." },
-      { property: "og:description", content: "Nexora SalonOS is a comprehensive platform for salon discovery, booking, and management." },
-      { name: "twitter:description", content: "Nexora SalonOS is a comprehensive platform for salon discovery, booking, and management." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/da4bf8e9-fc45-4add-8224-b9561fb25cd4" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/da4bf8e9-fc45-4add-8224-b9561fb25cd4" },
+      {
+        name: "description",
+        content:
+          "Nexora SalonOS is a comprehensive platform for salon discovery, booking, and management.",
+      },
+      {
+        property: "og:description",
+        content:
+          "Nexora SalonOS is a comprehensive platform for salon discovery, booking, and management.",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "Nexora SalonOS is a comprehensive platform for salon discovery, booking, and management.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/da4bf8e9-fc45-4add-8224-b9561fb25cd4",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/da4bf8e9-fc45-4add-8224-b9561fb25cd4",
+      },
     ],
     links: [
       { rel: "icon", href: nexoraLogo.url, type: "image/jpeg", sizes: "any" },
       { rel: "shortcut icon", href: nexoraLogo.url, type: "image/jpeg" },
       { rel: "apple-touch-icon", href: nexoraLogo.url, sizes: "180x180" },
       { rel: "manifest", href: "/manifest.webmanifest" },
-
 
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
@@ -149,9 +168,12 @@ function RootComponent() {
     let timer: ReturnType<typeof setTimeout> | undefined;
     const initializeAuthStore = () => {
       void import("@/stores/authStore").then(({ useAuthStore }) => {
-        useAuthStore.getState().initialize().then((unsub) => {
-          unsubscribe = unsub;
-        });
+        useAuthStore
+          .getState()
+          .initialize()
+          .then((unsub) => {
+            unsubscribe = unsub;
+          });
       });
     };
 
@@ -159,16 +181,6 @@ function RootComponent() {
       timer = setTimeout(initializeAuthStore, 3000);
     } else {
       initializeAuthStore();
-    }
-
-    // Kill-switch: any previously-installed customer-app service worker
-    // gets replaced by /sw.js which unregisters itself on activate. We
-    // additionally best-effort unregister here so returning visitors on
-    // browsers that already cached the old SW get evicted immediately.
-    if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
-      navigator.serviceWorker.getRegistrations?.()
-        .then((regs) => regs.forEach((r) => { void r.unregister(); }))
-        .catch(() => { /* ignore */ });
     }
 
     void import("@/lib/booking-offline-sync").then(({ initBookingOfflineSync }) => {
@@ -184,6 +196,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AppSideEffects />
+      <RolePwaManager />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <ReferralWelcomePopup />

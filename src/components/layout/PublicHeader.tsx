@@ -66,9 +66,9 @@ const NAV = [
   { to: "/", label: "Home", icon: null },
   { to: "/search", label: "Explore", icon: null },
   { to: "/jobs", label: "Job Portal", icon: Briefcase },
-  { to: "/owner/templates", label: "Create Shop Website", icon: null },
+  { to: "/website-builder", label: "Create Shop Website", icon: null },
   { to: "/growth-partner", label: "Growth Partner", icon: TrendingUp },
-  { to: "/owner/welcome", label: "Shop Owner", icon: Store },
+  { to: "/shop-owner-app", label: "Shop Owner", icon: Store },
 ] as const;
 
 const PORTAL_MENU = [
@@ -320,7 +320,7 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
           ) : (
             <>
               <Button variant="ghost" className="font-semibold" asChild>
-                <Link to="/login">Login</Link>
+                <Link to="/role-selection">Login</Link>
               </Button>
               <Button
                 className="bg-gradient-cta text-primary-foreground rounded-[var(--radius-button)] font-semibold shadow-[var(--shadow-glow)] hover:opacity-95"
