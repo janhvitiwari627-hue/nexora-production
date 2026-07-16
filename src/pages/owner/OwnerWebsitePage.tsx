@@ -30,6 +30,8 @@ import {
   Package,
   BadgePercent,
   ChevronRight,
+  Monitor,
+  Smartphone,
   Zap,
 } from "lucide-react";
 import { toast } from "sonner";
