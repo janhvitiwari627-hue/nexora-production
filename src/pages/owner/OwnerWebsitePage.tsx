@@ -207,8 +207,20 @@ export function OwnerWebsitePage() {
     if (!preview || !iframeReady || !form) return;
     const win = iframeRef.current?.contentWindow;
     if (!win) return;
-    win.postMessage({ type: "live-preview-overrides", patch: form }, "*");
-  }, [preview, iframeReady, form]);
+    const patch: Record<string, unknown> = { ...form };
+    if (services) {
+      patch.services = services.map((s) => ({
+        id: s.id,
+        name: s.name,
+        price: s.price,
+        duration: s.duration_minutes,
+        desc: s.description,
+        image: s.image_url || undefined,
+        category: s.category || undefined,
+      }));
+    }
+    win.postMessage({ type: "live-preview-overrides", patch }, "*");
+  }, [preview, iframeReady, form, services]);
 
   // Listen for the iframe's ready handshake.
   useEffect(() => {
