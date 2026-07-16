@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { CalendarDays, Clock, IndianRupee, LoaderCircle, ShieldCheck } from "lucide-react";
 import { salonBySlugQueryOptions } from "@/lib/salons.queries";
@@ -7,6 +7,7 @@ import { createPublicAppointment } from "@/lib/public-booking";
 import { sendBookingConfirmationEmail } from "@/lib/booking-email.functions";
 import { PublishedSiteShell } from "@/pages/public/site/PublishedSiteShell";
 import { BookingFlowPage } from "@/pages/public/BookingFlowPage";
+import { SalonNotFound } from "@/pages/public/site/SalonNotFound";
 
 const TIMES = [
   "10:00",
