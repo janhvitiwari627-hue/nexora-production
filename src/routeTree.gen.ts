@@ -160,6 +160,7 @@ import { Route as PortalDistributorsRegisterRouteImport } from './routes/portal.
 import { Route as PortalDistributorsSlugRouteImport } from './routes/portal.distributors.$slug'
 import { Route as PortalBrandsRegisterRouteImport } from './routes/portal.brands.register'
 import { Route as PortalBrandsSlugRouteImport } from './routes/portal.brands.$slug'
+import { Route as OwnerWebsiteEditRouteImport } from './routes/owner.website.edit'
 import { Route as OwnerJobsNewRouteImport } from './routes/owner.jobs.new'
 import { Route as JobsApplicationsJobIdRouteImport } from './routes/jobs.applications.$jobId'
 import { Route as DashboardBookingsIdRouteImport } from './routes/dashboard.bookings.$id'
@@ -947,6 +948,11 @@ const PortalBrandsSlugRoute = PortalBrandsSlugRouteImport.update({
   path: '/portal/brands/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OwnerWebsiteEditRoute = OwnerWebsiteEditRouteImport.update({
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => OwnerWebsiteRoute,
+} as any)
 const OwnerJobsNewRoute = OwnerJobsNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -1196,7 +1202,7 @@ export interface FileRoutesByFullPath {
   '/owner/settings': typeof OwnerSettingsRoute
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
-  '/owner/website': typeof OwnerWebsiteRoute
+  '/owner/website': typeof OwnerWebsiteRouteWithChildren
   '/owner/welcome': typeof OwnerWelcomeRoute
   '/partner/commission': typeof PartnerCommissionRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
@@ -1248,6 +1254,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
+  '/owner/website/edit': typeof OwnerWebsiteEditRoute
   '/portal/brands/$slug': typeof PortalBrandsSlugRoute
   '/portal/brands/register': typeof PortalBrandsRegisterRoute
   '/portal/distributors/$slug': typeof PortalDistributorsSlugRoute
@@ -1369,7 +1376,7 @@ export interface FileRoutesByTo {
   '/owner/settings': typeof OwnerSettingsRoute
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
-  '/owner/website': typeof OwnerWebsiteRoute
+  '/owner/website': typeof OwnerWebsiteRouteWithChildren
   '/owner/welcome': typeof OwnerWelcomeRoute
   '/partner/commission': typeof PartnerCommissionRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
@@ -1421,6 +1428,7 @@ export interface FileRoutesByTo {
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
+  '/owner/website/edit': typeof OwnerWebsiteEditRoute
   '/portal/brands/$slug': typeof PortalBrandsSlugRoute
   '/portal/brands/register': typeof PortalBrandsRegisterRoute
   '/portal/distributors/$slug': typeof PortalDistributorsSlugRoute
@@ -1550,7 +1558,7 @@ export interface FileRoutesById {
   '/owner/settings': typeof OwnerSettingsRoute
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
-  '/owner/website': typeof OwnerWebsiteRoute
+  '/owner/website': typeof OwnerWebsiteRouteWithChildren
   '/owner/welcome': typeof OwnerWelcomeRoute
   '/partner/commission': typeof PartnerCommissionRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
@@ -1602,6 +1610,7 @@ export interface FileRoutesById {
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
+  '/owner/website/edit': typeof OwnerWebsiteEditRoute
   '/portal/brands/$slug': typeof PortalBrandsSlugRoute
   '/portal/brands/register': typeof PortalBrandsRegisterRoute
   '/portal/distributors/$slug': typeof PortalDistributorsSlugRoute
@@ -1784,6 +1793,7 @@ export interface FileRouteTypes {
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
     | '/owner/jobs/new'
+    | '/owner/website/edit'
     | '/portal/brands/$slug'
     | '/portal/brands/register'
     | '/portal/distributors/$slug'
@@ -1957,6 +1967,7 @@ export interface FileRouteTypes {
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
     | '/owner/jobs/new'
+    | '/owner/website/edit'
     | '/portal/brands/$slug'
     | '/portal/brands/register'
     | '/portal/distributors/$slug'
@@ -2137,6 +2148,7 @@ export interface FileRouteTypes {
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
     | '/owner/jobs/new'
+    | '/owner/website/edit'
     | '/portal/brands/$slug'
     | '/portal/brands/register'
     | '/portal/distributors/$slug'
@@ -3318,6 +3330,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalBrandsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/owner/website/edit': {
+      id: '/owner/website/edit'
+      path: '/edit'
+      fullPath: '/owner/website/edit'
+      preLoaderRoute: typeof OwnerWebsiteEditRouteImport
+      parentRoute: typeof OwnerWebsiteRoute
+    }
     '/owner/jobs/new': {
       id: '/owner/jobs/new'
       path: '/new'
@@ -3611,6 +3630,18 @@ const OwnerJobsRouteWithChildren = OwnerJobsRoute._addFileChildren(
   OwnerJobsRouteChildren,
 )
 
+interface OwnerWebsiteRouteChildren {
+  OwnerWebsiteEditRoute: typeof OwnerWebsiteEditRoute
+}
+
+const OwnerWebsiteRouteChildren: OwnerWebsiteRouteChildren = {
+  OwnerWebsiteEditRoute: OwnerWebsiteEditRoute,
+}
+
+const OwnerWebsiteRouteWithChildren = OwnerWebsiteRoute._addFileChildren(
+  OwnerWebsiteRouteChildren,
+)
+
 interface OwnerRouteChildren {
   OwnerAnalyticsRoute: typeof OwnerAnalyticsRoute
   OwnerBookingsRoute: typeof OwnerBookingsRoute
@@ -3630,7 +3661,7 @@ interface OwnerRouteChildren {
   OwnerSettingsRoute: typeof OwnerSettingsRoute
   OwnerStaffRoute: typeof OwnerStaffRoute
   OwnerTemplatesRoute: typeof OwnerTemplatesRoute
-  OwnerWebsiteRoute: typeof OwnerWebsiteRoute
+  OwnerWebsiteRoute: typeof OwnerWebsiteRouteWithChildren
   OwnerWelcomeRoute: typeof OwnerWelcomeRoute
   OwnerIndexRoute: typeof OwnerIndexRoute
 }
@@ -3654,7 +3685,7 @@ const OwnerRouteChildren: OwnerRouteChildren = {
   OwnerSettingsRoute: OwnerSettingsRoute,
   OwnerStaffRoute: OwnerStaffRoute,
   OwnerTemplatesRoute: OwnerTemplatesRoute,
-  OwnerWebsiteRoute: OwnerWebsiteRoute,
+  OwnerWebsiteRoute: OwnerWebsiteRouteWithChildren,
   OwnerWelcomeRoute: OwnerWelcomeRoute,
   OwnerIndexRoute: OwnerIndexRoute,
 }
