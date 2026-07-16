@@ -22,7 +22,7 @@ function ShopOwnerAppPage() {
       eyebrow="Shop Owner App"
       title="Salon chalana ab simple hai."
       description="Bookings, services, salon profile, website and daily settings—owner ko sirf wahi tools dikhte hain jo business chalane ke liye zaroori hain."
-      startPath="/owner/welcome"
+      startPath="/app/owner"
       audience="salon owners and their business"
       features={[
         {

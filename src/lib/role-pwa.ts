@@ -11,6 +11,7 @@ const APP_MANIFESTS: Record<NexoraAppKind, string> = {
 
 export function appKindForPath(pathname: string): NexoraAppKind {
   if (pathname.startsWith("/app/customer")) return "customer";
+  if (pathname.startsWith("/app/owner")) return "owner";
   if (pathname.startsWith("/owner") || pathname === "/shop-owner-app") return "owner";
   if (pathname.startsWith("/partner") || pathname === "/growth-partner-app") return "partner";
   if (pathname.startsWith("/portal") || pathname === "/distributor-app") return "distributor";

@@ -3,7 +3,7 @@
   "short_name": "Nexora Owner",
   "id": "/apps/owner",
   "description": "Manage salon setup, services and bookings.",
-  "start_url": "/owner/welcome?source=pwa",
+  "start_url": "/app/owner?source=pwa",
   "scope": "/",
   "display": "standalone",
   "background_color": "#f8fafc",
