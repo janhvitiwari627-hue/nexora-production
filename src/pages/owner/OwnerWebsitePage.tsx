@@ -160,6 +160,22 @@ export function OwnerWebsitePage() {
     }
   }, [salon, form]);
 
+  useEffect(() => {
+    if (servicesData && services === null) {
+      setServices(
+        servicesData.map((s) => ({
+          id: s.id,
+          name: s.name,
+          price: Number(s.price ?? 0),
+          duration_minutes: s.duration_minutes ?? 30,
+          description: s.description ?? "",
+          image_url: s.image_url ?? "",
+          category: s.category ?? "",
+        })),
+      );
+    }
+  }, [servicesData, services]);
+
   const set = <K extends keyof Patch>(key: K, value: Patch[K]) =>
     setForm((f) => (f ? { ...f, [key]: value } : f));
 
