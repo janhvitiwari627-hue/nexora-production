@@ -12,6 +12,7 @@ const required = [
   "src/pages/jobs/app/JobsAppShell.tsx",
   "src/pages/jobs/app/SavedJobsPage.tsx",
   "supabase/migrations/20260716170000_jobs_pwa_saved_jobs.sql",
+  "supabase/migrations/20260716173000_candidate_resume_storage.sql",
 ];
 const failures = required.filter((path) => !existsSync(path)).map((path) => `Missing ${path}`);
 

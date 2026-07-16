@@ -37,6 +37,7 @@ export function CandidateProfilePage() {
   const [portfolio, setPortfolio] = useState<string[]>([]);
   const [video, setVideo] = useState<string>("");
   const [resume, setResume] = useState<string>("");
+  const [uploadingResume, setUploadingResume] = useState(false);
 
   const [avatar, setAvatar] = useState<string>(profile?.avatar_url || "");
   const [uploading, setUploading] = useState(false);
@@ -190,6 +191,40 @@ export function CandidateProfilePage() {
       setUploadError("We couldn't remove your profile image. Please try again.");
       toast.error("Could not remove profile image");
       setAvatar(previous);
+    }
+  }
+
+  async function handleResumeFile(file: File) {
+    if (!user) {
+      toast.error("Resume upload karne ke liye login karein.");
+      return;
+    }
+    if (file.type !== "application/pdf") {
+      toast.error("Sirf PDF resume upload karein.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Resume maximum 5 MB ka ho sakta hai.");
+      return;
+    }
+    setUploadingResume(true);
+    try {
+      const path = `${user.id}/resume-${Date.now()}.pdf`;
+      const { error: uploadError } = await supabase.storage
+        .from("candidate-resumes")
+        .upload(path, file, { contentType: "application/pdf", upsert: true });
+      if (uploadError) throw uploadError;
+      const { data, error: signError } = await supabase.storage
+        .from("candidate-resumes")
+        .createSignedUrl(path, 60 * 60 * 24 * 365);
+      if (signError) throw signError;
+      setResume(data.signedUrl);
+      toast.success("Resume uploaded securely.");
+    } catch (error) {
+      console.error("[candidate resume upload]", error);
+      toast.error("Resume upload nahi ho paaya. Dobara try karein.");
+    } finally {
+      setUploadingResume(false);
     }
   }
 
@@ -640,12 +675,19 @@ export function CandidateProfilePage() {
                 <Label>Resume (PDF)</Label>
                 <label className="bg-muted/30 hover:bg-muted grid cursor-pointer place-items-center rounded-xl border-2 border-dashed py-10 text-center">
                   <Upload className="text-muted-foreground mb-2 h-8 w-8" />
-                  <div className="font-medium">{resume || "Upload PDF resume"}</div>
+                  <div className="font-medium">
+                    {uploadingResume ? "Uploading resume…" : resume ? "Resume uploaded" : "Upload PDF resume"}
+                  </div>
                   <input
                     hidden
                     type="file"
                     accept="application/pdf"
-                    onChange={(e) => setResume(e.target.files?.[0]?.name || "")}
+                    disabled={uploadingResume}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) void handleResumeFile(file);
+                      e.target.value = "";
+                    }}
                   />
                 </label>
               </div>
