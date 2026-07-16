@@ -13,7 +13,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   ExternalLink,
-  Eye,
   Loader2,
   Upload,
   X,
@@ -31,6 +30,7 @@ import {
   Package,
   BadgePercent,
   ChevronRight,
+  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useOwnerContext } from "@/hooks/use-owner-context";
