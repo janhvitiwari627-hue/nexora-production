@@ -62,6 +62,7 @@ function PublishedBookingPage() {
   const [time, setTime] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [mobile, setMobile] = useState("");
+  const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
