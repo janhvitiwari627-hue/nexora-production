@@ -203,6 +203,17 @@
     max-width: 100%;
     overflow-x: clip;
   }
+  body > div,
+  main {
+    max-width: 100%;
+    overflow-x: clip;
+  }
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
+  }
   h1, h2, h3, h4, h5, h6 { color: var(--color-heading); font-weight: 700; letter-spacing: -0.02em; }
 }
 
