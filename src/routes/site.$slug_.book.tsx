@@ -2,13 +2,13 @@ import { useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { CalendarDays, Clock, IndianRupee, LoaderCircle, ShieldCheck } from "lucide-react";
-import { salonBySlugQueryOptions } from "@/lib/salons.queries";
+import { siteBySlugQueryOptions, isMockSalonId } from "@/lib/site-data";
 import { createPublicAppointment } from "@/lib/public-booking";
 import { sendBookingConfirmationEmail } from "@/lib/booking-email.functions";
 import { PublishedSiteShell } from "@/pages/public/site/PublishedSiteShell";
-
 import { SalonNotFound } from "@/pages/public/site/SalonNotFound";
 import { isBookingMockDisabled } from "@/lib/mock-booking-availability";
+import { createMockBooking } from "@/lib/mock-bookings";
 
 const TIMES = [
   "10:00",
@@ -40,7 +40,7 @@ export const Route = createFileRoute("/site/$slug_/book")({
     if (!params.slug || params.slug === "undefined" || params.slug === "null") {
       return null;
     }
-    return context.queryClient.ensureQueryData(salonBySlugQueryOptions(params.slug));
+    return context.queryClient.ensureQueryData(siteBySlugQueryOptions(params.slug));
   },
   head: ({ params }) => {
     const label = params.slug && params.slug !== "undefined" ? params.slug : "salon";
@@ -76,7 +76,7 @@ function PublishedBookingPage() {
 function PublishedBookingPageInner({ slug }: { slug: string }) {
   const search = Route.useSearch();
   const navigate = useNavigate();
-  const { data } = useSuspenseQuery(salonBySlugQueryOptions(slug));
+  const { data } = useSuspenseQuery(siteBySlugQueryOptions(slug));
   const services = useMemo(() => data?.services ?? [], [data?.services]);
   const initialService = services.some((service) => service.id === search.service)
     ? search.service
@@ -103,18 +103,11 @@ function PublishedBookingPageInner({ slug }: { slug: string }) {
   const advance = Math.round(total * 25) / 100;
   const remaining = Math.round((total - advance) * 100) / 100;
 
-  // Demo/template previews use mock slugs that don't exist in Supabase.
-  // Show a friendly "not published yet" screen (owner-branded CTA back to
-  // their template) instead of falling into the main-website BookingFlowPage,
-  // which has its own hooks that fail outside a real salon context.
   if (!data?.salon) {
-    return (
-      <SalonNotFound
-        title="Booking not enabled yet"
-        description="This salon website is still a preview. Once the owner publishes it, real online bookings will open right here — inside their own website design."
-      />
-    );
+    return <SalonNotFound />;
   }
+
+  const isMock = isMockSalonId(data.salon.id);
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -125,6 +118,30 @@ function PublishedBookingPageInner({ slug }: { slug: string }) {
     }
     setSubmitting(true);
     try {
+      if (isMock) {
+        // Demo/mock salon: skip the DB write, generate a local receipt so
+        // the confirmation screen still renders end-to-end.
+        const receipt = createMockBooking({
+          service_id: selectedService.id,
+          service_name: selectedService.name,
+          salon_slug: slug,
+          salon_name: data.salon.name,
+          staff_id: staffId || null,
+          staff_name: selectedStaff?.name ?? null,
+          booking_date: date,
+          booking_time: time,
+          price: total,
+          advance_amount: advance,
+          remaining,
+        });
+        await navigate({
+          to: "/site/$slug_/booking-success",
+          params: { slug },
+          search: { booking: receipt.id },
+        });
+        return;
+      }
+
       const appointment = await createPublicAppointment({
         tenantId: data.salon.id,
         serviceId: selectedService.id,
@@ -169,6 +186,13 @@ function PublishedBookingPageInner({ slug }: { slug: string }) {
   return (
     <PublishedSiteShell slug={slug} salonName={data.salon.name}>
       <main className="mx-auto max-w-5xl px-4 py-8 sm:py-12">
+        {isMock && (
+          <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <strong className="font-semibold">Demo booking:</strong> this salon site is a template
+            preview. Your appointment stays on this device for demo purposes and no email or
+            payment is sent.
+          </div>
+        )}
         <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
           <form onSubmit={submit} className="space-y-7">
             <div>
