@@ -469,7 +469,7 @@ export function OwnerSettingsPage() {
 
       <div className="sticky bottom-0 flex items-center justify-end gap-2 border-t bg-background/95 py-3 backdrop-blur">
         {isDirty && (
-          <span className="mr-auto text-xs text-muted-foreground">Unsaved changes</span>
+          <span className="mr-auto text-xs text-muted-foreground">Unsaved changes · autosaved as draft</span>
         )}
         <Button variant="outline" onClick={() => navigate({ to: "/owner/welcome" })}>
           Back
