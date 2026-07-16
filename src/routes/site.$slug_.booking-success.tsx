@@ -37,13 +37,31 @@ function BookingSuccessPage() {
     return <SalonNotFound />;
   }
   const { booking } = Route.useSearch();
+  const isMock = isMockBookingId(booking);
   const receipt = useQuery({
     queryKey: ["public-booking-receipt", booking],
     queryFn: () => getPublicAppointmentReceipt(booking),
-    enabled: Boolean(booking),
+    enabled: Boolean(booking) && !isMock,
     retry: false,
   });
+  const mockReceipt = isMock ? getMockBooking(booking) : null;
   const salonQuery = useQuery(salonBySlugQueryOptions(slug));
+
+  if (isMock && mockReceipt) {
+    const row = {
+      service_id: mockReceipt.service_id,
+      service_name: mockReceipt.service_name,
+      salons: { name: mockReceipt.salon_name, address: null, location: null, phone: null, whatsapp: null },
+      staff: mockReceipt.staff_name ? { name: mockReceipt.staff_name } : null,
+      booking_date: mockReceipt.booking_date,
+      booking_time: mockReceipt.booking_time,
+      booking_reference: mockReceipt.booking_reference,
+      price: mockReceipt.price,
+      advance_amount: mockReceipt.advance_amount,
+      remaining: mockReceipt.remaining,
+    };
+    return renderReceipt(slug, row as never, salonQuery.data ?? null, true);
+  }
 
   if (receipt.isLoading) {
     return (
