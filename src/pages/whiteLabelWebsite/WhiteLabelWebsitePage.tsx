@@ -26,6 +26,16 @@ import { toast } from "sonner";
 const DEFAULT_COVER =
   "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=1600&q=80";
 
+type LiveOverrideService = {
+  id?: string;
+  name: string;
+  price: number;
+  duration?: number | null;
+  desc?: string | null;
+  image?: string | null;
+  category?: string | null;
+};
+
 type LiveOverrides = Partial<{
   name: string;
   tagline: string | null;
@@ -45,6 +55,7 @@ type LiveOverrides = Partial<{
   home_service_charge: number;
   home_service_radius_km: number;
   selected_template_key: string;
+  services: LiveOverrideService[];
 }>;
 
 export function WhiteLabelWebsitePage({
