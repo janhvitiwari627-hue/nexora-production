@@ -127,12 +127,13 @@ export function SmartSearchCard() {
   };
 
   return (
-    <div ref={wrapRef} className="relative mx-auto w-[95%] max-w-[1400px]">
+    <div ref={wrapRef} className="relative mx-auto w-full max-w-[1400px] px-[max(env(safe-area-inset-left),0.75rem)] pr-[max(env(safe-area-inset-right),0.75rem)] sm:w-[95%] sm:px-0">
       <div className="rounded-[24px] border border-[#E6EBF1] bg-white p-3 shadow-[0_10px_40px_-12px_rgba(50,50,93,0.12),0_4px_10px_-4px_rgba(10,37,64,0.06)] md:p-4">
         <div className="flex flex-col gap-2 md:flex-row md:items-stretch">
           {/* Service */}
-          <div className="flex flex-[2] items-center gap-3 rounded-[16px] bg-[#F6F9FC] px-4 py-3">
+          <div className="flex flex-[2] min-w-0 items-center gap-2 rounded-[16px] bg-[#F6F9FC] px-3 py-3 sm:gap-3 sm:px-4">
             <Search className="h-5 w-5 shrink-0 text-[#635BFF]" />
+
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
