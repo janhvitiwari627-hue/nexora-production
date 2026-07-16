@@ -20,7 +20,7 @@ import {
 } from "@/components/whiteLabelWebsite/templates";
 import { getSalonBySlug } from "@/lib/salons.functions";
 import { expandMockBusiness, getMockBusinesses, getMockBusinessBySlug } from "@/lib/mock-businesses";
-import { Paintbrush } from "lucide-react";
+import { Check, Loader2, Paintbrush } from "lucide-react";
 
 const DEFAULT_COVER =
   "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=1600&q=80";
