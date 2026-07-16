@@ -276,7 +276,6 @@ export function OwnerSettingsPage() {
       return updateFn({ data: { salon_id: activeSalonId, patch } });
     },
     onSuccess: async () => {
-      toast.success("Shop details saved. Website updated.");
       setBaseline(form);
       setDraftRestored(false);
       if (draftKey && typeof window !== "undefined") {
@@ -287,6 +286,14 @@ export function OwnerSettingsPage() {
         }
       }
       await qc.invalidateQueries({ queryKey: ["owner"] });
+      toast.success("Saved! Ab template edit & live preview karein.", {
+        action: {
+          label: "Open Website Editor",
+          onClick: () => navigate({ to: "/owner/website" }),
+        },
+      });
+      // Auto-redirect so owner completes the website (template, colors, live preview)
+      navigate({ to: "/owner/website" });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Update failed"),
   });
