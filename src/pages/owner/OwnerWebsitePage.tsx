@@ -805,7 +805,35 @@ export function OwnerWebsitePage() {
                 <Zap className="h-4 w-4 text-primary" />
                 Edit & Live · {form.name}
               </DialogTitle>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="inline-flex overflow-hidden rounded-full border bg-muted p-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setPreviewDevice("desktop")}
+                    className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium transition ${
+                      previewDevice === "desktop"
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    aria-pressed={previewDevice === "desktop"}
+                    aria-label="Desktop preview"
+                  >
+                    <Monitor className="h-3.5 w-3.5" /> Desktop
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewDevice("mobile")}
+                    className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium transition ${
+                      previewDevice === "mobile"
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    aria-pressed={previewDevice === "mobile"}
+                    aria-label="Mobile preview"
+                  >
+                    <Smartphone className="h-3.5 w-3.5" /> Mobile
+                  </button>
+                </div>
                 <span
                   className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium ${
                     iframeReady
@@ -833,23 +861,34 @@ export function OwnerWebsitePage() {
               Aap jo bhi color, banner, logo ya text change karenge, wo yahan turant dikhega. Save Changes ke baad customers ko bhi dikhega.
             </p>
           </DialogHeader>
-          <iframe
-            ref={iframeRef}
-            src={previewUrl}
-            title="Live website preview"
-            className="h-full w-full flex-1"
-            onLoad={() => {
-              // Iframe finished loading — send an immediate patch so the
-              // preview reflects the current form even if the ready handshake
-              // is missed (e.g. cached page).
-              if (form) {
-                iframeRef.current?.contentWindow?.postMessage(
-                  { type: "live-preview-overrides", patch: form },
-                  "*",
-                );
+          <div
+            className={`flex-1 overflow-auto bg-muted/40 ${
+              previewDevice === "mobile" ? "grid place-items-start justify-center py-4" : ""
+            }`}
+          >
+            <div
+              className={
+                previewDevice === "mobile"
+                  ? "h-[760px] w-[390px] max-w-full overflow-hidden rounded-[2rem] border-[10px] border-slate-900 bg-background shadow-2xl"
+                  : "h-full w-full"
               }
-            }}
-          />
+            >
+              <iframe
+                ref={iframeRef}
+                src={previewUrl}
+                title="Live website preview"
+                className="h-full w-full"
+                onLoad={() => {
+                  if (form) {
+                    iframeRef.current?.contentWindow?.postMessage(
+                      { type: "live-preview-overrides", patch: form },
+                      "*",
+                    );
+                  }
+                }}
+              />
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
