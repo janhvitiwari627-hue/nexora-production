@@ -339,7 +339,17 @@ export function OwnerWebsitePage() {
             Update your ready-made salon website using these simple fields.
           </p>
         </div>
-        <div className="grid w-full grid-cols-1 items-center gap-2 sm:w-auto sm:grid-cols-2">
+        <div className="grid w-full grid-cols-1 items-center gap-2 sm:w-auto sm:grid-cols-[auto_auto_auto]">
+          <div className="text-xs text-muted-foreground flex items-center gap-1.5 justify-center sm:justify-end">
+            {autosaveState === "saving" && (
+              <>
+                <Loader2 className="h-3 w-3 animate-spin" /> Draft saving…
+              </>
+            )}
+            {autosaveState === "saved" && <span className="text-emerald-600">Draft saved</span>}
+            {autosaveState === "error" && <span className="text-destructive">Autosave failed</span>}
+            {autosaveState === "idle" && <span className="opacity-60">Auto-draft on</span>}
+          </div>
           <Button
             variant="outline"
             onClick={() => setPreview(true)}
@@ -361,6 +371,7 @@ export function OwnerWebsitePage() {
             Save Changes
           </Button>
         </div>
+
       </div>
 
       {/* Status card */}
