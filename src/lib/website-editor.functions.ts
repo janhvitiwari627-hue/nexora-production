@@ -75,7 +75,7 @@ export const getOrCreateMyWebsite = createServerFn({ method: "POST" })
 
     const { data: newId, error } = await supabase.rpc(
       "create_user_website_from_template",
-      { _template_id: templateId, _salon_id: data.salonId ?? null },
+      { _template_id: templateId, _salon_id: data.salonId ?? undefined },
     );
     if (error) throw new Error(error.message);
 
