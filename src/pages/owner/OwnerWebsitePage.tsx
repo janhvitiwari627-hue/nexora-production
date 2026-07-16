@@ -88,6 +88,7 @@ export function OwnerWebsitePage() {
   const qc = useQueryClient();
   const { data: salon, isLoading } = useQuery(ownerSalonFullQuery(activeSalonId ?? ""));
   const update = useServerFn(updateOwnerSalon);
+  const [autosaveState, setAutosaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const mutate = useMutation({
     mutationFn: (patch: Patch) => update({ data: { salon_id: activeSalonId!, patch } }),
     onSuccess: () => {
@@ -112,6 +113,7 @@ export function OwnerWebsitePage() {
       setPreview(true);
     }
   }, [routeSearch, salon]);
+
 
   useEffect(() => {
     if (salon && !form) {
@@ -184,10 +186,57 @@ export function OwnerWebsitePage() {
     return () => window.removeEventListener("message", onMessage);
   }, [preview]);
 
+  // Autosave draft for template/colors/logo/banner fields (debounced).
+  const AUTOSAVE_KEYS = [
+    "selected_template_key",
+    "brand_primary",
+    "brand_secondary",
+    "cover_image_url",
+    "owner_profile_image_url",
+  ] as const;
+  const lastAutosavedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!form || !activeSalonId) return;
+    const draft: Patch = {};
+    for (const k of AUTOSAVE_KEYS) {
+      // @ts-expect-error index
+      draft[k] = form[k];
+    }
+    const key = JSON.stringify(draft);
+    if (lastAutosavedRef.current === null) {
+      lastAutosavedRef.current = key;
+      return;
+    }
+    if (lastAutosavedRef.current === key) return;
+    const handle = setTimeout(async () => {
+      try {
+        setAutosaveState("saving");
+        await update({ data: { salon_id: activeSalonId, patch: draft } });
+        lastAutosavedRef.current = key;
+        setAutosaveState("saved");
+        qc.invalidateQueries({ queryKey: ["owner", "salon-full", activeSalonId] });
+      } catch (e) {
+        setAutosaveState("error");
+        toast.error(e instanceof Error ? e.message : "Draft autosave failed");
+      }
+    }, 800);
+    return () => clearTimeout(handle);
+  }, [
+    form?.selected_template_key,
+    form?.brand_primary,
+    form?.brand_secondary,
+    form?.cover_image_url,
+    form?.owner_profile_image_url,
+    activeSalonId,
+    update,
+    qc,
+  ]);
+
   const handleSave = () => {
     if (!form) return;
     mutate.mutate(form);
   };
+
 
   const uploadFile = async (file: File, folder: "cover" | "owner" | "gallery" | "video") => {
     if (!activeSalonId) return null;
@@ -290,7 +339,17 @@ export function OwnerWebsitePage() {
             Update your ready-made salon website using these simple fields.
           </p>
         </div>
-        <div className="grid w-full grid-cols-1 items-center gap-2 sm:w-auto sm:grid-cols-2">
+        <div className="grid w-full grid-cols-1 items-center gap-2 sm:w-auto sm:grid-cols-[auto_auto_auto]">
+          <div className="text-xs text-muted-foreground flex items-center gap-1.5 justify-center sm:justify-end">
+            {autosaveState === "saving" && (
+              <>
+                <Loader2 className="h-3 w-3 animate-spin" /> Draft saving…
+              </>
+            )}
+            {autosaveState === "saved" && <span className="text-emerald-600">Draft saved</span>}
+            {autosaveState === "error" && <span className="text-destructive">Autosave failed</span>}
+            {autosaveState === "idle" && <span className="opacity-60">Auto-draft on</span>}
+          </div>
           <Button
             variant="outline"
             onClick={() => setPreview(true)}
@@ -312,6 +371,7 @@ export function OwnerWebsitePage() {
             Save Changes
           </Button>
         </div>
+
       </div>
 
       {/* Status card */}
