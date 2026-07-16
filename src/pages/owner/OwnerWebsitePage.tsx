@@ -714,7 +714,7 @@ export function OwnerWebsitePage() {
                 />
                 <Input
                   className="sm:col-span-2"
-                  placeholder="Image URL (https://…)"
+                  placeholder="Ya image URL paste karein (optional)"
                   value={s.image_url}
                   onChange={(e) => updateService(idx, { image_url: e.target.value })}
                 />
