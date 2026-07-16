@@ -187,27 +187,23 @@ function ProfilePreviewPanel() {
   const profile = useAuthStore((s) => s.profile);
   const authLoading = useAuthStore((s) => s.isLoading);
   const refreshProfile = useAuthStore((s) => s.refreshProfile);
-  const [refreshing, setRefreshing] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) return;
+    // Root auth already hydrates the profile in the background. Only retry
+    // when it is missing, and never block the card while that request runs.
+    if (!user || profile) return;
     let cancelled = false;
 
-    setRefreshing(true);
     setLoadError(null);
-    refreshProfile()
-      .catch(() => {
-        if (!cancelled) setLoadError("Latest profile could not be loaded. Showing saved details.");
-      })
-      .finally(() => {
-        if (!cancelled) setRefreshing(false);
-      });
+    refreshProfile().catch(() => {
+      if (!cancelled) setLoadError("Latest profile could not be loaded. Showing saved details.");
+    });
 
     return () => {
       cancelled = true;
     };
-  }, [refreshProfile, user]);
+  }, [profile, refreshProfile, user]);
 
   const displayName =
     profile?.full_name?.trim() ||
@@ -232,7 +228,7 @@ function ProfilePreviewPanel() {
       .slice(0, 2)
       .join("")
       .toUpperCase() || "U";
-  const isLoading = authLoading || (refreshing && !profile);
+  const isLoading = authLoading && !user;
 
   return (
     <section className="bg-card border-border rounded-[var(--radius-card-lg)] border p-6">
