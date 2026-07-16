@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -10,6 +10,13 @@ import { Calendar, Clock, Sparkles } from "lucide-react";
  * the /salon/$slug parent route (which redirects to /site/$businessSlug).
  */
 export const Route = createFileRoute("/salon/$slug_/book")({
+  beforeLoad: ({ params }) => {
+    throw redirect({
+      to: "/site/$slug_/book",
+      params: { slug: params.slug },
+      search: { service: undefined },
+    });
+  },
   head: ({ params }) => ({
     meta: [{ title: `Book at ${params.slug} — Nexora` }],
   }),
@@ -37,9 +44,7 @@ function BookingFlowPage() {
 
   return (
     <main className="mx-auto max-w-md px-4 py-6">
-      <div className="text-xs uppercase tracking-wide text-muted-foreground">
-        Booking at {slug}
-      </div>
+      <div className="text-xs uppercase tracking-wide text-muted-foreground">Booking at {slug}</div>
       <h1 className="mt-1 text-2xl font-bold">{STEPS[step]}</h1>
 
       <ol className="mt-4 flex gap-2">

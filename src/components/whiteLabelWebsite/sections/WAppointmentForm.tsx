@@ -7,7 +7,11 @@ import { Calendar } from "lucide-react";
 
 export function WAppointmentForm({ shop, template }: { shop: ShopData; template: TemplateConfig }) {
   return (
-    <section id="appointment" className="px-6 py-16 md:px-12" style={{ backgroundColor: `${template.colors.primary}10` }}>
+    <section
+      id="appointment"
+      className="px-6 py-16 md:px-12"
+      style={{ backgroundColor: `${template.colors.primary}10` }}
+    >
       <SectionTitle font={template.font}>Book An Appointment</SectionTitle>
       <div className="mx-auto mt-8 grid max-w-2xl gap-4 text-center">
         <p className="text-muted-foreground">
@@ -17,9 +21,13 @@ export function WAppointmentForm({ shop, template }: { shop: ShopData; template:
           asChild
           size="lg"
           className="mx-auto inline-flex items-center gap-2"
-          style={{ backgroundColor: template.colors.primary, color: "white", borderRadius: template.radius }}
+          style={{
+            backgroundColor: template.colors.primary,
+            color: "white",
+            borderRadius: template.radius,
+          }}
         >
-          <Link to="/book/$slug" params={{ slug: shop.slug }}>
+          <Link to="/site/$slug_/book" params={{ slug: shop.slug }} search={{ service: undefined }}>
             <Calendar className="h-4 w-4" /> Start Booking
           </Link>
         </Button>

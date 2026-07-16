@@ -18,7 +18,6 @@ import {
   type TemplateKey,
 } from "@/components/whiteLabelWebsite/templates";
 import { getSalonBySlug } from "@/lib/salons.functions";
-import { expandMockBusiness, getMockBusinessBySlug } from "@/lib/mock-businesses";
 import { Paintbrush } from "lucide-react";
 
 const DEFAULT_COVER =
@@ -50,10 +49,7 @@ export function WhiteLabelWebsitePage({
     );
   }
 
-  // Mock fallback: if Supabase has no record, look up the Jaipur mock catalog.
-  const mockBiz = !data?.salon && _slug ? getMockBusinessBySlug(_slug) : null;
-
-  if (!data?.salon && !mockBiz) {
+  if (!data?.salon) {
     return (
       <div className="mx-auto grid min-h-[70vh] max-w-xl place-items-center px-6 text-center">
         <div className="space-y-4">
@@ -73,7 +69,7 @@ export function WhiteLabelWebsitePage({
     );
   }
 
-  const shop: ShopData = data?.salon ? toShopData(data) : expandMockBusiness(mockBiz!);
+  const shop: ShopData = toShopData(data);
   const savedTemplateKey = data?.salon?.selected_template_key ?? "modern-salon";
   const templateKey = normalizeTemplateKey(
     routeSearch?.t ?? browserSearch?.get("t") ?? savedTemplateKey,

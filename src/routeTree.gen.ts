@@ -133,6 +133,9 @@ import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising'
 import { Route as PortalDistributorsIndexRouteImport } from './routes/portal.distributors.index'
 import { Route as PortalBrandsIndexRouteImport } from './routes/portal.brands.index'
+import { Route as SiteSlugServicesRouteImport } from './routes/site.$slug_.services'
+import { Route as SiteSlugBookingSuccessRouteImport } from './routes/site.$slug_.booking-success'
+import { Route as SiteSlugBookRouteImport } from './routes/site.$slug_.book'
 import { Route as SalonSlugBookRouteImport } from './routes/salon.$slug_.book'
 import { Route as PortalDistributorsRegisterRouteImport } from './routes/portal.distributors.register'
 import { Route as PortalDistributorsSlugRouteImport } from './routes/portal.distributors.$slug'
@@ -771,6 +774,21 @@ const PortalBrandsIndexRoute = PortalBrandsIndexRouteImport.update({
   path: '/portal/brands/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SiteSlugServicesRoute = SiteSlugServicesRouteImport.update({
+  id: '/site/$slug_/services',
+  path: '/site/$slug/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SiteSlugBookingSuccessRoute = SiteSlugBookingSuccessRouteImport.update({
+  id: '/site/$slug_/booking-success',
+  path: '/site/$slug/booking-success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SiteSlugBookRoute = SiteSlugBookRouteImport.update({
+  id: '/site/$slug_/book',
+  path: '/site/$slug/book',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SalonSlugBookRoute = SalonSlugBookRouteImport.update({
   id: '/salon/$slug_/book',
   path: '/salon/$slug/book',
@@ -990,6 +1008,9 @@ export interface FileRoutesByFullPath {
   '/portal/distributors/$slug': typeof PortalDistributorsSlugRoute
   '/portal/distributors/register': typeof PortalDistributorsRegisterRoute
   '/salon/$slug/book': typeof SalonSlugBookRoute
+  '/site/$slug/book': typeof SiteSlugBookRoute
+  '/site/$slug/booking-success': typeof SiteSlugBookingSuccessRoute
+  '/site/$slug/services': typeof SiteSlugServicesRoute
   '/portal/brands/': typeof PortalBrandsIndexRoute
   '/portal/distributors/': typeof PortalDistributorsIndexRoute
   '/api/public/auth/forgot-password': typeof ApiPublicAuthForgotPasswordRoute
@@ -1128,6 +1149,9 @@ export interface FileRoutesByTo {
   '/portal/distributors/$slug': typeof PortalDistributorsSlugRoute
   '/portal/distributors/register': typeof PortalDistributorsRegisterRoute
   '/salon/$slug/book': typeof SalonSlugBookRoute
+  '/site/$slug/book': typeof SiteSlugBookRoute
+  '/site/$slug/booking-success': typeof SiteSlugBookingSuccessRoute
+  '/site/$slug/services': typeof SiteSlugServicesRoute
   '/portal/brands': typeof PortalBrandsIndexRoute
   '/portal/distributors': typeof PortalDistributorsIndexRoute
   '/api/public/auth/forgot-password': typeof ApiPublicAuthForgotPasswordRoute
@@ -1271,6 +1295,9 @@ export interface FileRoutesById {
   '/portal/distributors/$slug': typeof PortalDistributorsSlugRoute
   '/portal/distributors/register': typeof PortalDistributorsRegisterRoute
   '/salon/$slug_/book': typeof SalonSlugBookRoute
+  '/site/$slug_/book': typeof SiteSlugBookRoute
+  '/site/$slug_/booking-success': typeof SiteSlugBookingSuccessRoute
+  '/site/$slug_/services': typeof SiteSlugServicesRoute
   '/portal/brands/': typeof PortalBrandsIndexRoute
   '/portal/distributors/': typeof PortalDistributorsIndexRoute
   '/api/public/auth/forgot-password': typeof ApiPublicAuthForgotPasswordRoute
@@ -1415,6 +1442,9 @@ export interface FileRouteTypes {
     | '/portal/distributors/$slug'
     | '/portal/distributors/register'
     | '/salon/$slug/book'
+    | '/site/$slug/book'
+    | '/site/$slug/booking-success'
+    | '/site/$slug/services'
     | '/portal/brands/'
     | '/portal/distributors/'
     | '/api/public/auth/forgot-password'
@@ -1553,6 +1583,9 @@ export interface FileRouteTypes {
     | '/portal/distributors/$slug'
     | '/portal/distributors/register'
     | '/salon/$slug/book'
+    | '/site/$slug/book'
+    | '/site/$slug/booking-success'
+    | '/site/$slug/services'
     | '/portal/brands'
     | '/portal/distributors'
     | '/api/public/auth/forgot-password'
@@ -1695,6 +1728,9 @@ export interface FileRouteTypes {
     | '/portal/distributors/$slug'
     | '/portal/distributors/register'
     | '/salon/$slug_/book'
+    | '/site/$slug_/book'
+    | '/site/$slug_/booking-success'
+    | '/site/$slug_/services'
     | '/portal/brands/'
     | '/portal/distributors/'
     | '/api/public/auth/forgot-password'
@@ -1773,6 +1809,9 @@ export interface RootRouteChildren {
   PortalDistributorsSlugRoute: typeof PortalDistributorsSlugRoute
   PortalDistributorsRegisterRoute: typeof PortalDistributorsRegisterRoute
   SalonSlugBookRoute: typeof SalonSlugBookRoute
+  SiteSlugBookRoute: typeof SiteSlugBookRoute
+  SiteSlugBookingSuccessRoute: typeof SiteSlugBookingSuccessRoute
+  SiteSlugServicesRoute: typeof SiteSlugServicesRoute
   PortalBrandsIndexRoute: typeof PortalBrandsIndexRoute
   PortalDistributorsIndexRoute: typeof PortalDistributorsIndexRoute
   ApiPublicAuthForgotPasswordRoute: typeof ApiPublicAuthForgotPasswordRoute
@@ -2655,6 +2694,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalBrandsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/site/$slug_/services': {
+      id: '/site/$slug_/services'
+      path: '/site/$slug/services'
+      fullPath: '/site/$slug/services'
+      preLoaderRoute: typeof SiteSlugServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/site/$slug_/booking-success': {
+      id: '/site/$slug_/booking-success'
+      path: '/site/$slug/booking-success'
+      fullPath: '/site/$slug/booking-success'
+      preLoaderRoute: typeof SiteSlugBookingSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/site/$slug_/book': {
+      id: '/site/$slug_/book'
+      path: '/site/$slug/book'
+      fullPath: '/site/$slug/book'
+      preLoaderRoute: typeof SiteSlugBookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/salon/$slug_/book': {
       id: '/salon/$slug_/book'
       path: '/salon/$slug/book'
@@ -3029,6 +3089,9 @@ const rootRouteChildren: RootRouteChildren = {
   PortalDistributorsSlugRoute: PortalDistributorsSlugRoute,
   PortalDistributorsRegisterRoute: PortalDistributorsRegisterRoute,
   SalonSlugBookRoute: SalonSlugBookRoute,
+  SiteSlugBookRoute: SiteSlugBookRoute,
+  SiteSlugBookingSuccessRoute: SiteSlugBookingSuccessRoute,
+  SiteSlugServicesRoute: SiteSlugServicesRoute,
   PortalBrandsIndexRoute: PortalBrandsIndexRoute,
   PortalDistributorsIndexRoute: PortalDistributorsIndexRoute,
   ApiPublicAuthForgotPasswordRoute: ApiPublicAuthForgotPasswordRoute,

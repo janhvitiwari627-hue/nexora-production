@@ -199,6 +199,7 @@ export type Database = {
           refund_status: string | null
           salon_id: string
           service_address: string | null
+          service_id: string | null
           service_mode: string
           service_name: string
           status: string
@@ -228,6 +229,7 @@ export type Database = {
           refund_status?: string | null
           salon_id: string
           service_address?: string | null
+          service_id?: string | null
           service_mode?: string
           service_name: string
           status?: string
@@ -257,6 +259,7 @@ export type Database = {
           refund_status?: string | null
           salon_id?: string
           service_address?: string | null
+          service_id?: string | null
           service_mode?: string
           service_name?: string
           status?: string
@@ -264,6 +267,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "bookings_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "bookings_salon_id_fkey"
             columns: ["salon_id"]
@@ -4767,6 +4777,17 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      create_public_appointment: {
+        Args: {
+          _appointment_date: string
+          _appointment_time: string
+          _customer_name: string
+          _mobile: string
+          _service_id: string
+          _tenant_id: string
+        }
+        Returns: Json
       }
       is_district_partner: {
         Args: { _partner_id: string; _user_id: string }
