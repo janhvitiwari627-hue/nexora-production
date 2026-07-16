@@ -236,14 +236,14 @@ export function OwnerWebsitePage() {
             Update your ready-made salon website using these simple fields.
           </p>
         </div>
-        <div className="grid w-full grid-cols-2 items-center gap-2 sm:w-auto">
+        <div className="grid w-full grid-cols-1 items-center gap-2 sm:w-auto sm:grid-cols-2">
           <Button
             variant="outline"
             onClick={() => setPreview(true)}
             disabled={!previewUrl}
-            className="min-w-0 px-2 text-xs sm:px-4 sm:text-sm"
+            className="min-w-0 border-primary/40 bg-gradient-to-r from-primary/10 to-primary/5 px-2 text-xs font-semibold text-primary hover:from-primary/20 hover:to-primary/10 sm:px-4 sm:text-sm"
           >
-            <Eye className="h-4 w-4" /> Preview Website
+            <Zap className="h-4 w-4" /> Edit & Live
           </Button>
           <Button
             onClick={handleSave}
