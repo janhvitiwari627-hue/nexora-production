@@ -171,6 +171,27 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
     onSearchChange(next === "grid" ? rest : { ...rest, view: next });
   };
 
+  const scrollResultsIntoView = (behavior: ScrollBehavior = "smooth") => {
+    const target = document.getElementById("search-results");
+    if (!target) return;
+
+    const header = document.querySelector<HTMLElement>('[data-testid="public-header"]');
+    const headerOffset = (header?.getBoundingClientRect().height ?? 0) + 14;
+    const top = target.getBoundingClientRect().top + window.scrollY - headerOffset;
+
+    window.scrollTo({ top: Math.max(0, top), behavior });
+  };
+
+  const scrollToResultsAfterFiltering = () => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => scrollResultsIntoView("smooth"));
+    });
+
+    [120, 320, 650].forEach((delay) => {
+      window.setTimeout(() => scrollResultsIntoView("smooth"), delay);
+    });
+  };
+
   // Anchor-based scroll restore: pin the topmost visible result card so the
   // same section stays in view even when the list height changes.
   const preserveScroll = (fn: () => void) => {
@@ -350,20 +371,12 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
                 onApplyFilters={(f) => {
                   setDraft(f);
                   commitFilters(f);
-                  requestAnimationFrame(() => {
-                    document
-                      .getElementById("search-results")
-                      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-                  });
+                  scrollToResultsAfterFiltering();
                 }}
                 onSelectCategory={(cat) => {
                   const { category: _omit, ...rest } = search;
                   onSearchChange({ ...rest, category: cat });
-                  requestAnimationFrame(() => {
-                    document
-                      .getElementById("search-results")
-                      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-                  });
+                  scrollToResultsAfterFiltering();
                 }}
               />
               <InstantBookingSection shops={filtered} />
