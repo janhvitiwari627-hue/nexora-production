@@ -289,11 +289,11 @@ export function OwnerSettingsPage() {
       toast.success("Saved! Ab template edit & live preview karein.", {
         action: {
           label: "Open Website Editor",
-          onClick: () => navigate({ to: "/owner/website" }),
+          onClick: () => navigate({ to: "/owner/website", search: { live: 1 } }),
         },
       });
       // Auto-redirect so owner completes the website (template, colors, live preview)
-      navigate({ to: "/owner/website" });
+      navigate({ to: "/owner/website", search: { live: 1 } });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Update failed"),
   });
@@ -487,7 +487,7 @@ export function OwnerSettingsPage() {
         </Button>
         <Button
           variant="outline"
-          onClick={() => navigate({ to: "/owner/website" })}
+          onClick={() => navigate({ to: "/owner/website", search: { live: 1 } })}
           disabled={save.isPending}
           title="Template chunein, colors/banner edit karein aur live preview dekhein"
         >
