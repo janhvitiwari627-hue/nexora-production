@@ -167,7 +167,8 @@ export function SmartSearchCard() {
 
           {/* Location */}
           <button
-            className="flex flex-1 items-center gap-3 rounded-[16px] bg-[#F6F9FC] px-4 py-3 text-left"
+            className="flex flex-1 min-w-0 items-center gap-3 rounded-[16px] bg-[#F6F9FC] px-3 py-3 text-left sm:px-4"
+
             type="button"
             onClick={() => !location && requestGps()}
           >
