@@ -214,11 +214,26 @@ export function WhiteLabelWebsitePage({
   }
 
   const fallbackShop = expandMockBusiness(mockBusiness ?? getMockBusinesses()[0]);
-  const shop: ShopData = data?.salon
+  const baseShop: ShopData = data?.salon
     ? toShopData(data)
     : liveOverrides && isPreview
       ? toLivePreviewShop(fallbackShop, liveOverrides, _slug)
       : fallbackShop;
+  const shop: ShopData =
+    liveOverrides?.services && liveOverrides.services.length >= 0
+      ? {
+          ...baseShop,
+          services: liveOverrides.services.map((s, i) => ({
+            id: s.id ?? `draft-${i}`,
+            name: s.name,
+            price: Number(s.price) || 0,
+            duration: Number(s.duration ?? 30) || 30,
+            desc: s.desc ?? "",
+            image: s.image ?? undefined,
+            category: s.category ?? undefined,
+          })),
+        }
+      : baseShop;
   const savedTemplateKey =
     data?.salon?.selected_template_key ?? liveOverrides?.selected_template_key ?? "modern-salon";
   const templateKey = normalizeTemplateKey(
