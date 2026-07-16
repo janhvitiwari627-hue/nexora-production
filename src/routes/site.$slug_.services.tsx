@@ -1,19 +1,17 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Clock, IndianRupee } from "lucide-react";
 import { salonBySlugQueryOptions } from "@/lib/salons.queries";
 import { PublishedSiteShell } from "@/pages/public/site/PublishedSiteShell";
+import { SalonNotFound } from "@/pages/public/site/SalonNotFound";
 
 export const Route = createFileRoute("/site/$slug_/services")({
-  beforeLoad: ({ params }) => {
-    // Guard against links that accidentally serialize an undefined slug —
-    // sending users to the homepage is friendlier than a dead-end error.
+  loader: ({ context, params }) => {
     if (!params.slug || params.slug === "undefined" || params.slug === "null") {
-      throw redirect({ to: "/" });
+      return null;
     }
+    return context.queryClient.ensureQueryData(salonBySlugQueryOptions(params.slug));
   },
-  loader: ({ context, params }) =>
-    context.queryClient.ensureQueryData(salonBySlugQueryOptions(params.slug)),
   head: ({ params }) => {
     const label = params.slug && params.slug !== "undefined" ? params.slug : "salon";
     return { meta: [{ title: `Services · ${label} · Nexora` }] };
@@ -23,23 +21,20 @@ export const Route = createFileRoute("/site/$slug_/services")({
 
 function PublishedServicesPage() {
   const { slug } = Route.useParams();
+  if (!slug || slug === "undefined" || slug === "null") {
+    return <SalonNotFound />;
+  }
+  return <PublishedServicesPageInner slug={slug} />;
+}
+
+function PublishedServicesPageInner({ slug }: { slug: string }) {
   const { data } = useSuspenseQuery(salonBySlugQueryOptions(slug));
   if (!data?.salon) {
     return (
-      <main className="grid min-h-[70vh] place-items-center bg-slate-50 px-6 text-center">
-        <div className="max-w-md">
-          <h1 className="text-2xl font-bold">Services preview</h1>
-          <p className="mt-2 text-sm text-slate-600">
-            This salon website is still a demo. Publish your site or use a real salon link to see live services.
-          </p>
-          <Link
-            to="/"
-            className="mt-6 inline-flex rounded-lg bg-violet-700 px-5 py-2.5 text-sm font-semibold text-white"
-          >
-            Go to Nexora
-          </Link>
-        </div>
-      </main>
+      <SalonNotFound
+        title="Salon website not published"
+        description="This salon hasn't published their website yet. Browse other salons or head back home."
+      />
     );
   }
 
