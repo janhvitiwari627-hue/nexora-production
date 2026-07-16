@@ -323,6 +323,7 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
       navigate({ to: "/login" });
       return;
     }
+    if (!job) return;
     if (!job.isReal) {
       toast.info("Demo job save nahi hoti. Live opening select karein.");
       return;
