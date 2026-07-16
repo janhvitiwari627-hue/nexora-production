@@ -27,7 +27,7 @@ export function WHero({ shop, template }: { shop: ShopData; template: TemplateCo
           </div>
           <div className="flex flex-wrap gap-3">
             <Button size="lg" style={{ backgroundColor: template.colors.primary, color: "white", borderRadius: template.radius }} asChild>
-              <Link to="/book/$slug" params={{ slug: shop.slug }}><Calendar className="h-4 w-4" /> Book Now</Link>
+              <Link to="/site/$slug_/book" params={{ slug: shop.slug }} search={{ service: undefined }}><Calendar className="h-4 w-4" /> Book Now</Link>
             </Button>
             <Button size="lg" variant="outline" style={{ borderRadius: template.radius }} asChild>
               <a href="#services">View Services</a>

@@ -18,6 +18,7 @@ import {
   type TemplateKey,
 } from "@/components/whiteLabelWebsite/templates";
 import { getSalonBySlug } from "@/lib/salons.functions";
+import { expandMockBusiness, getMockBusinesses, getMockBusinessBySlug } from "@/lib/mock-businesses";
 import { Paintbrush } from "lucide-react";
 
 const DEFAULT_COVER =
@@ -49,7 +50,15 @@ export function WhiteLabelWebsitePage({
     );
   }
 
-  if (!data?.salon) {
+  // Template previews and demo slugs use mock businesses that don't exist in
+  // the DB. When the DB has no salon but we recognise the slug as a mock
+  // business (or we're explicitly in preview mode), render the template with
+  // the mock ShopData so the "Book Now" flow stays inside the owner's
+  // website design instead of dead-ending on a "not available" screen.
+  const mockBusiness = _slug ? getMockBusinessBySlug(_slug) : null;
+  const useMock = !data?.salon && (!!mockBusiness || isPreview);
+
+  if (!data?.salon && !useMock) {
     return (
       <div className="mx-auto grid min-h-[70vh] max-w-xl place-items-center px-6 text-center">
         <div className="space-y-4">
@@ -69,7 +78,9 @@ export function WhiteLabelWebsitePage({
     );
   }
 
-  const shop: ShopData = toShopData(data);
+  const shop: ShopData = data?.salon
+    ? toShopData(data)
+    : expandMockBusiness(mockBusiness ?? getMockBusinesses()[0]);
   const savedTemplateKey = data?.salon?.selected_template_key ?? "modern-salon";
   const templateKey = normalizeTemplateKey(
     routeSearch?.t ?? browserSearch?.get("t") ?? savedTemplateKey,
