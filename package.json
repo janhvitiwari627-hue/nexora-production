@@ -25,7 +25,8 @@
     "test:p1": "node scripts/audit-p1-public-booking.mjs",
     "test:multi-pwa": "node scripts/audit-multi-pwa-platform.mjs",
     "test:customer-pwa": "node scripts/audit-customer-pwa.mjs",
-    "test:owner-pwa": "node scripts/audit-owner-pwa.mjs"
+    "test:owner-pwa": "node scripts/audit-owner-pwa.mjs",
+    "test:jobs-pwa": "node scripts/audit-jobs-pwa.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^2.0.51",

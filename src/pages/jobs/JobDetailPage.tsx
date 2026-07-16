@@ -25,7 +25,7 @@ import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 import { Modal } from "@/components/shared/Modal";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/stores/authStore";
-import { applyToJob, isRealJobId, type JobRow } from "@/lib/jobs";
+import { applyToJob, isRealJobId, saveJobForLater, type JobRow } from "@/lib/jobs";
 import { parseRequirementsMeta, stripRequirementsMeta } from "@/lib/jobRequirementsMeta";
 import type { Job } from "./mockJobs";
 
@@ -118,6 +118,7 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
   } | null>(null);
   const alreadyApplied = Boolean(application);
   const [checkingApplied, setCheckingApplied] = useState(false);
+  const [savingJob, setSavingJob] = useState(false);
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -316,6 +317,27 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
         ? "Sign in to Apply"
         : "Apply Now";
 
+  async function handleSaveJob() {
+    if (!user) {
+      sessionStorage.setItem("nexora:postLoginRedirect", window.location.pathname);
+      navigate({ to: "/login" });
+      return;
+    }
+    if (!job.isReal) {
+      toast.info("Demo job save nahi hoti. Live opening select karein.");
+      return;
+    }
+    setSavingJob(true);
+    try {
+      await saveJobForLater(job.id, user.id);
+      toast.success("Job Saved Jobs mein add ho gayi.");
+    } catch {
+      toast.error("Job save nahi ho paayi. Dobara try karein.");
+    } finally {
+      setSavingJob(false);
+    }
+  }
+
   return (
     <>
       <PublicPageHeader />
@@ -333,8 +355,8 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => toast.success("Saved")}>
-                  <Bookmark className="h-4 w-4" /> Save
+                <Button variant="outline" size="sm" onClick={handleSaveJob} disabled={savingJob}>
+                  <Bookmark className="h-4 w-4" /> {savingJob ? "Saving…" : "Save"}
                 </Button>
                 <Button
                   variant="outline"

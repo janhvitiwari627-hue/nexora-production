@@ -3,7 +3,7 @@
   "short_name": "Nexora Jobs",
   "id": "/apps/jobs",
   "description": "Beauty industry jobs for candidates and salons.",
-  "start_url": "/jobs?source=pwa",
+  "start_url": "/app/jobs?source=pwa",
   "scope": "/",
   "display": "standalone",
   "background_color": "#f8fafc",

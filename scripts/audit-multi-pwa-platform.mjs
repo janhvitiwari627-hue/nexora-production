@@ -27,7 +27,7 @@ const manifests = [
   ["owner", "/apps/owner", "/app/owner"],
   ["partner", "/apps/partner", "/partner"],
   ["distributor", "/apps/distributor", "/portal"],
-  ["jobs", "/apps/jobs", "/jobs"],
+  ["jobs", "/apps/jobs", "/app/jobs"],
 ];
 
 const failures = [];

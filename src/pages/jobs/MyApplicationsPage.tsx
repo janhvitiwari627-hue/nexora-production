@@ -1,10 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 const PAGE_SIZE = 10;
-import { Link, getRouteApi, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import type { ApplicationsSearch } from "@/routes/jobs.applications";
-
-const applicationsRoute = getRouteApi("/jobs/applications");
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -101,10 +99,10 @@ function fmtSalary(min: number | null | undefined, max: number | null | undefine
 
 export function MyApplicationsPage() {
   const { user, isInitialized } = useAuthStore();
-  const search = applicationsRoute.useSearch();
-  const navigate = useNavigate({ from: "/jobs/applications" });
-  const filter = search.status;
-  const q = search.q;
+  const search = useSearch({ strict: false }) as Partial<ApplicationsSearch>;
+  const navigate = useNavigate();
+  const filter = search.status ?? "all";
+  const q = search.q ?? "";
   const setFilter = (status: string) =>
     navigate({
       search: (prev: ApplicationsSearch) => ({

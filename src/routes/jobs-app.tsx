@@ -14,7 +14,7 @@ function JobsAppPage() {
       eyebrow="Beauty Jobs App"
       title="Beauty industry jobs, bina confusion."
       description="Candidates job search aur applications manage karein; salon owners vacancies aur applicants handle karein."
-      startPath="/jobs"
+      startPath="/app/jobs"
       audience="beauty professionals and salon employers"
       features={[
         {

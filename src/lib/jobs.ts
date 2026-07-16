@@ -175,6 +175,39 @@ export async function listPublishedJobs(limit = 50): Promise<JobRow[]> {
   return (data ?? []) as JobRow[];
 }
 
+export type SavedJob = {
+  id: string;
+  user_id: string;
+  job_id: string;
+  created_at: string;
+  job: JobRow & { employer?: EmployerProfile | null };
+};
+
+export async function saveJobForLater(jobId: string, userId: string): Promise<void> {
+  const { error } = await table("saved_jobs").upsert(
+    { job_id: jobId, user_id: userId },
+    { onConflict: "user_id,job_id" },
+  );
+  if (error) throw error;
+}
+
+export async function removeSavedJob(jobId: string, userId: string): Promise<void> {
+  const { error } = await table("saved_jobs")
+    .delete()
+    .eq("job_id", jobId)
+    .eq("user_id", userId);
+  if (error) throw error;
+}
+
+export async function listSavedJobs(userId: string): Promise<SavedJob[]> {
+  const { data, error } = await table("saved_jobs")
+    .select("*, job:jobs(*, employer:employer_profiles(*))")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as SavedJob[];
+}
+
 export type JobApplication = {
   id: string;
   job_id: string;

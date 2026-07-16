@@ -127,6 +127,7 @@ import { Route as BrandSlugRouteImport } from './routes/brand.$slug'
 import { Route as BookSlugRouteImport } from './routes/book.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AppOwnerRouteImport } from './routes/app.owner'
+import { Route as AppJobsRouteImport } from './routes/app.jobs'
 import { Route as AppCustomerRouteImport } from './routes/app.customer'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
@@ -146,6 +147,7 @@ import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising
 import { Route as PortalDistributorsIndexRouteImport } from './routes/portal.distributors.index'
 import { Route as PortalBrandsIndexRouteImport } from './routes/portal.brands.index'
 import { Route as AppOwnerIndexRouteImport } from './routes/app.owner.index'
+import { Route as AppJobsIndexRouteImport } from './routes/app.jobs.index'
 import { Route as AppCustomerIndexRouteImport } from './routes/app.customer.index'
 import { Route as SiteSlugServicesRouteImport } from './routes/site.$slug_.services'
 import { Route as SiteSlugBookingSuccessRouteImport } from './routes/site.$slug_.booking-success'
@@ -163,6 +165,10 @@ import { Route as AppOwnerWalletRouteImport } from './routes/app.owner.wallet'
 import { Route as AppOwnerSupportRouteImport } from './routes/app.owner.support'
 import { Route as AppOwnerProfileRouteImport } from './routes/app.owner.profile'
 import { Route as AppOwnerBookingsRouteImport } from './routes/app.owner.bookings'
+import { Route as AppJobsSupportRouteImport } from './routes/app.jobs.support'
+import { Route as AppJobsSavedRouteImport } from './routes/app.jobs.saved'
+import { Route as AppJobsProfileRouteImport } from './routes/app.jobs.profile'
+import { Route as AppJobsApplicationsRouteImport } from './routes/app.jobs.applications'
 import { Route as AppCustomerSupportRouteImport } from './routes/app.customer.support'
 import { Route as AppCustomerSearchRouteImport } from './routes/app.customer.search'
 import { Route as AppCustomerRewardsRouteImport } from './routes/app.customer.rewards'
@@ -767,6 +773,11 @@ const AppOwnerRoute = AppOwnerRouteImport.update({
   path: '/app/owner',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppJobsRoute = AppJobsRouteImport.update({
+  id: '/app/jobs',
+  path: '/app/jobs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppCustomerRoute = AppCustomerRouteImport.update({
   id: '/app/customer',
   path: '/app/customer',
@@ -863,6 +874,11 @@ const AppOwnerIndexRoute = AppOwnerIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppOwnerRoute,
 } as any)
+const AppJobsIndexRoute = AppJobsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppJobsRoute,
+} as any)
 const AppCustomerIndexRoute = AppCustomerIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -948,6 +964,26 @@ const AppOwnerBookingsRoute = AppOwnerBookingsRouteImport.update({
   id: '/bookings',
   path: '/bookings',
   getParentRoute: () => AppOwnerRoute,
+} as any)
+const AppJobsSupportRoute = AppJobsSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => AppJobsRoute,
+} as any)
+const AppJobsSavedRoute = AppJobsSavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
+  getParentRoute: () => AppJobsRoute,
+} as any)
+const AppJobsProfileRoute = AppJobsProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppJobsRoute,
+} as any)
+const AppJobsApplicationsRoute = AppJobsApplicationsRouteImport.update({
+  id: '/applications',
+  path: '/applications',
+  getParentRoute: () => AppJobsRoute,
 } as any)
 const AppCustomerSupportRoute = AppCustomerSupportRouteImport.update({
   id: '/support',
@@ -1079,6 +1115,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/app/customer': typeof AppCustomerRouteWithChildren
+  '/app/jobs': typeof AppJobsRouteWithChildren
   '/app/owner': typeof AppOwnerRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/book/$slug': typeof BookSlugRoute
@@ -1161,6 +1198,10 @@ export interface FileRoutesByFullPath {
   '/app/customer/rewards': typeof AppCustomerRewardsRoute
   '/app/customer/search': typeof AppCustomerSearchRoute
   '/app/customer/support': typeof AppCustomerSupportRoute
+  '/app/jobs/applications': typeof AppJobsApplicationsRoute
+  '/app/jobs/profile': typeof AppJobsProfileRoute
+  '/app/jobs/saved': typeof AppJobsSavedRoute
+  '/app/jobs/support': typeof AppJobsSupportRoute
   '/app/owner/bookings': typeof AppOwnerBookingsRoute
   '/app/owner/profile': typeof AppOwnerProfileRoute
   '/app/owner/support': typeof AppOwnerSupportRoute
@@ -1178,6 +1219,7 @@ export interface FileRoutesByFullPath {
   '/site/$slug/booking-success': typeof SiteSlugBookingSuccessRoute
   '/site/$slug/services': typeof SiteSlugServicesRoute
   '/app/customer/': typeof AppCustomerIndexRoute
+  '/app/jobs/': typeof AppJobsIndexRoute
   '/app/owner/': typeof AppOwnerIndexRoute
   '/portal/brands/': typeof PortalBrandsIndexRoute
   '/portal/distributors/': typeof PortalDistributorsIndexRoute
@@ -1324,6 +1366,10 @@ export interface FileRoutesByTo {
   '/app/customer/rewards': typeof AppCustomerRewardsRoute
   '/app/customer/search': typeof AppCustomerSearchRoute
   '/app/customer/support': typeof AppCustomerSupportRoute
+  '/app/jobs/applications': typeof AppJobsApplicationsRoute
+  '/app/jobs/profile': typeof AppJobsProfileRoute
+  '/app/jobs/saved': typeof AppJobsSavedRoute
+  '/app/jobs/support': typeof AppJobsSupportRoute
   '/app/owner/bookings': typeof AppOwnerBookingsRoute
   '/app/owner/profile': typeof AppOwnerProfileRoute
   '/app/owner/support': typeof AppOwnerSupportRoute
@@ -1341,6 +1387,7 @@ export interface FileRoutesByTo {
   '/site/$slug/booking-success': typeof SiteSlugBookingSuccessRoute
   '/site/$slug/services': typeof SiteSlugServicesRoute
   '/app/customer': typeof AppCustomerIndexRoute
+  '/app/jobs': typeof AppJobsIndexRoute
   '/app/owner': typeof AppOwnerIndexRoute
   '/portal/brands': typeof PortalBrandsIndexRoute
   '/portal/distributors': typeof PortalDistributorsIndexRoute
@@ -1412,6 +1459,7 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/app/customer': typeof AppCustomerRouteWithChildren
+  '/app/jobs': typeof AppJobsRouteWithChildren
   '/app/owner': typeof AppOwnerRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/book/$slug': typeof BookSlugRoute
@@ -1494,6 +1542,10 @@ export interface FileRoutesById {
   '/app/customer/rewards': typeof AppCustomerRewardsRoute
   '/app/customer/search': typeof AppCustomerSearchRoute
   '/app/customer/support': typeof AppCustomerSupportRoute
+  '/app/jobs/applications': typeof AppJobsApplicationsRoute
+  '/app/jobs/profile': typeof AppJobsProfileRoute
+  '/app/jobs/saved': typeof AppJobsSavedRoute
+  '/app/jobs/support': typeof AppJobsSupportRoute
   '/app/owner/bookings': typeof AppOwnerBookingsRoute
   '/app/owner/profile': typeof AppOwnerProfileRoute
   '/app/owner/support': typeof AppOwnerSupportRoute
@@ -1511,6 +1563,7 @@ export interface FileRoutesById {
   '/site/$slug_/booking-success': typeof SiteSlugBookingSuccessRoute
   '/site/$slug_/services': typeof SiteSlugServicesRoute
   '/app/customer/': typeof AppCustomerIndexRoute
+  '/app/jobs/': typeof AppJobsIndexRoute
   '/app/owner/': typeof AppOwnerIndexRoute
   '/portal/brands/': typeof PortalBrandsIndexRoute
   '/portal/distributors/': typeof PortalDistributorsIndexRoute
@@ -1583,6 +1636,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/users'
     | '/app/customer'
+    | '/app/jobs'
     | '/app/owner'
     | '/auth/callback'
     | '/book/$slug'
@@ -1665,6 +1719,10 @@ export interface FileRouteTypes {
     | '/app/customer/rewards'
     | '/app/customer/search'
     | '/app/customer/support'
+    | '/app/jobs/applications'
+    | '/app/jobs/profile'
+    | '/app/jobs/saved'
+    | '/app/jobs/support'
     | '/app/owner/bookings'
     | '/app/owner/profile'
     | '/app/owner/support'
@@ -1682,6 +1740,7 @@ export interface FileRouteTypes {
     | '/site/$slug/booking-success'
     | '/site/$slug/services'
     | '/app/customer/'
+    | '/app/jobs/'
     | '/app/owner/'
     | '/portal/brands/'
     | '/portal/distributors/'
@@ -1828,6 +1887,10 @@ export interface FileRouteTypes {
     | '/app/customer/rewards'
     | '/app/customer/search'
     | '/app/customer/support'
+    | '/app/jobs/applications'
+    | '/app/jobs/profile'
+    | '/app/jobs/saved'
+    | '/app/jobs/support'
     | '/app/owner/bookings'
     | '/app/owner/profile'
     | '/app/owner/support'
@@ -1845,6 +1908,7 @@ export interface FileRouteTypes {
     | '/site/$slug/booking-success'
     | '/site/$slug/services'
     | '/app/customer'
+    | '/app/jobs'
     | '/app/owner'
     | '/portal/brands'
     | '/portal/distributors'
@@ -1915,6 +1979,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/users'
     | '/app/customer'
+    | '/app/jobs'
     | '/app/owner'
     | '/auth/callback'
     | '/book/$slug'
@@ -1997,6 +2062,10 @@ export interface FileRouteTypes {
     | '/app/customer/rewards'
     | '/app/customer/search'
     | '/app/customer/support'
+    | '/app/jobs/applications'
+    | '/app/jobs/profile'
+    | '/app/jobs/saved'
+    | '/app/jobs/support'
     | '/app/owner/bookings'
     | '/app/owner/profile'
     | '/app/owner/support'
@@ -2014,6 +2083,7 @@ export interface FileRouteTypes {
     | '/site/$slug_/booking-success'
     | '/site/$slug_/services'
     | '/app/customer/'
+    | '/app/jobs/'
     | '/app/owner/'
     | '/portal/brands/'
     | '/portal/distributors/'
@@ -2070,6 +2140,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   WebsiteBuilderRoute: typeof WebsiteBuilderRoute
   AppCustomerRoute: typeof AppCustomerRouteWithChildren
+  AppJobsRoute: typeof AppJobsRouteWithChildren
   AppOwnerRoute: typeof AppOwnerRouteWithChildren
   AuthCallbackRoute: typeof AuthCallbackRoute
   BookSlugRoute: typeof BookSlugRoute
@@ -2948,6 +3019,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppOwnerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/jobs': {
+      id: '/app/jobs'
+      path: '/app/jobs'
+      fullPath: '/app/jobs'
+      preLoaderRoute: typeof AppJobsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/customer': {
       id: '/app/customer'
       path: '/app/customer'
@@ -3081,6 +3159,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppOwnerIndexRouteImport
       parentRoute: typeof AppOwnerRoute
     }
+    '/app/jobs/': {
+      id: '/app/jobs/'
+      path: '/'
+      fullPath: '/app/jobs/'
+      preLoaderRoute: typeof AppJobsIndexRouteImport
+      parentRoute: typeof AppJobsRoute
+    }
     '/app/customer/': {
       id: '/app/customer/'
       path: '/'
@@ -3199,6 +3284,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/owner/bookings'
       preLoaderRoute: typeof AppOwnerBookingsRouteImport
       parentRoute: typeof AppOwnerRoute
+    }
+    '/app/jobs/support': {
+      id: '/app/jobs/support'
+      path: '/support'
+      fullPath: '/app/jobs/support'
+      preLoaderRoute: typeof AppJobsSupportRouteImport
+      parentRoute: typeof AppJobsRoute
+    }
+    '/app/jobs/saved': {
+      id: '/app/jobs/saved'
+      path: '/saved'
+      fullPath: '/app/jobs/saved'
+      preLoaderRoute: typeof AppJobsSavedRouteImport
+      parentRoute: typeof AppJobsRoute
+    }
+    '/app/jobs/profile': {
+      id: '/app/jobs/profile'
+      path: '/profile'
+      fullPath: '/app/jobs/profile'
+      preLoaderRoute: typeof AppJobsProfileRouteImport
+      parentRoute: typeof AppJobsRoute
+    }
+    '/app/jobs/applications': {
+      id: '/app/jobs/applications'
+      path: '/applications'
+      fullPath: '/app/jobs/applications'
+      preLoaderRoute: typeof AppJobsApplicationsRouteImport
+      parentRoute: typeof AppJobsRoute
     }
     '/app/customer/support': {
       id: '/app/customer/support'
@@ -3498,6 +3611,25 @@ const AppCustomerRouteWithChildren = AppCustomerRoute._addFileChildren(
   AppCustomerRouteChildren,
 )
 
+interface AppJobsRouteChildren {
+  AppJobsApplicationsRoute: typeof AppJobsApplicationsRoute
+  AppJobsProfileRoute: typeof AppJobsProfileRoute
+  AppJobsSavedRoute: typeof AppJobsSavedRoute
+  AppJobsSupportRoute: typeof AppJobsSupportRoute
+  AppJobsIndexRoute: typeof AppJobsIndexRoute
+}
+
+const AppJobsRouteChildren: AppJobsRouteChildren = {
+  AppJobsApplicationsRoute: AppJobsApplicationsRoute,
+  AppJobsProfileRoute: AppJobsProfileRoute,
+  AppJobsSavedRoute: AppJobsSavedRoute,
+  AppJobsSupportRoute: AppJobsSupportRoute,
+  AppJobsIndexRoute: AppJobsIndexRoute,
+}
+
+const AppJobsRouteWithChildren =
+  AppJobsRoute._addFileChildren(AppJobsRouteChildren)
+
 interface AppOwnerRouteChildren {
   AppOwnerBookingsRoute: typeof AppOwnerBookingsRoute
   AppOwnerProfileRoute: typeof AppOwnerProfileRoute
@@ -3574,6 +3706,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   WebsiteBuilderRoute: WebsiteBuilderRoute,
   AppCustomerRoute: AppCustomerRouteWithChildren,
+  AppJobsRoute: AppJobsRouteWithChildren,
   AppOwnerRoute: AppOwnerRouteWithChildren,
   AuthCallbackRoute: AuthCallbackRoute,
   BookSlugRoute: BookSlugRoute,
