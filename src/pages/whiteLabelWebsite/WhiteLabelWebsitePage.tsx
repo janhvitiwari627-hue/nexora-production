@@ -36,6 +36,15 @@ type LiveOverrideService = {
   category?: string | null;
 };
 
+type LiveOverrideStaff = {
+  id?: string;
+  name: string;
+  role?: string | null;
+  bio?: string | null;
+  avatar_url?: string | null;
+  rating?: number | null;
+};
+
 type LiveOverrides = Partial<{
   name: string;
   tagline: string | null;
@@ -56,6 +65,7 @@ type LiveOverrides = Partial<{
   home_service_radius_km: number;
   selected_template_key: string;
   services: LiveOverrideService[];
+  staff: LiveOverrideStaff[];
 }>;
 
 export function WhiteLabelWebsitePage({
