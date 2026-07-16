@@ -93,12 +93,13 @@ export function OwnerSettingsPage() {
   });
 
   const [form, setForm] = useState<Form>(EMPTY);
+  const [baseline, setBaseline] = useState<Form>(EMPTY);
   const [uploading, setUploading] = useState<"logo" | "cover" | null>(null);
 
   useEffect(() => {
     if (!salon) return;
     const row = salon as Record<string, unknown>;
-    setForm({
+    const next: Form = {
       name: s(row.name),
       category: s(row.category),
       owner_name: s(row.owner_name),
@@ -114,8 +115,32 @@ export function OwnerSettingsPage() {
       logo_url: s(row.logo_url),
       cover_image_url: s(row.cover_image_url),
       upi_id: s(row.upi_id),
-    });
+    };
+    setForm(next);
+    setBaseline(next);
   }, [salon]);
+
+  const isDirty = useMemo(() => {
+    return (Object.keys(form) as (keyof Form)[]).some((k) => form[k] !== baseline[k]);
+  }, [form, baseline]);
+
+  // Warn on browser close / refresh / external nav
+  useEffect(() => {
+    if (!isDirty) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [isDirty]);
+
+  // Intercept in-app navigation
+  const blocker = useBlocker({
+    shouldBlockFn: () => isDirty && !uploading,
+    withResolver: true,
+    enableBeforeUnload: false,
+  });
 
   const set = <K extends keyof Form>(k: K, v: Form[K]) => setForm((p) => ({ ...p, [k]: v }));
 
