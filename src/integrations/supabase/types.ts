@@ -2902,6 +2902,8 @@ export type Database = {
           comment: string | null
           created_at: string
           id: string
+          owner_replied_at: string | null
+          owner_reply: string | null
           rating: number
           salon_id: string
           updated_at: string
@@ -2911,6 +2913,8 @@ export type Database = {
           comment?: string | null
           created_at?: string
           id?: string
+          owner_replied_at?: string | null
+          owner_reply?: string | null
           rating: number
           salon_id: string
           updated_at?: string
@@ -2920,6 +2924,8 @@ export type Database = {
           comment?: string | null
           created_at?: string
           id?: string
+          owner_replied_at?: string | null
+          owner_reply?: string | null
           rating?: number
           salon_id?: string
           updated_at?: string
@@ -4792,6 +4798,10 @@ export type Database = {
         }[]
       }
       list_pending_owner_salons: { Args: never; Returns: Json }
+      reply_to_salon_review: {
+        Args: { _reply: string; _review_id: string }
+        Returns: Database["public"]["Tables"]["reviews"]["Row"]
+      }
       move_to_dlq: {
         Args: {
           dlq_name: string

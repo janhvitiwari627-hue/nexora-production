@@ -3,6 +3,7 @@ import { Image as ImageIcon, Video } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PhotosTab } from "./gallery/PhotosTab";
 import { LivePhotosTab } from "./gallery/LivePhotosTab";
+import { LiveVideoTab } from "./gallery/LiveVideoTab";
 import { VideosTab } from "./gallery/VideosTab";
 import {
   initialPhotos,
@@ -44,11 +45,14 @@ export function OwnerGalleryPage() {
             )}
           </TabsContent>
           <TabsContent value="videos" className="mt-6">
-            <VideosTab videos={videos} setVideos={setVideos} />
+            {activeSalonId ? (
+              <LiveVideoTab salonId={activeSalonId} />
+            ) : (
+              <VideosTab videos={videos} setVideos={setVideos} />
+            )}
           </TabsContent>
         </Tabs>
       </div>
     </div>
   );
 }
-

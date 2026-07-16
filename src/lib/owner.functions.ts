@@ -845,3 +845,37 @@ export const setSalonGallery = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+// ---------- Reviews ----------
+export const listOwnerReviews = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => SalonIdInput.parse(d))
+  .handler(async ({ data, context }) => {
+    await assertOwnsSalon(context.supabase, context.userId, data.salon_id);
+    const { data: rows, error } = await context.supabase
+      .from("reviews")
+      .select(
+        "id, salon_id, user_id, rating, comment, created_at, updated_at, owner_reply, owner_replied_at, customer:profiles!reviews_user_id_fkey(full_name, avatar_url)",
+      )
+      .eq("salon_id", data.salon_id)
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+const ReviewReplyInput = z.object({
+  review_id: z.string().uuid(),
+  reply: z.string().trim().min(1).max(1000),
+});
+
+export const replyToOwnerReview = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => ReviewReplyInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { data: row, error } = await context.supabase.rpc("reply_to_salon_review", {
+      _review_id: data.review_id,
+      _reply: data.reply,
+    });
+    if (error) throw new Error(error.message);
+    return row;
+  });
