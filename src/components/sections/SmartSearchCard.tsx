@@ -140,8 +140,9 @@ export function SmartSearchCard() {
               onFocus={() => setFocused(true)}
               onKeyDown={(e) => e.key === "Enter" && submit()}
               placeholder={PLACEHOLDERS[placeholderIdx]}
-              className="w-full bg-transparent text-sm font-medium text-[#0A2540] outline-none placeholder:text-[#8A95A8] md:text-base"
+              className="w-full min-w-0 bg-transparent text-base font-medium text-[#0A2540] outline-none placeholder:text-[#8A95A8]"
             />
+
             <button
               type="button"
               onClick={toggleVoice}
