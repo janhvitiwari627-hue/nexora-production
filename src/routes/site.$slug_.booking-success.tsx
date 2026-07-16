@@ -12,6 +12,7 @@ import { getPublicAppointmentReceipt } from "@/lib/public-booking";
 import { salonBySlugQueryOptions } from "@/lib/salons.queries";
 import { buildIcs, downloadIcs } from "@/lib/ics";
 import { SalonNotFound } from "@/pages/public/site/SalonNotFound";
+import { getMockBooking, isMockBookingId } from "@/lib/mock-bookings";
 
 export const Route = createFileRoute("/site/$slug_/booking-success")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -30,21 +31,35 @@ function money(value: unknown) {
   })}`;
 }
 
+type NormalizedRow = {
+  service_id: string;
+  service_name: string;
+  staff_name: string | null;
+  booking_date: string;
+  booking_time: string;
+  booking_reference: string;
+  price: number;
+  advance_amount: number;
+  remaining: number;
+};
+
 function BookingSuccessPage() {
   const { slug } = Route.useParams();
   if (!slug || slug === "undefined" || slug === "null") {
     return <SalonNotFound />;
   }
   const { booking } = Route.useSearch();
+  const isMock = isMockBookingId(booking);
   const receipt = useQuery({
     queryKey: ["public-booking-receipt", booking],
     queryFn: () => getPublicAppointmentReceipt(booking),
-    enabled: Boolean(booking),
+    enabled: Boolean(booking) && !isMock,
     retry: false,
   });
+  const mockReceipt = isMock ? getMockBooking(booking) : null;
   const salonQuery = useQuery(salonBySlugQueryOptions(slug));
 
-  if (receipt.isLoading) {
+  if (!isMock && receipt.isLoading) {
     return (
       <main className="grid min-h-screen place-items-center bg-slate-50">
         <LoaderCircle className="h-7 w-7 animate-spin text-violet-700" />
@@ -52,7 +67,37 @@ function BookingSuccessPage() {
     );
   }
 
-  if (!receipt.data) {
+  const row: NormalizedRow | null = mockReceipt
+    ? {
+        service_id: mockReceipt.service_id,
+        service_name: mockReceipt.service_name,
+        staff_name: mockReceipt.staff_name,
+        booking_date: mockReceipt.booking_date,
+        booking_time: mockReceipt.booking_time,
+        booking_reference: mockReceipt.booking_reference,
+        price: mockReceipt.price,
+        advance_amount: mockReceipt.advance_amount,
+        remaining: mockReceipt.remaining,
+      }
+    : receipt.data
+      ? (() => {
+          const r = receipt.data;
+          const staffAny = Array.isArray(r.staff) ? r.staff[0] : r.staff;
+          return {
+            service_id: r.service_id,
+            service_name: r.service_name,
+            staff_name: staffAny?.name ?? null,
+            booking_date: String(r.booking_date),
+            booking_time: String(r.booking_time),
+            booking_reference: r.booking_reference,
+            price: Number(r.price ?? 0),
+            advance_amount: Number(r.advance_amount ?? 0),
+            remaining: Number(r.remaining ?? 0),
+          };
+        })()
+      : null;
+
+  if (!row) {
     return (
       <main className="grid min-h-screen place-items-center bg-slate-50 px-4 text-center">
         <div>
@@ -73,9 +118,10 @@ function BookingSuccessPage() {
     );
   }
 
-  const row = receipt.data;
-  const salon = Array.isArray(row.salons) ? row.salons[0] : row.salons;
-  const staff = Array.isArray(row.staff) ? row.staff[0] : row.staff;
+  const salonFromDb = salonQuery.data?.salon;
+  const salon = mockReceipt
+    ? { name: mockReceipt.salon_name, address: null, location: null, phone: null, whatsapp: null }
+    : salonFromDb ?? null;
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-10">
@@ -94,7 +140,7 @@ function BookingSuccessPage() {
               <p className="font-bold">{row.service_name}</p>
               <p className="text-sm text-slate-600">{salon?.name ?? "Salon"}</p>
               <p className="mt-1 text-xs text-slate-500">
-                {staff?.name ?? "Any available professional"}
+                {row.staff_name ?? "Any available professional"}
               </p>
             </div>
             <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
