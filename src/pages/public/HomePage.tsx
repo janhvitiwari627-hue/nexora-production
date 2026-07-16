@@ -1254,7 +1254,7 @@ function Section({
 export function HomePage() {
   const filters = useHomeFilters();
   return (
-    <div className="min-h-screen bg-[#F8FAFC] font-sans text-slate-900 antialiased">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#F8FAFC] font-sans text-slate-900 antialiased">
       <PublicHeader showBackButton={false} />
       <main className="pb-24 md:pb-0">
         <Hero />
