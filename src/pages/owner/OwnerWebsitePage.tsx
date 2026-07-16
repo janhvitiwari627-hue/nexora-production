@@ -297,6 +297,13 @@ export function OwnerWebsitePage() {
   const removeService = (idx: number) => {
     setServices((prev) => prev?.filter((_, i) => i !== idx) ?? null);
   };
+  const [uploadingServiceIdx, setUploadingServiceIdx] = useState<number | null>(null);
+  const handleServiceImageUpload = async (idx: number, file: File) => {
+    setUploadingServiceIdx(idx);
+    const url = await uploadFile(file, "services");
+    setUploadingServiceIdx(null);
+    if (url) updateService(idx, { image_url: url });
+  };
   const saveServices = async () => {
     if (!activeSalonId || !services) return;
     setSavingServices(true);
