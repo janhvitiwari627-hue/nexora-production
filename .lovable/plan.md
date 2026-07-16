@@ -1,40 +1,69 @@
-# Plan: Unified Owner Settings + Clean Customer Settings
+Aapki uploaded file ke hisaab se pura **form-based live template editor** banana hai. Ye ek bada system hai, isliye main ise **phases** me build karunga — har phase ke baad aap test kar sakte ho.
 
-## Goal
-- `/dashboard/settings` = **sirf customers ke liye** (personal profile, notifications, security). Isme koi shop/owner data nahi.
-- Owner ke liye **ek hi jagah** shop details edit karne ki — `/owner/settings` (naya route). Ye page SetupWizard (business basics) + EditShop (full details) ko merge karega.
-- Templates (`/site/<slug>`) already `salons` table se data leta hai — jo bhi is unified page se save hoga, wahi templates par dikhega. Data source ek hi rahega, confusion khatam.
-- Sign-up flows already alag hain (`/register` customer, `/owner/register-business` owner) — inhe untouched rakhenge, sirf owner form main missing fields (owner_name, tagline, address etc.) already added.
+## Architecture (spec ke according)
 
-## Changes
+Template ko HTML ki tarah edit nahi karenge. Har section ek **structured JSON component** hoga:
+```json
+{ "type": "hero", "heading": "...", "imageUrl": "...", "visible": true, "order": 1 }
+```
+Website is JSON se render hogi. Editor sirf JSON badlega → template kabhi tootega nahi.
 
-### 1. Naya unified page: `src/pages/owner/OwnerSettingsPage.tsx`
-- EditShopPage ki full-featured form (name, category, owner_name, tagline, description, phone, whatsapp, email, address, city, location, pincode, logo, cover, upi_id) ko base banayenge.
-- SetupWizard ki "business basics" fields already isi form me hai — same salon record par likhta hai.
-- Route: `src/routes/owner.settings.tsx` → `/owner/settings`.
-- Save ke baad `/owner/welcome` ya same page par rehta hai, toast confirm.
+## Database Schema (nayi tables)
 
-### 2. Delete redundant pages/routes
-- `src/pages/owner/EditShopPage.tsx` + `src/routes/owner.edit-shop.tsx`
-- `src/pages/owner/SetupWizardPage.tsx` + `src/routes/owner.setup-wizard.tsx`
-- Har jagah `/owner/edit-shop` aur `/owner/setup-wizard` ke references ko `/owner/settings` par point karenge (register-business ke success redirect samet).
-- OwnerWebsitePage ke "Edit Website Sections" card ke About/Contact/etc. hints bhi `/owner/settings` par point karenge jahan applicable ho.
+```
+website_templates      – original templates (read-only master copies)
+user_websites          – har user ki apni website (draft + published)
+website_sections       – hero/services/gallery/about/contact… har section ka JSON content, order, visible flag
+website_theme          – colors, fonts, button styles per user_website
+website_versions       – snapshots for undo / version history
+media_library          – uploaded images/logos per user
+```
+RLS: har user sirf apni `user_websites` aur uske children edit kar sake.
 
-### 3. Customer `/dashboard/settings`
-- Existing `AccountSettingsPage` already customer-only. Verify karenge ki isme kahin bhi owner/shop data nahi hai — agar hai to hataenge.
+## Build Order (spec ke exact order me)
 
-### 4. Sign-up separation (already done — verify only)
-- `/register` = customer signup
-- `/owner/register-business` = owner signup (Category/WhatsApp/Address included in previous turn)
-- Login page par pehle se hi "Are you a salon owner? Register Your Business" CTA hai (screenshot me dikh raha hai).
+**Phase 1 — Schema + Template Copy System**
+- Migration: upar wali tables + RLS + GRANTs
+- "Use This Template" button → template ka snapshot user ke account me copy
+- Har section JSON structure ke saath insert ho
 
-## Files touched
-- **Create**: `src/pages/owner/OwnerSettingsPage.tsx`, `src/routes/owner.settings.tsx`
-- **Delete**: `src/pages/owner/EditShopPage.tsx`, `src/pages/owner/SetupWizardPage.tsx`, `src/routes/owner.edit-shop.tsx`, `src/routes/owner.setup-wizard.tsx`
-- **Update refs**: `src/pages/auth/OwnerBusinessRegisterPage.tsx` (redirect), `src/pages/owner/OwnerWebsitePage.tsx`, koi bhi nav/link jo in do routes par jaata hai (grep karke fix karenge).
+**Phase 2 — Section-based Editor Shell**
+- `/owner/website/edit` route: left = form controls, right = live iframe preview
+- Section list sidebar (Hero, About, Services, Gallery, Staff, Packages, Offers, Rate Card, Membership, Blog, Contact)
+- Har section ke liye alag form panel
 
-## Not doing
-- Templates ke data-fetch logic ko chhedenge nahi — wo pehle se `salons` table se leta hai jo is unified form se update hota hai.
-- Customer dashboard ke doosre pages ko touch nahi karenge.
+**Phase 3 — Text & Image Editors**
+- Har field (heading, description, button text/link) form input
+- Image upload (file picker + optional URL) — media_library me store
+- Debounced live preview via postMessage (jaise abhi hai)
 
-Confirm karein to implement kar deta hun.
+**Phase 4 — Theme Editor**
+- Colors (primary/secondary/accent/bg), fonts, button style
+- Live CSS variable injection in preview
+
+**Phase 5 — Section Show/Hide + Reorder**
+- Toggle switch per section (`visible`)
+- Drag-to-reorder (dnd-kit) → `order` field update
+
+**Phase 6 — Draft / Publish / Undo**
+- Save Draft (auto, jo abhi partially hai)
+- Publish button → draft → published copy
+- Undo: last N versions se restore
+
+**Phase 7 — Desktop/Mobile Preview Toggle**
+- Iframe width switch
+
+**Phase 8 — Domain + Version History UI** (last)
+
+## Renderer Refactor (important)
+
+Abhi `WhiteLabelWebsitePage` har section ko hardcoded tables (`shop`, `services`, `staff`…) se read karta hai. Isko refactor karunga taaki wo **`website_sections` JSON array** ko iterate karke render kare. Isse:
+- Section reorder / hide automatically work karega
+- Naye section types easily add honge
+- Editor aur renderer dono ek hi schema use karenge
+
+Existing data (shop/services/staff tables) ko migration me `website_sections` JSON me convert kar denge — kuch bhi lose nahi hoga.
+
+## Aaj kya start karun?
+
+Main **Phase 1 (schema + template copy)** se start karunga. Ye foundation hai — iske bina baaki sab patchwork hoga (jaisa abhi ho raha hai). Approve karo to migration likhta hun.

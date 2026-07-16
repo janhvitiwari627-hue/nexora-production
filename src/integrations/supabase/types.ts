@@ -1529,6 +1529,53 @@ export type Database = {
           },
         ]
       }
+      media_library: {
+        Row: {
+          created_at: string
+          file_name: string | null
+          folder: string
+          id: string
+          mime_type: string | null
+          owner_id: string
+          size_bytes: number | null
+          storage_path: string | null
+          url: string
+          website_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          file_name?: string | null
+          folder?: string
+          id?: string
+          mime_type?: string | null
+          owner_id: string
+          size_bytes?: number | null
+          storage_path?: string | null
+          url: string
+          website_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          file_name?: string | null
+          folder?: string
+          id?: string
+          mime_type?: string | null
+          owner_id?: string
+          size_bytes?: number | null
+          storage_path?: string | null
+          url?: string
+          website_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_library_website_id_fkey"
+            columns: ["website_id"]
+            isOneToOne: false
+            referencedRelation: "user_websites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       memberships: {
         Row: {
           created_at: string
@@ -4068,6 +4115,66 @@ export type Database = {
         }
         Relationships: []
       }
+      user_websites: {
+        Row: {
+          created_at: string
+          draft_updated_at: string
+          id: string
+          is_published: boolean
+          owner_id: string
+          published_at: string | null
+          published_snapshot: Json | null
+          salon_id: string | null
+          subdomain: string | null
+          template_id: string | null
+          template_key: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          draft_updated_at?: string
+          id?: string
+          is_published?: boolean
+          owner_id: string
+          published_at?: string | null
+          published_snapshot?: Json | null
+          salon_id?: string | null
+          subdomain?: string | null
+          template_id?: string | null
+          template_key?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          draft_updated_at?: string
+          id?: string
+          is_published?: boolean
+          owner_id?: string
+          published_at?: string | null
+          published_snapshot?: Json | null
+          salon_id?: string | null
+          subdomain?: string | null
+          template_id?: string | null
+          template_key?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_websites_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_websites_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "website_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       voice_searches: {
         Row: {
           audio_duration_seconds: number | null
@@ -4209,6 +4316,47 @@ export type Database = {
           },
         ]
       }
+      website_sections: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          is_visible: boolean
+          section_type: string
+          sort_order: number
+          updated_at: string
+          website_id: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: string
+          is_visible?: boolean
+          section_type: string
+          sort_order?: number
+          updated_at?: string
+          website_id: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          is_visible?: boolean
+          section_type?: string
+          sort_order?: number
+          updated_at?: string
+          website_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "website_sections_website_id_fkey"
+            columns: ["website_id"]
+            isOneToOne: false
+            referencedRelation: "user_websites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       website_templates: {
         Row: {
           background_color: string | null
@@ -4274,6 +4422,94 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      website_theme: {
+        Row: {
+          accent_color: string
+          background_color: string
+          body_font: string
+          button_style: string
+          created_at: string
+          extras: Json
+          heading_font: string
+          primary_color: string
+          secondary_color: string
+          text_color: string
+          updated_at: string
+          website_id: string
+        }
+        Insert: {
+          accent_color?: string
+          background_color?: string
+          body_font?: string
+          button_style?: string
+          created_at?: string
+          extras?: Json
+          heading_font?: string
+          primary_color?: string
+          secondary_color?: string
+          text_color?: string
+          updated_at?: string
+          website_id: string
+        }
+        Update: {
+          accent_color?: string
+          background_color?: string
+          body_font?: string
+          button_style?: string
+          created_at?: string
+          extras?: Json
+          heading_font?: string
+          primary_color?: string
+          secondary_color?: string
+          text_color?: string
+          updated_at?: string
+          website_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "website_theme_website_id_fkey"
+            columns: ["website_id"]
+            isOneToOne: true
+            referencedRelation: "user_websites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      website_versions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          note: string | null
+          snapshot: Json
+          website_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string | null
+          snapshot: Json
+          website_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string | null
+          snapshot?: Json
+          website_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "website_versions_website_id_fkey"
+            columns: ["website_id"]
+            isOneToOne: false
+            referencedRelation: "user_websites"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       withdrawals: {
         Row: {
@@ -4575,6 +4811,10 @@ export type Database = {
     Functions: {
       auto_release_escrow: { Args: never; Returns: number }
       complete_owner_salon_setup: { Args: { _salon_id: string }; Returns: Json }
+      create_user_website_from_template: {
+        Args: { _salon_id?: string; _template_id: string }
+        Returns: string
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
