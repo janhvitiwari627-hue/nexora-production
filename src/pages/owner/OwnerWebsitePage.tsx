@@ -540,6 +540,12 @@ export function OwnerWebsitePage() {
           <p className="text-muted-foreground text-sm">
             Update your ready-made salon website using these simple fields.
           </p>
+          <a
+            href="/app/owner/website-editor"
+            className="mt-3 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
+          >
+            ✨ Try new Section Editor (BETA) — edit every section, live preview
+          </a>
         </div>
         <div className="grid w-full grid-cols-1 items-center gap-2 sm:w-auto sm:grid-cols-[auto_auto_auto]">
           <div className="text-xs text-muted-foreground flex items-center gap-1.5 justify-center sm:justify-end">
