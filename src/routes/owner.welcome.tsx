@@ -4,11 +4,11 @@ import { OwnerWelcomePage } from "@/pages/owner/OwnerWelcomePage";
 export const Route = createFileRoute("/owner/welcome")({
   head: () => ({
     meta: [
-      { title: "Welcome — Nexora SalonOS for Owners" },
+      { title: "Register Your Salon — Nexora SalonOS" },
       {
         name: "description",
         content:
-          "Shop owner welcome hub: pick a booking website template and manage everything from your dashboard.",
+          "Register your salon, get a free booking website and manage bookings with no monthly charge. Pay only 10% on completed bookings.",
       },
     ],
   }),
