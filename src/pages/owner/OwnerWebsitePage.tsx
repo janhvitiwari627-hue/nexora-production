@@ -297,6 +297,13 @@ export function OwnerWebsitePage() {
   const removeService = (idx: number) => {
     setServices((prev) => prev?.filter((_, i) => i !== idx) ?? null);
   };
+  const [uploadingServiceIdx, setUploadingServiceIdx] = useState<number | null>(null);
+  const handleServiceImageUpload = async (idx: number, file: File) => {
+    setUploadingServiceIdx(idx);
+    const url = await uploadFile(file, "services");
+    setUploadingServiceIdx(null);
+    if (url) updateService(idx, { image_url: url });
+  };
   const saveServices = async () => {
     if (!activeSalonId || !services) return;
     setSavingServices(true);
@@ -339,7 +346,7 @@ export function OwnerWebsitePage() {
 
 
 
-  const uploadFile = async (file: File, folder: "cover" | "owner" | "gallery" | "video") => {
+  const uploadFile = async (file: File, folder: "cover" | "owner" | "gallery" | "video" | "services") => {
     if (!activeSalonId) return null;
     const isVideo = folder === "video";
     const maxBytes = isVideo ? 10 * 1024 * 1024 : 2 * 1024 * 1024;
@@ -644,11 +651,40 @@ export function OwnerWebsitePage() {
           )}
           {services?.map((s, idx) => (
             <div key={s.id ?? `new-${idx}`} className="grid gap-2 rounded-lg border p-3 sm:grid-cols-[80px_minmax(0,1fr)_auto]">
-              <div className="h-20 w-20 shrink-0 overflow-hidden rounded-md border bg-muted grid place-items-center">
-                {s.image_url ? (
-                  <img src={s.image_url} alt={s.name} className="h-full w-full object-cover" />
-                ) : (
-                  <ImageIcon className="h-6 w-6 text-muted-foreground" />
+              <div className="flex flex-col items-center gap-1.5">
+                <div className="h-20 w-20 shrink-0 overflow-hidden rounded-md border bg-muted grid place-items-center relative">
+                  {s.image_url ? (
+                    <img src={s.image_url} alt={s.name} className="h-full w-full object-cover" />
+                  ) : (
+                    <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                  )}
+                  {uploadingServiceIdx === idx && (
+                    <div className="absolute inset-0 grid place-items-center bg-black/50">
+                      <Loader2 className="h-5 w-5 animate-spin text-white" />
+                    </div>
+                  )}
+                </div>
+                <label className="cursor-pointer text-[11px] font-medium text-primary hover:underline">
+                  {s.image_url ? "Change" : "Upload"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) void handleServiceImageUpload(idx, f);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+                {s.image_url && (
+                  <button
+                    type="button"
+                    className="text-[11px] text-destructive hover:underline"
+                    onClick={() => updateService(idx, { image_url: "" })}
+                  >
+                    Remove
+                  </button>
                 )}
               </div>
               <div className="min-w-0 grid gap-2 sm:grid-cols-2">
@@ -678,7 +714,7 @@ export function OwnerWebsitePage() {
                 />
                 <Input
                   className="sm:col-span-2"
-                  placeholder="Image URL (https://…)"
+                  placeholder="Ya image URL paste karein (optional)"
                   value={s.image_url}
                   onChange={(e) => updateService(idx, { image_url: e.target.value })}
                 />
@@ -701,7 +737,7 @@ export function OwnerWebsitePage() {
             </div>
           ))}
           <p className="text-xs text-muted-foreground">
-            Tip: Image URL kisi bhi public image ka ho sakta hai — apni Gallery se copy kar sakte ho ya Unsplash/imgur se paste karo.
+            Tip: Thumbnail par "Upload" click karke apne phone/computer se image chunein (max 2MB). Ya optional URL field me public image link paste karein.
           </p>
         </CardContent>
       </Card>
