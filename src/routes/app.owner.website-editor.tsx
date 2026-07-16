@@ -70,6 +70,7 @@ function WebsiteEditorPage() {
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const saveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
     if (bundleQ.data?.sections) {
@@ -78,6 +79,14 @@ function WebsiteEditorPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bundleQ.data]);
+
+  // Push live-preview updates to iframe
+  useEffect(() => {
+    iframeRef.current?.contentWindow?.postMessage(
+      { type: "editor:bundle", bundle: { sections: localSections, theme: bundleQ.data?.theme ?? null } },
+      "*",
+    );
+  }, [localSections, bundleQ.data?.theme]);
 
   const selected = useMemo(
     () => localSections.find((s) => s.id === selectedId) ?? null,
