@@ -20,7 +20,8 @@ import {
 } from "@/components/whiteLabelWebsite/templates";
 import { getSalonBySlug } from "@/lib/salons.functions";
 import { expandMockBusiness, getMockBusinesses, getMockBusinessBySlug } from "@/lib/mock-businesses";
-import { Check, Loader2, Paintbrush } from "lucide-react";
+import { AlertTriangle, Check, Loader2, Paintbrush } from "lucide-react";
+import { toast } from "sonner";
 
 const DEFAULT_COVER =
   "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=1600&q=80";
@@ -32,22 +33,39 @@ export function WhiteLabelWebsitePage({
   slug?: string;
   routeSearch?: { t?: string; preview?: 1 };
 }) {
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["white-label-site", _slug],
     queryFn: () => (_slug ? getSalonBySlug({ data: { slug: _slug } }) : Promise.resolve(null)),
     enabled: !!_slug,
   });
   const queryClient = useQueryClient();
   const salonId = data?.salon?.id;
-  const [liveState, setLiveState] = useState<"idle" | "updating" | "updated">("idle");
+  const [liveState, setLiveState] = useState<"idle" | "updating" | "updated" | "error">("idle");
+  const [liveError, setLiveError] = useState<string | null>(null);
 
   // Live refresh: when the salon row (or its services) changes in the DB,
   // re-fetch so /site/<slug> reflects owner edits from /owner/settings instantly.
   useEffect(() => {
     if (!_slug || !salonId) return;
-    const onChange = () => {
+    const onChange = async () => {
+      setLiveError(null);
       setLiveState("updating");
-      queryClient.invalidateQueries({ queryKey: ["white-label-site", _slug] });
+      try {
+        await queryClient.refetchQueries({
+          queryKey: ["white-label-site", _slug],
+          type: "active",
+        });
+        const state = queryClient.getQueryState(["white-label-site", _slug]);
+        if (state?.status === "error") throw (state.error as Error) ?? new Error("Refetch failed");
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to refresh website.";
+        setLiveError(message);
+        setLiveState("error");
+        toast.error("Website update failed", {
+          description: message,
+          action: { label: "Retry", onClick: () => retryLive() },
+        });
+      }
     };
     const channel = supabase
       .channel(`site-${salonId}`)
@@ -57,7 +75,27 @@ export function WhiteLabelWebsitePage({
     return () => {
       supabase.removeChannel(channel);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [_slug, salonId, queryClient]);
+
+  const retryLive = async () => {
+    setLiveError(null);
+    setLiveState("updating");
+    try {
+      const r = await refetch();
+      if (r.error) throw r.error;
+      setLiveState("updated");
+      setTimeout(() => setLiveState("idle"), 1500);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to refresh website.";
+      setLiveError(message);
+      setLiveState("error");
+      toast.error("Website update failed", {
+        description: message,
+        action: { label: "Retry", onClick: () => retryLive() },
+      });
+    }
+  };
 
   // Flip the pill to "Updated" briefly once the refetch settles.
   useEffect(() => {
@@ -201,13 +239,35 @@ export function WhiteLabelWebsitePage({
           className={`fixed bottom-4 left-1/2 z-50 -translate-x-1/2 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium shadow-lg backdrop-blur transition-all ${
             liveState === "updating"
               ? "bg-slate-900/90 text-white"
-              : "bg-emerald-600/95 text-white"
+              : liveState === "error"
+                ? "bg-red-600/95 text-white"
+                : "bg-emerald-600/95 text-white"
           }`}
         >
           {liveState === "updating" ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
               Updating website…
+            </>
+          ) : liveState === "error" ? (
+            <>
+              <AlertTriangle className="h-4 w-4" />
+              <span>Update failed{liveError ? `: ${liveError}` : ""}</span>
+              <button
+                type="button"
+                onClick={retryLive}
+                className="ml-2 rounded-full bg-white/20 px-3 py-0.5 text-xs font-semibold hover:bg-white/30"
+              >
+                Retry
+              </button>
+              <button
+                type="button"
+                onClick={() => setLiveState("idle")}
+                aria-label="Dismiss"
+                className="ml-1 rounded-full px-2 py-0.5 text-xs font-semibold hover:bg-white/20"
+              >
+                ✕
+              </button>
             </>
           ) : (
             <>
