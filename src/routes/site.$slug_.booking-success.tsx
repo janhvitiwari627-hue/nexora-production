@@ -1,8 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { CalendarDays, CheckCircle2, Clock, LoaderCircle, MessageCircle } from "lucide-react";
+import {
+  CalendarDays,
+  CalendarPlus,
+  CheckCircle2,
+  Clock,
+  LoaderCircle,
+  MessageCircle,
+} from "lucide-react";
 import { getPublicAppointmentReceipt } from "@/lib/public-booking";
 import { salonBySlugQueryOptions } from "@/lib/salons.queries";
+import { buildIcs, downloadIcs } from "@/lib/ics";
 
 export const Route = createFileRoute("/site/$slug_/booking-success")({
   validateSearch: (search: Record<string, unknown>) => ({
