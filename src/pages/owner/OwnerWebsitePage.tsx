@@ -119,6 +119,8 @@ export function OwnerWebsitePage() {
   });
 
   const [form, setForm] = useState<Patch | null>(null);
+  const [services, setServices] = useState<ServiceDraft[] | null>(null);
+  const [savingServices, setSavingServices] = useState(false);
   const [preview, setPreview] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
