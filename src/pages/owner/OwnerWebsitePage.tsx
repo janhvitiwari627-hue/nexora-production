@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { HexColorPicker } from "react-colorful";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -13,7 +13,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   ExternalLink,
-  Eye,
   Loader2,
   Upload,
   X,
@@ -31,6 +30,7 @@ import {
   Package,
   BadgePercent,
   ChevronRight,
+  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useOwnerContext } from "@/hooks/use-owner-context";
@@ -126,9 +126,31 @@ export function OwnerWebsitePage() {
 
   const publicUrl = useMemo(() => (salon?.slug ? `/site/${salon.slug}` : ""), [salon?.slug]);
   const selectedTemplate = getTemplate(salon?.selected_template_key);
-  const previewUrl = salon?.is_active
-    ? publicUrl
-    : `/template-preview/${encodeURIComponent(selectedTemplate.key)}`;
+  const previewUrl = salon?.slug
+    ? `/site/${salon.slug}?preview=1&live=1`
+    : `/template-preview/${encodeURIComponent(selectedTemplate.key)}?live=1`;
+
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const [iframeReady, setIframeReady] = useState(false);
+
+  // Post current form patch to the live preview iframe whenever it changes.
+  useEffect(() => {
+    if (!preview || !iframeReady || !form) return;
+    const win = iframeRef.current?.contentWindow;
+    if (!win) return;
+    win.postMessage({ type: "live-preview-overrides", patch: form }, "*");
+  }, [preview, iframeReady, form]);
+
+  // Listen for the iframe's ready handshake.
+  useEffect(() => {
+    if (!preview) return;
+    setIframeReady(false);
+    const onMessage = (e: MessageEvent) => {
+      if (e.data?.type === "live-preview-ready") setIframeReady(true);
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [preview]);
 
   const handleSave = () => {
     if (!form) return;
@@ -236,14 +258,14 @@ export function OwnerWebsitePage() {
             Update your ready-made salon website using these simple fields.
           </p>
         </div>
-        <div className="grid w-full grid-cols-2 items-center gap-2 sm:w-auto">
+        <div className="grid w-full grid-cols-1 items-center gap-2 sm:w-auto sm:grid-cols-2">
           <Button
             variant="outline"
             onClick={() => setPreview(true)}
             disabled={!previewUrl}
-            className="min-w-0 px-2 text-xs sm:px-4 sm:text-sm"
+            className="min-w-0 border-primary/40 bg-gradient-to-r from-primary/10 to-primary/5 px-2 text-xs font-semibold text-primary hover:from-primary/20 hover:to-primary/10 sm:px-4 sm:text-sm"
           >
-            <Eye className="h-4 w-4" /> Preview Website
+            <Zap className="h-4 w-4" /> Edit & Live
           </Button>
           <Button
             onClick={handleSave}
@@ -749,10 +771,18 @@ export function OwnerWebsitePage() {
       </Card>
 
       {/* Theme preview hint + save bar */}
-      <div className="sticky bottom-0 -mx-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-t bg-background/95 px-3 py-3 backdrop-blur sm:-mx-4 sm:px-4">
+      <div className="sticky bottom-0 -mx-3 grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-t bg-background/95 px-3 py-3 backdrop-blur sm:-mx-4 sm:gap-3 sm:px-4">
         <div className="text-muted-foreground min-w-0 text-xs">
-          Simple salon template · Unsaved changes are not visible to customers yet.
+          Unsaved changes preview live rahenge — customers ko save ke baad hi dikhenge.
         </div>
+        <Button
+          variant="outline"
+          onClick={() => setPreview(true)}
+          disabled={!previewUrl}
+          className="border-primary/40 text-primary"
+        >
+          <Zap className="h-4 w-4" /> Edit & Live
+        </Button>
         <Button onClick={handleSave} disabled={mutate.isPending}>
           {mutate.isPending ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -765,11 +795,58 @@ export function OwnerWebsitePage() {
 
       {/* Live preview modal */}
       <Dialog open={preview} onOpenChange={setPreview}>
-        <DialogContent className="flex h-[85vh] w-[calc(100vw-1.5rem)] max-w-6xl flex-col p-0 sm:w-full">
+        <DialogContent className="flex h-[90vh] w-[calc(100vw-1rem)] max-w-6xl flex-col p-0 sm:w-full">
           <DialogHeader className="border-b px-4 py-3">
-            <DialogTitle>Website Preview · {form.name}</DialogTitle>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <DialogTitle className="flex items-center gap-2 text-base">
+                <Zap className="h-4 w-4 text-primary" />
+                Edit & Live · {form.name}
+              </DialogTitle>
+              <div className="flex items-center gap-2">
+                <span
+                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium ${
+                    iframeReady
+                      ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
+                      : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-1.5 w-1.5 rounded-full ${
+                      iframeReady ? "animate-pulse bg-emerald-500" : "bg-muted-foreground"
+                    }`}
+                  />
+                  {iframeReady ? "Live" : "Loading…"}
+                </span>
+                {publicUrl && (
+                  <Button variant="ghost" size="sm" asChild>
+                    <a href={publicUrl} target="_blank" rel="noreferrer">
+                      <ExternalLink className="h-3.5 w-3.5" /> Open
+                    </a>
+                  </Button>
+                )}
+              </div>
+            </div>
+            <p className="text-muted-foreground mt-1 text-xs">
+              Aap jo bhi color, banner, logo ya text change karenge, wo yahan turant dikhega. Save Changes ke baad customers ko bhi dikhega.
+            </p>
           </DialogHeader>
-          <iframe src={previewUrl} title="preview" className="h-full w-full flex-1" />
+          <iframe
+            ref={iframeRef}
+            src={previewUrl}
+            title="Live website preview"
+            className="h-full w-full flex-1"
+            onLoad={() => {
+              // Iframe finished loading — send an immediate patch so the
+              // preview reflects the current form even if the ready handshake
+              // is missed (e.g. cached page).
+              if (form) {
+                iframeRef.current?.contentWindow?.postMessage(
+                  { type: "live-preview-overrides", patch: form },
+                  "*",
+                );
+              }
+            }}
+          />
         </DialogContent>
       </Dialog>
     </div>
