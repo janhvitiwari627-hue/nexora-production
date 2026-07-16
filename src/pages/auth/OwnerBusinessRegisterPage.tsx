@@ -124,8 +124,11 @@ export default function OwnerBusinessRegisterPage() {
   const [form, setForm] = useState<FormState>({
     owner_name: "",
     mobile: "",
+    whatsapp: "",
     district: "",
     shop_name: "",
+    category: "",
+    address: "",
     email: "",
     password: "",
   });
@@ -135,8 +138,16 @@ export default function OwnerBusinessRegisterPage() {
   const [showPw, setShowPw] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const update = (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const v = e.target.value;
+  const update =
+    (k: keyof FormState) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const v = e.target.value;
+      setForm((f) => ({ ...f, [k]: v }));
+      if (errors[k]) setErrors((p) => ({ ...p, [k]: "" }));
+      if (serverError) setServerError(null);
+    };
+
+  const updateField = (k: keyof FormState, v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
     if (errors[k]) setErrors((p) => ({ ...p, [k]: "" }));
     if (serverError) setServerError(null);
