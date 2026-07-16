@@ -144,14 +144,15 @@ export function MobileMenuOverlay({
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", stiffness: 320, damping: 36 }}
-            className="bg-card fixed inset-y-0 right-0 z-[70] flex w-[88%] max-w-sm flex-col shadow-[var(--shadow-float)] md:hidden"
+            className="bg-card fixed inset-y-0 right-0 z-[70] flex w-[88%] max-w-sm flex-col shadow-[var(--shadow-float)] md:hidden pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)]"
             role="dialog"
             aria-modal="true"
             aria-label="Main menu"
             tabIndex={-1}
           >
 
-            <div className="border-border flex items-center justify-between border-b px-5 py-4">
+            <div className="border-border flex items-center justify-between border-b px-4 py-4 sm:px-5">
+
               <div className="flex items-center gap-2">
                 <div className="bg-gradient-cta grid h-9 w-9 place-items-center rounded-xl text-primary-foreground shadow-[var(--shadow-glow)]">
                   <Sparkles className="h-4 w-4" />
@@ -198,7 +199,7 @@ export function MobileMenuOverlay({
               </ul>
             </nav>
 
-            <div className="border-border bg-card flex flex-col gap-2 border-t p-4">
+            <div className="border-border bg-card flex flex-col gap-2 border-t p-3 sm:p-4">
               {!authResolved ? (
                 <>
                   <Skeleton className="h-11 w-full rounded-md" />

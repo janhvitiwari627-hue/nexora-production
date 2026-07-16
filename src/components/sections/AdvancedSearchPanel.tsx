@@ -60,8 +60,9 @@ export function AdvancedSearchPanel({
           transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
           className="relative z-50 overflow-hidden"
         >
-          <div className="mt-3 rounded-[24px] border border-border bg-card p-5 shadow-[var(--shadow-float)] md:p-6">
-            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-3 rounded-[24px] border border-border bg-card p-4 shadow-[var(--shadow-float)] sm:p-5 md:p-6">
+            <div className="grid gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-4">
+
               <Section title="Trending" icon={<TrendingUp className="h-4 w-4 text-primary" />}>
                 <div className="flex flex-wrap gap-2">
                   {TRENDING.map((t) => (
