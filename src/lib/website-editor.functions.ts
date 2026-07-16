@@ -133,8 +133,12 @@ export const updateSection = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) => {
     const { supabase } = context;
-    const patch: Record<string, unknown> = {};
-    if (data.content !== undefined) patch.content = data.content;
+    const patch: {
+      content?: Json;
+      is_visible?: boolean;
+      sort_order?: number;
+    } = {};
+    if (data.content !== undefined) patch.content = data.content as Json;
     if (data.is_visible !== undefined) patch.is_visible = data.is_visible;
     if (data.sort_order !== undefined) patch.sort_order = data.sort_order;
     const { data: row, error } = await supabase
