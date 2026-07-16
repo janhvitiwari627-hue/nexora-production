@@ -195,6 +195,7 @@ export function OwnerSettingsPage() {
     },
     onSuccess: async () => {
       toast.success("Shop details saved. Website updated.");
+      setBaseline(form);
       await qc.invalidateQueries({ queryKey: ["owner"] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Update failed"),
