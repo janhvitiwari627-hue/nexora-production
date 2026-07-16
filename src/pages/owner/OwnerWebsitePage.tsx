@@ -21,6 +21,16 @@ import {
   Trash2,
   Plus,
   Paintbrush,
+  Pencil,
+  Scissors,
+  Users,
+  Image as ImageIcon,
+  Star,
+  Info,
+  Tag,
+  Package,
+  BadgePercent,
+  ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useOwnerContext } from "@/hooks/use-owner-context";
