@@ -20,6 +20,7 @@ export function RoleAppLandingPage({
   startPath,
   audience,
   features,
+  hideFooter = false,
 }: {
   kind: NexoraAppKind;
   eyebrow: string;
@@ -28,6 +29,7 @@ export function RoleAppLandingPage({
   startPath: string;
   audience: string;
   features: AppFeature[];
+  hideFooter?: boolean;
 }) {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950">
