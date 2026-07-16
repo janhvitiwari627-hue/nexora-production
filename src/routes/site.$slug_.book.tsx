@@ -58,8 +58,17 @@ function localDate(offsetDays = 0) {
 
 function PublishedBookingPage() {
   const { slug } = Route.useParams();
+  const { booking: bookingSearch } = Route.useSearch();
   if (!slug || slug === "undefined" || slug === "null") {
     return <SalonNotFound />;
+  }
+  if (isBookingMockDisabled(slug, bookingSearch)) {
+    return (
+      <SalonNotFound
+        title="Booking not enabled yet"
+        description="Online booking is currently switched off for this salon. Please check back soon or contact the salon directly."
+      />
+    );
   }
   return <PublishedBookingPageInner slug={slug} />;
 }
