@@ -95,6 +95,9 @@ export function OwnerSettingsPage() {
   const [form, setForm] = useState<Form>(EMPTY);
   const [baseline, setBaseline] = useState<Form>(EMPTY);
   const [uploading, setUploading] = useState<"logo" | "cover" | null>(null);
+  const [draftRestored, setDraftRestored] = useState(false);
+
+  const draftKey = activeSalonId ? `owner-settings-draft:${activeSalonId}` : null;
 
   useEffect(() => {
     if (!salon) return;
@@ -116,13 +119,73 @@ export function OwnerSettingsPage() {
       cover_image_url: s(row.cover_image_url),
       upi_id: s(row.upi_id),
     };
-    setForm(next);
     setBaseline(next);
-  }, [salon]);
+
+    // Restore autosaved draft if present and different from server data.
+    let restored: Form | null = null;
+    if (draftKey && typeof window !== "undefined") {
+      try {
+        const raw = window.localStorage.getItem(draftKey);
+        if (raw) {
+          const parsed = JSON.parse(raw) as Partial<Form>;
+          const merged: Form = { ...next };
+          for (const k of Object.keys(EMPTY) as (keyof Form)[]) {
+            if (typeof parsed[k] === "string") merged[k] = parsed[k] as string;
+          }
+          const differs = (Object.keys(EMPTY) as (keyof Form)[]).some(
+            (k) => merged[k] !== next[k],
+          );
+          if (differs) restored = merged;
+        }
+      } catch {
+        /* ignore corrupt draft */
+      }
+    }
+
+    if (restored) {
+      setForm(restored);
+      setDraftRestored(true);
+      toast.info("Draft restored from your last edit.");
+    } else {
+      setForm(next);
+      setDraftRestored(false);
+    }
+  }, [salon, draftKey]);
 
   const isDirty = useMemo(() => {
     return (Object.keys(form) as (keyof Form)[]).some((k) => form[k] !== baseline[k]);
   }, [form, baseline]);
+
+  // Autosave draft (debounced) whenever the form drifts from server baseline.
+  useEffect(() => {
+    if (!draftKey || typeof window === "undefined") return;
+    const t = setTimeout(() => {
+      try {
+        if (isDirty) {
+          window.localStorage.setItem(draftKey, JSON.stringify(form));
+        } else {
+          window.localStorage.removeItem(draftKey);
+        }
+      } catch {
+        /* storage full / disabled — ignore */
+      }
+    }, 400);
+    return () => clearTimeout(t);
+  }, [form, isDirty, draftKey]);
+
+  const discardDraft = () => {
+    if (draftKey && typeof window !== "undefined") {
+      try {
+        window.localStorage.removeItem(draftKey);
+      } catch {
+        /* ignore */
+      }
+    }
+    setForm(baseline);
+    setDraftRestored(false);
+    toast.success("Draft discarded.");
+  };
+
 
   // Intercept ALL in-app router navigation (Link, useNavigate, router.navigate,
   // browser back/forward). This covers header/sidebar/breadcrumbs uniformly
