@@ -98,6 +98,14 @@ export function OwnerWebsitePage() {
   const [preview, setPreview] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
+  const routeSearch = Route.useSearch();
+  const autoOpenedRef = useRef(false);
+  useEffect(() => {
+    if (routeSearch?.live === 1 && !autoOpenedRef.current && salon) {
+      autoOpenedRef.current = true;
+      setPreview(true);
+    }
+  }, [routeSearch, salon]);
 
   useEffect(() => {
     if (salon && !form) {
