@@ -233,9 +233,9 @@ export default function OwnerBusinessRegisterPage() {
         _owner_name: payload.owner_name,
         _mobile: payload.mobile,
         _email: email,
-        _category: payload.category || null,
-        _whatsapp: payload.whatsapp || null,
-        _address: payload.address || null,
+        _category: payload.category || undefined,
+        _whatsapp: payload.whatsapp || undefined,
+        _address: payload.address || undefined,
       });
 
       if (rpcError) {
