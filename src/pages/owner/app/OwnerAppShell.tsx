@@ -16,9 +16,9 @@ export function OwnerAppShell() {
   const { activeSalon } = useOwnerContext();
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-950">
-      <header className="sticky top-0 z-40 border-b bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-slate-50 text-slate-950">
+      <header className="sticky top-0 z-40 w-full max-w-full overflow-x-hidden border-b bg-white/95 backdrop-blur">
+        <div className="mx-auto grid w-full max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3">
           <Link to="/app/owner" className="flex min-w-0 items-center gap-2">
             <img
               src={activeSalon?.image_url || nexoraLogo.url}
@@ -34,23 +34,23 @@ export function OwnerAppShell() {
           </Link>
           <Link
             to="/app/owner/profile"
-            className="ml-auto rounded-full border bg-violet-50 px-3 py-2 text-xs font-bold text-violet-800"
+            className="shrink-0 rounded-full border bg-violet-50 px-3 py-2 text-xs font-bold text-violet-800"
           >
             Manage
           </Link>
         </div>
       </header>
 
-      <div className="pb-24">
+      <div className="w-full max-w-full overflow-x-hidden pb-24">
         <Outlet />
       </div>
 
       <nav
         aria-label="Shop owner app navigation"
-        className="fixed inset-x-0 bottom-0 z-50 border-t bg-white/95 backdrop-blur"
+        className="fixed inset-x-0 bottom-0 z-50 w-full max-w-full overflow-x-hidden border-t bg-white/95 backdrop-blur"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
-        <ul className="mx-auto grid max-w-xl grid-cols-5">
+        <ul className="mx-auto grid w-full max-w-xl grid-cols-5">
           {NAV.map((item) => {
             const active = "exact" in item && item.exact
               ? pathname === item.to || pathname === `${item.to}/`
@@ -59,14 +59,14 @@ export function OwnerAppShell() {
               <li key={item.to}>
                 <Link
                   to={item.to}
-                  className={`flex min-h-16 flex-col items-center justify-center gap-1 text-[10px] font-bold ${
+                  className={`flex min-h-16 min-w-0 flex-col items-center justify-center gap-1 text-[10px] font-bold ${
                     active ? "text-violet-700" : "text-slate-500"
                   }`}
                 >
-                  <span className={`rounded-full px-4 py-1 ${active ? "bg-violet-100" : ""}`}>
+                  <span className={`rounded-full px-3 py-1 ${active ? "bg-violet-100" : ""}`}>
                     <item.icon className="h-5 w-5" />
                   </span>
-                  {item.label}
+                  <span className="max-w-full truncate px-0.5">{item.label}</span>
                 </Link>
               </li>
             );

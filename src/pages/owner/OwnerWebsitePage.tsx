@@ -218,22 +218,27 @@ export function OwnerWebsitePage() {
   }
 
   return (
-    <div className="container mx-auto max-w-6xl space-y-6 px-4 py-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
+    <div className="mx-auto w-full max-w-6xl space-y-5 overflow-x-hidden px-3 py-5 sm:px-4 sm:py-6">
+      <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-[minmax(0,1fr)_auto]">
+        <div className="min-w-0">
           <h1 className="text-2xl font-bold tracking-tight">Website Management</h1>
           <p className="text-muted-foreground text-sm">
             Update your ready-made salon website using these simple fields.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setPreview(true)} disabled={!previewUrl}>
+        <div className="grid w-full grid-cols-2 items-center gap-2 sm:w-auto">
+          <Button
+            variant="outline"
+            onClick={() => setPreview(true)}
+            disabled={!previewUrl}
+            className="min-w-0 px-2 text-xs sm:px-4 sm:text-sm"
+          >
             <Eye className="h-4 w-4" /> Preview Website
           </Button>
           <Button
             onClick={handleSave}
             disabled={mutate.isPending}
-            className="bg-gradient-to-r from-indigo-500 to-pink-500 text-white hover:opacity-90"
+            className="min-w-0 bg-gradient-cta px-2 text-xs text-primary-foreground hover:opacity-90 sm:px-4 sm:text-sm"
           >
             {mutate.isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -246,19 +251,21 @@ export function OwnerWebsitePage() {
       </div>
 
       {/* Status card */}
-      <Card>
-        <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
-          <div className="space-y-2">
+      <Card className="max-w-full overflow-hidden">
+        <CardContent className="grid min-w-0 gap-4 p-4 sm:p-5">
+          <div className="min-w-0 space-y-2">
             <Badge
               variant="secondary"
               className="bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
             >
               {salon?.is_active ? "Live" : "Waiting for approval"}
             </Badge>
-            <div className="flex items-center gap-2">
-              <code className="bg-muted rounded px-2 py-1 text-sm">{publicUrl}</code>
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+              <code className="bg-muted block min-w-0 truncate rounded px-2 py-1 text-sm">
+                {publicUrl}
+              </code>
               {publicUrl && (
-                <Button variant="ghost" size="sm" asChild>
+                <Button variant="ghost" size="sm" className="shrink-0 px-2" asChild>
                   <a href={publicUrl} target="_blank" rel="noreferrer">
                     <ExternalLink className="h-3.5 w-3.5" /> Open
                   </a>
@@ -270,23 +277,23 @@ export function OwnerWebsitePage() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
-          <div className="flex items-center gap-3">
+      <Card className="max-w-full overflow-hidden">
+        <CardContent className="grid min-w-0 gap-4 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:p-5">
+          <div className="flex min-w-0 items-center gap-3">
             <div
-              className="grid h-11 w-11 place-items-center rounded-xl text-white"
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-primary-foreground"
               style={{ backgroundColor: selectedTemplate.colors.primary }}
             >
               <Paintbrush className="h-5 w-5" />
             </div>
-            <div>
-              <div className="font-semibold">Shop Template: {selectedTemplate.name}</div>
+            <div className="min-w-0">
+              <div className="truncate font-semibold">Shop Template: {selectedTemplate.name}</div>
               <p className="text-muted-foreground text-xs">
                 Change the design anytime. Your services, photos, bookings and content remain safe.
               </p>
             </div>
           </div>
-          <Button variant="outline" asChild>
+          <Button variant="outline" className="w-full min-w-0 sm:w-auto" asChild>
             <Link to="/owner/templates">
               <Paintbrush className="h-4 w-4" /> Choose or Change Template
             </Link>
@@ -296,7 +303,7 @@ export function OwnerWebsitePage() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Brand customizer */}
-        <Card>
+        <Card className="max-w-full overflow-hidden">
           <CardHeader>
             <CardTitle className="text-base">Brand</CardTitle>
           </CardHeader>
@@ -386,7 +393,7 @@ export function OwnerWebsitePage() {
         </Card>
 
         {/* Simple identity */}
-        <Card>
+        <Card className="max-w-full overflow-hidden">
           <CardHeader>
             <CardTitle className="text-base">Owner & Colours</CardTitle>
           </CardHeader>
@@ -417,7 +424,7 @@ export function OwnerWebsitePage() {
                 />
               </label>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid gap-3 sm:grid-cols-2">
               <ColorField
                 label="Primary Color"
                 value={form.brand_primary ?? "#6366f1"}
@@ -438,7 +445,7 @@ export function OwnerWebsitePage() {
 
       {/* Contact + Hours */}
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
+        <Card className="max-w-full overflow-hidden">
           <CardHeader>
             <CardTitle className="text-base">Contact</CardTitle>
           </CardHeader>
@@ -475,7 +482,7 @@ export function OwnerWebsitePage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="max-w-full overflow-hidden">
           <CardHeader>
             <CardTitle className="text-base">Business Hours</CardTitle>
           </CardHeader>
@@ -483,12 +490,16 @@ export function OwnerWebsitePage() {
             {DAYS.map((d) => {
               const h = form.hours?.[d] ?? DEFAULT_HOURS[d];
               return (
-                <div key={d} className="grid grid-cols-[60px_1fr_1fr_70px] items-center gap-2">
+                <div
+                  key={d}
+                  className="grid grid-cols-[42px_minmax(0,1fr)_minmax(0,1fr)] items-center gap-2 sm:grid-cols-[52px_minmax(0,1fr)_minmax(0,1fr)_74px]"
+                >
                   <span className="text-sm font-medium">{DAY_LABELS[d]}</span>
                   <Input
                     type="time"
                     value={h.open}
                     disabled={h.closed}
+                    className="min-w-0 px-2 text-xs sm:text-sm"
                     onChange={(e) =>
                       set("hours", {
                         ...(form.hours ?? DEFAULT_HOURS),
@@ -500,6 +511,7 @@ export function OwnerWebsitePage() {
                     type="time"
                     value={h.close}
                     disabled={h.closed}
+                    className="min-w-0 px-2 text-xs sm:text-sm"
                     onChange={(e) =>
                       set("hours", {
                         ...(form.hours ?? DEFAULT_HOURS),
@@ -507,7 +519,7 @@ export function OwnerWebsitePage() {
                       })
                     }
                   />
-                  <label className="text-muted-foreground inline-flex items-center gap-1.5 text-xs">
+                  <label className="text-muted-foreground col-span-2 col-start-2 inline-flex items-center justify-end gap-1.5 text-xs sm:col-auto sm:justify-start">
                     <Switch
                       checked={!h.closed}
                       onCheckedChange={(v) =>
@@ -517,7 +529,7 @@ export function OwnerWebsitePage() {
                         })
                       }
                     />
-                    {h.closed ? "Closed" : "Open"}
+                    <span>{h.closed ? "Closed" : "Open"}</span>
                   </label>
                 </div>
               );
@@ -526,13 +538,13 @@ export function OwnerWebsitePage() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="max-w-full overflow-hidden">
         <CardHeader>
           <CardTitle className="text-base">Home Service</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <label className="flex items-center justify-between gap-4 rounded-lg border p-4">
-            <div>
+          <label className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 rounded-lg border p-4">
+            <div className="min-w-0">
               <div className="font-medium">Offer service at customer home</div>
               <div className="text-muted-foreground text-xs">
                 Customers see the extra charge before booking.
@@ -572,14 +584,14 @@ export function OwnerWebsitePage() {
       </Card>
 
       {/* Gallery */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
+      <Card className="max-w-full overflow-hidden">
+        <CardHeader className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+          <div className="min-w-0">
             <CardTitle className="text-base">Gallery</CardTitle>
             <p className="text-muted-foreground mt-1 text-xs">Up to 5 photos, maximum 2MB each.</p>
           </div>
           <label
-            className={`bg-primary text-primary-foreground inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold hover:opacity-90 ${(form.gallery_images ?? []).length >= 5 ? "pointer-events-none opacity-50" : "cursor-pointer"}`}
+            className={`bg-primary text-primary-foreground inline-flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold hover:opacity-90 ${(form.gallery_images ?? []).length >= 5 ? "pointer-events-none opacity-50" : "cursor-pointer"}`}
           >
             {uploading ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -623,7 +635,7 @@ export function OwnerWebsitePage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="max-w-full overflow-hidden">
         <CardHeader>
           <CardTitle className="text-base">Salon Video</CardTitle>
         </CardHeader>
@@ -662,8 +674,8 @@ export function OwnerWebsitePage() {
       </Card>
 
       {/* Theme preview hint + save bar */}
-      <div className="sticky bottom-0 -mx-4 flex items-center justify-between border-t bg-background/95 px-4 py-3 backdrop-blur">
-        <div className="text-muted-foreground text-xs">
+      <div className="sticky bottom-0 -mx-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-t bg-background/95 px-3 py-3 backdrop-blur sm:-mx-4 sm:px-4">
+        <div className="text-muted-foreground min-w-0 text-xs">
           Simple salon template · Unsaved changes are not visible to customers yet.
         </div>
         <Button onClick={handleSave} disabled={mutate.isPending}>
@@ -678,7 +690,7 @@ export function OwnerWebsitePage() {
 
       {/* Live preview modal */}
       <Dialog open={preview} onOpenChange={setPreview}>
-        <DialogContent className="flex h-[85vh] max-w-6xl flex-col p-0">
+        <DialogContent className="flex h-[85vh] w-[calc(100vw-1.5rem)] max-w-6xl flex-col p-0 sm:w-full">
           <DialogHeader className="border-b px-4 py-3">
             <DialogTitle>Website Preview · {form.name}</DialogTitle>
           </DialogHeader>
@@ -703,9 +715,9 @@ function ColorField({
       <label className="text-sm font-medium">{label}</label>
       <Popover>
         <PopoverTrigger asChild>
-          <button className="hover:bg-muted mt-2 flex w-full items-center gap-2 rounded-md border px-2 py-1.5">
+          <button className="hover:bg-muted mt-2 flex w-full min-w-0 items-center gap-2 rounded-md border px-2 py-1.5">
             <div className="h-6 w-6 rounded border" style={{ backgroundColor: value }} />
-            <span className="font-mono text-sm">{value}</span>
+            <span className="truncate font-mono text-sm">{value}</span>
           </button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-3">
