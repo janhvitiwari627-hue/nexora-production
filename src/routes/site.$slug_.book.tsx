@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { CalendarDays, Clock, IndianRupee, LoaderCircle, ShieldCheck } from "lucide-react";
 import { salonBySlugQueryOptions } from "@/lib/salons.queries";
@@ -7,6 +7,7 @@ import { createPublicAppointment } from "@/lib/public-booking";
 import { sendBookingConfirmationEmail } from "@/lib/booking-email.functions";
 import { PublishedSiteShell } from "@/pages/public/site/PublishedSiteShell";
 import { BookingFlowPage } from "@/pages/public/BookingFlowPage";
+import { SalonNotFound } from "@/pages/public/site/SalonNotFound";
 
 const TIMES = [
   "10:00",
@@ -30,14 +31,12 @@ export const Route = createFileRoute("/site/$slug_/book")({
   validateSearch: (search: Record<string, unknown>) => ({
     service: typeof search.service === "string" ? search.service : undefined,
   }),
-  beforeLoad: ({ params }) => {
-    // A link that serialized an undefined/null slug shouldn't dead-end the user.
+  loader: ({ context, params }) => {
     if (!params.slug || params.slug === "undefined" || params.slug === "null") {
-      throw redirect({ to: "/" });
+      return null;
     }
+    return context.queryClient.ensureQueryData(salonBySlugQueryOptions(params.slug));
   },
-  loader: ({ context, params }) =>
-    context.queryClient.ensureQueryData(salonBySlugQueryOptions(params.slug)),
   head: ({ params }) => {
     const label = params.slug && params.slug !== "undefined" ? params.slug : "salon";
     return { meta: [{ title: `Book appointment · ${label} · Nexora` }] };
@@ -54,6 +53,13 @@ function localDate(offsetDays = 0) {
 
 function PublishedBookingPage() {
   const { slug } = Route.useParams();
+  if (!slug || slug === "undefined" || slug === "null") {
+    return <SalonNotFound />;
+  }
+  return <PublishedBookingPageInner slug={slug} />;
+}
+
+function PublishedBookingPageInner({ slug }: { slug: string }) {
   const search = Route.useSearch();
   const navigate = useNavigate();
   const { data } = useSuspenseQuery(salonBySlugQueryOptions(slug));
