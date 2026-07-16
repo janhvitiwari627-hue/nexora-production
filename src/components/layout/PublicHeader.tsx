@@ -176,9 +176,10 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
               alt="Nexora SalonOS"
               className="h-9 w-9 shrink-0 rounded-xl object-cover shadow-[var(--shadow-glow)] sm:h-10 sm:w-10"
             />
-            <span className="text-gradient-brand hidden text-xl font-extrabold tracking-tight xs:inline sm:inline">
+            <span className="text-gradient-brand hidden text-lg font-extrabold tracking-tight sm:inline sm:text-xl">
               Nexora
             </span>
+
           </Link>
         </div>
 
