@@ -124,7 +124,6 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
   // Staging buffer for the filter sidebar (Apply commits to URL).
   const [draft, setDraft] = useState<Filters>(filters);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [resultsScrollRequest, setResultsScrollRequest] = useState(0);
 
   // Re-sync local buffers when URL changes externally (back/forward, share-link).
   useEffect(() => {
@@ -183,26 +182,14 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
     window.scrollTo({ top: Math.max(0, top), behavior });
   };
 
-  useEffect(() => {
-    if (resultsScrollRequest === 0 || isFetching) return;
-
-    let rafOne = 0;
-    let rafTwo = 0;
-    const settleTimer = window.setTimeout(() => scrollResultsIntoView("smooth"), 220);
-
-    rafOne = requestAnimationFrame(() => {
-      rafTwo = requestAnimationFrame(() => scrollResultsIntoView("smooth"));
+  const scrollToResultsAfterFiltering = () => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => scrollResultsIntoView("smooth"));
     });
 
-    return () => {
-      cancelAnimationFrame(rafOne);
-      cancelAnimationFrame(rafTwo);
-      window.clearTimeout(settleTimer);
-    };
-  }, [resultsScrollRequest, isFetching, filtered.length]);
-
-  const scrollToResultsAfterFiltering = () => {
-    setResultsScrollRequest((current) => current + 1);
+    [120, 320, 650].forEach((delay) => {
+      window.setTimeout(() => scrollResultsIntoView("smooth"), delay);
+    });
   };
 
   // Anchor-based scroll restore: pin the topmost visible result card so the
