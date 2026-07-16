@@ -85,7 +85,7 @@ import { Route as OwnerWelcomeRouteImport } from './routes/owner.welcome'
 import { Route as OwnerWebsiteRouteImport } from './routes/owner.website'
 import { Route as OwnerTemplatesRouteImport } from './routes/owner.templates'
 import { Route as OwnerStaffRouteImport } from './routes/owner.staff'
-import { Route as OwnerSetupWizardRouteImport } from './routes/owner.setup-wizard'
+import { Route as OwnerSettingsRouteImport } from './routes/owner.settings'
 import { Route as OwnerServicesRouteImport } from './routes/owner.services'
 import { Route as OwnerReviewsRouteImport } from './routes/owner.reviews'
 import { Route as OwnerRegisterBusinessRouteImport } from './routes/owner.register-business'
@@ -96,7 +96,6 @@ import { Route as OwnerOnboardingRouteImport } from './routes/owner.onboarding'
 import { Route as OwnerMarketingRouteImport } from './routes/owner.marketing'
 import { Route as OwnerJobsRouteImport } from './routes/owner.jobs'
 import { Route as OwnerGalleryRouteImport } from './routes/owner.gallery'
-import { Route as OwnerEditShopRouteImport } from './routes/owner.edit-shop'
 import { Route as OwnerDashboardRouteImport } from './routes/owner.dashboard'
 import { Route as OwnerCrmRouteImport } from './routes/owner.crm'
 import { Route as OwnerCreateWebsiteRouteImport } from './routes/owner.create-website'
@@ -567,9 +566,9 @@ const OwnerStaffRoute = OwnerStaffRouteImport.update({
   path: '/staff',
   getParentRoute: () => OwnerRoute,
 } as any)
-const OwnerSetupWizardRoute = OwnerSetupWizardRouteImport.update({
-  id: '/setup-wizard',
-  path: '/setup-wizard',
+const OwnerSettingsRoute = OwnerSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => OwnerRoute,
 } as any)
 const OwnerServicesRoute = OwnerServicesRouteImport.update({
@@ -620,11 +619,6 @@ const OwnerJobsRoute = OwnerJobsRouteImport.update({
 const OwnerGalleryRoute = OwnerGalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
-  getParentRoute: () => OwnerRoute,
-} as any)
-const OwnerEditShopRoute = OwnerEditShopRouteImport.update({
-  id: '/edit-shop',
-  path: '/edit-shop',
   getParentRoute: () => OwnerRoute,
 } as any)
 const OwnerDashboardRoute = OwnerDashboardRouteImport.update({
@@ -1177,7 +1171,6 @@ export interface FileRoutesByFullPath {
   '/owner/create-website': typeof OwnerCreateWebsiteRoute
   '/owner/crm': typeof OwnerCrmRoute
   '/owner/dashboard': typeof OwnerDashboardRoute
-  '/owner/edit-shop': typeof OwnerEditShopRoute
   '/owner/gallery': typeof OwnerGalleryRoute
   '/owner/jobs': typeof OwnerJobsRouteWithChildren
   '/owner/marketing': typeof OwnerMarketingRoute
@@ -1188,7 +1181,7 @@ export interface FileRoutesByFullPath {
   '/owner/register-business': typeof OwnerRegisterBusinessRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
-  '/owner/setup-wizard': typeof OwnerSetupWizardRoute
+  '/owner/settings': typeof OwnerSettingsRoute
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
@@ -1349,7 +1342,6 @@ export interface FileRoutesByTo {
   '/owner/create-website': typeof OwnerCreateWebsiteRoute
   '/owner/crm': typeof OwnerCrmRoute
   '/owner/dashboard': typeof OwnerDashboardRoute
-  '/owner/edit-shop': typeof OwnerEditShopRoute
   '/owner/gallery': typeof OwnerGalleryRoute
   '/owner/jobs': typeof OwnerJobsRouteWithChildren
   '/owner/marketing': typeof OwnerMarketingRoute
@@ -1360,7 +1352,7 @@ export interface FileRoutesByTo {
   '/owner/register-business': typeof OwnerRegisterBusinessRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
-  '/owner/setup-wizard': typeof OwnerSetupWizardRoute
+  '/owner/settings': typeof OwnerSettingsRoute
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
@@ -1529,7 +1521,6 @@ export interface FileRoutesById {
   '/owner/create-website': typeof OwnerCreateWebsiteRoute
   '/owner/crm': typeof OwnerCrmRoute
   '/owner/dashboard': typeof OwnerDashboardRoute
-  '/owner/edit-shop': typeof OwnerEditShopRoute
   '/owner/gallery': typeof OwnerGalleryRoute
   '/owner/jobs': typeof OwnerJobsRouteWithChildren
   '/owner/marketing': typeof OwnerMarketingRoute
@@ -1540,7 +1531,7 @@ export interface FileRoutesById {
   '/owner/register-business': typeof OwnerRegisterBusinessRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
-  '/owner/setup-wizard': typeof OwnerSetupWizardRoute
+  '/owner/settings': typeof OwnerSettingsRoute
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
   '/owner/website': typeof OwnerWebsiteRoute
@@ -1710,7 +1701,6 @@ export interface FileRouteTypes {
     | '/owner/create-website'
     | '/owner/crm'
     | '/owner/dashboard'
-    | '/owner/edit-shop'
     | '/owner/gallery'
     | '/owner/jobs'
     | '/owner/marketing'
@@ -1721,7 +1711,7 @@ export interface FileRouteTypes {
     | '/owner/register-business'
     | '/owner/reviews'
     | '/owner/services'
-    | '/owner/setup-wizard'
+    | '/owner/settings'
     | '/owner/staff'
     | '/owner/templates'
     | '/owner/website'
@@ -1882,7 +1872,6 @@ export interface FileRouteTypes {
     | '/owner/create-website'
     | '/owner/crm'
     | '/owner/dashboard'
-    | '/owner/edit-shop'
     | '/owner/gallery'
     | '/owner/jobs'
     | '/owner/marketing'
@@ -1893,7 +1882,7 @@ export interface FileRouteTypes {
     | '/owner/register-business'
     | '/owner/reviews'
     | '/owner/services'
-    | '/owner/setup-wizard'
+    | '/owner/settings'
     | '/owner/staff'
     | '/owner/templates'
     | '/owner/website'
@@ -2061,7 +2050,6 @@ export interface FileRouteTypes {
     | '/owner/create-website'
     | '/owner/crm'
     | '/owner/dashboard'
-    | '/owner/edit-shop'
     | '/owner/gallery'
     | '/owner/jobs'
     | '/owner/marketing'
@@ -2072,7 +2060,7 @@ export interface FileRouteTypes {
     | '/owner/register-business'
     | '/owner/reviews'
     | '/owner/services'
-    | '/owner/setup-wizard'
+    | '/owner/settings'
     | '/owner/staff'
     | '/owner/templates'
     | '/owner/website'
@@ -2780,11 +2768,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OwnerStaffRouteImport
       parentRoute: typeof OwnerRoute
     }
-    '/owner/setup-wizard': {
-      id: '/owner/setup-wizard'
-      path: '/setup-wizard'
-      fullPath: '/owner/setup-wizard'
-      preLoaderRoute: typeof OwnerSetupWizardRouteImport
+    '/owner/settings': {
+      id: '/owner/settings'
+      path: '/settings'
+      fullPath: '/owner/settings'
+      preLoaderRoute: typeof OwnerSettingsRouteImport
       parentRoute: typeof OwnerRoute
     }
     '/owner/services': {
@@ -2855,13 +2843,6 @@ declare module '@tanstack/react-router' {
       path: '/gallery'
       fullPath: '/owner/gallery'
       preLoaderRoute: typeof OwnerGalleryRouteImport
-      parentRoute: typeof OwnerRoute
-    }
-    '/owner/edit-shop': {
-      id: '/owner/edit-shop'
-      path: '/edit-shop'
-      fullPath: '/owner/edit-shop'
-      preLoaderRoute: typeof OwnerEditShopRouteImport
       parentRoute: typeof OwnerRoute
     }
     '/owner/dashboard': {
@@ -3597,7 +3578,6 @@ interface OwnerRouteChildren {
   OwnerCreateWebsiteRoute: typeof OwnerCreateWebsiteRoute
   OwnerCrmRoute: typeof OwnerCrmRoute
   OwnerDashboardRoute: typeof OwnerDashboardRoute
-  OwnerEditShopRoute: typeof OwnerEditShopRoute
   OwnerGalleryRoute: typeof OwnerGalleryRoute
   OwnerJobsRoute: typeof OwnerJobsRouteWithChildren
   OwnerMarketingRoute: typeof OwnerMarketingRoute
@@ -3608,7 +3588,7 @@ interface OwnerRouteChildren {
   OwnerRegisterBusinessRoute: typeof OwnerRegisterBusinessRoute
   OwnerReviewsRoute: typeof OwnerReviewsRoute
   OwnerServicesRoute: typeof OwnerServicesRoute
-  OwnerSetupWizardRoute: typeof OwnerSetupWizardRoute
+  OwnerSettingsRoute: typeof OwnerSettingsRoute
   OwnerStaffRoute: typeof OwnerStaffRoute
   OwnerTemplatesRoute: typeof OwnerTemplatesRoute
   OwnerWebsiteRoute: typeof OwnerWebsiteRoute
@@ -3622,7 +3602,6 @@ const OwnerRouteChildren: OwnerRouteChildren = {
   OwnerCreateWebsiteRoute: OwnerCreateWebsiteRoute,
   OwnerCrmRoute: OwnerCrmRoute,
   OwnerDashboardRoute: OwnerDashboardRoute,
-  OwnerEditShopRoute: OwnerEditShopRoute,
   OwnerGalleryRoute: OwnerGalleryRoute,
   OwnerJobsRoute: OwnerJobsRouteWithChildren,
   OwnerMarketingRoute: OwnerMarketingRoute,
@@ -3633,7 +3612,7 @@ const OwnerRouteChildren: OwnerRouteChildren = {
   OwnerRegisterBusinessRoute: OwnerRegisterBusinessRoute,
   OwnerReviewsRoute: OwnerReviewsRoute,
   OwnerServicesRoute: OwnerServicesRoute,
-  OwnerSetupWizardRoute: OwnerSetupWizardRoute,
+  OwnerSettingsRoute: OwnerSettingsRoute,
   OwnerStaffRoute: OwnerStaffRoute,
   OwnerTemplatesRoute: OwnerTemplatesRoute,
   OwnerWebsiteRoute: OwnerWebsiteRoute,
