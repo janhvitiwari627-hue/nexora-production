@@ -291,6 +291,18 @@ function PublishedBookingPage() {
                   placeholder="9876543210"
                 />
               </label>
+              <label className="text-sm font-medium sm:col-span-2">
+                Email <span className="text-slate-500 font-normal">(for confirmation)</span>
+                <input
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  type="email"
+                  autoComplete="email"
+                  maxLength={320}
+                  className="mt-1 w-full rounded-xl border bg-white px-3 py-2.5"
+                  placeholder="you@example.com"
+                />
+              </label>
             </fieldset>
 
             {error && (
