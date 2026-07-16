@@ -738,13 +738,26 @@ function RecentReviewsWidget() {
 }
 
 function QuickActionsRow() {
-  const actions = [
-    { icon: Plus, label: "Add Service" },
-    { icon: UserPlus, label: "Add Staff" },
-    { icon: Tag, label: "Create Offer" },
-    { icon: Share2, label: "Share Website" },
-    { icon: QrCode, label: "Generate QR" },
-    { icon: BarChart3, label: "View Analytics" },
+  const navigate = useNavigate();
+  const handleShare = async () => {
+    const url = `${window.location.origin}/owner/website`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "My Salon Website", url });
+      } else {
+        await navigator.clipboard.writeText(url);
+      }
+    } catch {
+      /* user cancelled */
+    }
+  };
+  const actions: { icon: typeof Plus; label: string; onClick: () => void }[] = [
+    { icon: Plus, label: "Add Service", onClick: () => navigate({ to: "/owner/services" }) },
+    { icon: UserPlus, label: "Add Staff", onClick: () => navigate({ to: "/owner/staff" }) },
+    { icon: Tag, label: "Create Offer", onClick: () => navigate({ to: "/owner/marketing" }) },
+    { icon: Share2, label: "Share Website", onClick: handleShare },
+    { icon: QrCode, label: "Generate QR", onClick: () => navigate({ to: "/owner/website" }) },
+    { icon: BarChart3, label: "View Analytics", onClick: () => navigate({ to: "/owner/analytics" }) },
   ];
   return (
     <Card className="p-4">
@@ -752,6 +765,8 @@ function QuickActionsRow() {
         {actions.map((a) => (
           <button
             key={a.label}
+            type="button"
+            onClick={a.onClick}
             className="group flex flex-col items-center gap-2 rounded-xl p-3 text-center transition hover:bg-primary/5"
           >
             <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
