@@ -226,6 +226,7 @@ function WebsiteEditorPage() {
         <section className="overflow-hidden border-l bg-muted/20">
           {websiteId && (
             <iframe
+              ref={iframeRef}
               key={websiteId}
               src={`/w/${websiteId}?preview=1`}
               className="h-full w-full border-0"
