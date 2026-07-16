@@ -350,16 +350,28 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
                 onApplyFilters={(f) => {
                   setDraft(f);
                   commitFilters(f);
+                  requestAnimationFrame(() => {
+                    document
+                      .getElementById("search-results")
+                      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  });
                 }}
                 onSelectCategory={(cat) => {
                   const { category: _omit, ...rest } = search;
                   onSearchChange({ ...rest, category: cat });
+                  requestAnimationFrame(() => {
+                    document
+                      .getElementById("search-results")
+                      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  });
                 }}
               />
               <InstantBookingSection shops={filtered} />
             </div>
 
             {/* Results */}
+            <div id="search-results" className="scroll-mt-24">
+
             <AnimatePresence mode="wait">
               {isFetching ? (
                 <motion.div
