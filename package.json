@@ -27,7 +27,8 @@
     "test:customer-pwa": "node scripts/audit-customer-pwa.mjs",
     "test:owner-pwa": "node scripts/audit-owner-pwa.mjs",
     "test:jobs-pwa": "node scripts/audit-jobs-pwa.mjs",
-    "test:responsive": "playwright test responsive-overflow"
+    "test:responsive": "playwright test responsive-overflow",
+    "test:safe-area": "playwright test responsive-safe-area"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^2.0.51",
