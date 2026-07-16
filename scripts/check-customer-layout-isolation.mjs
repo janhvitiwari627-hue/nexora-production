@@ -10,8 +10,9 @@
  */
 import { readdirSync, statSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const ROOT = new URL("..", import.meta.url).pathname;
+const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const routesDir = join(ROOT, "src/routes");
 const errors = [];
 
@@ -30,7 +31,9 @@ for (const f of forbidden) {
 // 2. No src/routes/customer/ directory
 try {
   statSync(join(routesDir, "customer"));
-  errors.push("src/routes/customer/: directory must not exist — Customer App is a separate project.");
+  errors.push(
+    "src/routes/customer/: directory must not exist — Customer App is a separate project.",
+  );
 } catch {
   /* absent — good */
 }
@@ -68,7 +71,9 @@ function walk(dir) {
     const lines = text.split("\n");
     lines.forEach((line, i) => {
       if (PATTERN.test(line)) {
-        errors.push(`${rel}:${i + 1}: references a /customer/* path — Customer App is a separate project.`);
+        errors.push(
+          `${rel}:${i + 1}: references a /customer/* path — Customer App is a separate project.`,
+        );
       }
     });
   }
@@ -78,7 +83,9 @@ for (const d of ["src", "app"]) {
   const full = join(ROOT, d);
   try {
     if (statSync(full).isDirectory()) walk(full);
-  } catch { /* dir absent — fine */ }
+  } catch {
+    /* dir absent — fine */
+  }
 }
 
 if (errors.length) {

@@ -4,11 +4,11 @@ import { CreateWebsitePage } from "@/pages/owner/CreateWebsitePage";
 export const Route = createFileRoute("/owner/templates")({
   head: () => ({
     meta: [
-      { title: "Choose Your Website Template — Nexora" },
+      { title: "Choose or Change Shop Template — Nexora" },
       {
         name: "description",
         content:
-          "Pick one of three Nexora templates — Luxury Salon, Modern Professional, or Spa & Wellness — and launch your booking website in minutes.",
+          "Choose or change your salon shop template without losing services, photos, content or bookings.",
       },
     ],
   }),

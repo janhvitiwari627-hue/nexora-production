@@ -5,8 +5,18 @@ import { WebsiteRenderer } from "@/components/whiteLabelWebsite/WebsiteRenderer"
 import { WhiteLabelHeader } from "@/components/whiteLabelWebsite/WhiteLabelHeader";
 import { WhiteLabelFooter } from "@/components/whiteLabelWebsite/WhiteLabelFooter";
 import { ViralGrowthWidget } from "@/components/whiteLabelWebsite/ViralGrowthWidget";
-import { DEFAULT_SECTIONS, type ShopData, type WebsiteConfig } from "@/components/whiteLabelWebsite/types";
-import { getTemplate, normalizeTemplateKey, TEMPLATE_KEYS, TEMPLATES, type TemplateKey } from "@/components/whiteLabelWebsite/templates";
+import {
+  DEFAULT_SECTIONS,
+  type ShopData,
+  type WebsiteConfig,
+} from "@/components/whiteLabelWebsite/types";
+import {
+  getTemplate,
+  normalizeTemplateKey,
+  TEMPLATE_KEYS,
+  TEMPLATES,
+  type TemplateKey,
+} from "@/components/whiteLabelWebsite/templates";
 import { getSalonBySlug } from "@/lib/salons.functions";
 import { expandMockBusiness, getMockBusinessBySlug } from "@/lib/mock-businesses";
 import { Paintbrush } from "lucide-react";
@@ -14,7 +24,13 @@ import { Paintbrush } from "lucide-react";
 const DEFAULT_COVER =
   "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=1600&q=80";
 
-export function WhiteLabelWebsitePage({ slug: _slug, routeSearch }: { slug?: string; routeSearch?: { t?: string; preview?: 1 } }) {
+export function WhiteLabelWebsitePage({
+  slug: _slug,
+  routeSearch,
+}: {
+  slug?: string;
+  routeSearch?: { t?: string; preview?: 1 };
+}) {
   const { data, isLoading } = useQuery({
     queryKey: ["white-label-site", _slug],
     queryFn: () => (_slug ? getSalonBySlug({ data: { slug: _slug } }) : Promise.resolve(null)),
@@ -22,7 +38,8 @@ export function WhiteLabelWebsitePage({ slug: _slug, routeSearch }: { slug?: str
   });
   const navigate = useNavigateSafe();
 
-  const browserSearch = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const browserSearch =
+    typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
   const isPreview = routeSearch?.preview === 1 || browserSearch?.get("preview") === "1";
 
   if (isLoading) {
@@ -45,7 +62,10 @@ export function WhiteLabelWebsitePage({ slug: _slug, routeSearch }: { slug?: str
           <p className="text-muted-foreground">
             The link you followed may be incorrect or the owner has not published their site yet.
           </p>
-          <Link to="/" className="inline-flex rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground">
+          <Link
+            to="/"
+            className="inline-flex rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground"
+          >
             Go to homepage
           </Link>
         </div>
@@ -55,14 +75,18 @@ export function WhiteLabelWebsitePage({ slug: _slug, routeSearch }: { slug?: str
 
   const shop: ShopData = data?.salon ? toShopData(data) : expandMockBusiness(mockBiz!);
   const savedTemplateKey = data?.salon?.selected_template_key ?? "modern-salon";
-  const templateKey = normalizeTemplateKey(routeSearch?.t ?? browserSearch?.get("t") ?? savedTemplateKey);
+  const templateKey = normalizeTemplateKey(
+    routeSearch?.t ?? browserSearch?.get("t") ?? savedTemplateKey,
+  );
+  const baseTemplate = getTemplate(templateKey);
 
   const config: WebsiteConfig = {
     template: templateKey,
     branding: {
-      primaryColor: getTemplate(templateKey).colors.primary,
-      secondaryColor: getTemplate(templateKey).colors.secondary,
-      font: getTemplate(templateKey).font,
+      logo: data?.salon?.owner_profile_image_url ?? undefined,
+      primaryColor: data?.salon?.brand_primary ?? baseTemplate.colors.primary,
+      secondaryColor: data?.salon?.brand_secondary ?? baseTemplate.colors.secondary,
+      font: baseTemplate.font,
     },
     sections: DEFAULT_SECTIONS,
     seoMeta: {
@@ -72,23 +96,43 @@ export function WhiteLabelWebsitePage({ slug: _slug, routeSearch }: { slug?: str
     },
     socialLinks: {},
   };
-  const template = getTemplate(templateKey);
+  const template = {
+    ...baseTemplate,
+    colors: {
+      ...baseTemplate.colors,
+      primary: config.branding.primaryColor,
+      secondary: config.branding.secondaryColor,
+    },
+  };
 
   const setTemplate = (key: TemplateKey) => {
-    if (navigate) navigate({ to: ".", search: (prev: Record<string, unknown>) => ({ ...prev, t: key }), replace: true } as never);
+    if (navigate)
+      navigate({
+        to: ".",
+        search: (prev: Record<string, unknown>) => ({ ...prev, t: key }),
+        replace: true,
+      } as never);
   };
 
   const wrapperClass =
-    templateKey === "royal-luxe" ? "tpl-royal" :
-    templateKey === "professional-beauty" ? "tpl-blossom" : "tpl-modern";
+    templateKey === "royal-luxe"
+      ? "tpl-royal"
+      : templateKey === "professional-beauty"
+        ? "tpl-blossom"
+        : "tpl-modern";
 
   const bgColor =
-    templateKey === "royal-luxe" ? "#0B0B0B" :
-    templateKey === "professional-beauty" ? "#FFFDFD" :
-    template.colors.bg;
+    templateKey === "royal-luxe"
+      ? "#0B0B0B"
+      : templateKey === "professional-beauty"
+        ? "#FFFDFD"
+        : template.colors.bg;
 
   return (
-    <div className={wrapperClass} style={{ fontFamily: template.font, backgroundColor: bgColor, color: template.colors.text }}>
+    <div
+      className={wrapperClass}
+      style={{ fontFamily: template.font, backgroundColor: bgColor, color: template.colors.text }}
+    >
       {isPreview && (
         <div className="sticky top-0 z-40 w-full bg-amber-500 text-amber-950 shadow-md">
           <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-2 text-sm font-medium sm:flex-row">
@@ -116,7 +160,6 @@ export function WhiteLabelWebsitePage({ slug: _slug, routeSearch }: { slug?: str
   );
 }
 
-
 function toShopData(data: NonNullable<Awaited<ReturnType<typeof getSalonBySlug>>>): ShopData {
   const salon = data.salon!;
   const cover = salon.cover_image_url ?? salon.image_url ?? DEFAULT_COVER;
@@ -140,11 +183,16 @@ function toShopData(data: NonNullable<Awaited<ReturnType<typeof getSalonBySlug>>
     rating: s.rating ?? undefined,
     available: true,
   }));
-  const gallery = (salon.gallery_images ?? []).map((url: string, i: number) => ({
-    url,
-    type: "photo" as const,
-    category: i % 2 ? "Work" : "Interior",
-  }));
+  const gallery: ShopData["gallery"] = (salon.gallery_images ?? []).map(
+    (url: string, i: number) => ({
+      url,
+      type: "photo" as const,
+      category: i % 2 ? "Work" : "Interior",
+    }),
+  );
+  if (salon.video_url) {
+    gallery.push({ url: salon.video_url, type: "video", category: "Salon Video" });
+  }
   const reviews = (data.reviews ?? []).map((r) => ({
     id: r.id,
     author: "Guest",
@@ -166,7 +214,7 @@ function toShopData(data: NonNullable<Awaited<ReturnType<typeof getSalonBySlug>>
     coverImage: cover,
     rating: salon.rating ?? 0,
     reviewCount: salon.reviews_count ?? 0,
-    about: salon.description ?? "",
+    about: salon.about_us ?? salon.description ?? "",
     services,
     staff,
     gallery,
@@ -183,19 +231,38 @@ function toShopData(data: NonNullable<Awaited<ReturnType<typeof getSalonBySlug>>
     beforeAfter: [],
     testimonials: [],
     socialLinks: {},
-    hours: [],
+    hours: toWebsiteHours(salon.hours),
     location: { lat: salon.latitude ?? 0, lng: salon.longitude ?? 0 },
   };
 }
 
+function toWebsiteHours(value: unknown): ShopData["hours"] {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return [];
+  return Object.entries(value as Record<string, unknown>).flatMap(([day, raw]) => {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return [];
+    const row = raw as { open?: unknown; close?: unknown; closed?: unknown };
+    if (row.closed === true || typeof row.open !== "string" || typeof row.close !== "string") {
+      return [];
+    }
+    return [{ day, open: row.open, close: row.close }];
+  });
+}
 
 function useNavigateSafe() {
-  try { return useNavigate(); } catch { return undefined; }
+  try {
+    return useNavigate();
+  } catch {
+    return undefined;
+  }
 }
 
 function TemplateSwitcher({
-  current, onChange,
-}: { current: TemplateKey; onChange: (k: TemplateKey) => void }) {
+  current,
+  onChange,
+}: {
+  current: TemplateKey;
+  onChange: (k: TemplateKey) => void;
+}) {
   const [open, setOpen] = useState(false);
   return (
     <div className="sticky top-[60px] z-20 mx-auto flex max-w-7xl items-center justify-end px-6 py-2 md:px-10">
@@ -216,10 +283,16 @@ function TemplateSwitcher({
                 <button
                   key={k}
                   type="button"
-                  onClick={() => { onChange(k); setOpen(false); }}
+                  onClick={() => {
+                    onChange(k);
+                    setOpen(false);
+                  }}
                   className={`flex w-full items-start gap-3 px-3 py-2 text-left hover:bg-muted ${current === k ? "bg-muted" : ""}`}
                 >
-                  <span className="mt-1 inline-flex h-5 w-5 shrink-0 rounded-full border" style={{ backgroundColor: t.colors.primary, borderColor: t.colors.secondary }} />
+                  <span
+                    className="mt-1 inline-flex h-5 w-5 shrink-0 rounded-full border"
+                    style={{ backgroundColor: t.colors.primary, borderColor: t.colors.secondary }}
+                  />
                   <span>
                     <span className="block text-sm font-semibold">{t.name}</span>
                     <span className="text-muted-foreground block text-[11px]">{t.tagline}</span>
