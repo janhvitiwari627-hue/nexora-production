@@ -1,5 +1,29 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, ArrowLeftRight, Bell, Briefcase, Building2, ChevronDown, LayoutDashboard, LogOut, Megaphone, Menu, Package, Phone, Settings, Sparkles, Star, Store, Tag, Target, TrendingUp, Truck, User, UserCircle2, Users } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowLeftRight,
+  Bell,
+  Briefcase,
+  Building2,
+  ChevronDown,
+  LayoutDashboard,
+  LogOut,
+  Megaphone,
+  Menu,
+  Package,
+  Phone,
+  Settings,
+  Sparkles,
+  Star,
+  Store,
+  Tag,
+  Target,
+  TrendingUp,
+  Truck,
+  User,
+  UserCircle2,
+  Users,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import nexoraLogo from "@/assets/nexora-logo.jpg.asset.json";
 import { Button } from "@/components/ui/button";
@@ -44,7 +68,7 @@ const NAV = [
   { to: "/jobs", label: "Job Portal", icon: Briefcase },
   { to: "/owner/templates", label: "Create Shop Website", icon: null },
   { to: "/growth-partner", label: "Growth Partner", icon: TrendingUp },
-  { to: "/owner/welcome", label: "Shop Owner", icon: Store },
+  { to: "/for-owners", label: "Shop Owner", icon: Store },
 ] as const;
 
 const PORTAL_MENU = [
@@ -65,7 +89,7 @@ const PORTAL_MENU = [
 import { assertPublicOnly } from "@/lib/enforce-public-only";
 
 export function PublicHeader({ showBackButton = true }: { showBackButton?: boolean }) {
-  if (assertPublicOnly("PublicHeader")) return null;
+  const shouldHide = assertPublicOnly("PublicHeader");
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -86,7 +110,9 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
   const switchToOwner = () => {
     try {
       sessionStorage.removeItem("nexora:browseAsCustomer");
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     navigate({ to: "/owner/dashboard" });
   };
 
@@ -103,28 +129,31 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Keep hook order stable even if a route boundary renders this public-only
+  // component on a protected surface.
+  if (shouldHide) return null;
+
   const handleLogout = async () => {
     setLogoutOpen(false);
     await signOut();
     navigate({ to: "/login", replace: true });
   };
 
-  const displayName =
-    profile?.full_name ||
-    (user?.email ? user.email.split("@")[0] : "Account");
+  const displayName = profile?.full_name || (user?.email ? user.email.split("@")[0] : "Account");
   const email = user?.email ?? "";
   const avatarUrl =
     profile?.avatar_url ||
     (user?.user_metadata?.avatar_url as string | undefined) ||
     (user?.user_metadata?.picture as string | undefined) ||
     "";
-  const initials = displayName
-    .split(" ")
-    .map((s) => s[0])
-    .filter(Boolean)
-    .slice(0, 2)
-    .join("")
-    .toUpperCase() || "U";
+  const initials =
+    displayName
+      .split(" ")
+      .map((s) => s[0])
+      .filter(Boolean)
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() || "U";
 
   return (
     <header
@@ -138,9 +167,7 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
       <div className="mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-4 px-4 py-3 md:px-6">
         {/* Back + Logo */}
         <div className="flex items-center gap-2">
-          {showBackButton && (
-            <BackButton size="icon" className="shrink-0" aria-label="Go back" />
-          )}
+          {showBackButton && <BackButton size="icon" className="shrink-0" aria-label="Go back" />}
           <Link to="/" className="flex items-center gap-2">
             <img
               src={nexoraLogo.url}
@@ -197,7 +224,9 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
         <div className="hidden items-center gap-1 md:flex">
           {isAuthed && (
             <Button variant="ghost" size="icon" aria-label="Notifications" asChild>
-              <Link to="/dashboard/notifications"><Bell className="h-5 w-5" /></Link>
+              <Link to="/dashboard/notifications">
+                <Bell className="h-5 w-5" />
+              </Link>
             </Button>
           )}
           <LocationChip className="mr-1 hidden lg:inline-flex" />
@@ -251,7 +280,10 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
                       </span>
                     </DropdownMenuLabel>
                     <DropdownMenuItem
-                      onSelect={(e) => { e.preventDefault(); switchToOwner(); }}
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        switchToOwner();
+                      }}
                       className="cursor-pointer"
                     >
                       <LayoutDashboard className="mr-2 h-4 w-4" />
@@ -304,7 +336,9 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
         <div className="flex items-center gap-2 md:hidden">
           {isAuthed && (
             <Button variant="ghost" size="icon" aria-label="Notifications" asChild>
-              <Link to="/dashboard/notifications"><Bell className="h-5 w-5" /></Link>
+              <Link to="/dashboard/notifications">
+                <Bell className="h-5 w-5" />
+              </Link>
             </Button>
           )}
           <Button
