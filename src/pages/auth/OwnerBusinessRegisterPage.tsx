@@ -244,7 +244,7 @@ export default function OwnerBusinessRegisterPage() {
       }
 
       setSuccess(true);
-      setTimeout(() => navigate({ to: "/owner/setup-wizard", replace: true }), 600);
+      setTimeout(() => navigate({ to: "/owner/settings", replace: true }), 600);
     } catch (err) {
       setServerError(parseErr(err));
     } finally {

@@ -173,9 +173,9 @@ const OWNER_PORTAL_ITEMS = [
     icon: LayoutDashboard,
   },
   {
-    label: "Salon Setup",
-    description: "Salon ki basic details update karein",
-    to: "/owner/edit-shop",
+    label: "Shop Settings",
+    description: "Sabhi shop details ek jagah manage karein",
+    to: "/owner/settings",
     icon: Store,
   },
   {

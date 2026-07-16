@@ -323,7 +323,7 @@ export function OwnerWebsitePage() {
             icon={<Info className="h-4 w-4" />}
             title="About / Our Salon"
             desc="Salon story, tagline, description"
-            hint="Neeche 'Brand' card me edit karein"
+            to="/owner/settings"
           />
           <SectionEditLink
             icon={<Scissors className="h-4 w-4" />}
@@ -370,8 +370,8 @@ export function OwnerWebsitePage() {
           <SectionEditLink
             icon={<Pencil className="h-4 w-4" />}
             title="Contact & Hours"
-            desc="Phone, address, timings"
-            hint="Neeche 'Contact' card me edit karein"
+            desc="Phone, WhatsApp, address, city"
+            to="/owner/settings"
           />
         </CardContent>
       </Card>
