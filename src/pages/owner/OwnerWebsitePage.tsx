@@ -36,11 +36,13 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useOwnerContext } from "@/hooks/use-owner-context";
-import { ownerSalonFullQuery, ownerServicesQuery } from "@/lib/owner.queries";
+import { ownerSalonFullQuery, ownerServicesQuery, ownerStaffQuery } from "@/lib/owner.queries";
 import {
   updateOwnerSalon,
   upsertOwnerService,
   deleteOwnerService,
+  upsertOwnerStaff,
+  deleteOwnerStaff,
 } from "@/lib/owner.functions";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -97,14 +99,26 @@ type ServiceDraft = {
   category: string;
 };
 
+type StaffDraft = {
+  id?: string;
+  name: string;
+  role: string;
+  bio: string;
+  avatar_url: string;
+  rating: number;
+};
+
 export function OwnerWebsitePage() {
   const { activeSalon, activeSalonId, hasSalon, isLoading: ctxLoading } = useOwnerContext();
   const qc = useQueryClient();
   const { data: salon, isLoading } = useQuery(ownerSalonFullQuery(activeSalonId ?? ""));
   const { data: servicesData } = useQuery(ownerServicesQuery(activeSalonId ?? ""));
+  const { data: staffData } = useQuery(ownerStaffQuery(activeSalonId ?? ""));
   const update = useServerFn(updateOwnerSalon);
   const upsertSvc = useServerFn(upsertOwnerService);
   const deleteSvc = useServerFn(deleteOwnerService);
+  const upsertStaffFn = useServerFn(upsertOwnerStaff);
+  const deleteStaffFn = useServerFn(deleteOwnerStaff);
   const [autosaveState, setAutosaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const mutate = useMutation({
     mutationFn: (patch: Patch) => update({ data: { salon_id: activeSalonId!, patch } }),
@@ -121,6 +135,8 @@ export function OwnerWebsitePage() {
   const [form, setForm] = useState<Patch | null>(null);
   const [services, setServices] = useState<ServiceDraft[] | null>(null);
   const [savingServices, setSavingServices] = useState(false);
+  const [staff, setStaff] = useState<StaffDraft[] | null>(null);
+  const [savingStaff, setSavingStaff] = useState(false);
   const [preview, setPreview] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
@@ -176,6 +192,21 @@ export function OwnerWebsitePage() {
     }
   }, [servicesData, services]);
 
+  useEffect(() => {
+    if (staffData && staff === null) {
+      setStaff(
+        staffData.map((s) => ({
+          id: s.id,
+          name: s.name ?? "",
+          role: s.role ?? "",
+          bio: s.bio ?? "",
+          avatar_url: s.avatar_url ?? "",
+          rating: Number(s.rating ?? 5),
+        })),
+      );
+    }
+  }, [staffData, staff]);
+
   const set = <K extends keyof Patch>(key: K, value: Patch[K]) =>
     setForm((f) => (f ? { ...f, [key]: value } : f));
 
@@ -219,8 +250,18 @@ export function OwnerWebsitePage() {
         category: s.category || undefined,
       }));
     }
+    if (staff) {
+      patch.staff = staff.map((s) => ({
+        id: s.id,
+        name: s.name,
+        role: s.role || null,
+        bio: s.bio || null,
+        avatar_url: s.avatar_url || null,
+        rating: s.rating || null,
+      }));
+    }
     win.postMessage({ type: "live-preview-overrides", patch }, "*");
-  }, [preview, iframeReady, form, services]);
+  }, [preview, iframeReady, form, services, staff]);
 
   // Listen for the iframe's ready handshake.
   useEffect(() => {
@@ -343,10 +384,63 @@ export function OwnerWebsitePage() {
     }
   };
 
+  // ---------- Staff (Meet the Team) editor helpers ----------
+  const addStaff = () => {
+    setStaff((prev) => [
+      ...(prev ?? []),
+      { name: "New Team Member", role: "Stylist", bio: "", avatar_url: "", rating: 5 },
+    ]);
+  };
+  const updateStaff = (idx: number, patch: Partial<StaffDraft>) => {
+    setStaff((prev) => prev?.map((s, i) => (i === idx ? { ...s, ...patch } : s)) ?? null);
+  };
+  const removeStaff = (idx: number) => {
+    setStaff((prev) => prev?.filter((_, i) => i !== idx) ?? null);
+  };
+  const [uploadingStaffIdx, setUploadingStaffIdx] = useState<number | null>(null);
+  const handleStaffAvatarUpload = async (idx: number, file: File) => {
+    setUploadingStaffIdx(idx);
+    const url = await uploadFile(file, "staff");
+    setUploadingStaffIdx(null);
+    if (url) updateStaff(idx, { avatar_url: url });
+  };
+  const saveStaff = async () => {
+    if (!activeSalonId || !staff) return;
+    setSavingStaff(true);
+    try {
+      const originals = staffData ?? [];
+      const draftIds = new Set(staff.filter((s) => s.id).map((s) => s.id!));
+      for (const orig of originals) {
+        if (!draftIds.has(orig.id)) {
+          await deleteStaffFn({ data: { id: orig.id } });
+        }
+      }
+      for (const s of staff) {
+        if (!s.name.trim()) continue;
+        await upsertStaffFn({
+          data: {
+            id: s.id,
+            salon_id: activeSalonId,
+            name: s.name.trim(),
+            role: s.role || null,
+            bio: s.bio || null,
+            avatar_url: s.avatar_url || null,
+            rating: Number(s.rating) || 5,
+            is_active: true,
+          },
+        });
+      }
+      toast.success("Team saved");
+      await qc.invalidateQueries({ queryKey: ["owner", "staff", activeSalonId] });
+      setStaff(null);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to save team");
+    } finally {
+      setSavingStaff(false);
+    }
+  };
 
-
-
-  const uploadFile = async (file: File, folder: "cover" | "owner" | "gallery" | "video" | "services") => {
+  const uploadFile = async (file: File, folder: "cover" | "owner" | "gallery" | "video" | "services" | "staff") => {
     if (!activeSalonId) return null;
     const isVideo = folder === "video";
     const maxBytes = isVideo ? 10 * 1024 * 1024 : 2 * 1024 * 1024;
@@ -741,6 +835,125 @@ export function OwnerWebsitePage() {
           </p>
         </CardContent>
       </Card>
+
+      {/* Meet the Team (Staff) inline editor */}
+      <Card className="max-w-full overflow-hidden">
+        <CardHeader className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
+          <div className="min-w-0">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Users className="h-4 w-4" /> Meet the Team
+            </CardTitle>
+            <p className="text-muted-foreground text-xs mt-1">
+              Team members add karein — photo upload karke turant live preview me dikhega. Save karke customers ke liye publish karo.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={addStaff}>
+              <Plus className="h-4 w-4" /> Add Member
+            </Button>
+            <Button size="sm" onClick={saveStaff} disabled={savingStaff || !staff}>
+              {savingStaff ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              Save Team
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {(!staff || staff.length === 0) && (
+            <div className="text-muted-foreground rounded-lg border border-dashed py-6 text-center text-sm">
+              Koi team member nahi. "Add Member" click karke shuru karein.
+            </div>
+          )}
+          {staff?.map((s, idx) => (
+            <div
+              key={s.id ?? `new-staff-${idx}`}
+              className="grid gap-2 rounded-lg border p-3 sm:grid-cols-[80px_minmax(0,1fr)_auto]"
+            >
+              <div className="flex flex-col items-center gap-1.5">
+                <div className="h-20 w-20 shrink-0 overflow-hidden rounded-full border bg-muted grid place-items-center relative">
+                  {s.avatar_url ? (
+                    <img src={s.avatar_url} alt={s.name} className="h-full w-full object-cover" />
+                  ) : (
+                    <Users className="h-6 w-6 text-muted-foreground" />
+                  )}
+                  {uploadingStaffIdx === idx && (
+                    <div className="absolute inset-0 grid place-items-center bg-black/50">
+                      <Loader2 className="h-5 w-5 animate-spin text-white" />
+                    </div>
+                  )}
+                </div>
+                <label className="cursor-pointer text-[11px] font-medium text-primary hover:underline">
+                  {s.avatar_url ? "Change" : "Upload"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) void handleStaffAvatarUpload(idx, f);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+                {s.avatar_url && (
+                  <button
+                    type="button"
+                    className="text-[11px] text-destructive hover:underline"
+                    onClick={() => updateStaff(idx, { avatar_url: "" })}
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+              <div className="min-w-0 grid gap-2 sm:grid-cols-2">
+                <Input
+                  placeholder="Full name (e.g. Priya R.)"
+                  value={s.name}
+                  onChange={(e) => updateStaff(idx, { name: e.target.value })}
+                />
+                <Input
+                  placeholder="Role (e.g. Senior Stylist)"
+                  value={s.role}
+                  onChange={(e) => updateStaff(idx, { role: e.target.value })}
+                />
+                <Input
+                  type="number"
+                  min={0}
+                  max={5}
+                  step={0.1}
+                  placeholder="Rating (0-5)"
+                  value={s.rating}
+                  onChange={(e) => updateStaff(idx, { rating: Number(e.target.value) })}
+                />
+                <Input
+                  placeholder="Ya photo URL paste karein (optional)"
+                  value={s.avatar_url}
+                  onChange={(e) => updateStaff(idx, { avatar_url: e.target.value })}
+                />
+                <Textarea
+                  className="sm:col-span-2"
+                  rows={2}
+                  placeholder="Short bio / specialization (e.g. Hair Color · Balayage · 8 yrs)"
+                  value={s.bio}
+                  onChange={(e) => updateStaff(idx, { bio: e.target.value })}
+                />
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-destructive self-start"
+                onClick={() => removeStaff(idx)}
+              >
+                <Trash2 className="h-4 w-4" /> Remove
+              </Button>
+            </div>
+          ))}
+          <p className="text-xs text-muted-foreground">
+            Tip: Har member ki photo circle me dikhegi. Save Team ke baad site par live ho jayegi.
+          </p>
+        </CardContent>
+      </Card>
+
+
 
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Brand customizer */}
