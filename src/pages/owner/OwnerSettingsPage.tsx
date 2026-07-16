@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { useBlocker, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -16,6 +16,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useOwnerContext } from "@/hooks/use-owner-context";
 import { supabase } from "@/integrations/supabase/client";
 import { getOwnerSalonFull, updateOwnerSalon } from "@/lib/owner.functions";
@@ -83,12 +93,13 @@ export function OwnerSettingsPage() {
   });
 
   const [form, setForm] = useState<Form>(EMPTY);
+  const [baseline, setBaseline] = useState<Form>(EMPTY);
   const [uploading, setUploading] = useState<"logo" | "cover" | null>(null);
 
   useEffect(() => {
     if (!salon) return;
     const row = salon as Record<string, unknown>;
-    setForm({
+    const next: Form = {
       name: s(row.name),
       category: s(row.category),
       owner_name: s(row.owner_name),
@@ -104,8 +115,32 @@ export function OwnerSettingsPage() {
       logo_url: s(row.logo_url),
       cover_image_url: s(row.cover_image_url),
       upi_id: s(row.upi_id),
-    });
+    };
+    setForm(next);
+    setBaseline(next);
   }, [salon]);
+
+  const isDirty = useMemo(() => {
+    return (Object.keys(form) as (keyof Form)[]).some((k) => form[k] !== baseline[k]);
+  }, [form, baseline]);
+
+  // Warn on browser close / refresh / external nav
+  useEffect(() => {
+    if (!isDirty) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [isDirty]);
+
+  // Intercept in-app navigation
+  const blocker = useBlocker({
+    shouldBlockFn: () => isDirty && !uploading,
+    withResolver: true,
+    enableBeforeUnload: false,
+  });
 
   const set = <K extends keyof Form>(k: K, v: Form[K]) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -160,6 +195,7 @@ export function OwnerSettingsPage() {
     },
     onSuccess: async () => {
       toast.success("Shop details saved. Website updated.");
+      setBaseline(form);
       await qc.invalidateQueries({ queryKey: ["owner"] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Update failed"),
@@ -323,13 +359,16 @@ export function OwnerSettingsPage() {
         </CardContent>
       </Card>
 
-      <div className="sticky bottom-0 flex justify-end gap-2 border-t bg-background/95 py-3 backdrop-blur">
+      <div className="sticky bottom-0 flex items-center justify-end gap-2 border-t bg-background/95 py-3 backdrop-blur">
+        {isDirty && (
+          <span className="mr-auto text-xs text-muted-foreground">Unsaved changes</span>
+        )}
         <Button variant="outline" onClick={() => navigate({ to: "/owner/welcome" })}>
           Back
         </Button>
         <Button
           onClick={() => save.mutate()}
-          disabled={save.isPending || uploading !== null || !form.name.trim()}
+          disabled={save.isPending || uploading !== null || !form.name.trim() || !isDirty}
         >
           {save.isPending ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -339,6 +378,38 @@ export function OwnerSettingsPage() {
           Save changes
         </Button>
       </div>
+
+      <AlertDialog
+        open={blocker.status === "blocked"}
+        onOpenChange={(open) => {
+          if (!open && blocker.status === "blocked") blocker.reset();
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Discard unsaved changes?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Aapne kuch changes save nahi kiye. Yahan se jaane par wo lost ho jaayenge.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => {
+                if (blocker.status === "blocked") blocker.reset();
+              }}
+            >
+              Stay on page
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (blocker.status === "blocked") blocker.proceed();
+              }}
+            >
+              Discard & leave
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
