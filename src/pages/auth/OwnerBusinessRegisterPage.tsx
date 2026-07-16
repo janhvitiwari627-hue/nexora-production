@@ -5,9 +5,28 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Eye, EyeOff, Building2, CheckCircle2 } from "lucide-react";
+
+const CATEGORIES = [
+  "Barber Shop",
+  "Salon",
+  "Beauty Parlour",
+  "Spa",
+  "Tattoo Studio",
+  "Massage Center",
+  "Nail Art Studio",
+  "Unisex",
+];
 import { BackButton } from "@/components/shared/BackButton";
 
 const mobileRe = /^(\+91)?[6-9]\d{9}$/;
