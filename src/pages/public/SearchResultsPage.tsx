@@ -422,6 +422,8 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
                 </motion.div>
               )}
             </AnimatePresence>
+            </div>
+
           </main>
         </div>
       </div>
