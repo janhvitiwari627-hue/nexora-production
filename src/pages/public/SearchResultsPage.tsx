@@ -124,6 +124,7 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
   // Staging buffer for the filter sidebar (Apply commits to URL).
   const [draft, setDraft] = useState<Filters>(filters);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [resultsScrollRequest, setResultsScrollRequest] = useState(0);
 
   // Re-sync local buffers when URL changes externally (back/forward, share-link).
   useEffect(() => {
@@ -169,6 +170,39 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
   const setView = (next: "grid" | "map") => {
     const { view: _omit, ...rest } = search;
     onSearchChange(next === "grid" ? rest : { ...rest, view: next });
+  };
+
+  const scrollResultsIntoView = (behavior: ScrollBehavior = "smooth") => {
+    const target = document.getElementById("search-results");
+    if (!target) return;
+
+    const header = document.querySelector<HTMLElement>('[data-testid="public-header"]');
+    const headerOffset = (header?.getBoundingClientRect().height ?? 0) + 14;
+    const top = target.getBoundingClientRect().top + window.scrollY - headerOffset;
+
+    window.scrollTo({ top: Math.max(0, top), behavior });
+  };
+
+  useEffect(() => {
+    if (resultsScrollRequest === 0 || isFetching) return;
+
+    let rafOne = 0;
+    let rafTwo = 0;
+    const settleTimer = window.setTimeout(() => scrollResultsIntoView("smooth"), 220);
+
+    rafOne = requestAnimationFrame(() => {
+      rafTwo = requestAnimationFrame(() => scrollResultsIntoView("smooth"));
+    });
+
+    return () => {
+      cancelAnimationFrame(rafOne);
+      cancelAnimationFrame(rafTwo);
+      window.clearTimeout(settleTimer);
+    };
+  }, [resultsScrollRequest, isFetching, filtered.length]);
+
+  const scrollToResultsAfterFiltering = () => {
+    setResultsScrollRequest((current) => current + 1);
   };
 
   // Anchor-based scroll restore: pin the topmost visible result card so the
@@ -350,20 +384,12 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
                 onApplyFilters={(f) => {
                   setDraft(f);
                   commitFilters(f);
-                  requestAnimationFrame(() => {
-                    document
-                      .getElementById("search-results")
-                      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-                  });
+                  scrollToResultsAfterFiltering();
                 }}
                 onSelectCategory={(cat) => {
                   const { category: _omit, ...rest } = search;
                   onSearchChange({ ...rest, category: cat });
-                  requestAnimationFrame(() => {
-                    document
-                      .getElementById("search-results")
-                      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-                  });
+                  scrollToResultsAfterFiltering();
                 }}
               />
               <InstantBookingSection shops={filtered} />
