@@ -745,18 +745,23 @@ function QuickActionsRow() {
   const isInitialized = useAuthStore((s) => s.isInitialized);
   const isOwner = roles.includes("owner" as any);
 
-  const requireOwner = (label: string, go: () => void) => {
+  const requireOwner = (label: string, target: string, run?: () => void) => {
     if (!isInitialized) {
       toast.info("Loading your account…");
       return;
     }
     if (!user) {
+      // Stash the intended destination so /login restores it after sign-in.
+      try {
+        sessionStorage.setItem("nexora:postLoginRedirect", target);
+      } catch {
+        /* storage unavailable */
+      }
       toast.error("Please sign in to continue", {
-        description: `Sign in as a shop owner to use "${label}".`,
+        description: `Sign in as a shop owner to use "${label}". We'll bring you right back.`,
         action: {
           label: "Sign in",
-          onClick: () =>
-            navigate({ to: "/login", search: { redirect: "/owner/dashboard" } as any }),
+          onClick: () => navigate({ to: "/login" }),
         },
       });
       return;
@@ -771,11 +776,11 @@ function QuickActionsRow() {
       });
       return;
     }
-    go();
+    (run ?? (() => navigate({ to: target as any })))();
   };
 
   const handleShare = () =>
-    requireOwner("Share Website", async () => {
+    requireOwner("Share Website", "/owner/website", async () => {
       const url = `${window.location.origin}/owner/website`;
       try {
         if (navigator.share) {
@@ -790,12 +795,12 @@ function QuickActionsRow() {
     });
 
   const actions: { icon: typeof Plus; label: string; onClick: () => void }[] = [
-    { icon: Plus, label: "Add Service", onClick: () => requireOwner("Add Service", () => navigate({ to: "/owner/services" })) },
-    { icon: UserPlus, label: "Add Staff", onClick: () => requireOwner("Add Staff", () => navigate({ to: "/owner/staff" })) },
-    { icon: Tag, label: "Create Offer", onClick: () => requireOwner("Create Offer", () => navigate({ to: "/owner/marketing" })) },
+    { icon: Plus, label: "Add Service", onClick: () => requireOwner("Add Service", "/owner/services") },
+    { icon: UserPlus, label: "Add Staff", onClick: () => requireOwner("Add Staff", "/owner/staff") },
+    { icon: Tag, label: "Create Offer", onClick: () => requireOwner("Create Offer", "/owner/marketing") },
     { icon: Share2, label: "Share Website", onClick: handleShare },
-    { icon: QrCode, label: "Generate QR", onClick: () => requireOwner("Generate QR", () => navigate({ to: "/owner/website" })) },
-    { icon: BarChart3, label: "View Analytics", onClick: () => requireOwner("View Analytics", () => navigate({ to: "/owner/analytics" })) },
+    { icon: QrCode, label: "Generate QR", onClick: () => requireOwner("Generate QR", "/owner/website") },
+    { icon: BarChart3, label: "View Analytics", onClick: () => requireOwner("View Analytics", "/owner/analytics") },
   ];
   return (
     <Card className="p-4">
