@@ -90,9 +90,17 @@ function PublishedBookingPageInner({ slug }: { slug: string }) {
   const remaining = Math.round((total - advance) * 100) / 100;
 
   // Demo/template previews use mock slugs that don't exist in Supabase.
-  // Fall back to the mock BookingFlowPage instead of a dead-end error so
-  // the "Start Booking" CTA in the white-label template preview still works.
-  if (!data?.salon) return <BookingFlowPage />;
+  // Show a friendly "not published yet" screen (owner-branded CTA back to
+  // their template) instead of falling into the main-website BookingFlowPage,
+  // which has its own hooks that fail outside a real salon context.
+  if (!data?.salon) {
+    return (
+      <SalonNotFound
+        title="Booking not enabled yet"
+        description="This salon website is still a preview. Once the owner publishes it, real online bookings will open right here — inside their own website design."
+      />
+    );
+  }
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
