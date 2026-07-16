@@ -5,9 +5,28 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Eye, EyeOff, Building2, CheckCircle2 } from "lucide-react";
+
+const CATEGORIES = [
+  "Barber Shop",
+  "Salon",
+  "Beauty Parlour",
+  "Spa",
+  "Tattoo Studio",
+  "Massage Center",
+  "Nail Art Studio",
+  "Unisex",
+];
 import { BackButton } from "@/components/shared/BackButton";
 
 const mobileRe = /^(\+91)?[6-9]\d{9}$/;
@@ -19,8 +38,17 @@ const schema = z.object({
     .trim()
     .transform((v) => v.replace(/[\s-]/g, ""))
     .pipe(z.string().regex(mobileRe, "Enter a valid 10-digit mobile")),
+  whatsapp: z
+    .string()
+    .trim()
+    .transform((v) => v.replace(/[\s-]/g, ""))
+    .refine((v) => v === "" || mobileRe.test(v), "Enter a valid 10-digit WhatsApp number")
+    .optional()
+    .or(z.literal("")),
   district: z.string().trim().min(2, "District is required").max(80),
   shop_name: z.string().trim().min(2, "Shop name is required").max(120),
+  category: z.string().trim().min(1, "Select a category").max(80),
+  address: z.string().trim().max(500).optional().or(z.literal("")),
   email: z.string().trim().email("Invalid email").max(255),
   password: z.string().min(8, "Min 8 characters").max(72),
 });
@@ -28,8 +56,11 @@ const schema = z.object({
 type FormState = {
   owner_name: string;
   mobile: string;
+  whatsapp: string;
   district: string;
   shop_name: string;
+  category: string;
+  address: string;
   email: string;
   password: string;
 };
@@ -93,8 +124,11 @@ export default function OwnerBusinessRegisterPage() {
   const [form, setForm] = useState<FormState>({
     owner_name: "",
     mobile: "",
+    whatsapp: "",
     district: "",
     shop_name: "",
+    category: "",
+    address: "",
     email: "",
     password: "",
   });
@@ -104,8 +138,16 @@ export default function OwnerBusinessRegisterPage() {
   const [showPw, setShowPw] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const update = (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const v = e.target.value;
+  const update =
+    (k: keyof FormState) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const v = e.target.value;
+      setForm((f) => ({ ...f, [k]: v }));
+      if (errors[k]) setErrors((p) => ({ ...p, [k]: "" }));
+      if (serverError) setServerError(null);
+    };
+
+  const updateField = (k: keyof FormState, v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
     if (errors[k]) setErrors((p) => ({ ...p, [k]: "" }));
     if (serverError) setServerError(null);
@@ -131,8 +173,11 @@ export default function OwnerBusinessRegisterPage() {
         ...parsed.data,
         owner_name: parsed.data.owner_name.trim(),
         mobile: parsed.data.mobile.trim(),
+        whatsapp: (parsed.data.whatsapp ?? "").trim(),
         district: parsed.data.district.trim(),
         shop_name: parsed.data.shop_name.trim(),
+        category: parsed.data.category.trim(),
+        address: (parsed.data.address ?? "").trim(),
         email: parsed.data.email.trim().toLowerCase(),
       };
       const email = payload.email;
@@ -146,7 +191,12 @@ export default function OwnerBusinessRegisterPage() {
           data: {
             full_name: payload.owner_name,
             mobile: payload.mobile,
+            whatsapp: payload.whatsapp || payload.mobile,
             role: "shop_owner",
+            shop_name: payload.shop_name,
+            category: payload.category,
+            district: payload.district,
+            address: payload.address,
           },
         },
       });
@@ -183,6 +233,9 @@ export default function OwnerBusinessRegisterPage() {
         _owner_name: payload.owner_name,
         _mobile: payload.mobile,
         _email: email,
+        _category: payload.category || undefined,
+        _whatsapp: payload.whatsapp || undefined,
+        _address: payload.address || undefined,
       });
 
       if (rpcError) {
@@ -288,6 +341,40 @@ export default function OwnerBusinessRegisterPage() {
               </div>
 
               <div className="space-y-1.5">
+                <Label htmlFor="whatsapp">WhatsApp (optional)</Label>
+                <Input
+                  id="whatsapp"
+                  type="tel"
+                  placeholder="Same as mobile if empty"
+                  value={form.whatsapp}
+                  onChange={update("whatsapp")}
+                  disabled={submitting}
+                />
+                {errors.whatsapp && <p className="text-xs text-destructive">{errors.whatsapp}</p>}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="category">Category *</Label>
+                <Select
+                  value={form.category}
+                  onValueChange={(v) => updateField("category", v)}
+                  disabled={submitting}
+                >
+                  <SelectTrigger id="category">
+                    <SelectValue placeholder="Choose a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CATEGORIES.map((c) => (
+                      <SelectItem key={c} value={c}>
+                        {c}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.category && <p className="text-xs text-destructive">{errors.category}</p>}
+              </div>
+
+              <div className="space-y-1.5">
                 <Label htmlFor="email">Email *</Label>
                 <Input
                   id="email"
@@ -299,6 +386,20 @@ export default function OwnerBusinessRegisterPage() {
                 />
                 {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
               </div>
+
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label htmlFor="address">Shop address (optional)</Label>
+                <Textarea
+                  id="address"
+                  rows={2}
+                  placeholder="Street, area, landmark"
+                  value={form.address}
+                  onChange={update("address")}
+                  disabled={submitting}
+                />
+                {errors.address && <p className="text-xs text-destructive">{errors.address}</p>}
+              </div>
+
 
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="password">Password *</Label>
