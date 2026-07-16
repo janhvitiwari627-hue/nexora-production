@@ -5,10 +5,8 @@ import { CalendarDays, Clock, IndianRupee, LoaderCircle, ShieldCheck } from "luc
 import { salonBySlugQueryOptions } from "@/lib/salons.queries";
 import { createPublicAppointment } from "@/lib/public-booking";
 import { sendBookingConfirmationEmail } from "@/lib/booking-email.functions";
-import {
-  PublishedSiteShell,
-  PublishedSiteUnavailable,
-} from "@/pages/public/site/PublishedSiteShell";
+import { PublishedSiteShell } from "@/pages/public/site/PublishedSiteShell";
+import { BookingFlowPage } from "@/pages/public/BookingFlowPage";
 
 const TIMES = [
   "10:00",
@@ -78,7 +76,10 @@ function PublishedBookingPage() {
   const advance = Math.round(total * 25) / 100;
   const remaining = Math.round((total - advance) * 100) / 100;
 
-  if (!data?.salon) return <PublishedSiteUnavailable />;
+  // Demo/template previews use mock slugs that don't exist in Supabase.
+  // Fall back to the mock BookingFlowPage instead of a dead-end error so
+  // the "Start Booking" CTA in the white-label template preview still works.
+  if (!data?.salon) return <BookingFlowPage />;
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
