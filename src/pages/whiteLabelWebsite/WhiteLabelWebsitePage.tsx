@@ -386,7 +386,7 @@ function toShopData(data: NonNullable<Awaited<ReturnType<typeof getSalonBySlug>>
     address: salon.address ?? salon.location ?? "",
     whatsapp: salon.whatsapp ?? salon.phone ?? "",
     phone: salon.phone ?? "",
-    email: salon.email ?? "",
+    email: "",
     coverImage: cover,
     logoImage: salon.owner_profile_image_url ?? undefined,
     videoUrl: salon.video_url ?? undefined,

@@ -142,6 +142,20 @@ export function OwnerWebsitePage() {
   const set = <K extends keyof Patch>(key: K, value: Patch[K]) =>
     setForm((f) => (f ? { ...f, [key]: value } : f));
 
+  const chooseTemplate = (key: TemplateKey) => {
+    const template = TEMPLATES[key];
+    setForm((f) =>
+      f
+        ? {
+            ...f,
+            selected_template_key: key,
+            brand_primary: template.colors.primary,
+            brand_secondary: template.colors.secondary,
+          }
+        : f,
+    );
+  };
+
   const publicUrl = useMemo(() => (salon?.slug ? `/site/${salon.slug}` : ""), [salon?.slug]);
   const selectedTemplate = getTemplate(form?.selected_template_key ?? salon?.selected_template_key);
   const previewUrl = salon?.slug
@@ -352,7 +366,7 @@ export function OwnerWebsitePage() {
                   <button
                     key={key}
                     type="button"
-                    onClick={() => set("selected_template_key", key)}
+                    onClick={() => chooseTemplate(key)}
                     className={`rounded-lg border p-2 text-left text-xs transition ${
                       active ? "border-primary bg-primary/10 text-primary" : "hover:bg-muted/60"
                     }`}
@@ -913,7 +927,7 @@ export function OwnerWebsitePage() {
                         <button
                           key={key}
                           type="button"
-                          onClick={() => set("selected_template_key", key)}
+                          onClick={() => chooseTemplate(key)}
                           className={`flex items-center gap-3 rounded-lg border p-2 text-left transition ${
                             active ? "border-primary bg-primary/10" : "hover:bg-muted/60"
                           }`}
