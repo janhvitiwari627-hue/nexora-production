@@ -99,6 +99,15 @@ type ServiceDraft = {
   category: string;
 };
 
+type StaffDraft = {
+  id?: string;
+  name: string;
+  role: string;
+  bio: string;
+  avatar_url: string;
+  rating: number;
+};
+
 export function OwnerWebsitePage() {
   const { activeSalon, activeSalonId, hasSalon, isLoading: ctxLoading } = useOwnerContext();
   const qc = useQueryClient();
