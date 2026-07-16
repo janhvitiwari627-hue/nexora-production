@@ -137,6 +137,9 @@ export function MobileMenuOverlay({
           />
           <motion.aside
             key="panel"
+            ref={(node) => {
+              panelRef.current = node as HTMLElement | null;
+            }}
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
@@ -145,7 +148,9 @@ export function MobileMenuOverlay({
             role="dialog"
             aria-modal="true"
             aria-label="Main menu"
+            tabIndex={-1}
           >
+
             <div className="border-border flex items-center justify-between border-b px-5 py-4">
               <div className="flex items-center gap-2">
                 <div className="bg-gradient-cta grid h-9 w-9 place-items-center rounded-xl text-primary-foreground shadow-[var(--shadow-glow)]">
