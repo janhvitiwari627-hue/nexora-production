@@ -5,10 +5,8 @@ import { CalendarDays, Clock, IndianRupee, LoaderCircle, ShieldCheck } from "luc
 import { salonBySlugQueryOptions } from "@/lib/salons.queries";
 import { createPublicAppointment } from "@/lib/public-booking";
 import { sendBookingConfirmationEmail } from "@/lib/booking-email.functions";
-import {
-  PublishedSiteShell,
-  PublishedSiteUnavailable,
-} from "@/pages/public/site/PublishedSiteShell";
+import { PublishedSiteShell } from "@/pages/public/site/PublishedSiteShell";
+import { BookingFlowPage } from "@/pages/public/BookingFlowPage";
 
 const TIMES = [
   "10:00",
