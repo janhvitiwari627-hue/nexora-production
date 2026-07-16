@@ -148,6 +148,54 @@ function BookingSuccessPage() {
             </a>
           );
         })()}
+        {(() => {
+          const salon = salonQuery.data?.salon;
+          const services = salonQuery.data?.services ?? [];
+          const [year, month, day] = String(row.booking_date).split("-").map(Number);
+          const [hour, minute] = String(row.booking_time).slice(0, 5).split(":").map(Number);
+          if (!year || !month || !day || Number.isNaN(hour) || Number.isNaN(minute)) return null;
+          const start = new Date(year, month - 1, day, hour, minute, 0);
+          if (Number.isNaN(start.getTime())) return null;
+          const matched = services.find((service) => service.id === row.service_id);
+          const durationMinutes = Number(matched?.duration_minutes ?? 60) || 60;
+          const end = new Date(start.getTime() + durationMinutes * 60_000);
+
+          const location = [salon?.name, salon?.address, salon?.location]
+            .filter(Boolean)
+            .join(", ");
+          const description = [
+            `Booking reference: ${row.booking_reference}`,
+            `Service: ${row.service_name}`,
+            salon?.phone ? `Salon phone: ${salon.phone}` : null,
+          ]
+            .filter(Boolean)
+            .join("\n");
+
+          const handleDownload = () => {
+            const ics = buildIcs({
+              uid: `${row.booking_reference}@nexora`,
+              start,
+              end,
+              summary: `${row.service_name} · ${salon?.name ?? "Salon"}`,
+              description,
+              location: location || undefined,
+              url: typeof window !== "undefined" ? window.location.href : undefined,
+            });
+            downloadIcs(`nexora-booking-${row.booking_reference}`, ics);
+          };
+
+          return (
+            <button
+              type="button"
+              onClick={handleDownload}
+              className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-violet-200 bg-violet-50 px-4 py-2.5 text-sm font-semibold text-violet-800 hover:bg-violet-100"
+            >
+              <CalendarPlus className="h-4 w-4" />
+              Add to calendar (Google · Apple · Outlook)
+            </button>
+          );
+        })()}
+
 
         <div className="mt-4 flex flex-col gap-3 sm:flex-row">
           <Link
