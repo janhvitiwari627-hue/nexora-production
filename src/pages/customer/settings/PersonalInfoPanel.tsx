@@ -4,7 +4,14 @@ import { toast } from "sonner";
 import { PROFILE } from "./mockSettings";
 import { INDIAN_STATES, getDistricts, getBlocks } from "./indiaGeo";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,12 +27,23 @@ function slugifyUsername(name: string) {
     .slice(0, 30);
 }
 
+function errorDetails(error: unknown) {
+  const value =
+    typeof error === "object" && error !== null ? (error as Record<string, unknown>) : {};
+  return {
+    code: String(value.code ?? ""),
+    message: String(value.message ?? value.error_description ?? value.error ?? ""),
+    status: Number(value.statusCode ?? value.status ?? 0),
+  };
+}
+
 export function PersonalInfoPanel() {
-  const { user, profile, refreshProfile, setUser } = useAuthStore();
+  const { user, profile, refreshProfile, setUser, setProfile } = useAuthStore();
   const [avatar, setAvatar] = useState<string>(profile?.avatar_url || "");
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [usernameTouched, setUsernameTouched] = useState(false);
   const [sessionChecked, setSessionChecked] = useState(false);
 
@@ -98,9 +116,11 @@ export function PersonalInfoPanel() {
     }));
   }
 
-  function friendlyUploadError(err: any, stage: "upload" | "sign" | "profile" | "remove"): string {
-    const raw = (err?.message || err?.error_description || err?.error || "").toString();
-    const status = Number(err?.statusCode ?? err?.status ?? 0);
+  function friendlyUploadError(
+    err: unknown,
+    stage: "upload" | "sign" | "profile" | "remove",
+  ): string {
+    const { message: raw, status } = errorDetails(err);
     const lower = raw.toLowerCase();
 
     if (!navigator.onLine) return "You appear to be offline. Check your connection and try again.";
@@ -110,7 +130,12 @@ export function PersonalInfoPanel() {
     if (status === 401 || lower.includes("jwt") || lower.includes("unauthorized")) {
       return "Your session has expired. Please sign in again and retry.";
     }
-    if (status === 403 || lower.includes("row-level security") || lower.includes("not allowed") || lower.includes("policy")) {
+    if (
+      status === 403 ||
+      lower.includes("row-level security") ||
+      lower.includes("not allowed") ||
+      lower.includes("policy")
+    ) {
       return "You don't have permission to update this photo.";
     }
     if (status === 413 || lower.includes("payload too large") || lower.includes("too large")) {
@@ -122,19 +147,24 @@ export function PersonalInfoPanel() {
     if (status === 429 || lower.includes("rate")) {
       return "Too many uploads in a short time. Please wait a moment and try again.";
     }
-    if (status >= 500) return "The server had a problem saving your photo. Please try again shortly.";
+    if (status >= 500)
+      return "The server had a problem saving your photo. Please try again shortly.";
 
     switch (stage) {
-      case "upload": return "We couldn't upload your photo. Please try a different image.";
-      case "sign":   return "Uploaded, but we couldn't generate a preview link. Please try again.";
-      case "profile":return "Photo uploaded, but saving it to your profile failed. Please retry.";
-      case "remove": return "We couldn't remove your photo. Please try again.";
+      case "upload":
+        return "We couldn't upload your photo. Please try a different image.";
+      case "sign":
+        return "Uploaded, but we couldn't generate a preview link. Please try again.";
+      case "profile":
+        return "Photo uploaded, but saving it to your profile failed. Please retry.";
+      case "remove":
+        return "We couldn't remove your photo. Please try again.";
     }
   }
 
-  function isBucketMissingError(err: any): boolean {
-    const raw = (err?.message || err?.error || "").toString().toLowerCase();
-    const status = Number(err?.statusCode ?? err?.status ?? 0);
+  function isBucketMissingError(err: unknown): boolean {
+    const { message, status } = errorDetails(err);
+    const raw = message.toLowerCase();
     return (
       raw.includes("bucket not found") ||
       raw.includes("bucket does not exist") ||
@@ -212,9 +242,10 @@ export function PersonalInfoPanel() {
       } else if (url?.startsWith("data:")) {
         toast.success("Profile photo saved");
       }
-    } catch (err: any) {
-      const msg = err?.message?.includes("Storage isn't configured")
-        ? err.message
+    } catch (err: unknown) {
+      const { message } = errorDetails(err);
+      const msg = message.includes("Storage isn't configured")
+        ? message
         : friendlyUploadError(err, stage);
       console.error("[avatar upload] stage=", stage, err);
       setUploadError(msg);
@@ -239,7 +270,7 @@ export function PersonalInfoPanel() {
       if (error) throw error;
       await refreshProfile();
       toast.success("Profile photo removed");
-    } catch (err: any) {
+    } catch (err: unknown) {
       const msg = friendlyUploadError(err, "remove");
       console.error("[avatar remove]", err);
       setUploadError(msg);
@@ -247,8 +278,6 @@ export function PersonalInfoPanel() {
       setAvatar(previous);
     }
   }
-
-
 
   function handlePincode(e: React.ChangeEvent<HTMLInputElement>) {
     const raw = e.target.value.replace(/\D/g, "").slice(0, 6);
@@ -260,7 +289,9 @@ export function PersonalInfoPanel() {
   }
 
   async function handleSave() {
-    if (!user) {
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    const activeUser = authData.user;
+    if (authError || !activeUser || (user && activeUser.id !== user.id)) {
       toast.error("Please sign in to save changes");
       return;
     }
@@ -269,28 +300,61 @@ export function PersonalInfoPanel() {
       return;
     }
     setSaving(true);
+    setSaveError(null);
     try {
-      const { error } = await supabase
+      const username = form.username.trim() || null;
+      const { data: savedProfile, error } = await supabase
         .from("profiles")
-        .update({
-          full_name: form.fullName || null,
-          username: form.username || null,
-          gender: form.gender || null,
-          date_of_birth: form.dob || null,
-          state: form.state || null,
-          district: form.district || null,
-          block: form.block || null,
-          pincode: form.pincode || null,
-        })
-        .eq("id", user.id);
+        .upsert(
+          {
+            id: activeUser.id,
+            email: activeUser.email ?? profile?.email ?? null,
+            full_name: form.fullName.trim() || null,
+            username,
+            gender: form.gender || null,
+            date_of_birth: form.dob || null,
+            state: form.state || null,
+            district: form.district || null,
+            block: form.block || null,
+            pincode: form.pincode || null,
+          },
+          { onConflict: "id" },
+        )
+        .select("*")
+        .single();
       if (error) throw error;
-      await refreshProfile();
+      if (!savedProfile || savedProfile.id !== activeUser.id) {
+        throw new Error("The profile update could not be verified. Please try again.");
+      }
+      setProfile(savedProfile);
       toast.success("Personal information saved");
-    } catch (err: any) {
-      toast.error(err?.message || "Could not save changes");
+    } catch (err: unknown) {
+      const details = errorDetails(err);
+      const message =
+        details.code === "23505" && details.message.includes("username")
+          ? "This username is already taken. Please choose another one."
+          : details.message || "Could not save changes";
+      setSaveError(message);
+      toast.error(message);
     } finally {
       setSaving(false);
     }
+  }
+
+  function handleCancel() {
+    if (!profile) return;
+    setForm({
+      fullName: profile.full_name || "",
+      username: profile.username || "",
+      gender: profile.gender || "prefer_not",
+      dob: profile.date_of_birth || "",
+      state: profile.state || "",
+      district: profile.district || "",
+      block: profile.block || "",
+      pincode: profile.pincode || "",
+    });
+    setPincodeError(null);
+    setSaveError(null);
   }
 
   const initials = (form.fullName || PROFILE.fullName)
@@ -314,7 +378,11 @@ export function PersonalInfoPanel() {
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <Field label="Full name">
-          <input value={form.fullName} onChange={(e) => onFullNameChange(e.target.value)} className={inputCls} />
+          <input
+            value={form.fullName}
+            onChange={(e) => onFullNameChange(e.target.value)}
+            className={inputCls}
+          />
         </Field>
         <Field label="Username">
           <input
@@ -349,7 +417,13 @@ export function PersonalInfoPanel() {
           </div>
         </Field>
         <Field label="Date of birth">
-          <input type="date" value={form.dob} onChange={(e) => setForm({ ...form, dob: e.target.value })} className={inputCls} />
+          <input
+            type="date"
+            max={new Date().toISOString().slice(0, 10)}
+            value={form.dob}
+            onChange={(e) => setForm({ ...form, dob: e.target.value })}
+            className={inputCls}
+          />
         </Field>
         <Field label="State">
           <SearchableSelect
@@ -395,7 +469,12 @@ export function PersonalInfoPanel() {
         </Field>
       </div>
 
-      <SaveBar onSave={handleSave} saving={saving} />
+      {saveError && (
+        <p role="alert" className="text-destructive mt-4 text-sm">
+          {saveError}
+        </p>
+      )}
+      <SaveBar onSave={handleSave} onCancel={handleCancel} saving={saving} />
     </PanelShell>
   );
 }
@@ -449,7 +528,9 @@ function SearchableSelect({
                     setOpen(false);
                   }}
                 >
-                  <Check className={cn("mr-2 h-4 w-4", value === opt ? "opacity-100" : "opacity-0")} />
+                  <Check
+                    className={cn("mr-2 h-4 w-4", value === opt ? "opacity-100" : "opacity-0")}
+                  />
                   {opt}
                 </CommandItem>
               ))}
@@ -467,13 +548,23 @@ export const inputCls =
 export function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="text-heading mb-1 block text-xs font-bold uppercase tracking-wide">{label}</label>
+      <label className="text-heading mb-1 block text-xs font-bold uppercase tracking-wide">
+        {label}
+      </label>
       {children}
     </div>
   );
 }
 
-export function PanelShell({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
+export function PanelShell({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string;
+  subtitle?: string;
+  children: React.ReactNode;
+}) {
   return (
     <section className="bg-card border-border rounded-[var(--radius-card-lg)] border p-5 md:p-6">
       <header className="mb-4">
@@ -485,10 +576,25 @@ export function PanelShell({ title, subtitle, children }: { title: string; subti
   );
 }
 
-export function SaveBar({ onSave, saving }: { onSave?: () => void; saving?: boolean }) {
+export function SaveBar({
+  onSave,
+  onCancel,
+  saving,
+}: {
+  onSave?: () => void;
+  onCancel?: () => void;
+  saving?: boolean;
+}) {
   return (
     <div className="border-border mt-6 flex justify-end gap-2 border-t pt-4">
-      <button type="button" className="border-border hover:bg-accent rounded-md border px-4 py-2 text-sm font-semibold">Cancel</button>
+      <button
+        type="button"
+        onClick={onCancel}
+        disabled={saving}
+        className="border-border hover:bg-accent rounded-md border px-4 py-2 text-sm font-semibold disabled:opacity-60"
+      >
+        Cancel
+      </button>
       <button
         type="button"
         onClick={onSave}
