@@ -359,13 +359,16 @@ export function OwnerSettingsPage() {
         </CardContent>
       </Card>
 
-      <div className="sticky bottom-0 flex justify-end gap-2 border-t bg-background/95 py-3 backdrop-blur">
+      <div className="sticky bottom-0 flex items-center justify-end gap-2 border-t bg-background/95 py-3 backdrop-blur">
+        {isDirty && (
+          <span className="mr-auto text-xs text-muted-foreground">Unsaved changes</span>
+        )}
         <Button variant="outline" onClick={() => navigate({ to: "/owner/welcome" })}>
           Back
         </Button>
         <Button
           onClick={() => save.mutate()}
-          disabled={save.isPending || uploading !== null || !form.name.trim()}
+          disabled={save.isPending || uploading !== null || !form.name.trim() || !isDirty}
         >
           {save.isPending ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -375,6 +378,38 @@ export function OwnerSettingsPage() {
           Save changes
         </Button>
       </div>
+
+      <AlertDialog
+        open={blocker.status === "blocked"}
+        onOpenChange={(open) => {
+          if (!open && blocker.status === "blocked") blocker.reset();
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Discard unsaved changes?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Aapne kuch changes save nahi kiye. Yahan se jaane par wo lost ho jaayenge.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => {
+                if (blocker.status === "blocked") blocker.reset();
+              }}
+            >
+              Stay on page
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (blocker.status === "blocked") blocker.proceed();
+              }}
+            >
+              Discard & leave
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
