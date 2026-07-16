@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Bell,
   CreditCard,
@@ -6,6 +6,7 @@ import {
   Globe2,
   Home,
   Link2,
+  Loader2,
   Lock,
   LogOut,
   Mail,
@@ -71,101 +72,95 @@ export function AccountSettingsPage() {
     }
   };
 
-
   return (
     <>
-    <div className="bg-background min-h-screen">
-
-      <div className="mx-auto max-w-6xl px-4 py-8 md:px-6 md:py-10">
-        <header className="mb-6">
-          <div className="mb-3 flex flex-wrap items-center gap-2">
-            <BackButton />
-            <Button asChild variant="outline" size="sm" className="gap-1.5">
-              <Link to="/dashboard">
-                <Home className="h-4 w-4" /> Home
-              </Link>
-            </Button>
-          </div>
-          <h1 className="text-heading text-3xl font-black md:text-4xl">Account settings</h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Manage your profile, security, payments and preferences.
-          </p>
-        </header>
-
-        {/* Mobile scroll tabs */}
-        <nav className="-mx-4 mb-5 overflow-x-auto px-4 md:hidden">
-          <div className="flex gap-2">
-            {SECTIONS.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => setActive(s.id)}
-                className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold transition ${
-                  active === s.id
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground hover:bg-muted/70"
-                }`}
-              >
-                {s.label}
-              </button>
-            ))}
-          </div>
-        </nav>
-
-        <div className="grid gap-6 md:grid-cols-[240px_1fr]">
-          {/* Desktop sidebar */}
-          <aside className="hidden md:block">
-            <nav className="bg-card border-border sticky top-6 space-y-1 rounded-[var(--radius-card-lg)] border p-2">
-              {SECTIONS.map((s) => {
-                const Icon = s.icon;
-                const isActive = active === s.id;
-                return (
-                  <button
-                    key={s.id}
-                    onClick={() => setActive(s.id)}
-                    className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm font-semibold transition ${
-                      isActive
-                        ? "bg-primary/10 text-primary"
-                        : "text-foreground hover:bg-accent"
-                    }`}
-                  >
-                    <Icon className="h-4 w-4" />
-                    {s.label}
-                  </button>
-                );
-              })}
-
-              <div className="border-border my-2 border-t" />
-
-              <button
-                onClick={() => setLogoutOpen(true)}
-                className="text-foreground hover:bg-destructive/5 hover:text-destructive flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm font-semibold transition"
-              >
-                <LogOut className="h-4 w-4" />
-                Logout
-              </button>
-            </nav>
-          </aside>
-
-          <div className="min-w-0">
-            <ActiveComp />
-
-            {/* Mobile logout */}
-            <div className="mt-6 md:hidden">
-              <Button
-                variant="outline"
-                onClick={() => setLogoutOpen(true)}
-                className="hover:border-destructive/40 hover:text-destructive w-full gap-2"
-              >
-                <LogOut className="h-4 w-4" />
-                Logout
+      <div className="bg-background min-h-screen">
+        <div className="mx-auto max-w-6xl px-4 py-8 md:px-6 md:py-10">
+          <header className="mb-6">
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              <BackButton />
+              <Button asChild variant="outline" size="sm" className="gap-1.5">
+                <Link to="/dashboard">
+                  <Home className="h-4 w-4" /> Home
+                </Link>
               </Button>
+            </div>
+            <h1 className="text-heading text-3xl font-black md:text-4xl">Account settings</h1>
+            <p className="text-muted-foreground mt-1 text-sm">
+              Manage your profile, security, payments and preferences.
+            </p>
+          </header>
+
+          {/* Mobile scroll tabs */}
+          <nav className="-mx-4 mb-5 overflow-x-auto px-4 md:hidden">
+            <div className="flex gap-2">
+              {SECTIONS.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => setActive(s.id)}
+                  className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold transition ${
+                    active === s.id
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground hover:bg-muted/70"
+                  }`}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </nav>
+
+          <div className="grid gap-6 md:grid-cols-[240px_1fr]">
+            {/* Desktop sidebar */}
+            <aside className="hidden md:block">
+              <nav className="bg-card border-border sticky top-6 space-y-1 rounded-[var(--radius-card-lg)] border p-2">
+                {SECTIONS.map((s) => {
+                  const Icon = s.icon;
+                  const isActive = active === s.id;
+                  return (
+                    <button
+                      key={s.id}
+                      onClick={() => setActive(s.id)}
+                      className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm font-semibold transition ${
+                        isActive ? "bg-primary/10 text-primary" : "text-foreground hover:bg-accent"
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {s.label}
+                    </button>
+                  );
+                })}
+
+                <div className="border-border my-2 border-t" />
+
+                <button
+                  onClick={() => setLogoutOpen(true)}
+                  className="text-foreground hover:bg-destructive/5 hover:text-destructive flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm font-semibold transition"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </button>
+              </nav>
+            </aside>
+
+            <div className="min-w-0">
+              <ActiveComp />
+
+              {/* Mobile logout */}
+              <div className="mt-6 md:hidden">
+                <Button
+                  variant="outline"
+                  onClick={() => setLogoutOpen(true)}
+                  className="hover:border-destructive/40 hover:text-destructive w-full gap-2"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-
-
 
       <AlertDialog open={logoutOpen} onOpenChange={setLogoutOpen}>
         <AlertDialogContent>
@@ -187,25 +182,97 @@ export function AccountSettingsPage() {
   );
 }
 
-
-
 function ProfilePreviewPanel() {
+  const user = useAuthStore((s) => s.user);
+  const profile = useAuthStore((s) => s.profile);
+  const authLoading = useAuthStore((s) => s.isLoading);
+  const refreshProfile = useAuthStore((s) => s.refreshProfile);
+  const [refreshing, setRefreshing] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+
+    setRefreshing(true);
+    setLoadError(null);
+    refreshProfile()
+      .catch(() => {
+        if (!cancelled) setLoadError("Latest profile could not be loaded. Showing saved details.");
+      })
+      .finally(() => {
+        if (!cancelled) setRefreshing(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [refreshProfile, user]);
+
+  const displayName =
+    profile?.full_name?.trim() ||
+    profile?.username?.trim() ||
+    user?.user_metadata?.full_name?.trim() ||
+    user?.email?.split("@")[0] ||
+    "Nexora member";
+  const username = profile?.username?.trim();
+  const location = useMemo(
+    () =>
+      [profile?.district || profile?.city, profile?.state, profile?.country || "India"]
+        .filter(Boolean)
+        .filter((value, index, values) => values.indexOf(value) === index)
+        .join(", "),
+    [profile?.city, profile?.country, profile?.district, profile?.state],
+  );
+  const initials =
+    displayName
+      .split(/\s+/)
+      .map((part) => part[0])
+      .filter(Boolean)
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() || "U";
+  const isLoading = authLoading || (refreshing && !profile);
+
   return (
     <section className="bg-card border-border rounded-[var(--radius-card-lg)] border p-6">
       <h2 className="text-heading text-xl font-black">Profile preview</h2>
       <p className="text-muted-foreground mt-1 text-sm">This is how others see you on Nexora.</p>
-      <div className="border-border bg-background mt-5 flex items-center gap-4 rounded-xl border p-4">
-        <div className="bg-primary/15 text-primary grid h-16 w-16 place-items-center rounded-full text-xl font-black">
-          AS
+      {isLoading ? (
+        <div className="border-border bg-background text-muted-foreground mt-5 flex min-h-24 items-center justify-center gap-2 rounded-xl border p-4 text-sm">
+          <Loader2 className="h-4 w-4 animate-spin" /> Loading your profile...
         </div>
-        <div>
-          <p className="text-heading text-lg font-black">Aarav Sharma</p>
-          <p className="text-muted-foreground text-sm">@aarav.sharma · Bengaluru, IN</p>
-          <p className="text-muted-foreground mt-1 text-xs">
-            Gold member · 24 bookings · 8 reviews
-          </p>
+      ) : !user ? (
+        <div className="border-border bg-background text-muted-foreground mt-5 rounded-xl border p-4 text-sm">
+          Sign in to see your profile preview.
         </div>
-      </div>
+      ) : (
+        <div className="border-border bg-background mt-5 flex items-center gap-4 rounded-xl border p-4">
+          {profile?.avatar_url ? (
+            <img
+              src={profile.avatar_url}
+              alt={`${displayName} profile`}
+              className="h-16 w-16 shrink-0 rounded-full object-cover ring-2 ring-primary/20"
+            />
+          ) : (
+            <div className="bg-primary/15 text-primary grid h-16 w-16 shrink-0 place-items-center rounded-full text-xl font-black">
+              {initials}
+            </div>
+          )}
+          <div className="min-w-0">
+            <p className="text-heading truncate text-lg font-black">{displayName}</p>
+            <p className="text-muted-foreground truncate text-sm">
+              {username ? `@${username}` : "Username not added"}
+              {location ? ` · ${location}` : ""}
+            </p>
+            <p className="text-muted-foreground mt-1 text-xs">
+              {profile?.is_verified ? "Verified profile" : "Nexora member"}
+              {profile?.nexora_id ? ` · ID ${profile.nexora_id}` : ""}
+            </p>
+          </div>
+        </div>
+      )}
+      {loadError ? <p className="text-destructive mt-2 text-xs">{loadError}</p> : null}
     </section>
   );
 }
