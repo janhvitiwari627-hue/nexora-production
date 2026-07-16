@@ -124,23 +124,42 @@ export function OwnerSettingsPage() {
     return (Object.keys(form) as (keyof Form)[]).some((k) => form[k] !== baseline[k]);
   }, [form, baseline]);
 
-  // Warn on browser close / refresh / external nav
-  useEffect(() => {
-    if (!isDirty) return;
-    const handler = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      e.returnValue = "";
-    };
-    window.addEventListener("beforeunload", handler);
-    return () => window.removeEventListener("beforeunload", handler);
-  }, [isDirty]);
-
-  // Intercept in-app navigation
+  // Intercept ALL in-app router navigation (Link, useNavigate, router.navigate,
+  // browser back/forward). This covers header/sidebar/breadcrumbs uniformly
+  // as long as they use TanStack Router.
   const blocker = useBlocker({
     shouldBlockFn: () => isDirty && !uploading,
     withResolver: true,
-    enableBeforeUnload: false,
+    // Also warn on browser refresh / tab close / external nav.
+    enableBeforeUnload: () => isDirty && !uploading,
   });
+
+  // Safety net: raw <a href="…"> anchors bypass the router. Catch same-origin
+  // link clicks in capture phase and route them through the blocker.
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
+  useEffect(() => {
+    if (!isDirty || uploading) return;
+    const onClick = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const anchor = (e.target as HTMLElement | null)?.closest?.("a[href]") as
+        | HTMLAnchorElement
+        | null;
+      if (!anchor) return;
+      const href = anchor.getAttribute("href");
+      if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:")) return;
+      if (anchor.target && anchor.target !== "" && anchor.target !== "_self") return;
+      const url = new URL(anchor.href, window.location.href);
+      if (url.origin !== window.location.origin) return;
+      if (url.pathname === window.location.pathname && url.search === window.location.search) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setPendingHref(url.pathname + url.search + url.hash);
+    };
+    document.addEventListener("click", onClick, true);
+    return () => document.removeEventListener("click", onClick, true);
+  }, [isDirty, uploading]);
+
 
   const set = <K extends keyof Form>(k: K, v: Form[K]) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -380,9 +399,11 @@ export function OwnerSettingsPage() {
       </div>
 
       <AlertDialog
-        open={blocker.status === "blocked"}
+        open={blocker.status === "blocked" || pendingHref !== null}
         onOpenChange={(open) => {
-          if (!open && blocker.status === "blocked") blocker.reset();
+          if (open) return;
+          if (blocker.status === "blocked") blocker.reset();
+          setPendingHref(null);
         }}
       >
         <AlertDialogContent>
@@ -396,13 +417,22 @@ export function OwnerSettingsPage() {
             <AlertDialogCancel
               onClick={() => {
                 if (blocker.status === "blocked") blocker.reset();
+                setPendingHref(null);
               }}
             >
               Stay on page
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
-                if (blocker.status === "blocked") blocker.proceed();
+                if (blocker.status === "blocked") {
+                  blocker.proceed();
+                } else if (pendingHref) {
+                  const href = pendingHref;
+                  setBaseline(form); // clear dirty so navigate won't re-block
+                  setPendingHref(null);
+                  // Use the router so back button works and no full reload.
+                  navigate({ to: href });
+                }
               }}
             >
               Discard & leave
