@@ -740,25 +740,62 @@ function RecentReviewsWidget() {
 
 function QuickActionsRow() {
   const navigate = useNavigate();
-  const handleShare = async () => {
-    const url = `${window.location.origin}/owner/website`;
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: "My Salon Website", url });
-      } else {
-        await navigator.clipboard.writeText(url);
-      }
-    } catch {
-      /* user cancelled */
+  const user = useAuthStore((s) => s.user);
+  const roles = useAuthStore((s) => s.roles);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
+  const isOwner = roles.includes("owner" as any);
+
+  const requireOwner = (label: string, go: () => void) => {
+    if (!isInitialized) {
+      toast.info("Loading your account…");
+      return;
     }
+    if (!user) {
+      toast.error("Please sign in to continue", {
+        description: `Sign in as a shop owner to use "${label}".`,
+        action: {
+          label: "Sign in",
+          onClick: () =>
+            navigate({ to: "/login", search: { redirect: "/owner/dashboard" } as any }),
+        },
+      });
+      return;
+    }
+    if (!isOwner) {
+      toast.error("Owner access required", {
+        description: `"${label}" is only available for shop owner accounts.`,
+        action: {
+          label: "Become an owner",
+          onClick: () => navigate({ to: "/owner-signup" as any }),
+        },
+      });
+      return;
+    }
+    go();
   };
+
+  const handleShare = () =>
+    requireOwner("Share Website", async () => {
+      const url = `${window.location.origin}/owner/website`;
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: "My Salon Website", url });
+        } else {
+          await navigator.clipboard.writeText(url);
+          toast.success("Website link copied to clipboard");
+        }
+      } catch {
+        /* user cancelled */
+      }
+    });
+
   const actions: { icon: typeof Plus; label: string; onClick: () => void }[] = [
-    { icon: Plus, label: "Add Service", onClick: () => navigate({ to: "/owner/services" }) },
-    { icon: UserPlus, label: "Add Staff", onClick: () => navigate({ to: "/owner/staff" }) },
-    { icon: Tag, label: "Create Offer", onClick: () => navigate({ to: "/owner/marketing" }) },
+    { icon: Plus, label: "Add Service", onClick: () => requireOwner("Add Service", () => navigate({ to: "/owner/services" })) },
+    { icon: UserPlus, label: "Add Staff", onClick: () => requireOwner("Add Staff", () => navigate({ to: "/owner/staff" })) },
+    { icon: Tag, label: "Create Offer", onClick: () => requireOwner("Create Offer", () => navigate({ to: "/owner/marketing" })) },
     { icon: Share2, label: "Share Website", onClick: handleShare },
-    { icon: QrCode, label: "Generate QR", onClick: () => navigate({ to: "/owner/website" }) },
-    { icon: BarChart3, label: "View Analytics", onClick: () => navigate({ to: "/owner/analytics" }) },
+    { icon: QrCode, label: "Generate QR", onClick: () => requireOwner("Generate QR", () => navigate({ to: "/owner/website" })) },
+    { icon: BarChart3, label: "View Analytics", onClick: () => requireOwner("View Analytics", () => navigate({ to: "/owner/analytics" })) },
   ];
   return (
     <Card className="p-4">
