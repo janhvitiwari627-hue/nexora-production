@@ -7,22 +7,6 @@
 //
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
-// Lovable Cloud provides these values as managed server environment variables.
-// Mirror only the public URL and publishable key into Vite's client build so an
-// imported GitHub project works without committing a .env file. Never mirror a
-// service-role key or any other backend secret here.
-const managedCloudPublicEnv = Object.fromEntries(
-  [
-    ["import.meta.env.VITE_SUPABASE_URL", process.env.VITE_SUPABASE_URL ?? process.env.SUPABASE_URL],
-    [
-      "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY",
-      process.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? process.env.SUPABASE_PUBLISHABLE_KEY,
-    ],
-  ]
-    .filter((entry): entry is [string, string] => Boolean(entry[1]))
-    .map(([name, value]) => [name, JSON.stringify(value)]),
-);
-
 export default defineConfig({
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
@@ -30,7 +14,6 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
-    define: managedCloudPublicEnv,
     // Background: `@tanstack/react-store` imports the *named* export
     //   `useSyncExternalStoreWithSelector` from `use-sync-external-store/shim/with-selector`.
     // The shim file is CJS (`module.exports = require(...)`), so when Vite serves it
