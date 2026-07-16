@@ -103,7 +103,7 @@ export function RoleAppLandingPage({
           </div>
         </section>
       </main>
-      <PublicFooter />
+      {!hideFooter && <PublicFooter />}
     </div>
   );
 }
