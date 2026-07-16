@@ -37,6 +37,25 @@ export function WhiteLabelWebsitePage({
     queryFn: () => (_slug ? getSalonBySlug({ data: { slug: _slug } }) : Promise.resolve(null)),
     enabled: !!_slug,
   });
+  const queryClient = useQueryClient();
+  const salonId = data?.salon?.id;
+
+  // Live refresh: when the salon row (or its services) changes in the DB,
+  // re-fetch so /site/<slug> reflects owner edits from /owner/settings instantly.
+  useEffect(() => {
+    if (!_slug || !salonId) return;
+    const invalidate = () =>
+      queryClient.invalidateQueries({ queryKey: ["white-label-site", _slug] });
+    const channel = supabase
+      .channel(`site-${salonId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "salons", filter: `id=eq.${salonId}` }, invalidate)
+      .on("postgres_changes", { event: "*", schema: "public", table: "services", filter: `salon_id=eq.${salonId}` }, invalidate)
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [_slug, salonId, queryClient]);
+
   const navigate = useNavigateSafe();
 
   const browserSearch =
