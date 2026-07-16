@@ -393,9 +393,10 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
       </div>
 
       {/* Mobile secondary row: location chip (always visible on very small screens) */}
-      <div className="mx-auto flex max-w-7xl items-center gap-2 px-3 pb-2 md:hidden">
-        <LocationChip className="inline-flex" />
+      <div className="mx-auto flex max-w-7xl items-center gap-2 pb-2 px-[max(env(safe-area-inset-left),0.75rem)] pr-[max(env(safe-area-inset-right),0.75rem)] md:hidden">
+        <LocationChip className="inline-flex min-w-0 max-w-full" />
       </div>
+
 
 
       <MobileMenuOverlay open={menuOpen} onClose={() => setMenuOpen(false)} />
