@@ -11,6 +11,7 @@ import {
 import { getPublicAppointmentReceipt } from "@/lib/public-booking";
 import { salonBySlugQueryOptions } from "@/lib/salons.queries";
 import { buildIcs, downloadIcs } from "@/lib/ics";
+import { SalonNotFound } from "@/pages/public/site/SalonNotFound";
 
 export const Route = createFileRoute("/site/$slug_/booking-success")({
   validateSearch: (search: Record<string, unknown>) => ({
