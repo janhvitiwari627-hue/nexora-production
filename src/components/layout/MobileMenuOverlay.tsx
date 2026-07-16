@@ -161,12 +161,14 @@ export function MobileMenuOverlay({
                 </span>
               </div>
               <button
+                ref={closeBtnRef}
                 onClick={onClose}
                 aria-label="Close menu"
-                className="hover:bg-muted text-muted-foreground grid h-9 w-9 place-items-center rounded-full transition"
+                className="hover:bg-muted text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary grid h-11 w-11 place-items-center rounded-full transition"
               >
                 <X className="h-5 w-5" />
               </button>
+
             </div>
 
             <nav className="flex-1 overflow-y-auto px-3 py-4">
