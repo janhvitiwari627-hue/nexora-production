@@ -771,10 +771,18 @@ export function OwnerWebsitePage() {
       </Card>
 
       {/* Theme preview hint + save bar */}
-      <div className="sticky bottom-0 -mx-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-t bg-background/95 px-3 py-3 backdrop-blur sm:-mx-4 sm:px-4">
+      <div className="sticky bottom-0 -mx-3 grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 border-t bg-background/95 px-3 py-3 backdrop-blur sm:-mx-4 sm:gap-3 sm:px-4">
         <div className="text-muted-foreground min-w-0 text-xs">
-          Simple salon template · Unsaved changes are not visible to customers yet.
+          Unsaved changes preview live rahenge — customers ko save ke baad hi dikhenge.
         </div>
+        <Button
+          variant="outline"
+          onClick={() => setPreview(true)}
+          disabled={!previewUrl}
+          className="border-primary/40 text-primary"
+        >
+          <Zap className="h-4 w-4" /> Edit & Live
+        </Button>
         <Button onClick={handleSave} disabled={mutate.isPending}>
           {mutate.isPending ? (
             <Loader2 className="h-4 w-4 animate-spin" />
