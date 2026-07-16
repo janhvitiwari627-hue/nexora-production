@@ -19,6 +19,7 @@
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "test:rls": "node scripts/test-rls.mjs",
+    "test:rls:static": "node scripts/audit-rls-migrations.mjs",
     "test:rls:local": "bash scripts/run-rls-local.sh"
   },
   "dependencies": {

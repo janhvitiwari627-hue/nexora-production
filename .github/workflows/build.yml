@@ -16,6 +16,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install ripgrep
+        run: sudo apt-get update && sudo apt-get install -y ripgrep
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
@@ -102,4 +105,5 @@ jobs:
           path: build-logs/
           retention-days: 14
           if-no-files-found: warn
+
 
