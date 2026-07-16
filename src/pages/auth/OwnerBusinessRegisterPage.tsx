@@ -341,6 +341,40 @@ export default function OwnerBusinessRegisterPage() {
               </div>
 
               <div className="space-y-1.5">
+                <Label htmlFor="whatsapp">WhatsApp (optional)</Label>
+                <Input
+                  id="whatsapp"
+                  type="tel"
+                  placeholder="Same as mobile if empty"
+                  value={form.whatsapp}
+                  onChange={update("whatsapp")}
+                  disabled={submitting}
+                />
+                {errors.whatsapp && <p className="text-xs text-destructive">{errors.whatsapp}</p>}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="category">Category *</Label>
+                <Select
+                  value={form.category}
+                  onValueChange={(v) => updateField("category", v)}
+                  disabled={submitting}
+                >
+                  <SelectTrigger id="category">
+                    <SelectValue placeholder="Choose a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CATEGORIES.map((c) => (
+                      <SelectItem key={c} value={c}>
+                        {c}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.category && <p className="text-xs text-destructive">{errors.category}</p>}
+              </div>
+
+              <div className="space-y-1.5">
                 <Label htmlFor="email">Email *</Label>
                 <Input
                   id="email"
@@ -352,6 +386,20 @@ export default function OwnerBusinessRegisterPage() {
                 />
                 {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
               </div>
+
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label htmlFor="address">Shop address (optional)</Label>
+                <Textarea
+                  id="address"
+                  rows={2}
+                  placeholder="Street, area, landmark"
+                  value={form.address}
+                  onChange={update("address")}
+                  disabled={submitting}
+                />
+                {errors.address && <p className="text-xs text-destructive">{errors.address}</p>}
+              </div>
+
 
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="password">Password *</Label>
