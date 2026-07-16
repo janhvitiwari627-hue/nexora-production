@@ -76,7 +76,10 @@ function PublishedBookingPage() {
   const advance = Math.round(total * 25) / 100;
   const remaining = Math.round((total - advance) * 100) / 100;
 
-  if (!data?.salon) return <PublishedSiteUnavailable />;
+  // Demo/template previews use mock slugs that don't exist in Supabase.
+  // Fall back to the mock BookingFlowPage instead of a dead-end error so
+  // the "Start Booking" CTA in the white-label template preview still works.
+  if (!data?.salon) return <BookingFlowPage />;
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
