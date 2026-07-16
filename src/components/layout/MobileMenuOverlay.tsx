@@ -199,7 +199,7 @@ export function MobileMenuOverlay({
               </ul>
             </nav>
 
-            <div className="border-border bg-card flex flex-col gap-2 border-t p-4">
+            <div className="border-border bg-card flex flex-col gap-2 border-t p-3 sm:p-4">
               {!authResolved ? (
                 <>
                   <Skeleton className="h-11 w-full rounded-md" />
