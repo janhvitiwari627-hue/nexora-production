@@ -8,6 +8,7 @@ import { sendBookingConfirmationEmail } from "@/lib/booking-email.functions";
 import { PublishedSiteShell } from "@/pages/public/site/PublishedSiteShell";
 
 import { SalonNotFound } from "@/pages/public/site/SalonNotFound";
+import { isBookingMockDisabled } from "@/lib/mock-booking-availability";
 
 const TIMES = [
   "10:00",
@@ -30,6 +31,10 @@ const TIMES = [
 export const Route = createFileRoute("/site/$slug_/book")({
   validateSearch: (search: Record<string, unknown>) => ({
     service: typeof search.service === "string" ? search.service : undefined,
+    booking:
+      search.booking === "on" || search.booking === "off"
+        ? (search.booking as "on" | "off")
+        : undefined,
   }),
   loader: ({ context, params }) => {
     if (!params.slug || params.slug === "undefined" || params.slug === "null") {
