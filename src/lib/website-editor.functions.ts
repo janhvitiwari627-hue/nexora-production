@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import type { Json } from "@/integrations/supabase/types";
 
 // ---- Types shared with UI ----
 export type SectionType =
@@ -20,7 +21,7 @@ export type WebsiteSection = {
   id: string;
   website_id: string;
   section_type: SectionType;
-  content: Record<string, unknown>;
+  content: Json;
   sort_order: number;
   is_visible: boolean;
 };
@@ -35,7 +36,7 @@ export type WebsiteTheme = {
   heading_font: string;
   body_font: string;
   button_style: string;
-  extras: Record<string, unknown>;
+  extras: Json;
 };
 
 // ---- Get or create the user's website for a salon ----
