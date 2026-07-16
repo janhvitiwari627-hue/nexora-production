@@ -38,8 +38,17 @@ const schema = z.object({
     .trim()
     .transform((v) => v.replace(/[\s-]/g, ""))
     .pipe(z.string().regex(mobileRe, "Enter a valid 10-digit mobile")),
+  whatsapp: z
+    .string()
+    .trim()
+    .transform((v) => v.replace(/[\s-]/g, ""))
+    .refine((v) => v === "" || mobileRe.test(v), "Enter a valid 10-digit WhatsApp number")
+    .optional()
+    .or(z.literal("")),
   district: z.string().trim().min(2, "District is required").max(80),
   shop_name: z.string().trim().min(2, "Shop name is required").max(120),
+  category: z.string().trim().min(1, "Select a category").max(80),
+  address: z.string().trim().max(500).optional().or(z.literal("")),
   email: z.string().trim().email("Invalid email").max(255),
   password: z.string().min(8, "Min 8 characters").max(72),
 });
@@ -47,8 +56,11 @@ const schema = z.object({
 type FormState = {
   owner_name: string;
   mobile: string;
+  whatsapp: string;
   district: string;
   shop_name: string;
+  category: string;
+  address: string;
   email: string;
   password: string;
 };
