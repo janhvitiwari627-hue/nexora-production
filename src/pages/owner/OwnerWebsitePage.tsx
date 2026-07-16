@@ -87,11 +87,24 @@ type Patch = {
   selected_template_key?: TemplateKey;
 };
 
+type ServiceDraft = {
+  id?: string;
+  name: string;
+  price: number;
+  duration_minutes: number;
+  description: string;
+  image_url: string;
+  category: string;
+};
+
 export function OwnerWebsitePage() {
   const { activeSalon, activeSalonId, hasSalon, isLoading: ctxLoading } = useOwnerContext();
   const qc = useQueryClient();
   const { data: salon, isLoading } = useQuery(ownerSalonFullQuery(activeSalonId ?? ""));
+  const { data: servicesData } = useQuery(ownerServicesQuery(activeSalonId ?? ""));
   const update = useServerFn(updateOwnerSalon);
+  const upsertSvc = useServerFn(upsertOwnerService);
+  const deleteSvc = useServerFn(deleteOwnerService);
   const [autosaveState, setAutosaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const mutate = useMutation({
     mutationFn: (patch: Patch) => update({ data: { salon_id: activeSalonId!, patch } }),
