@@ -113,9 +113,12 @@ export function OwnerWebsitePage() {
   const qc = useQueryClient();
   const { data: salon, isLoading } = useQuery(ownerSalonFullQuery(activeSalonId ?? ""));
   const { data: servicesData } = useQuery(ownerServicesQuery(activeSalonId ?? ""));
+  const { data: staffData } = useQuery(ownerStaffQuery(activeSalonId ?? ""));
   const update = useServerFn(updateOwnerSalon);
   const upsertSvc = useServerFn(upsertOwnerService);
   const deleteSvc = useServerFn(deleteOwnerService);
+  const upsertStaffFn = useServerFn(upsertOwnerStaff);
+  const deleteStaffFn = useServerFn(deleteOwnerStaff);
   const [autosaveState, setAutosaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const mutate = useMutation({
     mutationFn: (patch: Patch) => update({ data: { salon_id: activeSalonId!, patch } }),
