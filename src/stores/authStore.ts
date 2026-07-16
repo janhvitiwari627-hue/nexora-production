@@ -28,24 +28,17 @@ interface AuthStore {
 }
 
 async function loadProfileAndRoles(userId: string) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 8_000);
   const [profileResult, rolesResult] = await Promise.all([
-    supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userId)
-      .maybeSingle()
-      .abortSignal(controller.signal),
-    supabase.from("user_roles").select("role").eq("user_id", userId).abortSignal(controller.signal),
-  ]).finally(() => clearTimeout(timeout));
+    supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
+    supabase.from("user_roles").select("role").eq("user_id", userId),
+  ]);
 
   if (profileResult.error) throw profileResult.error;
   if (rolesResult.error) throw rolesResult.error;
 
   const profile = profileResult.data;
   const roleRows = rolesResult.data;
-  const roles = (roleRows ?? []).map((r) => r.role as UserRole);
+  const roles = (roleRows ?? []).map((r: { role: UserRole }) => r.role as UserRole);
   return { profile: profile ?? null, roles };
 }
 

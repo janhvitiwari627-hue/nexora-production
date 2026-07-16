@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
-export type Salon = Database["public"]["Views"]["public_salon_cards"]["Row"];
+export type Salon = Database["public"]["Tables"]["public_salon_cards"]["Row"];
 export type NewSalon = Database["public"]["Tables"]["salons"]["Insert"];
 
 export async function listSalons(): Promise<Salon[]> {
