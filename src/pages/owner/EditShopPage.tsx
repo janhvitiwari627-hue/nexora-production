@@ -3,7 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Loader2, Save } from "lucide-react";
+import { ImagePlus, Loader2, Save, Trash2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useOwnerContext } from "@/hooks/use-owner-context";
+import { supabase } from "@/integrations/supabase/client";
 import { getOwnerSalonFull, updateOwnerSalon } from "@/lib/owner.functions";
 
 const CATEGORIES = [
@@ -83,6 +84,7 @@ export function EditShopPage() {
   });
 
   const [form, setForm] = useState<Form>(EMPTY);
+  const [uploading, setUploading] = useState<"logo" | "cover" | null>(null);
 
   useEffect(() => {
     if (!salon) return;
@@ -107,6 +109,43 @@ export function EditShopPage() {
   }, [salon]);
 
   const set = <K extends keyof Form>(k: K, v: Form[K]) => setForm((p) => ({ ...p, [k]: v }));
+
+  const uploadImage = async (file: File, kind: "logo" | "cover") => {
+    if (!activeSalonId) {
+      toast.error("No active shop");
+      return;
+    }
+
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      toast.error("Please choose a JPG, PNG or WebP image");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Image must be 2MB or smaller");
+      return;
+    }
+
+    setUploading(kind);
+    try {
+      const extension =
+        file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
+      const path = `${activeSalonId}/${kind}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
+      const { error } = await supabase.storage.from("salon-media").upload(path, file, {
+        cacheControl: "3600",
+        contentType: file.type,
+        upsert: false,
+      });
+      if (error) throw error;
+
+      const { data } = supabase.storage.from("salon-media").getPublicUrl(path);
+      set(kind === "logo" ? "logo_url" : "cover_image_url", data.publicUrl);
+      toast.success(`${kind === "logo" ? "Logo" : "Cover image"} uploaded. Save changes to apply.`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Image upload failed");
+    } finally {
+      setUploading(null);
+    }
+  };
 
   const save = useMutation({
     mutationFn: async () => {
@@ -204,11 +243,7 @@ export function EditShopPage() {
           </Field>
 
           <Field label="Email">
-            <Input
-              type="email"
-              value={form.email}
-              onChange={(e) => set("email", e.target.value)}
-            />
+            <Input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} />
           </Field>
 
           <Field label="UPI ID">
@@ -239,21 +274,35 @@ export function EditShopPage() {
             <Input value={form.pincode} onChange={(e) => set("pincode", e.target.value)} />
           </Field>
 
-          <Field label="Logo URL" className="md:col-span-2">
+          <ImageUploadField
+            label="Logo"
+            value={form.logo_url}
+            uploading={uploading === "logo"}
+            previewClassName="h-24 w-24 rounded-xl object-cover"
+            onUpload={(file) => uploadImage(file, "logo")}
+            onRemove={() => set("logo_url", "")}
+          >
             <Input
               value={form.logo_url}
               onChange={(e) => set("logo_url", e.target.value)}
               placeholder="https://…"
             />
-          </Field>
+          </ImageUploadField>
 
-          <Field label="Cover Image URL" className="md:col-span-2">
+          <ImageUploadField
+            label="Cover Image"
+            value={form.cover_image_url}
+            uploading={uploading === "cover"}
+            previewClassName="h-32 w-full rounded-xl object-cover"
+            onUpload={(file) => uploadImage(file, "cover")}
+            onRemove={() => set("cover_image_url", "")}
+          >
             <Input
               value={form.cover_image_url}
               onChange={(e) => set("cover_image_url", e.target.value)}
               placeholder="https://…"
             />
-          </Field>
+          </ImageUploadField>
         </CardContent>
       </Card>
 
@@ -263,7 +312,7 @@ export function EditShopPage() {
         </Button>
         <Button
           onClick={() => save.mutate()}
-          disabled={save.isPending || !form.name.trim()}
+          disabled={save.isPending || uploading !== null || !form.name.trim()}
         >
           {save.isPending ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -274,6 +323,69 @@ export function EditShopPage() {
         </Button>
       </div>
     </div>
+  );
+}
+
+function ImageUploadField({
+  label,
+  value,
+  uploading,
+  previewClassName,
+  onUpload,
+  onRemove,
+  children,
+}: {
+  label: string;
+  value: string;
+  uploading: boolean;
+  previewClassName: string;
+  onUpload: (file: File) => void;
+  onRemove: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <Field label={`${label} URL`} className="md:col-span-2">
+      <div className="space-y-3">
+        {value && (
+          <div className="overflow-hidden rounded-xl border border-border bg-muted/30 p-2">
+            <img src={value} alt={`${label} preview`} className={previewClassName} />
+          </div>
+        )}
+        {children}
+        <div className="flex flex-wrap items-center gap-2">
+          <label
+            className={`inline-flex h-10 cursor-pointer items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm transition hover:bg-primary/90 ${
+              uploading ? "pointer-events-none opacity-60" : ""
+            }`}
+          >
+            {uploading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <ImagePlus className="mr-2 h-4 w-4" />
+            )}
+            {uploading ? "Uploading…" : `Upload ${label}`}
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="sr-only"
+              disabled={uploading}
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) onUpload(file);
+                event.target.value = "";
+              }}
+            />
+          </label>
+          {value && (
+            <Button type="button" variant="outline" onClick={onRemove} disabled={uploading}>
+              <Trash2 className="mr-2 h-4 w-4" />
+              Remove
+            </Button>
+          )}
+          <span className="text-xs text-muted-foreground">JPG, PNG or WebP · maximum 2MB</span>
+        </div>
+      </div>
+    </Field>
   );
 }
 
