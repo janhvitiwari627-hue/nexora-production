@@ -229,7 +229,7 @@ export function WhiteLabelWebsitePage({
     : liveOverrides && isPreview
       ? toLivePreviewShop(fallbackShop, liveOverrides, _slug)
       : fallbackShop;
-  const shop: ShopData =
+  const shopWithServices: ShopData =
     liveOverrides?.services && liveOverrides.services.length >= 0
       ? {
           ...baseShop,
@@ -244,6 +244,22 @@ export function WhiteLabelWebsitePage({
           })),
         }
       : baseShop;
+  const shop: ShopData =
+    liveOverrides?.staff && liveOverrides.staff.length >= 0
+      ? {
+          ...shopWithServices,
+          staff: liveOverrides.staff.map((s, i) => ({
+            id: s.id ?? `draft-staff-${i}`,
+            name: s.name,
+            designation: s.role ?? "Team Member",
+            image: s.avatar_url ?? shopWithServices.coverImage,
+            experience: 3,
+            specialization: s.bio ?? undefined,
+            rating: s.rating ?? undefined,
+            available: true,
+          })),
+        }
+      : shopWithServices;
   const savedTemplateKey =
     data?.salon?.selected_template_key ?? liveOverrides?.selected_template_key ?? "modern-salon";
   const templateKey = normalizeTemplateKey(
