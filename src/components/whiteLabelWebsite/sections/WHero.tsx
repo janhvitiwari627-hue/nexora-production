@@ -59,7 +59,7 @@ export function WHero({ shop, template }: { shop: ShopData; template: TemplateCo
             <div className="blossom-divider max-w-xs" />
             <div className="flex flex-wrap items-center gap-3">
               <Button size="lg" className="rounded-full px-7" style={{ backgroundColor: template.colors.primary, color: "white" }} asChild>
-                <Link to="/book/$slug" params={{ slug: shop.slug }}>Book Beauty Session</Link>
+                <Link to="/site/$slug_/book" params={{ slug_: shop.slug }} search={{ service: undefined }}>Book Beauty Session</Link>
               </Button>
               <ShareButton title={`${shop.name} — ${shop.tagline}`} label="Share Portfolio" />
             </div>
