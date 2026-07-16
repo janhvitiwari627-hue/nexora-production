@@ -30,11 +30,18 @@ export const Route = createFileRoute("/site/$slug_/book")({
   validateSearch: (search: Record<string, unknown>) => ({
     service: typeof search.service === "string" ? search.service : undefined,
   }),
+  beforeLoad: ({ params }) => {
+    // A link that serialized an undefined/null slug shouldn't dead-end the user.
+    if (!params.slug || params.slug === "undefined" || params.slug === "null") {
+      throw redirect({ to: "/" });
+    }
+  },
   loader: ({ context, params }) =>
     context.queryClient.ensureQueryData(salonBySlugQueryOptions(params.slug)),
-  head: ({ params }) => ({
-    meta: [{ title: `Book appointment · ${params.slug} · Nexora` }],
-  }),
+  head: ({ params }) => {
+    const label = params.slug && params.slug !== "undefined" ? params.slug : "salon";
+    return { meta: [{ title: `Book appointment · ${label} · Nexora` }] };
+  },
   component: PublishedBookingPage,
 });
 
