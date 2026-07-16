@@ -36,11 +36,13 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useOwnerContext } from "@/hooks/use-owner-context";
-import { ownerSalonFullQuery, ownerServicesQuery } from "@/lib/owner.queries";
+import { ownerSalonFullQuery, ownerServicesQuery, ownerStaffQuery } from "@/lib/owner.queries";
 import {
   updateOwnerSalon,
   upsertOwnerService,
   deleteOwnerService,
+  upsertOwnerStaff,
+  deleteOwnerStaff,
 } from "@/lib/owner.functions";
 import { supabase } from "@/integrations/supabase/client";
 import {
