@@ -20,7 +20,7 @@ import {
 } from "@/components/whiteLabelWebsite/templates";
 import { getSalonBySlug } from "@/lib/salons.functions";
 import { expandMockBusiness, getMockBusinesses, getMockBusinessBySlug } from "@/lib/mock-businesses";
-import { Paintbrush } from "lucide-react";
+import { Check, Loader2, Paintbrush } from "lucide-react";
 
 const DEFAULT_COVER =
   "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=1600&q=80";
@@ -32,29 +32,40 @@ export function WhiteLabelWebsitePage({
   slug?: string;
   routeSearch?: { t?: string; preview?: 1 };
 }) {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     queryKey: ["white-label-site", _slug],
     queryFn: () => (_slug ? getSalonBySlug({ data: { slug: _slug } }) : Promise.resolve(null)),
     enabled: !!_slug,
   });
   const queryClient = useQueryClient();
   const salonId = data?.salon?.id;
+  const [liveState, setLiveState] = useState<"idle" | "updating" | "updated">("idle");
 
   // Live refresh: when the salon row (or its services) changes in the DB,
   // re-fetch so /site/<slug> reflects owner edits from /owner/settings instantly.
   useEffect(() => {
     if (!_slug || !salonId) return;
-    const invalidate = () =>
+    const onChange = () => {
+      setLiveState("updating");
       queryClient.invalidateQueries({ queryKey: ["white-label-site", _slug] });
+    };
     const channel = supabase
       .channel(`site-${salonId}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "salons", filter: `id=eq.${salonId}` }, invalidate)
-      .on("postgres_changes", { event: "*", schema: "public", table: "services", filter: `salon_id=eq.${salonId}` }, invalidate)
+      .on("postgres_changes", { event: "*", schema: "public", table: "salons", filter: `id=eq.${salonId}` }, onChange)
+      .on("postgres_changes", { event: "*", schema: "public", table: "services", filter: `salon_id=eq.${salonId}` }, onChange)
       .subscribe();
     return () => {
       supabase.removeChannel(channel);
     };
   }, [_slug, salonId, queryClient]);
+
+  // Flip the pill to "Updated" briefly once the refetch settles.
+  useEffect(() => {
+    if (liveState !== "updating" || isFetching) return;
+    setLiveState("updated");
+    const t = setTimeout(() => setLiveState("idle"), 1500);
+    return () => clearTimeout(t);
+  }, [liveState, isFetching]);
 
   const navigate = useNavigateSafe();
 
@@ -183,6 +194,29 @@ export function WhiteLabelWebsitePage({
       </main>
       <WhiteLabelFooter shop={shop} config={config} template={template} />
       <ViralGrowthWidget />
+      {liveState !== "idle" && (
+        <div
+          role="status"
+          aria-live="polite"
+          className={`fixed bottom-4 left-1/2 z-50 -translate-x-1/2 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium shadow-lg backdrop-blur transition-all ${
+            liveState === "updating"
+              ? "bg-slate-900/90 text-white"
+              : "bg-emerald-600/95 text-white"
+          }`}
+        >
+          {liveState === "updating" ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Updating website…
+            </>
+          ) : (
+            <>
+              <Check className="h-4 w-4" />
+              Website updated
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }
