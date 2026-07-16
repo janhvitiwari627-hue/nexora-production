@@ -12,13 +12,14 @@ import {
   type SectionType,
 } from "@/lib/website-editor.functions";
 import { getMyOwnedSalons } from "@/lib/owner.functions";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Loader2, Eye, Globe } from "lucide-react";
+import { Loader2, Eye, Globe, Plus, Trash2, Upload, Image as ImageIcon } from "lucide-react";
 
 const SECTION_LABELS: Record<SectionType, string> = {
   hero: "Hero / Banner",
