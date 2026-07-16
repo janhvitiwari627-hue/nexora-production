@@ -239,13 +239,35 @@ export function WhiteLabelWebsitePage({
           className={`fixed bottom-4 left-1/2 z-50 -translate-x-1/2 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium shadow-lg backdrop-blur transition-all ${
             liveState === "updating"
               ? "bg-slate-900/90 text-white"
-              : "bg-emerald-600/95 text-white"
+              : liveState === "error"
+                ? "bg-red-600/95 text-white"
+                : "bg-emerald-600/95 text-white"
           }`}
         >
           {liveState === "updating" ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
               Updating website…
+            </>
+          ) : liveState === "error" ? (
+            <>
+              <AlertTriangle className="h-4 w-4" />
+              <span>Update failed{liveError ? `: ${liveError}` : ""}</span>
+              <button
+                type="button"
+                onClick={retryLive}
+                className="ml-2 rounded-full bg-white/20 px-3 py-0.5 text-xs font-semibold hover:bg-white/30"
+              >
+                Retry
+              </button>
+              <button
+                type="button"
+                onClick={() => setLiveState("idle")}
+                aria-label="Dismiss"
+                className="ml-1 rounded-full px-2 py-0.5 text-xs font-semibold hover:bg-white/20"
+              >
+                ✕
+              </button>
             </>
           ) : (
             <>
