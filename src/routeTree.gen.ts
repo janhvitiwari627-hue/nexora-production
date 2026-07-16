@@ -30,6 +30,7 @@ import { Route as OwnerRouteImport } from './routes/owner'
 import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as MembershipRulesRouteImport } from './routes/membership-rules'
 import { Route as MembershipRouteImport } from './routes/membership'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as JobsAppRouteImport } from './routes/jobs-app'
 import { Route as HelpRouteImport } from './routes/help'
@@ -144,6 +145,8 @@ import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as PortalDistributorsIndexRouteImport } from './routes/portal.distributors.index'
 import { Route as PortalBrandsIndexRouteImport } from './routes/portal.brands.index'
 import { Route as AppOwnerIndexRouteImport } from './routes/app.owner.index'
@@ -174,6 +177,7 @@ import { Route as AppCustomerSearchRouteImport } from './routes/app.customer.sea
 import { Route as AppCustomerRewardsRouteImport } from './routes/app.customer.rewards'
 import { Route as AppCustomerProfileRouteImport } from './routes/app.customer.profile'
 import { Route as AppCustomerBookingsRouteImport } from './routes/app.customer.bookings'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -286,6 +290,11 @@ const MembershipRulesRoute = MembershipRulesRouteImport.update({
 const MembershipRoute = MembershipRouteImport.update({
   id: '/membership',
   path: '/membership',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -859,6 +868,18 @@ const AdminAdvertisingRoute = AdminAdvertisingRouteImport.update({
   path: '/advertising',
   getParentRoute: () => AdminRoute,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const PortalDistributorsIndexRoute = PortalDistributorsIndexRouteImport.update({
   id: '/portal/distributors/',
   path: '/portal/distributors/',
@@ -1010,6 +1031,12 @@ const AppCustomerBookingsRoute = AppCustomerBookingsRouteImport.update({
   path: '/bookings',
   getParentRoute: () => AppCustomerRoute,
 } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -1078,6 +1105,7 @@ export interface FileRoutesByFullPath {
   '/help': typeof HelpRoute
   '/jobs-app': typeof JobsAppRoute
   '/login': typeof LoginRoute
+  '/mcp': typeof McpRoute
   '/membership': typeof MembershipRoute
   '/membership-rules': typeof MembershipRulesRoute
   '/offline': typeof OfflineRoute
@@ -1099,6 +1127,8 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/website-builder': typeof WebsiteBuilderRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -1193,6 +1223,7 @@ export interface FileRoutesByFullPath {
   '/owner/': typeof OwnerIndexRoute
   '/partner/': typeof PartnerIndexRoute
   '/portal/': typeof PortalIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/app/customer/bookings': typeof AppCustomerBookingsRoute
   '/app/customer/profile': typeof AppCustomerProfileRoute
   '/app/customer/rewards': typeof AppCustomerRewardsRoute
@@ -1251,6 +1282,7 @@ export interface FileRoutesByTo {
   '/help': typeof HelpRoute
   '/jobs-app': typeof JobsAppRoute
   '/login': typeof LoginRoute
+  '/mcp': typeof McpRoute
   '/membership': typeof MembershipRoute
   '/membership-rules': typeof MembershipRulesRoute
   '/offline': typeof OfflineRoute
@@ -1270,6 +1302,8 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/website-builder': typeof WebsiteBuilderRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -1361,6 +1395,7 @@ export interface FileRoutesByTo {
   '/owner': typeof OwnerIndexRoute
   '/partner': typeof PartnerIndexRoute
   '/portal': typeof PortalIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/app/customer/bookings': typeof AppCustomerBookingsRoute
   '/app/customer/profile': typeof AppCustomerProfileRoute
   '/app/customer/rewards': typeof AppCustomerRewardsRoute
@@ -1422,6 +1457,7 @@ export interface FileRoutesById {
   '/help': typeof HelpRoute
   '/jobs-app': typeof JobsAppRoute
   '/login': typeof LoginRoute
+  '/mcp': typeof McpRoute
   '/membership': typeof MembershipRoute
   '/membership-rules': typeof MembershipRulesRoute
   '/offline': typeof OfflineRoute
@@ -1443,6 +1479,8 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/website-builder': typeof WebsiteBuilderRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -1537,6 +1575,7 @@ export interface FileRoutesById {
   '/owner/': typeof OwnerIndexRoute
   '/partner/': typeof PartnerIndexRoute
   '/portal/': typeof PortalIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/app/customer/bookings': typeof AppCustomerBookingsRoute
   '/app/customer/profile': typeof AppCustomerProfileRoute
   '/app/customer/rewards': typeof AppCustomerRewardsRoute
@@ -1599,6 +1638,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/jobs-app'
     | '/login'
+    | '/mcp'
     | '/membership'
     | '/membership-rules'
     | '/offline'
@@ -1620,6 +1660,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/website-builder'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/advertising'
     | '/admin/analytics'
     | '/admin/audit'
@@ -1714,6 +1756,7 @@ export interface FileRouteTypes {
     | '/owner/'
     | '/partner/'
     | '/portal/'
+    | '/.mcp/invoke-tool/$tool'
     | '/app/customer/bookings'
     | '/app/customer/profile'
     | '/app/customer/rewards'
@@ -1772,6 +1815,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/jobs-app'
     | '/login'
+    | '/mcp'
     | '/membership'
     | '/membership-rules'
     | '/offline'
@@ -1791,6 +1835,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/website-builder'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/advertising'
     | '/admin/analytics'
     | '/admin/audit'
@@ -1882,6 +1928,7 @@ export interface FileRouteTypes {
     | '/owner'
     | '/partner'
     | '/portal'
+    | '/.mcp/invoke-tool/$tool'
     | '/app/customer/bookings'
     | '/app/customer/profile'
     | '/app/customer/rewards'
@@ -1942,6 +1989,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/jobs-app'
     | '/login'
+    | '/mcp'
     | '/membership'
     | '/membership-rules'
     | '/offline'
@@ -1963,6 +2011,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/website-builder'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/advertising'
     | '/admin/analytics'
     | '/admin/audit'
@@ -2057,6 +2107,7 @@ export interface FileRouteTypes {
     | '/owner/'
     | '/partner/'
     | '/portal/'
+    | '/.mcp/invoke-tool/$tool'
     | '/app/customer/bookings'
     | '/app/customer/profile'
     | '/app/customer/rewards'
@@ -2118,6 +2169,7 @@ export interface RootRouteChildren {
   HelpRoute: typeof HelpRoute
   JobsAppRoute: typeof JobsAppRoute
   LoginRoute: typeof LoginRoute
+  McpRoute: typeof McpRoute
   MembershipRoute: typeof MembershipRoute
   MembershipRulesRoute: typeof MembershipRulesRoute
   OfflineRoute: typeof OfflineRoute
@@ -2139,6 +2191,8 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   WebsiteBuilderRoute: typeof WebsiteBuilderRoute
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   AppCustomerRoute: typeof AppCustomerRouteWithChildren
   AppJobsRoute: typeof AppJobsRouteWithChildren
   AppOwnerRoute: typeof AppOwnerRouteWithChildren
@@ -2171,6 +2225,7 @@ export interface RootRouteChildren {
   HireIndexRoute: typeof HireIndexRoute
   JobsIndexRoute: typeof JobsIndexRoute
   PortalIndexRoute: typeof PortalIndexRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   PortalBrandsSlugRoute: typeof PortalBrandsSlugRoute
   PortalBrandsRegisterRoute: typeof PortalBrandsRegisterRoute
   PortalDistributorsSlugRoute: typeof PortalDistributorsSlugRoute
@@ -2338,6 +2393,13 @@ declare module '@tanstack/react-router' {
       path: '/membership'
       fullPath: '/membership'
       preLoaderRoute: typeof MembershipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -3138,6 +3200,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdvertisingRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/portal/distributors/': {
       id: '/portal/distributors/'
       path: '/portal/distributors'
@@ -3347,6 +3423,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/customer/bookings'
       preLoaderRoute: typeof AppCustomerBookingsRouteImport
       parentRoute: typeof AppCustomerRoute
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
@@ -3684,6 +3767,7 @@ const rootRouteChildren: RootRouteChildren = {
   HelpRoute: HelpRoute,
   JobsAppRoute: JobsAppRoute,
   LoginRoute: LoginRoute,
+  McpRoute: McpRoute,
   MembershipRoute: MembershipRoute,
   MembershipRulesRoute: MembershipRulesRoute,
   OfflineRoute: OfflineRoute,
@@ -3705,6 +3789,9 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   WebsiteBuilderRoute: WebsiteBuilderRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   AppCustomerRoute: AppCustomerRouteWithChildren,
   AppJobsRoute: AppJobsRouteWithChildren,
   AppOwnerRoute: AppOwnerRouteWithChildren,
@@ -3737,6 +3824,7 @@ const rootRouteChildren: RootRouteChildren = {
   HireIndexRoute: HireIndexRoute,
   JobsIndexRoute: JobsIndexRoute,
   PortalIndexRoute: PortalIndexRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   PortalBrandsSlugRoute: PortalBrandsSlugRoute,
   PortalBrandsRegisterRoute: PortalBrandsRegisterRoute,
   PortalDistributorsSlugRoute: PortalDistributorsSlugRoute,
