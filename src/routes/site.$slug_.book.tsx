@@ -31,14 +31,12 @@ export const Route = createFileRoute("/site/$slug_/book")({
   validateSearch: (search: Record<string, unknown>) => ({
     service: typeof search.service === "string" ? search.service : undefined,
   }),
-  beforeLoad: ({ params }) => {
-    // A link that serialized an undefined/null slug shouldn't dead-end the user.
+  loader: ({ context, params }) => {
     if (!params.slug || params.slug === "undefined" || params.slug === "null") {
-      throw redirect({ to: "/" });
+      return null;
     }
+    return context.queryClient.ensureQueryData(salonBySlugQueryOptions(params.slug));
   },
-  loader: ({ context, params }) =>
-    context.queryClient.ensureQueryData(salonBySlugQueryOptions(params.slug)),
   head: ({ params }) => {
     const label = params.slug && params.slug !== "undefined" ? params.slug : "salon";
     return { meta: [{ title: `Book appointment · ${label} · Nexora` }] };
