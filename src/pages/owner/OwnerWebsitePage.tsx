@@ -658,6 +658,42 @@ export function OwnerWebsitePage() {
                   <ImageIcon className="h-6 w-6 text-muted-foreground" />
                 )}
               </div>
+              <div className="flex flex-col items-center gap-1.5">
+                <div className="h-20 w-20 shrink-0 overflow-hidden rounded-md border bg-muted grid place-items-center relative">
+                  {s.image_url ? (
+                    <img src={s.image_url} alt={s.name} className="h-full w-full object-cover" />
+                  ) : (
+                    <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                  )}
+                  {uploadingServiceIdx === idx && (
+                    <div className="absolute inset-0 grid place-items-center bg-black/50">
+                      <Loader2 className="h-5 w-5 animate-spin text-white" />
+                    </div>
+                  )}
+                </div>
+                <label className="cursor-pointer text-[11px] font-medium text-primary hover:underline">
+                  {s.image_url ? "Change" : "Upload"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) void handleServiceImageUpload(idx, f);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+                {s.image_url && (
+                  <button
+                    type="button"
+                    className="text-[11px] text-destructive hover:underline"
+                    onClick={() => updateService(idx, { image_url: "" })}
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
               <div className="min-w-0 grid gap-2 sm:grid-cols-2">
                 <Input
                   placeholder="Service name (e.g. Haircut)"
