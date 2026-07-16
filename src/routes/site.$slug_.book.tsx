@@ -56,6 +56,7 @@ function PublishedBookingPage() {
     ? search.service
     : services[0]?.id;
   const [serviceId, setServiceId] = useState(initialService ?? "");
+  const [staffId, setStaffId] = useState("");
   const [date, setDate] = useState(localDate(1));
   const [time, setTime] = useState("");
   const [customerName, setCustomerName] = useState("");
@@ -66,6 +67,10 @@ function PublishedBookingPage() {
   const selectedService = useMemo(
     () => services.find((service) => service.id === serviceId),
     [serviceId, services],
+  );
+  const selectedStaff = useMemo(
+    () => data?.staff.find((staff) => staff.id === staffId),
+    [data?.staff, staffId],
   );
   const total = Number(selectedService?.price ?? 0);
   const advance = Math.round(total * 25) / 100;
@@ -89,6 +94,7 @@ function PublishedBookingPage() {
         time,
         customerName,
         mobile,
+        staffId: staffId || null,
       });
       await navigate({
         to: "/site/$slug_/booking-success",
@@ -153,7 +159,52 @@ function PublishedBookingPage() {
             </fieldset>
 
             <fieldset>
-              <legend className="mb-3 font-bold">2. Select date and time</legend>
+              <legend className="mb-3 font-bold">2. Select professional</legend>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label
+                  className={`cursor-pointer rounded-xl border bg-white p-4 ${
+                    staffId === "" ? "border-violet-700 ring-2 ring-violet-100" : ""
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="staff"
+                    value=""
+                    checked={staffId === ""}
+                    onChange={() => setStaffId("")}
+                    className="sr-only"
+                  />
+                  <span className="block font-semibold">Any professional</span>
+                  <span className="mt-1 block text-sm text-slate-600">
+                    Salon will assign an available expert.
+                  </span>
+                </label>
+                {data.staff.map((staff) => (
+                  <label
+                    key={staff.id}
+                    className={`cursor-pointer rounded-xl border bg-white p-4 ${
+                      staffId === staff.id ? "border-violet-700 ring-2 ring-violet-100" : ""
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="staff"
+                      value={staff.id}
+                      checked={staffId === staff.id}
+                      onChange={() => setStaffId(staff.id)}
+                      className="sr-only"
+                    />
+                    <span className="block font-semibold">{staff.name}</span>
+                    <span className="mt-1 block text-sm text-slate-600">
+                      {staff.role ?? "Beauty professional"}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend className="mb-3 font-bold">3. Select date and time</legend>
               <label className="block max-w-sm text-sm font-medium">
                 Date
                 <span className="relative mt-1 block">
@@ -191,7 +242,7 @@ function PublishedBookingPage() {
             </fieldset>
 
             <fieldset className="grid gap-4 sm:grid-cols-2">
-              <legend className="mb-3 font-bold sm:col-span-2">3. Your details</legend>
+              <legend className="mb-3 font-bold sm:col-span-2">4. Your details</legend>
               <label className="text-sm font-medium">
                 Name
                 <input
@@ -246,6 +297,12 @@ function PublishedBookingPage() {
                 <dt className="text-slate-600">Service</dt>
                 <dd className="text-right font-medium">
                   {selectedService?.name ?? "Select service"}
+                </dd>
+              </div>
+              <div className="flex justify-between gap-4">
+                <dt className="text-slate-600">Professional</dt>
+                <dd className="text-right font-medium">
+                  {selectedStaff?.name ?? "Any professional"}
                 </dd>
               </div>
               <div className="flex justify-between">

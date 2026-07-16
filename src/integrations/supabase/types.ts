@@ -202,6 +202,7 @@ export type Database = {
           service_id: string | null
           service_mode: string
           service_name: string
+          staff_id: string | null
           status: string
           updated_at: string
           user_id: string
@@ -232,6 +233,7 @@ export type Database = {
           service_id?: string | null
           service_mode?: string
           service_name: string
+          staff_id?: string | null
           status?: string
           updated_at?: string
           user_id: string
@@ -262,6 +264,7 @@ export type Database = {
           service_id?: string | null
           service_mode?: string
           service_name?: string
+          staff_id?: string | null
           status?: string
           updated_at?: string
           user_id?: string
@@ -279,6 +282,13 @@ export type Database = {
             columns: ["salon_id"]
             isOneToOne: false
             referencedRelation: "public_salon_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
             referencedColumns: ["id"]
           },
           {
@@ -4785,6 +4795,7 @@ export type Database = {
           _customer_name: string
           _mobile: string
           _service_id: string
+          _staff_id: string | null
           _tenant_id: string
         }
         Returns: Json

@@ -1,0 +1,74 @@
+#!/usr/bin/env node
+
+import { existsSync, readFileSync } from "node:fs";
+
+const files = [
+  "src/routes/app.customer.tsx",
+  "src/routes/app.customer.index.tsx",
+  "src/routes/app.customer.search.tsx",
+  "src/routes/app.customer.bookings.tsx",
+  "src/routes/app.customer.rewards.tsx",
+  "src/routes/app.customer.profile.tsx",
+  "src/routes/app.customer.support.tsx",
+  "src/pages/customer/app/CustomerAppShell.tsx",
+  "src/pages/customer/app/CustomerAppHome.tsx",
+  "src/pages/customer/app/CustomerAppSearch.tsx",
+  "src/pages/customer/app/CustomerAppBookings.tsx",
+  "src/pages/customer/app/CustomerAppRewards.tsx",
+  "src/pages/customer/app/CustomerAppProfile.tsx",
+  "supabase/migrations/20260716130000_customer_pwa_staff_booking.sql",
+];
+
+const failures = [];
+for (const file of files) {
+  if (!existsSync(file)) failures.push(`Missing customer app file: ${file}`);
+}
+
+const shell = readFileSync("src/pages/customer/app/CustomerAppShell.tsx", "utf8");
+for (const label of ["Home", "Search", "Bookings", "Rewards", "Profile"]) {
+  if (!shell.includes(`label: "${label}"`)) failures.push(`Bottom navigation is missing ${label}`);
+}
+
+const liveSalons = readFileSync("src/lib/customer-app.ts", "utf8");
+if (!liveSalons.includes('.eq("website_created", true)')) {
+  failures.push("Customer app must only load published salon websites");
+}
+if (/DEMO_SHOPS|mock/i.test(liveSalons)) {
+  failures.push("Customer app salon discovery must not use demo data");
+}
+
+const home = readFileSync("src/pages/customer/app/CustomerAppHome.tsx", "utf8");
+if (!home.includes("geolocation.getCurrentPosition")) {
+  failures.push("Customer app must request real location permission");
+}
+
+const staffMigration = readFileSync(
+  "supabase/migrations/20260716130000_customer_pwa_staff_booking.sql",
+  "utf8",
+);
+if (
+  !staffMigration.includes("staff_id uuid") ||
+  !staffMigration.includes("staff_member.salon_id")
+) {
+  failures.push("Selected staff must be validated and persisted with the booking");
+}
+
+const booking = readFileSync("src/routes/site.$slug_.book.tsx", "utf8");
+if (!booking.includes("Select professional") || !booking.includes("staffId: staffId || null")) {
+  failures.push("Public booking journey is missing staff selection");
+}
+
+const manifest = JSON.parse(readFileSync("public/manifests/customer.webmanifest", "utf8"));
+if (!String(manifest.start_url).startsWith("/app/customer")) {
+  failures.push("Customer PWA manifest must open /app/customer");
+}
+
+if (failures.length) {
+  console.error("Customer PWA audit failed:");
+  for (const failure of failures) console.error(`- ${failure}`);
+  process.exit(1);
+}
+
+console.log(
+  "Customer PWA audit passed: focused routes, five-tab navigation, live published salons, location permission and persisted staff selection are present.",
+);

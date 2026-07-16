@@ -6,6 +6,8 @@ export type PublicAppointmentReceipt = {
   tenant_id: string;
   service_id: string;
   service_name: string;
+  staff_id: string | null;
+  staff_name: string;
   appointment_date: string;
   appointment_time: string;
   total: number;
@@ -40,6 +42,7 @@ export async function createPublicAppointment(input: {
   time: string;
   customerName: string;
   mobile: string;
+  staffId?: string | null;
 }): Promise<PublicAppointmentReceipt> {
   await ensurePublicBookingSession();
   const { data, error } = await supabase.rpc("create_public_appointment", {
@@ -49,6 +52,7 @@ export async function createPublicAppointment(input: {
     _appointment_time: input.time,
     _customer_name: input.customerName,
     _mobile: input.mobile,
+    _staff_id: input.staffId ?? null,
   });
 
   if (error) {
@@ -67,7 +71,7 @@ export async function getPublicAppointmentReceipt(bookingId: string) {
   const { data, error } = await supabase
     .from("bookings")
     .select(
-      "id, booking_reference, salon_id, service_id, service_name, booking_date, booking_time, price, advance_amount, status, payment_status, salons(name, slug)",
+      "id, booking_reference, salon_id, service_id, service_name, staff_id, booking_date, booking_time, price, advance_amount, status, payment_status, salons(name, slug), staff(name)",
     )
     .eq("id", bookingId)
     .maybeSingle();

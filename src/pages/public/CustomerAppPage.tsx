@@ -8,7 +8,7 @@ export default function CustomerAppPage() {
       eyebrow="Customer App"
       title="Salon discover karo. Appointment book karo."
       description="Nearby salons, active services, transparent prices and your bookings—customer ko सिर्फ उसका simple booking experience मिलता है."
-      startPath="/search"
+      startPath="/app/customer"
       audience="salon customers"
       features={[
         {

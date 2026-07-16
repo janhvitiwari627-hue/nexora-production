@@ -3,7 +3,7 @@
   "short_name": "Nexora",
   "id": "/apps/customer",
   "description": "Discover salons and manage your Nexora bookings.",
-  "start_url": "/dashboard/bookings?source=pwa",
+  "start_url": "/app/customer?source=pwa",
   "scope": "/",
   "display": "standalone",
   "background_color": "#f8fafc",

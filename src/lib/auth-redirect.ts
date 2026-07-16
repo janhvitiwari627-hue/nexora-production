@@ -28,15 +28,11 @@ const ROLE_ROUTES: Record<UserRole, string> = {
   distributor: "/",
   district_partner: "/partner/dashboard",
   growth_partner: "/partner/dashboard",
-  customer: "/",
+  customer: "/app/customer",
 };
 
-
 export async function fetchUserRoles(userId: string): Promise<UserRole[]> {
-  const { data, error } = await supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userId);
+  const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", userId);
   if (error) return [];
   return (data ?? []).map((r) => r.role as UserRole);
 }
@@ -48,7 +44,9 @@ export function pickPrimaryRole(roles: UserRole[]): UserRole {
   return "customer";
 }
 
-export function routeForRole(role: UserRole | "staff" | "shop_owner" | "shop_manager" | "super_admin"): string {
+export function routeForRole(
+  role: UserRole | "staff" | "shop_owner" | "shop_manager" | "super_admin",
+): string {
   // Map spec role names to existing app_role enum
   if (role === "super_admin") return "/admin/dashboard";
   if (role === "shop_owner" || role === "shop_manager") return "/owner/dashboard";

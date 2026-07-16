@@ -61,6 +61,7 @@ function BookingSuccessPage() {
 
   const row = receipt.data;
   const salon = Array.isArray(row.salons) ? row.salons[0] : row.salons;
+  const staff = Array.isArray(row.staff) ? row.staff[0] : row.staff;
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-10">
@@ -78,6 +79,9 @@ function BookingSuccessPage() {
             <div>
               <p className="font-bold">{row.service_name}</p>
               <p className="text-sm text-slate-600">{salon?.name ?? "Salon"}</p>
+              <p className="mt-1 text-xs text-slate-500">
+                {staff?.name ?? "Any available professional"}
+              </p>
             </div>
             <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
               Advance pending
