@@ -26,22 +26,77 @@ import { toast } from "sonner";
 const DEFAULT_COVER =
   "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=1600&q=80";
 
+type LiveOverrides = Partial<{
+  name: string;
+  tagline: string | null;
+  description: string | null;
+  about_us: string | null;
+  cover_image_url: string | null;
+  owner_profile_image_url: string | null;
+  video_url: string | null;
+  brand_primary: string | null;
+  brand_secondary: string | null;
+  phone: string | null;
+  email: string | null;
+  address: string | null;
+  gallery_images: string[];
+  hours: unknown;
+  is_home_service: boolean;
+  home_service_charge: number;
+  home_service_radius_km: number;
+  selected_template_key: string;
+}>;
+
 export function WhiteLabelWebsitePage({
   slug: _slug,
   routeSearch,
 }: {
   slug?: string;
-  routeSearch?: { t?: string; preview?: 1 };
+  routeSearch?: { t?: string; preview?: 1; live?: 1 };
 }) {
-  const { data, isLoading, isFetching, refetch } = useQuery({
+  const { data: rawData, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["white-label-site", _slug],
     queryFn: () => (_slug ? getSalonBySlug({ data: { slug: _slug } }) : Promise.resolve(null)),
     enabled: !!_slug,
   });
   const queryClient = useQueryClient();
-  const salonId = data?.salon?.id;
+  const salonId = rawData?.salon?.id;
   const [liveState, setLiveState] = useState<"idle" | "updating" | "updated" | "error">("idle");
   const [liveError, setLiveError] = useState<string | null>(null);
+  const [liveOverrides, setLiveOverrides] = useState<LiveOverrides | null>(null);
+
+  const isLiveMode =
+    routeSearch?.live === 1 ||
+    (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("live") === "1");
+
+  // Listen for owner "Edit & Live" postMessage patches so unsaved edits render
+  // instantly inside the preview iframe without hitting the DB.
+  useEffect(() => {
+    if (!isLiveMode || typeof window === "undefined") return;
+    const onMessage = (e: MessageEvent) => {
+      const msg = e.data;
+      if (!msg || typeof msg !== "object") return;
+      if (msg.type === "live-preview-overrides" && msg.patch && typeof msg.patch === "object") {
+        setLiveOverrides(msg.patch as LiveOverrides);
+      } else if (msg.type === "live-preview-clear") {
+        setLiveOverrides(null);
+      }
+    };
+    window.addEventListener("message", onMessage);
+    // Signal to parent that we're ready to receive overrides
+    try {
+      window.parent?.postMessage({ type: "live-preview-ready" }, "*");
+    } catch {
+      /* noop */
+    }
+    return () => window.removeEventListener("message", onMessage);
+  }, [isLiveMode]);
+
+  // Merge live overrides onto salon data before rendering.
+  const data = useMemo(() => {
+    if (!rawData?.salon || !liveOverrides) return rawData;
+    return { ...rawData, salon: { ...rawData.salon, ...liveOverrides } };
+  }, [rawData, liveOverrides]);
 
   // Live refresh: when the salon row (or its services) changes in the DB,
   // re-fetch so /site/<slug> reflects owner edits from /owner/settings instantly.
