@@ -284,6 +284,60 @@ export function OwnerWebsitePage() {
     mutate.mutate(form);
   };
 
+  // ---------- Services editor helpers ----------
+  const addService = () => {
+    setServices((prev) => [
+      ...(prev ?? []),
+      { name: "New Service", price: 500, duration_minutes: 30, description: "", image_url: "", category: "" },
+    ]);
+  };
+  const updateService = (idx: number, patch: Partial<ServiceDraft>) => {
+    setServices((prev) => prev?.map((s, i) => (i === idx ? { ...s, ...patch } : s)) ?? null);
+  };
+  const removeService = (idx: number) => {
+    setServices((prev) => prev?.filter((_, i) => i !== idx) ?? null);
+  };
+  const saveServices = async () => {
+    if (!activeSalonId || !services) return;
+    setSavingServices(true);
+    try {
+      const originals = servicesData ?? [];
+      const draftIds = new Set(services.filter((s) => s.id).map((s) => s.id!));
+      // Delete removed rows
+      for (const orig of originals) {
+        if (!draftIds.has(orig.id)) {
+          await deleteSvc({ data: { id: orig.id } });
+        }
+      }
+      // Upsert current rows
+      for (const s of services) {
+        if (!s.name.trim()) continue;
+        await upsertSvc({
+          data: {
+            id: s.id,
+            salon_id: activeSalonId,
+            name: s.name.trim(),
+            description: s.description || null,
+            category: s.category || null,
+            duration_minutes: s.duration_minutes || 30,
+            price: Number(s.price) || 0,
+            is_active: true,
+            image_url: s.image_url ? s.image_url : null,
+          },
+        });
+      }
+      toast.success("Services saved");
+      await qc.invalidateQueries({ queryKey: ["owner", "services", activeSalonId] });
+      setServices(null); // re-init from fresh data
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to save services");
+    } finally {
+      setSavingServices(false);
+    }
+  };
+
+
+
 
   const uploadFile = async (file: File, folder: "cover" | "owner" | "gallery" | "video") => {
     if (!activeSalonId) return null;
