@@ -787,11 +787,58 @@ export function OwnerWebsitePage() {
 
       {/* Live preview modal */}
       <Dialog open={preview} onOpenChange={setPreview}>
-        <DialogContent className="flex h-[85vh] w-[calc(100vw-1.5rem)] max-w-6xl flex-col p-0 sm:w-full">
+        <DialogContent className="flex h-[90vh] w-[calc(100vw-1rem)] max-w-6xl flex-col p-0 sm:w-full">
           <DialogHeader className="border-b px-4 py-3">
-            <DialogTitle>Website Preview · {form.name}</DialogTitle>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <DialogTitle className="flex items-center gap-2 text-base">
+                <Zap className="h-4 w-4 text-primary" />
+                Edit & Live · {form.name}
+              </DialogTitle>
+              <div className="flex items-center gap-2">
+                <span
+                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium ${
+                    iframeReady
+                      ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
+                      : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-1.5 w-1.5 rounded-full ${
+                      iframeReady ? "animate-pulse bg-emerald-500" : "bg-muted-foreground"
+                    }`}
+                  />
+                  {iframeReady ? "Live" : "Loading…"}
+                </span>
+                {publicUrl && (
+                  <Button variant="ghost" size="sm" asChild>
+                    <a href={publicUrl} target="_blank" rel="noreferrer">
+                      <ExternalLink className="h-3.5 w-3.5" /> Open
+                    </a>
+                  </Button>
+                )}
+              </div>
+            </div>
+            <p className="text-muted-foreground mt-1 text-xs">
+              Aap jo bhi color, banner, logo ya text change karenge, wo yahan turant dikhega. Save Changes ke baad customers ko bhi dikhega.
+            </p>
           </DialogHeader>
-          <iframe src={previewUrl} title="preview" className="h-full w-full flex-1" />
+          <iframe
+            ref={iframeRef}
+            src={previewUrl}
+            title="Live website preview"
+            className="h-full w-full flex-1"
+            onLoad={() => {
+              // Iframe finished loading — send an immediate patch so the
+              // preview reflects the current form even if the ready handshake
+              // is missed (e.g. cached page).
+              if (form) {
+                iframeRef.current?.contentWindow?.postMessage(
+                  { type: "live-preview-overrides", patch: form },
+                  "*",
+                );
+              }
+            }}
+          />
         </DialogContent>
       </Dialog>
     </div>
