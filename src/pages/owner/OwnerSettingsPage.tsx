@@ -95,6 +95,9 @@ export function OwnerSettingsPage() {
   const [form, setForm] = useState<Form>(EMPTY);
   const [baseline, setBaseline] = useState<Form>(EMPTY);
   const [uploading, setUploading] = useState<"logo" | "cover" | null>(null);
+  const [draftRestored, setDraftRestored] = useState(false);
+
+  const draftKey = activeSalonId ? `owner-settings-draft:${activeSalonId}` : null;
 
   useEffect(() => {
     if (!salon) return;
@@ -116,13 +119,73 @@ export function OwnerSettingsPage() {
       cover_image_url: s(row.cover_image_url),
       upi_id: s(row.upi_id),
     };
-    setForm(next);
     setBaseline(next);
-  }, [salon]);
+
+    // Restore autosaved draft if present and different from server data.
+    let restored: Form | null = null;
+    if (draftKey && typeof window !== "undefined") {
+      try {
+        const raw = window.localStorage.getItem(draftKey);
+        if (raw) {
+          const parsed = JSON.parse(raw) as Partial<Form>;
+          const merged: Form = { ...next };
+          for (const k of Object.keys(EMPTY) as (keyof Form)[]) {
+            if (typeof parsed[k] === "string") merged[k] = parsed[k] as string;
+          }
+          const differs = (Object.keys(EMPTY) as (keyof Form)[]).some(
+            (k) => merged[k] !== next[k],
+          );
+          if (differs) restored = merged;
+        }
+      } catch {
+        /* ignore corrupt draft */
+      }
+    }
+
+    if (restored) {
+      setForm(restored);
+      setDraftRestored(true);
+      toast.info("Draft restored from your last edit.");
+    } else {
+      setForm(next);
+      setDraftRestored(false);
+    }
+  }, [salon, draftKey]);
 
   const isDirty = useMemo(() => {
     return (Object.keys(form) as (keyof Form)[]).some((k) => form[k] !== baseline[k]);
   }, [form, baseline]);
+
+  // Autosave draft (debounced) whenever the form drifts from server baseline.
+  useEffect(() => {
+    if (!draftKey || typeof window === "undefined") return;
+    const t = setTimeout(() => {
+      try {
+        if (isDirty) {
+          window.localStorage.setItem(draftKey, JSON.stringify(form));
+        } else {
+          window.localStorage.removeItem(draftKey);
+        }
+      } catch {
+        /* storage full / disabled — ignore */
+      }
+    }, 400);
+    return () => clearTimeout(t);
+  }, [form, isDirty, draftKey]);
+
+  const discardDraft = () => {
+    if (draftKey && typeof window !== "undefined") {
+      try {
+        window.localStorage.removeItem(draftKey);
+      } catch {
+        /* ignore */
+      }
+    }
+    setForm(baseline);
+    setDraftRestored(false);
+    toast.success("Draft discarded.");
+  };
+
 
   // Intercept ALL in-app router navigation (Link, useNavigate, router.navigate,
   // browser back/forward). This covers header/sidebar/breadcrumbs uniformly
@@ -215,6 +278,14 @@ export function OwnerSettingsPage() {
     onSuccess: async () => {
       toast.success("Shop details saved. Website updated.");
       setBaseline(form);
+      setDraftRestored(false);
+      if (draftKey && typeof window !== "undefined") {
+        try {
+          window.localStorage.removeItem(draftKey);
+        } catch {
+          /* ignore */
+        }
+      }
       await qc.invalidateQueries({ queryKey: ["owner"] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Update failed"),
@@ -251,6 +322,24 @@ export function OwnerSettingsPage() {
           data seedha aapke template website (/site/{"<slug>"}) par dikhega.
         </p>
       </header>
+
+      {draftRestored && isDirty && (
+        <div className="flex flex-col gap-2 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 sm:flex-row sm:items-center sm:justify-between dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200">
+          <span>
+            <strong className="font-semibold">Draft restored.</strong> Aapke pichhle unsaved edits
+            yahan wapas load kiye gaye hain. Save karke apply karein ya discard karein.
+          </span>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={discardDraft}
+            className="border-amber-400 text-amber-900 hover:bg-amber-100 dark:border-amber-400/50 dark:text-amber-100 dark:hover:bg-amber-500/20"
+          >
+            Discard draft
+          </Button>
+        </div>
+      )}
+
 
       <Card>
         <CardHeader>
@@ -380,7 +469,7 @@ export function OwnerSettingsPage() {
 
       <div className="sticky bottom-0 flex items-center justify-end gap-2 border-t bg-background/95 py-3 backdrop-blur">
         {isDirty && (
-          <span className="mr-auto text-xs text-muted-foreground">Unsaved changes</span>
+          <span className="mr-auto text-xs text-muted-foreground">Unsaved changes · autosaved as draft</span>
         )}
         <Button variant="outline" onClick={() => navigate({ to: "/owner/welcome" })}>
           Back
