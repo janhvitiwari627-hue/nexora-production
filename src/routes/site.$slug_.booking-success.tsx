@@ -140,7 +140,7 @@ function BookingSuccessPage() {
               <p className="font-bold">{row.service_name}</p>
               <p className="text-sm text-slate-600">{salon?.name ?? "Salon"}</p>
               <p className="mt-1 text-xs text-slate-500">
-                {staff?.name ?? "Any available professional"}
+                {row.staff_name ?? "Any available professional"}
               </p>
             </div>
             <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
