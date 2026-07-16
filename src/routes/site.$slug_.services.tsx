@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Clock, IndianRupee } from "lucide-react";
-import { salonBySlugQueryOptions } from "@/lib/salons.queries";
+import { siteBySlugQueryOptions } from "@/lib/site-data";
 import { PublishedSiteShell } from "@/pages/public/site/PublishedSiteShell";
 import { SalonNotFound } from "@/pages/public/site/SalonNotFound";
 
@@ -10,7 +10,7 @@ export const Route = createFileRoute("/site/$slug_/services")({
     if (!params.slug || params.slug === "undefined" || params.slug === "null") {
       return null;
     }
-    return context.queryClient.ensureQueryData(salonBySlugQueryOptions(params.slug));
+    return context.queryClient.ensureQueryData(siteBySlugQueryOptions(params.slug));
   },
   head: ({ params }) => {
     const label = params.slug && params.slug !== "undefined" ? params.slug : "salon";
@@ -28,14 +28,9 @@ function PublishedServicesPage() {
 }
 
 function PublishedServicesPageInner({ slug }: { slug: string }) {
-  const { data } = useSuspenseQuery(salonBySlugQueryOptions(slug));
+  const { data } = useSuspenseQuery(siteBySlugQueryOptions(slug));
   if (!data?.salon) {
-    return (
-      <SalonNotFound
-        title="Salon website not published"
-        description="This salon hasn't published their website yet. Browse other salons or head back home."
-      />
-    );
+    return <SalonNotFound />;
   }
 
   return (
