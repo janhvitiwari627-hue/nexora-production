@@ -807,3 +807,47 @@ function ColorField({
     </div>
   );
 }
+
+function SectionEditLink({
+  icon,
+  title,
+  desc,
+  to,
+  hint,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+  to?: string;
+  hint?: string;
+}) {
+  const inner = (
+    <>
+      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+        {icon}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-sm font-semibold">{title}</div>
+        <div className="text-muted-foreground truncate text-xs">{hint ?? desc}</div>
+      </div>
+      {to ? (
+        <ChevronRight className="text-muted-foreground h-4 w-4 shrink-0" />
+      ) : (
+        <span className="text-muted-foreground shrink-0 rounded-full border px-2 py-0.5 text-[10px] uppercase">
+          Below
+        </span>
+      )}
+    </>
+  );
+  const className =
+    "hover:bg-muted/60 flex items-center gap-3 rounded-lg border p-3 text-left transition";
+  if (to) {
+    return (
+      <Link to={to} className={className}>
+        {inner}
+      </Link>
+    );
+  }
+  return <div className={className}>{inner}</div>;
+}
+
