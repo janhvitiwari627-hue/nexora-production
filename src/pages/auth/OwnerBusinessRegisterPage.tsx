@@ -173,8 +173,11 @@ export default function OwnerBusinessRegisterPage() {
         ...parsed.data,
         owner_name: parsed.data.owner_name.trim(),
         mobile: parsed.data.mobile.trim(),
+        whatsapp: (parsed.data.whatsapp ?? "").trim(),
         district: parsed.data.district.trim(),
         shop_name: parsed.data.shop_name.trim(),
+        category: parsed.data.category.trim(),
+        address: (parsed.data.address ?? "").trim(),
         email: parsed.data.email.trim().toLowerCase(),
       };
       const email = payload.email;
@@ -188,7 +191,12 @@ export default function OwnerBusinessRegisterPage() {
           data: {
             full_name: payload.owner_name,
             mobile: payload.mobile,
+            whatsapp: payload.whatsapp || payload.mobile,
             role: "shop_owner",
+            shop_name: payload.shop_name,
+            category: payload.category,
+            district: payload.district,
+            address: payload.address,
           },
         },
       });
@@ -225,6 +233,9 @@ export default function OwnerBusinessRegisterPage() {
         _owner_name: payload.owner_name,
         _mobile: payload.mobile,
         _email: email,
+        _category: payload.category || null,
+        _whatsapp: payload.whatsapp || null,
+        _address: payload.address || null,
       });
 
       if (rpcError) {
