@@ -51,6 +51,7 @@ import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useOwnerContext } from "@/hooks/use-owner-context";
+import { useAuthStore } from "@/stores/authStore";
 import {
   ownerDashboardMetricsQuery,
   ownerAnalyticsQuery,
