@@ -36,8 +36,12 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useOwnerContext } from "@/hooks/use-owner-context";
-import { ownerSalonFullQuery } from "@/lib/owner.queries";
-import { updateOwnerSalon } from "@/lib/owner.functions";
+import { ownerSalonFullQuery, ownerServicesQuery } from "@/lib/owner.queries";
+import {
+  updateOwnerSalon,
+  upsertOwnerService,
+  deleteOwnerService,
+} from "@/lib/owner.functions";
 import { supabase } from "@/integrations/supabase/client";
 import {
   getTemplate,
@@ -83,11 +87,24 @@ type Patch = {
   selected_template_key?: TemplateKey;
 };
 
+type ServiceDraft = {
+  id?: string;
+  name: string;
+  price: number;
+  duration_minutes: number;
+  description: string;
+  image_url: string;
+  category: string;
+};
+
 export function OwnerWebsitePage() {
   const { activeSalon, activeSalonId, hasSalon, isLoading: ctxLoading } = useOwnerContext();
   const qc = useQueryClient();
   const { data: salon, isLoading } = useQuery(ownerSalonFullQuery(activeSalonId ?? ""));
+  const { data: servicesData } = useQuery(ownerServicesQuery(activeSalonId ?? ""));
   const update = useServerFn(updateOwnerSalon);
+  const upsertSvc = useServerFn(upsertOwnerService);
+  const deleteSvc = useServerFn(deleteOwnerService);
   const [autosaveState, setAutosaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const mutate = useMutation({
     mutationFn: (patch: Patch) => update({ data: { salon_id: activeSalonId!, patch } }),
@@ -102,6 +119,8 @@ export function OwnerWebsitePage() {
   });
 
   const [form, setForm] = useState<Patch | null>(null);
+  const [services, setServices] = useState<ServiceDraft[] | null>(null);
+  const [savingServices, setSavingServices] = useState(false);
   const [preview, setPreview] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
@@ -141,6 +160,22 @@ export function OwnerWebsitePage() {
     }
   }, [salon, form]);
 
+  useEffect(() => {
+    if (servicesData && services === null) {
+      setServices(
+        servicesData.map((s) => ({
+          id: s.id,
+          name: s.name,
+          price: Number(s.price ?? 0),
+          duration_minutes: s.duration_minutes ?? 30,
+          description: s.description ?? "",
+          image_url: s.image_url ?? "",
+          category: s.category ?? "",
+        })),
+      );
+    }
+  }, [servicesData, services]);
+
   const set = <K extends keyof Patch>(key: K, value: Patch[K]) =>
     setForm((f) => (f ? { ...f, [key]: value } : f));
 
@@ -172,8 +207,20 @@ export function OwnerWebsitePage() {
     if (!preview || !iframeReady || !form) return;
     const win = iframeRef.current?.contentWindow;
     if (!win) return;
-    win.postMessage({ type: "live-preview-overrides", patch: form }, "*");
-  }, [preview, iframeReady, form]);
+    const patch: Record<string, unknown> = { ...form };
+    if (services) {
+      patch.services = services.map((s) => ({
+        id: s.id,
+        name: s.name,
+        price: s.price,
+        duration: s.duration_minutes,
+        desc: s.description,
+        image: s.image_url || undefined,
+        category: s.category || undefined,
+      }));
+    }
+    win.postMessage({ type: "live-preview-overrides", patch }, "*");
+  }, [preview, iframeReady, form, services]);
 
   // Listen for the iframe's ready handshake.
   useEffect(() => {
@@ -236,6 +283,60 @@ export function OwnerWebsitePage() {
     if (!form) return;
     mutate.mutate(form);
   };
+
+  // ---------- Services editor helpers ----------
+  const addService = () => {
+    setServices((prev) => [
+      ...(prev ?? []),
+      { name: "New Service", price: 500, duration_minutes: 30, description: "", image_url: "", category: "" },
+    ]);
+  };
+  const updateService = (idx: number, patch: Partial<ServiceDraft>) => {
+    setServices((prev) => prev?.map((s, i) => (i === idx ? { ...s, ...patch } : s)) ?? null);
+  };
+  const removeService = (idx: number) => {
+    setServices((prev) => prev?.filter((_, i) => i !== idx) ?? null);
+  };
+  const saveServices = async () => {
+    if (!activeSalonId || !services) return;
+    setSavingServices(true);
+    try {
+      const originals = servicesData ?? [];
+      const draftIds = new Set(services.filter((s) => s.id).map((s) => s.id!));
+      // Delete removed rows
+      for (const orig of originals) {
+        if (!draftIds.has(orig.id)) {
+          await deleteSvc({ data: { id: orig.id } });
+        }
+      }
+      // Upsert current rows
+      for (const s of services) {
+        if (!s.name.trim()) continue;
+        await upsertSvc({
+          data: {
+            id: s.id,
+            salon_id: activeSalonId,
+            name: s.name.trim(),
+            description: s.description || null,
+            category: s.category || null,
+            duration_minutes: s.duration_minutes || 30,
+            price: Number(s.price) || 0,
+            is_active: true,
+            image_url: s.image_url ? s.image_url : null,
+          },
+        });
+      }
+      toast.success("Services saved");
+      await qc.invalidateQueries({ queryKey: ["owner", "services", activeSalonId] });
+      setServices(null); // re-init from fresh data
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to save services");
+    } finally {
+      setSavingServices(false);
+    }
+  };
+
+
 
 
   const uploadFile = async (file: File, folder: "cover" | "owner" | "gallery" | "video") => {
@@ -511,6 +612,97 @@ export function OwnerWebsitePage() {
             desc="Phone, WhatsApp, address, city"
             to="/owner/settings"
           />
+        </CardContent>
+      </Card>
+
+      {/* Services (Our Services / Rate Card) inline editor */}
+      <Card className="max-w-full overflow-hidden">
+        <CardHeader className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
+          <div className="min-w-0">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Scissors className="h-4 w-4" /> Our Services / Rate Card
+            </CardTitle>
+            <p className="text-muted-foreground text-xs mt-1">
+              Add ya edit karein — image URL paste karke turant live preview me dikhega. Save karke customers ko live karo.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={addService}>
+              <Plus className="h-4 w-4" /> Add Service
+            </Button>
+            <Button size="sm" onClick={saveServices} disabled={savingServices || !services}>
+              {savingServices ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              Save Services
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {(!services || services.length === 0) && (
+            <div className="text-muted-foreground rounded-lg border border-dashed py-6 text-center text-sm">
+              Koi service nahi. "Add Service" click karke shuru karein.
+            </div>
+          )}
+          {services?.map((s, idx) => (
+            <div key={s.id ?? `new-${idx}`} className="grid gap-2 rounded-lg border p-3 sm:grid-cols-[80px_minmax(0,1fr)_auto]">
+              <div className="h-20 w-20 shrink-0 overflow-hidden rounded-md border bg-muted grid place-items-center">
+                {s.image_url ? (
+                  <img src={s.image_url} alt={s.name} className="h-full w-full object-cover" />
+                ) : (
+                  <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                )}
+              </div>
+              <div className="min-w-0 grid gap-2 sm:grid-cols-2">
+                <Input
+                  placeholder="Service name (e.g. Haircut)"
+                  value={s.name}
+                  onChange={(e) => updateService(idx, { name: e.target.value })}
+                />
+                <Input
+                  placeholder="Category (Hair / Skin / Nails)"
+                  value={s.category}
+                  onChange={(e) => updateService(idx, { category: e.target.value })}
+                />
+                <Input
+                  type="number"
+                  min={0}
+                  placeholder="Price (₹)"
+                  value={s.price}
+                  onChange={(e) => updateService(idx, { price: Number(e.target.value) })}
+                />
+                <Input
+                  type="number"
+                  min={5}
+                  placeholder="Duration (minutes)"
+                  value={s.duration_minutes}
+                  onChange={(e) => updateService(idx, { duration_minutes: Number(e.target.value) })}
+                />
+                <Input
+                  className="sm:col-span-2"
+                  placeholder="Image URL (https://…)"
+                  value={s.image_url}
+                  onChange={(e) => updateService(idx, { image_url: e.target.value })}
+                />
+                <Textarea
+                  className="sm:col-span-2"
+                  rows={2}
+                  placeholder="Short description"
+                  value={s.description}
+                  onChange={(e) => updateService(idx, { description: e.target.value })}
+                />
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-destructive self-start"
+                onClick={() => removeService(idx)}
+              >
+                <Trash2 className="h-4 w-4" /> Remove
+              </Button>
+            </div>
+          ))}
+          <p className="text-xs text-muted-foreground">
+            Tip: Image URL kisi bhi public image ka ho sakta hai — apni Gallery se copy kar sakte ho ya Unsplash/imgur se paste karo.
+          </p>
         </CardContent>
       </Card>
 

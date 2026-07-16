@@ -26,6 +26,16 @@ import { toast } from "sonner";
 const DEFAULT_COVER =
   "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=1600&q=80";
 
+type LiveOverrideService = {
+  id?: string;
+  name: string;
+  price: number;
+  duration?: number | null;
+  desc?: string | null;
+  image?: string | null;
+  category?: string | null;
+};
+
 type LiveOverrides = Partial<{
   name: string;
   tagline: string | null;
@@ -45,6 +55,7 @@ type LiveOverrides = Partial<{
   home_service_charge: number;
   home_service_radius_km: number;
   selected_template_key: string;
+  services: LiveOverrideService[];
 }>;
 
 export function WhiteLabelWebsitePage({
@@ -203,11 +214,26 @@ export function WhiteLabelWebsitePage({
   }
 
   const fallbackShop = expandMockBusiness(mockBusiness ?? getMockBusinesses()[0]);
-  const shop: ShopData = data?.salon
+  const baseShop: ShopData = data?.salon
     ? toShopData(data)
     : liveOverrides && isPreview
       ? toLivePreviewShop(fallbackShop, liveOverrides, _slug)
       : fallbackShop;
+  const shop: ShopData =
+    liveOverrides?.services && liveOverrides.services.length >= 0
+      ? {
+          ...baseShop,
+          services: liveOverrides.services.map((s, i) => ({
+            id: s.id ?? `draft-${i}`,
+            name: s.name,
+            price: Number(s.price) || 0,
+            duration: Number(s.duration ?? 30) || 30,
+            desc: s.desc ?? "",
+            image: s.image ?? undefined,
+            category: s.category ?? undefined,
+          })),
+        }
+      : baseShop;
   const savedTemplateKey =
     data?.salon?.selected_template_key ?? liveOverrides?.selected_template_key ?? "modern-salon";
   const templateKey = normalizeTemplateKey(
