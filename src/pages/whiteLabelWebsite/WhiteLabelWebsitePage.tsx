@@ -51,12 +51,12 @@ export function WhiteLabelWebsitePage({
       setLiveError(null);
       setLiveState("updating");
       try {
-        const result = await queryClient.refetchQueries({
+        await queryClient.refetchQueries({
           queryKey: ["white-label-site", _slug],
           type: "active",
         });
-        const failed = result.find((r) => r.status === "error");
-        if (failed) throw (failed.error as Error) ?? new Error("Refetch failed");
+        const state = queryClient.getQueryState(["white-label-site", _slug]);
+        if (state?.status === "error") throw (state.error as Error) ?? new Error("Refetch failed");
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to refresh website.";
         setLiveError(message);
