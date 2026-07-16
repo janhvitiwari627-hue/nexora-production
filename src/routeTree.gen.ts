@@ -162,6 +162,7 @@ import { Route as PortalBrandsSlugRouteImport } from './routes/portal.brands.$sl
 import { Route as OwnerJobsNewRouteImport } from './routes/owner.jobs.new'
 import { Route as JobsApplicationsJobIdRouteImport } from './routes/jobs.applications.$jobId'
 import { Route as DashboardBookingsIdRouteImport } from './routes/dashboard.bookings.$id'
+import { Route as AppOwnerWebsiteEditorRouteImport } from './routes/app.owner.website-editor'
 import { Route as AppOwnerWebsiteRouteImport } from './routes/app.owner.website'
 import { Route as AppOwnerWalletRouteImport } from './routes/app.owner.wallet'
 import { Route as AppOwnerSupportRouteImport } from './routes/app.owner.support'
@@ -185,7 +186,6 @@ import { Route as ApiPublicHooksRecomputeRankingsRouteImport } from './routes/ap
 import { Route as ApiPublicHooksRecomputeInsightsRouteImport } from './routes/api/public/hooks/recompute-insights'
 import { Route as ApiPublicHooksProcessSettlementsRouteImport } from './routes/api/public/hooks/process-settlements'
 import { Route as ApiPublicAuthForgotPasswordRouteImport } from './routes/api/public/auth/forgot-password'
-import { Route as AuthenticatedAppOwnerWebsiteEditorRouteImport } from './routes/_authenticated.app.owner.website-editor'
 
 const WebsiteBuilderRoute = WebsiteBuilderRouteImport.update({
   id: '/website-builder',
@@ -956,6 +956,11 @@ const DashboardBookingsIdRoute = DashboardBookingsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => DashboardBookingsRoute,
 } as any)
+const AppOwnerWebsiteEditorRoute = AppOwnerWebsiteEditorRouteImport.update({
+  id: '/website-editor',
+  path: '/website-editor',
+  getParentRoute: () => AppOwnerRoute,
+} as any)
 const AppOwnerWebsiteRoute = AppOwnerWebsiteRouteImport.update({
   id: '/website',
   path: '/website',
@@ -1076,12 +1081,6 @@ const ApiPublicAuthForgotPasswordRoute =
   ApiPublicAuthForgotPasswordRouteImport.update({
     id: '/api/public/auth/forgot-password',
     path: '/api/public/auth/forgot-password',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AuthenticatedAppOwnerWebsiteEditorRoute =
-  AuthenticatedAppOwnerWebsiteEditorRouteImport.update({
-    id: '/_authenticated/app/owner/website-editor',
-    path: '/app/owner/website-editor',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -1238,6 +1237,7 @@ export interface FileRoutesByFullPath {
   '/app/owner/support': typeof AppOwnerSupportRoute
   '/app/owner/wallet': typeof AppOwnerWalletRoute
   '/app/owner/website': typeof AppOwnerWebsiteRoute
+  '/app/owner/website-editor': typeof AppOwnerWebsiteEditorRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
@@ -1254,7 +1254,6 @@ export interface FileRoutesByFullPath {
   '/app/owner/': typeof AppOwnerIndexRoute
   '/portal/brands/': typeof PortalBrandsIndexRoute
   '/portal/distributors/': typeof PortalDistributorsIndexRoute
-  '/app/owner/website-editor': typeof AuthenticatedAppOwnerWebsiteEditorRoute
   '/api/public/auth/forgot-password': typeof ApiPublicAuthForgotPasswordRoute
   '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
@@ -1410,6 +1409,7 @@ export interface FileRoutesByTo {
   '/app/owner/support': typeof AppOwnerSupportRoute
   '/app/owner/wallet': typeof AppOwnerWalletRoute
   '/app/owner/website': typeof AppOwnerWebsiteRoute
+  '/app/owner/website-editor': typeof AppOwnerWebsiteEditorRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
@@ -1426,7 +1426,6 @@ export interface FileRoutesByTo {
   '/app/owner': typeof AppOwnerIndexRoute
   '/portal/brands': typeof PortalBrandsIndexRoute
   '/portal/distributors': typeof PortalDistributorsIndexRoute
-  '/app/owner/website-editor': typeof AuthenticatedAppOwnerWebsiteEditorRoute
   '/api/public/auth/forgot-password': typeof ApiPublicAuthForgotPasswordRoute
   '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
@@ -1590,6 +1589,7 @@ export interface FileRoutesById {
   '/app/owner/support': typeof AppOwnerSupportRoute
   '/app/owner/wallet': typeof AppOwnerWalletRoute
   '/app/owner/website': typeof AppOwnerWebsiteRoute
+  '/app/owner/website-editor': typeof AppOwnerWebsiteEditorRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
@@ -1606,7 +1606,6 @@ export interface FileRoutesById {
   '/app/owner/': typeof AppOwnerIndexRoute
   '/portal/brands/': typeof PortalBrandsIndexRoute
   '/portal/distributors/': typeof PortalDistributorsIndexRoute
-  '/_authenticated/app/owner/website-editor': typeof AuthenticatedAppOwnerWebsiteEditorRoute
   '/api/public/auth/forgot-password': typeof ApiPublicAuthForgotPasswordRoute
   '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
@@ -1771,6 +1770,7 @@ export interface FileRouteTypes {
     | '/app/owner/support'
     | '/app/owner/wallet'
     | '/app/owner/website'
+    | '/app/owner/website-editor'
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
     | '/owner/jobs/new'
@@ -1787,7 +1787,6 @@ export interface FileRouteTypes {
     | '/app/owner/'
     | '/portal/brands/'
     | '/portal/distributors/'
-    | '/app/owner/website-editor'
     | '/api/public/auth/forgot-password'
     | '/api/public/hooks/process-settlements'
     | '/api/public/hooks/recompute-insights'
@@ -1943,6 +1942,7 @@ export interface FileRouteTypes {
     | '/app/owner/support'
     | '/app/owner/wallet'
     | '/app/owner/website'
+    | '/app/owner/website-editor'
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
     | '/owner/jobs/new'
@@ -1959,7 +1959,6 @@ export interface FileRouteTypes {
     | '/app/owner'
     | '/portal/brands'
     | '/portal/distributors'
-    | '/app/owner/website-editor'
     | '/api/public/auth/forgot-password'
     | '/api/public/hooks/process-settlements'
     | '/api/public/hooks/recompute-insights'
@@ -2122,6 +2121,7 @@ export interface FileRouteTypes {
     | '/app/owner/support'
     | '/app/owner/wallet'
     | '/app/owner/website'
+    | '/app/owner/website-editor'
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
     | '/owner/jobs/new'
@@ -2138,7 +2138,6 @@ export interface FileRouteTypes {
     | '/app/owner/'
     | '/portal/brands/'
     | '/portal/distributors/'
-    | '/_authenticated/app/owner/website-editor'
     | '/api/public/auth/forgot-password'
     | '/api/public/hooks/process-settlements'
     | '/api/public/hooks/recompute-insights'
@@ -2237,7 +2236,6 @@ export interface RootRouteChildren {
   SiteSlugServicesRoute: typeof SiteSlugServicesRoute
   PortalBrandsIndexRoute: typeof PortalBrandsIndexRoute
   PortalDistributorsIndexRoute: typeof PortalDistributorsIndexRoute
-  AuthenticatedAppOwnerWebsiteEditorRoute: typeof AuthenticatedAppOwnerWebsiteEditorRoute
   ApiPublicAuthForgotPasswordRoute: typeof ApiPublicAuthForgotPasswordRoute
   ApiPublicHooksProcessSettlementsRoute: typeof ApiPublicHooksProcessSettlementsRoute
   ApiPublicHooksRecomputeInsightsRoute: typeof ApiPublicHooksRecomputeInsightsRoute
@@ -3321,6 +3319,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardBookingsIdRouteImport
       parentRoute: typeof DashboardBookingsRoute
     }
+    '/app/owner/website-editor': {
+      id: '/app/owner/website-editor'
+      path: '/website-editor'
+      fullPath: '/app/owner/website-editor'
+      preLoaderRoute: typeof AppOwnerWebsiteEditorRouteImport
+      parentRoute: typeof AppOwnerRoute
+    }
     '/app/owner/website': {
       id: '/app/owner/website'
       path: '/website'
@@ -3480,13 +3485,6 @@ declare module '@tanstack/react-router' {
       path: '/api/public/auth/forgot-password'
       fullPath: '/api/public/auth/forgot-password'
       preLoaderRoute: typeof ApiPublicAuthForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/app/owner/website-editor': {
-      id: '/_authenticated/app/owner/website-editor'
-      path: '/app/owner/website-editor'
-      fullPath: '/app/owner/website-editor'
-      preLoaderRoute: typeof AuthenticatedAppOwnerWebsiteEditorRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -3719,6 +3717,7 @@ interface AppOwnerRouteChildren {
   AppOwnerSupportRoute: typeof AppOwnerSupportRoute
   AppOwnerWalletRoute: typeof AppOwnerWalletRoute
   AppOwnerWebsiteRoute: typeof AppOwnerWebsiteRoute
+  AppOwnerWebsiteEditorRoute: typeof AppOwnerWebsiteEditorRoute
   AppOwnerIndexRoute: typeof AppOwnerIndexRoute
 }
 
@@ -3728,6 +3727,7 @@ const AppOwnerRouteChildren: AppOwnerRouteChildren = {
   AppOwnerSupportRoute: AppOwnerSupportRoute,
   AppOwnerWalletRoute: AppOwnerWalletRoute,
   AppOwnerWebsiteRoute: AppOwnerWebsiteRoute,
+  AppOwnerWebsiteEditorRoute: AppOwnerWebsiteEditorRoute,
   AppOwnerIndexRoute: AppOwnerIndexRoute,
 }
 
@@ -3835,8 +3835,6 @@ const rootRouteChildren: RootRouteChildren = {
   SiteSlugServicesRoute: SiteSlugServicesRoute,
   PortalBrandsIndexRoute: PortalBrandsIndexRoute,
   PortalDistributorsIndexRoute: PortalDistributorsIndexRoute,
-  AuthenticatedAppOwnerWebsiteEditorRoute:
-    AuthenticatedAppOwnerWebsiteEditorRoute,
   ApiPublicAuthForgotPasswordRoute: ApiPublicAuthForgotPasswordRoute,
   ApiPublicHooksProcessSettlementsRoute: ApiPublicHooksProcessSettlementsRoute,
   ApiPublicHooksRecomputeInsightsRoute: ApiPublicHooksRecomputeInsightsRoute,

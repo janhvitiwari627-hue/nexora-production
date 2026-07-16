@@ -20,7 +20,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Loader2, Save, Eye, Globe } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/app/owner/website-editor")({
+export const Route = createFileRoute("/app/owner/website-editor")({
   head: () => ({
     meta: [{ title: "Website Editor — Nexora" }, { name: "robots", content: "noindex" }],
   }),
