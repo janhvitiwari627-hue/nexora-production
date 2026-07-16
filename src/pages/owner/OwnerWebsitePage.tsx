@@ -836,6 +836,125 @@ export function OwnerWebsitePage() {
         </CardContent>
       </Card>
 
+      {/* Meet the Team (Staff) inline editor */}
+      <Card className="max-w-full overflow-hidden">
+        <CardHeader className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
+          <div className="min-w-0">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Users className="h-4 w-4" /> Meet the Team
+            </CardTitle>
+            <p className="text-muted-foreground text-xs mt-1">
+              Team members add karein — photo upload karke turant live preview me dikhega. Save karke customers ke liye publish karo.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={addStaff}>
+              <Plus className="h-4 w-4" /> Add Member
+            </Button>
+            <Button size="sm" onClick={saveStaff} disabled={savingStaff || !staff}>
+              {savingStaff ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              Save Team
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {(!staff || staff.length === 0) && (
+            <div className="text-muted-foreground rounded-lg border border-dashed py-6 text-center text-sm">
+              Koi team member nahi. "Add Member" click karke shuru karein.
+            </div>
+          )}
+          {staff?.map((s, idx) => (
+            <div
+              key={s.id ?? `new-staff-${idx}`}
+              className="grid gap-2 rounded-lg border p-3 sm:grid-cols-[80px_minmax(0,1fr)_auto]"
+            >
+              <div className="flex flex-col items-center gap-1.5">
+                <div className="h-20 w-20 shrink-0 overflow-hidden rounded-full border bg-muted grid place-items-center relative">
+                  {s.avatar_url ? (
+                    <img src={s.avatar_url} alt={s.name} className="h-full w-full object-cover" />
+                  ) : (
+                    <Users className="h-6 w-6 text-muted-foreground" />
+                  )}
+                  {uploadingStaffIdx === idx && (
+                    <div className="absolute inset-0 grid place-items-center bg-black/50">
+                      <Loader2 className="h-5 w-5 animate-spin text-white" />
+                    </div>
+                  )}
+                </div>
+                <label className="cursor-pointer text-[11px] font-medium text-primary hover:underline">
+                  {s.avatar_url ? "Change" : "Upload"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) void handleStaffAvatarUpload(idx, f);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+                {s.avatar_url && (
+                  <button
+                    type="button"
+                    className="text-[11px] text-destructive hover:underline"
+                    onClick={() => updateStaff(idx, { avatar_url: "" })}
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+              <div className="min-w-0 grid gap-2 sm:grid-cols-2">
+                <Input
+                  placeholder="Full name (e.g. Priya R.)"
+                  value={s.name}
+                  onChange={(e) => updateStaff(idx, { name: e.target.value })}
+                />
+                <Input
+                  placeholder="Role (e.g. Senior Stylist)"
+                  value={s.role}
+                  onChange={(e) => updateStaff(idx, { role: e.target.value })}
+                />
+                <Input
+                  type="number"
+                  min={0}
+                  max={5}
+                  step={0.1}
+                  placeholder="Rating (0-5)"
+                  value={s.rating}
+                  onChange={(e) => updateStaff(idx, { rating: Number(e.target.value) })}
+                />
+                <Input
+                  placeholder="Ya photo URL paste karein (optional)"
+                  value={s.avatar_url}
+                  onChange={(e) => updateStaff(idx, { avatar_url: e.target.value })}
+                />
+                <Textarea
+                  className="sm:col-span-2"
+                  rows={2}
+                  placeholder="Short bio / specialization (e.g. Hair Color · Balayage · 8 yrs)"
+                  value={s.bio}
+                  onChange={(e) => updateStaff(idx, { bio: e.target.value })}
+                />
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-destructive self-start"
+                onClick={() => removeStaff(idx)}
+              >
+                <Trash2 className="h-4 w-4" /> Remove
+              </Button>
+            </div>
+          ))}
+          <p className="text-xs text-muted-foreground">
+            Tip: Har member ki photo circle me dikhegi. Save Team ke baad site par live ho jayegi.
+          </p>
+        </CardContent>
+      </Card>
+
+
+
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Brand customizer */}
         <Card className="max-w-full overflow-hidden">
