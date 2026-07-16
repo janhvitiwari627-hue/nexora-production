@@ -323,6 +323,24 @@ export function OwnerSettingsPage() {
         </p>
       </header>
 
+      {draftRestored && isDirty && (
+        <div className="flex flex-col gap-2 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 sm:flex-row sm:items-center sm:justify-between dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200">
+          <span>
+            <strong className="font-semibold">Draft restored.</strong> Aapke pichhle unsaved edits
+            yahan wapas load kiye gaye hain. Save karke apply karein ya discard karein.
+          </span>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={discardDraft}
+            className="border-amber-400 text-amber-900 hover:bg-amber-100 dark:border-amber-400/50 dark:text-amber-100 dark:hover:bg-amber-500/20"
+          >
+            Discard draft
+          </Button>
+        </div>
+      )}
+
+
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Business basics</CardTitle>
