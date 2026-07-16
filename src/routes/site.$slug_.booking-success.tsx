@@ -32,6 +32,9 @@ function money(value: unknown) {
 
 function BookingSuccessPage() {
   const { slug } = Route.useParams();
+  if (!slug || slug === "undefined" || slug === "null") {
+    return <SalonNotFound />;
+  }
   const { booking } = Route.useSearch();
   const receipt = useQuery({
     queryKey: ["public-booking-receipt", booking],
