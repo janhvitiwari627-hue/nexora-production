@@ -95,6 +95,7 @@ export function OwnerWebsitePage() {
   const [form, setForm] = useState<Patch | null>(null);
   const [preview, setPreview] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
 
   useEffect(() => {
     if (salon && !form) {
