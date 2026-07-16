@@ -193,10 +193,11 @@ export function SmartSearchCard() {
           {/* CTA */}
           <button
             onClick={() => submit()}
-            className="ripple relative overflow-hidden rounded-[16px] bg-gradient-to-r from-[#635BFF] to-[#7A73FF] px-7 py-4 text-sm font-bold text-white shadow-[0_10px_30px_-10px_rgba(99,91,255,0.55)] transition hover:scale-[1.02] active:scale-[0.98]"
+            className="ripple relative w-full overflow-hidden rounded-[16px] bg-gradient-to-r from-[#635BFF] to-[#7A73FF] px-7 py-3.5 text-sm font-bold text-white shadow-[0_10px_30px_-10px_rgba(99,91,255,0.55)] transition hover:scale-[1.02] active:scale-[0.98] md:w-auto md:py-4"
           >
             Find Services
           </button>
+
         </div>
 
         {/* Trending chips */}
