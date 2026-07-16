@@ -1,5 +1,6 @@
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { WhiteLabelWebsitePage } from "@/pages/whiteLabelWebsite/WhiteLabelWebsitePage";
+import { SalonNotFound } from "@/pages/public/site/SalonNotFound";
 
 export const Route = createFileRoute("/site/$businessSlug")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -7,8 +8,16 @@ export const Route = createFileRoute("/site/$businessSlug")({
     preview: search.preview === "1" || search.preview === 1 || search.preview === true ? 1 : undefined,
   }),
   head: ({ params }) => {
-    const url = `https://meripahalfasthelp.online/site/${params.businessSlug}`;
-    const title = "Nexora SalonOS — Salon website";
+    const isValid =
+      params.businessSlug &&
+      params.businessSlug !== "undefined" &&
+      params.businessSlug !== "null";
+    const url = isValid
+      ? `https://meripahalfasthelp.online/site/${params.businessSlug}`
+      : "https://meripahalfasthelp.online";
+    const title = isValid
+      ? "Nexora SalonOS — Salon website"
+      : "Salon not found · Nexora";
     const description = "Discover services, stylists and book appointments online.";
     return {
       meta: [
@@ -31,5 +40,8 @@ export const Route = createFileRoute("/site/$businessSlug")({
 function WhiteLabelRouteComponent() {
   const { businessSlug } = useParams({ from: "/site/$businessSlug" });
   const search = Route.useSearch();
+  if (!businessSlug || businessSlug === "undefined" || businessSlug === "null") {
+    return <SalonNotFound />;
+  }
   return <WhiteLabelWebsitePage slug={businessSlug} routeSearch={search} />;
 }
