@@ -31,7 +31,6 @@ function BookingSuccessPage() {
     retry: false,
   });
   const salonQuery = useQuery(salonBySlugQueryOptions(slug));
-  });
 
   if (receipt.isLoading) {
     return (
