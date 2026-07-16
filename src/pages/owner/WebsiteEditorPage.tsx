@@ -208,6 +208,7 @@ export function WebsiteEditorPage() {
             <SectionEditor
               section={selected}
               content={content}
+              salonId={salonId ?? null}
               onFieldChange={updateContent}
               onToggleVisible={(v) => patchSection(selected.id, { is_visible: v })}
             />
