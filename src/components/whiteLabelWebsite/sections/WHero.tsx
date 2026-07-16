@@ -111,7 +111,7 @@ export function WHero({ shop, template }: { shop: ShopData; template: TemplateCo
         <p className="mx-auto max-w-xl text-base font-light tracking-wide opacity-85 md:text-lg">{shop.tagline}</p>
         <div className="flex flex-wrap justify-center gap-3 pt-4">
           <Button size="lg" className="royal-shimmer relative overflow-hidden border-0 px-8 py-6 text-sm font-medium uppercase tracking-[0.25em]" style={{ backgroundColor: template.colors.secondary, color: "#0A0A0A", borderRadius: 2 }} asChild>
-            <Link to="/book/$slug" params={{ slug: shop.slug }}><Calendar className="h-4 w-4" /> Reserve Your Visit</Link>
+            <Link to="/site/$slug_/book" params={{ slug_: shop.slug }} search={{ service: undefined }}><Calendar className="h-4 w-4" /> Reserve Your Visit</Link>
           </Button>
           <Button size="lg" variant="outline" className="border px-8 py-6 text-sm font-medium uppercase tracking-[0.25em] text-white hover:bg-white/10" style={{ borderColor: "rgba(212,175,55,0.5)", borderRadius: 2, backgroundColor: "transparent" }} asChild>
             <a href="#services">Discover Services</a>
