@@ -4,6 +4,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { CalendarDays, Clock, IndianRupee, LoaderCircle, ShieldCheck } from "lucide-react";
 import { salonBySlugQueryOptions } from "@/lib/salons.queries";
 import { createPublicAppointment } from "@/lib/public-booking";
+import { sendBookingConfirmationEmail } from "@/lib/booking-email.functions";
 import {
   PublishedSiteShell,
   PublishedSiteUnavailable,
