@@ -399,9 +399,11 @@ export function OwnerSettingsPage() {
       </div>
 
       <AlertDialog
-        open={blocker.status === "blocked"}
+        open={blocker.status === "blocked" || pendingHref !== null}
         onOpenChange={(open) => {
-          if (!open && blocker.status === "blocked") blocker.reset();
+          if (open) return;
+          if (blocker.status === "blocked") blocker.reset();
+          setPendingHref(null);
         }}
       >
         <AlertDialogContent>
@@ -415,13 +417,22 @@ export function OwnerSettingsPage() {
             <AlertDialogCancel
               onClick={() => {
                 if (blocker.status === "blocked") blocker.reset();
+                setPendingHref(null);
               }}
             >
               Stay on page
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
-                if (blocker.status === "blocked") blocker.proceed();
+                if (blocker.status === "blocked") {
+                  blocker.proceed();
+                } else if (pendingHref) {
+                  const href = pendingHref;
+                  setBaseline(form); // clear dirty so navigate won't re-block
+                  setPendingHref(null);
+                  // Use the router so back button works and no full reload.
+                  navigate({ to: href });
+                }
               }}
             >
               Discard & leave
