@@ -474,12 +474,25 @@ export function OwnerSettingsPage() {
         </CardContent>
       </Card>
 
-      <div className="sticky bottom-0 flex items-center justify-end gap-2 border-t bg-background/95 py-3 backdrop-blur">
-        {isDirty && (
+      <div className="sticky bottom-0 flex flex-wrap items-center justify-end gap-2 border-t bg-background/95 py-3 backdrop-blur">
+        {isDirty ? (
           <span className="mr-auto text-xs text-muted-foreground">Unsaved changes · autosaved as draft</span>
+        ) : (
+          <span className="mr-auto text-xs text-muted-foreground">
+            Next: template, colors, banner & live preview →
+          </span>
         )}
-        <Button variant="outline" onClick={() => navigate({ to: "/owner/welcome" })}>
+        <Button variant="ghost" onClick={() => navigate({ to: "/owner/welcome" })}>
           Back
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => navigate({ to: "/owner/website" })}
+          disabled={save.isPending}
+          title="Template chunein, colors/banner edit karein aur live preview dekhein"
+        >
+          <Sparkles className="mr-2 h-4 w-4" />
+          {isDirty ? "Skip & Edit Website" : "Continue: Edit & Live Preview"}
         </Button>
         <Button
           onClick={() => save.mutate()}
@@ -490,7 +503,7 @@ export function OwnerSettingsPage() {
           ) : (
             <Save className="mr-2 h-4 w-4" />
           )}
-          Save changes
+          Save & Continue
         </Button>
       </div>
 
