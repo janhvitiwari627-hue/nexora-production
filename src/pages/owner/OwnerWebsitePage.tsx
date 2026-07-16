@@ -615,6 +615,97 @@ export function OwnerWebsitePage() {
         </CardContent>
       </Card>
 
+      {/* Services (Our Services / Rate Card) inline editor */}
+      <Card className="max-w-full overflow-hidden">
+        <CardHeader className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
+          <div className="min-w-0">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Scissors className="h-4 w-4" /> Our Services / Rate Card
+            </CardTitle>
+            <p className="text-muted-foreground text-xs mt-1">
+              Add ya edit karein — image URL paste karke turant live preview me dikhega. Save karke customers ko live karo.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={addService}>
+              <Plus className="h-4 w-4" /> Add Service
+            </Button>
+            <Button size="sm" onClick={saveServices} disabled={savingServices || !services}>
+              {savingServices ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              Save Services
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {(!services || services.length === 0) && (
+            <div className="text-muted-foreground rounded-lg border border-dashed py-6 text-center text-sm">
+              Koi service nahi. "Add Service" click karke shuru karein.
+            </div>
+          )}
+          {services?.map((s, idx) => (
+            <div key={s.id ?? `new-${idx}`} className="grid gap-2 rounded-lg border p-3 sm:grid-cols-[80px_minmax(0,1fr)_auto]">
+              <div className="h-20 w-20 shrink-0 overflow-hidden rounded-md border bg-muted grid place-items-center">
+                {s.image_url ? (
+                  <img src={s.image_url} alt={s.name} className="h-full w-full object-cover" />
+                ) : (
+                  <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                )}
+              </div>
+              <div className="min-w-0 grid gap-2 sm:grid-cols-2">
+                <Input
+                  placeholder="Service name (e.g. Haircut)"
+                  value={s.name}
+                  onChange={(e) => updateService(idx, { name: e.target.value })}
+                />
+                <Input
+                  placeholder="Category (Hair / Skin / Nails)"
+                  value={s.category}
+                  onChange={(e) => updateService(idx, { category: e.target.value })}
+                />
+                <Input
+                  type="number"
+                  min={0}
+                  placeholder="Price (₹)"
+                  value={s.price}
+                  onChange={(e) => updateService(idx, { price: Number(e.target.value) })}
+                />
+                <Input
+                  type="number"
+                  min={5}
+                  placeholder="Duration (minutes)"
+                  value={s.duration_minutes}
+                  onChange={(e) => updateService(idx, { duration_minutes: Number(e.target.value) })}
+                />
+                <Input
+                  className="sm:col-span-2"
+                  placeholder="Image URL (https://…)"
+                  value={s.image_url}
+                  onChange={(e) => updateService(idx, { image_url: e.target.value })}
+                />
+                <Textarea
+                  className="sm:col-span-2"
+                  rows={2}
+                  placeholder="Short description"
+                  value={s.description}
+                  onChange={(e) => updateService(idx, { description: e.target.value })}
+                />
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-destructive self-start"
+                onClick={() => removeService(idx)}
+              >
+                <Trash2 className="h-4 w-4" /> Remove
+              </Button>
+            </div>
+          ))}
+          <p className="text-xs text-muted-foreground">
+            Tip: Image URL kisi bhi public image ka ho sakta hai — apni Gallery se copy kar sakte ho ya Unsplash/imgur se paste karo.
+          </p>
+        </CardContent>
+      </Card>
+
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Brand customizer */}
         <Card className="max-w-full overflow-hidden">
