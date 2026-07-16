@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { LoaderCircle, Search } from "lucide-react";
 import { listCustomerAppSalons } from "@/lib/customer-app";
+import { useAuthStore } from "@/stores/authStore";
 import { CustomerSalonCard } from "./CustomerSalonCard";
 
 const CATEGORIES = ["All", "Salon", "Beauty Parlour", "Spa", "Barber Shop", "Nail Art Studio"];
@@ -15,12 +16,18 @@ export function CustomerAppSearch({
 }) {
   const [query, setQuery] = useState(initialQuery);
   const [category, setCategory] = useState(initialCategory);
+  const gender = useAuthStore((state) =>
+    state.profile?.gender === "male" || state.profile?.gender === "female"
+      ? state.profile.gender
+      : null,
+  );
   const shops = useQuery({
-    queryKey: ["customer-app", "salons", query, category],
+    queryKey: ["customer-app", "salons", query, category, gender],
     queryFn: () =>
       listCustomerAppSalons({
         q: query || undefined,
         category: category && category !== "All" ? category : undefined,
+        gender,
         limit: 50,
       }),
   });

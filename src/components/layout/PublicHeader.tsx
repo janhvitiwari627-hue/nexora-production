@@ -262,6 +262,9 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
                       {email}
                     </span>
                   )}
+                  <span className="truncate text-[11px] font-semibold text-primary">
+                    Nexora member{profile?.nexora_id ? ` · ID ${profile.nexora_id}` : ""}
+                  </span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>

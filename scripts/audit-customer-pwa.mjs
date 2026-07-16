@@ -16,7 +16,9 @@ const files = [
   "src/pages/customer/app/CustomerAppBookings.tsx",
   "src/pages/customer/app/CustomerAppRewards.tsx",
   "src/pages/customer/app/CustomerAppProfile.tsx",
+  "src/pages/customer/app/CustomerAvatar.tsx",
   "supabase/migrations/20260716130000_customer_pwa_staff_booking.sql",
+  "supabase/migrations/20260716130020_persist_customer_gender.sql",
 ];
 
 const failures = [];
@@ -36,10 +38,26 @@ if (!liveSalons.includes('.eq("website_created", true)')) {
 if (/DEMO_SHOPS|mock/i.test(liveSalons)) {
   failures.push("Customer app salon discovery must not use demo data");
 }
+if (!liveSalons.includes('input?.gender === "male"') || !liveSalons.includes('"Beauty Parlour"')) {
+  failures.push("Customer salon discovery must respect the saved gender preference");
+}
 
 const home = readFileSync("src/pages/customer/app/CustomerAppHome.tsx", "utf8");
 if (!home.includes("geolocation.getCurrentPosition")) {
   failures.push("Customer app must request real location permission");
+}
+
+const signup = readFileSync("src/pages/auth/SignupPage.tsx", "utf8");
+if (
+  !signup.includes('gender: z.enum(["male", "female"]') ||
+  !signup.includes("gender: parsed.data.gender")
+) {
+  failures.push("Customer signup must require and persist gender");
+}
+
+const profile = readFileSync("src/pages/customer/app/CustomerAppProfile.tsx", "utf8");
+if (!profile.includes("Nexora member") || !profile.includes("Choose profile photo")) {
+  failures.push("Customer profile must show the member ID and photo chooser");
 }
 
 const staffMigration = readFileSync(

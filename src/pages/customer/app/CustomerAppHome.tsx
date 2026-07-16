@@ -5,6 +5,7 @@ import { ArrowRight, LoaderCircle, MapPin, Search } from "lucide-react";
 import { toast } from "sonner";
 import { listCustomerAppSalons } from "@/lib/customer-app";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuthStore } from "@/stores/authStore";
 import { CustomerSalonCard } from "./CustomerSalonCard";
 
 const CATEGORIES = [
@@ -18,9 +19,14 @@ const CATEGORIES = [
 
 export function CustomerAppHome() {
   const [locating, setLocating] = useState(false);
+  const gender = useAuthStore((state) =>
+    state.profile?.gender === "male" || state.profile?.gender === "female"
+      ? state.profile.gender
+      : null,
+  );
   const shops = useQuery({
-    queryKey: ["customer-app", "salons", "home"],
-    queryFn: () => listCustomerAppSalons({ limit: 6 }),
+    queryKey: ["customer-app", "salons", "home", gender],
+    queryFn: () => listCustomerAppSalons({ gender, limit: 6 }),
   });
 
   const requestLocation = () => {
@@ -113,7 +119,9 @@ export function CustomerAppHome() {
       <section className="mt-8">
         <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="text-sm font-bold text-violet-700">Nearby salons</p>
+            <p className="text-sm font-bold text-violet-700">
+              {gender ? `Recommended for ${gender === "male" ? "men" : "women"}` : "Nearby salons"}
+            </p>
             <h2 className="mt-1 text-2xl font-black">Popular around you</h2>
           </div>
           <Link

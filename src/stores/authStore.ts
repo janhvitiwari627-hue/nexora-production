@@ -55,6 +55,10 @@ async function ensureProfileExists(user: User) {
   const current = await loadProfileAndRoles(user.id);
   if (!current.profile) {
     console.log("[Auth Store] Creating missing profile for user:", user.id);
+    const pendingGender =
+      typeof window !== "undefined"
+        ? window.sessionStorage.getItem("nexora_pending_customer_gender")
+        : null;
     const { data: profile, error } = await supabase
       .from("profiles")
       .insert({
@@ -62,6 +66,12 @@ async function ensureProfileExists(user: User) {
         email: user.email,
         full_name: user.user_metadata?.full_name ?? null,
         mobile: user.user_metadata?.mobile ?? null,
+        gender:
+          user.user_metadata?.gender === "male" || user.user_metadata?.gender === "female"
+            ? user.user_metadata.gender
+            : pendingGender === "male" || pendingGender === "female"
+              ? pendingGender
+              : null,
         referred_by: user.user_metadata?.referred_by ?? null,
         is_active: true,
         is_verified: false,
@@ -74,9 +84,29 @@ async function ensureProfileExists(user: User) {
       console.error("[Auth Store] Failed to create profile:", error);
       throw error;
     }
+    if (pendingGender === "male" || pendingGender === "female") {
+      window.sessionStorage.removeItem("nexora_pending_customer_gender");
+    }
     console.log("[Auth Store] Profile created successfully for user:", user.id);
     return { profile, roles: current.roles };
   }
+
+  if (typeof window !== "undefined") {
+    const pendingGender = window.sessionStorage.getItem("nexora_pending_customer_gender");
+    if (!current.profile.gender && (pendingGender === "male" || pendingGender === "female")) {
+      const { data: updatedProfile, error } = await supabase
+        .from("profiles")
+        .update({ gender: pendingGender, updated_at: new Date().toISOString() })
+        .eq("id", user.id)
+        .select("*")
+        .single();
+      if (!error) {
+        window.sessionStorage.removeItem("nexora_pending_customer_gender");
+        return { profile: updatedProfile, roles: current.roles };
+      }
+    }
+  }
+
   return current;
 }
 

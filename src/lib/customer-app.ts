@@ -4,6 +4,7 @@ import type { Shop } from "@/components/shared/ShopCard";
 export async function listCustomerAppSalons(input?: {
   q?: string;
   category?: string;
+  gender?: "male" | "female" | null;
   limit?: number;
 }): Promise<Shop[]> {
   let query = supabase
@@ -17,6 +18,16 @@ export async function listCustomerAppSalons(input?: {
 
   if (input?.category && input.category !== "All") {
     query = query.eq("category", input.category);
+  } else if (input?.gender === "male") {
+    query = query.in("category", ["Barber Shop", "Salon", "Spa"]);
+  } else if (input?.gender === "female") {
+    query = query.in("category", [
+      "Beauty Parlour",
+      "Salon",
+      "Spa",
+      "Nail Art Studio",
+      "Makeup Artist",
+    ]);
   }
   if (input?.q?.trim()) {
     const term = input.q.trim().replace(/[%_,]/g, "");

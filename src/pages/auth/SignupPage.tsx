@@ -10,7 +10,10 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Eye, EyeOff, CheckCircle2 } from "lucide-react";
-import { PasswordStrengthIndicator, scorePassword } from "@/components/auth/PasswordStrengthIndicator";
+import {
+  PasswordStrengthIndicator,
+  scorePassword,
+} from "@/components/auth/PasswordStrengthIndicator";
 import { BackButton } from "@/components/shared/BackButton";
 import { useAuthStore } from "@/stores/authStore";
 import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
@@ -36,13 +39,12 @@ const schema = z
       .trim()
       .min(1, "Mobile number is required")
       .transform((v) => v.replace(/[\s-]/g, ""))
-      .pipe(
-        z
-          .string()
-          .regex(/^(\+91)?[6-9]\d{9}$/, "Enter a valid 10-digit mobile number"),
-      ),
+      .pipe(z.string().regex(/^(\+91)?[6-9]\d{9}$/, "Enter a valid 10-digit mobile number")),
     password: z.string().min(8, "Password must be at least 8 characters").max(72),
     confirm_password: z.string(),
+    gender: z.enum(["male", "female"], {
+      message: "Please select Male or Female",
+    }),
   })
   .refine((d) => d.password === d.confirm_password, {
     path: ["confirm_password"],
@@ -70,16 +72,25 @@ export default function SignupPage() {
     mobile: "",
     password: "",
     confirm_password: "",
+    gender: "" as "" | "male" | "female",
   });
   const urlRef = (search?.ref ?? "").trim().slice(0, 20);
   const referredBy = useMemo(() => {
     if (typeof window === "undefined") return urlRef;
     const KEY = "nexora_pending_ref";
     if (urlRef) {
-      try { window.sessionStorage.setItem(KEY, urlRef); } catch { /* ignore */ }
+      try {
+        window.sessionStorage.setItem(KEY, urlRef);
+      } catch {
+        /* ignore */
+      }
       return urlRef;
     }
-    try { return (window.sessionStorage.getItem(KEY) ?? "").slice(0, 20); } catch { return ""; }
+    try {
+      return (window.sessionStorage.getItem(KEY) ?? "").slice(0, 20);
+    } catch {
+      return "";
+    }
   }, [urlRef]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -184,6 +195,7 @@ export default function SignupPage() {
             full_name: parsed.data.full_name,
             mobile: parsed.data.mobile,
             referred_by: referredBy || null,
+            gender: parsed.data.gender,
             // Force customer role — trigger ignores unknown/disallowed roles
             role: "customer",
           },
@@ -194,7 +206,8 @@ export default function SignupPage() {
         const raw = parseErr(error);
         let msg = raw;
         if (/already registered|already exists/i.test(raw)) {
-          msg = "Email already registered hai. Please sign in karein, ya password bhool gaye hain to reset link bhejein.";
+          msg =
+            "Email already registered hai. Please sign in karein, ya password bhool gaye hain to reset link bhejein.";
           setAlreadyRegisteredEmail(email);
           setResetSent(false);
         } else if (/weak password|pwned|breach/i.test(raw)) {
@@ -219,7 +232,11 @@ export default function SignupPage() {
       if (session) {
         useAuthStore.getState().setSession(session);
         await useAuthStore.getState().refreshProfile();
-        try { window.sessionStorage.removeItem("nexora_pending_ref"); } catch { /* ignore */ }
+        try {
+          window.sessionStorage.removeItem("nexora_pending_ref");
+        } catch {
+          /* ignore */
+        }
         setSuccess("signed_in");
         const redirectTo = await resolvePostLoginRedirect(session.user.id);
         setTimeout(() => navigate({ to: redirectTo, replace: true }), 600);
@@ -230,7 +247,6 @@ export default function SignupPage() {
       setSubmitting(false);
     }
   };
-
 
   if (success === "signed_in") {
     return (
@@ -261,159 +277,198 @@ export default function SignupPage() {
             <CardDescription>Sign up as a customer to discover and book salons.</CardDescription>
           </CardHeader>
           <CardContent>
-          {typeof serverError === "string" && serverError.trim().length > 0 && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertDescription>{serverError.trim()}</AlertDescription>
-            </Alert>
-          )}
+            {typeof serverError === "string" && serverError.trim().length > 0 && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertDescription>{serverError.trim()}</AlertDescription>
+              </Alert>
+            )}
 
-          {alreadyRegisteredEmail && (
-            <Alert className="mb-4 border-primary/20 bg-primary/5">
-              <AlertDescription className="space-y-2 text-sm">
-                <p>
-                  <strong>{alreadyRegisteredEmail}</strong> already registered hai. Same account use karne ke liye login karein.
-                </p>
-                {resetSent ? (
-                  <p className="font-medium text-primary">Reset link sent. Inbox/spam check karke new password set karein.</p>
-                ) : (
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    <Button type="button" variant="outline" size="sm" asChild>
-                      <Link to="/login">Go to login</Link>
-                    </Button>
-                    <Button
+            {alreadyRegisteredEmail && (
+              <Alert className="mb-4 border-primary/20 bg-primary/5">
+                <AlertDescription className="space-y-2 text-sm">
+                  <p>
+                    <strong>{alreadyRegisteredEmail}</strong> already registered hai. Same account
+                    use karne ke liye login karein.
+                  </p>
+                  {resetSent ? (
+                    <p className="font-medium text-primary">
+                      Reset link sent. Inbox/spam check karke new password set karein.
+                    </p>
+                  ) : (
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <Button type="button" variant="outline" size="sm" asChild>
+                        <Link to="/login">Go to login</Link>
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={sendResetLink}
+                        disabled={resetSubmitting || submitting}
+                      >
+                        {resetSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        Reset password
+                      </Button>
+                    </div>
+                  )}
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {referredBy && (
+              <Alert className="mb-4 border-primary/20 bg-primary/5">
+                <AlertDescription className="text-sm">
+                  Joining with referral code <strong className="font-mono">{referredBy}</strong>.
+                  <span className="block text-xs text-muted-foreground mt-0.5">
+                    Referral rewards will be activated soon.
+                  </span>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="full_name">Full name</Label>
+                <Input
+                  id="full_name"
+                  autoComplete="name"
+                  value={form.full_name}
+                  onChange={update("full_name")}
+                  disabled={submitting}
+                />
+                {errors.full_name && <p className="text-xs text-destructive">{errors.full_name}</p>}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  value={form.email}
+                  onChange={update("email")}
+                  disabled={submitting}
+                />
+                {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="mobile">Phone</Label>
+                <Input
+                  id="mobile"
+                  type="tel"
+                  autoComplete="tel"
+                  placeholder="+91 9876543210"
+                  value={form.mobile}
+                  onChange={update("mobile")}
+                  disabled={submitting}
+                />
+                {errors.mobile && <p className="text-xs text-destructive">{errors.mobile}</p>}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>Gender</Label>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { value: "male", label: "Male" },
+                    { value: "female", label: "Female" },
+                  ].map((option) => (
+                    <button
+                      key={option.value}
                       type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={sendResetLink}
-                      disabled={resetSubmitting || submitting}
+                      onClick={() => {
+                        setForm((current) => ({
+                          ...current,
+                          gender: option.value as "male" | "female",
+                        }));
+                        setErrors((current) => ({ ...current, gender: "" }));
+                      }}
+                      disabled={submitting}
+                      className={`rounded-xl border px-4 py-3 text-sm font-bold transition ${
+                        form.gender === option.value
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "bg-background text-foreground hover:border-primary/40"
+                      }`}
                     >
-                      {resetSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                      Reset password
-                    </Button>
-                  </div>
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  This helps us show relevant salons and services.
+                </p>
+                {errors.gender && <p className="text-xs text-destructive">{errors.gender}</p>}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPw ? "text" : "password"}
+                    autoComplete="new-password"
+                    value={form.password}
+                    onChange={update("password")}
+                    disabled={submitting}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPw((s) => !s)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    tabIndex={-1}
+                  >
+                    {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                {form.password && <PasswordStrengthIndicator password={form.password} />}
+                {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="confirm_password">Confirm password</Label>
+                <div className="relative">
+                  <Input
+                    id="confirm_password"
+                    type={showConfirm ? "text" : "password"}
+                    autoComplete="new-password"
+                    value={form.confirm_password}
+                    onChange={update("confirm_password")}
+                    disabled={submitting}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirm((s) => !s)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    tabIndex={-1}
+                  >
+                    {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                {errors.confirm_password && (
+                  <p className="text-xs text-destructive">{errors.confirm_password}</p>
                 )}
-              </AlertDescription>
-            </Alert>
-          )}
-
-          {referredBy && (
-            <Alert className="mb-4 border-primary/20 bg-primary/5">
-              <AlertDescription className="text-sm">
-                Joining with referral code <strong className="font-mono">{referredBy}</strong>.
-                <span className="block text-xs text-muted-foreground mt-0.5">Referral rewards will be activated soon.</span>
-              </AlertDescription>
-            </Alert>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="full_name">Full name</Label>
-              <Input
-                id="full_name"
-                autoComplete="name"
-                value={form.full_name}
-                onChange={update("full_name")}
-                disabled={submitting}
-              />
-              {errors.full_name && <p className="text-xs text-destructive">{errors.full_name}</p>}
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                autoComplete="email"
-                value={form.email}
-                onChange={update("email")}
-                disabled={submitting}
-              />
-              {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="mobile">Phone</Label>
-              <Input
-                id="mobile"
-                type="tel"
-                autoComplete="tel"
-                placeholder="+91 9876543210"
-                value={form.mobile}
-                onChange={update("mobile")}
-                disabled={submitting}
-              />
-              {errors.mobile && <p className="text-xs text-destructive">{errors.mobile}</p>}
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPw ? "text" : "password"}
-                  autoComplete="new-password"
-                  value={form.password}
-                  onChange={update("password")}
-                  disabled={submitting}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPw((s) => !s)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
-                  tabIndex={-1}
-                >
-                  {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
               </div>
-              {form.password && <PasswordStrengthIndicator password={form.password} />}
-              {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
-            </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="confirm_password">Confirm password</Label>
-              <div className="relative">
-                <Input
-                  id="confirm_password"
-                  type={showConfirm ? "text" : "password"}
-                  autoComplete="new-password"
-                  value={form.confirm_password}
-                  onChange={update("confirm_password")}
-                  disabled={submitting}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirm((s) => !s)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
-                  tabIndex={-1}
-                >
-                  {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-              {errors.confirm_password && (
-                <p className="text-xs text-destructive">{errors.confirm_password}</p>
-              )}
-            </div>
+              <Button type="submit" className="w-full" disabled={submitting}>
+                {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Create account
+              </Button>
+            </form>
 
-            <Button type="submit" className="w-full" disabled={submitting}>
-              {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create account
-            </Button>
-          </form>
-
-          <p className="mt-4 text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
-            <Link to="/login" className="text-primary font-medium hover:underline">
-              Sign in
-            </Link>
-          </p>
-          <p className="mt-2 text-center text-xs text-muted-foreground">
-            Are you a salon owner?{" "}
-            <Link to="/owner-signup" className="text-primary hover:underline">
-              Register your business
-            </Link>
-          </p>
-        </CardContent>
-      </Card>
+            <p className="mt-4 text-center text-sm text-muted-foreground">
+              Already have an account?{" "}
+              <Link to="/login" className="text-primary font-medium hover:underline">
+                Sign in
+              </Link>
+            </p>
+            <p className="mt-2 text-center text-xs text-muted-foreground">
+              Are you a salon owner?{" "}
+              <Link to="/owner-signup" className="text-primary hover:underline">
+                Register your business
+              </Link>
+            </p>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

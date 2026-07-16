@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ChevronRight, Crown, Heart, LifeBuoy, LogIn, Settings, Users } from "lucide-react";
+import { Camera, ChevronRight, Crown, Heart, LifeBuoy, LogIn, Settings, Users } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 import { CustomerAvatar } from "./CustomerAvatar";
 
@@ -46,8 +46,23 @@ export function CustomerAppProfile() {
         <div className="min-w-0">
           <h1 className="truncate text-2xl font-black">{name}</h1>
           <p className="truncate text-sm text-slate-500">{user.email || profile?.mobile}</p>
+          <p className="mt-1 truncate text-xs font-bold text-violet-700">
+            Nexora member{profile?.nexora_id ? ` · ID ${profile.nexora_id}` : ""}
+          </p>
+          <p className="mt-1 text-xs capitalize text-slate-500">
+            {profile?.gender
+              ? `${profile.gender} recommendations`
+              : "Add gender for personalised salons"}
+          </p>
         </div>
       </section>
+      <Link
+        to="/dashboard/settings"
+        className="mt-3 flex items-center justify-center gap-2 rounded-2xl border bg-white px-4 py-3 text-sm font-bold text-violet-700"
+      >
+        <Camera className="h-4 w-4" />
+        {profile?.avatar_url ? "Change profile photo" : "Choose profile photo"}
+      </Link>
       <div className="mt-6 overflow-hidden rounded-2xl border bg-white">
         {LINKS.map((item) => (
           <Link
