@@ -11,6 +11,7 @@ import {
 import { getPublicAppointmentReceipt } from "@/lib/public-booking";
 import { salonBySlugQueryOptions } from "@/lib/salons.queries";
 import { buildIcs, downloadIcs } from "@/lib/ics";
+import { SalonNotFound } from "@/pages/public/site/SalonNotFound";
 
 export const Route = createFileRoute("/site/$slug_/booking-success")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -31,6 +32,9 @@ function money(value: unknown) {
 
 function BookingSuccessPage() {
   const { slug } = Route.useParams();
+  if (!slug || slug === "undefined" || slug === "null") {
+    return <SalonNotFound />;
+  }
   const { booking } = Route.useSearch();
   const receipt = useQuery({
     queryKey: ["public-booking-receipt", booking],
