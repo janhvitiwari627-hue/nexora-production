@@ -58,6 +58,7 @@ import { Route as JobsIndexRouteImport } from './routes/jobs.index'
 import { Route as HireIndexRouteImport } from './routes/hire.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as WWebsiteIdRouteImport } from './routes/w.$websiteId'
 import { Route as TemplatePreviewKeyRouteImport } from './routes/template-preview.$key'
 import { Route as StaffDashboardRouteImport } from './routes/staff.dashboard'
 import { Route as SiteBusinessSlugRouteImport } from './routes/site.$businessSlug'
@@ -431,6 +432,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const WWebsiteIdRoute = WWebsiteIdRouteImport.update({
+  id: '/w/$websiteId',
+  path: '/w/$websiteId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const TemplatePreviewKeyRoute = TemplatePreviewKeyRouteImport.update({
   id: '/template-preview/$key',
@@ -1215,6 +1221,7 @@ export interface FileRoutesByFullPath {
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/staff/dashboard': typeof StaffDashboardRoute
   '/template-preview/$key': typeof TemplatePreviewKeyRoute
+  '/w/$websiteId': typeof WWebsiteIdRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/hire/': typeof HireIndexRoute
@@ -1387,6 +1394,7 @@ export interface FileRoutesByTo {
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/staff/dashboard': typeof StaffDashboardRoute
   '/template-preview/$key': typeof TemplatePreviewKeyRoute
+  '/w/$websiteId': typeof WWebsiteIdRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/hire': typeof HireIndexRoute
@@ -1567,6 +1575,7 @@ export interface FileRoutesById {
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/staff/dashboard': typeof StaffDashboardRoute
   '/template-preview/$key': typeof TemplatePreviewKeyRoute
+  '/w/$websiteId': typeof WWebsiteIdRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/hire/': typeof HireIndexRoute
@@ -1748,6 +1757,7 @@ export interface FileRouteTypes {
     | '/site/$businessSlug'
     | '/staff/dashboard'
     | '/template-preview/$key'
+    | '/w/$websiteId'
     | '/admin/'
     | '/dashboard/'
     | '/hire/'
@@ -1920,6 +1930,7 @@ export interface FileRouteTypes {
     | '/site/$businessSlug'
     | '/staff/dashboard'
     | '/template-preview/$key'
+    | '/w/$websiteId'
     | '/admin'
     | '/dashboard'
     | '/hire'
@@ -2099,6 +2110,7 @@ export interface FileRouteTypes {
     | '/site/$businessSlug'
     | '/staff/dashboard'
     | '/template-preview/$key'
+    | '/w/$websiteId'
     | '/admin/'
     | '/dashboard/'
     | '/hire/'
@@ -2222,6 +2234,7 @@ export interface RootRouteChildren {
   SiteBusinessSlugRoute: typeof SiteBusinessSlugRoute
   StaffDashboardRoute: typeof StaffDashboardRoute
   TemplatePreviewKeyRoute: typeof TemplatePreviewKeyRoute
+  WWebsiteIdRoute: typeof WWebsiteIdRoute
   HireIndexRoute: typeof HireIndexRoute
   JobsIndexRoute: typeof JobsIndexRoute
   PortalIndexRoute: typeof PortalIndexRoute
@@ -2590,6 +2603,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/w/$websiteId': {
+      id: '/w/$websiteId'
+      path: '/w/$websiteId'
+      fullPath: '/w/$websiteId'
+      preLoaderRoute: typeof WWebsiteIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/template-preview/$key': {
       id: '/template-preview/$key'
@@ -3821,6 +3841,7 @@ const rootRouteChildren: RootRouteChildren = {
   SiteBusinessSlugRoute: SiteBusinessSlugRoute,
   StaffDashboardRoute: StaffDashboardRoute,
   TemplatePreviewKeyRoute: TemplatePreviewKeyRoute,
+  WWebsiteIdRoute: WWebsiteIdRoute,
   HireIndexRoute: HireIndexRoute,
   JobsIndexRoute: JobsIndexRoute,
   PortalIndexRoute: PortalIndexRoute,
