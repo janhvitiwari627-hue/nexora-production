@@ -1,15 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import {
-  ChevronRight,
-  Crown,
-  Heart,
-  LifeBuoy,
-  LogIn,
-  Settings,
-  UserRound,
-  Users,
-} from "lucide-react";
+import { ChevronRight, Crown, Heart, LifeBuoy, LogIn, Settings, Users } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
+import { CustomerAvatar } from "./CustomerAvatar";
 
 const LINKS = [
   { icon: Heart, label: "Favourite salons", to: "/dashboard/favorites" },
@@ -50,9 +42,7 @@ export function CustomerAppProfile() {
   return (
     <main className="mx-auto max-w-2xl px-4 py-6 sm:py-10">
       <section className="flex items-center gap-4 rounded-3xl border bg-white p-6">
-        <div className="grid h-16 w-16 place-items-center rounded-full bg-violet-100 text-violet-700">
-          <UserRound className="h-8 w-8" />
-        </div>
+        <CustomerAvatar className="h-16 w-16 text-xl" iconClassName="h-8 w-8" />
         <div className="min-w-0">
           <h1 className="truncate text-2xl font-black">{name}</h1>
           <p className="truncate text-sm text-slate-500">{user.email || profile?.mobile}</p>

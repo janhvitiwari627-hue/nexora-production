@@ -3,6 +3,7 @@ import { CalendarDays, Gift, Home, Search, UserRound } from "lucide-react";
 import nexoraLogo from "@/assets/nexora-logo.jpg.asset.json";
 import { LocationPermissionModal } from "@/components/auth/LocationPermissionModal";
 import { useAuthStore } from "@/stores/authStore";
+import { CustomerAvatar } from "./CustomerAvatar";
 
 const NAV = [
   { to: "/app/customer", label: "Home", icon: Home, exact: true },
@@ -33,9 +34,10 @@ export function CustomerAppShell() {
           {user ? (
             <Link
               to="/app/customer/profile"
-              className="max-w-40 truncate rounded-full bg-violet-50 px-4 py-2 text-sm font-bold text-violet-800"
+              className="flex max-w-44 items-center gap-2 rounded-full border border-violet-200 bg-violet-50 py-1 pl-1 pr-3 text-sm font-bold text-violet-800"
             >
-              {profile?.full_name || "My profile"}
+              <CustomerAvatar className="h-8 w-8" iconClassName="h-4 w-4" />
+              <span className="truncate">{profile?.full_name || "My profile"}</span>
             </Link>
           ) : (
             <div className="flex items-center gap-2">
@@ -76,7 +78,11 @@ export function CustomerAppShell() {
                   }`}
                 >
                   <span className={`rounded-full px-4 py-1 ${active ? "bg-violet-100" : ""}`}>
-                    <item.icon className="h-5 w-5" />
+                    {item.label === "Profile" && user ? (
+                      <CustomerAvatar className="h-6 w-6" iconClassName="h-3.5 w-3.5" />
+                    ) : (
+                      <item.icon className="h-5 w-5" />
+                    )}
                   </span>
                   {item.label}
                 </Link>
