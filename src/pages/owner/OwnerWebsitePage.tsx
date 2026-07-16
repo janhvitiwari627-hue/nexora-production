@@ -339,7 +339,7 @@ export function OwnerWebsitePage() {
 
 
 
-  const uploadFile = async (file: File, folder: "cover" | "owner" | "gallery" | "video") => {
+  const uploadFile = async (file: File, folder: "cover" | "owner" | "gallery" | "video" | "services") => {
     if (!activeSalonId) return null;
     const isVideo = folder === "video";
     const maxBytes = isVideo ? 10 * 1024 * 1024 : 2 * 1024 * 1024;
