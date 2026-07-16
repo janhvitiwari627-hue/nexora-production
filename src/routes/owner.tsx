@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, redirect, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { BackButton } from "@/components/shared/BackButton";
 import { ViewSwitcher } from "@/components/layout/ViewSwitcher";
 import { requireRole } from "@/lib/route-guards";
@@ -7,12 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/owner")({
   ssr: false,
   beforeLoad: async ({ location }) => {
-    const publicPaths = [
-      "/owner/welcome",
-      "/owner/register-business",
-      "/owner/templates",
-      "/owner/create-website",
-    ];
+    const publicPaths = ["/owner/register-business", "/owner/templates", "/owner/create-website"];
     if (publicPaths.some((p) => location.pathname.startsWith(p))) return;
 
     // Friendly interstitial for unauthenticated visitors before the login redirect.
@@ -33,12 +28,6 @@ export const Route = createFileRoute("/owner")({
 });
 
 function OwnerLayout() {
-  const isPublicWelcome = useRouterState({
-    select: (state) => state.location.pathname === "/owner/welcome",
-  });
-
-  if (isPublicWelcome) return <Outlet />;
-
   return (
     <div className="min-h-screen bg-background">
       <div className="sticky top-0 z-30 border-b border-border/60 bg-card/90 backdrop-blur">
