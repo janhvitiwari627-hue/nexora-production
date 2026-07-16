@@ -340,24 +340,62 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
         </div>
 
         {/* Mobile */}
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-0.5 md:hidden">
+          <LocationChip className="hidden xs:inline-flex sm:inline-flex" />
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Search"
+            asChild
+            className="h-9 w-9 shrink-0"
+          >
+            <Link to="/search">
+              <Search className="h-5 w-5" />
+            </Link>
+          </Button>
           {isAuthed && (
-            <Button variant="ghost" size="icon" aria-label="Notifications" asChild>
-              <Link to="/dashboard/notifications">
-                <Bell className="h-5 w-5" />
-              </Link>
-            </Button>
+            <>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Wishlist"
+                asChild
+                className="h-9 w-9 shrink-0"
+              >
+                <Link to="/dashboard/favorites">
+                  <Heart className="h-5 w-5" />
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Notifications"
+                asChild
+                className="h-9 w-9 shrink-0"
+              >
+                <Link to="/dashboard/notifications">
+                  <Bell className="h-5 w-5" />
+                </Link>
+              </Button>
+            </>
           )}
           <Button
             variant="ghost"
             size="icon"
             aria-label="Menu"
             onClick={() => setMenuOpen((v) => !v)}
+            className="h-9 w-9 shrink-0"
           >
             <Menu className="h-5 w-5" />
           </Button>
         </div>
       </div>
+
+      {/* Mobile secondary row: location chip (always visible on very small screens) */}
+      <div className="mx-auto flex max-w-7xl items-center gap-2 px-3 pb-2 md:hidden">
+        <LocationChip className="inline-flex" />
+      </div>
+
 
       <MobileMenuOverlay open={menuOpen} onClose={() => setMenuOpen(false)} />
 
