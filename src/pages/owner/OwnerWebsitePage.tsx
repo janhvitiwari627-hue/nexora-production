@@ -126,9 +126,31 @@ export function OwnerWebsitePage() {
 
   const publicUrl = useMemo(() => (salon?.slug ? `/site/${salon.slug}` : ""), [salon?.slug]);
   const selectedTemplate = getTemplate(salon?.selected_template_key);
-  const previewUrl = salon?.is_active
-    ? publicUrl
-    : `/template-preview/${encodeURIComponent(selectedTemplate.key)}`;
+  const previewUrl = salon?.slug
+    ? `/site/${salon.slug}?preview=1&live=1`
+    : `/template-preview/${encodeURIComponent(selectedTemplate.key)}?live=1`;
+
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const [iframeReady, setIframeReady] = useState(false);
+
+  // Post current form patch to the live preview iframe whenever it changes.
+  useEffect(() => {
+    if (!preview || !iframeReady || !form) return;
+    const win = iframeRef.current?.contentWindow;
+    if (!win) return;
+    win.postMessage({ type: "live-preview-overrides", patch: form }, "*");
+  }, [preview, iframeReady, form]);
+
+  // Listen for the iframe's ready handshake.
+  useEffect(() => {
+    if (!preview) return;
+    setIframeReady(false);
+    const onMessage = (e: MessageEvent) => {
+      if (e.data?.type === "live-preview-ready") setIframeReady(true);
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [preview]);
 
   const handleSave = () => {
     if (!form) return;
