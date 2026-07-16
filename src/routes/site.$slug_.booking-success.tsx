@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { CalendarDays, CheckCircle2, Clock, LoaderCircle } from "lucide-react";
+import { CalendarDays, CheckCircle2, Clock, LoaderCircle, MessageCircle } from "lucide-react";
 import { getPublicAppointmentReceipt } from "@/lib/public-booking";
+import { salonBySlugQueryOptions } from "@/lib/salons.queries";
 
 export const Route = createFileRoute("/site/$slug_/booking-success")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -29,6 +30,7 @@ function BookingSuccessPage() {
     enabled: Boolean(booking),
     retry: false,
   });
+  const salonQuery = useQuery(salonBySlugQueryOptions(slug));
 
   if (receipt.isLoading) {
     return (
@@ -118,7 +120,28 @@ function BookingSuccessPage() {
           </div>
         </dl>
 
-        <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+        {(() => {
+          const salon = salonQuery.data?.salon;
+          const rawWa = (salon?.whatsapp ?? salon?.phone ?? "") as string;
+          const waDigits = rawWa.replace(/[^\d]/g, "");
+          if (!waDigits) return null;
+          const message = encodeURIComponent(
+            `Hi ${salon?.name ?? ""}, I just booked ${row.service_name} on ${row.booking_date} at ${String(row.booking_time).slice(0, 5)}. Reference: ${row.booking_reference}.`,
+          );
+          return (
+            <a
+              href={`https://wa.me/${waDigits}?text=${message}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-600 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-800 hover:bg-emerald-100"
+            >
+              <MessageCircle className="h-4 w-4" />
+              Message salon on WhatsApp
+            </a>
+          );
+        })()}
+
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row">
           <Link
             to="/dashboard/bookings"
             className="inline-flex flex-1 justify-center rounded-xl bg-violet-700 px-4 py-2.5 text-sm font-semibold text-white"

@@ -4,6 +4,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { CalendarDays, Clock, IndianRupee, LoaderCircle, ShieldCheck } from "lucide-react";
 import { salonBySlugQueryOptions } from "@/lib/salons.queries";
 import { createPublicAppointment } from "@/lib/public-booking";
+import { sendBookingConfirmationEmail } from "@/lib/booking-email.functions";
 import {
   PublishedSiteShell,
   PublishedSiteUnavailable,
@@ -61,6 +62,7 @@ function PublishedBookingPage() {
   const [time, setTime] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [mobile, setMobile] = useState("");
+  const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -96,6 +98,26 @@ function PublishedBookingPage() {
         mobile,
         staffId: staffId || null,
       });
+      if (email) {
+        try {
+          await sendBookingConfirmationEmail({
+            data: {
+              email,
+              customerName,
+              bookingReference: appointment.booking_reference,
+              salonName: data.salon.name,
+              serviceName: selectedService.name,
+              date,
+              time,
+              total,
+              advance,
+              remaining,
+            },
+          });
+        } catch (mailErr) {
+          console.error("Confirmation email failed", mailErr);
+        }
+      }
       await navigate({
         to: "/site/$slug_/booking-success",
         params: { slug },
@@ -267,6 +289,18 @@ function PublishedBookingPage() {
                   required
                   className="mt-1 w-full rounded-xl border bg-white px-3 py-2.5"
                   placeholder="9876543210"
+                />
+              </label>
+              <label className="text-sm font-medium sm:col-span-2">
+                Email <span className="text-slate-500 font-normal">(for confirmation)</span>
+                <input
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  type="email"
+                  autoComplete="email"
+                  maxLength={320}
+                  className="mt-1 w-full rounded-xl border bg-white px-3 py-2.5"
+                  placeholder="you@example.com"
                 />
               </label>
             </fieldset>
