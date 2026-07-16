@@ -75,7 +75,7 @@ export function WhiteLabelHeader({ shop, template }: { shop: ShopData; template:
             style={{ backgroundColor: template.colors.primary, color: "white", borderRadius: template.radius }}
             asChild
           >
-            <Link to="/site/$slug_/book" params={{ slug: shop.slug }} search={{ service: undefined }}>Book Now</Link>
+            <Link to="/site/$slug_/book" params={{ slug_: shop.slug }} search={{ service: undefined }}>Book Now</Link>
           </Button>
           <button
             type="button"
@@ -105,7 +105,7 @@ export function WhiteLabelHeader({ shop, template }: { shop: ShopData; template:
               style={{ backgroundColor: template.colors.primary, color: "white", borderRadius: template.radius }}
               asChild
             >
-              <Link to="/site/$slug_/book" params={{ slug: shop.slug }} search={{ service: undefined }} onClick={() => setOpen(false)}>Book Now</Link>
+              <Link to="/site/$slug_/book" params={{ slug_: shop.slug }} search={{ service: undefined }} onClick={() => setOpen(false)}>Book Now</Link>
             </Button>
           </nav>
         </div>
