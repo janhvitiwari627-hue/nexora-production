@@ -185,6 +185,7 @@ import { Route as ApiPublicHooksRecomputeRankingsRouteImport } from './routes/ap
 import { Route as ApiPublicHooksRecomputeInsightsRouteImport } from './routes/api/public/hooks/recompute-insights'
 import { Route as ApiPublicHooksProcessSettlementsRouteImport } from './routes/api/public/hooks/process-settlements'
 import { Route as ApiPublicAuthForgotPasswordRouteImport } from './routes/api/public/auth/forgot-password'
+import { Route as AuthenticatedAppOwnerWebsiteEditorRouteImport } from './routes/_authenticated.app.owner.website-editor'
 
 const WebsiteBuilderRoute = WebsiteBuilderRouteImport.update({
   id: '/website-builder',
@@ -1077,6 +1078,12 @@ const ApiPublicAuthForgotPasswordRoute =
     path: '/api/public/auth/forgot-password',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedAppOwnerWebsiteEditorRoute =
+  AuthenticatedAppOwnerWebsiteEditorRouteImport.update({
+    id: '/_authenticated/app/owner/website-editor',
+    path: '/app/owner/website-editor',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -1247,6 +1254,7 @@ export interface FileRoutesByFullPath {
   '/app/owner/': typeof AppOwnerIndexRoute
   '/portal/brands/': typeof PortalBrandsIndexRoute
   '/portal/distributors/': typeof PortalDistributorsIndexRoute
+  '/app/owner/website-editor': typeof AuthenticatedAppOwnerWebsiteEditorRoute
   '/api/public/auth/forgot-password': typeof ApiPublicAuthForgotPasswordRoute
   '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
@@ -1418,6 +1426,7 @@ export interface FileRoutesByTo {
   '/app/owner': typeof AppOwnerIndexRoute
   '/portal/brands': typeof PortalBrandsIndexRoute
   '/portal/distributors': typeof PortalDistributorsIndexRoute
+  '/app/owner/website-editor': typeof AuthenticatedAppOwnerWebsiteEditorRoute
   '/api/public/auth/forgot-password': typeof ApiPublicAuthForgotPasswordRoute
   '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
@@ -1597,6 +1606,7 @@ export interface FileRoutesById {
   '/app/owner/': typeof AppOwnerIndexRoute
   '/portal/brands/': typeof PortalBrandsIndexRoute
   '/portal/distributors/': typeof PortalDistributorsIndexRoute
+  '/_authenticated/app/owner/website-editor': typeof AuthenticatedAppOwnerWebsiteEditorRoute
   '/api/public/auth/forgot-password': typeof ApiPublicAuthForgotPasswordRoute
   '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
@@ -1777,6 +1787,7 @@ export interface FileRouteTypes {
     | '/app/owner/'
     | '/portal/brands/'
     | '/portal/distributors/'
+    | '/app/owner/website-editor'
     | '/api/public/auth/forgot-password'
     | '/api/public/hooks/process-settlements'
     | '/api/public/hooks/recompute-insights'
@@ -1948,6 +1959,7 @@ export interface FileRouteTypes {
     | '/app/owner'
     | '/portal/brands'
     | '/portal/distributors'
+    | '/app/owner/website-editor'
     | '/api/public/auth/forgot-password'
     | '/api/public/hooks/process-settlements'
     | '/api/public/hooks/recompute-insights'
@@ -2126,6 +2138,7 @@ export interface FileRouteTypes {
     | '/app/owner/'
     | '/portal/brands/'
     | '/portal/distributors/'
+    | '/_authenticated/app/owner/website-editor'
     | '/api/public/auth/forgot-password'
     | '/api/public/hooks/process-settlements'
     | '/api/public/hooks/recompute-insights'
@@ -2224,6 +2237,7 @@ export interface RootRouteChildren {
   SiteSlugServicesRoute: typeof SiteSlugServicesRoute
   PortalBrandsIndexRoute: typeof PortalBrandsIndexRoute
   PortalDistributorsIndexRoute: typeof PortalDistributorsIndexRoute
+  AuthenticatedAppOwnerWebsiteEditorRoute: typeof AuthenticatedAppOwnerWebsiteEditorRoute
   ApiPublicAuthForgotPasswordRoute: typeof ApiPublicAuthForgotPasswordRoute
   ApiPublicHooksProcessSettlementsRoute: typeof ApiPublicHooksProcessSettlementsRoute
   ApiPublicHooksRecomputeInsightsRoute: typeof ApiPublicHooksRecomputeInsightsRoute
@@ -3468,6 +3482,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAuthForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/app/owner/website-editor': {
+      id: '/_authenticated/app/owner/website-editor'
+      path: '/app/owner/website-editor'
+      fullPath: '/app/owner/website-editor'
+      preLoaderRoute: typeof AuthenticatedAppOwnerWebsiteEditorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -3814,6 +3835,8 @@ const rootRouteChildren: RootRouteChildren = {
   SiteSlugServicesRoute: SiteSlugServicesRoute,
   PortalBrandsIndexRoute: PortalBrandsIndexRoute,
   PortalDistributorsIndexRoute: PortalDistributorsIndexRoute,
+  AuthenticatedAppOwnerWebsiteEditorRoute:
+    AuthenticatedAppOwnerWebsiteEditorRoute,
   ApiPublicAuthForgotPasswordRoute: ApiPublicAuthForgotPasswordRoute,
   ApiPublicHooksProcessSettlementsRoute: ApiPublicHooksProcessSettlementsRoute,
   ApiPublicHooksRecomputeInsightsRoute: ApiPublicHooksRecomputeInsightsRoute,
