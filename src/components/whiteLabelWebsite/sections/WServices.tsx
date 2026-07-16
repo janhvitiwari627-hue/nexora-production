@@ -62,7 +62,7 @@ export function WServices({ shop, template }: { shop: ShopData; template: Templa
               </div>
               <Link
                 to="/site/$slug_/book"
-                params={{ slug: shop.slug }}
+                params={{ slug_: shop.slug }}
                 search={{ service: s.id }}
                 className="mt-2 block rounded-md py-2 text-center text-sm font-semibold text-white transition hover:opacity-90"
                 style={{ backgroundColor: template.colors.primary, borderRadius: template.radius }}

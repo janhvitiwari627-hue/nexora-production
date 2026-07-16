@@ -52,7 +52,7 @@ export function WAppointmentForm({ shop, template }: { shop: ShopData; template:
               borderRadius: template.radius,
             }}
           >
-            <Link to="/site/$slug_/book" params={{ slug: shop.slug }} search={{ service: undefined }}>
+            <Link to="/site/$slug_/book" params={{ slug_: shop.slug }} search={{ service: undefined }}>
               <Calendar className="h-4 w-4" /> Start Booking
             </Link>
           </Button>
