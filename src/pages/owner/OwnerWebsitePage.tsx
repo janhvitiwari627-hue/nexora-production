@@ -737,7 +737,7 @@ export function OwnerWebsitePage() {
             </div>
           ))}
           <p className="text-xs text-muted-foreground">
-            Tip: Image URL kisi bhi public image ka ho sakta hai — apni Gallery se copy kar sakte ho ya Unsplash/imgur se paste karo.
+            Tip: Thumbnail par "Upload" click karke apne phone/computer se image chunein (max 2MB). Ya optional URL field me public image link paste karein.
           </p>
         </CardContent>
       </Card>
