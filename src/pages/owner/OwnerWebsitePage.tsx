@@ -384,10 +384,63 @@ export function OwnerWebsitePage() {
     }
   };
 
+  // ---------- Staff (Meet the Team) editor helpers ----------
+  const addStaff = () => {
+    setStaff((prev) => [
+      ...(prev ?? []),
+      { name: "New Team Member", role: "Stylist", bio: "", avatar_url: "", rating: 5 },
+    ]);
+  };
+  const updateStaff = (idx: number, patch: Partial<StaffDraft>) => {
+    setStaff((prev) => prev?.map((s, i) => (i === idx ? { ...s, ...patch } : s)) ?? null);
+  };
+  const removeStaff = (idx: number) => {
+    setStaff((prev) => prev?.filter((_, i) => i !== idx) ?? null);
+  };
+  const [uploadingStaffIdx, setUploadingStaffIdx] = useState<number | null>(null);
+  const handleStaffAvatarUpload = async (idx: number, file: File) => {
+    setUploadingStaffIdx(idx);
+    const url = await uploadFile(file, "staff");
+    setUploadingStaffIdx(null);
+    if (url) updateStaff(idx, { avatar_url: url });
+  };
+  const saveStaff = async () => {
+    if (!activeSalonId || !staff) return;
+    setSavingStaff(true);
+    try {
+      const originals = staffData ?? [];
+      const draftIds = new Set(staff.filter((s) => s.id).map((s) => s.id!));
+      for (const orig of originals) {
+        if (!draftIds.has(orig.id)) {
+          await deleteStaffFn({ data: { id: orig.id } });
+        }
+      }
+      for (const s of staff) {
+        if (!s.name.trim()) continue;
+        await upsertStaffFn({
+          data: {
+            id: s.id,
+            salon_id: activeSalonId,
+            name: s.name.trim(),
+            role: s.role || null,
+            bio: s.bio || null,
+            avatar_url: s.avatar_url || null,
+            rating: Number(s.rating) || 5,
+            is_active: true,
+          },
+        });
+      }
+      toast.success("Team saved");
+      await qc.invalidateQueries({ queryKey: ["owner", "staff", activeSalonId] });
+      setStaff(null);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to save team");
+    } finally {
+      setSavingStaff(false);
+    }
+  };
 
-
-
-  const uploadFile = async (file: File, folder: "cover" | "owner" | "gallery" | "video" | "services") => {
+  const uploadFile = async (file: File, folder: "cover" | "owner" | "gallery" | "video" | "services" | "staff") => {
     if (!activeSalonId) return null;
     const isVideo = folder === "video";
     const maxBytes = isVideo ? 10 * 1024 * 1024 : 2 * 1024 * 1024;
