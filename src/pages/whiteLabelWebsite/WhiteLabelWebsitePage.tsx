@@ -202,10 +202,14 @@ export function WhiteLabelWebsitePage({
     );
   }
 
+  const fallbackShop = expandMockBusiness(mockBusiness ?? getMockBusinesses()[0]);
   const shop: ShopData = data?.salon
     ? toShopData(data)
-    : expandMockBusiness(mockBusiness ?? getMockBusinesses()[0]);
-  const savedTemplateKey = data?.salon?.selected_template_key ?? "modern-salon";
+    : liveOverrides && isPreview
+      ? toLivePreviewShop(fallbackShop, liveOverrides, _slug)
+      : fallbackShop;
+  const savedTemplateKey =
+    data?.salon?.selected_template_key ?? liveOverrides?.selected_template_key ?? "modern-salon";
   const templateKey = normalizeTemplateKey(
     routeSearch?.t ?? browserSearch?.get("t") ?? savedTemplateKey,
   );
@@ -214,9 +218,9 @@ export function WhiteLabelWebsitePage({
   const config: WebsiteConfig = {
     template: templateKey,
     branding: {
-      logo: data?.salon?.owner_profile_image_url ?? undefined,
-      primaryColor: data?.salon?.brand_primary ?? baseTemplate.colors.primary,
-      secondaryColor: data?.salon?.brand_secondary ?? baseTemplate.colors.secondary,
+      logo: data?.salon?.owner_profile_image_url ?? liveOverrides?.owner_profile_image_url ?? undefined,
+      primaryColor: data?.salon?.brand_primary ?? liveOverrides?.brand_primary ?? baseTemplate.colors.primary,
+      secondaryColor: data?.salon?.brand_secondary ?? liveOverrides?.brand_secondary ?? baseTemplate.colors.secondary,
       font: baseTemplate.font,
     },
     sections: DEFAULT_SECTIONS,
@@ -411,6 +415,36 @@ function toShopData(data: NonNullable<Awaited<ReturnType<typeof getSalonBySlug>>
     socialLinks: {},
     hours: toWebsiteHours(salon.hours),
     location: { lat: salon.latitude ?? 0, lng: salon.longitude ?? 0 },
+  };
+}
+
+function toLivePreviewShop(base: ShopData, patch: LiveOverrides, slug?: string): ShopData {
+  const cover = patch.cover_image_url ?? base.coverImage;
+  const gallery: ShopData["gallery"] = (patch.gallery_images ?? base.gallery.map((g) => g.url)).map(
+    (url, i) => ({
+      url,
+      type: "photo" as const,
+      category: i % 2 ? "Work" : "Interior",
+    }),
+  );
+  if (patch.video_url) {
+    gallery.push({ url: patch.video_url, type: "video", category: "Salon Video" });
+  }
+  return {
+    ...base,
+    slug: slug ?? base.slug,
+    name: patch.name ?? base.name,
+    tagline: patch.tagline ?? patch.description ?? base.tagline,
+    address: patch.address ?? base.address,
+    whatsapp: patch.phone ?? base.whatsapp,
+    phone: patch.phone ?? base.phone,
+    email: patch.email ?? base.email,
+    coverImage: cover,
+    logoImage: patch.owner_profile_image_url ?? base.logoImage,
+    videoUrl: patch.video_url ?? base.videoUrl,
+    about: patch.about_us ?? patch.description ?? base.about,
+    gallery,
+    hours: toWebsiteHours(patch.hours).length ? toWebsiteHours(patch.hours) : base.hours,
   };
 }
 
