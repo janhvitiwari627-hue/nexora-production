@@ -1,25 +1,47 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Clock, IndianRupee } from "lucide-react";
 import { salonBySlugQueryOptions } from "@/lib/salons.queries";
-import {
-  PublishedSiteShell,
-  PublishedSiteUnavailable,
-} from "@/pages/public/site/PublishedSiteShell";
+import { PublishedSiteShell } from "@/pages/public/site/PublishedSiteShell";
 
 export const Route = createFileRoute("/site/$slug_/services")({
+  beforeLoad: ({ params }) => {
+    // Guard against links that accidentally serialize an undefined slug —
+    // sending users to the homepage is friendlier than a dead-end error.
+    if (!params.slug || params.slug === "undefined" || params.slug === "null") {
+      throw redirect({ to: "/" });
+    }
+  },
   loader: ({ context, params }) =>
     context.queryClient.ensureQueryData(salonBySlugQueryOptions(params.slug)),
-  head: ({ params }) => ({
-    meta: [{ title: `Services · ${params.slug} · Nexora` }],
-  }),
+  head: ({ params }) => {
+    const label = params.slug && params.slug !== "undefined" ? params.slug : "salon";
+    return { meta: [{ title: `Services · ${label} · Nexora` }] };
+  },
   component: PublishedServicesPage,
 });
 
 function PublishedServicesPage() {
   const { slug } = Route.useParams();
   const { data } = useSuspenseQuery(salonBySlugQueryOptions(slug));
-  if (!data?.salon) return <PublishedSiteUnavailable />;
+  if (!data?.salon) {
+    return (
+      <main className="grid min-h-[70vh] place-items-center bg-slate-50 px-6 text-center">
+        <div className="max-w-md">
+          <h1 className="text-2xl font-bold">Services preview</h1>
+          <p className="mt-2 text-sm text-slate-600">
+            This salon website is still a demo. Publish your site or use a real salon link to see live services.
+          </p>
+          <Link
+            to="/"
+            className="mt-6 inline-flex rounded-lg bg-violet-700 px-5 py-2.5 text-sm font-semibold text-white"
+          >
+            Go to Nexora
+          </Link>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <PublishedSiteShell slug={slug} salonName={data.salon.name}>
