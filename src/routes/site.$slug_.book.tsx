@@ -98,6 +98,26 @@ function PublishedBookingPage() {
         mobile,
         staffId: staffId || null,
       });
+      if (email) {
+        try {
+          await sendBookingConfirmationEmail({
+            data: {
+              email,
+              customerName,
+              bookingReference: appointment.booking_reference,
+              salonName: data.salon.name,
+              serviceName: selectedService.name,
+              date,
+              time,
+              total,
+              advance,
+              remaining,
+            },
+          });
+        } catch (mailErr) {
+          console.error("Confirmation email failed", mailErr);
+        }
+      }
       await navigate({
         to: "/site/$slug_/booking-success",
         params: { slug },
