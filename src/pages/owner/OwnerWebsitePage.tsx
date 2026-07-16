@@ -186,10 +186,57 @@ export function OwnerWebsitePage() {
     return () => window.removeEventListener("message", onMessage);
   }, [preview]);
 
+  // Autosave draft for template/colors/logo/banner fields (debounced).
+  const AUTOSAVE_KEYS = [
+    "selected_template_key",
+    "brand_primary",
+    "brand_secondary",
+    "cover_image_url",
+    "owner_profile_image_url",
+  ] as const;
+  const lastAutosavedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!form || !activeSalonId) return;
+    const draft: Patch = {};
+    for (const k of AUTOSAVE_KEYS) {
+      // @ts-expect-error index
+      draft[k] = form[k];
+    }
+    const key = JSON.stringify(draft);
+    if (lastAutosavedRef.current === null) {
+      lastAutosavedRef.current = key;
+      return;
+    }
+    if (lastAutosavedRef.current === key) return;
+    const handle = setTimeout(async () => {
+      try {
+        setAutosaveState("saving");
+        await update({ data: { salon_id: activeSalonId, patch: draft } });
+        lastAutosavedRef.current = key;
+        setAutosaveState("saved");
+        qc.invalidateQueries({ queryKey: ["owner", "salon-full", activeSalonId] });
+      } catch (e) {
+        setAutosaveState("error");
+        toast.error(e instanceof Error ? e.message : "Draft autosave failed");
+      }
+    }, 800);
+    return () => clearTimeout(handle);
+  }, [
+    form?.selected_template_key,
+    form?.brand_primary,
+    form?.brand_secondary,
+    form?.cover_image_url,
+    form?.owner_profile_image_url,
+    activeSalonId,
+    update,
+    qc,
+  ]);
+
   const handleSave = () => {
     if (!form) return;
     mutate.mutate(form);
   };
+
 
   const uploadFile = async (file: File, folder: "cover" | "owner" | "gallery" | "video") => {
     if (!activeSalonId) return null;
