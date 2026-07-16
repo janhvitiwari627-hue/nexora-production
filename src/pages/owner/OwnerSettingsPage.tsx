@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { ImagePlus, Loader2, Save, Trash2 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,7 +21,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { getOwnerSalonFull, updateOwnerSalon } from "@/lib/owner.functions";
 
 const CATEGORIES = [
-  "Hire Cute Shop",
   "Barber Shop",
   "Salon",
   "Beauty Parlour",
@@ -70,7 +69,7 @@ const EMPTY: Form = {
 
 const s = (v: unknown) => (typeof v === "string" ? v : "");
 
-export function EditShopPage() {
+export function OwnerSettingsPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { activeSalonId, isLoading: ctxLoading, hasSalon } = useOwnerContext();
@@ -115,7 +114,6 @@ export function EditShopPage() {
       toast.error("No active shop");
       return;
     }
-
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
       toast.error("Please choose a JPG, PNG or WebP image");
       return;
@@ -136,7 +134,6 @@ export function EditShopPage() {
         upsert: false,
       });
       if (error) throw error;
-
       const { data } = supabase.storage.from("salon-media").getPublicUrl(path);
       set(kind === "logo" ? "logo_url" : "cover_image_url", data.publicUrl);
       toast.success(`${kind === "logo" ? "Logo" : "Cover image"} uploaded. Save changes to apply.`);
@@ -162,9 +159,8 @@ export function EditShopPage() {
       return updateFn({ data: { salon_id: activeSalonId, patch } });
     },
     onSuccess: async () => {
-      toast.success("Shop details updated");
+      toast.success("Shop details saved. Website updated.");
       await qc.invalidateQueries({ queryKey: ["owner"] });
-      navigate({ to: "/owner/welcome", replace: true });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Update failed"),
   });
@@ -182,10 +178,10 @@ export function EditShopPage() {
       <div className="mx-auto max-w-2xl px-4 py-12 text-center">
         <h1 className="text-heading text-2xl font-semibold">No shop yet</h1>
         <p className="text-muted-foreground mt-2 text-sm">
-          Create your shop first, then come back to edit its details.
+          Register your shop first, then come back to manage its details.
         </p>
-        <Button className="mt-4" onClick={() => navigate({ to: "/owner/onboarding" })}>
-          Get started
+        <Button className="mt-4" onClick={() => navigate({ to: "/owner/register-business" })}>
+          Register your shop
         </Button>
       </div>
     );
@@ -194,12 +190,18 @@ export function EditShopPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6 px-4 py-6 md:py-10">
       <header>
-        <h1 className="text-heading text-2xl font-bold md:text-3xl">Edit Shop</h1>
-        <p className="text-muted-foreground text-sm">Update your shop details anytime.</p>
+        <h1 className="text-heading text-2xl font-bold md:text-3xl">Shop Settings</h1>
+        <p className="text-muted-foreground text-sm">
+          Yeh single page hai shop ke saare details manage karne ke liye. Yahan se save hone wala
+          data seedha aapke template website (/site/{"<slug>"}) par dikhega.
+        </p>
       </header>
 
       <Card>
-        <CardContent className="grid gap-4 p-6 md:grid-cols-2">
+        <CardHeader>
+          <CardTitle className="text-base">Business basics</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-2">
           <Field label="Business Name" required>
             <Input value={form.name} onChange={(e) => set("name", e.target.value)} />
           </Field>
@@ -234,7 +236,14 @@ export function EditShopPage() {
               onChange={(e) => set("description", e.target.value)}
             />
           </Field>
+        </CardContent>
+      </Card>
 
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Contact</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-2">
           <Field label="Phone">
             <Input value={form.phone} onChange={(e) => set("phone", e.target.value)} />
           </Field>
@@ -274,7 +283,14 @@ export function EditShopPage() {
           <Field label="PIN Code">
             <Input value={form.pincode} onChange={(e) => set("pincode", e.target.value)} />
           </Field>
+        </CardContent>
+      </Card>
 
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Branding images</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-4">
           <ImageUploadField
             label="Logo"
             value={form.logo_url}
@@ -307,9 +323,9 @@ export function EditShopPage() {
         </CardContent>
       </Card>
 
-      <div className="flex justify-end gap-2">
+      <div className="sticky bottom-0 flex justify-end gap-2 border-t bg-background/95 py-3 backdrop-blur">
         <Button variant="outline" onClick={() => navigate({ to: "/owner/welcome" })}>
-          Cancel
+          Back
         </Button>
         <Button
           onClick={() => save.mutate()}
@@ -345,7 +361,7 @@ function ImageUploadField({
   children: React.ReactNode;
 }) {
   return (
-    <Field label={`${label} URL`} className="md:col-span-2">
+    <Field label={`${label} URL`}>
       <div className="space-y-3">
         {value && (
           <div className="overflow-hidden rounded-xl border border-border bg-muted/30 p-2">
