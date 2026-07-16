@@ -51,12 +51,20 @@ export function WhiteLabelHeader({ shop, template }: { shop: ShopData; template:
           className="flex items-center gap-2 font-bold"
           style={{ fontFamily: template.headingFont }}
         >
-          <span
-            className="grid h-9 w-9 place-items-center rounded-full text-white shadow"
-            style={{ backgroundColor: template.colors.primary }}
-          >
-            {shop.name[0]}
-          </span>
+          {shop.logoImage ? (
+            <img
+              src={shop.logoImage}
+              alt={`${shop.name} logo`}
+              className="h-9 w-9 rounded-full object-cover shadow"
+            />
+          ) : (
+            <span
+              className="grid h-9 w-9 place-items-center rounded-full text-white shadow"
+              style={{ backgroundColor: template.colors.primary }}
+            >
+              {shop.name[0]}
+            </span>
+          )}
           <span className={variant === "elegant" ? "text-xl tracking-wide" : "text-base font-extrabold uppercase tracking-wide"}>
             {shop.name}
           </span>

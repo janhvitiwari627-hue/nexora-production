@@ -39,7 +39,12 @@ import { useOwnerContext } from "@/hooks/use-owner-context";
 import { ownerSalonFullQuery } from "@/lib/owner.queries";
 import { updateOwnerSalon } from "@/lib/owner.functions";
 import { supabase } from "@/integrations/supabase/client";
-import { getTemplate } from "@/components/whiteLabelWebsite/templates";
+import {
+  getTemplate,
+  TEMPLATE_KEYS,
+  TEMPLATES,
+  type TemplateKey,
+} from "@/components/whiteLabelWebsite/templates";
 
 const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 type DayKey = (typeof DAYS)[number];
@@ -75,6 +80,7 @@ type Patch = {
   home_service_radius_km?: number;
   hours?: HoursMap | null;
   gallery_images?: string[];
+  selected_template_key?: TemplateKey;
 };
 
 export function OwnerWebsitePage() {
@@ -128,6 +134,7 @@ export function OwnerWebsitePage() {
         home_service_radius_km: salon.home_service_radius_km ?? 5,
         hours: (salon.hours as HoursMap) ?? DEFAULT_HOURS,
         gallery_images: (salon.gallery_images as string[] | null) ?? [],
+        selected_template_key: templateDefaults.key,
       });
     }
   }, [salon, form]);
@@ -136,9 +143,9 @@ export function OwnerWebsitePage() {
     setForm((f) => (f ? { ...f, [key]: value } : f));
 
   const publicUrl = useMemo(() => (salon?.slug ? `/site/${salon.slug}` : ""), [salon?.slug]);
-  const selectedTemplate = getTemplate(salon?.selected_template_key);
+  const selectedTemplate = getTemplate(form?.selected_template_key ?? salon?.selected_template_key);
   const previewUrl = salon?.slug
-    ? `/site/${salon.slug}?preview=1&live=1`
+    ? `/site/${salon.slug}?preview=1&live=1&t=${encodeURIComponent(selectedTemplate.key)}`
     : `/template-preview/${encodeURIComponent(selectedTemplate.key)}?live=1`;
 
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -336,11 +343,35 @@ export function OwnerWebsitePage() {
               </p>
             </div>
           </div>
-          <Button variant="outline" className="w-full min-w-0 sm:w-auto" asChild>
-            <Link to="/owner/templates">
-              <Paintbrush className="h-4 w-4" /> Choose or Change Template
-            </Link>
-          </Button>
+          <div className="grid gap-2 sm:min-w-72">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+              {TEMPLATE_KEYS.map((key) => {
+                const template = TEMPLATES[key];
+                const active = selectedTemplate.key === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => set("selected_template_key", key)}
+                    className={`rounded-lg border p-2 text-left text-xs transition ${
+                      active ? "border-primary bg-primary/10 text-primary" : "hover:bg-muted/60"
+                    }`}
+                  >
+                    <span
+                      className="mb-1 block h-3 rounded-full"
+                      style={{ backgroundColor: template.colors.primary }}
+                    />
+                    <span className="block truncate font-semibold">{template.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <Button variant="outline" className="w-full min-w-0" asChild>
+              <Link to="/owner/templates">
+                <Paintbrush className="h-4 w-4" /> Full Template Gallery
+              </Link>
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
@@ -869,32 +900,149 @@ export function OwnerWebsitePage() {
               Aap jo bhi color, banner, logo ya text change karenge, wo yahan turant dikhega. Save Changes ke baad customers ko bhi dikhega.
             </p>
           </DialogHeader>
-          <div
-            className={`flex-1 overflow-auto bg-muted/40 ${
-              previewDevice === "mobile" ? "grid place-items-start justify-center py-4" : ""
-            }`}
-          >
+          <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden bg-muted/40 lg:grid-cols-[340px_minmax(0,1fr)]">
+            <aside className="max-h-[34vh] overflow-y-auto border-b bg-background p-4 lg:max-h-none lg:border-r lg:border-b-0">
+              <div className="space-y-4">
+                <div>
+                  <div className="mb-2 text-sm font-semibold">Template</div>
+                  <div className="grid gap-2">
+                    {TEMPLATE_KEYS.map((key) => {
+                      const template = TEMPLATES[key];
+                      const active = selectedTemplate.key === key;
+                      return (
+                        <button
+                          key={key}
+                          type="button"
+                          onClick={() => set("selected_template_key", key)}
+                          className={`flex items-center gap-3 rounded-lg border p-2 text-left transition ${
+                            active ? "border-primary bg-primary/10" : "hover:bg-muted/60"
+                          }`}
+                        >
+                          <span
+                            className="h-8 w-8 shrink-0 rounded-full border"
+                            style={{ backgroundColor: template.colors.primary, borderColor: template.colors.secondary }}
+                          />
+                          <span className="min-w-0">
+                            <span className="block truncate text-sm font-semibold">{template.name}</span>
+                            <span className="text-muted-foreground block truncate text-[11px]">{template.themeType}</span>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="grid gap-3">
+                  <label className="text-sm font-medium">
+                    Shop Name
+                    <Input
+                      value={form.name ?? ""}
+                      onChange={(e) => set("name", e.target.value)}
+                      className="mt-1"
+                    />
+                  </label>
+                  <label className="text-sm font-medium">
+                    Tagline
+                    <Input
+                      value={form.tagline ?? ""}
+                      onChange={(e) => set("tagline", e.target.value)}
+                      className="mt-1"
+                    />
+                  </label>
+                  <label className="text-sm font-medium">
+                    About Text
+                    <Textarea
+                      value={form.about_us ?? ""}
+                      onChange={(e) => set("about_us", e.target.value)}
+                      rows={3}
+                      className="mt-1"
+                    />
+                  </label>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <ColorField
+                    label="Primary"
+                    value={form.brand_primary ?? selectedTemplate.colors.primary}
+                    onChange={(v) => set("brand_primary", v)}
+                  />
+                  <ColorField
+                    label="Accent"
+                    value={form.brand_secondary ?? selectedTemplate.colors.secondary}
+                    onChange={(v) => set("brand_secondary", v)}
+                  />
+                </div>
+                <div className="grid gap-3">
+                  <label className="text-sm font-medium">
+                    Banner Image
+                    <span className="hover:bg-muted/50 mt-1 flex h-24 cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-dashed">
+                      {form.cover_image_url ? (
+                        <img src={form.cover_image_url} alt="Website banner" className="h-full w-full object-cover" />
+                      ) : (
+                        <span className="text-muted-foreground text-xs">Upload banner</span>
+                      )}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) handleImageUpload(f, "cover_image_url");
+                      }}
+                    />
+                  </label>
+                  <label className="text-sm font-medium">
+                    Logo / Owner Photo
+                    <span className="hover:bg-muted/50 mt-1 flex h-24 cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-dashed">
+                      {form.owner_profile_image_url ? (
+                        <img src={form.owner_profile_image_url} alt="Website logo" className="h-full w-full object-cover" />
+                      ) : (
+                        <span className="text-muted-foreground text-xs">Upload logo</span>
+                      )}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) handleImageUpload(f, "owner_profile_image_url");
+                      }}
+                    />
+                  </label>
+                </div>
+                <Button onClick={handleSave} disabled={mutate.isPending} className="w-full">
+                  {mutate.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                  Save Website
+                </Button>
+              </div>
+            </aside>
             <div
-              className={
-                previewDevice === "mobile"
-                  ? "h-[760px] w-[390px] max-w-full overflow-hidden rounded-[2rem] border-[10px] border-slate-900 bg-background shadow-2xl"
-                  : "h-full w-full"
-              }
+              className={`min-h-0 overflow-auto ${
+                previewDevice === "mobile" ? "grid place-items-start justify-center py-4" : ""
+              }`}
             >
-              <iframe
-                ref={iframeRef}
-                src={previewUrl}
-                title="Live website preview"
-                className="h-full w-full"
-                onLoad={() => {
-                  if (form) {
-                    iframeRef.current?.contentWindow?.postMessage(
-                      { type: "live-preview-overrides", patch: form },
-                      "*",
-                    );
-                  }
-                }}
-              />
+              <div
+                className={
+                  previewDevice === "mobile"
+                    ? "h-[760px] w-[390px] max-w-full overflow-hidden rounded-[2rem] border-[10px] border-slate-900 bg-background shadow-2xl"
+                    : "h-full min-h-[680px] w-full"
+                }
+              >
+                <iframe
+                  ref={iframeRef}
+                  src={previewUrl}
+                  title="Live website preview"
+                  className="h-full w-full"
+                  onLoad={() => {
+                    if (form) {
+                      iframeRef.current?.contentWindow?.postMessage(
+                        { type: "live-preview-overrides", patch: form },
+                        "*",
+                      );
+                    }
+                  }}
+                />
+              </div>
             </div>
           </div>
         </DialogContent>

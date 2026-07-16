@@ -92,7 +92,7 @@ export function WHero({ shop, template }: { shop: ShopData; template: TemplateCo
         poster={shop.coverImage}
         className="absolute inset-0 h-full w-full object-cover"
       >
-        <source src="https://cdn.coverr.co/videos/coverr-luxury-spa-treatment-2417/1080p.mp4" type="video/mp4" />
+        <source src={shop.videoUrl ?? "https://cdn.coverr.co/videos/coverr-luxury-spa-treatment-2417/1080p.mp4"} type="video/mp4" />
       </video>
       <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/55 to-black" />
       <div className="absolute inset-0 opacity-30" style={{ background: "radial-gradient(circle at 50% 60%, rgba(212,175,55,0.25), transparent 55%)" }} />

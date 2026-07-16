@@ -569,6 +569,9 @@ const SalonUpdateInput = z.object({
     cover_image_url: nullableUrl,
     owner_profile_image_url: nullableUrl,
     video_url: nullableUrl,
+    selected_template_key: z
+      .enum(["royal-luxe", "modern-salon", "professional-beauty"])
+      .optional(),
     brand_primary: z
       .string()
       .regex(/^#[0-9a-fA-F]{6}$/)
