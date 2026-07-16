@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { CalendarDays, Clock, IndianRupee, LoaderCircle, ShieldCheck } from "lucide-react";
 import { salonBySlugQueryOptions } from "@/lib/salons.queries";
