@@ -3,7 +3,7 @@ import { useBlocker, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { ImagePlus, Loader2, Save, Trash2 } from "lucide-react";
+import { ImagePlus, Loader2, Save, Sparkles, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -276,7 +276,6 @@ export function OwnerSettingsPage() {
       return updateFn({ data: { salon_id: activeSalonId, patch } });
     },
     onSuccess: async () => {
-      toast.success("Shop details saved. Website updated.");
       setBaseline(form);
       setDraftRestored(false);
       if (draftKey && typeof window !== "undefined") {
@@ -287,6 +286,14 @@ export function OwnerSettingsPage() {
         }
       }
       await qc.invalidateQueries({ queryKey: ["owner"] });
+      toast.success("Saved! Ab template edit & live preview karein.", {
+        action: {
+          label: "Open Website Editor",
+          onClick: () => navigate({ to: "/owner/website" }),
+        },
+      });
+      // Auto-redirect so owner completes the website (template, colors, live preview)
+      navigate({ to: "/owner/website" });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Update failed"),
   });
@@ -467,12 +474,25 @@ export function OwnerSettingsPage() {
         </CardContent>
       </Card>
 
-      <div className="sticky bottom-0 flex items-center justify-end gap-2 border-t bg-background/95 py-3 backdrop-blur">
-        {isDirty && (
+      <div className="sticky bottom-0 flex flex-wrap items-center justify-end gap-2 border-t bg-background/95 py-3 backdrop-blur">
+        {isDirty ? (
           <span className="mr-auto text-xs text-muted-foreground">Unsaved changes · autosaved as draft</span>
+        ) : (
+          <span className="mr-auto text-xs text-muted-foreground">
+            Next: template, colors, banner & live preview →
+          </span>
         )}
-        <Button variant="outline" onClick={() => navigate({ to: "/owner/welcome" })}>
+        <Button variant="ghost" onClick={() => navigate({ to: "/owner/welcome" })}>
           Back
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => navigate({ to: "/owner/website" })}
+          disabled={save.isPending}
+          title="Template chunein, colors/banner edit karein aur live preview dekhein"
+        >
+          <Sparkles className="mr-2 h-4 w-4" />
+          {isDirty ? "Skip & Edit Website" : "Continue: Edit & Live Preview"}
         </Button>
         <Button
           onClick={() => save.mutate()}
@@ -483,7 +503,7 @@ export function OwnerSettingsPage() {
           ) : (
             <Save className="mr-2 h-4 w-4" />
           )}
-          Save changes
+          Save & Continue
         </Button>
       </div>
 
