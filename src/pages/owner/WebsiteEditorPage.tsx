@@ -12,13 +12,14 @@ import {
   type SectionType,
 } from "@/lib/website-editor.functions";
 import { getMyOwnedSalons } from "@/lib/owner.functions";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Loader2, Eye, Globe } from "lucide-react";
+import { Loader2, Eye, Globe, Plus, Trash2, Upload, Image as ImageIcon } from "lucide-react";
 
 const SECTION_LABELS: Record<SectionType, string> = {
   hero: "Hero / Banner",
@@ -207,6 +208,7 @@ export function WebsiteEditorPage() {
             <SectionEditor
               section={selected}
               content={content}
+              salonId={salonId ?? null}
               onFieldChange={updateContent}
               onToggleVisible={(v) => patchSection(selected.id, { is_visible: v })}
             />
@@ -235,15 +237,20 @@ export function WebsiteEditorPage() {
 function SectionEditor({
   section,
   content,
+  salonId,
   onFieldChange,
   onToggleVisible,
 }: {
   section: WebsiteSection;
   content: Record<string, unknown>;
+  salonId: string | null;
   onFieldChange: (field: string, value: unknown) => void;
   onToggleVisible: (v: boolean) => void;
 }) {
   const str = (k: string) => (content[k] as string) ?? "";
+  const items = Array.isArray(content.items) ? (content.items as Item[]) : [];
+
+  const setItems = (next: Item[]) => onFieldChange("items", next);
 
   return (
     <div className="mx-auto max-w-xl space-y-6">
@@ -261,7 +268,7 @@ function SectionEditor({
           <Field label="Sub-heading" value={str("subheading")} onChange={(v) => onFieldChange("subheading", v)} />
           <Field label="Button Text" value={str("buttonText")} onChange={(v) => onFieldChange("buttonText", v)} />
           <Field label="Button Link" value={str("buttonLink")} onChange={(v) => onFieldChange("buttonLink", v)} />
-          <Field label="Background Image URL" value={str("imageUrl")} onChange={(v) => onFieldChange("imageUrl", v)} />
+          <ImageField label="Background Image" value={str("imageUrl")} salonId={salonId} folder="hero" onChange={(v) => onFieldChange("imageUrl", v)} />
         </>
       )}
 
@@ -286,18 +293,227 @@ function SectionEditor({
       {(section.section_type === "services" ||
         section.section_type === "rate_card" ||
         section.section_type === "packages" ||
-        section.section_type === "offers" ||
-        section.section_type === "staff" ||
+        section.section_type === "staff") && (
+        <>
+          <Field label="Heading" value={str("heading")} onChange={(v) => onFieldChange("heading", v)} />
+          <ItemsEditor
+            kind={section.section_type}
+            items={items}
+            salonId={salonId}
+            onChange={setItems}
+          />
+        </>
+      )}
+
+      {(section.section_type === "offers" ||
         section.section_type === "membership" ||
         section.section_type === "gallery" ||
         section.section_type === "blog") && (
         <>
           <Field label="Heading" value={str("heading")} onChange={(v) => onFieldChange("heading", v)} />
           <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-            Detailed item editor for <strong>{SECTION_LABELS[section.section_type]}</strong> aa raha hai next update me. Abhi aap heading edit kar sakte ho aur section ko show/hide kar sakte ho.
+            Detailed item editor for <strong>{SECTION_LABELS[section.section_type]}</strong> aa raha hai next update me.
           </p>
         </>
       )}
+    </div>
+  );
+}
+
+type Item = {
+  id: string;
+  name?: string;
+  price?: string;
+  duration?: string;
+  description?: string;
+  role?: string;
+  bio?: string;
+  image?: string;
+};
+
+function newId() {
+  return (typeof crypto !== "undefined" && "randomUUID" in crypto)
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function ItemsEditor({
+  kind,
+  items,
+  salonId,
+  onChange,
+}: {
+  kind: "services" | "rate_card" | "packages" | "staff";
+  items: Item[];
+  salonId: string | null;
+  onChange: (next: Item[]) => void;
+}) {
+  const isStaff = kind === "staff";
+  const addLabel =
+    kind === "services" ? "Add Service" :
+    kind === "rate_card" ? "Add Rate" :
+    kind === "packages" ? "Add Package" : "Add Team Member";
+
+  const patch = (id: string, p: Partial<Item>) =>
+    onChange(items.map((it) => (it.id === id ? { ...it, ...p } : it)));
+  const remove = (id: string) => onChange(items.filter((it) => it.id !== id));
+  const add = () => onChange([...items, { id: newId() }]);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <Label className="text-sm">Items ({items.length})</Label>
+        <Button type="button" size="sm" variant="secondary" onClick={add}>
+          <Plus className="mr-1 h-4 w-4" /> {addLabel}
+        </Button>
+      </div>
+
+      {items.length === 0 && (
+        <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+          No items yet. Click <strong>{addLabel}</strong> to create one.
+        </p>
+      )}
+
+      <ul className="space-y-3">
+        {items.map((it, idx) => (
+          <li key={it.id} className="rounded-lg border bg-card p-3 space-y-3">
+            <div className="flex items-start justify-between gap-2">
+              <span className="text-xs text-muted-foreground">#{idx + 1}</span>
+              <Button type="button" size="sm" variant="ghost" onClick={() => remove(it.id)}>
+                <Trash2 className="h-4 w-4 text-destructive" />
+              </Button>
+            </div>
+
+            <ImageField
+              label="Image"
+              value={it.image ?? ""}
+              salonId={salonId}
+              folder={isStaff ? "staff" : "services"}
+              compact
+              onChange={(v) => patch(it.id, { image: v })}
+            />
+
+            <Field label="Name" value={it.name ?? ""} onChange={(v) => patch(it.id, { name: v })} />
+
+            {isStaff ? (
+              <>
+                <Field label="Role" value={it.role ?? ""} onChange={(v) => patch(it.id, { role: v })} />
+                <TextField label="Bio" value={it.bio ?? ""} onChange={(v) => patch(it.id, { bio: v })} />
+              </>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 gap-2">
+                  <Field label="Price" value={it.price ?? ""} onChange={(v) => patch(it.id, { price: v })} />
+                  {kind !== "packages" && (
+                    <Field label="Duration" value={it.duration ?? ""} onChange={(v) => patch(it.id, { duration: v })} />
+                  )}
+                </div>
+                <TextField label="Description" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
+              </>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function ImageField({
+  label,
+  value,
+  salonId,
+  folder,
+  compact,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  salonId: string | null;
+  folder: string;
+  compact?: boolean;
+  onChange: (v: string) => void;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleFile = async (file: File) => {
+    if (!salonId) {
+      toast.error("Salon not ready yet");
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please choose an image file");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Image must be 2MB or smaller");
+      return;
+    }
+    const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
+    const path = `${salonId}/${folder}/${Date.now()}.${ext}`;
+    setUploading(true);
+    const { error } = await supabase.storage.from("salon-media").upload(path, file, {
+      cacheControl: "3600",
+      upsert: false,
+    });
+    setUploading(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    const { data } = supabase.storage.from("salon-media").getPublicUrl(path);
+    onChange(data.publicUrl);
+    toast.success("Image uploaded");
+  };
+
+  return (
+    <div className="space-y-1.5">
+      <Label>{label}</Label>
+      <div className="flex items-center gap-3">
+        <div className={`bg-muted flex ${compact ? "h-16 w-16" : "h-20 w-28"} shrink-0 items-center justify-center overflow-hidden rounded-md border`}>
+          {value ? (
+            <img src={value} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <ImageIcon className="text-muted-foreground h-6 w-6" />
+          )}
+        </div>
+        <div className="flex-1 space-y-1.5">
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              disabled={uploading}
+              onClick={() => inputRef.current?.click()}
+            >
+              {uploading ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Upload className="mr-1 h-4 w-4" />}
+              Upload
+            </Button>
+            {value && (
+              <Button type="button" size="sm" variant="ghost" onClick={() => onChange("")}>
+                Remove
+              </Button>
+            )}
+          </div>
+          <Input
+            placeholder="…or paste image URL"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="h-8 text-xs"
+          />
+        </div>
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) void handleFile(f);
+            e.target.value = "";
+          }}
+        />
+      </div>
     </div>
   );
 }
@@ -331,7 +547,8 @@ function TextField({
   return (
     <div className="space-y-1.5">
       <Label>{label}</Label>
-      <Textarea rows={5} value={value} onChange={(e) => onChange(e.target.value)} />
+      <Textarea rows={4} value={value} onChange={(e) => onChange(e.target.value)} />
     </div>
   );
 }
+
