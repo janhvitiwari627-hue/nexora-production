@@ -250,8 +250,18 @@ export function OwnerWebsitePage() {
         category: s.category || undefined,
       }));
     }
+    if (staff) {
+      patch.staff = staff.map((s) => ({
+        id: s.id,
+        name: s.name,
+        role: s.role || null,
+        bio: s.bio || null,
+        avatar_url: s.avatar_url || null,
+        rating: s.rating || null,
+      }));
+    }
     win.postMessage({ type: "live-preview-overrides", patch }, "*");
-  }, [preview, iframeReady, form, services]);
+  }, [preview, iframeReady, form, services, staff]);
 
   // Listen for the iframe's ready handshake.
   useEffect(() => {
