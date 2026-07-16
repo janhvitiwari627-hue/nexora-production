@@ -52,7 +52,7 @@ export function OwnerAppShell() {
       >
         <ul className="mx-auto grid max-w-xl grid-cols-5">
           {NAV.map((item) => {
-            const active = item.exact
+            const active = "exact" in item && item.exact
               ? pathname === item.to || pathname === `${item.to}/`
               : pathname.startsWith(item.to);
             return (

@@ -105,10 +105,10 @@ export function MyApplicationsPage() {
   const q = search.q ?? "";
   const setFilter = (status: string) =>
     navigate({
-      search: (prev: ApplicationsSearch) => ({
+      search: ((prev: ApplicationsSearch) => ({
         ...prev,
         status: status as ApplicationsSearch["status"],
-      }),
+      })) as any,
       replace: false,
     });
   // Local input value; the URL `q` is only updated after the user pauses typing
@@ -122,7 +122,7 @@ export function MyApplicationsPage() {
     if (qInput === q) return;
     const t = setTimeout(() => {
       navigate({
-        search: (prev: ApplicationsSearch) => ({ ...prev, q: qInput }),
+        search: ((prev: ApplicationsSearch) => ({ ...prev, q: qInput })) as any,
         replace: true,
       });
     }, 300);
