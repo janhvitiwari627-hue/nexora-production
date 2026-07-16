@@ -58,6 +58,7 @@ import { Route as JobsIndexRouteImport } from './routes/jobs.index'
 import { Route as HireIndexRouteImport } from './routes/hire.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as WWebsiteIdRouteImport } from './routes/w.$websiteId'
 import { Route as TemplatePreviewKeyRouteImport } from './routes/template-preview.$key'
 import { Route as StaffDashboardRouteImport } from './routes/staff.dashboard'
 import { Route as SiteBusinessSlugRouteImport } from './routes/site.$businessSlug'
@@ -162,6 +163,7 @@ import { Route as PortalBrandsSlugRouteImport } from './routes/portal.brands.$sl
 import { Route as OwnerJobsNewRouteImport } from './routes/owner.jobs.new'
 import { Route as JobsApplicationsJobIdRouteImport } from './routes/jobs.applications.$jobId'
 import { Route as DashboardBookingsIdRouteImport } from './routes/dashboard.bookings.$id'
+import { Route as AppOwnerWebsiteEditorRouteImport } from './routes/app.owner.website-editor'
 import { Route as AppOwnerWebsiteRouteImport } from './routes/app.owner.website'
 import { Route as AppOwnerWalletRouteImport } from './routes/app.owner.wallet'
 import { Route as AppOwnerSupportRouteImport } from './routes/app.owner.support'
@@ -430,6 +432,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const WWebsiteIdRoute = WWebsiteIdRouteImport.update({
+  id: '/w/$websiteId',
+  path: '/w/$websiteId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const TemplatePreviewKeyRoute = TemplatePreviewKeyRouteImport.update({
   id: '/template-preview/$key',
@@ -955,6 +962,11 @@ const DashboardBookingsIdRoute = DashboardBookingsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => DashboardBookingsRoute,
 } as any)
+const AppOwnerWebsiteEditorRoute = AppOwnerWebsiteEditorRouteImport.update({
+  id: '/website-editor',
+  path: '/website-editor',
+  getParentRoute: () => AppOwnerRoute,
+} as any)
 const AppOwnerWebsiteRoute = AppOwnerWebsiteRouteImport.update({
   id: '/website',
   path: '/website',
@@ -1209,6 +1221,7 @@ export interface FileRoutesByFullPath {
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/staff/dashboard': typeof StaffDashboardRoute
   '/template-preview/$key': typeof TemplatePreviewKeyRoute
+  '/w/$websiteId': typeof WWebsiteIdRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/hire/': typeof HireIndexRoute
@@ -1231,6 +1244,7 @@ export interface FileRoutesByFullPath {
   '/app/owner/support': typeof AppOwnerSupportRoute
   '/app/owner/wallet': typeof AppOwnerWalletRoute
   '/app/owner/website': typeof AppOwnerWebsiteRoute
+  '/app/owner/website-editor': typeof AppOwnerWebsiteEditorRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
@@ -1380,6 +1394,7 @@ export interface FileRoutesByTo {
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/staff/dashboard': typeof StaffDashboardRoute
   '/template-preview/$key': typeof TemplatePreviewKeyRoute
+  '/w/$websiteId': typeof WWebsiteIdRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/hire': typeof HireIndexRoute
@@ -1402,6 +1417,7 @@ export interface FileRoutesByTo {
   '/app/owner/support': typeof AppOwnerSupportRoute
   '/app/owner/wallet': typeof AppOwnerWalletRoute
   '/app/owner/website': typeof AppOwnerWebsiteRoute
+  '/app/owner/website-editor': typeof AppOwnerWebsiteEditorRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
@@ -1559,6 +1575,7 @@ export interface FileRoutesById {
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/staff/dashboard': typeof StaffDashboardRoute
   '/template-preview/$key': typeof TemplatePreviewKeyRoute
+  '/w/$websiteId': typeof WWebsiteIdRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/hire/': typeof HireIndexRoute
@@ -1581,6 +1598,7 @@ export interface FileRoutesById {
   '/app/owner/support': typeof AppOwnerSupportRoute
   '/app/owner/wallet': typeof AppOwnerWalletRoute
   '/app/owner/website': typeof AppOwnerWebsiteRoute
+  '/app/owner/website-editor': typeof AppOwnerWebsiteEditorRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
@@ -1739,6 +1757,7 @@ export interface FileRouteTypes {
     | '/site/$businessSlug'
     | '/staff/dashboard'
     | '/template-preview/$key'
+    | '/w/$websiteId'
     | '/admin/'
     | '/dashboard/'
     | '/hire/'
@@ -1761,6 +1780,7 @@ export interface FileRouteTypes {
     | '/app/owner/support'
     | '/app/owner/wallet'
     | '/app/owner/website'
+    | '/app/owner/website-editor'
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
     | '/owner/jobs/new'
@@ -1910,6 +1930,7 @@ export interface FileRouteTypes {
     | '/site/$businessSlug'
     | '/staff/dashboard'
     | '/template-preview/$key'
+    | '/w/$websiteId'
     | '/admin'
     | '/dashboard'
     | '/hire'
@@ -1932,6 +1953,7 @@ export interface FileRouteTypes {
     | '/app/owner/support'
     | '/app/owner/wallet'
     | '/app/owner/website'
+    | '/app/owner/website-editor'
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
     | '/owner/jobs/new'
@@ -2088,6 +2110,7 @@ export interface FileRouteTypes {
     | '/site/$businessSlug'
     | '/staff/dashboard'
     | '/template-preview/$key'
+    | '/w/$websiteId'
     | '/admin/'
     | '/dashboard/'
     | '/hire/'
@@ -2110,6 +2133,7 @@ export interface FileRouteTypes {
     | '/app/owner/support'
     | '/app/owner/wallet'
     | '/app/owner/website'
+    | '/app/owner/website-editor'
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
     | '/owner/jobs/new'
@@ -2210,6 +2234,7 @@ export interface RootRouteChildren {
   SiteBusinessSlugRoute: typeof SiteBusinessSlugRoute
   StaffDashboardRoute: typeof StaffDashboardRoute
   TemplatePreviewKeyRoute: typeof TemplatePreviewKeyRoute
+  WWebsiteIdRoute: typeof WWebsiteIdRoute
   HireIndexRoute: typeof HireIndexRoute
   JobsIndexRoute: typeof JobsIndexRoute
   PortalIndexRoute: typeof PortalIndexRoute
@@ -2578,6 +2603,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/w/$websiteId': {
+      id: '/w/$websiteId'
+      path: '/w/$websiteId'
+      fullPath: '/w/$websiteId'
+      preLoaderRoute: typeof WWebsiteIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/template-preview/$key': {
       id: '/template-preview/$key'
@@ -3307,6 +3339,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardBookingsIdRouteImport
       parentRoute: typeof DashboardBookingsRoute
     }
+    '/app/owner/website-editor': {
+      id: '/app/owner/website-editor'
+      path: '/website-editor'
+      fullPath: '/app/owner/website-editor'
+      preLoaderRoute: typeof AppOwnerWebsiteEditorRouteImport
+      parentRoute: typeof AppOwnerRoute
+    }
     '/app/owner/website': {
       id: '/app/owner/website'
       path: '/website'
@@ -3698,6 +3737,7 @@ interface AppOwnerRouteChildren {
   AppOwnerSupportRoute: typeof AppOwnerSupportRoute
   AppOwnerWalletRoute: typeof AppOwnerWalletRoute
   AppOwnerWebsiteRoute: typeof AppOwnerWebsiteRoute
+  AppOwnerWebsiteEditorRoute: typeof AppOwnerWebsiteEditorRoute
   AppOwnerIndexRoute: typeof AppOwnerIndexRoute
 }
 
@@ -3707,6 +3747,7 @@ const AppOwnerRouteChildren: AppOwnerRouteChildren = {
   AppOwnerSupportRoute: AppOwnerSupportRoute,
   AppOwnerWalletRoute: AppOwnerWalletRoute,
   AppOwnerWebsiteRoute: AppOwnerWebsiteRoute,
+  AppOwnerWebsiteEditorRoute: AppOwnerWebsiteEditorRoute,
   AppOwnerIndexRoute: AppOwnerIndexRoute,
 }
 
@@ -3800,6 +3841,7 @@ const rootRouteChildren: RootRouteChildren = {
   SiteBusinessSlugRoute: SiteBusinessSlugRoute,
   StaffDashboardRoute: StaffDashboardRoute,
   TemplatePreviewKeyRoute: TemplatePreviewKeyRoute,
+  WWebsiteIdRoute: WWebsiteIdRoute,
   HireIndexRoute: HireIndexRoute,
   JobsIndexRoute: JobsIndexRoute,
   PortalIndexRoute: PortalIndexRoute,
