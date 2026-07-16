@@ -33,22 +33,39 @@ export function WhiteLabelWebsitePage({
   slug?: string;
   routeSearch?: { t?: string; preview?: 1 };
 }) {
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["white-label-site", _slug],
     queryFn: () => (_slug ? getSalonBySlug({ data: { slug: _slug } }) : Promise.resolve(null)),
     enabled: !!_slug,
   });
   const queryClient = useQueryClient();
   const salonId = data?.salon?.id;
-  const [liveState, setLiveState] = useState<"idle" | "updating" | "updated">("idle");
+  const [liveState, setLiveState] = useState<"idle" | "updating" | "updated" | "error">("idle");
+  const [liveError, setLiveError] = useState<string | null>(null);
 
   // Live refresh: when the salon row (or its services) changes in the DB,
   // re-fetch so /site/<slug> reflects owner edits from /owner/settings instantly.
   useEffect(() => {
     if (!_slug || !salonId) return;
-    const onChange = () => {
+    const onChange = async () => {
+      setLiveError(null);
       setLiveState("updating");
-      queryClient.invalidateQueries({ queryKey: ["white-label-site", _slug] });
+      try {
+        const result = await queryClient.refetchQueries({
+          queryKey: ["white-label-site", _slug],
+          type: "active",
+        });
+        const failed = result.find((r) => r.status === "error");
+        if (failed) throw (failed.error as Error) ?? new Error("Refetch failed");
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to refresh website.";
+        setLiveError(message);
+        setLiveState("error");
+        toast.error("Website update failed", {
+          description: message,
+          action: { label: "Retry", onClick: () => retryLive() },
+        });
+      }
     };
     const channel = supabase
       .channel(`site-${salonId}`)
@@ -58,7 +75,27 @@ export function WhiteLabelWebsitePage({
     return () => {
       supabase.removeChannel(channel);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [_slug, salonId, queryClient]);
+
+  const retryLive = async () => {
+    setLiveError(null);
+    setLiveState("updating");
+    try {
+      const r = await refetch();
+      if (r.error) throw r.error;
+      setLiveState("updated");
+      setTimeout(() => setLiveState("idle"), 1500);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to refresh website.";
+      setLiveError(message);
+      setLiveState("error");
+      toast.error("Website update failed", {
+        description: message,
+        action: { label: "Retry", onClick: () => retryLive() },
+      });
+    }
+  };
 
   // Flip the pill to "Updated" briefly once the refetch settles.
   useEffect(() => {
