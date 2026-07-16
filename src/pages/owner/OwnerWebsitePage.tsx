@@ -192,6 +192,21 @@ export function OwnerWebsitePage() {
     }
   }, [servicesData, services]);
 
+  useEffect(() => {
+    if (staffData && staff === null) {
+      setStaff(
+        staffData.map((s) => ({
+          id: s.id,
+          name: s.name ?? "",
+          role: s.role ?? "",
+          bio: s.bio ?? "",
+          avatar_url: s.avatar_url ?? "",
+          rating: Number(s.rating ?? 5),
+        })),
+      );
+    }
+  }, [staffData, staff]);
+
   const set = <K extends keyof Patch>(key: K, value: Patch[K]) =>
     setForm((f) => (f ? { ...f, [key]: value } : f));
 
