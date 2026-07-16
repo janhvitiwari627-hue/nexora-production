@@ -651,13 +651,6 @@ export function OwnerWebsitePage() {
           )}
           {services?.map((s, idx) => (
             <div key={s.id ?? `new-${idx}`} className="grid gap-2 rounded-lg border p-3 sm:grid-cols-[80px_minmax(0,1fr)_auto]">
-              <div className="h-20 w-20 shrink-0 overflow-hidden rounded-md border bg-muted grid place-items-center">
-                {s.image_url ? (
-                  <img src={s.image_url} alt={s.name} className="h-full w-full object-cover" />
-                ) : (
-                  <ImageIcon className="h-6 w-6 text-muted-foreground" />
-                )}
-              </div>
               <div className="flex flex-col items-center gap-1.5">
                 <div className="h-20 w-20 shrink-0 overflow-hidden rounded-md border bg-muted grid place-items-center relative">
                   {s.image_url ? (
