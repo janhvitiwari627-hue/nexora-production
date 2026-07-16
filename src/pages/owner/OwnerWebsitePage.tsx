@@ -88,6 +88,7 @@ export function OwnerWebsitePage() {
   const qc = useQueryClient();
   const { data: salon, isLoading } = useQuery(ownerSalonFullQuery(activeSalonId ?? ""));
   const update = useServerFn(updateOwnerSalon);
+  const [autosaveState, setAutosaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const mutate = useMutation({
     mutationFn: (patch: Patch) => update({ data: { salon_id: activeSalonId!, patch } }),
     onSuccess: () => {
@@ -112,6 +113,7 @@ export function OwnerWebsitePage() {
       setPreview(true);
     }
   }, [routeSearch, salon]);
+
 
   useEffect(() => {
     if (salon && !form) {
