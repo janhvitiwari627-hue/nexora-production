@@ -53,6 +53,13 @@ function localDate(offsetDays = 0) {
 
 function PublishedBookingPage() {
   const { slug } = Route.useParams();
+  if (!slug || slug === "undefined" || slug === "null") {
+    return <SalonNotFound />;
+  }
+  return <PublishedBookingPageInner slug={slug} />;
+}
+
+function PublishedBookingPageInner({ slug }: { slug: string }) {
   const search = Route.useSearch();
   const navigate = useNavigate();
   const { data } = useSuspenseQuery(salonBySlugQueryOptions(slug));
