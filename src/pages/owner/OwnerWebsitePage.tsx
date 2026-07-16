@@ -311,6 +311,71 @@ export function OwnerWebsitePage() {
         </CardContent>
       </Card>
 
+      <Card className="max-w-full overflow-hidden">
+        <CardHeader>
+          <CardTitle className="text-base">Edit Website Sections</CardTitle>
+          <p className="text-muted-foreground text-xs">
+            Har section ko yahan se edit karein. Changes turant aapki template website par dikhenge.
+          </p>
+        </CardHeader>
+        <CardContent className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          <SectionEditLink
+            icon={<Info className="h-4 w-4" />}
+            title="About / Our Salon"
+            desc="Salon story, tagline, description"
+            hint="Neeche 'Brand' card me edit karein"
+          />
+          <SectionEditLink
+            icon={<Scissors className="h-4 w-4" />}
+            title="Services"
+            desc="Add, edit ya remove services"
+            to="/owner/services"
+          />
+          <SectionEditLink
+            icon={<Tag className="h-4 w-4" />}
+            title="Rate Card"
+            desc="Service prices manage karein"
+            to="/owner/services"
+          />
+          <SectionEditLink
+            icon={<Package className="h-4 w-4" />}
+            title="Packages"
+            desc="Combo & bundle offers"
+            to="/owner/services"
+          />
+          <SectionEditLink
+            icon={<Users className="h-4 w-4" />}
+            title="Staff / Meet the Team"
+            desc="Team members add & edit"
+            to="/owner/staff"
+          />
+          <SectionEditLink
+            icon={<BadgePercent className="h-4 w-4" />}
+            title="Membership & Offers"
+            desc="Promotions aur memberships"
+            to="/owner/marketing"
+          />
+          <SectionEditLink
+            icon={<ImageIcon className="h-4 w-4" />}
+            title="Gallery"
+            desc="Salon photos manage karein"
+            to="/owner/gallery"
+          />
+          <SectionEditLink
+            icon={<Star className="h-4 w-4" />}
+            title="Reviews"
+            desc="Customer reviews dekhein"
+            to="/owner/reviews"
+          />
+          <SectionEditLink
+            icon={<Pencil className="h-4 w-4" />}
+            title="Contact & Hours"
+            desc="Phone, address, timings"
+            hint="Neeche 'Contact' card me edit karein"
+          />
+        </CardContent>
+      </Card>
+
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Brand customizer */}
         <Card className="max-w-full overflow-hidden">
