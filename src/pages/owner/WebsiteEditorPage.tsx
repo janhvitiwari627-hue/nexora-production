@@ -1955,7 +1955,138 @@ function buildBgPreview(style: BgStyle, theme: ThemeState): CSSProperties {
   }
 }
 
+const CUSTOM_PRESETS_KEY = "lovable:website-editor:custom-theme-presets:v1";
+
+type CustomPreset = { key: string; name: string; theme: ThemeState; createdAt: number };
+
+function loadCustomPresets(): CustomPreset[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(CUSTOM_PRESETS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as CustomPreset[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCustomPresets(list: CustomPreset[]) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(CUSTOM_PRESETS_KEY, JSON.stringify(list));
+  } catch {
+    // storage full or blocked; ignore
+  }
+}
+
 function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch: Partial<ThemeState>) => void }) {
+  const [customPresets, setCustomPresets] = useState<CustomPreset[]>([]);
+  const [saveOpen, setSaveOpen] = useState(false);
+  const [presetName, setPresetName] = useState("");
+
+  useEffect(() => {
+    setCustomPresets(loadCustomPresets());
+  }, []);
+
+  const persist = (next: CustomPreset[]) => {
+    setCustomPresets(next);
+    saveCustomPresets(next);
+  };
+
+  const handleSavePreset = () => {
+    const name = presetName.trim();
+    if (!name) {
+      toast.error("Preset ka naam daaliye");
+      return;
+    }
+    if (customPresets.some((p) => p.name.toLowerCase() === name.toLowerCase())) {
+      toast.error("Is naam se preset already exists");
+      return;
+    }
+    const preset: CustomPreset = {
+      key: `custom-${Date.now()}`,
+      name,
+      theme: JSON.parse(JSON.stringify(theme)) as ThemeState,
+      createdAt: Date.now(),
+    };
+    persist([...customPresets, preset]);
+    setPresetName("");
+    setSaveOpen(false);
+    toast.success(`"${name}" preset saved`);
+  };
+
+  const handleDeletePreset = (key: string, name: string) => {
+    persist(customPresets.filter((p) => p.key !== key));
+    toast.success(`"${name}" preset removed`);
+  };
+
+  const renderPresetCard = (p: { key: string; name: string; description?: string; theme: ThemeState }, opts?: { onDelete?: () => void }) => {
+    const active =
+      theme.primary_color === p.theme.primary_color &&
+      theme.secondary_color === p.theme.secondary_color &&
+      theme.heading_font === p.theme.heading_font &&
+      theme.button_style === p.theme.button_style &&
+      (theme.extras.bg_style ?? "solid") === (p.theme.extras.bg_style ?? "solid");
+    const bgPreview = buildBgPreview(
+      (p.theme.extras.bg_style as BgStyle | undefined) ?? "solid",
+      p.theme,
+    );
+    return (
+      <div key={p.key} className="relative">
+        <button
+          type="button"
+          onClick={() => onChange(p.theme)}
+          className={`group w-full overflow-hidden rounded-lg border text-left transition ${
+            active ? "border-primary ring-2 ring-primary/30" : "hover:border-primary/60"
+          }`}
+        >
+          <div className="relative p-2" style={bgPreview}>
+            <div className="flex gap-1">
+              {[p.theme.primary_color, p.theme.secondary_color, p.theme.accent_color, p.theme.text_color].map((c, i) => (
+                <span key={i} className="h-4 w-4 rounded-full border border-black/10 shadow-sm" style={{ background: c }} />
+              ))}
+            </div>
+            <div
+              className="mt-6 text-sm font-semibold leading-tight"
+              style={{ color: p.theme.text_color, fontFamily: p.theme.heading_font }}
+            >
+              Aa
+            </div>
+            <span
+              className="absolute right-1.5 top-1.5 inline-block px-2 py-0.5 text-[10px]"
+              style={{
+                background: p.theme.secondary_color,
+                color: p.theme.background_color,
+                fontFamily: p.theme.body_font,
+                borderRadius:
+                  p.theme.button_style === "pill" ? "9999px" :
+                  p.theme.button_style === "square" ? "0" : "4px",
+              }}
+            >
+              Book
+            </span>
+          </div>
+          <div className="border-t bg-card px-2 py-1.5">
+            <div className="truncate text-xs font-semibold" style={{ fontFamily: p.theme.heading_font }}>{p.name}</div>
+            {p.description && <div className="truncate text-[10px] text-muted-foreground">{p.description}</div>}
+          </div>
+        </button>
+        {opts?.onDelete && (
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); opts.onDelete?.(); }}
+            className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full border bg-background text-destructive shadow-sm hover:bg-destructive hover:text-destructive-foreground"
+            title="Delete preset"
+            aria-label={`Delete preset ${p.name}`}
+          >
+            <Trash2 className="h-3 w-3" />
+          </button>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="mx-auto max-w-xl space-y-6">
       <div>
@@ -1966,73 +2097,75 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
       <div className="space-y-3 rounded-lg border bg-card p-4">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold uppercase text-muted-foreground">Presets</h3>
-          <button
-            type="button"
-            onClick={() => onChange(DEFAULT_THEME)}
-            className="text-xs text-primary underline-offset-2 hover:underline"
-          >
-            Reset to default
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setSaveOpen((v) => !v)}
+              className="inline-flex items-center gap-1 text-xs text-primary underline-offset-2 hover:underline"
+            >
+              <Save className="h-3.5 w-3.5" />
+              Save current
+            </button>
+            <button
+              type="button"
+              onClick={() => onChange(DEFAULT_THEME)}
+              className="text-xs text-primary underline-offset-2 hover:underline"
+            >
+              Reset
+            </button>
+          </div>
         </div>
         <p className="text-xs text-muted-foreground">
           Ek click me colors, fonts, background style — sab kuch instantly apply ho jayega.
         </p>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {THEME_PRESETS.map((p) => {
-            const active =
-              theme.primary_color === p.theme.primary_color &&
-              theme.secondary_color === p.theme.secondary_color &&
-              theme.heading_font === p.theme.heading_font &&
-              theme.button_style === p.theme.button_style &&
-              (theme.extras.bg_style ?? "solid") === (p.theme.extras.bg_style ?? "solid");
-            const bgPreview = buildBgPreview(
-              (p.theme.extras.bg_style as BgStyle | undefined) ?? "solid",
-              p.theme,
-            );
-            return (
-              <button
-                key={p.key}
-                type="button"
-                onClick={() => onChange(p.theme)}
-                className={`group overflow-hidden rounded-lg border text-left transition ${
-                  active ? "border-primary ring-2 ring-primary/30" : "hover:border-primary/60"
-                }`}
-              >
-                <div className="relative p-2" style={bgPreview}>
-                  <div className="flex gap-1">
-                    {[p.theme.primary_color, p.theme.secondary_color, p.theme.accent_color, p.theme.text_color].map((c, i) => (
-                      <span key={i} className="h-4 w-4 rounded-full border border-black/10 shadow-sm" style={{ background: c }} />
-                    ))}
-                  </div>
-                  <div
-                    className="mt-6 text-sm font-semibold leading-tight"
-                    style={{ color: p.theme.text_color, fontFamily: p.theme.heading_font }}
-                  >
-                    Aa
-                  </div>
-                  <span
-                    className="absolute right-1.5 top-1.5 inline-block px-2 py-0.5 text-[10px]"
-                    style={{
-                      background: p.theme.secondary_color,
-                      color: p.theme.background_color,
-                      fontFamily: p.theme.body_font,
-                      borderRadius:
-                        p.theme.button_style === "pill" ? "9999px" :
-                        p.theme.button_style === "square" ? "0" : "4px",
-                    }}
-                  >
-                    Book
-                  </span>
-                </div>
-                <div className="border-t bg-card px-2 py-1.5">
-                  <div className="text-xs font-semibold" style={{ fontFamily: p.theme.heading_font }}>{p.name}</div>
-                  <div className="truncate text-[10px] text-muted-foreground">{p.description}</div>
-                </div>
-              </button>
-            );
-          })}
+
+        {saveOpen && (
+          <div className="flex items-center gap-2 rounded-md border bg-muted/30 p-2">
+            <Input
+              autoFocus
+              placeholder="Preset name (e.g. My Salon Look)"
+              value={presetName}
+              onChange={(e) => setPresetName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") { e.preventDefault(); handleSavePreset(); }
+                if (e.key === "Escape") { setSaveOpen(false); setPresetName(""); }
+              }}
+              className="h-8 text-sm"
+              maxLength={40}
+            />
+            <Button type="button" size="sm" onClick={handleSavePreset}>Save</Button>
+            <Button type="button" size="sm" variant="ghost" onClick={() => { setSaveOpen(false); setPresetName(""); }}>
+              Cancel
+            </Button>
+          </div>
+        )}
+
+        {customPresets.length > 0 && (
+          <div className="space-y-2">
+            <div className="text-[11px] font-medium uppercase text-muted-foreground">My presets</div>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {customPresets.map((p) =>
+                renderPresetCard(
+                  { ...p, description: `Saved ${new Date(p.createdAt).toLocaleDateString()}` },
+                  { onDelete: () => handleDeletePreset(p.key, p.name) },
+                ),
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="space-y-2">
+          {customPresets.length > 0 && (
+            <div className="text-[11px] font-medium uppercase text-muted-foreground">Built-in</div>
+          )}
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {THEME_PRESETS.map((p) => renderPresetCard(p))}
+          </div>
         </div>
       </div>
+
+
+
 
 
 
