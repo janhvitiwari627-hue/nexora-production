@@ -604,6 +604,7 @@ export function WebsiteEditorPage() {
   }
 
   function patchTheme(patch: Partial<ThemeState>) {
+    markDirty();
     setLocalTheme((prev) => {
       const nextExtras = patch.extras ? { ...prev.extras, ...patch.extras } : prev.extras;
       const next = { ...prev, ...patch, extras: nextExtras };
@@ -626,6 +627,7 @@ export function WebsiteEditorPage() {
   }
 
   function patchSection(id: string, patch: Partial<WebsiteSection>) {
+    markDirty();
     setLocalSections((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)));
     // Debounced autosave
     if (saveTimers.current[id]) clearTimeout(saveTimers.current[id]);
@@ -661,6 +663,12 @@ export function WebsiteEditorPage() {
   const [versionsLoading, setVersionsLoading] = useState(false);
   const [restoring, setRestoring] = useState<string | null>(null);
   const [savingVersion, setSavingVersion] = useState(false);
+  const dirtySinceSnapshotRef = useRef(false);
+  const lastAutoSnapshotRef = useRef<number>(Date.now());
+  const [lastSnapshotAt, setLastSnapshotAt] = useState<number | null>(null);
+  function markDirty() {
+    dirtySinceSnapshotRef.current = true;
+  }
 
   // ---- Diff viewer ----
   type DiffChange =
@@ -829,6 +837,36 @@ export function WebsiteEditorPage() {
     }
   }
 
+  // Load versions once website is known
+  useEffect(() => {
+    if (!websiteId) return;
+    void refreshVersions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [websiteId]);
+
+  // Auto-snapshot every 2 minutes if there are unsaved edits since the last snapshot.
+  useEffect(() => {
+    if (!websiteId) return;
+    const interval = window.setInterval(async () => {
+      if (!dirtySinceSnapshotRef.current) return;
+      // Skip if user manually saved very recently
+      if (Date.now() - lastAutoSnapshotRef.current < 60_000) return;
+      try {
+        await doSaveVersion({ data: { websiteId } });
+        dirtySinceSnapshotRef.current = false;
+        lastAutoSnapshotRef.current = Date.now();
+        setLastSnapshotAt(Date.now());
+        void refreshVersions();
+      } catch {
+        // Silent; will retry next interval
+      }
+    }, 120_000);
+    return () => window.clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [websiteId]);
+
+
+
 
   async function handlePublish() {
     if (!websiteId) return;
@@ -879,6 +917,7 @@ export function WebsiteEditorPage() {
     if (oldIndex < 0 || newIndex < 0) return;
     const next = arrayMove(localSections, oldIndex, newIndex).map((s, i) => ({ ...s, sort_order: i }));
     setLocalSections(next);
+    markDirty();
     try {
       setSaving(true);
       await saveOrder({ data: { websiteId, order: next.map((s) => s.id) } });
@@ -979,13 +1018,35 @@ export function WebsiteEditorPage() {
         <div className="min-w-0">
           <h1 className="truncate text-lg font-semibold">Final Website Editor</h1>
           <p className="text-xs text-muted-foreground">
-            {saving ? "Saving latest changes..." : "Edit sections, theme and preview here."}
+            {saving
+              ? "Saving latest changes..."
+              : lastSnapshotAt
+                ? `Auto-saved draft at ${new Date(lastSnapshotAt).toLocaleTimeString()}`
+                : "Edits auto-save; drafts snapshot every 2 min."}
           </p>
         </div>
-        <Button onClick={handlePublish} disabled={publishing || !websiteId} className="shrink-0">
-          {publishing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Globe className="mr-2 h-4 w-4" />}
-          Final Save &amp; Publish
-        </Button>
+        <div className="flex shrink-0 items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => { setVersionsOpen(true); void refreshVersions(); }}
+            disabled={!websiteId}
+          >
+            <History className="mr-2 h-4 w-4" />
+            History
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleSaveVersion}
+            disabled={savingVersion || !websiteId}
+          >
+            {savingVersion ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+            Save draft
+          </Button>
+          <Button onClick={handlePublish} disabled={publishing || !websiteId}>
+            {publishing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Globe className="mr-2 h-4 w-4" />}
+            Final Save &amp; Publish
+          </Button>
+        </div>
       </header>
 
 
@@ -1136,6 +1197,148 @@ export function WebsiteEditorPage() {
           </div>
         </section>
       </div>
+
+      {/* Version history dialog */}
+      <Dialog open={versionsOpen} onOpenChange={setVersionsOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Draft history</DialogTitle>
+            <DialogDescription>
+              Auto-saved every 2 minutes while you edit. Restore any snapshot to switch back to that draft.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[60vh] overflow-y-auto">
+            {versionsLoading ? (
+              <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Loading history...
+              </div>
+            ) : versions.length === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">
+                No drafts saved yet. Make an edit or click &quot;Save draft&quot; to create one.
+              </p>
+            ) : (
+              <ul className="divide-y">
+                {versions.map((v) => (
+                  <li key={v.id} className="flex items-center justify-between gap-3 py-3">
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-medium">
+                        {v.note || "Auto-saved draft"}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {new Date(v.created_at).toLocaleString()}
+                      </div>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <Button size="sm" variant="ghost" onClick={() => void handleViewDiff(v)}>
+                        <GitCompare className="mr-1 h-4 w-4" /> Diff
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={restoring === v.id}
+                        onClick={() => void handleRestoreVersion(v.id)}
+                      >
+                        {restoring === v.id ? (
+                          <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                        ) : (
+                          <Undo2 className="mr-1 h-4 w-4" />
+                        )}
+                        Restore
+                      </Button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => void refreshVersions()} disabled={versionsLoading}>
+              Refresh
+            </Button>
+            <Button onClick={handleSaveVersion} disabled={savingVersion || !websiteId}>
+              {savingVersion ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+              Save current as draft
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Diff dialog */}
+      <Dialog open={diffOpen} onOpenChange={setDiffOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Changes since this draft</DialogTitle>
+            <DialogDescription>
+              {diffVersion ? new Date(diffVersion.created_at).toLocaleString() : ""}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[60vh] overflow-y-auto space-y-4 text-sm">
+            {diffLoading || !diffResult ? (
+              <div className="flex items-center justify-center py-8 text-muted-foreground">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Comparing...
+              </div>
+            ) : (
+              <>
+                <div>
+                  <div className="mb-1 text-xs font-semibold uppercase text-muted-foreground">Sections</div>
+                  {diffResult.sections.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">No section changes.</p>
+                  ) : (
+                    <ul className="space-y-1">
+                      {diffResult.sections.map((c, i) => (
+                        <li key={i} className="rounded border p-2">
+                          <div className="font-medium">
+                            [{c.kind}] {c.label}
+                          </div>
+                          {c.kind === "modified" && (
+                            <ul className="mt-1 list-disc pl-5 text-xs text-muted-foreground">
+                              {c.details.map((d, j) => <li key={j}>{d}</li>)}
+                            </ul>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <div>
+                  <div className="mb-1 text-xs font-semibold uppercase text-muted-foreground">Theme</div>
+                  {diffResult.theme.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">No theme changes.</p>
+                  ) : (
+                    <ul className="space-y-1">
+                      {diffResult.theme.map((c, i) => (
+                        <li key={i} className="rounded border p-2">
+                          <div className="font-medium">{c.label}</div>
+                          {c.kind === "modified" && (
+                            <ul className="mt-1 list-disc pl-5 text-xs text-muted-foreground">
+                              {c.details.map((d, j) => <li key={j}>{d}</li>)}
+                            </ul>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+          <DialogFooter>
+            {diffVersion && (
+              <Button
+                onClick={() => void handleRestoreVersion(diffVersion.id)}
+                disabled={restoring === diffVersion.id}
+              >
+                {restoring === diffVersion.id ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Undo2 className="mr-2 h-4 w-4" />
+                )}
+                Restore this draft
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
