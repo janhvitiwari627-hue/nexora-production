@@ -20,7 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Eye, Globe, Plus, Trash2, Upload, Image as ImageIcon, Palette } from "lucide-react";
+import { Loader2, Eye, Globe, Plus, Trash2, Upload, Image as ImageIcon, Palette, GripVertical } from "lucide-react";
 
 type NavLink = { id: string; label: string; url: string };
 
