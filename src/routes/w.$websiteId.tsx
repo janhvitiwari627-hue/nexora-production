@@ -155,28 +155,57 @@ function PublicWebsitePage() {
   );
 }
 
+type Item = Record<string, string | number | undefined>;
+
+function asArray(v: unknown): Item[] {
+  if (Array.isArray(v)) return v as Item[];
+  if (typeof v === "string") {
+    try {
+      const p = JSON.parse(v);
+      return Array.isArray(p) ? (p as Item[]) : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
+function SectionHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <h2
+      className="mb-8 text-center text-3xl font-semibold md:text-4xl"
+      style={{ color: "var(--w-primary)", fontFamily: "var(--w-heading-font)" }}
+    >
+      {children}
+    </h2>
+  );
+}
+
 function SectionRenderer({ section }: { section: WebsiteSection }) {
-  const c = (section.content ?? {}) as Record<string, string>;
+  const raw = (section.content ?? {}) as Record<string, unknown>;
+  const c = raw as Record<string, string>;
 
   switch (section.section_type) {
     case "hero":
       return (
         <section
-          className="relative flex min-h-[60vh] items-center justify-center bg-cover bg-center px-6 py-24 text-center"
+          className="relative flex min-h-[70vh] items-center justify-center bg-cover bg-center px-6 py-24 text-center"
           style={{
             backgroundImage: c.imageUrl ? `url(${c.imageUrl})` : undefined,
             backgroundColor: !c.imageUrl ? "var(--w-primary)" : undefined,
-            color: c.imageUrl ? "#fff" : "#fff",
+            color: "#fff",
           }}
         >
-          {c.imageUrl && <div className="absolute inset-0 bg-black/40" />}
+          {c.imageUrl && <div className="absolute inset-0 bg-black/50" />}
           <div className="relative max-w-3xl">
-            <h1 className="text-4xl font-bold md:text-6xl" style={{ fontFamily: "var(--w-heading-font)" }}>{c.heading || "Welcome"}</h1>
-            {c.subheading && <p className="mt-4 text-lg opacity-90">{c.subheading}</p>}
+            <h1 className="text-4xl font-bold leading-tight md:text-6xl" style={{ fontFamily: "var(--w-heading-font)" }}>
+              {c.heading || "Welcome"}
+            </h1>
+            {c.subheading && <p className="mt-4 text-lg opacity-90 md:text-xl">{c.subheading}</p>}
             {c.buttonText && (
               <a
                 href={c.buttonLink || "#"}
-                className="mt-8 inline-block px-6 py-3 font-medium"
+                className="mt-8 inline-block px-8 py-3 font-medium shadow-lg transition hover:opacity-90"
                 style={{ background: "var(--w-secondary)", color: "#000", borderRadius: "var(--w-btn-radius)" }}
               >
                 {c.buttonText}
@@ -185,47 +214,251 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
           </div>
         </section>
       );
+
     case "about":
       return (
-        <section className="mx-auto max-w-3xl px-6 py-16">
-          <h2 className="mb-4 text-3xl font-semibold" style={{ color: "var(--w-primary)", fontFamily: "var(--w-heading-font)" }}>
-            {c.heading || "About Us"}
-          </h2>
-          <p className="whitespace-pre-wrap leading-relaxed opacity-90">{c.body}</p>
+        <section className="mx-auto max-w-3xl px-6 py-20">
+          <SectionHeading>{c.heading || "About Us"}</SectionHeading>
+          <p className="whitespace-pre-wrap text-center leading-relaxed opacity-90">{c.body}</p>
         </section>
       );
+
+    case "services": {
+      const items = asArray(raw.items);
+      return (
+        <section className="mx-auto max-w-6xl px-6 py-20">
+          <SectionHeading>{c.heading || "Our Services"}</SectionHeading>
+          {items.length === 0 ? (
+            <p className="text-center text-sm opacity-60">No services listed yet.</p>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {items.map((it, i) => (
+                <div
+                  key={i}
+                  className="rounded-lg border p-6 shadow-sm transition hover:shadow-md"
+                  style={{ borderColor: "var(--w-primary)", borderOpacity: 0.15 } as React.CSSProperties}
+                >
+                  {it.image && (
+                    <img src={String(it.image)} alt={String(it.name ?? "")} className="mb-4 h-40 w-full rounded-md object-cover" />
+                  )}
+                  <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--w-heading-font)" }}>{String(it.name ?? "Service")}</h3>
+                  {it.description && <p className="mt-2 text-sm opacity-80">{String(it.description)}</p>}
+                  <div className="mt-4 flex items-center justify-between text-sm">
+                    {it.duration && <span className="opacity-70">{String(it.duration)}</span>}
+                    {it.price && (
+                      <span className="font-semibold" style={{ color: "var(--w-accent)" }}>
+                        ₹{String(it.price)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      );
+    }
+
+    case "rate_card": {
+      const items = asArray(raw.items);
+      return (
+        <section className="mx-auto max-w-4xl px-6 py-20">
+          <SectionHeading>{c.heading || "Rate Card"}</SectionHeading>
+          {items.length === 0 ? (
+            <p className="text-center text-sm opacity-60">No rates listed yet.</p>
+          ) : (
+            <div className="overflow-hidden rounded-lg border">
+              <table className="w-full text-left text-sm">
+                <thead style={{ background: "var(--w-primary)", color: "#fff" }}>
+                  <tr>
+                    <th className="px-4 py-3">Service</th>
+                    <th className="px-4 py-3">Duration</th>
+                    <th className="px-4 py-3 text-right">Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((it, i) => (
+                    <tr key={i} className="border-t">
+                      <td className="px-4 py-3">{String(it.name ?? "-")}</td>
+                      <td className="px-4 py-3 opacity-70">{String(it.duration ?? "-")}</td>
+                      <td className="px-4 py-3 text-right font-semibold" style={{ color: "var(--w-accent)" }}>
+                        {it.price ? `₹${String(it.price)}` : "-"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      );
+    }
+
+    case "packages":
+    case "membership": {
+      const items = asArray(raw.items);
+      return (
+        <section className="mx-auto max-w-6xl px-6 py-20">
+          <SectionHeading>{c.heading || (section.section_type === "packages" ? "Packages" : "Membership")}</SectionHeading>
+          {items.length === 0 ? (
+            <p className="text-center text-sm opacity-60">Nothing here yet.</p>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-3">
+              {items.map((it, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col rounded-xl border-2 p-6 text-center shadow-sm"
+                  style={{ borderColor: "var(--w-secondary)" }}
+                >
+                  <h3 className="text-xl font-semibold" style={{ fontFamily: "var(--w-heading-font)" }}>
+                    {String(it.name ?? "Plan")}
+                  </h3>
+                  {it.price && (
+                    <div className="my-3 text-3xl font-bold" style={{ color: "var(--w-primary)" }}>
+                      ₹{String(it.price)}
+                    </div>
+                  )}
+                  {it.description && <p className="text-sm opacity-80">{String(it.description)}</p>}
+                  {it.duration && <p className="mt-2 text-xs opacity-60">{String(it.duration)}</p>}
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      );
+    }
+
+    case "offers": {
+      const items = asArray(raw.items);
+      return (
+        <section className="mx-auto max-w-6xl px-6 py-20">
+          <SectionHeading>{c.heading || "Current Offers"}</SectionHeading>
+          {items.length === 0 ? (
+            <p className="text-center text-sm opacity-60">No active offers.</p>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2">
+              {items.map((it, i) => (
+                <div
+                  key={i}
+                  className="rounded-lg p-6 text-white shadow-md"
+                  style={{ background: `linear-gradient(135deg, var(--w-primary), var(--w-secondary))` }}
+                >
+                  <div className="text-xs font-semibold uppercase tracking-wider opacity-80">Offer</div>
+                  <h3 className="mt-1 text-xl font-bold">{String(it.title ?? "Special Offer")}</h3>
+                  {it.description && <p className="mt-2 text-sm opacity-90">{String(it.description)}</p>}
+                  {it.discount && (
+                    <div className="mt-4 inline-block rounded-full bg-white/20 px-3 py-1 text-sm font-medium">
+                      {String(it.discount)}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      );
+    }
+
+    case "staff": {
+      const items = asArray(raw.items);
+      return (
+        <section className="mx-auto max-w-6xl px-6 py-20">
+          <SectionHeading>{c.heading || "Meet the Team"}</SectionHeading>
+          {items.length === 0 ? (
+            <p className="text-center text-sm opacity-60">Team details coming soon.</p>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-4">
+              {items.map((it, i) => (
+                <div key={i} className="text-center">
+                  <img
+                    src={String(it.image ?? it.avatar ?? "https://via.placeholder.com/200")}
+                    alt={String(it.name ?? "")}
+                    className="mx-auto h-32 w-32 rounded-full object-cover shadow-md"
+                  />
+                  <h3 className="mt-3 font-semibold" style={{ fontFamily: "var(--w-heading-font)" }}>{String(it.name ?? "")}</h3>
+                  {it.role && <p className="text-sm opacity-70">{String(it.role)}</p>}
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      );
+    }
+
+    case "gallery": {
+      const images = asArray(raw.images);
+      const urls: string[] = Array.isArray(raw.images)
+        ? (raw.images as unknown[]).map((x) => (typeof x === "string" ? x : String((x as Item)?.url ?? ""))).filter(Boolean)
+        : images.map((x) => String(x.url ?? "")).filter(Boolean);
+      return (
+        <section className="mx-auto max-w-6xl px-6 py-20">
+          <SectionHeading>{c.heading || "Gallery"}</SectionHeading>
+          {urls.length === 0 ? (
+            <p className="text-center text-sm opacity-60">No images uploaded yet.</p>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              {urls.map((u, i) => (
+                <img key={i} src={u} alt="" className="h-48 w-full rounded-md object-cover shadow-sm transition hover:scale-[1.02]" />
+              ))}
+            </div>
+          )}
+        </section>
+      );
+    }
+
+    case "blog": {
+      const posts = asArray(raw.posts);
+      return (
+        <section className="mx-auto max-w-5xl px-6 py-20">
+          <SectionHeading>{c.heading || "Blog"}</SectionHeading>
+          {posts.length === 0 ? (
+            <p className="text-center text-sm opacity-60">No posts yet.</p>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2">
+              {posts.map((p, i) => (
+                <article key={i} className="rounded-lg border overflow-hidden shadow-sm">
+                  {p.image && <img src={String(p.image)} alt={String(p.title ?? "")} className="h-44 w-full object-cover" />}
+                  <div className="p-5">
+                    <h3 className="font-semibold" style={{ fontFamily: "var(--w-heading-font)" }}>{String(p.title ?? "Untitled")}</h3>
+                    {p.date && <p className="mt-1 text-xs opacity-60">{String(p.date)}</p>}
+                    {p.excerpt && <p className="mt-2 text-sm opacity-80">{String(p.excerpt)}</p>}
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+      );
+    }
+
     case "contact":
       return (
-        <section className="mx-auto max-w-3xl px-6 py-16">
-          <h2 className="mb-6 text-3xl font-semibold" style={{ color: "var(--w-primary)", fontFamily: "var(--w-heading-font)" }}>
-            {c.heading || "Contact Us"}
-          </h2>
-          <div className="space-y-2">
-            {c.phone && <p>📞 {c.phone}</p>}
-            {c.whatsapp && <p>💬 WhatsApp: {c.whatsapp}</p>}
-            {c.email && <p>✉️ {c.email}</p>}
+        <section className="mx-auto max-w-3xl px-6 py-20">
+          <SectionHeading>{c.heading || "Contact Us"}</SectionHeading>
+          <div className="grid gap-3 text-center">
+            {c.phone && <p>📞 <a href={`tel:${c.phone}`} className="hover:underline">{c.phone}</a></p>}
+            {c.whatsapp && <p>💬 <a href={`https://wa.me/${c.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="hover:underline">WhatsApp: {c.whatsapp}</a></p>}
+            {c.email && <p>✉️ <a href={`mailto:${c.email}`} className="hover:underline">{c.email}</a></p>}
             {c.address && <p>📍 {c.address}</p>}
           </div>
           {c.mapEmbed && (
             <iframe
               src={c.mapEmbed}
-              className="mt-6 h-64 w-full rounded-md border-0"
+              className="mt-8 h-72 w-full rounded-md border-0"
               loading="lazy"
               title="Map"
             />
           )}
         </section>
       );
+
     default:
       return (
-        <section className="mx-auto max-w-4xl px-6 py-12">
-          <h2 className="mb-4 text-2xl font-semibold" style={{ color: "var(--w-primary)", fontFamily: "var(--w-heading-font)" }}>
-            {c.heading || section.section_type}
-          </h2>
-          <p className="text-sm opacity-70">
-            (Is section ka detailed view aa raha hai next update me.)
-          </p>
+        <section className="mx-auto max-w-4xl px-6 py-16">
+          <SectionHeading>{c.heading || section.section_type}</SectionHeading>
+          {c.body && <p className="whitespace-pre-wrap text-center leading-relaxed opacity-90">{c.body}</p>}
         </section>
       );
   }
 }
+
