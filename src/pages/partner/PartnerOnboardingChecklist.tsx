@@ -121,6 +121,43 @@ export function PartnerOnboardingChecklist() {
   const announceAlert = (msg: string) => setSrAlert(msg);
   const cloudinaryReady = isCloudinaryConfigured();
 
+  // Per-file status list — tracks every upload attempt (including retries) so
+  // the user sees a running log of uploading / success / failure per file.
+  type FileStatus = {
+    id: string;
+    name: string;
+    size: number;
+    status: "uploading" | "success" | "error" | "cancelled";
+    progress: number;
+    error?: string;
+    attempt: number;
+  };
+  const [fileStatuses, setFileStatuses] = useState<FileStatus[]>([]);
+  const currentStatusIdRef = useRef<string | null>(null);
+  const attemptCountRef = useRef<Map<string, number>>(new Map());
+
+  const updateStatus = (id: string, patch: Partial<FileStatus>) => {
+    setFileStatuses((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)));
+  };
+  const addStatus = (file: File): string => {
+    const key = `${file.name}::${file.size}`;
+    const attempt = (attemptCountRef.current.get(key) ?? 0) + 1;
+    attemptCountRef.current.set(key, attempt);
+    const id = `${key}::${attempt}::${Date.now()}`;
+    setFileStatuses((prev) => [
+      ...prev,
+      { id, name: file.name, size: file.size, status: "uploading", progress: 0, attempt },
+    ]);
+    currentStatusIdRef.current = id;
+    return id;
+  };
+  const clearFileStatuses = () => {
+    setFileStatuses([]);
+    attemptCountRef.current.clear();
+    currentStatusIdRef.current = null;
+  };
+
+
   const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
   const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
 
