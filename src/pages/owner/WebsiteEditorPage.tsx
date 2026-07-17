@@ -18,8 +18,38 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Eye, Globe, Plus, Trash2, Upload, Image as ImageIcon } from "lucide-react";
+import { Loader2, Eye, Globe, Plus, Trash2, Upload, Image as ImageIcon, Palette } from "lucide-react";
+
+type ThemeState = {
+  primary_color: string;
+  secondary_color: string;
+  accent_color: string;
+  background_color: string;
+  text_color: string;
+  heading_font: string;
+  body_font: string;
+  button_style: string;
+};
+
+const DEFAULT_THEME: ThemeState = {
+  primary_color: "#111827",
+  secondary_color: "#F59E0B",
+  accent_color: "#10B981",
+  background_color: "#FFFFFF",
+  text_color: "#111827",
+  heading_font: "Inter",
+  body_font: "Inter",
+  button_style: "rounded",
+};
+
+const FONT_OPTIONS = ["Inter", "Poppins", "Playfair Display", "Montserrat", "Lora", "Roboto", "Merriweather", "Space Grotesk"];
+const BUTTON_STYLES = [
+  { value: "rounded", label: "Rounded" },
+  { value: "pill", label: "Pill" },
+  { value: "square", label: "Square" },
+];
 
 const SECTION_LABELS: Record<SectionType, string> = {
   hero: "Hero / Banner",
