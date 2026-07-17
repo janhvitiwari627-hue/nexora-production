@@ -1162,7 +1162,17 @@ function GenericItemsEditor({
                 <TextField label="Excerpt" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
               </>
             ) : (
-              <TextField label="Caption" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
+              <>
+                <TextField label="Caption" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
+                {it.image && (
+                  <GalleryImageCropControl
+                    image={it.image}
+                    objectPosition={it.objectPosition ?? "center"}
+                    thumbShape={it.thumbShape ?? "auto"}
+                    onChange={(p) => patch(it.id, p)}
+                  />
+                )}
+              </>
             )}
 
           </li>
