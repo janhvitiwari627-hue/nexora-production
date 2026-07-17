@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { motion } from "framer-motion";
-import { CheckCircle2, Circle, ClipboardList, Image as ImageIcon, MapPin, Phone, Sparkles, Loader2, Upload, X, RefreshCw } from "lucide-react";
+import { CheckCircle2, Circle, ClipboardList, Image as ImageIcon, MapPin, Phone, Sparkles, Loader2, Upload, X, RefreshCw, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { getPartnerProfile, updatePartnerProfile, type PartnerProfile } from "@/lib/partner.functions";
-import { uploadToCloudinary, isCloudinaryConfigured } from "@/lib/cloudinary";
+import { uploadToCloudinary, isCloudinaryConfigured, CloudinaryUploadError } from "@/lib/cloudinary";
 
 function friendlyUploadError(raw: string): string {
   const msg = (raw || "").trim();
@@ -106,6 +106,13 @@ export function PartnerOnboardingChecklist() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [localPreview, setLocalPreview] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadErrorDetails, setUploadErrorDetails] = useState<{
+    status?: number;
+    statusText?: string;
+    code?: string;
+    raw: string;
+  } | null>(null);
+  const [showErrorDetails, setShowErrorDetails] = useState(false);
   const cloudinaryReady = isCloudinaryConfigured();
 
   const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -137,6 +144,16 @@ export function PartnerOnboardingChecklist() {
       const raw = err instanceof Error ? err.message : String(err);
       const friendly = friendlyUploadError(raw);
       setUploadError(friendly);
+      if (err instanceof CloudinaryUploadError) {
+        setUploadErrorDetails({
+          status: err.status,
+          statusText: err.statusText,
+          code: err.code,
+          raw: err.rawResponse || err.message,
+        });
+      } else {
+        setUploadErrorDetails({ raw });
+      }
       toast.error(friendly);
       lastFileRef.current = file;
       if (!keepPreview && localPreview) {
@@ -384,27 +401,64 @@ export function PartnerOnboardingChecklist() {
                     onChange={onPickLogo}
                   />
                   {uploadError && (
-                    <div className="flex flex-wrap items-center gap-2 rounded-md border border-red-200 bg-red-50 px-2 py-1.5">
-                      <p className="flex-1 text-[11px] font-medium text-red-600">{uploadError}</p>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={onRetryUpload}
-                        disabled={uploading}
-                        className="h-7 border-red-300 px-2 text-[11px] text-red-700 hover:bg-red-100"
-                      >
-                        {uploading ? (
-                          <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                        ) : (
-                          <RefreshCw className="mr-1 h-3 w-3" />
-                        )}
-                        {uploading
-                          ? `Retrying… ${uploadProgress}%`
-                          : lastFileRef.current
-                            ? "Retry upload"
-                            : "Choose file"}
-                      </Button>
+                    <div className="rounded-md border border-red-200 bg-red-50 px-2 py-1.5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="flex-1 text-[11px] font-medium text-red-600">{uploadError}</p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={onRetryUpload}
+                          disabled={uploading}
+                          className="h-7 border-red-300 px-2 text-[11px] text-red-700 hover:bg-red-100"
+                        >
+                          {uploading ? (
+                            <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                          ) : (
+                            <RefreshCw className="mr-1 h-3 w-3" />
+                          )}
+                          {uploading
+                            ? `Retrying… ${uploadProgress}%`
+                            : lastFileRef.current
+                              ? "Retry upload"
+                              : "Choose file"}
+                        </Button>
+                      </div>
+                      {uploadErrorDetails && (
+                        <div className="mt-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setShowErrorDetails((v) => !v)}
+                            className="flex items-center gap-1 text-[10px] font-semibold text-red-700 hover:underline"
+                            aria-expanded={showErrorDetails}
+                          >
+                            <ChevronDown
+                              className={`h-3 w-3 transition-transform ${showErrorDetails ? "rotate-180" : ""}`}
+                            />
+                            {showErrorDetails ? "Hide details" : "Details"}
+                          </button>
+                          {showErrorDetails && (
+                            <div className="mt-1 space-y-0.5 rounded border border-red-200 bg-white/60 p-1.5 text-[10px] font-mono text-red-800">
+                              {typeof uploadErrorDetails.status === "number" && (
+                                <div>
+                                  <span className="opacity-60">HTTP:</span> {uploadErrorDetails.status}
+                                  {uploadErrorDetails.statusText ? ` ${uploadErrorDetails.statusText}` : ""}
+                                </div>
+                              )}
+                              {uploadErrorDetails.code && (
+                                <div>
+                                  <span className="opacity-60">Code:</span> {uploadErrorDetails.code}
+                                </div>
+                              )}
+                              {uploadErrorDetails.raw && (
+                                <div className="max-h-24 overflow-auto whitespace-pre-wrap break-all">
+                                  <span className="opacity-60">Raw:</span> {uploadErrorDetails.raw.slice(0, 500)}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
