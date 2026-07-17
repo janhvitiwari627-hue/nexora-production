@@ -90,10 +90,13 @@ export const updatePartnerProfile = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => profileUpdateSchema.parse(data))
   .handler(async ({ context, data }): Promise<PartnerProfile> => {
     const { supabase, userId } = context;
-    const patch: Record<string, string | null> = {};
-    for (const [k, v] of Object.entries(data)) {
+    const patch: Partial<Record<
+      "mobile" | "email" | "state" | "pincode" | "tagline" | "success_story" | "photo_url",
+      string | null
+    >> = {};
+    for (const [k, v] of Object.entries(data) as Array<[keyof typeof patch, string | null | undefined]>) {
       if (v === undefined) continue;
-      patch[k] = v === "" ? null : (v as string | null);
+      patch[k] = v === "" ? null : v;
     }
     const { data: row, error } = await supabase
       .from("district_business_partners")
