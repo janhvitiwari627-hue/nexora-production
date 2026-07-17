@@ -837,6 +837,36 @@ export function WebsiteEditorPage() {
     }
   }
 
+  // Load versions once website is known
+  useEffect(() => {
+    if (!websiteId) return;
+    void refreshVersions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [websiteId]);
+
+  // Auto-snapshot every 2 minutes if there are unsaved edits since the last snapshot.
+  useEffect(() => {
+    if (!websiteId) return;
+    const interval = window.setInterval(async () => {
+      if (!dirtySinceSnapshotRef.current) return;
+      // Skip if user manually saved very recently
+      if (Date.now() - lastAutoSnapshotRef.current < 60_000) return;
+      try {
+        await doSaveVersion({ data: { websiteId } });
+        dirtySinceSnapshotRef.current = false;
+        lastAutoSnapshotRef.current = Date.now();
+        setLastSnapshotAt(Date.now());
+        void refreshVersions();
+      } catch {
+        // Silent; will retry next interval
+      }
+    }, 120_000);
+    return () => window.clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [websiteId]);
+
+
+
 
   async function handlePublish() {
     if (!websiteId) return;
