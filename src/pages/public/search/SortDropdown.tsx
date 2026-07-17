@@ -17,7 +17,10 @@ export function SortDropdown({
 }) {
   return (
     <Select value={value} onValueChange={(v) => onChange(v as SortKey)}>
-      <SelectTrigger className="h-10 w-[200px] rounded-full border-border bg-card text-sm font-semibold text-heading">
+      <SelectTrigger
+        aria-label="Sort salons"
+        className="h-10 w-[164px] rounded-full border-border bg-card text-xs font-semibold text-heading sm:w-[200px] sm:text-sm"
+      >
         <span className="flex items-center gap-1.5">
           <span className="text-muted-foreground">Sort:</span>
           <SelectValue />

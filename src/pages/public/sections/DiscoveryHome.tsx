@@ -47,11 +47,7 @@ import {
 } from "lucide-react";
 import { BeautyIndustrySpotlight } from "./BeautyIndustrySpotlight";
 import { TrendingThisWeek } from "./TrendingThisWeek";
-import {
-  getMockBusinesses,
-  mockBusinessToShop,
-  type MockBusiness,
-} from "@/lib/mock-businesses";
+import { getMockBusinesses, mockBusinessToShop, type MockBusiness } from "@/lib/mock-businesses";
 import type { Shop } from "@/components/shared/ShopCard";
 
 /* ============================================================
@@ -141,13 +137,7 @@ export type DiscoveryHomeProps = {
 type SearchDest = {
   area?: string;
   category?: string;
-  sort?:
-    | "relevance"
-    | "rating"
-    | "distance"
-    | "price_low"
-    | "price_high"
-    | "popular";
+  sort?: "relevance" | "rating" | "distance" | "price_low" | "price_high" | "popular";
   on?: 1;
   vo?: 1;
   tr?: 1;
@@ -220,17 +210,13 @@ function enrich(b: MockBusiness, i: number, istHour: number, liveTick: number): 
   const eta = Math.max(2, Math.round((shop.distance_km ?? 1) * 3 + (i % 4)));
   const hasOffer = i % 3 === 0;
   const offerPct = hasOffer ? 10 + (i % 5) * 5 : 0;
-  const repeatRate = Math.min(1, 0.4 + ((b.reviewCount % 60) / 100));
+  const repeatRate = Math.min(1, 0.4 + (b.reviewCount % 60) / 100);
   const ownerActivity = ((i * 13) % 100) / 100;
-  const verifiedReviews = Math.round(b.reviewCount * (0.5 + ((i % 4) / 10)));
-  const weeklyBookings = Math.round(
-    20 + (b.reviewCount % 80) + (b.rating - 3) * 25 + (i % 11) * 3,
-  );
+  const verifiedReviews = Math.round(b.reviewCount * (0.5 + (i % 4) / 10));
+  const weeklyBookings = Math.round(20 + (b.reviewCount % 80) + (b.rating - 3) * 25 + (i % 11) * 3);
   const popularityScore = Math.min(
     100,
-    Math.round(
-      weeklyBookings * 0.5 + b.rating * 8 + (b.isVerified ? 6 : 0) + repeatRate * 10,
-    ),
+    Math.round(weeklyBookings * 0.5 + b.rating * 8 + (b.isVerified ? 6 : 0) + repeatRate * 10),
   );
   const latestReviewDaysAgo = (i * 3) % 21;
   const trendingScore =
@@ -253,21 +239,21 @@ function enrich(b: MockBusiness, i: number, istHour: number, liveTick: number): 
   const startingPrice = priceFromShop > 0 ? priceFromShop : 150 + ((i * 53) % 1400);
   const isLuxury = b.rating >= 4.6 && startingPrice >= 800 && b.isVerified;
   const priceTier: Enriched["priceTier"] =
-    startingPrice < 200 ? "budget"
-    : startingPrice < 600 ? "mid"
-    : startingPrice < 1200 ? "premium"
-    : "luxury";
+    startingPrice < 200
+      ? "budget"
+      : startingPrice < 600
+        ? "mid"
+        : startingPrice < 1200
+          ? "premium"
+          : "luxury";
 
   // Suitability + gender focus inferred from category + index spread.
   const cat = (b.category || "").toLowerCase();
   const isBarber = cat.includes("barber") || cat.includes("men");
-  const isLadies = cat.includes("ladies") || cat.includes("women") || cat.includes("beauty parlour");
+  const isLadies =
+    cat.includes("ladies") || cat.includes("women") || cat.includes("beauty parlour");
   const isSpa = cat.includes("spa") || cat.includes("massage");
-  const genderFocus: Enriched["genderFocus"] = isBarber
-    ? "male"
-    : isLadies
-      ? "female"
-      : "unisex";
+  const genderFocus: Enriched["genderFocus"] = isBarber ? "male" : isLadies ? "female" : "unisex";
   const suitableFor = {
     kids: i % 5 === 0 || cat.includes("salon"),
     women: genderFocus !== "male",
@@ -279,7 +265,14 @@ function enrich(b: MockBusiness, i: number, istHour: number, liveTick: number): 
   const isHomeService = i % 6 === 0;
   const travelChargeINR = isHomeService ? 50 + (i % 4) * 50 : 0;
   const arrivalMin = isHomeService ? 30 + (i % 5) * 15 : 0;
-  const allAreas = ["Vaishali Nagar", "Malviya Nagar", "C-Scheme", "Mansarovar", "Raja Park", "Jagatpura"];
+  const allAreas = [
+    "Vaishali Nagar",
+    "Malviya Nagar",
+    "C-Scheme",
+    "Mansarovar",
+    "Raja Park",
+    "Jagatpura",
+  ];
   const serviceAreas = isHomeService ? allAreas.slice(0, 2 + (i % 4)) : [];
 
   const tiers: Enriched["membershipTier"][] = [null, "silver", "gold", "platinum", "vip"];
@@ -287,14 +280,33 @@ function enrich(b: MockBusiness, i: number, istHour: number, liveTick: number): 
 
   const aiMatchPct = 60 + ((i * 19 + Math.round(b.rating * 10)) % 40);
 
-  const specialties: Enriched["staffPickSpecialty"][] = ["Hair", "Spa", "Tattoo", "Makeup", "Nails"];
+  const specialties: Enriched["staffPickSpecialty"][] = [
+    "Hair",
+    "Spa",
+    "Tattoo",
+    "Makeup",
+    "Nails",
+  ];
   const staffPickSpecialty = i % 2 === 0 ? specialties[i % specialties.length] : null;
 
-  const seasons: Enriched["seasonTag"][] = ["Wedding", "Festival", "Summer", "Winter", "Monsoon", "Holiday"];
+  const seasons: Enriched["seasonTag"][] = [
+    "Wedding",
+    "Festival",
+    "Summer",
+    "Winter",
+    "Monsoon",
+    "Holiday",
+  ];
   const seasonTag = seasons[i % seasons.length];
 
   const allFestivals: FestivalTag[] = [
-    "Diwali", "Holi", "Karwa Chauth", "Eid", "Christmas", "New Year", "Raksha Bandhan",
+    "Diwali",
+    "Holi",
+    "Karwa Chauth",
+    "Eid",
+    "Christmas",
+    "New Year",
+    "Raksha Bandhan",
   ];
   const festivalTags: FestivalTag[] = [
     allFestivals[i % allFestivals.length],
@@ -325,13 +337,18 @@ function enrich(b: MockBusiness, i: number, istHour: number, liveTick: number): 
   const nailService = isNailStudio ? nailServices[i % nailServices.length] : null;
 
   const isWellness = isSpa || cat.includes("wellness") || cat.includes("ayurved") || i % 7 === 0;
-  const wellnessFoci: Enriched["wellnessFocus"][] = ["Spa", "Massage", "Therapy", "Relaxation", "Ayurveda"];
+  const wellnessFoci: Enriched["wellnessFocus"][] = [
+    "Spa",
+    "Massage",
+    "Therapy",
+    "Relaxation",
+    "Ayurveda",
+  ];
   const wellnessFocus = isWellness ? wellnessFoci[i % wellnessFoci.length] : null;
 
   const isKidsCollection = suitableFor.kids && (cat.includes("salon") || i % 5 === 0);
   const isSeniorFriendly = suitableFor.seniors || i % 6 === 0;
   const wheelchairAccessible = isSeniorFriendly && i % 2 === 0;
-
 
   return {
     ...shop,
@@ -462,21 +479,6 @@ export function DiscoveryHome({
   const [aiSeed, setAiSeed] = useState(0);
   const refreshAi = useCallback(() => setAiSeed((n) => n + 1), []);
 
-  if (shops.length === 0) {
-    return (
-      <div className="px-5 py-12 sm:px-8 sm:py-16">
-        <div className="mx-auto max-w-[1400px] rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
-          <p className="text-sm font-semibold text-slate-700">
-            No shops match your current filters.
-          </p>
-          <p className="mt-1 text-xs text-slate-500">
-            Try clearing the location or category to see Discovery results.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   const aiSorted = useMemo(() => {
     const personalWeight = aiPersonalized ? 0.7 : 0.3;
     const trendingWeight = 1 - personalWeight;
@@ -494,6 +496,21 @@ export function DiscoveryHome({
     });
   }, [shops, aiPersonalized, aiSeed]);
 
+  if (shops.length === 0) {
+    return (
+      <div className="px-5 py-12 sm:px-8 sm:py-16">
+        <div className="mx-auto max-w-[1400px] rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
+          <p className="text-sm font-semibold text-slate-700">
+            No shops match your current filters.
+          </p>
+          <p className="mt-1 text-xs text-slate-500">
+            Try clearing the location or category to see Discovery results.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-14 px-5 py-12 sm:px-8 sm:py-16">
       <div className="mx-auto max-w-[1400px] space-y-14">
@@ -503,9 +520,7 @@ export function DiscoveryHome({
           title="Recommended For You"
           subtitle="Personalised picks based on your activity"
           icon={<Wand2 className="h-4 w-4" />}
-          items={[...shops]
-            .sort((a, b) => b.recommendedScore - a.recommendedScore)
-            .slice(0, 10)}
+          items={[...shops].sort((a, b) => b.recommendedScore - a.recommendedScore).slice(0, 10)}
           render={(s) => <Card s={s} accent="primary" />}
           dest={{ ...baseDest, sort: "popular" }}
         />
@@ -525,9 +540,7 @@ export function DiscoveryHome({
           title="Trending Today"
           subtitle="Most booked in the last few hours"
           icon={<Flame className="h-4 w-4 text-orange-500" />}
-          items={[...shops]
-            .sort((a, b) => b.trendingScore - a.trendingScore)
-            .slice(0, 10)}
+          items={[...shops].sort((a, b) => b.trendingScore - a.trendingScore).slice(0, 10)}
           render={(s) => <Card s={s} showTrending />}
           dest={{ ...baseDest, sort: "popular", tr: 1 }}
         />
@@ -579,8 +592,6 @@ export function DiscoveryHome({
 
         {/* ───────── Trending This Week (Leaderboard) ───────── */}
         <TrendingThisWeek shops={shops} />
-
-
 
         <Rail
           title="Membership Benefits"
@@ -652,7 +663,11 @@ export function DiscoveryHome({
         <MostReviewedCategory shops={shops} dest={{ ...baseDest, sort: "rating" }} />
         <MostRewardedCategory shops={shops} dest={{ ...baseDest }} />
         <MostSavedCategory shops={shops} dest={{ ...baseDest }} />
-        <OpenNowCategory shops={shops} dest={{ ...baseDest, on: 1, sort: "distance" }} liveTick={liveTick} />
+        <OpenNowCategory
+          shops={shops}
+          dest={{ ...baseDest, on: 1, sort: "distance" }}
+          liveTick={liveTick}
+        />
         <LuxuryCategory shops={shops} dest={{ ...baseDest }} />
         <BudgetFriendlyCategory shops={shops} dest={{ ...baseDest, sort: "price_low" }} />
         <FamilyFriendlyCategory shops={shops} dest={{ ...baseDest }} />
@@ -674,9 +689,6 @@ export function DiscoveryHome({
         <WellnessCollectionCategory shops={shops} dest={{ ...baseDest }} />
         <KidsCollectionCategory shops={shops} dest={{ ...baseDest }} />
         <SeniorCitizenCategory shops={shops} dest={{ ...baseDest }} />
-        <SmartFiltersBar dest={{ ...baseDest }} />
-        <SmartSortingBar dest={{ ...baseDest }} />
-        <DiscoveryBadgesLegend />
       </div>
     </div>
   );
@@ -778,11 +790,7 @@ function Card({
   showSponsored,
 }: CardProps) {
   const accentRing =
-    accent === "ai"
-      ? "ring-1 ring-violet-300"
-      : accent === "primary"
-        ? "ring-1 ring-blue-200"
-        : "";
+    accent === "ai" ? "ring-1 ring-violet-300" : accent === "primary" ? "ring-1 ring-blue-200" : "";
   const walkable = (s.distance_km ?? 9) <= 1.2;
   return (
     <Link
@@ -886,15 +894,7 @@ function Card({
   );
 }
 
-function Pill({
-  icon,
-  cls,
-  children,
-}: {
-  icon?: ReactNode;
-  cls: string;
-  children: ReactNode;
-}) {
+function Pill({ icon, cls, children }: { icon?: ReactNode; cls: string; children: ReactNode }) {
   return (
     <span
       className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide shadow-sm ${cls}`}
@@ -920,9 +920,7 @@ function CategoryHeader({
   return (
     <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-end">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-          {title}
-        </h2>
+        <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">{title}</h2>
         <p className="mt-1 text-sm text-slate-600">{purpose}</p>
       </div>
       <div className="flex flex-wrap items-center gap-1.5">
@@ -946,18 +944,11 @@ function CategoryHeader({
   );
 }
 
-function FormulaStrip({
-  items,
-}: {
-  items: { pct: number; label: string }[];
-}) {
+function FormulaStrip({ items }: { items: { pct: number; label: string }[] }) {
   return (
     <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
       {items.map((i) => (
-        <div
-          key={i.label}
-          className="rounded-xl bg-white p-3 text-center ring-1 ring-slate-200"
-        >
+        <div key={i.label} className="rounded-xl bg-white p-3 text-center ring-1 ring-slate-200">
           <div className="text-lg font-black text-amber-600">{i.pct}%</div>
           <div className="text-[11px] font-semibold text-slate-600">{i.label}</div>
         </div>
@@ -969,10 +960,7 @@ function FormulaStrip({
 /* ============= CATEGORY: NEARBY ============= */
 function NearbyCategory({ shops, dest }: CategoryProps) {
   const list = useMemo(
-    () =>
-      [...shops]
-        .sort((a, b) => (a.distance_km ?? 99) - (b.distance_km ?? 99))
-        .slice(0, 8),
+    () => [...shops].sort((a, b) => (a.distance_km ?? 99) - (b.distance_km ?? 99)).slice(0, 8),
     [shops],
   );
   if (list.length === 0) return null;
@@ -1182,9 +1170,7 @@ function MostReviewedCategory({ shops, dest }: CategoryProps) {
               <div className="mt-2 flex items-center justify-between text-[11px] font-semibold text-slate-600">
                 <span>Latest review</span>
                 <span className="text-slate-900">
-                  {s.latestReviewDaysAgo === 0
-                    ? "Today"
-                    : `${s.latestReviewDaysAgo}d ago`}
+                  {s.latestReviewDaysAgo === 0 ? "Today" : `${s.latestReviewDaysAgo}d ago`}
                 </span>
               </div>
             </div>
@@ -1203,9 +1189,7 @@ function MostRewardedCategory({ shops, dest }: CategoryProps) {
     () =>
       [...shops]
         .sort((a, b) =>
-          sort === "rate"
-            ? b.rewardRatePct - a.rewardRatePct
-            : b.rewardUsagePct - a.rewardUsagePct,
+          sort === "rate" ? b.rewardRatePct - a.rewardRatePct : b.rewardUsagePct - a.rewardUsagePct,
         )
         .slice(0, 8),
     [shops, sort],
@@ -1223,10 +1207,12 @@ function MostRewardedCategory({ shops, dest }: CategoryProps) {
         dest={dest}
       />
       <div className="mt-3 inline-flex rounded-full bg-white p-1 ring-1 ring-slate-200">
-        {([
-          { id: "rate", label: "Highest Reward Rate" },
-          { id: "usage", label: "Highest Reward Usage" },
-        ] as { id: RewardSort; label: string }[]).map((o) => (
+        {(
+          [
+            { id: "rate", label: "Highest Reward Rate" },
+            { id: "usage", label: "Highest Reward Usage" },
+          ] as { id: RewardSort; label: string }[]
+        ).map((o) => (
           <button
             key={o.id}
             type="button"
@@ -1372,7 +1358,11 @@ function LiveStatusBadge({ tick }: { tick: number }) {
   }, []);
   const seconds = Math.max(0, Math.floor((Date.now() - updatedAt) / 1000));
   const label =
-    seconds < 5 ? "just now" : seconds < 60 ? `${seconds}s ago` : `${Math.floor(seconds / 60)}m ago`;
+    seconds < 5
+      ? "just now"
+      : seconds < 60
+        ? `${seconds}s ago`
+        : `${Math.floor(seconds / 60)}m ago`;
   return (
     <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold text-emerald-700">
       <span className="relative flex h-2 w-2">
@@ -1407,8 +1397,17 @@ function LuxuryCategory({ shops, dest }: CategoryProps) {
         dest={dest}
       />
       <div className="mt-3 flex flex-wrap gap-1.5 text-[11px] font-semibold text-slate-600">
-        {["Premium Interior", "Verified Brand", "Luxury Pricing", "Premium Staff", "VIP Services"].map((b) => (
-          <span key={b} className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 ring-1 ring-violet-200">
+        {[
+          "Premium Interior",
+          "Verified Brand",
+          "Luxury Pricing",
+          "Premium Staff",
+          "VIP Services",
+        ].map((b) => (
+          <span
+            key={b}
+            className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 ring-1 ring-violet-200"
+          >
             <Diamond className="h-3 w-3 text-violet-600" />
             {b}
           </span>
@@ -1493,10 +1492,7 @@ function BudgetFriendlyCategory({ shops, dest }: CategoryProps) {
 
 /* ============= CATEGORY: FAMILY FRIENDLY ============= */
 function FamilyFriendlyCategory({ shops, dest }: CategoryProps) {
-  const list = useMemo(
-    () => shops.filter((s) => s.suitableFor.family).slice(0, 8),
-    [shops],
-  );
+  const list = useMemo(() => shops.filter((s) => s.suitableFor.family).slice(0, 8), [shops]);
   if (list.length === 0) return null;
   return (
     <section
@@ -1516,7 +1512,10 @@ function FamilyFriendlyCategory({ shops, dest }: CategoryProps) {
           { l: "Men", I: User },
           { l: "Seniors", I: Users },
         ].map(({ l, I }) => (
-          <span key={l} className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 ring-1 ring-sky-200">
+          <span
+            key={l}
+            className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 ring-1 ring-sky-200"
+          >
             <I className="h-3 w-3 text-sky-600" />
             {l}
           </span>
@@ -1527,10 +1526,18 @@ function FamilyFriendlyCategory({ shops, dest }: CategoryProps) {
           <div key={s.slug} className="space-y-2">
             <Card s={s} />
             <div className="flex flex-wrap gap-1 rounded-xl bg-white p-3 text-[10px] font-semibold ring-1 ring-sky-200">
-              {s.suitableFor.kids && <span className="rounded-full bg-sky-50 px-2 py-0.5 text-sky-700">Kids</span>}
-              {s.suitableFor.women && <span className="rounded-full bg-sky-50 px-2 py-0.5 text-sky-700">Women</span>}
-              {s.suitableFor.men && <span className="rounded-full bg-sky-50 px-2 py-0.5 text-sky-700">Men</span>}
-              {s.suitableFor.seniors && <span className="rounded-full bg-sky-50 px-2 py-0.5 text-sky-700">Seniors</span>}
+              {s.suitableFor.kids && (
+                <span className="rounded-full bg-sky-50 px-2 py-0.5 text-sky-700">Kids</span>
+              )}
+              {s.suitableFor.women && (
+                <span className="rounded-full bg-sky-50 px-2 py-0.5 text-sky-700">Women</span>
+              )}
+              {s.suitableFor.men && (
+                <span className="rounded-full bg-sky-50 px-2 py-0.5 text-sky-700">Men</span>
+              )}
+              {s.suitableFor.seniors && (
+                <span className="rounded-full bg-sky-50 px-2 py-0.5 text-sky-700">Seniors</span>
+              )}
             </div>
           </div>
         ))}
@@ -1541,10 +1548,7 @@ function FamilyFriendlyCategory({ shops, dest }: CategoryProps) {
 
 /* ============= CATEGORY: WOMEN ONLY ============= */
 function WomenOnlyCategory({ shops, dest }: CategoryProps) {
-  const list = useMemo(
-    () => shops.filter((s) => s.genderFocus === "female").slice(0, 8),
-    [shops],
-  );
+  const list = useMemo(() => shops.filter((s) => s.genderFocus === "female").slice(0, 8), [shops]);
   if (list.length === 0) return null;
   return (
     <section
@@ -1568,10 +1572,7 @@ function WomenOnlyCategory({ shops, dest }: CategoryProps) {
 
 /* ============= CATEGORY: MEN ONLY ============= */
 function MenOnlyCategory({ shops, dest }: CategoryProps) {
-  const list = useMemo(
-    () => shops.filter((s) => s.genderFocus === "male").slice(0, 8),
-    [shops],
-  );
+  const list = useMemo(() => shops.filter((s) => s.genderFocus === "male").slice(0, 8), [shops]);
   if (list.length === 0) return null;
   return (
     <section
@@ -1595,10 +1596,7 @@ function MenOnlyCategory({ shops, dest }: CategoryProps) {
 
 /* ============= CATEGORY: UNISEX ============= */
 function UnisexCategory({ shops, dest }: CategoryProps) {
-  const list = useMemo(
-    () => shops.filter((s) => s.genderFocus === "unisex").slice(0, 8),
-    [shops],
-  );
+  const list = useMemo(() => shops.filter((s) => s.genderFocus === "unisex").slice(0, 8), [shops]);
   if (list.length === 0) return null;
   return (
     <section
@@ -1648,11 +1646,15 @@ function HomeServiceCategory({ shops, dest }: CategoryProps) {
             <Card s={s} />
             <div className="space-y-1.5 rounded-xl bg-white p-3 text-[11px] font-semibold ring-1 ring-teal-200">
               <div className="flex items-center justify-between text-slate-600">
-                <span className="inline-flex items-center gap-1"><Home className="h-3 w-3 text-teal-600" /> Travel</span>
+                <span className="inline-flex items-center gap-1">
+                  <Home className="h-3 w-3 text-teal-600" /> Travel
+                </span>
                 <span className="text-slate-900">₹{s.travelChargeINR}</span>
               </div>
               <div className="flex items-center justify-between text-slate-600">
-                <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3 text-teal-600" /> Arrival</span>
+                <span className="inline-flex items-center gap-1">
+                  <Clock className="h-3 w-3 text-teal-600" /> Arrival
+                </span>
                 <span className="text-slate-900">~{s.arrivalMin} min</span>
               </div>
               <div className="text-[10px] text-slate-500">Areas: {s.serviceAreas.join(", ")}</div>
@@ -1670,10 +1672,7 @@ function PremiumMembersCategory({ shops, dest }: CategoryProps) {
   const [tier, setTier] = useState<MTier>("gold");
   const rank: Record<MTier, number> = { silver: 1, gold: 2, platinum: 3, vip: 4 };
   const list = useMemo(
-    () =>
-      shops
-        .filter((s) => s.membershipTier && rank[s.membershipTier] >= rank[tier])
-        .slice(0, 8),
+    () => shops.filter((s) => s.membershipTier && rank[s.membershipTier] >= rank[tier]).slice(0, 8),
     [shops, tier],
   );
   return (
@@ -1742,8 +1741,20 @@ function AIRecommendedCategory({ shops, dest }: CategoryProps) {
         dest={dest}
       />
       <div className="mt-3 flex flex-wrap gap-1.5 text-[11px] font-semibold text-slate-600">
-        {["Previous Bookings", "Favorite Services", "Location", "Budget", "Preferred Staff", "Visit Frequency", "Reward Usage", "Membership"].map((b) => (
-          <span key={b} className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 ring-1 ring-violet-200">
+        {[
+          "Previous Bookings",
+          "Favorite Services",
+          "Location",
+          "Budget",
+          "Preferred Staff",
+          "Visit Frequency",
+          "Reward Usage",
+          "Membership",
+        ].map((b) => (
+          <span
+            key={b}
+            className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 ring-1 ring-violet-200"
+          >
             <Sparkles className="h-3 w-3 text-violet-600" />
             {b}
           </span>
@@ -1756,10 +1767,15 @@ function AIRecommendedCategory({ shops, dest }: CategoryProps) {
             <div className="rounded-xl bg-white p-3 ring-1 ring-violet-200">
               <div className="flex items-center justify-between text-[11px] font-semibold text-slate-600">
                 <span>AI match</span>
-                <span className="rounded-full bg-violet-500/10 px-2 py-0.5 text-violet-700">{s.aiMatchPct}%</span>
+                <span className="rounded-full bg-violet-500/10 px-2 py-0.5 text-violet-700">
+                  {s.aiMatchPct}%
+                </span>
               </div>
               <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100">
-                <div className="h-full rounded-full bg-violet-500" style={{ width: `${s.aiMatchPct}%` }} />
+                <div
+                  className="h-full rounded-full bg-violet-500"
+                  style={{ width: `${s.aiMatchPct}%` }}
+                />
               </div>
             </div>
           </div>
@@ -1802,7 +1818,9 @@ function StaffPicksCategory({ shops, dest }: CategoryProps) {
             type="button"
             onClick={() => setSp(id)}
             className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-              sp === id ? "bg-fuchsia-600 text-white" : "bg-white text-slate-700 ring-1 ring-slate-200 hover:text-slate-900"
+              sp === id
+                ? "bg-fuchsia-600 text-white"
+                : "bg-white text-slate-700 ring-1 ring-slate-200 hover:text-slate-900"
             }`}
           >
             <I className="h-3 w-3" />
@@ -1858,7 +1876,9 @@ function SeasonalPicksCategory({ shops, dest }: CategoryProps) {
             type="button"
             onClick={() => setSeason(id)}
             className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-              season === id ? "bg-slate-900 text-white" : "bg-white text-slate-700 ring-1 ring-slate-200 hover:text-slate-900"
+              season === id
+                ? "bg-slate-900 text-white"
+                : "bg-white text-slate-700 ring-1 ring-slate-200 hover:text-slate-900"
             }`}
           >
             <I className="h-3 w-3" />
@@ -1920,7 +1940,9 @@ function FestivalSpecialsCategory({ shops, dest }: CategoryProps) {
             type="button"
             onClick={() => setFest(f.id)}
             className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-              fest === f.id ? "bg-slate-900 text-white" : "bg-white/80 text-slate-700 ring-1 ring-white hover:text-slate-900"
+              fest === f.id
+                ? "bg-slate-900 text-white"
+                : "bg-white/80 text-slate-700 ring-1 ring-white hover:text-slate-900"
             }`}
           >
             <span>{f.emoji}</span>
@@ -1943,11 +1965,18 @@ function FestivalSpecialsCategory({ shops, dest }: CategoryProps) {
                 {active.emoji} {fest}
               </div>
               {s.cover_image && (
-                <img src={s.cover_image} alt={s.name} loading="lazy" className="h-36 w-full object-cover" />
+                <img
+                  src={s.cover_image}
+                  alt={s.name}
+                  loading="lazy"
+                  className="h-36 w-full object-cover"
+                />
               )}
               <div className="space-y-1 p-3 pt-4">
                 <h3 className="line-clamp-1 text-sm font-bold text-slate-900">{s.name}</h3>
-                <p className="line-clamp-1 text-xs text-slate-500">{s.area} · {s.category}</p>
+                <p className="line-clamp-1 text-xs text-slate-500">
+                  {s.area} · {s.category}
+                </p>
                 <div className="flex items-center justify-between pt-1 text-xs">
                   <span className="inline-flex items-center gap-1 font-semibold text-amber-700">
                     <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
@@ -1970,13 +1999,13 @@ function FestivalSpecialsCategory({ shops, dest }: CategoryProps) {
 
 /* === 22. COUPLE FRIENDLY — Side-by-side dual cards === */
 function CoupleFriendlyCategory({ shops, dest }: CategoryProps) {
-  const list = useMemo(
-    () => shops.filter((s) => s.isCoupleFriendly).slice(0, 6),
-    [shops],
-  );
+  const list = useMemo(() => shops.filter((s) => s.isCoupleFriendly).slice(0, 6), [shops]);
   if (list.length === 0) return null;
   return (
-    <section id="cat-couple" className="rounded-3xl bg-gradient-to-br from-rose-50 via-pink-50 to-white p-6 ring-1 ring-rose-100 sm:p-8">
+    <section
+      id="cat-couple"
+      className="rounded-3xl bg-gradient-to-br from-rose-50 via-pink-50 to-white p-6 ring-1 ring-rose-100 sm:p-8"
+    >
       <CategoryHeader
         title="Couple Friendly"
         purpose="Couple spa, partner packages & duo discounts"
@@ -1993,7 +2022,12 @@ function CoupleFriendlyCategory({ shops, dest }: CategoryProps) {
           >
             <div className="relative w-1/2 bg-gradient-to-br from-rose-400 to-pink-500">
               {s.cover_image && (
-                <img src={s.cover_image} alt={s.name} loading="lazy" className="h-full w-full object-cover opacity-90" />
+                <img
+                  src={s.cover_image}
+                  alt={s.name}
+                  loading="lazy"
+                  className="h-full w-full object-cover opacity-90"
+                />
               )}
               <div className="absolute inset-0 bg-gradient-to-br from-rose-500/30 to-pink-500/40" />
               <div className="absolute bottom-2 left-2 flex items-center gap-1 rounded-full bg-white px-2 py-0.5 text-[10px] font-bold text-rose-600 shadow">
@@ -2025,14 +2059,19 @@ function CoupleFriendlyCategory({ shops, dest }: CategoryProps) {
 /* === 23. STUDENT SPECIALS — Notebook / ID-card layout === */
 function StudentSpecialsCategory({ shops, dest }: CategoryProps) {
   const list = useMemo(
-    () => shops.filter((s) => s.isStudentSpecial)
-      .sort((a, b) => b.studentDiscountPct - a.studentDiscountPct)
-      .slice(0, 8),
+    () =>
+      shops
+        .filter((s) => s.isStudentSpecial)
+        .sort((a, b) => b.studentDiscountPct - a.studentDiscountPct)
+        .slice(0, 8),
     [shops],
   );
   if (list.length === 0) return null;
   return (
-    <section id="cat-student" className="rounded-3xl bg-gradient-to-br from-indigo-50 to-sky-50 p-6 ring-1 ring-indigo-100 sm:p-8">
+    <section
+      id="cat-student"
+      className="rounded-3xl bg-gradient-to-br from-indigo-50 to-sky-50 p-6 ring-1 ring-indigo-100 sm:p-8"
+    >
       <CategoryHeader
         title="Student Specials"
         purpose="Show your ID, save big · college offers & youth packages"
@@ -2075,9 +2114,11 @@ function StudentSpecialsCategory({ shops, dest }: CategoryProps) {
 function OfficeBreakCategory({ shops, dest }: CategoryProps) {
   const [maxMin, setMaxMin] = useState<number>(30);
   const list = useMemo(
-    () => shops.filter((s) => s.isOfficeBreak && s.expressMins <= maxMin)
-      .sort((a, b) => a.expressMins - b.expressMins)
-      .slice(0, 8),
+    () =>
+      shops
+        .filter((s) => s.isOfficeBreak && s.expressMins <= maxMin)
+        .sort((a, b) => a.expressMins - b.expressMins)
+        .slice(0, 8),
     [shops, maxMin],
   );
   return (
@@ -2096,7 +2137,9 @@ function OfficeBreakCategory({ shops, dest }: CategoryProps) {
               type="button"
               onClick={() => setMaxMin(m)}
               className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-                maxMin === m ? "bg-emerald-400 text-slate-900" : "bg-white/10 text-white hover:bg-white/20"
+                maxMin === m
+                  ? "bg-emerald-400 text-slate-900"
+                  : "bg-white/10 text-white hover:bg-white/20"
               }`}
             >
               ≤ {m} min
@@ -2124,7 +2167,9 @@ function OfficeBreakCategory({ shops, dest }: CategoryProps) {
                 </span>
               </div>
               <h3 className="mt-2 line-clamp-1 text-sm font-bold text-white">{s.name}</h3>
-              <p className="line-clamp-1 text-[11px] text-slate-400">{s.area} · {s.category}</p>
+              <p className="line-clamp-1 text-[11px] text-slate-400">
+                {s.area} · {s.category}
+              </p>
               <div className="mt-2 flex items-center justify-between text-[11px] text-slate-300">
                 <span className="inline-flex items-center gap-1">
                   <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
@@ -2145,15 +2190,20 @@ function OfficeBreakCategory({ shops, dest }: CategoryProps) {
 /* === 25. BRIDAL COLLECTION — Magazine hero cards === */
 function BridalCollectionCategory({ shops, dest }: CategoryProps) {
   const list = useMemo(
-    () => shops.filter((s) => s.isBridal)
-      .sort((a, b) => b.rating - a.rating)
-      .slice(0, 5),
+    () =>
+      shops
+        .filter((s) => s.isBridal)
+        .sort((a, b) => b.rating - a.rating)
+        .slice(0, 5),
     [shops],
   );
   if (list.length === 0) return null;
   const [hero, ...rest] = list;
   return (
-    <section id="cat-bridal" className="rounded-3xl bg-gradient-to-br from-rose-50 via-amber-50 to-white p-6 ring-1 ring-rose-100 sm:p-8">
+    <section
+      id="cat-bridal"
+      className="rounded-3xl bg-gradient-to-br from-rose-50 via-amber-50 to-white p-6 ring-1 ring-rose-100 sm:p-8"
+    >
       <CategoryHeader
         title="Bridal Collection"
         purpose="Bridal makeup, pre-bridal, hair styling, photography & wedding packages"
@@ -2167,7 +2217,12 @@ function BridalCollectionCategory({ shops, dest }: CategoryProps) {
           className="group relative col-span-3 block overflow-hidden rounded-3xl bg-rose-900 text-white shadow-xl"
         >
           {hero.cover_image && (
-            <img src={hero.cover_image} alt={hero.name} loading="lazy" className="h-72 w-full object-cover opacity-80 transition group-hover:scale-105 sm:h-80" />
+            <img
+              src={hero.cover_image}
+              alt={hero.name}
+              loading="lazy"
+              className="h-72 w-full object-cover opacity-80 transition group-hover:scale-105 sm:h-80"
+            />
           )}
           <div className="absolute inset-0 bg-gradient-to-tr from-rose-950/85 via-rose-900/30 to-transparent" />
           <div className="absolute top-4 left-4 flex items-center gap-1.5 rounded-full bg-amber-300/95 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-rose-900 shadow">
@@ -2193,7 +2248,12 @@ function BridalCollectionCategory({ shops, dest }: CategoryProps) {
               className="group flex overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-rose-100 transition hover:shadow-md"
             >
               {s.cover_image && (
-                <img src={s.cover_image} alt={s.name} loading="lazy" className="h-24 w-24 shrink-0 object-cover" />
+                <img
+                  src={s.cover_image}
+                  alt={s.name}
+                  loading="lazy"
+                  className="h-24 w-24 shrink-0 object-cover"
+                />
               )}
               <div className="flex min-w-0 flex-1 flex-col justify-between p-3">
                 <div>
@@ -2237,7 +2297,9 @@ function TattooCollectionCategory({ shops, dest }: CategoryProps) {
                 type="button"
                 onClick={() => setType(t)}
                 className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-                  type === t ? "bg-white text-zinc-900" : "bg-white/10 text-zinc-200 hover:bg-white/20"
+                  type === t
+                    ? "bg-white text-zinc-900"
+                    : "bg-white/10 text-zinc-200 hover:bg-white/20"
                 }`}
               >
                 {t}
@@ -2259,7 +2321,12 @@ function TattooCollectionCategory({ shops, dest }: CategoryProps) {
             >
               <div className="relative aspect-square bg-zinc-800">
                 {s.cover_image && (
-                  <img src={s.cover_image} alt={s.name} loading="lazy" className="h-full w-full object-cover opacity-80 transition group-hover:scale-105 group-hover:opacity-100" />
+                  <img
+                    src={s.cover_image}
+                    alt={s.name}
+                    loading="lazy"
+                    className="h-full w-full object-cover opacity-80 transition group-hover:scale-105 group-hover:opacity-100"
+                  />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
                 <div className="absolute top-2 left-2 rounded bg-white/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur">
@@ -2282,7 +2349,12 @@ function TattooCollectionCategory({ shops, dest }: CategoryProps) {
 
 /* === 27. NAIL STUDIO — Polish-bottle pill cards === */
 function NailStudioCategory({ shops, dest }: CategoryProps) {
-  const services: Exclude<Enriched["nailService"], null>[] = ["Gel", "Acrylic", "Extensions", "Luxury Art"];
+  const services: Exclude<Enriched["nailService"], null>[] = [
+    "Gel",
+    "Acrylic",
+    "Extensions",
+    "Luxury Art",
+  ];
   const [svc, setSvc] = useState<Exclude<Enriched["nailService"], null>>("Gel");
   const list = useMemo(
     () => shops.filter((s) => s.isNailStudio && s.nailService === svc).slice(0, 8),
@@ -2295,7 +2367,10 @@ function NailStudioCategory({ shops, dest }: CategoryProps) {
     "Luxury Art": "bg-amber-500",
   };
   return (
-    <section id="cat-nail" className="rounded-3xl bg-gradient-to-br from-fuchsia-50 to-pink-50 p-6 ring-1 ring-fuchsia-100 sm:p-8">
+    <section
+      id="cat-nail"
+      className="rounded-3xl bg-gradient-to-br from-fuchsia-50 to-pink-50 p-6 ring-1 ring-fuchsia-100 sm:p-8"
+    >
       <CategoryHeader
         title="Nail Studio Collection"
         purpose="Gel, acrylic, extensions & luxury nail art"
@@ -2309,7 +2384,9 @@ function NailStudioCategory({ shops, dest }: CategoryProps) {
             type="button"
             onClick={() => setSvc(t)}
             className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-              svc === t ? "bg-slate-900 text-white" : "bg-white text-slate-700 ring-1 ring-fuchsia-200 hover:text-fuchsia-700"
+              svc === t
+                ? "bg-slate-900 text-white"
+                : "bg-white text-slate-700 ring-1 ring-fuchsia-200 hover:text-fuchsia-700"
             }`}
           >
             <PaintBucket className="h-3 w-3" />
@@ -2328,7 +2405,9 @@ function NailStudioCategory({ shops, dest }: CategoryProps) {
               params={{ slug: s.slug }}
               className="group flex items-center gap-3 rounded-full bg-white p-2 pr-4 shadow-sm ring-1 ring-fuchsia-100 transition hover:shadow-md"
             >
-              <div className={`relative grid h-12 w-12 shrink-0 place-items-center rounded-full ${svcColor[svc]} text-white shadow-inner`}>
+              <div
+                className={`relative grid h-12 w-12 shrink-0 place-items-center rounded-full ${svcColor[svc]} text-white shadow-inner`}
+              >
                 <Brush className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1">
@@ -2354,14 +2433,19 @@ function NailStudioCategory({ shops, dest }: CategoryProps) {
 /* === 28. WELLNESS COLLECTION — Zen leaf cards === */
 function WellnessCollectionCategory({ shops, dest }: CategoryProps) {
   const list = useMemo(
-    () => shops.filter((s) => s.isWellness)
-      .sort((a, b) => b.rating - a.rating)
-      .slice(0, 8),
+    () =>
+      shops
+        .filter((s) => s.isWellness)
+        .sort((a, b) => b.rating - a.rating)
+        .slice(0, 8),
     [shops],
   );
   if (list.length === 0) return null;
   return (
-    <section id="cat-wellness" className="rounded-3xl bg-gradient-to-br from-emerald-50 to-teal-50 p-6 ring-1 ring-emerald-100 sm:p-8">
+    <section
+      id="cat-wellness"
+      className="rounded-3xl bg-gradient-to-br from-emerald-50 to-teal-50 p-6 ring-1 ring-emerald-100 sm:p-8"
+    >
       <CategoryHeader
         title="Wellness Collection"
         purpose="Spa, massage, therapy, relaxation & Ayurveda"
@@ -2404,13 +2488,13 @@ function WellnessCollectionCategory({ shops, dest }: CategoryProps) {
 
 /* === 29. KIDS COLLECTION — Playful sticker cards === */
 function KidsCollectionCategory({ shops, dest }: CategoryProps) {
-  const list = useMemo(
-    () => shops.filter((s) => s.isKidsCollection).slice(0, 8),
-    [shops],
-  );
+  const list = useMemo(() => shops.filter((s) => s.isKidsCollection).slice(0, 8), [shops]);
   if (list.length === 0) return null;
   return (
-    <section id="cat-kids" className="rounded-3xl bg-gradient-to-br from-sky-50 via-yellow-50 to-rose-50 p-6 ring-1 ring-sky-100 sm:p-8">
+    <section
+      id="cat-kids"
+      className="rounded-3xl bg-gradient-to-br from-sky-50 via-yellow-50 to-rose-50 p-6 ring-1 ring-sky-100 sm:p-8"
+    >
       <CategoryHeader
         title="Kids Collection"
         purpose="Kids haircut, kid-safe products & family-friendly studios"
@@ -2428,8 +2512,12 @@ function KidsCollectionCategory({ shops, dest }: CategoryProps) {
               params={{ slug: s.slug }}
               className="group relative block overflow-hidden rounded-3xl bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
             >
-              <div className={`absolute -top-6 -right-6 h-20 w-20 rounded-full ${dot} opacity-70`} />
-              <div className={`absolute -bottom-6 -left-6 h-16 w-16 rounded-full ${dot} opacity-50`} />
+              <div
+                className={`absolute -top-6 -right-6 h-20 w-20 rounded-full ${dot} opacity-70`}
+              />
+              <div
+                className={`absolute -bottom-6 -left-6 h-16 w-16 rounded-full ${dot} opacity-50`}
+              />
               <div className="relative p-4">
                 <div className="flex items-center gap-2">
                   <div className="grid h-10 w-10 place-items-center rounded-2xl bg-yellow-300 text-slate-900 shadow">
@@ -2439,8 +2527,12 @@ function KidsCollectionCategory({ shops, dest }: CategoryProps) {
                     Kid Safe
                   </span>
                 </div>
-                <h3 className="mt-3 line-clamp-1 text-base font-extrabold text-slate-900">{s.name}</h3>
-                <p className="line-clamp-1 text-[11px] text-slate-500">{s.area} · {s.category}</p>
+                <h3 className="mt-3 line-clamp-1 text-base font-extrabold text-slate-900">
+                  {s.name}
+                </h3>
+                <p className="line-clamp-1 text-[11px] text-slate-500">
+                  {s.area} · {s.category}
+                </p>
                 <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-amber-700">
                   <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
                   {s.rating.toFixed(1)}
@@ -2457,13 +2549,13 @@ function KidsCollectionCategory({ shops, dest }: CategoryProps) {
 
 /* === 30. SENIOR CITIZEN — Large-text accessible cards === */
 function SeniorCitizenCategory({ shops, dest }: CategoryProps) {
-  const list = useMemo(
-    () => shops.filter((s) => s.isSeniorFriendly).slice(0, 8),
-    [shops],
-  );
+  const list = useMemo(() => shops.filter((s) => s.isSeniorFriendly).slice(0, 8), [shops]);
   if (list.length === 0) return null;
   return (
-    <section id="cat-senior" className="rounded-3xl bg-gradient-to-br from-amber-50 to-stone-50 p-6 ring-1 ring-amber-100 sm:p-8">
+    <section
+      id="cat-senior"
+      className="rounded-3xl bg-gradient-to-br from-amber-50 to-stone-50 p-6 ring-1 ring-amber-100 sm:p-8"
+    >
       <CategoryHeader
         title="Senior Citizen Collection"
         purpose="Senior-friendly, easy access, wheelchair-accessible studios with special discounts"
@@ -2479,11 +2571,18 @@ function SeniorCitizenCategory({ shops, dest }: CategoryProps) {
             className="group flex items-center gap-4 rounded-2xl bg-white p-5 ring-1 ring-amber-100 transition hover:-translate-y-0.5 hover:shadow-md"
           >
             {s.cover_image && (
-              <img src={s.cover_image} alt={s.name} loading="lazy" className="h-20 w-20 shrink-0 rounded-xl object-cover" />
+              <img
+                src={s.cover_image}
+                alt={s.name}
+                loading="lazy"
+                className="h-20 w-20 shrink-0 rounded-xl object-cover"
+              />
             )}
             <div className="min-w-0 flex-1">
               <h3 className="line-clamp-1 text-lg font-extrabold text-slate-900">{s.name}</h3>
-              <p className="line-clamp-1 text-sm text-slate-600">{s.area} · {s.category}</p>
+              <p className="line-clamp-1 text-sm text-slate-600">
+                {s.area} · {s.category}
+              </p>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-800">
                   <UserRound className="h-3 w-3" /> Senior Friendly
@@ -2557,7 +2656,10 @@ function SmartSortingBar({ dest }: { dest: SearchDest }) {
     { label: "Newest", to: { ...dest, sort: "relevance" } },
   ];
   return (
-    <section id="smart-sorting" className="rounded-3xl bg-slate-50 p-6 ring-1 ring-slate-200 sm:p-8">
+    <section
+      id="smart-sorting"
+      className="rounded-3xl bg-slate-50 p-6 ring-1 ring-slate-200 sm:p-8"
+    >
       <div className="flex items-center gap-2">
         <ArrowUpDown className="h-4 w-4 text-slate-700" />
         <h2 className="text-lg font-bold text-slate-900">Smart Sorting</h2>

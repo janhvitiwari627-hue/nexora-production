@@ -22,6 +22,12 @@ export type Shop = {
   popularity?: number;
   gender?: "male" | "female" | "unisex" | null;
   badges?: Array<"verified" | "top_rated" | "most_popular">;
+  is_open_now?: boolean;
+  has_offer?: boolean;
+  is_home_service?: boolean;
+  amenities?: string[];
+  created_at?: string | null;
+  price_tier?: "budget" | "mid" | "premium" | "luxury";
 };
 
 function formatStartingPrice(shop: Shop): string {
@@ -88,10 +94,7 @@ export function ShopCard({
         className="absolute top-3 right-3 grid h-9 w-9 place-items-center rounded-full bg-white/95 shadow transition hover:scale-110"
       >
         <Heart
-          className={cn(
-            "h-4 w-4 transition",
-            wished ? "fill-danger text-danger" : "text-heading",
-          )}
+          className={cn("h-4 w-4 transition", wished ? "fill-danger text-danger" : "text-heading")}
         />
       </button>
 
@@ -166,9 +169,7 @@ export function ShopCard({
         aria-label={shop.name}
         className={cn(
           "bg-card block overflow-hidden rounded-[var(--radius-card)]",
-          isList
-            ? "grid grid-cols-1 gap-0 md:grid-cols-[minmax(0,260px)_1fr]"
-            : "p-2",
+          isList ? "grid grid-cols-1 gap-0 md:grid-cols-[minmax(0,260px)_1fr]" : "p-2",
           variant === "carousel" && "min-w-[280px] max-w-[320px]",
         )}
       >

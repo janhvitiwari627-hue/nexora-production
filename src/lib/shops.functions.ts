@@ -25,8 +25,9 @@ function filterDemo(
   if (data?.q) {
     const term = data.q.toLowerCase();
     out = out.filter((s) =>
-      [s.name, s.category, s.area ?? "", s.city, s.tagline ?? ""]
-        .some((v) => v.toLowerCase().includes(term)),
+      [s.name, s.category, s.area ?? "", s.city, s.tagline ?? ""].some((v) =>
+        v.toLowerCase().includes(term),
+      ),
     );
   }
   if (data?.limit) out = out.slice(0, data.limit);
@@ -34,11 +35,9 @@ function filterDemo(
 }
 
 function publicClient() {
-  return createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_PUBLISHABLE_KEY!,
-    { auth: { persistSession: false, autoRefreshToken: false } },
-  );
+  return createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
 }
 
 function priceLevelFromAmount(p: number | null | undefined): number {
@@ -49,22 +48,85 @@ function priceLevelFromAmount(p: number | null | undefined): number {
   return 4;
 }
 
+function inferGender(category: string | null): Shop["gender"] {
+  const value = (category ?? "").toLowerCase();
+  if (value.includes("unisex")) return "unisex";
+  if (value.includes("barber") || value.includes("men")) return "male";
+  if (value.includes("beauty parlour") || value.includes("women")) return "female";
+  return null;
+}
+
+function priceTierFromAmount(p: number | null | undefined): Shop["price_tier"] {
+  if (!p || p < 500) return "budget";
+  if (p < 1_000) return "mid";
+  if (p < 2_000) return "premium";
+  return "luxury";
+}
+
+function parseMinutes(value: unknown): number | null {
+  if (typeof value !== "string") return null;
+  const match = value.match(/^(\d{1,2})(?::(\d{2}))?/);
+  if (!match) return null;
+  const hour = Number(match[1]);
+  const minute = Number(match[2] ?? 0);
+  return hour >= 0 && hour < 24 && minute >= 0 && minute < 60 ? hour * 60 + minute : null;
+}
+
+function isOpenNow(hours: unknown): boolean {
+  if (!hours || typeof hours !== "object" || Array.isArray(hours)) return false;
+  const now = new Date();
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Kolkata",
+    weekday: "long",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(now);
+  const weekday = parts.find((part) => part.type === "weekday")?.value.toLowerCase();
+  const hour = Number(parts.find((part) => part.type === "hour")?.value ?? 0);
+  const minute = Number(parts.find((part) => part.type === "minute")?.value ?? 0);
+  if (!weekday) return false;
+
+  const record = hours as Record<string, unknown>;
+  const schedule = record[weekday] ?? record[weekday.slice(0, 3)];
+  if (!schedule) return false;
+  let open: unknown;
+  let close: unknown;
+  if (typeof schedule === "string") {
+    [open, close] = schedule.split(/\s*(?:-|–|to)\s*/i);
+  } else if (typeof schedule === "object" && !Array.isArray(schedule)) {
+    const day = schedule as Record<string, unknown>;
+    if (day.closed === true || day.is_closed === true) return false;
+    open = day.open ?? day.opening ?? day.start;
+    close = day.close ?? day.closing ?? day.end;
+  }
+  const start = parseMinutes(open);
+  const end = parseMinutes(close);
+  if (start === null || end === null) return false;
+  const current = hour * 60 + minute;
+  return end > start ? current >= start && current < end : current >= start || current < end;
+}
+
 export const listShops = createServerFn({ method: "GET" })
   .inputValidator((data: unknown) => ListInput.parse(data))
   .handler(async ({ data }): Promise<Shop[]> => {
     const supabase = publicClient();
-    const limit = data?.limit ?? 50;
+    // Search currently renders one result set (no pagination); fetch the public
+    // catalogue ceiling so advanced filters are not applied to an arbitrary
+    // first page and therefore return incomplete counts.
+    const limit = data?.limit ?? 200;
 
     try {
       let q = supabase
         .from("public_salon_cards")
         .select(
-          "id, slug, name, tagline, category, city, location, cover_image_url, image_url, rating, reviews_count, is_verified",
+          "id, slug, name, tagline, category, city, location, cover_image_url, image_url, rating, reviews_count, is_verified, amenities, created_at, discount, hours, is_home_service, nexora_score, price_range",
         )
         .eq("is_active", true)
         .limit(limit);
 
       if (data?.category) q = q.eq("category", data.category);
+      if (data?.area && data.area !== "All Areas") q = q.ilike("location", data.area);
       if (data?.q) {
         const term = data.q.replace(/[%_]/g, "");
         q = q.or(
@@ -109,8 +171,14 @@ export const listShops = createServerFn({ method: "GET" })
           distance_km: null,
           membership_perk: null,
           starting_price: startingPrice,
-          popularity: s.reviews_count ?? 0,
-          gender: null,
+          popularity: s.nexora_score ?? s.reviews_count ?? 0,
+          gender: inferGender(s.category),
+          is_open_now: isOpenNow(s.hours),
+          has_offer: typeof s.discount === "string" && s.discount.trim().length > 0,
+          is_home_service: !!s.is_home_service,
+          amenities: s.amenities ?? [],
+          created_at: s.created_at,
+          price_tier: priceTierFromAmount(startingPrice),
         };
       });
 
