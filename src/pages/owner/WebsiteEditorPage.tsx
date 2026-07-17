@@ -397,9 +397,12 @@ export function WebsiteEditorPage() {
               section={selected}
               content={content}
               salonId={salonId ?? null}
+              websiteId={websiteId ?? null}
               onFieldChange={updateContent}
               onToggleVisible={(v) => patchSection(selected.id, { is_visible: v })}
             />
+
+
 
           ) : (
             <p className="text-muted-foreground">Select a section to edit</p>
@@ -427,12 +430,14 @@ function SectionEditor({
   section,
   content,
   salonId,
+  websiteId,
   onFieldChange,
   onToggleVisible,
 }: {
   section: WebsiteSection;
   content: Record<string, unknown>;
   salonId: string | null;
+  websiteId: string | null;
   onFieldChange: (field: string, value: unknown) => void;
   onToggleVisible: (v: boolean) => void;
 }) {
@@ -455,22 +460,27 @@ function SectionEditor({
         <>
           <Field label="Heading" value={str("heading")} onChange={(v) => onFieldChange("heading", v)} />
           <Field label="Sub-heading" value={str("subheading")} onChange={(v) => onFieldChange("subheading", v)} />
+          <TextField label="Description" value={str("description")} onChange={(v) => onFieldChange("description", v)} />
           <Field label="Button Text" value={str("buttonText")} onChange={(v) => onFieldChange("buttonText", v)} />
           <Field label="Button Link" value={str("buttonLink")} onChange={(v) => onFieldChange("buttonLink", v)} />
-          <ImageField label="Background Image" value={str("imageUrl")} salonId={salonId} folder="hero" onChange={(v) => onFieldChange("imageUrl", v)} />
+          <ImageField label="Background Image" value={str("imageUrl")} salonId={salonId} websiteId={websiteId} folder="hero" onChange={(v) => onFieldChange("imageUrl", v)} />
         </>
       )}
 
       {section.section_type === "about" && (
         <>
           <Field label="Heading" value={str("heading")} onChange={(v) => onFieldChange("heading", v)} />
-          <TextField label="Body" value={str("body")} onChange={(v) => onFieldChange("body", v)} />
+          <TextField label="Description" value={str("body")} onChange={(v) => onFieldChange("body", v)} />
+          <Field label="Button Text" value={str("buttonText")} onChange={(v) => onFieldChange("buttonText", v)} />
+          <Field label="Button Link" value={str("buttonLink")} onChange={(v) => onFieldChange("buttonLink", v)} />
+          <ImageField label="Image" value={str("imageUrl")} salonId={salonId} websiteId={websiteId} folder="about" onChange={(v) => onFieldChange("imageUrl", v)} />
         </>
       )}
 
       {section.section_type === "contact" && (
         <>
           <Field label="Heading" value={str("heading")} onChange={(v) => onFieldChange("heading", v)} />
+          <TextField label="Description" value={str("description")} onChange={(v) => onFieldChange("description", v)} />
           <Field label="Phone" value={str("phone")} onChange={(v) => onFieldChange("phone", v)} />
           <Field label="WhatsApp" value={str("whatsapp")} onChange={(v) => onFieldChange("whatsapp", v)} />
           <Field label="Email" value={str("email")} onChange={(v) => onFieldChange("email", v)} />
@@ -485,10 +495,12 @@ function SectionEditor({
         section.section_type === "staff") && (
         <>
           <Field label="Heading" value={str("heading")} onChange={(v) => onFieldChange("heading", v)} />
+          <TextField label="Description" value={str("description")} onChange={(v) => onFieldChange("description", v)} />
           <ItemsEditor
             kind={section.section_type}
             items={items}
             salonId={salonId}
+            websiteId={websiteId}
             onChange={setItems}
           />
         </>
@@ -500,14 +512,26 @@ function SectionEditor({
         section.section_type === "blog") && (
         <>
           <Field label="Heading" value={str("heading")} onChange={(v) => onFieldChange("heading", v)} />
-          <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-            Detailed item editor for <strong>{SECTION_LABELS[section.section_type]}</strong> aa raha hai next update me.
-          </p>
+          <TextField label="Description" value={str("description")} onChange={(v) => onFieldChange("description", v)} />
+          {section.section_type !== "gallery" && (
+            <>
+              <Field label="Button Text" value={str("buttonText")} onChange={(v) => onFieldChange("buttonText", v)} />
+              <Field label="Button Link" value={str("buttonLink")} onChange={(v) => onFieldChange("buttonLink", v)} />
+            </>
+          )}
+          <GenericItemsEditor
+            kind={section.section_type}
+            items={items}
+            salonId={salonId}
+            websiteId={websiteId}
+            onChange={setItems}
+          />
         </>
       )}
     </div>
   );
 }
+
 
 type Item = {
   id: string;
@@ -530,11 +554,13 @@ function ItemsEditor({
   kind,
   items,
   salonId,
+  websiteId,
   onChange,
 }: {
   kind: "services" | "rate_card" | "packages" | "staff";
   items: Item[];
   salonId: string | null;
+  websiteId: string | null;
   onChange: (next: Item[]) => void;
 }) {
   const isStaff = kind === "staff";
@@ -577,6 +603,7 @@ function ItemsEditor({
               label="Image"
               value={it.image ?? ""}
               salonId={salonId}
+              websiteId={websiteId}
               folder={isStaff ? "staff" : "services"}
               compact
               onChange={(v) => patch(it.id, { image: v })}
@@ -607,10 +634,95 @@ function ItemsEditor({
   );
 }
 
+function GenericItemsEditor({
+  kind,
+  items,
+  salonId,
+  websiteId,
+  onChange,
+}: {
+  kind: "offers" | "membership" | "gallery" | "blog";
+  items: Item[];
+  salonId: string | null;
+  websiteId: string | null;
+  onChange: (next: Item[]) => void;
+}) {
+  const addLabel =
+    kind === "offers" ? "Add Offer" :
+    kind === "membership" ? "Add Plan" :
+    kind === "gallery" ? "Add Image" : "Add Post";
+
+  const patch = (id: string, p: Partial<Item>) =>
+    onChange(items.map((it) => (it.id === id ? { ...it, ...p } : it)));
+  const remove = (id: string) => onChange(items.filter((it) => it.id !== id));
+  const add = () => onChange([...items, { id: newId() }]);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <Label className="text-sm">Items ({items.length})</Label>
+        <Button type="button" size="sm" variant="secondary" onClick={add}>
+          <Plus className="mr-1 h-4 w-4" /> {addLabel}
+        </Button>
+      </div>
+
+      {items.length === 0 && (
+        <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+          No items yet. Click <strong>{addLabel}</strong> to create one.
+        </p>
+      )}
+
+      <ul className="space-y-3">
+        {items.map((it, idx) => (
+          <li key={it.id} className="rounded-lg border bg-card p-3 space-y-3">
+            <div className="flex items-start justify-between gap-2">
+              <span className="text-xs text-muted-foreground">#{idx + 1}</span>
+              <Button type="button" size="sm" variant="ghost" onClick={() => remove(it.id)}>
+                <Trash2 className="h-4 w-4 text-destructive" />
+              </Button>
+            </div>
+
+            <ImageField
+              label="Image"
+              value={it.image ?? ""}
+              salonId={salonId}
+              websiteId={websiteId}
+              folder={kind}
+              compact
+              onChange={(v) => patch(it.id, { image: v })}
+            />
+
+            {kind !== "gallery" && (
+              <Field label="Title" value={it.name ?? ""} onChange={(v) => patch(it.id, { name: v })} />
+            )}
+
+            {kind === "offers" || kind === "membership" ? (
+              <>
+                {kind === "membership" && (
+                  <Field label="Price" value={it.price ?? ""} onChange={(v) => patch(it.id, { price: v })} />
+                )}
+                <TextField label="Description" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
+              </>
+            ) : kind === "blog" ? (
+              <>
+                <TextField label="Excerpt" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
+              </>
+            ) : (
+              <TextField label="Caption" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+
 function ImageField({
   label,
   value,
   salonId,
+  websiteId,
   folder,
   compact,
   onChange,
@@ -618,6 +730,7 @@ function ImageField({
   label: string;
   value: string;
   salonId: string | null;
+  websiteId?: string | null;
   folder: string;
   compact?: boolean;
   onChange: (v: string) => void;
@@ -645,15 +758,36 @@ function ImageField({
       cacheControl: "3600",
       upsert: false,
     });
-    setUploading(false);
     if (error) {
+      setUploading(false);
       toast.error(error.message);
       return;
     }
     const { data } = supabase.storage.from("salon-media").getPublicUrl(path);
+    // Log into media_library (best-effort; do not block on failure)
+    try {
+      const { data: userRes } = await supabase.auth.getUser();
+      const ownerId = userRes.user?.id;
+      if (ownerId) {
+        await supabase.from("media_library").insert({
+          owner_id: ownerId,
+          website_id: websiteId ?? null,
+          url: data.publicUrl,
+          storage_path: path,
+          file_name: file.name,
+          mime_type: file.type,
+          size_bytes: file.size,
+          folder,
+        });
+      }
+    } catch {
+      // silent; media_library is only for reuse tracking
+    }
+    setUploading(false);
     onChange(data.publicUrl);
     toast.success("Image uploaded");
   };
+
 
   return (
     <div className="space-y-1.5">
