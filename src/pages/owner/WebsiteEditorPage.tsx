@@ -48,6 +48,8 @@ import { CSS } from "@dnd-kit/utilities";
 
 type NavLink = { id: string; label: string; url: string };
 
+type BgStyle = "solid" | "gradient" | "dots" | "grid" | "diagonal" | "soft-radial";
+
 type ThemeExtras = {
   header_bg?: string;
   header_text?: string;
@@ -55,6 +57,12 @@ type ThemeExtras = {
   link_style?: "underline" | "none" | "hover-underline";
   nav_links?: NavLink[];
   site_title?: string;
+  bg_style?: BgStyle;
+  bg_gradient_from?: string;
+  bg_gradient_to?: string;
+  bg_gradient_angle?: number;
+  bg_pattern_color?: string;
+  bg_pattern_size?: number;
 };
 
 type ThemeState = {
@@ -82,7 +90,22 @@ const DEFAULT_EXTRAS: ThemeExtras = {
   link_style: "hover-underline",
   nav_links: DEFAULT_NAV,
   site_title: "Home",
+  bg_style: "solid",
+  bg_gradient_from: "#FFFFFF",
+  bg_gradient_to: "#F1F5F9",
+  bg_gradient_angle: 135,
+  bg_pattern_color: "#E5E7EB",
+  bg_pattern_size: 24,
 };
+
+const BG_STYLES: { value: BgStyle; label: string; description: string }[] = [
+  { value: "solid", label: "Solid", description: "Flat background color" },
+  { value: "gradient", label: "Gradient", description: "Two-color smooth blend" },
+  { value: "soft-radial", label: "Soft Glow", description: "Radial highlight from center" },
+  { value: "dots", label: "Dots", description: "Subtle dotted pattern" },
+  { value: "grid", label: "Grid", description: "Fine grid lines" },
+  { value: "diagonal", label: "Stripes", description: "Diagonal stripes" },
+];
 
 const DEFAULT_THEME: ThemeState = {
   primary_color: "#111827",
