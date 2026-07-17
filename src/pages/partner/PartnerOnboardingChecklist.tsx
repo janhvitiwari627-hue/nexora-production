@@ -279,6 +279,8 @@ export function PartnerOnboardingChecklist() {
       if (isAbort) {
         setUploadError("Upload cancel ho gaya");
         setUploadErrorDetails({ code: "ABORTED", raw: "User cancelled upload" });
+        updateStatus(statusId, { status: "cancelled", error: "Cancelled by user" });
+
         announceStatus(`Upload cancelled for ${file.name}. Retry button available.`);
         toast.info("Upload cancel");
         lastFileRef.current = file;
