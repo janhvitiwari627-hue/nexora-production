@@ -1110,20 +1110,25 @@ function GenericItemsEditor({
               <Field label="Title" value={it.name ?? ""} onChange={(v) => patch(it.id, { name: v })} />
             )}
 
-            {kind === "offers" || kind === "membership" ? (
+            {kind === "offers" ? (
               <>
-                {kind === "membership" && (
-                  <Field label="Price" value={it.price ?? ""} onChange={(v) => patch(it.id, { price: v })} />
-                )}
+                <Field label="Discount (e.g. 20% OFF)" value={it.discount ?? ""} onChange={(v) => patch(it.id, { discount: v })} />
+                <TextField label="Description" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
+              </>
+            ) : kind === "membership" ? (
+              <>
+                <Field label="Price" value={it.price ?? ""} onChange={(v) => patch(it.id, { price: v })} />
                 <TextField label="Description" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
               </>
             ) : kind === "blog" ? (
               <>
+                <Field label="Date" value={it.date ?? ""} onChange={(v) => patch(it.id, { date: v })} />
                 <TextField label="Excerpt" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
               </>
             ) : (
               <TextField label="Caption" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
             )}
+
           </li>
         ))}
       </ul>
