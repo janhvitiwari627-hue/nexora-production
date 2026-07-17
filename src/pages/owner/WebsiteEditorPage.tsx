@@ -582,6 +582,15 @@ export function WebsiteEditorPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localSections, localTheme]);
 
+  useEffect(() => {
+    const onMessage = (event: MessageEvent) => {
+      if (event.data?.type === "website-preview-ready") postPreviewBundle();
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localSections, localTheme]);
+
   const selected = useMemo(
     () => localSections.find((s) => s.id === selectedId) ?? null,
     [localSections, selectedId],
