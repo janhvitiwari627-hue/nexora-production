@@ -237,6 +237,8 @@ export function PartnerOnboardingChecklist() {
         folder: "partner-logos",
         onProgress: (pct) => {
           setUploadProgress(pct);
+          updateStatus(statusId, { progress: pct });
+
           // Announce at 25/50/75 milestones to avoid flooding the screen reader
           const milestone = pct >= 75 ? 75 : pct >= 50 ? 50 : pct >= 25 ? 25 : 0;
           if (milestone > lastAnnouncedMilestoneRef.current && milestone > 0 && pct < 100) {
