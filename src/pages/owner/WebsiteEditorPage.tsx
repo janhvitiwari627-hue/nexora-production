@@ -210,8 +210,9 @@ export function WebsiteEditorPage() {
       if (!selectedId && !showTheme && bundleQ.data.sections.length) setSelectedId(bundleQ.data.sections[0].id);
     }
     if (bundleQ.data?.theme) {
-      const t = bundleQ.data.theme as Partial<ThemeState>;
-      setLocalTheme({ ...DEFAULT_THEME, ...t });
+      const t = bundleQ.data.theme as Partial<ThemeState> & { extras?: unknown };
+      const extras = { ...DEFAULT_EXTRAS, ...(t.extras as ThemeExtras | undefined) };
+      setLocalTheme({ ...DEFAULT_THEME, ...t, extras });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bundleQ.data]);
