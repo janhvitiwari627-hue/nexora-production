@@ -243,9 +243,9 @@ export function WebsiteEditorPage() {
             {localSections.map((s) => (
               <li key={s.id}>
                 <button
-                  onClick={() => setSelectedId(s.id)}
+                  onClick={() => { setSelectedId(s.id); setShowTheme(false); }}
                   className={`w-full rounded-md px-3 py-2 text-left text-sm ${
-                    selectedId === s.id ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+                    selectedId === s.id && !showTheme ? "bg-primary text-primary-foreground" : "hover:bg-muted"
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -256,11 +256,22 @@ export function WebsiteEditorPage() {
               </li>
             ))}
           </ul>
+          <div className="mt-4 mb-2 text-xs font-semibold uppercase text-muted-foreground">Design</div>
+          <button
+            onClick={() => setShowTheme(true)}
+            className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm ${
+              showTheme ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+            }`}
+          >
+            <Palette className="h-4 w-4" /> Theme &amp; Typography
+          </button>
         </aside>
 
         {/* Editor form */}
         <section className="overflow-y-auto p-6">
-          {selected ? (
+          {showTheme ? (
+            <ThemeEditor theme={localTheme} onChange={patchTheme} />
+          ) : selected ? (
             <SectionEditor
               section={selected}
               content={content}
@@ -268,6 +279,7 @@ export function WebsiteEditorPage() {
               onFieldChange={updateContent}
               onToggleVisible={(v) => patchSection(selected.id, { is_visible: v })}
             />
+
           ) : (
             <p className="text-muted-foreground">Select a section to edit</p>
           )}
