@@ -917,6 +917,7 @@ export function WebsiteEditorPage() {
     if (oldIndex < 0 || newIndex < 0) return;
     const next = arrayMove(localSections, oldIndex, newIndex).map((s, i) => ({ ...s, sort_order: i }));
     setLocalSections(next);
+    markDirty();
     try {
       setSaving(true);
       await saveOrder({ data: { websiteId, order: next.map((s) => s.id) } });
