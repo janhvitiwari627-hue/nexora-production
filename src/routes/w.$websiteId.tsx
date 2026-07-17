@@ -429,25 +429,81 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
     }
 
     case "gallery": {
-      // Editor stores items[] with { image }. Also tolerate legacy raw.images (strings or {url}).
+      // Editor stores items[] with { image, objectPosition, thumbShape }. Also tolerate legacy raw.images (strings or {url}).
       const items = asArray(raw.items);
-      let urls: string[] = items.map((x) => String(x.image ?? "")).filter(Boolean);
-      if (urls.length === 0 && Array.isArray(raw.images)) {
-        urls = (raw.images as unknown[])
-          .map((x) => (typeof x === "string" ? x : String((x as Item)?.url ?? (x as Item)?.image ?? "")))
-          .filter(Boolean);
+      type Tile = { url: string; objectPosition: string; shape: string };
+      let tiles: Tile[] = items
+        .map((x) => ({
+          url: String(x.image ?? ""),
+          objectPosition: String(x.objectPosition ?? "center"),
+          shape: String(x.thumbShape ?? "auto"),
+        }))
+        .filter((t) => t.url);
+      if (tiles.length === 0 && Array.isArray(raw.images)) {
+        tiles = (raw.images as unknown[])
+          .map((x) => {
+            const url = typeof x === "string" ? x : String((x as Item)?.url ?? (x as Item)?.image ?? "");
+            return { url, objectPosition: "center", shape: "auto" };
+          })
+          .filter((t) => t.url);
       }
+
+      const gridAspect = String(raw.gridAspect ?? "square");
+      const gridColumns = Math.max(2, Math.min(6, Number(raw.gridColumns ?? 4)));
+      const imageFit = (String(raw.imageFit ?? "cover") === "contain" ? "contain" : "cover") as "cover" | "contain";
+      const gridGap = Math.max(0, Math.min(48, Number(raw.gridGap ?? 12)));
+
+      const ratioMap: Record<string, string> = {
+        square: "1 / 1",
+        portrait: "3 / 4",
+        landscape: "4 / 3",
+        wide: "16 / 9",
+        auto: "auto",
+      };
+      const gridRatio = ratioMap[gridAspect] ?? "1 / 1";
+      const gridKey = `${gridAspect}-${gridColumns}-${gridGap}`;
+
       return (
         <section className="mx-auto max-w-6xl px-6 py-20">
           <SectionHeading>{c.heading || "Gallery"}</SectionHeading>
-          {urls.length === 0 ? (
+          {tiles.length === 0 ? (
             <p className="text-center text-sm opacity-60">No images uploaded yet.</p>
           ) : (
-            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {urls.map((u, i) => (
-                <img key={i} src={u} alt="" className="h-48 w-full rounded-md object-cover shadow-sm transition hover:scale-[1.02]" />
-              ))}
-            </div>
+            <>
+              <style>{`
+                [data-gallery="${gridKey}"] {
+                  display: grid;
+                  gap: ${gridGap}px;
+                  grid-template-columns: repeat(${Math.min(2, gridColumns)}, minmax(0, 1fr));
+                }
+                @media (min-width: 640px) {
+                  [data-gallery="${gridKey}"] { grid-template-columns: repeat(${Math.min(3, gridColumns)}, minmax(0, 1fr)); }
+                }
+                @media (min-width: 1024px) {
+                  [data-gallery="${gridKey}"] { grid-template-columns: repeat(${gridColumns}, minmax(0, 1fr)); }
+                }
+              `}</style>
+              <div data-gallery={gridKey}>
+                {tiles.map((t, i) => {
+                  const useShape = t.shape !== "auto" ? t.shape : gridAspect;
+                  const tileRatio = ratioMap[useShape] ?? gridRatio;
+                  return (
+                    <div
+                      key={i}
+                      className="overflow-hidden rounded-md shadow-sm transition hover:scale-[1.02] bg-black/5"
+                      style={{ aspectRatio: tileRatio === "auto" ? undefined : tileRatio }}
+                    >
+                      <img
+                        src={t.url}
+                        alt=""
+                        className="h-full w-full"
+                        style={{ objectFit: imageFit, objectPosition: t.objectPosition }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </>
           )}
         </section>
       );
