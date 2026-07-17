@@ -391,7 +391,7 @@ export function PartnerOnboardingChecklist() {
                         variant="outline"
                         size="sm"
                         onClick={onRetryUpload}
-                        disabled={uploading || !cloudinaryReady}
+                        disabled={uploading}
                         className="h-7 border-red-300 px-2 text-[11px] text-red-700 hover:bg-red-100"
                       >
                         {uploading ? (
