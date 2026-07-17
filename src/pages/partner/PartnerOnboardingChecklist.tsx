@@ -12,6 +12,21 @@ import { Button } from "@/components/ui/button";
 import { getPartnerProfile, updatePartnerProfile, type PartnerProfile } from "@/lib/partner.functions";
 import { uploadToCloudinary, isCloudinaryConfigured } from "@/lib/cloudinary";
 
+function friendlyUploadError(raw: string): string {
+  const msg = (raw || "").trim();
+  if (!msg) return "Logo upload nahi hua — dobara try karein.";
+  const low = msg.toLowerCase();
+  if (low.includes("network")) return "Internet issue lag raha hai — connection check karke retry karein.";
+  if (low.includes("cancel") || low.includes("abort")) return "Upload cancel ho gaya — retry dabaakar dobara bhejein.";
+  if (low.includes("timeout")) return "Server ne time out kar diya — thodi der me retry karein.";
+  if (low.includes("too large") || low.includes("file size")) return "Image bahut badi hai — 5 MB se choti file chunein.";
+  if (low.includes("invalid") && low.includes("preset")) return "Cloudinary preset galat hai — admin se contact karein.";
+  if (low.includes("unauthor") || low.includes("401") || low.includes("403")) return "Upload permission nahi mila — admin se contact karein.";
+  if (low.includes("500") || low.includes("502") || low.includes("503")) return "Cloudinary server down hai — kuch der baad retry karein.";
+  if (low.startsWith("upload failed")) return `${msg} — retry karein.`;
+  return msg;
+}
+
 type ChecklistItem = {
   key: "logo" | "contact" | "location" | "tagline" | "story";
   label: string;
@@ -119,9 +134,10 @@ export function PartnerOnboardingChecklist() {
       setUploadProgress(100);
       toast.success("Logo uploaded — save karke pakka karo");
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Upload failed";
-      setUploadError(msg);
-      toast.error(msg);
+      const raw = err instanceof Error ? err.message : String(err);
+      const friendly = friendlyUploadError(raw);
+      setUploadError(friendly);
+      toast.error(friendly);
       lastFileRef.current = file;
       if (!keepPreview && localPreview) {
         URL.revokeObjectURL(localPreview);
@@ -375,7 +391,7 @@ export function PartnerOnboardingChecklist() {
                         variant="outline"
                         size="sm"
                         onClick={onRetryUpload}
-                        disabled={uploading || !cloudinaryReady}
+                        disabled={uploading}
                         className="h-7 border-red-300 px-2 text-[11px] text-red-700 hover:bg-red-100"
                       >
                         {uploading ? (
