@@ -953,7 +953,10 @@ type Item = {
   role?: string;
   bio?: string;
   image?: string;
+  date?: string;
+  discount?: string;
 };
+
 
 function newId() {
   return (typeof crypto !== "undefined" && "randomUUID" in crypto)
