@@ -328,10 +328,29 @@ export function PartnerOnboardingChecklist() {
                     size="sm"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading || !cloudinaryReady}
+                    aria-busy={uploading}
                   >
                     {uploading ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Upload className="mr-1 h-4 w-4" />}
-                    {form.photo_url ? "Replace logo" : "Upload logo"}
+                    {uploading
+                      ? `Uploading… ${uploadProgress}%`
+                      : form.photo_url
+                        ? "Replace logo"
+                        : "Upload logo"}
                   </Button>
+                  {uploading && (
+                    <div
+                      className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100"
+                      role="progressbar"
+                      aria-valuenow={uploadProgress}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                    >
+                      <div
+                        className="h-full bg-[#4F46E5] transition-[width] duration-200 ease-out"
+                        style={{ width: `${uploadProgress}%` }}
+                      />
+                    </div>
+                  )}
                   <Input
                     placeholder="https://..."
                     value={form.photo_url}
