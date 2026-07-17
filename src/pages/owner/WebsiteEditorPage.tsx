@@ -1521,6 +1521,95 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
       </div>
 
       <div className="space-y-4 rounded-lg border bg-card p-4">
+        <h3 className="text-sm font-semibold uppercase text-muted-foreground">Background Style</h3>
+        <p className="text-xs text-muted-foreground">Choose how the page background looks behind your sections.</p>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {BG_STYLES.map((s) => {
+            const active = (theme.extras.bg_style ?? "solid") === s.value;
+            return (
+              <button
+                key={s.value}
+                type="button"
+                onClick={() => onChange({ extras: { bg_style: s.value } })}
+                className={`rounded-lg border p-2 text-left transition ${
+                  active ? "border-primary ring-2 ring-primary/30" : "hover:border-primary/60"
+                }`}
+              >
+                <div
+                  className="h-12 w-full rounded"
+                  style={buildBgPreview(s.value, theme)}
+                />
+                <div className="mt-1.5 text-xs font-semibold">{s.label}</div>
+                <div className="text-[10px] text-muted-foreground">{s.description}</div>
+              </button>
+            );
+          })}
+        </div>
+
+        {(theme.extras.bg_style ?? "solid") === "gradient" || (theme.extras.bg_style ?? "solid") === "soft-radial" ? (
+          <div className="space-y-3 pt-2">
+            <div className="grid grid-cols-2 gap-3">
+              <ColorField
+                label="Gradient From"
+                value={theme.extras.bg_gradient_from ?? theme.background_color}
+                onChange={(v) => onChange({ extras: { bg_gradient_from: v } })}
+              />
+              <ColorField
+                label="Gradient To"
+                value={theme.extras.bg_gradient_to ?? "#F1F5F9"}
+                onChange={(v) => onChange({ extras: { bg_gradient_to: v } })}
+              />
+            </div>
+            {(theme.extras.bg_style ?? "solid") === "gradient" && (
+              <div className="space-y-1.5">
+                <Label>Angle: {theme.extras.bg_gradient_angle ?? 135}°</Label>
+                <input
+                  type="range"
+                  min={0}
+                  max={360}
+                  step={5}
+                  value={theme.extras.bg_gradient_angle ?? 135}
+                  onChange={(e) => onChange({ extras: { bg_gradient_angle: Number(e.target.value) } })}
+                  className="w-full"
+                />
+              </div>
+            )}
+          </div>
+        ) : null}
+
+        {["dots", "grid", "diagonal"].includes(theme.extras.bg_style ?? "solid") && (
+          <div className="grid grid-cols-2 gap-3 pt-2">
+            <ColorField
+              label="Pattern Color"
+              value={theme.extras.bg_pattern_color ?? "#E5E7EB"}
+              onChange={(v) => onChange({ extras: { bg_pattern_color: v } })}
+            />
+            <div className="space-y-1.5">
+              <Label>Pattern Size: {theme.extras.bg_pattern_size ?? 24}px</Label>
+              <input
+                type="range"
+                min={8}
+                max={64}
+                step={2}
+                value={theme.extras.bg_pattern_size ?? 24}
+                onChange={(e) => onChange({ extras: { bg_pattern_size: Number(e.target.value) } })}
+                className="w-full"
+              />
+            </div>
+          </div>
+        )}
+
+        <div className="mt-3">
+          <div className="text-xs text-muted-foreground mb-1">Live preview</div>
+          <div
+            className="h-24 w-full rounded-lg border"
+            style={buildBgPreview(theme.extras.bg_style ?? "solid", theme)}
+          />
+        </div>
+      </div>
+
+
+      <div className="space-y-4 rounded-lg border bg-card p-4">
         <h3 className="text-sm font-semibold uppercase text-muted-foreground">Header</h3>
         <div className="grid grid-cols-2 gap-3">
           <ColorField
