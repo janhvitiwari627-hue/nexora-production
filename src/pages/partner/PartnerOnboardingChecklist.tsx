@@ -125,8 +125,21 @@ export function PartnerOnboardingChecklist() {
   }, [localPreview]);
 
   const lastFileRef = useRef<File | null>(null);
+  const uploadAbortRef = useRef<AbortController | null>(null);
+
+  const cancelUpload = () => {
+    if (uploadAbortRef.current) {
+      uploadAbortRef.current.abort();
+      uploadAbortRef.current = null;
+    }
+  };
 
   const doUpload = async (file: File, keepPreview?: string) => {
+    // Cancel any previous in-flight upload before starting a new one
+    if (uploadAbortRef.current) uploadAbortRef.current.abort();
+    const controller = new AbortController();
+    uploadAbortRef.current = controller;
+
     setUploading(true);
     setUploadProgress(0);
     setUploadError(null);
@@ -134,6 +147,7 @@ export function PartnerOnboardingChecklist() {
       const res = await uploadToCloudinary(file, {
         folder: "partner-logos",
         onProgress: (pct) => setUploadProgress(pct),
+        signal: controller.signal,
       });
       setForm((f) => ({ ...f, photo_url: res.secure_url }));
       setUploadError(null);
@@ -141,6 +155,20 @@ export function PartnerOnboardingChecklist() {
       setUploadProgress(100);
       toast.success("Logo uploaded — save karke pakka karo");
     } catch (err) {
+      const isAbort =
+        (err instanceof CloudinaryUploadError && err.code === "ABORTED") ||
+        controller.signal.aborted;
+      if (isAbort) {
+        setUploadError("Upload cancel ho gaya");
+        setUploadErrorDetails({ code: "ABORTED", raw: "User cancelled upload" });
+        toast.info("Upload cancel");
+        lastFileRef.current = file;
+        if (!keepPreview && localPreview) {
+          URL.revokeObjectURL(localPreview);
+          setLocalPreview(null);
+        }
+        return;
+      }
       const raw = err instanceof Error ? err.message : String(err);
       const friendly = friendlyUploadError(raw);
       setUploadError(friendly);
@@ -161,9 +189,11 @@ export function PartnerOnboardingChecklist() {
         setLocalPreview(null);
       }
     } finally {
+      if (uploadAbortRef.current === controller) uploadAbortRef.current = null;
       setUploading(false);
     }
   };
+
 
   const MIN_DIM = 200;
   const MAX_DIM = 4000;
