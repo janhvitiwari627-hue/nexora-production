@@ -410,12 +410,18 @@ export function PartnerOnboardingChecklist() {
   const onRetryUpload = async () => {
     const file = lastFileRef.current;
     if (!file) {
+      announceStatus("No previous file to retry. Opening file picker.");
       fileInputRef.current?.click();
       return;
     }
     setUploadError(null);
-    await doUpload(file, localPreview ?? undefined);
+    setUploadErrorDetails(null);
+    announceStatus(`Retrying upload for ${file.name}.`);
+    // Re-run the same validation the initial upload went through so a stale
+    // file that no longer passes checks doesn't silently fail again.
+    await validateAndUpload(file);
   };
+
 
 
   useEffect(() => {
