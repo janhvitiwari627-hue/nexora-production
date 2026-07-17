@@ -135,8 +135,8 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
   },
   {
     key: "classic",
-    name: "Classic",
-    description: "Warm gold on deep navy",
+    name: "Classic Elegance",
+    description: "Warm gold on navy · serif",
     theme: {
       primary_color: "#1E293B",
       secondary_color: "#D4A24C",
@@ -146,13 +146,16 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       heading_font: "Playfair Display",
       body_font: "Lora",
       button_style: "rounded",
-      extras: { header_bg: "#1E293B", header_text: "#FAF7F2", link_color: "#D4A24C", link_style: "hover-underline" },
+      extras: {
+        header_bg: "#1E293B", header_text: "#FAF7F2", link_color: "#D4A24C", link_style: "hover-underline",
+        bg_style: "soft-radial", bg_gradient_from: "#FAF7F2", bg_gradient_to: "#EFE7D6", bg_gradient_angle: 135,
+      },
     },
   },
   {
     key: "modern",
-    name: "Modern",
-    description: "Bold indigo, clean sans",
+    name: "Modern Studio",
+    description: "Indigo · clean sans · gradient",
     theme: {
       primary_color: "#4F46E5",
       secondary_color: "#F59E0B",
@@ -162,13 +165,16 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       heading_font: "Space Grotesk",
       body_font: "Inter",
       button_style: "pill",
-      extras: { header_bg: "#FFFFFF", header_text: "#0F172A", link_color: "#4F46E5", link_style: "hover-underline" },
+      extras: {
+        header_bg: "#FFFFFF", header_text: "#0F172A", link_color: "#4F46E5", link_style: "hover-underline",
+        bg_style: "gradient", bg_gradient_from: "#EEF2FF", bg_gradient_to: "#FFFFFF", bg_gradient_angle: 160,
+      },
     },
   },
   {
     key: "minimal",
-    name: "Minimal",
-    description: "Monochrome, lots of white",
+    name: "Minimal Mono",
+    description: "Monochrome · Swiss grid",
     theme: {
       primary_color: "#000000",
       secondary_color: "#111111",
@@ -178,13 +184,16 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       heading_font: "Montserrat",
       body_font: "Inter",
       button_style: "square",
-      extras: { header_bg: "#FFFFFF", header_text: "#111111", link_color: "#111111", link_style: "underline" },
+      extras: {
+        header_bg: "#FFFFFF", header_text: "#111111", link_color: "#111111", link_style: "underline",
+        bg_style: "grid", bg_pattern_color: "#EEEEEE", bg_pattern_size: 32,
+      },
     },
   },
   {
     key: "luxury",
-    name: "Luxury",
-    description: "Rich rose on charcoal",
+    name: "Luxury Noir",
+    description: "Rose gold on charcoal",
     theme: {
       primary_color: "#111111",
       secondary_color: "#E5B8A6",
@@ -194,13 +203,16 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       heading_font: "Playfair Display",
       body_font: "Montserrat",
       button_style: "pill",
-      extras: { header_bg: "#0F0F0F", header_text: "#F5F0EB", link_color: "#E5B8A6", link_style: "hover-underline" },
+      extras: {
+        header_bg: "#0F0F0F", header_text: "#F5F0EB", link_color: "#E5B8A6", link_style: "hover-underline",
+        bg_style: "soft-radial", bg_gradient_from: "#1A1A1A", bg_gradient_to: "#0F0F0F", bg_gradient_angle: 135,
+      },
     },
   },
   {
     key: "fresh",
-    name: "Fresh",
-    description: "Mint & coral, playful",
+    name: "Fresh Mint",
+    description: "Mint & coral · playful",
     theme: {
       primary_color: "#0F766E",
       secondary_color: "#FB7185",
@@ -210,7 +222,124 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       heading_font: "Poppins",
       body_font: "Poppins",
       button_style: "rounded",
-      extras: { header_bg: "#0F766E", header_text: "#F0FDFA", link_color: "#FB7185", link_style: "hover-underline" },
+      extras: {
+        header_bg: "#0F766E", header_text: "#F0FDFA", link_color: "#FB7185", link_style: "hover-underline",
+        bg_style: "dots", bg_pattern_color: "#A7F3D0", bg_pattern_size: 22,
+      },
+    },
+  },
+  {
+    key: "editorial",
+    name: "Editorial Ink",
+    description: "Serif magazine · paper",
+    theme: {
+      primary_color: "#1A1A1A",
+      secondary_color: "#B91C1C",
+      accent_color: "#7C2D12",
+      background_color: "#F5F3EE",
+      text_color: "#1A1A1A",
+      heading_font: "Playfair Display",
+      body_font: "Merriweather",
+      button_style: "square",
+      extras: {
+        header_bg: "#F5F3EE", header_text: "#1A1A1A", link_color: "#B91C1C", link_style: "underline",
+        bg_style: "solid",
+      },
+    },
+  },
+  {
+    key: "ocean",
+    name: "Ocean Deep",
+    description: "Teal gradient · airy",
+    theme: {
+      primary_color: "#0C2340",
+      secondary_color: "#5CBDB9",
+      accent_color: "#2D8A9E",
+      background_color: "#F0F9FF",
+      text_color: "#0C2340",
+      heading_font: "Space Grotesk",
+      body_font: "Inter",
+      button_style: "rounded",
+      extras: {
+        header_bg: "#0C2340", header_text: "#F0F9FF", link_color: "#2D8A9E", link_style: "hover-underline",
+        bg_style: "gradient", bg_gradient_from: "#E0F2FE", bg_gradient_to: "#F0F9FF", bg_gradient_angle: 180,
+      },
+    },
+  },
+  {
+    key: "sunset",
+    name: "Sunset Blaze",
+    description: "Warm gradient · bold",
+    theme: {
+      primary_color: "#6C5CE7",
+      secondary_color: "#FF6B35",
+      accent_color: "#E84393",
+      background_color: "#FFF7ED",
+      text_color: "#1F2937",
+      heading_font: "Poppins",
+      body_font: "Inter",
+      button_style: "pill",
+      extras: {
+        header_bg: "#FFFFFF", header_text: "#1F2937", link_color: "#E84393", link_style: "hover-underline",
+        bg_style: "gradient", bg_gradient_from: "#FED7AA", bg_gradient_to: "#FBCFE8", bg_gradient_angle: 135,
+      },
+    },
+  },
+  {
+    key: "botanical",
+    name: "Botanical",
+    description: "Sage & cream · organic",
+    theme: {
+      primary_color: "#1A3C2A",
+      secondary_color: "#A8C0A0",
+      accent_color: "#7D9B76",
+      background_color: "#F5F0E8",
+      text_color: "#1A3C2A",
+      heading_font: "Lora",
+      body_font: "Nunito Sans",
+      button_style: "rounded",
+      extras: {
+        header_bg: "#1A3C2A", header_text: "#F5F0E8", link_color: "#7D9B76", link_style: "hover-underline",
+        bg_style: "dots", bg_pattern_color: "#DCE5D4", bg_pattern_size: 26,
+      },
+    },
+  },
+  {
+    key: "brutalist",
+    name: "Brutalist Pop",
+    description: "High contrast · yellow accent",
+    theme: {
+      primary_color: "#0A0A0A",
+      secondary_color: "#FFEB3B",
+      accent_color: "#FF5722",
+      background_color: "#FFFFFF",
+      text_color: "#0A0A0A",
+      heading_font: "Space Grotesk",
+      body_font: "Inter",
+      button_style: "square",
+      extras: {
+        header_bg: "#0A0A0A", header_text: "#FFEB3B", link_color: "#FF5722", link_style: "underline",
+        bg_style: "diagonal", bg_pattern_color: "#F5F5F5", bg_pattern_size: 20,
+      },
+    },
+  },
+  {
+    key: "midnight",
+    name: "Midnight Tech",
+    description: "Dark indigo · neon glow",
+    theme: {
+      primary_color: "#818CF8",
+      secondary_color: "#F472B6",
+      accent_color: "#34D399",
+      background_color: "#0A0A1A",
+      text_color: "#E0E7FF",
+      heading_font: "Space Grotesk",
+      body_font: "Inter",
+      button_style: "pill",
+      extras: {
+        header_bg: "#0A0A1A", header_text: "#E0E7FF", link_color: "#818CF8", link_style: "hover-underline",
+        bg_style: "soft-radial", bg_gradient_from: "#1E1B4B", bg_gradient_to: "#0A0A1A", bg_gradient_angle: 135,
+      },
     },
   },
 ];
@@ -1845,42 +1974,66 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
             Reset to default
           </button>
         </div>
+        <p className="text-xs text-muted-foreground">
+          Ek click me colors, fonts, background style — sab kuch instantly apply ho jayega.
+        </p>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {THEME_PRESETS.map((p) => {
             const active =
               theme.primary_color === p.theme.primary_color &&
               theme.secondary_color === p.theme.secondary_color &&
               theme.heading_font === p.theme.heading_font &&
-              theme.button_style === p.theme.button_style;
+              theme.button_style === p.theme.button_style &&
+              (theme.extras.bg_style ?? "solid") === (p.theme.extras.bg_style ?? "solid");
+            const bgPreview = buildBgPreview(
+              (p.theme.extras.bg_style as BgStyle | undefined) ?? "solid",
+              p.theme,
+            );
             return (
               <button
                 key={p.key}
                 type="button"
                 onClick={() => onChange(p.theme)}
-                className={`group rounded-lg border p-2 text-left transition ${
+                className={`group overflow-hidden rounded-lg border text-left transition ${
                   active ? "border-primary ring-2 ring-primary/30" : "hover:border-primary/60"
                 }`}
-                style={{ background: p.theme.background_color }}
               >
-                <div className="flex gap-1">
-                  {[p.theme.primary_color, p.theme.secondary_color, p.theme.accent_color, p.theme.text_color].map((c, i) => (
-                    <span key={i} className="h-5 w-5 rounded-full border" style={{ background: c }} />
-                  ))}
+                <div className="relative p-2" style={bgPreview}>
+                  <div className="flex gap-1">
+                    {[p.theme.primary_color, p.theme.secondary_color, p.theme.accent_color, p.theme.text_color].map((c, i) => (
+                      <span key={i} className="h-4 w-4 rounded-full border border-black/10 shadow-sm" style={{ background: c }} />
+                    ))}
+                  </div>
+                  <div
+                    className="mt-6 text-sm font-semibold leading-tight"
+                    style={{ color: p.theme.text_color, fontFamily: p.theme.heading_font }}
+                  >
+                    Aa
+                  </div>
+                  <span
+                    className="absolute right-1.5 top-1.5 inline-block px-2 py-0.5 text-[10px]"
+                    style={{
+                      background: p.theme.secondary_color,
+                      color: p.theme.background_color,
+                      fontFamily: p.theme.body_font,
+                      borderRadius:
+                        p.theme.button_style === "pill" ? "9999px" :
+                        p.theme.button_style === "square" ? "0" : "4px",
+                    }}
+                  >
+                    Book
+                  </span>
                 </div>
-                <div
-                  className="mt-2 text-sm font-semibold"
-                  style={{ color: p.theme.text_color, fontFamily: p.theme.heading_font }}
-                >
-                  {p.name}
-                </div>
-                <div className="text-[11px] opacity-70" style={{ color: p.theme.text_color }}>
-                  {p.description}
+                <div className="border-t bg-card px-2 py-1.5">
+                  <div className="text-xs font-semibold" style={{ fontFamily: p.theme.heading_font }}>{p.name}</div>
+                  <div className="truncate text-[10px] text-muted-foreground">{p.description}</div>
                 </div>
               </button>
             );
           })}
         </div>
       </div>
+
 
 
       <div className="space-y-4 rounded-lg border bg-card p-4">
