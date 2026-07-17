@@ -397,9 +397,12 @@ export function WebsiteEditorPage() {
               section={selected}
               content={content}
               salonId={salonId ?? null}
+              websiteId={websiteId ?? null}
               onFieldChange={updateContent}
               onToggleVisible={(v) => patchSection(selected.id, { is_visible: v })}
             />
+
+
 
           ) : (
             <p className="text-muted-foreground">Select a section to edit</p>
