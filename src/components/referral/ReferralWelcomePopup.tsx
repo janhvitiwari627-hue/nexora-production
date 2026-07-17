@@ -32,7 +32,12 @@ export function ReferralWelcomePopup() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [open, setOpen] = useState(false);
   const [howOpen, setHowOpen] = useState(false);
+  const isWebsitePreview =
+    pathname.startsWith("/w/") &&
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("preview") === "1";
   const isWorkspaceRoute =
+    isWebsitePreview ||
     pathname.startsWith("/owner") || pathname.startsWith("/app/owner") || pathname.startsWith("/admin");
 
   const code = profile?.referral_code ?? null;

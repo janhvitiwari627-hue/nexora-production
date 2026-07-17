@@ -34,7 +34,14 @@ function PublicWebsitePage() {
       }
     }
     window.addEventListener("message", onMsg);
-    return () => window.removeEventListener("message", onMsg);
+    window.parent?.postMessage({ type: "website-preview-ready" }, "*");
+    const readyRetry = window.setInterval(() => {
+      window.parent?.postMessage({ type: "website-preview-ready" }, "*");
+    }, 500);
+    return () => {
+      window.removeEventListener("message", onMsg);
+      window.clearInterval(readyRetry);
+    };
   }, [isPreview]);
 
   const bundle: Bundle | null = preview ?? (q.data

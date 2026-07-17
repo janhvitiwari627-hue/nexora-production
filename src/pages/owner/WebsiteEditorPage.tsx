@@ -16,7 +16,7 @@ import {
   type WebsiteSection,
   type SectionType,
 } from "@/lib/website-editor.functions";
-import { getMyOwnedSalons } from "@/lib/owner.functions";
+import { getMyOwnedSalons, listOwnerServices } from "@/lib/owner.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,7 +26,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "sonner";
-import { Loader2, Eye, EyeOff, Globe, Plus, Trash2, Upload, Image as ImageIcon, Palette, GripVertical, History, Undo2, Save, GitCompare, Monitor, Tablet, Smartphone } from "lucide-react";
+import { Loader2, Eye, EyeOff, Globe, Plus, Trash2, Upload, Image as ImageIcon, Palette, GripVertical, History, Undo2, Save, GitCompare, Monitor, Tablet, Smartphone, Wand2, MapPinned, ListChecks } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import {
   DndContext,
@@ -358,8 +358,160 @@ const SECTION_LABELS: Record<SectionType, string> = {
   contact: "Contact",
 };
 
+type OwnerServiceOption = {
+  id: string;
+  name: string;
+  description?: string | null;
+  category?: string | null;
+  duration_minutes?: number | null;
+  price?: number | string | null;
+  image_url?: string | null;
+};
+
+type SalonBasics = {
+  name?: string | null;
+  address?: string | null;
+  location?: string | null;
+  phone?: string | null;
+};
+
+type BusinessRole = "Salon" | "Barber" | "Makeup Studio" | "Spa" | "Nail Studio";
+
+const BUSINESS_ROLES: BusinessRole[] = ["Salon", "Barber", "Makeup Studio", "Spa", "Nail Studio"];
+
+const STAFF_ROLE_OPTIONS = [
+  "Senior Stylist",
+  "Hair Stylist",
+  "Master Barber",
+  "Makeup Artist",
+  "Nail Artist",
+  "Beautician",
+  "Spa Therapist",
+  "Receptionist",
+  "Manager",
+];
+
+function mapsEmbedFromAddress(address?: string | null) {
+  const q = (address ?? "").trim();
+  return q ? `https://www.google.com/maps?q=${encodeURIComponent(q)}&output=embed` : "";
+}
+
+function mapsEmbedFromCoords(lat: number, lng: number) {
+  return `https://www.google.com/maps?q=${encodeURIComponent(`${lat},${lng}`)}&z=16&output=embed`;
+}
+
+function normalizeServiceItem(s: OwnerServiceOption): Item {
+  return {
+    id: s.id,
+    name: s.name,
+    price: s.price === null || s.price === undefined ? "" : String(s.price),
+    duration: `${s.duration_minutes ?? 30} min`,
+    description: s.description ?? "",
+    image: s.image_url ?? "",
+    category: s.category ?? "General",
+  };
+}
+
+type StarterTemplate = {
+  key: string;
+  name: string;
+  role: BusinessRole;
+  description: string;
+  theme: ThemeState;
+  visibleOrder: SectionType[];
+  content: Partial<Record<SectionType, (ctx: { salon?: SalonBasics | null; services: OwnerServiceOption[] }) => Record<string, unknown>>>;
+};
+
+const WEBSITE_STARTER_TEMPLATES: StarterTemplate[] = [
+  {
+    key: "salon-30-min",
+    name: "30-min Salon Website",
+    role: "Salon",
+    description: "Hero, services, rate card, gallery, team, contact and map ready.",
+    theme: THEME_PRESETS.find((p) => p.key === "classic")?.theme ?? DEFAULT_THEME,
+    visibleOrder: ["hero", "about", "services", "rate_card", "gallery", "staff", "offers", "contact"],
+    content: {
+      hero: ({ salon }) => ({ heading: salon?.name ?? "Premium Salon", subheading: "Hair, beauty and care in one place", description: "Book trusted salon services with transparent pricing.", buttonText: "Book Now", buttonLink: "#services", imageUrl: "" }),
+      about: ({ salon }) => ({ heading: "About Us", body: `${salon?.name ?? "Our salon"} delivers professional beauty services with trained experts and hygienic care.` }),
+      services: ({ services }) => ({ heading: "Popular Services", description: "Choose services and publish instantly.", items: services.slice(0, 6).map(normalizeServiceItem) }),
+      rate_card: ({ services }) => ({ heading: "Rate Card", description: "Transparent prices for quick booking decisions.", items: services.slice(0, 8).map(normalizeServiceItem) }),
+      gallery: () => ({ heading: "Gallery", description: "Show your best salon work.", items: [], gridAspect: "square", gridColumns: 4, imageFit: "cover", gridGap: 12 }),
+      staff: () => ({ heading: "Meet the Team", description: "Introduce your experts.", items: [] }),
+      offers: () => ({ heading: "Current Offers", description: "Limited time deals for new and returning customers.", items: [{ id: newId(), name: "First Visit Offer", discount: "20% OFF", description: "Welcome offer for first-time customers." }] }),
+      contact: ({ salon }) => ({ heading: "Contact Us", description: "Call, WhatsApp or visit us.", phone: salon?.phone ?? "", whatsapp: salon?.phone ?? "", email: "", address: salon?.address ?? salon?.location ?? "", mapEmbed: mapsEmbedFromAddress(salon?.address ?? salon?.location) }),
+    },
+  },
+  {
+    key: "barber-fast",
+    name: "Barber Fast Booking",
+    role: "Barber",
+    description: "Bold layout for haircut, beard and grooming price lists.",
+    theme: THEME_PRESETS.find((p) => p.key === "modern")?.theme ?? DEFAULT_THEME,
+    visibleOrder: ["hero", "services", "rate_card", "gallery", "staff", "contact"],
+    content: {
+      hero: ({ salon }) => ({ heading: salon?.name ?? "Modern Barber Shop", subheading: "Sharp cuts. Clean fades. Fast booking.", description: "Pick your grooming service and visit today.", buttonText: "View Rates", buttonLink: "#rate_card", imageUrl: "" }),
+      services: ({ services }) => ({ heading: "Grooming Services", description: "Haircut, beard, shave and styling.", items: services.slice(0, 6).map(normalizeServiceItem) }),
+      rate_card: ({ services }) => ({ heading: "Barber Rate Card", description: "Quick list for walk-ins and bookings.", items: services.slice(0, 10).map(normalizeServiceItem) }),
+      gallery: () => ({ heading: "Work Gallery", description: "Show fades, beard trims and transformations.", items: [], gridAspect: "landscape", gridColumns: 3, imageFit: "cover", gridGap: 10 }),
+      staff: () => ({ heading: "Barbers", description: "Your grooming specialists.", items: [] }),
+      contact: ({ salon }) => ({ heading: "Visit The Shop", description: "Directions and contact details.", phone: salon?.phone ?? "", whatsapp: salon?.phone ?? "", email: "", address: salon?.address ?? salon?.location ?? "", mapEmbed: mapsEmbedFromAddress(salon?.address ?? salon?.location) }),
+    },
+  },
+  {
+    key: "makeup-portfolio",
+    name: "Makeup Portfolio",
+    role: "Makeup Studio",
+    description: "Portfolio-first template for bridal and event makeup.",
+    theme: THEME_PRESETS.find((p) => p.key === "blush")?.theme ?? THEME_PRESETS.find((p) => p.key === "classic")?.theme ?? DEFAULT_THEME,
+    visibleOrder: ["hero", "about", "services", "packages", "gallery", "offers", "contact"],
+    content: {
+      hero: ({ salon }) => ({ heading: salon?.name ?? "Makeup Studio", subheading: "Bridal, party and editorial makeup", description: "Showcase your best transformations and packages.", buttonText: "See Packages", buttonLink: "#packages", imageUrl: "" }),
+      about: () => ({ heading: "Artist Profile", body: "Professional makeup services for weddings, shoots and special occasions." }),
+      services: ({ services }) => ({ heading: "Makeup Services", description: "Choose from studio and event services.", items: services.slice(0, 6).map(normalizeServiceItem) }),
+      packages: () => ({ heading: "Packages", description: "Ready-made offers customers can understand fast.", items: [{ id: newId(), name: "Bridal Glow Package", price: "12999", description: "Consultation, makeup trial and wedding-day look.", duration: "Full day" }] }),
+      gallery: () => ({ heading: "Portfolio", description: "Upload bridal and before/after photos.", items: [], gridAspect: "portrait", gridColumns: 3, imageFit: "cover", gridGap: 12 }),
+      offers: () => ({ heading: "Special Offers", description: "Promote seasonal bookings.", items: [] }),
+      contact: ({ salon }) => ({ heading: "Book Consultation", description: "Share your event date and location.", phone: salon?.phone ?? "", whatsapp: salon?.phone ?? "", email: "", address: salon?.address ?? salon?.location ?? "", mapEmbed: mapsEmbedFromAddress(salon?.address ?? salon?.location) }),
+    },
+  },
+  {
+    key: "spa-calm",
+    name: "Spa & Wellness",
+    role: "Spa",
+    description: "Calm wellness pages with memberships and packages.",
+    theme: THEME_PRESETS.find((p) => p.key === "botanical")?.theme ?? THEME_PRESETS.find((p) => p.key === "fresh")?.theme ?? DEFAULT_THEME,
+    visibleOrder: ["hero", "about", "services", "packages", "membership", "gallery", "contact"],
+    content: {
+      hero: ({ salon }) => ({ heading: salon?.name ?? "Spa & Wellness", subheading: "Relax, refresh and recharge", description: "A ready wellness website with service menu and booking CTA.", buttonText: "Book Session", buttonLink: "#services", imageUrl: "" }),
+      about: () => ({ heading: "Our Wellness Space", body: "Relaxing treatments, trained therapists and a clean, peaceful environment." }),
+      services: ({ services }) => ({ heading: "Spa Services", description: "Massages, facials and wellness rituals.", items: services.slice(0, 6).map(normalizeServiceItem) }),
+      packages: () => ({ heading: "Wellness Packages", description: "Bundle your best services.", items: [{ id: newId(), name: "Relaxation Day", price: "4999", description: "Massage, facial and refreshment ritual.", duration: "3 hours" }] }),
+      membership: () => ({ heading: "Membership", description: "Monthly wellness plans for repeat customers.", items: [{ id: newId(), name: "Gold Wellness", price: "999", description: "Priority booking and member discounts." }] }),
+      gallery: () => ({ heading: "Spa Gallery", description: "Show ambience and treatment rooms.", items: [], gridAspect: "landscape", gridColumns: 3, imageFit: "cover", gridGap: 14 }),
+      contact: ({ salon }) => ({ heading: "Find Us", description: "Call or get directions.", phone: salon?.phone ?? "", whatsapp: salon?.phone ?? "", email: "", address: salon?.address ?? salon?.location ?? "", mapEmbed: mapsEmbedFromAddress(salon?.address ?? salon?.location) }),
+    },
+  },
+  {
+    key: "nails-clean",
+    name: "Nail Studio",
+    role: "Nail Studio",
+    description: "Visual grid for nail art, prices and offers.",
+    theme: THEME_PRESETS.find((p) => p.key === "fresh")?.theme ?? DEFAULT_THEME,
+    visibleOrder: ["hero", "services", "rate_card", "gallery", "offers", "contact"],
+    content: {
+      hero: ({ salon }) => ({ heading: salon?.name ?? "Nail Studio", subheading: "Nail art, extensions and care", description: "A simple template customers can scan quickly.", buttonText: "See Nail Menu", buttonLink: "#services", imageUrl: "" }),
+      services: ({ services }) => ({ heading: "Nail Services", description: "Manicure, pedicure, nail art and extensions.", items: services.slice(0, 6).map(normalizeServiceItem) }),
+      rate_card: ({ services }) => ({ heading: "Nail Rate Card", description: "Clear menu for every customer.", items: services.slice(0, 10).map(normalizeServiceItem) }),
+      gallery: () => ({ heading: "Nail Art Gallery", description: "Upload your best designs.", items: [], gridAspect: "square", gridColumns: 4, imageFit: "cover", gridGap: 8 }),
+      offers: () => ({ heading: "Offers", description: "Feature combo offers.", items: [{ id: newId(), name: "Mani + Pedi Combo", discount: "15% OFF", description: "Limited-time combo deal." }] }),
+      contact: ({ salon }) => ({ heading: "Visit Studio", description: "Location and WhatsApp booking.", phone: salon?.phone ?? "", whatsapp: salon?.phone ?? "", email: "", address: salon?.address ?? salon?.location ?? "", mapEmbed: mapsEmbedFromAddress(salon?.address ?? salon?.location) }),
+    },
+  },
+];
+
 export function WebsiteEditorPage() {
   const fetchSalons = useServerFn(getMyOwnedSalons);
+  const fetchServices = useServerFn(listOwnerServices);
   const fetchOrCreate = useServerFn(getOrCreateMyWebsite);
   const fetchBundle = useServerFn(getMyWebsiteBundle);
   const saveSection = useServerFn(updateSection);
@@ -374,7 +526,14 @@ export function WebsiteEditorPage() {
 
 
   const salonsQ = useQuery({ queryKey: ["my-owned-salons-editor"], queryFn: () => fetchSalons() });
-  const salonId = salonsQ.data?.[0]?.salon?.id;
+  const selectedSalon = salonsQ.data?.[0]?.salon as (SalonBasics & { id?: string }) | undefined;
+  const salonId = selectedSalon?.id;
+
+  const ownerServicesQ = useQuery({
+    queryKey: ["owner-services-for-website", salonId],
+    queryFn: () => fetchServices({ data: { salon_id: salonId! } }),
+    enabled: !!salonId,
+  });
 
   const websiteQ = useQuery({
     queryKey: ["editor-website", salonId],
@@ -395,6 +554,8 @@ export function WebsiteEditorPage() {
   const [localTheme, setLocalTheme] = useState<ThemeState>(DEFAULT_THEME);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [templateRole, setTemplateRole] = useState<BusinessRole>("Salon");
+  const [applyingTemplate, setApplyingTemplate] = useState<string | null>(null);
   const saveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const themeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -415,16 +576,32 @@ export function WebsiteEditorPage() {
 
   // Push live-preview updates to iframe
   useEffect(() => {
-    iframeRef.current?.contentWindow?.postMessage(
-      { type: "editor:bundle", bundle: { sections: localSections, theme: localTheme } },
-      "*",
-    );
+    postPreviewBundle();
+    const retry = window.setTimeout(postPreviewBundle, 300);
+    return () => window.clearTimeout(retry);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localSections, localTheme]);
+
+  useEffect(() => {
+    const onMessage = (event: MessageEvent) => {
+      if (event.data?.type === "website-preview-ready") postPreviewBundle();
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localSections, localTheme]);
 
   const selected = useMemo(
     () => localSections.find((s) => s.id === selectedId) ?? null,
     [localSections, selectedId],
   );
+
+  function postPreviewBundle() {
+    iframeRef.current?.contentWindow?.postMessage(
+      { type: "editor:bundle", bundle: { sections: localSections, theme: localTheme } },
+      "*",
+    );
+  }
 
   function patchTheme(patch: Partial<ThemeState>) {
     setLocalTheme((prev) => {
@@ -712,6 +889,67 @@ export function WebsiteEditorPage() {
     }
   }
 
+  async function applyStarterTemplate(template: StarterTemplate) {
+    if (!websiteId) return;
+    setApplyingTemplate(template.key);
+    try {
+      if (themeTimer.current) {
+        clearTimeout(themeTimer.current);
+        themeTimer.current = null;
+      }
+      Object.values(saveTimers.current).forEach((timer) => clearTimeout(timer));
+      saveTimers.current = {};
+
+      const services = (ownerServicesQ.data ?? []) as OwnerServiceOption[];
+      const ctx = { salon: selectedSalon, services };
+      const visible = new Set<SectionType>(template.visibleOrder);
+      const order = new Map<SectionType, number>(template.visibleOrder.map((type, index) => [type, index]));
+      const nextTheme = {
+        ...template.theme,
+        extras: { ...DEFAULT_EXTRAS, ...template.theme.extras },
+      };
+      const nextSections = localSections
+        .map((section, index) => {
+          const buildContent = template.content[section.section_type];
+          const currentContent = (section.content ?? {}) as Record<string, unknown>;
+          return {
+            ...section,
+            content: (buildContent ? { ...currentContent, ...buildContent(ctx) } : currentContent) as WebsiteSection["content"],
+            is_visible: visible.has(section.section_type),
+            sort_order: order.get(section.section_type) ?? template.visibleOrder.length + index,
+          };
+        })
+        .sort((a, b) => a.sort_order - b.sort_order);
+
+      setSaving(true);
+      setLocalTheme(nextTheme);
+      setLocalSections(nextSections);
+      setSelectedId(nextSections.find((section) => section.is_visible)?.id ?? nextSections[0]?.id ?? null);
+      setShowTheme(false);
+
+      await saveTheme({ data: { websiteId, patch: nextTheme } });
+      await Promise.all(
+        nextSections.map((section) =>
+          saveSection({
+            data: {
+              sectionId: section.id,
+              content: section.content as Record<string, unknown>,
+              is_visible: section.is_visible,
+              sort_order: section.sort_order,
+            },
+          }),
+        ),
+      );
+      await saveOrder({ data: { websiteId, order: nextSections.map((section) => section.id) } });
+      toast.success(`${template.name} applied`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Template apply failed");
+    } finally {
+      setSaving(false);
+      setApplyingTemplate(null);
+    }
+  }
+
 
   if (salonsQ.isLoading || websiteQ.isLoading || bundleQ.isLoading) {
     return (
@@ -755,6 +993,36 @@ export function WebsiteEditorPage() {
       <div className="grid flex-1 grid-cols-[240px_1fr_1fr] overflow-hidden">
         {/* Section list */}
         <aside className="overflow-y-auto border-r bg-muted/30 p-3">
+          <div className="mb-4 rounded-lg border bg-background p-3 shadow-sm">
+            <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase text-muted-foreground">
+              <Wand2 className="h-3.5 w-3.5" /> Ready Templates
+            </div>
+            <Select value={templateRole} onValueChange={(v) => setTemplateRole(v as BusinessRole)}>
+              <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {BUSINESS_ROLES.map((role) => (
+                  <SelectItem key={role} value={role}>{role}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="mt-3 space-y-2">
+              {WEBSITE_STARTER_TEMPLATES.filter((template) => template.role === templateRole).map((template) => (
+                <button
+                  key={template.key}
+                  type="button"
+                  onClick={() => void applyStarterTemplate(template)}
+                  disabled={!!applyingTemplate || !websiteId}
+                  className="w-full rounded-md border p-2 text-left text-xs transition hover:border-primary hover:bg-muted/50 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <span className="flex items-center justify-between gap-2 font-semibold">
+                    {template.name}
+                    {applyingTemplate === template.key && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                  </span>
+                  <span className="mt-1 block text-[11px] leading-snug text-muted-foreground">{template.description}</span>
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="mb-2 flex items-center justify-between">
             <div className="text-xs font-semibold uppercase text-muted-foreground">Sections</div>
             <div className="text-[10px] text-muted-foreground">Drag to reorder</div>
@@ -797,6 +1065,8 @@ export function WebsiteEditorPage() {
               content={content}
               salonId={salonId ?? null}
               websiteId={websiteId ?? null}
+              salon={selectedSalon ?? null}
+              serviceOptions={(ownerServicesQ.data ?? []) as OwnerServiceOption[]}
               onFieldChange={updateContent}
               onToggleVisible={(v) => patchSection(selected.id, { is_visible: v })}
             />
@@ -857,6 +1127,7 @@ export function WebsiteEditorPage() {
                   ref={iframeRef}
                   key={websiteId}
                   src={`/w/${websiteId}?preview=1`}
+                  onLoad={postPreviewBundle}
                   className="h-full w-full border-0"
                   title="Live preview"
                 />
@@ -874,6 +1145,8 @@ function SectionEditor({
   content,
   salonId,
   websiteId,
+  salon,
+  serviceOptions,
   onFieldChange,
   onToggleVisible,
 }: {
@@ -881,6 +1154,8 @@ function SectionEditor({
   content: Record<string, unknown>;
   salonId: string | null;
   websiteId: string | null;
+  salon: SalonBasics | null;
+  serviceOptions: OwnerServiceOption[];
   onFieldChange: (field: string, value: unknown) => void;
   onToggleVisible: (v: boolean) => void;
 }) {
@@ -927,8 +1202,13 @@ function SectionEditor({
           <Field label="Phone" value={str("phone")} onChange={(v) => onFieldChange("phone", v)} />
           <Field label="WhatsApp" value={str("whatsapp")} onChange={(v) => onFieldChange("whatsapp", v)} />
           <Field label="Email" value={str("email")} onChange={(v) => onFieldChange("email", v)} />
-          <TextField label="Address" value={str("address")} onChange={(v) => onFieldChange("address", v)} />
-          <Field label="Google Map Embed URL" value={str("mapEmbed")} onChange={(v) => onFieldChange("mapEmbed", v)} />
+          <MapEmbedControls
+            address={str("address")}
+            mapEmbed={str("mapEmbed")}
+            salon={salon}
+            onAddressChange={(v) => onFieldChange("address", v)}
+            onMapEmbedChange={(v) => onFieldChange("mapEmbed", v)}
+          />
         </>
       )}
 
@@ -942,6 +1222,7 @@ function SectionEditor({
           <ItemsEditor
             kind={section.section_type}
             items={items}
+            serviceOptions={serviceOptions}
             salonId={salonId}
             websiteId={websiteId}
             onChange={setItems}
@@ -996,6 +1277,7 @@ type Item = {
   role?: string;
   bio?: string;
   image?: string;
+  category?: string;
   date?: string;
   discount?: string;
   objectPosition?: string; // e.g. "center", "top", "left top", used for gallery crop focus
@@ -1009,20 +1291,129 @@ function newId() {
     : `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+function RoleSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const custom = value && !STAFF_ROLE_OPTIONS.includes(value);
+  return (
+    <div className="space-y-1.5">
+      <Label>Role</Label>
+      <Select value={custom ? "custom" : value} onValueChange={(v) => onChange(v === "custom" ? value : v)}>
+        <SelectTrigger><SelectValue placeholder="Choose role" /></SelectTrigger>
+        <SelectContent>
+          {STAFF_ROLE_OPTIONS.map((role) => (
+            <SelectItem key={role} value={role}>{role}</SelectItem>
+          ))}
+          <SelectItem value="custom">Custom role</SelectItem>
+        </SelectContent>
+      </Select>
+      {(custom || value === "") && (
+        <Input placeholder="Type custom role" value={value} onChange={(e) => onChange(e.target.value)} />
+      )}
+    </div>
+  );
+}
+
+function MapEmbedControls({
+  address,
+  mapEmbed,
+  salon,
+  onAddressChange,
+  onMapEmbedChange,
+}: {
+  address: string;
+  mapEmbed: string;
+  salon: SalonBasics | null;
+  onAddressChange: (v: string) => void;
+  onMapEmbedChange: (v: string) => void;
+}) {
+  const [locating, setLocating] = useState(false);
+  const salonAddress = salon?.address ?? salon?.location ?? "";
+
+  const generateFromAddress = (value: string) => {
+    if (!value.trim()) {
+      toast.error("Address add karein pehle");
+      return;
+    }
+    onMapEmbedChange(mapsEmbedFromAddress(value));
+    toast.success("Map embed URL ready");
+  };
+
+  const useCurrentLocation = () => {
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      toast.error("Location access is not available in this browser");
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const text = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+        onAddressChange(text);
+        onMapEmbedChange(mapsEmbedFromCoords(latitude, longitude));
+        setLocating(false);
+        toast.success("Current location added");
+      },
+      () => {
+        setLocating(false);
+        toast.error("Location permission nahi mili");
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  };
+
+  return (
+    <div className="space-y-3 rounded-lg border bg-card p-3">
+      <div className="flex items-center gap-2 text-sm font-semibold">
+        <MapPinned className="h-4 w-4 text-muted-foreground" /> Google Map & Location
+      </div>
+      <TextField label="Address / Location" value={address} onChange={onAddressChange} />
+      <div className="grid gap-2 sm:grid-cols-2">
+        <Button type="button" variant="secondary" onClick={() => generateFromAddress(address)}>
+          Generate map from address
+        </Button>
+        <Button type="button" variant="outline" onClick={useCurrentLocation} disabled={locating}>
+          {locating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <MapPinned className="mr-2 h-4 w-4" />}
+          Use current location
+        </Button>
+      </div>
+      {salonAddress && (
+        <Button
+          type="button"
+          variant="ghost"
+          className="w-full justify-start text-left"
+          onClick={() => {
+            onAddressChange(salonAddress);
+            onMapEmbedChange(mapsEmbedFromAddress(salonAddress));
+          }}
+        >
+          Use saved salon address: {salonAddress}
+        </Button>
+      )}
+      <Field label="Google Map Embed URL" value={mapEmbed} onChange={onMapEmbedChange} />
+      {mapEmbed && (
+        <iframe title="Map preview" src={mapEmbed} className="h-44 w-full rounded-md border-0" loading="lazy" />
+      )}
+    </div>
+  );
+}
+
 function ItemsEditor({
   kind,
   items,
+  serviceOptions,
   salonId,
   websiteId,
   onChange,
 }: {
   kind: "services" | "rate_card" | "packages" | "staff";
   items: Item[];
+  serviceOptions: OwnerServiceOption[];
   salonId: string | null;
   websiteId: string | null;
   onChange: (next: Item[]) => void;
 }) {
   const isStaff = kind === "staff";
+  const canPickServices = kind === "services" || kind === "rate_card";
+  const selectedServiceIds = new Set(items.map((item) => item.id));
   const addLabel =
     kind === "services" ? "Add Service" :
     kind === "rate_card" ? "Add Rate" :
@@ -1032,6 +1423,21 @@ function ItemsEditor({
     onChange(items.map((it) => (it.id === id ? { ...it, ...p } : it)));
   const remove = (id: string) => onChange(items.filter((it) => it.id !== id));
   const add = () => onChange([...items, { id: newId() }]);
+  const toggleService = (service: OwnerServiceOption) => {
+    if (selectedServiceIds.has(service.id)) {
+      remove(service.id);
+      return;
+    }
+    onChange([...items, normalizeServiceItem(service)]);
+  };
+  const addAllServices = () => {
+    const existing = new Set(items.map((item) => item.id));
+    const next = [
+      ...items,
+      ...serviceOptions.filter((service) => !existing.has(service.id)).map(normalizeServiceItem),
+    ];
+    onChange(next);
+  };
 
   return (
     <div className="space-y-3">
@@ -1041,6 +1447,48 @@ function ItemsEditor({
           <Plus className="mr-1 h-4 w-4" /> {addLabel}
         </Button>
       </div>
+
+      {canPickServices && (
+        <div className="space-y-2 rounded-lg border bg-muted/30 p-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <ListChecks className="h-4 w-4 text-muted-foreground" /> Select from saved services
+            </div>
+            <Button type="button" size="sm" variant="ghost" onClick={addAllServices}>
+              Add all
+            </Button>
+          </div>
+          {serviceOptions.length === 0 ? (
+            <p className="rounded-md border border-dashed bg-background p-3 text-xs text-muted-foreground">
+              No saved services yet. Add services from the Services section or create manual items below.
+            </p>
+          ) : (
+            <div className="max-h-48 space-y-1 overflow-y-auto pr-1">
+              {serviceOptions.map((service) => {
+              const selected = selectedServiceIds.has(service.id);
+              return (
+                <button
+                  key={service.id}
+                  type="button"
+                  onClick={() => toggleService(service)}
+                  className={`flex w-full items-center justify-between gap-3 rounded-md border px-3 py-2 text-left text-xs transition ${
+                    selected ? "border-primary bg-primary/10" : "bg-background hover:border-primary/60"
+                  }`}
+                >
+                  <span className="min-w-0">
+                    <span className="block truncate font-medium">{service.name}</span>
+                    <span className="block truncate text-muted-foreground">
+                      {service.category ?? "General"} · {service.duration_minutes ?? 30} min
+                    </span>
+                  </span>
+                  <span className="shrink-0 font-semibold">₹{String(service.price ?? 0)}</span>
+                </button>
+              );
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       {items.length === 0 && (
         <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
@@ -1072,7 +1520,7 @@ function ItemsEditor({
 
             {isStaff ? (
               <>
-                <Field label="Role" value={it.role ?? ""} onChange={(v) => patch(it.id, { role: v })} />
+                <RoleSelect value={it.role ?? ""} onChange={(v) => patch(it.id, { role: v })} />
                 <TextField label="Bio" value={it.bio ?? ""} onChange={(v) => patch(it.id, { bio: v })} />
               </>
             ) : (
