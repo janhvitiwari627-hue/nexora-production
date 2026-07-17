@@ -1617,6 +1617,10 @@ function ItemsEditor({
   const isStaff = kind === "staff";
   const canPickServices = kind === "services" || kind === "rate_card";
   const selectedServiceIds = new Set(items.map((item) => item.id));
+  const dndSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
   const addLabel =
     kind === "services" ? "Add Service" :
     kind === "rate_card" ? "Add Rate" :
