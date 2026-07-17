@@ -1045,6 +1045,8 @@ export function WebsiteEditorPage() {
               content={content}
               salonId={salonId ?? null}
               websiteId={websiteId ?? null}
+              salon={selectedSalon ?? null}
+              serviceOptions={(ownerServicesQ.data ?? []) as OwnerServiceOption[]}
               onFieldChange={updateContent}
               onToggleVisible={(v) => patchSection(selected.id, { is_visible: v })}
             />
@@ -1122,6 +1124,8 @@ function SectionEditor({
   content,
   salonId,
   websiteId,
+  salon,
+  serviceOptions,
   onFieldChange,
   onToggleVisible,
 }: {
@@ -1129,6 +1133,8 @@ function SectionEditor({
   content: Record<string, unknown>;
   salonId: string | null;
   websiteId: string | null;
+  salon: SalonBasics | null;
+  serviceOptions: OwnerServiceOption[];
   onFieldChange: (field: string, value: unknown) => void;
   onToggleVisible: (v: boolean) => void;
 }) {
@@ -1175,8 +1181,13 @@ function SectionEditor({
           <Field label="Phone" value={str("phone")} onChange={(v) => onFieldChange("phone", v)} />
           <Field label="WhatsApp" value={str("whatsapp")} onChange={(v) => onFieldChange("whatsapp", v)} />
           <Field label="Email" value={str("email")} onChange={(v) => onFieldChange("email", v)} />
-          <TextField label="Address" value={str("address")} onChange={(v) => onFieldChange("address", v)} />
-          <Field label="Google Map Embed URL" value={str("mapEmbed")} onChange={(v) => onFieldChange("mapEmbed", v)} />
+          <MapEmbedControls
+            address={str("address")}
+            mapEmbed={str("mapEmbed")}
+            salon={salon}
+            onAddressChange={(v) => onFieldChange("address", v)}
+            onMapEmbedChange={(v) => onFieldChange("mapEmbed", v)}
+          />
         </>
       )}
 
@@ -1190,6 +1201,7 @@ function SectionEditor({
           <ItemsEditor
             kind={section.section_type}
             items={items}
+            serviceOptions={serviceOptions}
             salonId={salonId}
             websiteId={websiteId}
             onChange={setItems}
