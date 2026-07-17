@@ -383,7 +383,11 @@ export function PartnerOnboardingChecklist() {
                         ) : (
                           <RefreshCw className="mr-1 h-3 w-3" />
                         )}
-                        {lastFileRef.current ? "Retry upload" : "Choose file"}
+                        {uploading
+                          ? `Retrying… ${uploadProgress}%`
+                          : lastFileRef.current
+                            ? "Retry upload"
+                            : "Choose file"}
                       </Button>
                     </div>
                   )}
