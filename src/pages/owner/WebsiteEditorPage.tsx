@@ -2165,61 +2165,7 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
       </div>
 
 
-          {THEME_PRESETS.map((p) => {
-            const active =
-              theme.primary_color === p.theme.primary_color &&
-              theme.secondary_color === p.theme.secondary_color &&
-              theme.heading_font === p.theme.heading_font &&
-              theme.button_style === p.theme.button_style &&
-              (theme.extras.bg_style ?? "solid") === (p.theme.extras.bg_style ?? "solid");
-            const bgPreview = buildBgPreview(
-              (p.theme.extras.bg_style as BgStyle | undefined) ?? "solid",
-              p.theme,
-            );
-            return (
-              <button
-                key={p.key}
-                type="button"
-                onClick={() => onChange(p.theme)}
-                className={`group overflow-hidden rounded-lg border text-left transition ${
-                  active ? "border-primary ring-2 ring-primary/30" : "hover:border-primary/60"
-                }`}
-              >
-                <div className="relative p-2" style={bgPreview}>
-                  <div className="flex gap-1">
-                    {[p.theme.primary_color, p.theme.secondary_color, p.theme.accent_color, p.theme.text_color].map((c, i) => (
-                      <span key={i} className="h-4 w-4 rounded-full border border-black/10 shadow-sm" style={{ background: c }} />
-                    ))}
-                  </div>
-                  <div
-                    className="mt-6 text-sm font-semibold leading-tight"
-                    style={{ color: p.theme.text_color, fontFamily: p.theme.heading_font }}
-                  >
-                    Aa
-                  </div>
-                  <span
-                    className="absolute right-1.5 top-1.5 inline-block px-2 py-0.5 text-[10px]"
-                    style={{
-                      background: p.theme.secondary_color,
-                      color: p.theme.background_color,
-                      fontFamily: p.theme.body_font,
-                      borderRadius:
-                        p.theme.button_style === "pill" ? "9999px" :
-                        p.theme.button_style === "square" ? "0" : "4px",
-                    }}
-                  >
-                    Book
-                  </span>
-                </div>
-                <div className="border-t bg-card px-2 py-1.5">
-                  <div className="text-xs font-semibold" style={{ fontFamily: p.theme.heading_font }}>{p.name}</div>
-                  <div className="truncate text-[10px] text-muted-foreground">{p.description}</div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+
 
 
 
