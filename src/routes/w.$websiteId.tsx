@@ -125,13 +125,13 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
         >
           {c.imageUrl && <div className="absolute inset-0 bg-black/40" />}
           <div className="relative max-w-3xl">
-            <h1 className="text-4xl font-bold md:text-6xl">{c.heading || "Welcome"}</h1>
+            <h1 className="text-4xl font-bold md:text-6xl" style={{ fontFamily: "var(--w-heading-font)" }}>{c.heading || "Welcome"}</h1>
             {c.subheading && <p className="mt-4 text-lg opacity-90">{c.subheading}</p>}
             {c.buttonText && (
               <a
                 href={c.buttonLink || "#"}
-                className="mt-8 inline-block rounded-md px-6 py-3 font-medium"
-                style={{ background: "var(--w-secondary)", color: "#000" }}
+                className="mt-8 inline-block px-6 py-3 font-medium"
+                style={{ background: "var(--w-secondary)", color: "#000", borderRadius: "var(--w-btn-radius)" }}
               >
                 {c.buttonText}
               </a>
