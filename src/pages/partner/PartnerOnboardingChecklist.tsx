@@ -210,7 +210,13 @@ export function PartnerOnboardingChecklist() {
       } else {
         setUploadErrorDetails({ raw });
       }
-      announceAlert(`Upload failed. ${friendly}. Retry button available.`);
+      const statusPart =
+        err instanceof CloudinaryUploadError && err.status
+          ? ` Status ${err.status}${err.statusText ? ` ${err.statusText}` : ""}.`
+          : "";
+      announceAlert(
+        `Upload failed for ${file.name}.${statusPart} Reason: ${friendly}. Retry button available.`,
+      );
       toast.error(friendly);
       lastFileRef.current = file;
       if (!keepPreview && localPreview) {
