@@ -579,7 +579,7 @@ export function PartnerOnboardingChecklist() {
                         </div>
                         <span
                           className="min-w-[3ch] text-right text-[11px] font-bold tabular-nums text-slate-600"
-                          aria-live="polite"
+                          aria-hidden="true"
                         >
                           {uploadProgress}%
                         </span>
