@@ -558,6 +558,25 @@ export function PartnerOnboardingChecklist() {
                       : "Drag & drop image here, Enter/Space press karein, ya button click karein"}
                   </p>
 
+                  {/* Screen-reader only live regions for upload lifecycle */}
+                  <div
+                    role="status"
+                    aria-live="polite"
+                    aria-atomic="true"
+                    className="sr-only"
+                  >
+                    {srStatus}
+                  </div>
+                  <div
+                    role="alert"
+                    aria-live="assertive"
+                    aria-atomic="true"
+                    className="sr-only"
+                  >
+                    {srAlert}
+                  </div>
+
+
 
                   {uploading && (
                     <div className="space-y-1.5">
