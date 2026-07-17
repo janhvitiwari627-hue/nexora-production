@@ -59,7 +59,6 @@ const DEFAULT_EXTRAS: ThemeExtras = {
   nav_links: DEFAULT_NAV,
   site_title: "Home",
 };
-};
 
 const DEFAULT_THEME: ThemeState = {
   primary_color: "#111827",
