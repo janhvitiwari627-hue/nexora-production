@@ -3,7 +3,7 @@
   "short_name": "Nexora Partner",
   "id": "/apps/partner",
   "description": "Onboard salons and manage partner work.",
-  "start_url": "/partner?source=pwa",
+  "start_url": "/app/partner?source=pwa",
   "scope": "/",
   "display": "standalone",
   "background_color": "#f8fafc",

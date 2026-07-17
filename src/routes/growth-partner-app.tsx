@@ -14,7 +14,7 @@ function GrowthPartnerAppPage() {
       eyebrow="Growth Partner App"
       title="Apne area ke salons ko digital banaiye."
       description="Leads, salon onboarding, training, milestones and commission ke liye ek focused partner app."
-      startPath="/partner"
+      startPath="/app/partner"
       audience="Nexora growth partners"
       features={[
         {

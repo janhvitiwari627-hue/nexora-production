@@ -25,7 +25,7 @@ const requiredRoutes = [
 const manifests = [
   ["customer", "/apps/customer", "/app/customer"],
   ["owner", "/apps/owner", "/app/owner"],
-  ["partner", "/apps/partner", "/partner"],
+  ["partner", "/apps/partner", "/app/partner"],
   ["distributor", "/apps/distributor", "/portal"],
   ["jobs", "/apps/jobs", "/app/jobs"],
 ];

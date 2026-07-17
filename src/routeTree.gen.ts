@@ -127,6 +127,7 @@ import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as BrandSlugRouteImport } from './routes/brand.$slug'
 import { Route as BookSlugRouteImport } from './routes/book.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as AppPartnerRouteImport } from './routes/app.partner'
 import { Route as AppOwnerRouteImport } from './routes/app.owner'
 import { Route as AppJobsRouteImport } from './routes/app.jobs'
 import { Route as AppCustomerRouteImport } from './routes/app.customer'
@@ -149,6 +150,7 @@ import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } fr
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as PortalDistributorsIndexRouteImport } from './routes/portal.distributors.index'
 import { Route as PortalBrandsIndexRouteImport } from './routes/portal.brands.index'
+import { Route as AppPartnerIndexRouteImport } from './routes/app.partner.index'
 import { Route as AppOwnerIndexRouteImport } from './routes/app.owner.index'
 import { Route as AppJobsIndexRouteImport } from './routes/app.jobs.index'
 import { Route as AppCustomerIndexRouteImport } from './routes/app.customer.index'
@@ -164,6 +166,11 @@ import { Route as OwnerWebsiteEditRouteImport } from './routes/owner.website.edi
 import { Route as OwnerJobsNewRouteImport } from './routes/owner.jobs.new'
 import { Route as JobsApplicationsJobIdRouteImport } from './routes/jobs.applications.$jobId'
 import { Route as DashboardBookingsIdRouteImport } from './routes/dashboard.bookings.$id'
+import { Route as AppPartnerTrainingRouteImport } from './routes/app.partner.training'
+import { Route as AppPartnerShopsRouteImport } from './routes/app.partner.shops'
+import { Route as AppPartnerProfileRouteImport } from './routes/app.partner.profile'
+import { Route as AppPartnerLeadsRouteImport } from './routes/app.partner.leads'
+import { Route as AppPartnerEarningsRouteImport } from './routes/app.partner.earnings'
 import { Route as AppOwnerWebsiteEditorRouteImport } from './routes/app.owner.website-editor'
 import { Route as AppOwnerWebsiteRouteImport } from './routes/app.owner.website'
 import { Route as AppOwnerWalletRouteImport } from './routes/app.owner.wallet'
@@ -779,6 +786,11 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppPartnerRoute = AppPartnerRouteImport.update({
+  id: '/app/partner',
+  path: '/app/partner',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppOwnerRoute = AppOwnerRouteImport.update({
   id: '/app/owner',
   path: '/app/owner',
@@ -892,6 +904,11 @@ const PortalBrandsIndexRoute = PortalBrandsIndexRouteImport.update({
   path: '/portal/brands/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppPartnerIndexRoute = AppPartnerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppPartnerRoute,
+} as any)
 const AppOwnerIndexRoute = AppOwnerIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -967,6 +984,31 @@ const DashboardBookingsIdRoute = DashboardBookingsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => DashboardBookingsRoute,
+} as any)
+const AppPartnerTrainingRoute = AppPartnerTrainingRouteImport.update({
+  id: '/training',
+  path: '/training',
+  getParentRoute: () => AppPartnerRoute,
+} as any)
+const AppPartnerShopsRoute = AppPartnerShopsRouteImport.update({
+  id: '/shops',
+  path: '/shops',
+  getParentRoute: () => AppPartnerRoute,
+} as any)
+const AppPartnerProfileRoute = AppPartnerProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppPartnerRoute,
+} as any)
+const AppPartnerLeadsRoute = AppPartnerLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => AppPartnerRoute,
+} as any)
+const AppPartnerEarningsRoute = AppPartnerEarningsRouteImport.update({
+  id: '/earnings',
+  path: '/earnings',
+  getParentRoute: () => AppPartnerRoute,
 } as any)
 const AppOwnerWebsiteEditorRoute = AppOwnerWebsiteEditorRouteImport.update({
   id: '/website-editor',
@@ -1159,6 +1201,7 @@ export interface FileRoutesByFullPath {
   '/app/customer': typeof AppCustomerRouteWithChildren
   '/app/jobs': typeof AppJobsRouteWithChildren
   '/app/owner': typeof AppOwnerRouteWithChildren
+  '/app/partner': typeof AppPartnerRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/book/$slug': typeof BookSlugRoute
   '/brand/$slug': typeof BrandSlugRoute
@@ -1251,6 +1294,11 @@ export interface FileRoutesByFullPath {
   '/app/owner/wallet': typeof AppOwnerWalletRoute
   '/app/owner/website': typeof AppOwnerWebsiteRoute
   '/app/owner/website-editor': typeof AppOwnerWebsiteEditorRoute
+  '/app/partner/earnings': typeof AppPartnerEarningsRoute
+  '/app/partner/leads': typeof AppPartnerLeadsRoute
+  '/app/partner/profile': typeof AppPartnerProfileRoute
+  '/app/partner/shops': typeof AppPartnerShopsRoute
+  '/app/partner/training': typeof AppPartnerTrainingRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
@@ -1266,6 +1314,7 @@ export interface FileRoutesByFullPath {
   '/app/customer/': typeof AppCustomerIndexRoute
   '/app/jobs/': typeof AppJobsIndexRoute
   '/app/owner/': typeof AppOwnerIndexRoute
+  '/app/partner/': typeof AppPartnerIndexRoute
   '/portal/brands/': typeof PortalBrandsIndexRoute
   '/portal/distributors/': typeof PortalDistributorsIndexRoute
   '/api/public/auth/forgot-password': typeof ApiPublicAuthForgotPasswordRoute
@@ -1425,6 +1474,11 @@ export interface FileRoutesByTo {
   '/app/owner/wallet': typeof AppOwnerWalletRoute
   '/app/owner/website': typeof AppOwnerWebsiteRoute
   '/app/owner/website-editor': typeof AppOwnerWebsiteEditorRoute
+  '/app/partner/earnings': typeof AppPartnerEarningsRoute
+  '/app/partner/leads': typeof AppPartnerLeadsRoute
+  '/app/partner/profile': typeof AppPartnerProfileRoute
+  '/app/partner/shops': typeof AppPartnerShopsRoute
+  '/app/partner/training': typeof AppPartnerTrainingRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
@@ -1440,6 +1494,7 @@ export interface FileRoutesByTo {
   '/app/customer': typeof AppCustomerIndexRoute
   '/app/jobs': typeof AppJobsIndexRoute
   '/app/owner': typeof AppOwnerIndexRoute
+  '/app/partner': typeof AppPartnerIndexRoute
   '/portal/brands': typeof PortalBrandsIndexRoute
   '/portal/distributors': typeof PortalDistributorsIndexRoute
   '/api/public/auth/forgot-password': typeof ApiPublicAuthForgotPasswordRoute
@@ -1515,6 +1570,7 @@ export interface FileRoutesById {
   '/app/customer': typeof AppCustomerRouteWithChildren
   '/app/jobs': typeof AppJobsRouteWithChildren
   '/app/owner': typeof AppOwnerRouteWithChildren
+  '/app/partner': typeof AppPartnerRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/book/$slug': typeof BookSlugRoute
   '/brand/$slug': typeof BrandSlugRoute
@@ -1607,6 +1663,11 @@ export interface FileRoutesById {
   '/app/owner/wallet': typeof AppOwnerWalletRoute
   '/app/owner/website': typeof AppOwnerWebsiteRoute
   '/app/owner/website-editor': typeof AppOwnerWebsiteEditorRoute
+  '/app/partner/earnings': typeof AppPartnerEarningsRoute
+  '/app/partner/leads': typeof AppPartnerLeadsRoute
+  '/app/partner/profile': typeof AppPartnerProfileRoute
+  '/app/partner/shops': typeof AppPartnerShopsRoute
+  '/app/partner/training': typeof AppPartnerTrainingRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
@@ -1622,6 +1683,7 @@ export interface FileRoutesById {
   '/app/customer/': typeof AppCustomerIndexRoute
   '/app/jobs/': typeof AppJobsIndexRoute
   '/app/owner/': typeof AppOwnerIndexRoute
+  '/app/partner/': typeof AppPartnerIndexRoute
   '/portal/brands/': typeof PortalBrandsIndexRoute
   '/portal/distributors/': typeof PortalDistributorsIndexRoute
   '/api/public/auth/forgot-password': typeof ApiPublicAuthForgotPasswordRoute
@@ -1698,6 +1760,7 @@ export interface FileRouteTypes {
     | '/app/customer'
     | '/app/jobs'
     | '/app/owner'
+    | '/app/partner'
     | '/auth/callback'
     | '/book/$slug'
     | '/brand/$slug'
@@ -1790,6 +1853,11 @@ export interface FileRouteTypes {
     | '/app/owner/wallet'
     | '/app/owner/website'
     | '/app/owner/website-editor'
+    | '/app/partner/earnings'
+    | '/app/partner/leads'
+    | '/app/partner/profile'
+    | '/app/partner/shops'
+    | '/app/partner/training'
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
     | '/owner/jobs/new'
@@ -1805,6 +1873,7 @@ export interface FileRouteTypes {
     | '/app/customer/'
     | '/app/jobs/'
     | '/app/owner/'
+    | '/app/partner/'
     | '/portal/brands/'
     | '/portal/distributors/'
     | '/api/public/auth/forgot-password'
@@ -1964,6 +2033,11 @@ export interface FileRouteTypes {
     | '/app/owner/wallet'
     | '/app/owner/website'
     | '/app/owner/website-editor'
+    | '/app/partner/earnings'
+    | '/app/partner/leads'
+    | '/app/partner/profile'
+    | '/app/partner/shops'
+    | '/app/partner/training'
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
     | '/owner/jobs/new'
@@ -1979,6 +2053,7 @@ export interface FileRouteTypes {
     | '/app/customer'
     | '/app/jobs'
     | '/app/owner'
+    | '/app/partner'
     | '/portal/brands'
     | '/portal/distributors'
     | '/api/public/auth/forgot-password'
@@ -2053,6 +2128,7 @@ export interface FileRouteTypes {
     | '/app/customer'
     | '/app/jobs'
     | '/app/owner'
+    | '/app/partner'
     | '/auth/callback'
     | '/book/$slug'
     | '/brand/$slug'
@@ -2145,6 +2221,11 @@ export interface FileRouteTypes {
     | '/app/owner/wallet'
     | '/app/owner/website'
     | '/app/owner/website-editor'
+    | '/app/partner/earnings'
+    | '/app/partner/leads'
+    | '/app/partner/profile'
+    | '/app/partner/shops'
+    | '/app/partner/training'
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
     | '/owner/jobs/new'
@@ -2160,6 +2241,7 @@ export interface FileRouteTypes {
     | '/app/customer/'
     | '/app/jobs/'
     | '/app/owner/'
+    | '/app/partner/'
     | '/portal/brands/'
     | '/portal/distributors/'
     | '/api/public/auth/forgot-password'
@@ -2220,6 +2302,7 @@ export interface RootRouteChildren {
   AppCustomerRoute: typeof AppCustomerRouteWithChildren
   AppJobsRoute: typeof AppJobsRouteWithChildren
   AppOwnerRoute: typeof AppOwnerRouteWithChildren
+  AppPartnerRoute: typeof AppPartnerRouteWithChildren
   AuthCallbackRoute: typeof AuthCallbackRoute
   BookSlugRoute: typeof BookSlugRoute
   BrandSlugRoute: typeof BrandSlugRoute
@@ -3099,6 +3182,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/partner': {
+      id: '/app/partner'
+      path: '/app/partner'
+      fullPath: '/app/partner'
+      preLoaderRoute: typeof AppPartnerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/owner': {
       id: '/app/owner'
       path: '/app/owner'
@@ -3253,6 +3343,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalBrandsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/partner/': {
+      id: '/app/partner/'
+      path: '/'
+      fullPath: '/app/partner/'
+      preLoaderRoute: typeof AppPartnerIndexRouteImport
+      parentRoute: typeof AppPartnerRoute
+    }
     '/app/owner/': {
       id: '/app/owner/'
       path: '/'
@@ -3357,6 +3454,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/bookings/$id'
       preLoaderRoute: typeof DashboardBookingsIdRouteImport
       parentRoute: typeof DashboardBookingsRoute
+    }
+    '/app/partner/training': {
+      id: '/app/partner/training'
+      path: '/training'
+      fullPath: '/app/partner/training'
+      preLoaderRoute: typeof AppPartnerTrainingRouteImport
+      parentRoute: typeof AppPartnerRoute
+    }
+    '/app/partner/shops': {
+      id: '/app/partner/shops'
+      path: '/shops'
+      fullPath: '/app/partner/shops'
+      preLoaderRoute: typeof AppPartnerShopsRouteImport
+      parentRoute: typeof AppPartnerRoute
+    }
+    '/app/partner/profile': {
+      id: '/app/partner/profile'
+      path: '/profile'
+      fullPath: '/app/partner/profile'
+      preLoaderRoute: typeof AppPartnerProfileRouteImport
+      parentRoute: typeof AppPartnerRoute
+    }
+    '/app/partner/leads': {
+      id: '/app/partner/leads'
+      path: '/leads'
+      fullPath: '/app/partner/leads'
+      preLoaderRoute: typeof AppPartnerLeadsRouteImport
+      parentRoute: typeof AppPartnerRoute
+    }
+    '/app/partner/earnings': {
+      id: '/app/partner/earnings'
+      path: '/earnings'
+      fullPath: '/app/partner/earnings'
+      preLoaderRoute: typeof AppPartnerEarningsRouteImport
+      parentRoute: typeof AppPartnerRoute
     }
     '/app/owner/website-editor': {
       id: '/app/owner/website-editor'
@@ -3786,6 +3918,28 @@ const AppOwnerRouteWithChildren = AppOwnerRoute._addFileChildren(
   AppOwnerRouteChildren,
 )
 
+interface AppPartnerRouteChildren {
+  AppPartnerEarningsRoute: typeof AppPartnerEarningsRoute
+  AppPartnerLeadsRoute: typeof AppPartnerLeadsRoute
+  AppPartnerProfileRoute: typeof AppPartnerProfileRoute
+  AppPartnerShopsRoute: typeof AppPartnerShopsRoute
+  AppPartnerTrainingRoute: typeof AppPartnerTrainingRoute
+  AppPartnerIndexRoute: typeof AppPartnerIndexRoute
+}
+
+const AppPartnerRouteChildren: AppPartnerRouteChildren = {
+  AppPartnerEarningsRoute: AppPartnerEarningsRoute,
+  AppPartnerLeadsRoute: AppPartnerLeadsRoute,
+  AppPartnerProfileRoute: AppPartnerProfileRoute,
+  AppPartnerShopsRoute: AppPartnerShopsRoute,
+  AppPartnerTrainingRoute: AppPartnerTrainingRoute,
+  AppPartnerIndexRoute: AppPartnerIndexRoute,
+}
+
+const AppPartnerRouteWithChildren = AppPartnerRoute._addFileChildren(
+  AppPartnerRouteChildren,
+)
+
 interface JobsApplicationsRouteChildren {
   JobsApplicationsJobIdRoute: typeof JobsApplicationsJobIdRoute
 }
@@ -3846,6 +4000,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppCustomerRoute: AppCustomerRouteWithChildren,
   AppJobsRoute: AppJobsRouteWithChildren,
   AppOwnerRoute: AppOwnerRouteWithChildren,
+  AppPartnerRoute: AppPartnerRouteWithChildren,
   AuthCallbackRoute: AuthCallbackRoute,
   BookSlugRoute: BookSlugRoute,
   BrandSlugRoute: BrandSlugRoute,

@@ -14,7 +14,12 @@ export function appKindForPath(pathname: string): NexoraAppKind {
   if (pathname.startsWith("/app/owner")) return "owner";
   if (pathname.startsWith("/app/jobs")) return "jobs";
   if (pathname.startsWith("/owner") || pathname === "/shop-owner-app") return "owner";
-  if (pathname.startsWith("/partner") || pathname === "/growth-partner-app") return "partner";
+  if (
+    pathname.startsWith("/partner") ||
+    pathname.startsWith("/app/partner") ||
+    pathname === "/growth-partner-app"
+  )
+    return "partner";
   if (pathname.startsWith("/portal") || pathname === "/distributor-app") return "distributor";
   if (pathname.startsWith("/jobs") || pathname.startsWith("/hire") || pathname === "/jobs-app") {
     return "jobs";

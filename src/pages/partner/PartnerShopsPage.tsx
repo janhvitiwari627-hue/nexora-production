@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "@tanstack/react-router";
 import { Search, Store, Filter, Download, Plus } from "lucide-react";
 import { useState } from "react";
 import { PartnerPageShell } from "./PartnerAppLayout";
@@ -21,40 +22,94 @@ type Shop = {
 
 const SHOPS: Shop[] = [
   {
-    name: "Glow Studio", owner: "Priya Sharma", mobile: "98765 43210",
-    area: "Malviya Nagar", district: "Jaipur", website: "Published",
-    verification: "Verified", qr: "Active", active: "Active",
-    todayCollection: "₹2,100", totalRevenue: "₹42,300", commission: "₹4,230", activationDay: 15,
+    name: "Glow Studio",
+    owner: "Priya Sharma",
+    mobile: "98765 43210",
+    area: "Malviya Nagar",
+    district: "Jaipur",
+    website: "Published",
+    verification: "Verified",
+    qr: "Active",
+    active: "Active",
+    todayCollection: "₹2,100",
+    totalRevenue: "₹42,300",
+    commission: "₹4,230",
+    activationDay: 15,
   },
   {
-    name: "The Barber Loft", owner: "Rahul Verma", mobile: "97845 21390",
-    area: "C-Scheme", district: "Jaipur", website: "Published",
-    verification: "Verified", qr: "Active", active: "Active",
-    todayCollection: "₹1,650", totalRevenue: "₹28,900", commission: "₹2,890", activationDay: 15,
+    name: "The Barber Loft",
+    owner: "Rahul Verma",
+    mobile: "97845 21390",
+    area: "C-Scheme",
+    district: "Jaipur",
+    website: "Published",
+    verification: "Verified",
+    qr: "Active",
+    active: "Active",
+    todayCollection: "₹1,650",
+    totalRevenue: "₹28,900",
+    commission: "₹2,890",
+    activationDay: 15,
   },
   {
-    name: "Blush Salon", owner: "Neha Gupta", mobile: "99887 66554",
-    area: "Vaishali", district: "Jaipur", website: "Draft",
-    verification: "Pending", qr: "Inactive", active: "Onboarding",
-    todayCollection: "—", totalRevenue: "—", commission: "—", activationDay: 3,
+    name: "Blush Salon",
+    owner: "Neha Gupta",
+    mobile: "99887 66554",
+    area: "Vaishali",
+    district: "Jaipur",
+    website: "Draft",
+    verification: "Pending",
+    qr: "Inactive",
+    active: "Onboarding",
+    todayCollection: "—",
+    totalRevenue: "—",
+    commission: "—",
+    activationDay: 3,
   },
   {
-    name: "Nailed It", owner: "Aarti Singh", mobile: "98123 45678",
-    area: "Jagatpura", district: "Jaipur", website: "Published",
-    verification: "Verified", qr: "Active", active: "Active",
-    todayCollection: "₹980", totalRevenue: "₹18,400", commission: "₹1,840", activationDay: 12,
+    name: "Nailed It",
+    owner: "Aarti Singh",
+    mobile: "98123 45678",
+    area: "Jagatpura",
+    district: "Jaipur",
+    website: "Published",
+    verification: "Verified",
+    qr: "Active",
+    active: "Active",
+    todayCollection: "₹980",
+    totalRevenue: "₹18,400",
+    commission: "₹1,840",
+    activationDay: 12,
   },
   {
-    name: "Elegance Spa", owner: "Meera Kapoor", mobile: "97001 55889",
-    area: "Mansarovar", district: "Jaipur", website: "Published",
-    verification: "Verified", qr: "Active", active: "Active",
-    todayCollection: "₹3,200", totalRevenue: "₹56,700", commission: "₹5,670", activationDay: 15,
+    name: "Elegance Spa",
+    owner: "Meera Kapoor",
+    mobile: "97001 55889",
+    area: "Mansarovar",
+    district: "Jaipur",
+    website: "Published",
+    verification: "Verified",
+    qr: "Active",
+    active: "Active",
+    todayCollection: "₹3,200",
+    totalRevenue: "₹56,700",
+    commission: "₹5,670",
+    activationDay: 15,
   },
   {
-    name: "Cuts & Curls", owner: "Vikas Yadav", mobile: "98555 21467",
-    area: "Sitapura", district: "Jaipur", website: "Pending",
-    verification: "Pending", qr: "Inactive", active: "Onboarding",
-    todayCollection: "—", totalRevenue: "—", commission: "—", activationDay: 1,
+    name: "Cuts & Curls",
+    owner: "Vikas Yadav",
+    mobile: "98555 21467",
+    area: "Sitapura",
+    district: "Jaipur",
+    website: "Pending",
+    verification: "Pending",
+    qr: "Inactive",
+    active: "Onboarding",
+    todayCollection: "—",
+    totalRevenue: "—",
+    commission: "—",
+    activationDay: 1,
   },
 ];
 
@@ -66,7 +121,9 @@ function statusPill(text: string, tone: "green" | "amber" | "red" | "slate") {
     slate: "bg-slate-100 text-slate-600",
   };
   return (
-    <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${map[tone]}`}>
+    <span
+      className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${map[tone]}`}
+    >
       {text}
     </span>
   );
@@ -148,11 +205,17 @@ export function PartnerShopsPage() {
                     <div className="text-xs text-slate-500">{s.district}</div>
                   </td>
                   <td className="px-4 py-3">{statusPill(s.website, toneFor(s.website))}</td>
-                  <td className="px-4 py-3">{statusPill(s.verification, toneFor(s.verification))}</td>
+                  <td className="px-4 py-3">
+                    {statusPill(s.verification, toneFor(s.verification))}
+                  </td>
                   <td className="px-4 py-3">{statusPill(s.qr, toneFor(s.qr))}</td>
                   <td className="px-4 py-3">{statusPill(s.active, toneFor(s.active))}</td>
-                  <td className="px-4 py-3 text-right font-bold text-[#0B1330]">{s.todayCollection}</td>
-                  <td className="px-4 py-3 text-right font-bold text-[#0B1330]">{s.totalRevenue}</td>
+                  <td className="px-4 py-3 text-right font-bold text-[#0B1330]">
+                    {s.todayCollection}
+                  </td>
+                  <td className="px-4 py-3 text-right font-bold text-[#0B1330]">
+                    {s.totalRevenue}
+                  </td>
                   <td className="px-4 py-3 text-right font-bold text-[#16A34A]">{s.commission}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
@@ -174,9 +237,12 @@ export function PartnerShopsPage() {
 
       {/* Add shop */}
       <div className="mt-6 flex justify-end">
-        <button className="inline-flex items-center gap-2 rounded-xl bg-[#0B1330] px-4 py-2.5 text-sm font-bold text-white hover:-translate-y-0.5 transition-transform">
+        <Link
+          to="/app/partner/leads"
+          className="inline-flex items-center gap-2 rounded-xl bg-[#0B1330] px-4 py-2.5 text-sm font-bold text-white hover:-translate-y-0.5 transition-transform"
+        >
           <Plus className="h-4 w-4" /> Add new shop
-        </button>
+        </Link>
       </div>
     </PartnerPageShell>
   );

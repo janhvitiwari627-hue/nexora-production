@@ -40,7 +40,7 @@ const ROLE_CARDS = [
     to: "/growth-partner-app",
     action: "Partner App",
     kind: "partner",
-    startPath: "/partner",
+    startPath: "/app/partner",
   },
   {
     icon: Truck,
