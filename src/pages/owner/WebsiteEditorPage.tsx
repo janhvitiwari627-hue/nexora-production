@@ -953,6 +953,17 @@ function SectionEditor({
               <Field label="Button Link" value={str("buttonLink")} onChange={(v) => onFieldChange("buttonLink", v)} />
             </>
           )}
+          {section.section_type === "gallery" && (
+            <GalleryGridControls
+              gridAspect={(content.gridAspect as string) || "square"}
+              gridColumns={typeof content.gridColumns === "number" ? (content.gridColumns as number) : 4}
+              imageFit={(content.imageFit as string) || "cover"}
+              gap={typeof content.gridGap === "number" ? (content.gridGap as number) : 12}
+              onChange={(patch) => {
+                for (const [k, v] of Object.entries(patch)) onFieldChange(k, v);
+              }}
+            />
+          )}
           <GenericItemsEditor
             kind={section.section_type}
             items={items}
