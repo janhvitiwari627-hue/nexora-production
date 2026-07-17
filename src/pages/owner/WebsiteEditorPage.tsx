@@ -9,6 +9,9 @@ import {
   updateTheme,
   publishWebsite,
   reorderSections,
+  listWebsiteVersions,
+  saveDraftVersion,
+  restoreWebsiteVersion,
   type WebsiteSection,
   type SectionType,
 } from "@/lib/website-editor.functions";
@@ -20,8 +23,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "sonner";
-import { Loader2, Eye, EyeOff, Globe, Plus, Trash2, Upload, Image as ImageIcon, Palette, GripVertical } from "lucide-react";
+import { Loader2, Eye, EyeOff, Globe, Plus, Trash2, Upload, Image as ImageIcon, Palette, GripVertical, History, Undo2, Save } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -208,6 +212,11 @@ export function WebsiteEditorPage() {
   const saveTheme = useServerFn(updateTheme);
   const doPublish = useServerFn(publishWebsite);
   const saveOrder = useServerFn(reorderSections);
+  const fetchVersions = useServerFn(listWebsiteVersions);
+  const doSaveVersion = useServerFn(saveDraftVersion);
+  const doRestoreVersion = useServerFn(restoreWebsiteVersion);
+
+
 
   const salonsQ = useQuery({ queryKey: ["my-owned-salons-editor"], queryFn: () => fetchSalons() });
   const salonId = salonsQ.data?.[0]?.salon?.id;
@@ -312,6 +321,58 @@ export function WebsiteEditorPage() {
     patchSection(selected.id, { content: nextContent as WebsiteSection["content"] });
   }
 
+  // ---- Versions / Undo ----
+  type VersionRow = { id: string; note: string | null; created_at: string };
+  const [versions, setVersions] = useState<VersionRow[]>([]);
+  const [versionsOpen, setVersionsOpen] = useState(false);
+  const [versionsLoading, setVersionsLoading] = useState(false);
+  const [restoring, setRestoring] = useState<string | null>(null);
+  const [savingVersion, setSavingVersion] = useState(false);
+
+  async function refreshVersions() {
+    if (!websiteId) return;
+    setVersionsLoading(true);
+    try {
+      const rows = await fetchVersions({ data: { websiteId } });
+      setVersions(rows as VersionRow[]);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to load history");
+    } finally {
+      setVersionsLoading(false);
+    }
+  }
+
+  async function handleSaveVersion() {
+    if (!websiteId) return;
+    setSavingVersion(true);
+    try {
+      await doSaveVersion({ data: { websiteId } });
+      toast.success("Version saved");
+      await refreshVersions();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Save version failed");
+    } finally {
+      setSavingVersion(false);
+    }
+  }
+
+  async function handleRestoreVersion(versionId: string) {
+    if (!websiteId) return;
+    setRestoring(versionId);
+    try {
+      await doRestoreVersion({ data: { versionId } });
+      toast.success("Restored");
+      await bundleQ.refetch();
+      await refreshVersions();
+      setVersionsOpen(false);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Restore failed");
+    } finally {
+      setRestoring(null);
+    }
+  }
+
+
   async function handlePublish() {
     if (!websiteId) return;
     setPublishing(true);
@@ -392,6 +453,66 @@ export function WebsiteEditorPage() {
               <Eye className="h-4 w-4" /> Preview
             </a>
           )}
+          <Button variant="outline" size="sm" onClick={handleSaveVersion} disabled={savingVersion || !websiteId}>
+            {savingVersion ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Save className="mr-1 h-4 w-4" />}
+            Save version
+          </Button>
+          <Popover
+            open={versionsOpen}
+            onOpenChange={(o) => {
+              setVersionsOpen(o);
+              if (o) void refreshVersions();
+            }}
+          >
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" disabled={!websiteId}>
+                <History className="mr-1 h-4 w-4" /> History
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-80 p-0">
+              <div className="border-b p-3">
+                <div className="text-sm font-semibold">Version history</div>
+                <div className="text-xs text-muted-foreground">Last {10} saves. Restore to undo.</div>
+              </div>
+              <div className="max-h-80 overflow-y-auto">
+                {versionsLoading ? (
+                  <div className="flex items-center justify-center p-6">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  </div>
+                ) : versions.length === 0 ? (
+                  <p className="p-4 text-sm text-muted-foreground">
+                    No versions yet. Click <strong>Save version</strong> or publish to create one.
+                  </p>
+                ) : (
+                  <ul className="divide-y">
+                    {versions.map((v) => (
+                      <li key={v.id} className="flex items-center justify-between gap-2 p-3">
+                        <div className="min-w-0">
+                          <div className="truncate text-sm font-medium">{v.note || "Draft"}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {new Date(v.created_at).toLocaleString()}
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => handleRestoreVersion(v.id)}
+                          disabled={restoring !== null}
+                        >
+                          {restoring === v.id ? (
+                            <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                          ) : (
+                            <Undo2 className="mr-1 h-3 w-3" />
+                          )}
+                          Restore
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
           <Button onClick={handlePublish} disabled={publishing}>
             {publishing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Globe className="mr-2 h-4 w-4" />}
             Publish

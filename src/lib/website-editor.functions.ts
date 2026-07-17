@@ -279,3 +279,142 @@ export const getPublishedWebsite = createServerFn({ method: "GET" })
       theme: snapshot?.theme ?? null,
     };
   });
+
+// ---- Versions (Undo history) ----
+const MAX_VERSIONS = 10;
+
+async function snapshotAndPrune(
+  supabase: import("@supabase/supabase-js").SupabaseClient,
+  websiteId: string,
+  userId: string,
+  note: string,
+) {
+  const [{ data: sections }, { data: theme }] = await Promise.all([
+    supabase.from("website_sections").select("*").eq("website_id", websiteId),
+    supabase.from("website_theme").select("*").eq("website_id", websiteId).maybeSingle(),
+  ]);
+  const snapshot = { sections: sections ?? [], theme: theme ?? null };
+  await supabase
+    .from("website_versions")
+    .insert({ website_id: websiteId, snapshot, note, created_by: userId });
+
+  // Keep only latest MAX_VERSIONS
+  const { data: rows } = await supabase
+    .from("website_versions")
+    .select("id, created_at")
+    .eq("website_id", websiteId)
+    .order("created_at", { ascending: false });
+  const excess = (rows ?? []).slice(MAX_VERSIONS);
+  if (excess.length > 0) {
+    await supabase
+      .from("website_versions")
+      .delete()
+      .in("id", excess.map((r) => (r as { id: string }).id));
+  }
+  return snapshot;
+}
+
+export const listWebsiteVersions = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ websiteId: z.string().uuid() }).parse(d))
+  .handler(async ({ context, data }) => {
+    const { supabase } = context;
+    const { data: rows, error } = await supabase
+      .from("website_versions")
+      .select("id, note, created_at, created_by")
+      .eq("website_id", data.websiteId)
+      .order("created_at", { ascending: false })
+      .limit(MAX_VERSIONS);
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+export const saveDraftVersion = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z.object({ websiteId: z.string().uuid(), note: z.string().max(200).optional() }).parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    // Verify ownership
+    const { data: w, error } = await supabase
+      .from("user_websites")
+      .select("id")
+      .eq("id", data.websiteId)
+      .eq("owner_id", userId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!w) throw new Error("Website not found");
+    await snapshotAndPrune(supabase, data.websiteId, userId, data.note?.trim() || "Draft saved");
+    return { ok: true };
+  });
+
+export const restoreWebsiteVersion = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ versionId: z.string().uuid() }).parse(d))
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    const { data: version, error } = await supabase
+      .from("website_versions")
+      .select("id, website_id, snapshot")
+      .eq("id", data.versionId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!version) throw new Error("Version not found");
+
+    const websiteId = (version as { website_id: string }).website_id;
+
+    // Verify ownership
+    const { data: w } = await supabase
+      .from("user_websites")
+      .select("id")
+      .eq("id", websiteId)
+      .eq("owner_id", userId)
+      .maybeSingle();
+    if (!w) throw new Error("Not authorized");
+
+    // Snapshot current state first so restore itself is undoable
+    await snapshotAndPrune(supabase, websiteId, userId, "Before restore");
+
+    const snap = (version as { snapshot: unknown }).snapshot as {
+      sections?: Array<Record<string, unknown>>;
+      theme?: Record<string, unknown> | null;
+    };
+
+    // Wipe & re-insert sections
+    await supabase.from("website_sections").delete().eq("website_id", websiteId);
+    const toInsert = (snap.sections ?? []).map((s, i) => ({
+      website_id: websiteId,
+      section_type: (s as { section_type: string }).section_type,
+      content: (s as { content: unknown }).content as Json,
+      sort_order: typeof (s as { sort_order: number }).sort_order === "number"
+        ? (s as { sort_order: number }).sort_order
+        : i,
+      is_visible: (s as { is_visible?: boolean }).is_visible ?? true,
+    }));
+    if (toInsert.length > 0) {
+      const { error: insErr } = await supabase.from("website_sections").insert(toInsert);
+      if (insErr) throw new Error(insErr.message);
+    }
+
+    // Update theme in place (row already exists per template creation)
+    if (snap.theme) {
+      const t = snap.theme as Record<string, unknown>;
+      const themePatch: Record<string, unknown> = {};
+      for (const k of [
+        "primary_color", "secondary_color", "accent_color", "background_color",
+        "text_color", "heading_font", "body_font", "button_style", "extras",
+      ]) {
+        if (k in t) themePatch[k] = t[k];
+      }
+      await supabase.from("website_theme").update(themePatch as never).eq("website_id", websiteId);
+    }
+
+    await supabase
+      .from("user_websites")
+      .update({ draft_updated_at: new Date().toISOString() })
+      .eq("id", websiteId);
+
+    return { ok: true, websiteId };
+  });
+
