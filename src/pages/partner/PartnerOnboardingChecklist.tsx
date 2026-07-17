@@ -340,7 +340,24 @@ export function PartnerOnboardingChecklist() {
                     onChange={onPickLogo}
                   />
                   {uploadError && (
-                    <p className="text-[11px] font-medium text-red-600">{uploadError}</p>
+                    <div className="flex flex-wrap items-center gap-2 rounded-md border border-red-200 bg-red-50 px-2 py-1.5">
+                      <p className="flex-1 text-[11px] font-medium text-red-600">{uploadError}</p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={onRetryUpload}
+                        disabled={uploading || !cloudinaryReady}
+                        className="h-7 border-red-300 px-2 text-[11px] text-red-700 hover:bg-red-100"
+                      >
+                        {uploading ? (
+                          <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                        ) : (
+                          <RefreshCw className="mr-1 h-3 w-3" />
+                        )}
+                        {lastFileRef.current ? "Retry upload" : "Choose file"}
+                      </Button>
+                    </div>
                   )}
                 </div>
               </div>
