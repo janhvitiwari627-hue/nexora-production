@@ -88,27 +88,65 @@ export function PartnerOnboardingChecklist() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [localPreview, setLocalPreview] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const cloudinaryReady = isCloudinaryConfigured();
+
+  const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+  const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
+
+  useEffect(() => {
+    return () => {
+      if (localPreview) URL.revokeObjectURL(localPreview);
+    };
+  }, [localPreview]);
 
   const onPickLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (e.target) e.target.value = "";
     if (!file) return;
-    if (!cloudinaryReady) {
-      toast.error("Cloudinary is not configured");
+    setUploadError(null);
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      const msg = "Sirf JPG, PNG, WEBP ya GIF allowed hain";
+      setUploadError(msg);
+      toast.error(msg);
       return;
     }
+    if (file.size > MAX_BYTES) {
+      const msg = `File 5 MB se choti honi chahiye (abhi ${(file.size / 1024 / 1024).toFixed(1)} MB)`;
+      setUploadError(msg);
+      toast.error(msg);
+      return;
+    }
+    if (!cloudinaryReady) {
+      const msg = "Cloudinary is not configured";
+      setUploadError(msg);
+      toast.error(msg);
+      return;
+    }
+
+    // Instant local preview while upload runs
+    if (localPreview) URL.revokeObjectURL(localPreview);
+    const objectUrl = URL.createObjectURL(file);
+    setLocalPreview(objectUrl);
+
     setUploading(true);
     try {
       const res = await uploadToCloudinary(file, { folder: "partner-logos" });
       setForm((f) => ({ ...f, photo_url: res.secure_url }));
       toast.success("Logo uploaded — save karke pakka karo");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Upload failed");
+      const msg = err instanceof Error ? err.message : "Upload failed";
+      setUploadError(msg);
+      toast.error(msg);
+      setLocalPreview(null);
+      URL.revokeObjectURL(objectUrl);
     } finally {
       setUploading(false);
     }
   };
+
 
   useEffect(() => {
     if (!profile) return;
