@@ -417,21 +417,36 @@ export function PartnerOnboardingChecklist() {
                 onDragLeave={onDragLeave}
                 onDrop={onDrop}
                 onClick={() => {
-                  if (!uploading && cloudinaryReady && !form.photo_url && !localPreview) {
+                  if (!uploading && cloudinaryReady) {
+                    fileInputRef.current?.click();
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (uploading || !cloudinaryReady) return;
+                  if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+                    e.preventDefault();
                     fileInputRef.current?.click();
                   }
                 }}
                 role="button"
-                tabIndex={0}
-                aria-label="Drag and drop logo here or click to browse"
-                className={`flex items-start gap-3 rounded-xl border-2 border-dashed p-3 transition ${
+                tabIndex={uploading ? -1 : 0}
+                aria-label={
+                  form.photo_url || localPreview
+                    ? "Replace logo. Press Enter or Space to browse files, or drag and drop an image here."
+                    : "Upload logo. Press Enter or Space to browse files, or drag and drop an image here."
+                }
+                aria-disabled={uploading || !cloudinaryReady}
+                aria-busy={uploading}
+                aria-describedby="logo-dropzone-hint"
+                className={`flex items-start gap-3 rounded-xl border-2 border-dashed p-3 transition outline-none focus-visible:ring-2 focus-visible:ring-[#4F46E5] focus-visible:ring-offset-2 ${
                   isDragging
                     ? "border-[#4F46E5] bg-[#EEF2FF]"
                     : uploading
-                      ? "border-slate-200 bg-slate-50/50"
-                      : "border-slate-200 bg-slate-50/40 hover:border-[#4F46E5]/50 hover:bg-[#EEF2FF]/30"
+                      ? "border-slate-200 bg-slate-50/50 cursor-not-allowed"
+                      : "border-slate-200 bg-slate-50/40 hover:border-[#4F46E5]/50 hover:bg-[#EEF2FF]/30 cursor-pointer"
                 }`}
               >
+
 
                 {(localPreview || form.photo_url) ? (
                   <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
@@ -483,11 +498,12 @@ export function PartnerOnboardingChecklist() {
                         ? "Replace logo"
                         : "Upload logo"}
                   </Button>
-                  <p className="text-[10px] text-slate-500">
+                  <p id="logo-dropzone-hint" className="text-[10px] text-slate-500" aria-live="polite">
                     {isDragging
                       ? "Release to upload"
-                      : "Drag & drop image here, ya button click karein"}
+                      : "Drag & drop image here, Enter/Space press karein, ya button click karein"}
                   </p>
+
 
                   {uploading && (
                     <div
