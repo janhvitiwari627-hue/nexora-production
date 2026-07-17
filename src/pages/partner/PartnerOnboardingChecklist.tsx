@@ -179,7 +179,15 @@ export function PartnerOnboardingChecklist() {
     setUploadError(null);
     lastAnnouncedMilestoneRef.current = -1;
     setSrAlert("");
-    announceStatus(`Uploading ${file.name}. 0 percent complete.`);
+    // File X of Y context — single-file flow today, but keep the phrasing so
+    // screen-reader users hear a consistent "file 1 of 1" summary that scales
+    // when batch uploads land.
+    const fileIndex = 1;
+    const fileTotal = 1;
+    const batchLabel = `file ${fileIndex} of ${fileTotal}`;
+    announceStatus(
+      `Uploading ${batchLabel}: ${file.name}. 0 percent complete.`,
+    );
     try {
       const res = await uploadToCloudinary(file, {
         folder: "partner-logos",
@@ -189,17 +197,20 @@ export function PartnerOnboardingChecklist() {
           const milestone = pct >= 75 ? 75 : pct >= 50 ? 50 : pct >= 25 ? 25 : 0;
           if (milestone > lastAnnouncedMilestoneRef.current && milestone > 0 && pct < 100) {
             lastAnnouncedMilestoneRef.current = milestone;
-            announceStatus(`Upload ${milestone} percent complete.`);
+            announceStatus(
+              `Uploading ${batchLabel} (${file.name}): ${milestone} percent complete.`,
+            );
           }
           if (pct >= 100 && lastAnnouncedMilestoneRef.current < 100) {
             lastAnnouncedMilestoneRef.current = 100;
             announceStatus(
-              `Upload complete for ${file.name}. Cloudinary is processing the image.`,
+              `${batchLabel} (${file.name}) transfer complete. Cloudinary is processing the image.`,
             );
           }
         },
         signal: controller.signal,
       });
+
       setForm((f) => ({ ...f, photo_url: res.secure_url }));
       setUploadError(null);
       lastFileRef.current = null;
