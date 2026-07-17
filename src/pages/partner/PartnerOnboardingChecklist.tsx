@@ -101,6 +101,30 @@ export function PartnerOnboardingChecklist() {
     };
   }, [localPreview]);
 
+  const lastFileRef = useRef<File | null>(null);
+
+  const doUpload = async (file: File, keepPreview?: string) => {
+    setUploading(true);
+    try {
+      const res = await uploadToCloudinary(file, { folder: "partner-logos" });
+      setForm((f) => ({ ...f, photo_url: res.secure_url }));
+      setUploadError(null);
+      lastFileRef.current = null;
+      toast.success("Logo uploaded — save karke pakka karo");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Upload failed";
+      setUploadError(msg);
+      toast.error(msg);
+      lastFileRef.current = file;
+      if (!keepPreview && localPreview) {
+        URL.revokeObjectURL(localPreview);
+        setLocalPreview(null);
+      }
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const onPickLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (e.target) e.target.value = "";
@@ -131,20 +155,17 @@ export function PartnerOnboardingChecklist() {
     const objectUrl = URL.createObjectURL(file);
     setLocalPreview(objectUrl);
 
-    setUploading(true);
-    try {
-      const res = await uploadToCloudinary(file, { folder: "partner-logos" });
-      setForm((f) => ({ ...f, photo_url: res.secure_url }));
-      toast.success("Logo uploaded — save karke pakka karo");
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Upload failed";
-      setUploadError(msg);
-      toast.error(msg);
-      setLocalPreview(null);
-      URL.revokeObjectURL(objectUrl);
-    } finally {
-      setUploading(false);
+    await doUpload(file, objectUrl);
+  };
+
+  const onRetryUpload = async () => {
+    const file = lastFileRef.current;
+    if (!file) {
+      fileInputRef.current?.click();
+      return;
     }
+    setUploadError(null);
+    await doUpload(file, localPreview ?? undefined);
   };
 
 
