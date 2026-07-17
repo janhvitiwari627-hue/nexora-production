@@ -1448,7 +1448,7 @@ function ItemsEditor({
         </Button>
       </div>
 
-      {canPickServices && serviceOptions.length > 0 && (
+      {canPickServices && (
         <div className="space-y-2 rounded-lg border bg-muted/30 p-3">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-sm font-medium">
@@ -1458,8 +1458,13 @@ function ItemsEditor({
               Add all
             </Button>
           </div>
-          <div className="max-h-48 space-y-1 overflow-y-auto pr-1">
-            {serviceOptions.map((service) => {
+          {serviceOptions.length === 0 ? (
+            <p className="rounded-md border border-dashed bg-background p-3 text-xs text-muted-foreground">
+              No saved services yet. Add services from the Services section or create manual items below.
+            </p>
+          ) : (
+            <div className="max-h-48 space-y-1 overflow-y-auto pr-1">
+              {serviceOptions.map((service) => {
               const selected = selectedServiceIds.has(service.id);
               return (
                 <button
@@ -1479,8 +1484,9 @@ function ItemsEditor({
                   <span className="shrink-0 font-semibold">₹{String(service.price ?? 0)}</span>
                 </button>
               );
-            })}
-          </div>
+              })}
+            </div>
+          )}
         </div>
       )}
 
