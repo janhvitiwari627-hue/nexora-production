@@ -217,6 +217,7 @@ export function WebsiteEditorPage() {
   const fetchVersions = useServerFn(listWebsiteVersions);
   const doSaveVersion = useServerFn(saveDraftVersion);
   const doRestoreVersion = useServerFn(restoreWebsiteVersion);
+  const fetchVersionSnapshot = useServerFn(getWebsiteVersionSnapshot);
 
 
 
