@@ -137,23 +137,33 @@ export const saveWebsiteTemplateSelection = createServerFn({ method: "POST" })
       .select("id, template_key")
       .eq("template_key", data.templateKey)
       .eq("is_active", true)
-      .single();
-    if (templateError || !template)
-      throw new Error(templateError?.message ?? "Template is not available");
+      .maybeSingle();
+    if (templateError) throw new Error(templateError.message);
+
+    const patch: {
+      template_id?: string;
+      template_key: string;
+      business_category: string;
+      draft_updated_at: string;
+    } = {
+      template_key: data.templateKey,
+      business_category: data.businessCategory,
+      draft_updated_at: new Date().toISOString(),
+    };
+    // Lovable Cloud can apply frontend code before a newly seeded catalogue row
+    // becomes visible. Persist the stable key immediately and attach the FK as
+    // soon as the master template row is available.
+    if (template) patch.template_id = template.id;
 
     const { data: website, error } = await supabase
       .from("user_websites")
-      .update({
-        template_id: template.id,
-        template_key: template.template_key,
-        business_category: data.businessCategory,
-        draft_updated_at: new Date().toISOString(),
-      })
+      .update(patch)
       .eq("id", data.websiteId)
       .eq("owner_id", userId)
       .select("id, template_id, template_key, business_category")
-      .single();
+      .maybeSingle();
     if (error) throw new Error(error.message);
+    if (!website) throw new Error("Website was not found or you do not have permission to edit it");
     return website;
   });
 
