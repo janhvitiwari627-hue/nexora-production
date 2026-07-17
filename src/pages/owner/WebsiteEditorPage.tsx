@@ -207,6 +207,7 @@ export function WebsiteEditorPage() {
   const saveSection = useServerFn(updateSection);
   const saveTheme = useServerFn(updateTheme);
   const doPublish = useServerFn(publishWebsite);
+  const saveOrder = useServerFn(reorderSections);
 
   const salonsQ = useQuery({ queryKey: ["my-owned-salons-editor"], queryFn: () => fetchSalons() });
   const salonId = salonsQ.data?.[0]?.salon?.id;
