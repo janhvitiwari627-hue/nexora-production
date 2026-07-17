@@ -358,6 +358,153 @@ const SECTION_LABELS: Record<SectionType, string> = {
   contact: "Contact",
 };
 
+type OwnerServiceOption = {
+  id: string;
+  name: string;
+  description?: string | null;
+  category?: string | null;
+  duration_minutes?: number | null;
+  price?: number | string | null;
+  image_url?: string | null;
+};
+
+type SalonBasics = {
+  name?: string | null;
+  address?: string | null;
+  location?: string | null;
+  phone?: string | null;
+};
+
+type BusinessRole = "Salon" | "Barber" | "Makeup Studio" | "Spa" | "Nail Studio";
+
+const BUSINESS_ROLES: BusinessRole[] = ["Salon", "Barber", "Makeup Studio", "Spa", "Nail Studio"];
+
+const STAFF_ROLE_OPTIONS = [
+  "Senior Stylist",
+  "Hair Stylist",
+  "Master Barber",
+  "Makeup Artist",
+  "Nail Artist",
+  "Beautician",
+  "Spa Therapist",
+  "Receptionist",
+  "Manager",
+];
+
+function mapsEmbedFromAddress(address?: string | null) {
+  const q = (address ?? "").trim();
+  return q ? `https://www.google.com/maps?q=${encodeURIComponent(q)}&output=embed` : "";
+}
+
+function normalizeServiceItem(s: OwnerServiceOption): Item {
+  return {
+    id: s.id,
+    name: s.name,
+    price: s.price === null || s.price === undefined ? "" : String(s.price),
+    duration: `${s.duration_minutes ?? 30} min`,
+    description: s.description ?? "",
+    image: s.image_url ?? "",
+    category: s.category ?? "General",
+  };
+}
+
+type StarterTemplate = {
+  key: string;
+  name: string;
+  role: BusinessRole;
+  description: string;
+  theme: ThemeState;
+  visibleOrder: SectionType[];
+  content: Partial<Record<SectionType, (ctx: { salon?: SalonBasics | null; services: OwnerServiceOption[] }) => Record<string, unknown>>>;
+};
+
+const WEBSITE_STARTER_TEMPLATES: StarterTemplate[] = [
+  {
+    key: "salon-30-min",
+    name: "30-min Salon Website",
+    role: "Salon",
+    description: "Hero, services, rate card, gallery, team, contact and map ready.",
+    theme: THEME_PRESETS.find((p) => p.key === "classic")?.theme ?? DEFAULT_THEME,
+    visibleOrder: ["hero", "about", "services", "rate_card", "gallery", "staff", "offers", "contact"],
+    content: {
+      hero: ({ salon }) => ({ heading: salon?.name ?? "Premium Salon", subheading: "Hair, beauty and care in one place", description: "Book trusted salon services with transparent pricing.", buttonText: "Book Now", buttonLink: "#services", imageUrl: "" }),
+      about: ({ salon }) => ({ heading: "About Us", body: `${salon?.name ?? "Our salon"} delivers professional beauty services with trained experts and hygienic care.` }),
+      services: ({ services }) => ({ heading: "Popular Services", description: "Choose services and publish instantly.", items: services.slice(0, 6).map(normalizeServiceItem) }),
+      rate_card: ({ services }) => ({ heading: "Rate Card", description: "Transparent prices for quick booking decisions.", items: services.slice(0, 8).map(normalizeServiceItem) }),
+      gallery: () => ({ heading: "Gallery", description: "Show your best salon work.", items: [], gridAspect: "square", gridColumns: 4, imageFit: "cover", gridGap: 12 }),
+      staff: () => ({ heading: "Meet the Team", description: "Introduce your experts.", items: [] }),
+      offers: () => ({ heading: "Current Offers", description: "Limited time deals for new and returning customers.", items: [{ id: newId(), name: "First Visit Offer", discount: "20% OFF", description: "Welcome offer for first-time customers." }] }),
+      contact: ({ salon }) => ({ heading: "Contact Us", description: "Call, WhatsApp or visit us.", phone: salon?.phone ?? "", whatsapp: salon?.phone ?? "", email: "", address: salon?.address ?? salon?.location ?? "", mapEmbed: mapsEmbedFromAddress(salon?.address ?? salon?.location) }),
+    },
+  },
+  {
+    key: "barber-fast",
+    name: "Barber Fast Booking",
+    role: "Barber",
+    description: "Bold layout for haircut, beard and grooming price lists.",
+    theme: THEME_PRESETS.find((p) => p.key === "modern")?.theme ?? DEFAULT_THEME,
+    visibleOrder: ["hero", "services", "rate_card", "gallery", "staff", "contact"],
+    content: {
+      hero: ({ salon }) => ({ heading: salon?.name ?? "Modern Barber Shop", subheading: "Sharp cuts. Clean fades. Fast booking.", description: "Pick your grooming service and visit today.", buttonText: "View Rates", buttonLink: "#rate_card", imageUrl: "" }),
+      services: ({ services }) => ({ heading: "Grooming Services", description: "Haircut, beard, shave and styling.", items: services.slice(0, 6).map(normalizeServiceItem) }),
+      rate_card: ({ services }) => ({ heading: "Barber Rate Card", description: "Quick list for walk-ins and bookings.", items: services.slice(0, 10).map(normalizeServiceItem) }),
+      gallery: () => ({ heading: "Work Gallery", description: "Show fades, beard trims and transformations.", items: [], gridAspect: "landscape", gridColumns: 3, imageFit: "cover", gridGap: 10 }),
+      staff: () => ({ heading: "Barbers", description: "Your grooming specialists.", items: [] }),
+      contact: ({ salon }) => ({ heading: "Visit The Shop", description: "Directions and contact details.", phone: salon?.phone ?? "", whatsapp: salon?.phone ?? "", email: "", address: salon?.address ?? salon?.location ?? "", mapEmbed: mapsEmbedFromAddress(salon?.address ?? salon?.location) }),
+    },
+  },
+  {
+    key: "makeup-portfolio",
+    name: "Makeup Portfolio",
+    role: "Makeup Studio",
+    description: "Portfolio-first template for bridal and event makeup.",
+    theme: THEME_PRESETS.find((p) => p.key === "blush")?.theme ?? THEME_PRESETS.find((p) => p.key === "classic")?.theme ?? DEFAULT_THEME,
+    visibleOrder: ["hero", "about", "services", "packages", "gallery", "offers", "contact"],
+    content: {
+      hero: ({ salon }) => ({ heading: salon?.name ?? "Makeup Studio", subheading: "Bridal, party and editorial makeup", description: "Showcase your best transformations and packages.", buttonText: "See Packages", buttonLink: "#packages", imageUrl: "" }),
+      about: () => ({ heading: "Artist Profile", body: "Professional makeup services for weddings, shoots and special occasions." }),
+      services: ({ services }) => ({ heading: "Makeup Services", description: "Choose from studio and event services.", items: services.slice(0, 6).map(normalizeServiceItem) }),
+      packages: () => ({ heading: "Packages", description: "Ready-made offers customers can understand fast.", items: [{ id: newId(), name: "Bridal Glow Package", price: "12999", description: "Consultation, makeup trial and wedding-day look.", duration: "Full day" }] }),
+      gallery: () => ({ heading: "Portfolio", description: "Upload bridal and before/after photos.", items: [], gridAspect: "portrait", gridColumns: 3, imageFit: "cover", gridGap: 12 }),
+      offers: () => ({ heading: "Special Offers", description: "Promote seasonal bookings.", items: [] }),
+      contact: ({ salon }) => ({ heading: "Book Consultation", description: "Share your event date and location.", phone: salon?.phone ?? "", whatsapp: salon?.phone ?? "", email: "", address: salon?.address ?? salon?.location ?? "", mapEmbed: mapsEmbedFromAddress(salon?.address ?? salon?.location) }),
+    },
+  },
+  {
+    key: "spa-calm",
+    name: "Spa & Wellness",
+    role: "Spa",
+    description: "Calm wellness pages with memberships and packages.",
+    theme: THEME_PRESETS.find((p) => p.key === "botanical")?.theme ?? THEME_PRESETS.find((p) => p.key === "fresh")?.theme ?? DEFAULT_THEME,
+    visibleOrder: ["hero", "about", "services", "packages", "membership", "gallery", "contact"],
+    content: {
+      hero: ({ salon }) => ({ heading: salon?.name ?? "Spa & Wellness", subheading: "Relax, refresh and recharge", description: "A ready wellness website with service menu and booking CTA.", buttonText: "Book Session", buttonLink: "#services", imageUrl: "" }),
+      about: () => ({ heading: "Our Wellness Space", body: "Relaxing treatments, trained therapists and a clean, peaceful environment." }),
+      services: ({ services }) => ({ heading: "Spa Services", description: "Massages, facials and wellness rituals.", items: services.slice(0, 6).map(normalizeServiceItem) }),
+      packages: () => ({ heading: "Wellness Packages", description: "Bundle your best services.", items: [{ id: newId(), name: "Relaxation Day", price: "4999", description: "Massage, facial and refreshment ritual.", duration: "3 hours" }] }),
+      membership: () => ({ heading: "Membership", description: "Monthly wellness plans for repeat customers.", items: [{ id: newId(), name: "Gold Wellness", price: "999", description: "Priority booking and member discounts." }] }),
+      gallery: () => ({ heading: "Spa Gallery", description: "Show ambience and treatment rooms.", items: [], gridAspect: "landscape", gridColumns: 3, imageFit: "cover", gridGap: 14 }),
+      contact: ({ salon }) => ({ heading: "Find Us", description: "Call or get directions.", phone: salon?.phone ?? "", whatsapp: salon?.phone ?? "", email: "", address: salon?.address ?? salon?.location ?? "", mapEmbed: mapsEmbedFromAddress(salon?.address ?? salon?.location) }),
+    },
+  },
+  {
+    key: "nails-clean",
+    name: "Nail Studio",
+    role: "Nail Studio",
+    description: "Visual grid for nail art, prices and offers.",
+    theme: THEME_PRESETS.find((p) => p.key === "fresh")?.theme ?? DEFAULT_THEME,
+    visibleOrder: ["hero", "services", "rate_card", "gallery", "offers", "contact"],
+    content: {
+      hero: ({ salon }) => ({ heading: salon?.name ?? "Nail Studio", subheading: "Nail art, extensions and care", description: "A simple template customers can scan quickly.", buttonText: "See Nail Menu", buttonLink: "#services", imageUrl: "" }),
+      services: ({ services }) => ({ heading: "Nail Services", description: "Manicure, pedicure, nail art and extensions.", items: services.slice(0, 6).map(normalizeServiceItem) }),
+      rate_card: ({ services }) => ({ heading: "Nail Rate Card", description: "Clear menu for every customer.", items: services.slice(0, 10).map(normalizeServiceItem) }),
+      gallery: () => ({ heading: "Nail Art Gallery", description: "Upload your best designs.", items: [], gridAspect: "square", gridColumns: 4, imageFit: "cover", gridGap: 8 }),
+      offers: () => ({ heading: "Offers", description: "Feature combo offers.", items: [{ id: newId(), name: "Mani + Pedi Combo", discount: "15% OFF", description: "Limited-time combo deal." }] }),
+      contact: ({ salon }) => ({ heading: "Visit Studio", description: "Location and WhatsApp booking.", phone: salon?.phone ?? "", whatsapp: salon?.phone ?? "", email: "", address: salon?.address ?? salon?.location ?? "", mapEmbed: mapsEmbedFromAddress(salon?.address ?? salon?.location) }),
+    },
+  },
+];
+
 export function WebsiteEditorPage() {
   const fetchSalons = useServerFn(getMyOwnedSalons);
   const fetchOrCreate = useServerFn(getOrCreateMyWebsite);
