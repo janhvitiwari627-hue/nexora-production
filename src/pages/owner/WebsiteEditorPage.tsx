@@ -1118,6 +1118,7 @@ export function WebsiteEditorPage() {
                   ref={iframeRef}
                   key={websiteId}
                   src={`/w/${websiteId}?preview=1`}
+                  onLoad={postPreviewBundle}
                   className="h-full w-full border-0"
                   title="Live preview"
                 />
