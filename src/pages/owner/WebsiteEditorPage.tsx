@@ -937,6 +937,19 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
           </div>
         </div>
       </div>
+
+      <div className="space-y-4 rounded-lg border bg-card p-4">
+        <h3 className="text-sm font-semibold uppercase text-muted-foreground">Header Navigation</h3>
+        <Field
+          label="Site title"
+          value={theme.extras.site_title ?? ""}
+          onChange={(v) => onChange({ extras: { site_title: v } })}
+        />
+        <NavLinksEditor
+          links={theme.extras.nav_links ?? []}
+          onChange={(next) => onChange({ extras: { nav_links: next } })}
+        />
+      </div>
     </div>
   );
 }
