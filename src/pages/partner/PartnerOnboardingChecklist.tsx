@@ -411,7 +411,28 @@ export function PartnerOnboardingChecklist() {
               label="Logo / Photo"
               hint={cloudinaryReady ? "JPG, PNG, WEBP ya GIF — max 5 MB" : "Cloudinary configure nahi hai — URL paste karein"}
             >
-              <div className="flex items-start gap-3">
+              <div
+                onDragEnter={onDragEnter}
+                onDragOver={onDragOver}
+                onDragLeave={onDragLeave}
+                onDrop={onDrop}
+                onClick={() => {
+                  if (!uploading && cloudinaryReady && !form.photo_url && !localPreview) {
+                    fileInputRef.current?.click();
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                aria-label="Drag and drop logo here or click to browse"
+                className={`flex items-start gap-3 rounded-xl border-2 border-dashed p-3 transition ${
+                  isDragging
+                    ? "border-[#4F46E5] bg-[#EEF2FF]"
+                    : uploading
+                      ? "border-slate-200 bg-slate-50/50"
+                      : "border-slate-200 bg-slate-50/40 hover:border-[#4F46E5]/50 hover:bg-[#EEF2FF]/30"
+                }`}
+              >
+
                 {(localPreview || form.photo_url) ? (
                   <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
                     <img
