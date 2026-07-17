@@ -87,6 +87,7 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       heading_font: "Playfair Display",
       body_font: "Lora",
       button_style: "rounded",
+      extras: { header_bg: "#1E293B", header_text: "#FAF7F2", link_color: "#D4A24C", link_style: "hover-underline" },
     },
   },
   {
@@ -102,6 +103,7 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       heading_font: "Space Grotesk",
       body_font: "Inter",
       button_style: "pill",
+      extras: { header_bg: "#FFFFFF", header_text: "#0F172A", link_color: "#4F46E5", link_style: "hover-underline" },
     },
   },
   {
@@ -117,6 +119,7 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       heading_font: "Montserrat",
       body_font: "Inter",
       button_style: "square",
+      extras: { header_bg: "#FFFFFF", header_text: "#111111", link_color: "#111111", link_style: "underline" },
     },
   },
   {
@@ -132,6 +135,7 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       heading_font: "Playfair Display",
       body_font: "Montserrat",
       button_style: "pill",
+      extras: { header_bg: "#0F0F0F", header_text: "#F5F0EB", link_color: "#E5B8A6", link_style: "hover-underline" },
     },
   },
   {
@@ -147,6 +151,7 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       heading_font: "Poppins",
       body_font: "Poppins",
       button_style: "rounded",
+      extras: { header_bg: "#0F766E", header_text: "#F0FDFA", link_color: "#FB7185", link_style: "hover-underline" },
     },
   },
 ];
