@@ -165,7 +165,9 @@ export function PartnerOnboardingChecklist() {
           }
           if (pct >= 100 && lastAnnouncedMilestoneRef.current < 100) {
             lastAnnouncedMilestoneRef.current = 100;
-            announceStatus("Upload complete. Cloudinary is processing the image.");
+            announceStatus(
+              `Upload complete for ${file.name}. Cloudinary is processing the image.`,
+            );
           }
         },
         signal: controller.signal,
@@ -174,7 +176,10 @@ export function PartnerOnboardingChecklist() {
       setUploadError(null);
       lastFileRef.current = null;
       setUploadProgress(100);
-      announceStatus("Logo uploaded successfully. Save karke pakka karo.");
+      const sizeKb = Math.max(1, Math.round(file.size / 1024));
+      announceStatus(
+        `Success: ${file.name} (${sizeKb} KB) uploaded to Cloudinary. Logo preview updated. Save karke pakka karo.`,
+      );
       toast.success("Logo uploaded — save karke pakka karo");
     } catch (err) {
       const isAbort =
@@ -183,7 +188,7 @@ export function PartnerOnboardingChecklist() {
       if (isAbort) {
         setUploadError("Upload cancel ho gaya");
         setUploadErrorDetails({ code: "ABORTED", raw: "User cancelled upload" });
-        announceStatus("Upload cancelled.");
+        announceStatus(`Upload cancelled for ${file.name}. Retry button available.`);
         toast.info("Upload cancel");
         lastFileRef.current = file;
         if (!keepPreview && localPreview) {
@@ -205,7 +210,13 @@ export function PartnerOnboardingChecklist() {
       } else {
         setUploadErrorDetails({ raw });
       }
-      announceAlert(`Upload failed. ${friendly}. Retry button available.`);
+      const statusPart =
+        err instanceof CloudinaryUploadError && err.status
+          ? ` Status ${err.status}${err.statusText ? ` ${err.statusText}` : ""}.`
+          : "";
+      announceAlert(
+        `Upload failed for ${file.name}.${statusPart} Reason: ${friendly}. Retry button available.`,
+      );
       toast.error(friendly);
       lastFileRef.current = file;
       if (!keepPreview && localPreview) {
