@@ -114,7 +114,7 @@ export function PartnerApplicationsPage() {
       const { error } = await supabase.rpc("review_partner_application", {
         _partner_id: id,
         _approve: approve,
-        _reason: reason ?? null,
+        _reason: reason,
       });
       if (error) throw error;
     },
