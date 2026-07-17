@@ -136,19 +136,30 @@ export function PartnerOnboardingChecklist() {
   const cancelHadFocusRef = useRef(false);
   const wasUploadingRef = useRef(false);
 
-  // When the upload finishes (success, error, or cancel) and the Cancel button
-  // had focus, move focus back to the dropzone so the described-by hint is
-  // re-announced and keyboard users don't lose their place.
+  // When the upload finishes (success, error, or cancel), restore focus to the
+  // dropzone so its describedby hint is announced and keyboard users don't lose
+  // their place. We only steal focus if it currently sits inside our upload
+  // region (dropzone, cancel button that just unmounted, or document.body after
+  // that unmount) — mouse users who moved on elsewhere are not disturbed.
   useEffect(() => {
     if (wasUploadingRef.current && !uploading) {
-      if (cancelHadFocusRef.current) {
-        cancelHadFocusRef.current = false;
-        // Defer past the unmount of the Cancel button
+      const shouldRestore = (() => {
+        if (cancelHadFocusRef.current) return true;
+        const active = typeof document !== "undefined" ? document.activeElement : null;
+        if (!active || active === document.body) return true;
+        const dz = dropzoneRef.current;
+        if (dz && (active === dz || dz.contains(active))) return true;
+        return false;
+      })();
+      cancelHadFocusRef.current = false;
+      if (shouldRestore) {
+        // Defer past the unmount of the Cancel button / progress region
         requestAnimationFrame(() => dropzoneRef.current?.focus());
       }
     }
     wasUploadingRef.current = uploading;
   }, [uploading]);
+
 
   const cancelUpload = () => {
     if (uploadAbortRef.current) {
