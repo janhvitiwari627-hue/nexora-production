@@ -1143,6 +1143,7 @@ type Item = {
   role?: string;
   bio?: string;
   image?: string;
+  category?: string;
   date?: string;
   discount?: string;
   objectPosition?: string; // e.g. "center", "top", "left top", used for gallery crop focus
