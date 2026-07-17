@@ -749,6 +749,100 @@ export function PartnerOnboardingChecklist() {
                     </div>
                   )}
 
+                  {fileStatuses.length > 0 && (
+                    <div className="space-y-1 rounded-md border border-slate-200 bg-white/70 p-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                          Upload log ({fileStatuses.length})
+                        </p>
+                        {!uploading && (
+                          <button
+                            type="button"
+                            onClick={clearFileStatuses}
+                            className="text-[10px] font-semibold text-slate-500 hover:text-slate-700 hover:underline"
+                          >
+                            Clear
+                          </button>
+                        )}
+                      </div>
+                      <ul className="space-y-1" role="list" aria-label="Per-file upload status">
+                        {fileStatuses.map((s) => {
+                          const sizeKb = Math.max(1, Math.round(s.size / 1024));
+                          const canRetry = (s.status === "error" || s.status === "cancelled") && !uploading;
+                          return (
+                            <li
+                              key={s.id}
+                              className={`rounded border px-2 py-1 text-[11px] ${
+                                s.status === "success"
+                                  ? "border-emerald-200 bg-emerald-50"
+                                  : s.status === "error"
+                                    ? "border-red-200 bg-red-50"
+                                    : s.status === "cancelled"
+                                      ? "border-amber-200 bg-amber-50"
+                                      : "border-slate-200 bg-slate-50"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                <span aria-hidden="true" className="shrink-0">
+                                  {s.status === "uploading" && <Loader2 className="h-3.5 w-3.5 animate-spin text-[#4F46E5]" />}
+                                  {s.status === "success" && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />}
+                                  {s.status === "error" && <XCircle className="h-3.5 w-3.5 text-red-600" />}
+                                  {s.status === "cancelled" && <AlertCircle className="h-3.5 w-3.5 text-amber-600" />}
+                                </span>
+                                <span className="flex-1 truncate font-semibold text-slate-700" title={s.name}>
+                                  {s.name}
+                                  {s.attempt > 1 && (
+                                    <span className="ml-1 rounded bg-slate-200 px-1 text-[9px] font-bold uppercase text-slate-600">
+                                      try {s.attempt}
+                                    </span>
+                                  )}
+                                </span>
+                                <span className="shrink-0 tabular-nums text-[10px] text-slate-500">
+                                  {sizeKb} KB
+                                </span>
+                                <span
+                                  className={`shrink-0 rounded px-1.5 py-0.5 text-[9px] font-bold uppercase ${
+                                    s.status === "success"
+                                      ? "bg-emerald-600 text-white"
+                                      : s.status === "error"
+                                        ? "bg-red-600 text-white"
+                                        : s.status === "cancelled"
+                                          ? "bg-amber-500 text-white"
+                                          : "bg-[#4F46E5] text-white"
+                                  }`}
+                                >
+                                  {s.status === "uploading" ? `${s.progress}%` : s.status}
+                                </span>
+                                {canRetry && lastFileRef.current && lastFileRef.current.name === s.name && (
+                                  <button
+                                    type="button"
+                                    onClick={onRetryUpload}
+                                    className="shrink-0 rounded border border-red-300 px-1.5 py-0.5 text-[10px] font-semibold text-red-700 hover:bg-red-100"
+                                    aria-label={`Retry upload of ${s.name}`}
+                                  >
+                                    Retry
+                                  </button>
+                                )}
+                              </div>
+                              {s.status === "uploading" && (
+                                <div className="mt-1 h-1 overflow-hidden rounded-full bg-white">
+                                  <div
+                                    className="h-full bg-[#4F46E5] transition-[width] duration-200"
+                                    style={{ width: `${s.progress}%` }}
+                                  />
+                                </div>
+                              )}
+                              {s.error && s.status !== "uploading" && (
+                                <p className="mt-0.5 line-clamp-2 text-[10px] text-slate-600">{s.error}</p>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  )}
+
+
                   <Input
                     placeholder="https://..."
                     value={form.photo_url}
