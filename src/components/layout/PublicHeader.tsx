@@ -6,12 +6,14 @@ import {
   Briefcase,
   Building2,
   ChevronDown,
+  Heart,
   LayoutDashboard,
   LogOut,
   Megaphone,
   Menu,
   Package,
   Phone,
+  Search,
   Settings,
   Sparkles,
   Star,
@@ -158,27 +160,30 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
   return (
     <header
       data-testid="public-header"
-      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+      className={`sticky top-0 z-50 w-full transition-all duration-300 pt-[env(safe-area-inset-top)] ${
         scrolled
           ? "glass-panel border-b border-border/60 shadow-[var(--shadow-card)]"
           : "bg-transparent"
       }`}
     >
-      <div className="mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-4 px-4 py-3 md:px-6">
+      <div className="mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-2 py-3 sm:gap-4 px-[max(env(safe-area-inset-left),0.75rem)] pr-[max(env(safe-area-inset-right),0.75rem)] sm:px-[max(env(safe-area-inset-left),1rem)] sm:pr-[max(env(safe-area-inset-right),1rem)] md:px-6">
+
         {/* Back + Logo */}
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 items-center gap-2">
           {showBackButton && <BackButton size="icon" className="shrink-0" aria-label="Go back" />}
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex min-w-0 items-center gap-2">
             <img
               src={nexoraLogo.url}
               alt="Nexora SalonOS"
-              className="h-10 w-10 rounded-xl object-cover shadow-[var(--shadow-glow)]"
+              className="h-9 w-9 shrink-0 rounded-xl object-cover shadow-[var(--shadow-glow)] sm:h-10 sm:w-10"
             />
-            <span className="text-gradient-brand text-xl font-extrabold tracking-tight">
+            <span className="text-gradient-brand hidden text-lg font-extrabold tracking-tight sm:inline sm:text-xl">
               Nexora
             </span>
+
           </Link>
         </div>
+
 
         {/* Center nav */}
         <nav className="hidden items-center justify-center gap-1 md:flex">
@@ -336,24 +341,63 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
         </div>
 
         {/* Mobile */}
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-0.5 md:hidden">
+          
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Search"
+            asChild
+            className="h-9 w-9 shrink-0"
+          >
+            <Link to="/search">
+              <Search className="h-5 w-5" />
+            </Link>
+          </Button>
           {isAuthed && (
-            <Button variant="ghost" size="icon" aria-label="Notifications" asChild>
-              <Link to="/dashboard/notifications">
-                <Bell className="h-5 w-5" />
-              </Link>
-            </Button>
+            <>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Wishlist"
+                asChild
+                className="h-9 w-9 shrink-0"
+              >
+                <Link to="/dashboard/favorites">
+                  <Heart className="h-5 w-5" />
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Notifications"
+                asChild
+                className="h-9 w-9 shrink-0"
+              >
+                <Link to="/dashboard/notifications">
+                  <Bell className="h-5 w-5" />
+                </Link>
+              </Button>
+            </>
           )}
           <Button
             variant="ghost"
             size="icon"
             aria-label="Menu"
             onClick={() => setMenuOpen((v) => !v)}
+            className="h-9 w-9 shrink-0"
           >
             <Menu className="h-5 w-5" />
           </Button>
         </div>
       </div>
+
+      {/* Mobile secondary row: location chip (always visible on very small screens) */}
+      <div className="mx-auto flex max-w-7xl items-center gap-2 pb-2 px-[max(env(safe-area-inset-left),0.75rem)] pr-[max(env(safe-area-inset-right),0.75rem)] md:hidden">
+        <LocationChip className="inline-flex min-w-0 max-w-full" />
+      </div>
+
+
 
       <MobileMenuOverlay open={menuOpen} onClose={() => setMenuOpen(false)} />
 

@@ -7,7 +7,12 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/owner")({
   ssr: false,
   beforeLoad: async ({ location }) => {
-    const publicPaths = ["/owner/register-business", "/owner/templates", "/owner/create-website"];
+    const publicPaths = [
+      "/owner/register-business",
+      "/owner/templates",
+      "/owner/create-website",
+      "/owner/website",
+    ];
     if (publicPaths.some((p) => location.pathname.startsWith(p))) return;
 
     // Friendly interstitial for unauthenticated visitors before the login redirect.

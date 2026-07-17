@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { useBlocker, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { ImagePlus, Loader2, Save, Trash2 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { ImagePlus, Loader2, Save, Sparkles, Trash2 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,12 +16,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useOwnerContext } from "@/hooks/use-owner-context";
 import { supabase } from "@/integrations/supabase/client";
 import { getOwnerSalonFull, updateOwnerSalon } from "@/lib/owner.functions";
 
 const CATEGORIES = [
-  "Hire Cute Shop",
   "Barber Shop",
   "Salon",
   "Beauty Parlour",
@@ -70,7 +79,7 @@ const EMPTY: Form = {
 
 const s = (v: unknown) => (typeof v === "string" ? v : "");
 
-export function EditShopPage() {
+export function OwnerSettingsPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { activeSalonId, isLoading: ctxLoading, hasSalon } = useOwnerContext();
@@ -84,12 +93,16 @@ export function EditShopPage() {
   });
 
   const [form, setForm] = useState<Form>(EMPTY);
+  const [baseline, setBaseline] = useState<Form>(EMPTY);
   const [uploading, setUploading] = useState<"logo" | "cover" | null>(null);
+  const [draftRestored, setDraftRestored] = useState(false);
+
+  const draftKey = activeSalonId ? `owner-settings-draft:${activeSalonId}` : null;
 
   useEffect(() => {
     if (!salon) return;
     const row = salon as Record<string, unknown>;
-    setForm({
+    const next: Form = {
       name: s(row.name),
       category: s(row.category),
       owner_name: s(row.owner_name),
@@ -105,8 +118,111 @@ export function EditShopPage() {
       logo_url: s(row.logo_url),
       cover_image_url: s(row.cover_image_url),
       upi_id: s(row.upi_id),
-    });
-  }, [salon]);
+    };
+    setBaseline(next);
+
+    // Restore autosaved draft if present and different from server data.
+    let restored: Form | null = null;
+    if (draftKey && typeof window !== "undefined") {
+      try {
+        const raw = window.localStorage.getItem(draftKey);
+        if (raw) {
+          const parsed = JSON.parse(raw) as Partial<Form>;
+          const merged: Form = { ...next };
+          for (const k of Object.keys(EMPTY) as (keyof Form)[]) {
+            if (typeof parsed[k] === "string") merged[k] = parsed[k] as string;
+          }
+          const differs = (Object.keys(EMPTY) as (keyof Form)[]).some(
+            (k) => merged[k] !== next[k],
+          );
+          if (differs) restored = merged;
+        }
+      } catch {
+        /* ignore corrupt draft */
+      }
+    }
+
+    if (restored) {
+      setForm(restored);
+      setDraftRestored(true);
+      toast.info("Draft restored from your last edit.");
+    } else {
+      setForm(next);
+      setDraftRestored(false);
+    }
+  }, [salon, draftKey]);
+
+  const isDirty = useMemo(() => {
+    return (Object.keys(form) as (keyof Form)[]).some((k) => form[k] !== baseline[k]);
+  }, [form, baseline]);
+
+  // Autosave draft (debounced) whenever the form drifts from server baseline.
+  useEffect(() => {
+    if (!draftKey || typeof window === "undefined") return;
+    const t = setTimeout(() => {
+      try {
+        if (isDirty) {
+          window.localStorage.setItem(draftKey, JSON.stringify(form));
+        } else {
+          window.localStorage.removeItem(draftKey);
+        }
+      } catch {
+        /* storage full / disabled — ignore */
+      }
+    }, 400);
+    return () => clearTimeout(t);
+  }, [form, isDirty, draftKey]);
+
+  const discardDraft = () => {
+    if (draftKey && typeof window !== "undefined") {
+      try {
+        window.localStorage.removeItem(draftKey);
+      } catch {
+        /* ignore */
+      }
+    }
+    setForm(baseline);
+    setDraftRestored(false);
+    toast.success("Draft discarded.");
+  };
+
+
+  // Intercept ALL in-app router navigation (Link, useNavigate, router.navigate,
+  // browser back/forward). This covers header/sidebar/breadcrumbs uniformly
+  // as long as they use TanStack Router.
+  const blocker = useBlocker({
+    shouldBlockFn: () => isDirty && !uploading,
+    withResolver: true,
+    // Also warn on browser refresh / tab close / external nav.
+    enableBeforeUnload: () => isDirty && !uploading,
+  });
+
+  // Safety net: raw <a href="…"> anchors bypass the router. Catch same-origin
+  // link clicks in capture phase and route them through the blocker.
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
+  useEffect(() => {
+    if (!isDirty || uploading) return;
+    const onClick = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const anchor = (e.target as HTMLElement | null)?.closest?.("a[href]") as
+        | HTMLAnchorElement
+        | null;
+      if (!anchor) return;
+      const href = anchor.getAttribute("href");
+      if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:")) return;
+      if (anchor.target && anchor.target !== "" && anchor.target !== "_self") return;
+      const url = new URL(anchor.href, window.location.href);
+      if (url.origin !== window.location.origin) return;
+      if (url.pathname === window.location.pathname && url.search === window.location.search) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setPendingHref(url.pathname + url.search + url.hash);
+    };
+    document.addEventListener("click", onClick, true);
+    return () => document.removeEventListener("click", onClick, true);
+  }, [isDirty, uploading]);
+
 
   const set = <K extends keyof Form>(k: K, v: Form[K]) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -115,7 +231,6 @@ export function EditShopPage() {
       toast.error("No active shop");
       return;
     }
-
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
       toast.error("Please choose a JPG, PNG or WebP image");
       return;
@@ -136,7 +251,6 @@ export function EditShopPage() {
         upsert: false,
       });
       if (error) throw error;
-
       const { data } = supabase.storage.from("salon-media").getPublicUrl(path);
       set(kind === "logo" ? "logo_url" : "cover_image_url", data.publicUrl);
       toast.success(`${kind === "logo" ? "Logo" : "Cover image"} uploaded. Save changes to apply.`);
@@ -162,9 +276,24 @@ export function EditShopPage() {
       return updateFn({ data: { salon_id: activeSalonId, patch } });
     },
     onSuccess: async () => {
-      toast.success("Shop details updated");
+      setBaseline(form);
+      setDraftRestored(false);
+      if (draftKey && typeof window !== "undefined") {
+        try {
+          window.localStorage.removeItem(draftKey);
+        } catch {
+          /* ignore */
+        }
+      }
       await qc.invalidateQueries({ queryKey: ["owner"] });
-      navigate({ to: "/owner/welcome", replace: true });
+      toast.success("Saved! Ab template edit & live preview karein.", {
+        action: {
+          label: "Open Website Editor",
+          onClick: () => navigate({ to: "/owner/website", search: { live: 1 } }),
+        },
+      });
+      // Auto-redirect so owner completes the website (template, colors, live preview)
+      navigate({ to: "/owner/website", search: { live: 1 } });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Update failed"),
   });
@@ -182,10 +311,10 @@ export function EditShopPage() {
       <div className="mx-auto max-w-2xl px-4 py-12 text-center">
         <h1 className="text-heading text-2xl font-semibold">No shop yet</h1>
         <p className="text-muted-foreground mt-2 text-sm">
-          Create your shop first, then come back to edit its details.
+          Register your shop first, then come back to manage its details.
         </p>
-        <Button className="mt-4" onClick={() => navigate({ to: "/owner/onboarding" })}>
-          Get started
+        <Button className="mt-4" onClick={() => navigate({ to: "/owner/register-business" })}>
+          Register your shop
         </Button>
       </div>
     );
@@ -194,12 +323,36 @@ export function EditShopPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6 px-4 py-6 md:py-10">
       <header>
-        <h1 className="text-heading text-2xl font-bold md:text-3xl">Edit Shop</h1>
-        <p className="text-muted-foreground text-sm">Update your shop details anytime.</p>
+        <h1 className="text-heading text-2xl font-bold md:text-3xl">Shop Settings</h1>
+        <p className="text-muted-foreground text-sm">
+          Yeh single page hai shop ke saare details manage karne ke liye. Yahan se save hone wala
+          data seedha aapke template website (/site/{"<slug>"}) par dikhega.
+        </p>
       </header>
 
+      {draftRestored && isDirty && (
+        <div className="flex flex-col gap-2 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 sm:flex-row sm:items-center sm:justify-between dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200">
+          <span>
+            <strong className="font-semibold">Draft restored.</strong> Aapke pichhle unsaved edits
+            yahan wapas load kiye gaye hain. Save karke apply karein ya discard karein.
+          </span>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={discardDraft}
+            className="border-amber-400 text-amber-900 hover:bg-amber-100 dark:border-amber-400/50 dark:text-amber-100 dark:hover:bg-amber-500/20"
+          >
+            Discard draft
+          </Button>
+        </div>
+      )}
+
+
       <Card>
-        <CardContent className="grid gap-4 p-6 md:grid-cols-2">
+        <CardHeader>
+          <CardTitle className="text-base">Business basics</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-2">
           <Field label="Business Name" required>
             <Input value={form.name} onChange={(e) => set("name", e.target.value)} />
           </Field>
@@ -234,7 +387,14 @@ export function EditShopPage() {
               onChange={(e) => set("description", e.target.value)}
             />
           </Field>
+        </CardContent>
+      </Card>
 
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Contact</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-2">
           <Field label="Phone">
             <Input value={form.phone} onChange={(e) => set("phone", e.target.value)} />
           </Field>
@@ -274,7 +434,14 @@ export function EditShopPage() {
           <Field label="PIN Code">
             <Input value={form.pincode} onChange={(e) => set("pincode", e.target.value)} />
           </Field>
+        </CardContent>
+      </Card>
 
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Branding images</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-4">
           <ImageUploadField
             label="Logo"
             value={form.logo_url}
@@ -307,22 +474,81 @@ export function EditShopPage() {
         </CardContent>
       </Card>
 
-      <div className="flex justify-end gap-2">
-        <Button variant="outline" onClick={() => navigate({ to: "/owner/welcome" })}>
-          Cancel
+      <div className="sticky bottom-0 flex flex-wrap items-center justify-end gap-2 border-t bg-background/95 py-3 backdrop-blur">
+        {isDirty ? (
+          <span className="mr-auto text-xs text-muted-foreground">Unsaved changes · autosaved as draft</span>
+        ) : (
+          <span className="mr-auto text-xs text-muted-foreground">
+            Next: template, colors, banner & live preview →
+          </span>
+        )}
+        <Button variant="ghost" onClick={() => navigate({ to: "/owner/welcome" })}>
+          Back
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => navigate({ to: "/owner/website", search: { live: 1 } })}
+          disabled={save.isPending}
+          title="Template chunein, colors/banner edit karein aur live preview dekhein"
+        >
+          <Sparkles className="mr-2 h-4 w-4" />
+          {isDirty ? "Skip & Edit Website" : "Continue: Edit & Live Preview"}
         </Button>
         <Button
           onClick={() => save.mutate()}
-          disabled={save.isPending || uploading !== null || !form.name.trim()}
+          disabled={save.isPending || uploading !== null || !form.name.trim() || !isDirty}
         >
           {save.isPending ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (
             <Save className="mr-2 h-4 w-4" />
           )}
-          Save changes
+          Save & Continue
         </Button>
       </div>
+
+      <AlertDialog
+        open={blocker.status === "blocked" || pendingHref !== null}
+        onOpenChange={(open) => {
+          if (open) return;
+          if (blocker.status === "blocked") blocker.reset();
+          setPendingHref(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Discard unsaved changes?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Aapne kuch changes save nahi kiye. Yahan se jaane par wo lost ho jaayenge.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => {
+                if (blocker.status === "blocked") blocker.reset();
+                setPendingHref(null);
+              }}
+            >
+              Stay on page
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (blocker.status === "blocked") {
+                  blocker.proceed();
+                } else if (pendingHref) {
+                  const href = pendingHref;
+                  setBaseline(form); // clear dirty so navigate won't re-block
+                  setPendingHref(null);
+                  // Use the router so back button works and no full reload.
+                  navigate({ to: href });
+                }
+              }}
+            >
+              Discard & leave
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
@@ -345,7 +571,7 @@ function ImageUploadField({
   children: React.ReactNode;
 }) {
   return (
-    <Field label={`${label} URL`} className="md:col-span-2">
+    <Field label={`${label} URL`}>
       <div className="space-y-3">
         {value && (
           <div className="overflow-hidden rounded-xl border border-border bg-muted/30 p-2">

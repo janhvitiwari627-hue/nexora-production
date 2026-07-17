@@ -51,12 +51,20 @@ export function WhiteLabelHeader({ shop, template }: { shop: ShopData; template:
           className="flex items-center gap-2 font-bold"
           style={{ fontFamily: template.headingFont }}
         >
-          <span
-            className="grid h-9 w-9 place-items-center rounded-full text-white shadow"
-            style={{ backgroundColor: template.colors.primary }}
-          >
-            {shop.name[0]}
-          </span>
+          {shop.logoImage ? (
+            <img
+              src={shop.logoImage}
+              alt={`${shop.name} logo`}
+              className="h-9 w-9 rounded-full object-cover shadow"
+            />
+          ) : (
+            <span
+              className="grid h-9 w-9 place-items-center rounded-full text-white shadow"
+              style={{ backgroundColor: template.colors.primary }}
+            >
+              {shop.name[0]}
+            </span>
+          )}
           <span className={variant === "elegant" ? "text-xl tracking-wide" : "text-base font-extrabold uppercase tracking-wide"}>
             {shop.name}
           </span>
@@ -75,7 +83,7 @@ export function WhiteLabelHeader({ shop, template }: { shop: ShopData; template:
             style={{ backgroundColor: template.colors.primary, color: "white", borderRadius: template.radius }}
             asChild
           >
-            <Link to="/book/$slug" params={{ slug: shop.slug }}>Book Now</Link>
+            <Link to="/site/$slug/book" params={{ slug: shop.slug }} search={{ service: undefined }}>Book Now</Link>
           </Button>
           <button
             type="button"
@@ -105,7 +113,7 @@ export function WhiteLabelHeader({ shop, template }: { shop: ShopData; template:
               style={{ backgroundColor: template.colors.primary, color: "white", borderRadius: template.radius }}
               asChild
             >
-              <Link to="/book/$slug" params={{ slug: shop.slug }} onClick={() => setOpen(false)}>Book Now</Link>
+              <Link to="/site/$slug/book" params={{ slug: shop.slug }} search={{ service: undefined }} onClick={() => setOpen(false)}>Book Now</Link>
             </Button>
           </nav>
         </div>

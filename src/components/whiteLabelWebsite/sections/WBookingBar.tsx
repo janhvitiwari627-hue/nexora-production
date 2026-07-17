@@ -12,7 +12,7 @@ export function WBookingBar({ shop, template }: { shop: ShopData; template: Temp
           <div className="text-muted-foreground text-xs">Available today</div>
         </div>
         <Link
-          to="/site/$slug_/book"
+          to="/site/$slug/book"
           params={{ slug: shop.slug }}
           search={{ service: undefined }}
           className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white"

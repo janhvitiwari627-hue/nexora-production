@@ -18,9 +18,9 @@ import { useAuthStore } from "@/stores/authStore";
 
 const MODULES = [
   {
-    label: "Business profile",
-    description: "Salon details and contact",
-    to: "/owner/edit-shop",
+    label: "Shop settings",
+    description: "Salon details, contact & branding",
+    to: "/owner/settings",
     icon: Store,
   },
   {

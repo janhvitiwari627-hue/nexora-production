@@ -186,6 +186,7 @@
   html {
     width: 100%;
     min-width: 0;
+    max-width: 100%;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -193,11 +194,28 @@
   body {
     width: 100%;
     min-width: 0;
+    max-width: 100%;
     overflow-x: hidden;
     background-color: var(--color-background);
     color: var(--color-body);
     font-family: var(--font-sans);
     font-feature-settings: "cv11", "ss01";
+  }
+  #root {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+  body > div,
+  main {
+    max-width: 100%;
+    overflow-x: clip;
+  }
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
   }
   h1, h2, h3, h4, h5, h6 { color: var(--color-heading); font-weight: 700; letter-spacing: -0.02em; }
 }

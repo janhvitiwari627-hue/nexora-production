@@ -81,8 +81,8 @@ export function OwnerPaymentsPage() {
   const commissionPercent = commission <= 1 ? commission * 100 : commission;
 
   return (
-    <div className="container mx-auto max-w-6xl space-y-6 px-4 py-6">
-      <header>
+    <div className="mx-auto w-full max-w-6xl space-y-6 overflow-x-hidden px-3 py-5 sm:px-4 sm:py-6">
+      <header className="min-w-0">
         <h1 className="text-2xl font-bold">Wallet & Payouts</h1>
         <p className="text-sm text-muted-foreground">
           10% platform commission is deducted from completed bookings.
@@ -116,8 +116,8 @@ export function OwnerPaymentsPage() {
               note={`Commission rate ${commissionPercent}%`}
             />
           </div>
-          <Tabs defaultValue="transactions">
-            <TabsList>
+          <Tabs defaultValue="transactions" className="min-w-0">
+            <TabsList className="w-full max-w-full justify-start overflow-x-auto">
               <TabsTrigger value="transactions">Transactions</TabsTrigger>
               <TabsTrigger value="withdrawals">Withdrawals</TabsTrigger>
               <TabsTrigger value="request">Request payout</TabsTrigger>
@@ -127,8 +127,8 @@ export function OwnerPaymentsPage() {
                 <CardHeader>
                   <CardTitle className="text-base">Wallet transactions</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <Table>
+                <CardContent className="overflow-x-auto">
+                  <Table className="min-w-[640px]">
                     <TableHeader>
                       <TableRow>
                         <TableHead>Date</TableHead>
@@ -173,8 +173,8 @@ export function OwnerPaymentsPage() {
                 <CardHeader>
                   <CardTitle className="text-base">Withdrawal history</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <Table>
+                <CardContent className="overflow-x-auto">
+                  <Table className="min-w-[420px]">
                     <TableHeader>
                       <TableRow>
                         <TableHead>Date</TableHead>

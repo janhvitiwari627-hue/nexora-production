@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { WebsiteRenderer } from "@/components/whiteLabelWebsite/WebsiteRenderer";
 import { WhiteLabelHeader } from "@/components/whiteLabelWebsite/WhiteLabelHeader";
 import { WhiteLabelFooter } from "@/components/whiteLabelWebsite/WhiteLabelFooter";
@@ -18,23 +19,168 @@ import {
   type TemplateKey,
 } from "@/components/whiteLabelWebsite/templates";
 import { getSalonBySlug } from "@/lib/salons.functions";
-import { Paintbrush } from "lucide-react";
+import { expandMockBusiness, getMockBusinesses, getMockBusinessBySlug } from "@/lib/mock-businesses";
+import { AlertTriangle, Check, Loader2, Paintbrush } from "lucide-react";
+import { toast } from "sonner";
 
 const DEFAULT_COVER =
   "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=1600&q=80";
+
+type LiveOverrideService = {
+  id?: string;
+  name: string;
+  price: number;
+  duration?: number | null;
+  desc?: string | null;
+  image?: string | null;
+  category?: string | null;
+};
+
+type LiveOverrideStaff = {
+  id?: string;
+  name: string;
+  role?: string | null;
+  bio?: string | null;
+  avatar_url?: string | null;
+  rating?: number | null;
+};
+
+type LiveOverrides = Partial<{
+  name: string;
+  tagline: string | null;
+  description: string | null;
+  about_us: string | null;
+  cover_image_url: string | null;
+  owner_profile_image_url: string | null;
+  video_url: string | null;
+  brand_primary: string | null;
+  brand_secondary: string | null;
+  phone: string | null;
+  email: string | null;
+  address: string | null;
+  gallery_images: string[];
+  hours: unknown;
+  is_home_service: boolean;
+  home_service_charge: number;
+  home_service_radius_km: number;
+  selected_template_key: string;
+  services: LiveOverrideService[];
+  staff: LiveOverrideStaff[];
+}>;
 
 export function WhiteLabelWebsitePage({
   slug: _slug,
   routeSearch,
 }: {
   slug?: string;
-  routeSearch?: { t?: string; preview?: 1 };
+  routeSearch?: { t?: string; preview?: 1; live?: 1 };
 }) {
-  const { data, isLoading } = useQuery({
+  const { data: rawData, isLoading, isFetching, refetch } = useQuery({
     queryKey: ["white-label-site", _slug],
     queryFn: () => (_slug ? getSalonBySlug({ data: { slug: _slug } }) : Promise.resolve(null)),
     enabled: !!_slug,
   });
+  const queryClient = useQueryClient();
+  const salonId = rawData?.salon?.id;
+  const [liveState, setLiveState] = useState<"idle" | "updating" | "updated" | "error">("idle");
+  const [liveError, setLiveError] = useState<string | null>(null);
+  const [liveOverrides, setLiveOverrides] = useState<LiveOverrides | null>(null);
+
+  const isLiveMode =
+    routeSearch?.live === 1 ||
+    (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("live") === "1");
+
+  // Listen for owner "Edit & Live" postMessage patches so unsaved edits render
+  // instantly inside the preview iframe without hitting the DB.
+  useEffect(() => {
+    if (!isLiveMode || typeof window === "undefined") return;
+    const onMessage = (e: MessageEvent) => {
+      const msg = e.data;
+      if (!msg || typeof msg !== "object") return;
+      if (msg.type === "live-preview-overrides" && msg.patch && typeof msg.patch === "object") {
+        setLiveOverrides(msg.patch as LiveOverrides);
+      } else if (msg.type === "live-preview-clear") {
+        setLiveOverrides(null);
+      }
+    };
+    window.addEventListener("message", onMessage);
+    // Signal to parent that we're ready to receive overrides
+    try {
+      window.parent?.postMessage({ type: "live-preview-ready" }, "*");
+    } catch {
+      /* noop */
+    }
+    return () => window.removeEventListener("message", onMessage);
+  }, [isLiveMode]);
+
+  // Merge live overrides onto salon data before rendering.
+  const data = useMemo(() => {
+    if (!rawData?.salon || !liveOverrides) return rawData;
+    return { ...rawData, salon: { ...rawData.salon, ...liveOverrides } };
+  }, [rawData, liveOverrides]);
+
+  // Live refresh: when the salon row (or its services) changes in the DB,
+  // re-fetch so /site/<slug> reflects owner edits from /owner/settings instantly.
+  useEffect(() => {
+    if (!_slug || !salonId) return;
+    const onChange = async () => {
+      setLiveError(null);
+      setLiveState("updating");
+      try {
+        await queryClient.refetchQueries({
+          queryKey: ["white-label-site", _slug],
+          type: "active",
+        });
+        const state = queryClient.getQueryState(["white-label-site", _slug]);
+        if (state?.status === "error") throw (state.error as Error) ?? new Error("Refetch failed");
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to refresh website.";
+        setLiveError(message);
+        setLiveState("error");
+        toast.error("Website update failed", {
+          description: message,
+          action: { label: "Retry", onClick: () => retryLive() },
+        });
+      }
+    };
+    const channel = supabase
+      .channel(`site-${salonId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "salons", filter: `id=eq.${salonId}` }, onChange)
+      .on("postgres_changes", { event: "*", schema: "public", table: "services", filter: `salon_id=eq.${salonId}` }, onChange)
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [_slug, salonId, queryClient]);
+
+  const retryLive = async () => {
+    setLiveError(null);
+    setLiveState("updating");
+    try {
+      const r = await refetch();
+      if (r.error) throw r.error;
+      setLiveState("updated");
+      setTimeout(() => setLiveState("idle"), 1500);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to refresh website.";
+      setLiveError(message);
+      setLiveState("error");
+      toast.error("Website update failed", {
+        description: message,
+        action: { label: "Retry", onClick: () => retryLive() },
+      });
+    }
+  };
+
+  // Flip the pill to "Updated" briefly once the refetch settles.
+  useEffect(() => {
+    if (liveState !== "updating" || isFetching) return;
+    setLiveState("updated");
+    const t = setTimeout(() => setLiveState("idle"), 1500);
+    return () => clearTimeout(t);
+  }, [liveState, isFetching]);
+
   const navigate = useNavigateSafe();
 
   const browserSearch =
@@ -49,7 +195,15 @@ export function WhiteLabelWebsitePage({
     );
   }
 
-  if (!data?.salon) {
+  // Template previews and demo slugs use mock businesses that don't exist in
+  // the DB. When the DB has no salon but we recognise the slug as a mock
+  // business (or we're explicitly in preview mode), render the template with
+  // the mock ShopData so the "Book Now" flow stays inside the owner's
+  // website design instead of dead-ending on a "not available" screen.
+  const mockBusiness = _slug ? getMockBusinessBySlug(_slug) : null;
+  const useMock = !data?.salon && (!!mockBusiness || isPreview);
+
+  if (!data?.salon && !useMock) {
     return (
       <div className="mx-auto grid min-h-[70vh] max-w-xl place-items-center px-6 text-center">
         <div className="space-y-4">
@@ -69,8 +223,45 @@ export function WhiteLabelWebsitePage({
     );
   }
 
-  const shop: ShopData = toShopData(data);
-  const savedTemplateKey = data?.salon?.selected_template_key ?? "modern-salon";
+  const fallbackShop = expandMockBusiness(mockBusiness ?? getMockBusinesses()[0]);
+  const baseShop: ShopData = data?.salon
+    ? toShopData(data)
+    : liveOverrides && isPreview
+      ? toLivePreviewShop(fallbackShop, liveOverrides, _slug)
+      : fallbackShop;
+  const shopWithServices: ShopData =
+    liveOverrides?.services && liveOverrides.services.length >= 0
+      ? {
+          ...baseShop,
+          services: liveOverrides.services.map((s, i) => ({
+            id: s.id ?? `draft-${i}`,
+            name: s.name,
+            price: Number(s.price) || 0,
+            duration: Number(s.duration ?? 30) || 30,
+            desc: s.desc ?? "",
+            image: s.image ?? undefined,
+            category: s.category ?? undefined,
+          })),
+        }
+      : baseShop;
+  const shop: ShopData =
+    liveOverrides?.staff && liveOverrides.staff.length >= 0
+      ? {
+          ...shopWithServices,
+          staff: liveOverrides.staff.map((s, i) => ({
+            id: s.id ?? `draft-staff-${i}`,
+            name: s.name,
+            designation: s.role ?? "Team Member",
+            image: s.avatar_url ?? shopWithServices.coverImage,
+            experience: 3,
+            specialization: s.bio ?? undefined,
+            rating: s.rating ?? undefined,
+            available: true,
+          })),
+        }
+      : shopWithServices;
+  const savedTemplateKey =
+    data?.salon?.selected_template_key ?? liveOverrides?.selected_template_key ?? "modern-salon";
   const templateKey = normalizeTemplateKey(
     routeSearch?.t ?? browserSearch?.get("t") ?? savedTemplateKey,
   );
@@ -79,9 +270,9 @@ export function WhiteLabelWebsitePage({
   const config: WebsiteConfig = {
     template: templateKey,
     branding: {
-      logo: data?.salon?.owner_profile_image_url ?? undefined,
-      primaryColor: data?.salon?.brand_primary ?? baseTemplate.colors.primary,
-      secondaryColor: data?.salon?.brand_secondary ?? baseTemplate.colors.secondary,
+      logo: data?.salon?.owner_profile_image_url ?? liveOverrides?.owner_profile_image_url ?? undefined,
+      primaryColor: data?.salon?.brand_primary ?? liveOverrides?.brand_primary ?? baseTemplate.colors.primary,
+      secondaryColor: data?.salon?.brand_secondary ?? liveOverrides?.brand_secondary ?? baseTemplate.colors.secondary,
       font: baseTemplate.font,
     },
     sections: DEFAULT_SECTIONS,
@@ -152,6 +343,51 @@ export function WhiteLabelWebsitePage({
       </main>
       <WhiteLabelFooter shop={shop} config={config} template={template} />
       <ViralGrowthWidget />
+      {liveState !== "idle" && (
+        <div
+          role="status"
+          aria-live="polite"
+          className={`fixed bottom-4 left-1/2 z-50 -translate-x-1/2 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium shadow-lg backdrop-blur transition-all ${
+            liveState === "updating"
+              ? "bg-slate-900/90 text-white"
+              : liveState === "error"
+                ? "bg-red-600/95 text-white"
+                : "bg-emerald-600/95 text-white"
+          }`}
+        >
+          {liveState === "updating" ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Updating website…
+            </>
+          ) : liveState === "error" ? (
+            <>
+              <AlertTriangle className="h-4 w-4" />
+              <span>Update failed{liveError ? `: ${liveError}` : ""}</span>
+              <button
+                type="button"
+                onClick={retryLive}
+                className="ml-2 rounded-full bg-white/20 px-3 py-0.5 text-xs font-semibold hover:bg-white/30"
+              >
+                Retry
+              </button>
+              <button
+                type="button"
+                onClick={() => setLiveState("idle")}
+                aria-label="Dismiss"
+                className="ml-1 rounded-full px-2 py-0.5 text-xs font-semibold hover:bg-white/20"
+              >
+                ✕
+              </button>
+            </>
+          ) : (
+            <>
+              <Check className="h-4 w-4" />
+              Website updated
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -208,6 +444,8 @@ function toShopData(data: NonNullable<Awaited<ReturnType<typeof getSalonBySlug>>
     phone: salon.phone ?? "",
     email: "",
     coverImage: cover,
+    logoImage: salon.owner_profile_image_url ?? undefined,
+    videoUrl: salon.video_url ?? undefined,
     rating: salon.rating ?? 0,
     reviewCount: salon.reviews_count ?? 0,
     about: salon.about_us ?? salon.description ?? "",
@@ -229,6 +467,36 @@ function toShopData(data: NonNullable<Awaited<ReturnType<typeof getSalonBySlug>>
     socialLinks: {},
     hours: toWebsiteHours(salon.hours),
     location: { lat: salon.latitude ?? 0, lng: salon.longitude ?? 0 },
+  };
+}
+
+function toLivePreviewShop(base: ShopData, patch: LiveOverrides, slug?: string): ShopData {
+  const cover = patch.cover_image_url ?? base.coverImage;
+  const gallery: ShopData["gallery"] = (patch.gallery_images ?? base.gallery.map((g) => g.url)).map(
+    (url, i) => ({
+      url,
+      type: "photo" as const,
+      category: i % 2 ? "Work" : "Interior",
+    }),
+  );
+  if (patch.video_url) {
+    gallery.push({ url: patch.video_url, type: "video", category: "Salon Video" });
+  }
+  return {
+    ...base,
+    slug: slug ?? base.slug,
+    name: patch.name ?? base.name,
+    tagline: patch.tagline ?? patch.description ?? base.tagline,
+    address: patch.address ?? base.address,
+    whatsapp: patch.phone ?? base.whatsapp,
+    phone: patch.phone ?? base.phone,
+    email: patch.email ?? base.email,
+    coverImage: cover,
+    logoImage: patch.owner_profile_image_url ?? base.logoImage,
+    videoUrl: patch.video_url ?? base.videoUrl,
+    about: patch.about_us ?? patch.description ?? base.about,
+    gallery,
+    hours: toWebsiteHours(patch.hours).length ? toWebsiteHours(patch.hours) : base.hours,
   };
 }
 

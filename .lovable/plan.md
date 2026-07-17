@@ -1,100 +1,69 @@
-## Problem
+Aapki uploaded file ke hisaab se pura **form-based live template editor** banana hai. Ye ek bada system hai, isliye main ise **phases** me build karunga — har phase ke baad aap test kar sakte ho.
 
-Admin panel ke saare 12 options open toh ho rahe hain, lekin andar ke features properly kaam nahi kar rahe:
+## Architecture (spec ke according)
 
-- Most pages **mock data** (`useState` + hardcoded arrays) use kar rahe hain — actual website ka data show nahi hota
-- Buttons (Approve, Reject, Suspend, Save, Delete) sirf `toast` message dikhate hain, real DB update nahi karte
-- Kuch pages incomplete hain (missing filters, empty tabs, no detail views)
-- Cross-linking missing hai (e.g. Business row se User profile ya bookings tak jump)
+Template ko HTML ki tarah edit nahi karenge. Har section ek **structured JSON component** hoga:
+```json
+{ "type": "hero", "heading": "...", "imageUrl": "...", "visible": true, "order": 1 }
+```
+Website is JSON se render hogi. Editor sirf JSON badlega → template kabhi tootega nahi.
 
-Yaani admin ke paas "full control" abhi sirf UI level pe hai — real backend ke saath wired nahi.
+## Database Schema (nayi tables)
 
-## Scope: 12 admin pages — page by page
+```
+website_templates      – original templates (read-only master copies)
+user_websites          – har user ki apni website (draft + published)
+website_sections       – hero/services/gallery/about/contact… har section ka JSON content, order, visible flag
+website_theme          – colors, fonts, button styles per user_website
+website_versions       – snapshots for undo / version history
+media_library          – uploaded images/logos per user
+```
+RLS: har user sirf apni `user_websites` aur uske children edit kar sake.
 
-Har page pe (a) real Lovable Cloud data pull karna hai, (b) actions ko real DB writes se jodna hai, (c) missing features complete karne hain.
+## Build Order (spec ke exact order me)
 
-### 1. Dashboard (`/admin/dashboard`)
-- Real KPIs: total users, businesses, bookings, revenue, active jobs — DB counts se
-- Recent activity feed real bookings/signups/reviews se
-- Pending actions live count (approvals waiting)
-- Quick-jump links har KPI se relevant page tak
+**Phase 1 — Schema + Template Copy System**
+- Migration: upar wali tables + RLS + GRANTs
+- "Use This Template" button → template ka snapshot user ke account me copy
+- Har section JSON structure ke saath insert ho
 
-### 2. Users (`/admin/users`)
-- Real user list `profiles` + `user_roles` se
-- Filters: role, status, city, signup date, search
-- Actions: role assign/revoke, suspend, delete, reset password, view bookings
-- Detail drawer: profile, roles, activity, membership, reviews
+**Phase 2 — Section-based Editor Shell**
+- `/owner/website/edit` route: left = form controls, right = live iframe preview
+- Section list sidebar (Hero, About, Services, Gallery, Staff, Packages, Offers, Rate Card, Membership, Blog, Contact)
+- Har section ke liye alag form panel
 
-### 3. Businesses (`/admin/businesses`)
-- Real salon list; approve/reject pending owner registrations (already partial)
-- Suspend/verify/feature toggle — DB write
-- View business detail: staff, services, bookings, revenue, reviews
-- Bulk actions
+**Phase 3 — Text & Image Editors**
+- Har field (heading, description, button text/link) form input
+- Image upload (file picker + optional URL) — media_library me store
+- Debounced live preview via postMessage (jaise abhi hai)
 
-### 4. Jobs & Hiring (`/admin/jobs`)
-- Real jobs from `jobs` table (currently mock)
-- Applications tab wired to real applicants table
-- Interview requests + Hire requests real
-- Approve/close/flag job, approve/reject applications — DB write
-- Candidate profile view
+**Phase 4 — Theme Editor**
+- Colors (primary/secondary/accent/bg), fonts, button style
+- Live CSS variable injection in preview
 
-### 5. Partner Applications (`/admin/partner-applications`)
-- Pehle se real hai — polish: bulk actions, notes, contact log
+**Phase 5 — Section Show/Hide + Reorder**
+- Toggle switch per section (`visible`)
+- Drag-to-reorder (dnd-kit) → `order` field update
 
-### 6. Payments (`/admin/payments`)
-- UPI/QR management from DB (not local state)
-- Pending payment verifications: approve screenshot → mark booking paid
-- Settlements table with real aggregates
-- Transactions with filters (date, amount, status, method)
-- Refund action
+**Phase 6 — Draft / Publish / Undo**
+- Save Draft (auto, jo abhi partially hai)
+- Publish button → draft → published copy
+- Undo: last N versions se restore
 
-### 7. Advertising (`/admin/advertising`)
-- Listing + Video campaigns real from DB
-- Create/edit campaign → DB write, upload creative
-- Approve pending campaigns, pause/resume, budget edits
-- Performance metrics (impressions/clicks) from analytics events
+**Phase 7 — Desktop/Mobile Preview Toggle**
+- Iframe width switch
 
-### 8. Rewards (`/admin/rewards`)
-- Reward rules CRUD (points per booking, referral bonus, etc.)
-- Redemption requests approve/reject
-- Reward transactions log
-- Manual points adjustment for a user
+**Phase 8 — Domain + Version History UI** (last)
 
-### 9. Reviews (`/admin/reviews`)
-- Real reviews list with filters (rating, business, flagged)
-- Approve/reject/hide, delete, reply as admin
-- Flagged reviews queue
+## Renderer Refactor (important)
 
-### 10. Rankings (`/admin/rankings`)
-- Featured shops management: pin/unpin, order, expiry
-- Sponsored slots CRUD
-- Category-wise top shops override
+Abhi `WhiteLabelWebsitePage` har section ko hardcoded tables (`shop`, `services`, `staff`…) se read karta hai. Isko refactor karunga taaki wo **`website_sections` JSON array** ko iterate karke render kare. Isse:
+- Section reorder / hide automatically work karega
+- Naye section types easily add honge
+- Editor aur renderer dono ek hi schema use karenge
 
-### 11. Analytics (`/admin/analytics`)
-- Real charts: revenue trend, bookings/day, user growth, top cities, top categories
-- Date range picker, export CSV
-- Cohort/funnel basics
+Existing data (shop/services/staff tables) ko migration me `website_sections` JSON me convert kar denge — kuch bhi lose nahi hoga.
 
-### 12. Settings (`/admin/settings`)
-- Platform settings (commission %, min payout, feature flags) persisted in a `platform_settings` table
-- Contact email, support phone
-- Terms/Privacy content editors
-- Maintenance mode toggle
+## Aaj kya start karun?
 
-## Approach
-
-Because ye 12 pages ka bada kaam hai, main **do phases** mein karunga taaki har turn pe ek clean shippable slice mile:
-
-**Phase 1 — Data wiring (real DB reads):**
-Har page ke lists/tables ko real Lovable Cloud queries se jodna. Jo tables missing hain (jaise `platform_settings`, `reward_rules`, `ad_campaigns`) unke migrations create karna with RLS + GRANTs.
-
-**Phase 2 — Action wiring:**
-Har button/toggle/form ko real mutation se jodna (RPC ya server function), success/error handling, optimistic updates, react-query invalidation.
-
-Ek turn mein 2–3 pages complete karunga end-to-end, phir agla batch. Aap priority bata sakte hain — konsa page pehle chahiye.
-
-## Confirm before I start
-
-1. **Priority order** — konsa page sabse pehle chahiye? (default order: Jobs → Payments → Businesses → Users → baaki)
-2. **Missing tables banane ki permission** — Rewards, Ads, Platform Settings, Rankings ke liye naye tables chahiye. OK?
-3. **Kya kuch page abhi mock hi rehne dena hai** (agar aap chahte ho ki sirf UI dikh jaaye MVP ke liye)?
+Main **Phase 1 (schema + template copy)** se start karunga. Ye foundation hai — iske bina baaki sab patchwork hoga (jaisa abhi ho raha hai). Approve karo to migration likhta hun.

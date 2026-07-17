@@ -18,6 +18,7 @@ export const Route = createFileRoute("/shop-owner-app")({
 function ShopOwnerAppPage() {
   return (
     <RoleAppLandingPage
+      hideFooter
       kind="owner"
       eyebrow="Shop Owner App"
       title="Salon chalana ab simple hai."

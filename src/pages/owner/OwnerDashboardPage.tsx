@@ -51,6 +51,7 @@ import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { useOwnerContext } from "@/hooks/use-owner-context";
+import { useAuthStore } from "@/stores/authStore";
 import {
   ownerDashboardMetricsQuery,
   ownerAnalyticsQuery,
@@ -134,18 +135,11 @@ function TopBar({
             <Switch checked={open} onCheckedChange={onToggle} className="ml-1" />
           </div>
           {showWebsiteActions && (
-            <>
-              <Button variant="ghost" size="sm" className="hidden gap-1.5 md:inline-flex" asChild>
-                <a href="/owner/templates">
-                  <Globe className="h-4 w-4" /> Website
-                </a>
-              </Button>
-              <Button variant="outline" size="sm" className="hidden gap-1.5 md:inline-flex" asChild>
-                <a href="/owner/website">
-                  <Settings className="h-4 w-4" /> Edit Website
-                </a>
-              </Button>
-            </>
+            <Button variant="outline" size="sm" className="hidden gap-1.5 md:inline-flex" asChild>
+              <a href="/owner/website">
+                <Globe className="h-4 w-4" /> Final Website Editor
+              </a>
+            </Button>
           )}
           {showWebsiteActions && (
             <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
@@ -172,9 +166,9 @@ const OWNER_PORTAL_ITEMS = [
     icon: LayoutDashboard,
   },
   {
-    label: "Salon Setup",
-    description: "Salon ki basic details update karein",
-    to: "/owner/edit-shop",
+    label: "Shop Settings",
+    description: "Sabhi shop details ek jagah manage karein",
+    to: "/owner/settings",
     icon: Store,
   },
   {
@@ -738,13 +732,68 @@ function RecentReviewsWidget() {
 }
 
 function QuickActionsRow() {
-  const actions = [
-    { icon: Plus, label: "Add Service" },
-    { icon: UserPlus, label: "Add Staff" },
-    { icon: Tag, label: "Create Offer" },
-    { icon: Share2, label: "Share Website" },
-    { icon: QrCode, label: "Generate QR" },
-    { icon: BarChart3, label: "View Analytics" },
+  const navigate = useNavigate();
+  const user = useAuthStore((s) => s.user);
+  const roles = useAuthStore((s) => s.roles);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
+  const isOwner = roles.includes("owner" as any);
+
+  const requireOwner = (label: string, target: string, run?: () => void) => {
+    if (!isInitialized) {
+      toast.info("Loading your account…");
+      return;
+    }
+    if (!user) {
+      // Stash the intended destination so /login restores it after sign-in.
+      try {
+        sessionStorage.setItem("nexora:postLoginRedirect", target);
+      } catch {
+        /* storage unavailable */
+      }
+      toast.error("Please sign in to continue", {
+        description: `Sign in as a shop owner to use "${label}". We'll bring you right back.`,
+        action: {
+          label: "Sign in",
+          onClick: () => navigate({ to: "/login" }),
+        },
+      });
+      return;
+    }
+    if (!isOwner) {
+      toast.error("Owner access required", {
+        description: `"${label}" is only available for shop owner accounts.`,
+        action: {
+          label: "Become an owner",
+          onClick: () => navigate({ to: "/owner-signup" as any }),
+        },
+      });
+      return;
+    }
+    (run ?? (() => navigate({ to: target as any })))();
+  };
+
+  const handleShare = () =>
+    requireOwner("Share Website", "/owner/website", async () => {
+      const url = `${window.location.origin}/owner/website`;
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: "My Salon Website", url });
+        } else {
+          await navigator.clipboard.writeText(url);
+          toast.success("Website link copied to clipboard");
+        }
+      } catch {
+        /* user cancelled */
+      }
+    });
+
+  const actions: { icon: typeof Plus; label: string; onClick: () => void }[] = [
+    { icon: Plus, label: "Add Service", onClick: () => requireOwner("Add Service", "/owner/services") },
+    { icon: UserPlus, label: "Add Staff", onClick: () => requireOwner("Add Staff", "/owner/staff") },
+    { icon: Tag, label: "Create Offer", onClick: () => requireOwner("Create Offer", "/owner/marketing") },
+    { icon: Share2, label: "Share Website", onClick: handleShare },
+    { icon: QrCode, label: "Generate QR", onClick: () => requireOwner("Generate QR", "/owner/website") },
+    { icon: BarChart3, label: "View Analytics", onClick: () => requireOwner("View Analytics", "/owner/analytics") },
   ];
   return (
     <Card className="p-4">
@@ -752,6 +801,8 @@ function QuickActionsRow() {
         {actions.map((a) => (
           <button
             key={a.label}
+            type="button"
+            onClick={a.onClick}
             className="group flex flex-col items-center gap-2 rounded-xl p-3 text-center transition hover:bg-primary/5"
           >
             <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
@@ -828,7 +879,7 @@ export function OwnerDashboardPage({ ownerPortalOnly = false }: { ownerPortalOnl
   // Mandatory onboarding: redirect approved owners with no website yet to template gallery.
   const needsWebsite = !!activeSalon && activeSalon.website_created === false;
   useEffect(() => {
-    if (!ownerPortalOnly && needsWebsite) navigate({ to: "/owner/templates" });
+    if (!ownerPortalOnly && needsWebsite) navigate({ to: "/owner/website" });
   }, [needsWebsite, navigate, ownerPortalOnly]);
 
   // Compute greeting on the client only to avoid SSR/CSR hydration mismatch
@@ -857,7 +908,7 @@ export function OwnerDashboardPage({ ownerPortalOnly = false }: { ownerPortalOnl
                   </div>
                 </div>
               </div>
-              <Button onClick={() => navigate({ to: "/owner/templates" })}>Create Website</Button>
+              <Button onClick={() => navigate({ to: "/owner/website" })}>Open Final Editor</Button>
             </div>
           </Card>
         )}

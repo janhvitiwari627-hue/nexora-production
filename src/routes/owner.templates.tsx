@@ -1,16 +1,17 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { CreateWebsitePage } from "@/pages/owner/CreateWebsitePage";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/owner/templates")({
+  beforeLoad: () => {
+    throw redirect({ to: "/owner/website", replace: true });
+  },
   head: () => ({
     meta: [
-      { title: "Choose or Change Shop Template — Nexora" },
+      { title: "Final Website Editor — Nexora" },
       {
         name: "description",
         content:
-          "Choose or change your salon shop template without losing services, photos, content or bookings.",
+          "Edit your salon website design, content, theme and final publish action in one place.",
       },
     ],
   }),
-  component: CreateWebsitePage,
 });

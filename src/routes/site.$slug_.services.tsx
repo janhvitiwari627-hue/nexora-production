@@ -1,25 +1,37 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Clock, IndianRupee } from "lucide-react";
-import { salonBySlugQueryOptions } from "@/lib/salons.queries";
-import {
-  PublishedSiteShell,
-  PublishedSiteUnavailable,
-} from "@/pages/public/site/PublishedSiteShell";
+import { siteBySlugQueryOptions } from "@/lib/site-data";
+import { PublishedSiteShell } from "@/pages/public/site/PublishedSiteShell";
+import { SalonNotFound } from "@/pages/public/site/SalonNotFound";
 
 export const Route = createFileRoute("/site/$slug_/services")({
-  loader: ({ context, params }) =>
-    context.queryClient.ensureQueryData(salonBySlugQueryOptions(params.slug)),
-  head: ({ params }) => ({
-    meta: [{ title: `Services · ${params.slug} · Nexora` }],
-  }),
+  loader: ({ context, params }) => {
+    if (!params.slug || params.slug === "undefined" || params.slug === "null") {
+      return null;
+    }
+    return context.queryClient.ensureQueryData(siteBySlugQueryOptions(params.slug));
+  },
+  head: ({ params }) => {
+    const label = params.slug && params.slug !== "undefined" ? params.slug : "salon";
+    return { meta: [{ title: `Services · ${label} · Nexora` }] };
+  },
   component: PublishedServicesPage,
 });
 
 function PublishedServicesPage() {
   const { slug } = Route.useParams();
-  const { data } = useSuspenseQuery(salonBySlugQueryOptions(slug));
-  if (!data?.salon) return <PublishedSiteUnavailable />;
+  if (!slug || slug === "undefined" || slug === "null") {
+    return <SalonNotFound />;
+  }
+  return <PublishedServicesPageInner slug={slug} />;
+}
+
+function PublishedServicesPageInner({ slug }: { slug: string }) {
+  const { data } = useSuspenseQuery(siteBySlugQueryOptions(slug));
+  if (!data?.salon) {
+    return <SalonNotFound />;
+  }
 
   return (
     <PublishedSiteShell slug={slug} salonName={data.salon.name}>

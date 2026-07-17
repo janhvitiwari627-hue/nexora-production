@@ -2,12 +2,13 @@ import { useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { CalendarDays, Clock, IndianRupee, LoaderCircle, ShieldCheck } from "lucide-react";
-import { salonBySlugQueryOptions } from "@/lib/salons.queries";
+import { siteBySlugQueryOptions, isMockSalonId } from "@/lib/site-data";
 import { createPublicAppointment } from "@/lib/public-booking";
-import {
-  PublishedSiteShell,
-  PublishedSiteUnavailable,
-} from "@/pages/public/site/PublishedSiteShell";
+import { sendBookingConfirmationEmail } from "@/lib/booking-email.functions";
+import { PublishedSiteShell } from "@/pages/public/site/PublishedSiteShell";
+import { SalonNotFound } from "@/pages/public/site/SalonNotFound";
+import { isBookingMockDisabled } from "@/lib/mock-booking-availability";
+import { createMockBooking } from "@/lib/mock-bookings";
 
 const TIMES = [
   "10:00",
@@ -30,12 +31,21 @@ const TIMES = [
 export const Route = createFileRoute("/site/$slug_/book")({
   validateSearch: (search: Record<string, unknown>) => ({
     service: typeof search.service === "string" ? search.service : undefined,
+    booking:
+      search.booking === "on" || search.booking === "off"
+        ? (search.booking as "on" | "off")
+        : undefined,
   }),
-  loader: ({ context, params }) =>
-    context.queryClient.ensureQueryData(salonBySlugQueryOptions(params.slug)),
-  head: ({ params }) => ({
-    meta: [{ title: `Book appointment · ${params.slug} · Nexora` }],
-  }),
+  loader: ({ context, params }) => {
+    if (!params.slug || params.slug === "undefined" || params.slug === "null") {
+      return null;
+    }
+    return context.queryClient.ensureQueryData(siteBySlugQueryOptions(params.slug));
+  },
+  head: ({ params }) => {
+    const label = params.slug && params.slug !== "undefined" ? params.slug : "salon";
+    return { meta: [{ title: `Book appointment · ${label} · Nexora` }] };
+  },
   component: PublishedBookingPage,
 });
 
@@ -48,9 +58,25 @@ function localDate(offsetDays = 0) {
 
 function PublishedBookingPage() {
   const { slug } = Route.useParams();
+  const { booking: bookingSearch } = Route.useSearch();
+  if (!slug || slug === "undefined" || slug === "null") {
+    return <SalonNotFound />;
+  }
+  if (isBookingMockDisabled(slug, bookingSearch)) {
+    return (
+      <SalonNotFound
+        title="Booking not enabled yet"
+        description="Online booking is currently switched off for this salon. Please check back soon or contact the salon directly."
+      />
+    );
+  }
+  return <PublishedBookingPageInner slug={slug} />;
+}
+
+function PublishedBookingPageInner({ slug }: { slug: string }) {
   const search = Route.useSearch();
   const navigate = useNavigate();
-  const { data } = useSuspenseQuery(salonBySlugQueryOptions(slug));
+  const { data } = useSuspenseQuery(siteBySlugQueryOptions(slug));
   const services = useMemo(() => data?.services ?? [], [data?.services]);
   const initialService = services.some((service) => service.id === search.service)
     ? search.service
@@ -61,6 +87,7 @@ function PublishedBookingPage() {
   const [time, setTime] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [mobile, setMobile] = useState("");
+  const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -76,7 +103,11 @@ function PublishedBookingPage() {
   const advance = Math.round(total * 25) / 100;
   const remaining = Math.round((total - advance) * 100) / 100;
 
-  if (!data?.salon) return <PublishedSiteUnavailable />;
+  if (!data?.salon) {
+    return <SalonNotFound />;
+  }
+
+  const isMock = isMockSalonId(data.salon.id);
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -87,6 +118,30 @@ function PublishedBookingPage() {
     }
     setSubmitting(true);
     try {
+      if (isMock) {
+        // Demo/mock salon: skip the DB write, generate a local receipt so
+        // the confirmation screen still renders end-to-end.
+        const receipt = createMockBooking({
+          service_id: selectedService.id,
+          service_name: selectedService.name,
+          salon_slug: slug,
+          salon_name: data.salon.name,
+          staff_id: staffId || null,
+          staff_name: selectedStaff?.name ?? null,
+          booking_date: date,
+          booking_time: time,
+          price: total,
+          advance_amount: advance,
+          remaining,
+        });
+        await navigate({
+          to: "/site/$slug_/booking-success",
+          params: { slug },
+          search: { booking: receipt.id },
+        });
+        return;
+      }
+
       const appointment = await createPublicAppointment({
         tenantId: data.salon.id,
         serviceId: selectedService.id,
@@ -96,6 +151,26 @@ function PublishedBookingPage() {
         mobile,
         staffId: staffId || null,
       });
+      if (email) {
+        try {
+          await sendBookingConfirmationEmail({
+            data: {
+              email,
+              customerName,
+              bookingReference: appointment.booking_reference,
+              salonName: data.salon.name,
+              serviceName: selectedService.name,
+              date,
+              time,
+              total,
+              advance,
+              remaining,
+            },
+          });
+        } catch (mailErr) {
+          console.error("Confirmation email failed", mailErr);
+        }
+      }
       await navigate({
         to: "/site/$slug_/booking-success",
         params: { slug },
@@ -111,6 +186,13 @@ function PublishedBookingPage() {
   return (
     <PublishedSiteShell slug={slug} salonName={data.salon.name}>
       <main className="mx-auto max-w-5xl px-4 py-8 sm:py-12">
+        {isMock && (
+          <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <strong className="font-semibold">Demo booking:</strong> this salon site is a template
+            preview. Your appointment stays on this device for demo purposes and no email or
+            payment is sent.
+          </div>
+        )}
         <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
           <form onSubmit={submit} className="space-y-7">
             <div>
@@ -267,6 +349,18 @@ function PublishedBookingPage() {
                   required
                   className="mt-1 w-full rounded-xl border bg-white px-3 py-2.5"
                   placeholder="9876543210"
+                />
+              </label>
+              <label className="text-sm font-medium sm:col-span-2">
+                Email <span className="text-slate-500 font-normal">(for confirmation)</span>
+                <input
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  type="email"
+                  autoComplete="email"
+                  maxLength={320}
+                  className="mt-1 w-full rounded-xl border bg-white px-3 py-2.5"
+                  placeholder="you@example.com"
                 />
               </label>
             </fieldset>

@@ -24,6 +24,8 @@ export interface ShopData {
   phone: string;
   email?: string;
   coverImage: string;
+  logoImage?: string;
+  videoUrl?: string;
   rating: number;
   reviewCount: number;
   about: string;

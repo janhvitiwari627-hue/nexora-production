@@ -26,7 +26,9 @@
     "test:multi-pwa": "node scripts/audit-multi-pwa-platform.mjs",
     "test:customer-pwa": "node scripts/audit-customer-pwa.mjs",
     "test:owner-pwa": "node scripts/audit-owner-pwa.mjs",
-    "test:jobs-pwa": "node scripts/audit-jobs-pwa.mjs"
+    "test:jobs-pwa": "node scripts/audit-jobs-pwa.mjs",
+    "test:responsive": "playwright test responsive-overflow",
+    "test:safe-area": "playwright test responsive-safe-area"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^2.0.51",
@@ -36,6 +38,7 @@
     "@hookform/resolvers": "^5.2.2",
     "@lovable.dev/cloud-auth-js": "^1.1.2",
     "@lovable.dev/email-js": "^0.0.4",
+    "@lovable.dev/mcp-js": "^0.22.2",
     "@lovable.dev/webhooks-js": "^0.0.1",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -100,7 +103,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
-    "@lovable.dev/vite-tanstack-config": "2.7.4",
+    "@lovable.dev/vite-tanstack-config": "2.7.6",
     "@playwright/test": "^1.61.0",
     "@types/node": "^22.16.5",
     "@types/react": "^19.2.0",

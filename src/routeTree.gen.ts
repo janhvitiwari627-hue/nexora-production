@@ -30,6 +30,7 @@ import { Route as OwnerRouteImport } from './routes/owner'
 import { Route as OfflineRouteImport } from './routes/offline'
 import { Route as MembershipRulesRouteImport } from './routes/membership-rules'
 import { Route as MembershipRouteImport } from './routes/membership'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as JobsAppRouteImport } from './routes/jobs-app'
 import { Route as HelpRouteImport } from './routes/help'
@@ -57,6 +58,7 @@ import { Route as JobsIndexRouteImport } from './routes/jobs.index'
 import { Route as HireIndexRouteImport } from './routes/hire.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as WWebsiteIdRouteImport } from './routes/w.$websiteId'
 import { Route as TemplatePreviewKeyRouteImport } from './routes/template-preview.$key'
 import { Route as StaffDashboardRouteImport } from './routes/staff.dashboard'
 import { Route as SiteBusinessSlugRouteImport } from './routes/site.$businessSlug'
@@ -84,7 +86,7 @@ import { Route as OwnerWelcomeRouteImport } from './routes/owner.welcome'
 import { Route as OwnerWebsiteRouteImport } from './routes/owner.website'
 import { Route as OwnerTemplatesRouteImport } from './routes/owner.templates'
 import { Route as OwnerStaffRouteImport } from './routes/owner.staff'
-import { Route as OwnerSetupWizardRouteImport } from './routes/owner.setup-wizard'
+import { Route as OwnerSettingsRouteImport } from './routes/owner.settings'
 import { Route as OwnerServicesRouteImport } from './routes/owner.services'
 import { Route as OwnerReviewsRouteImport } from './routes/owner.reviews'
 import { Route as OwnerRegisterBusinessRouteImport } from './routes/owner.register-business'
@@ -95,7 +97,6 @@ import { Route as OwnerOnboardingRouteImport } from './routes/owner.onboarding'
 import { Route as OwnerMarketingRouteImport } from './routes/owner.marketing'
 import { Route as OwnerJobsRouteImport } from './routes/owner.jobs'
 import { Route as OwnerGalleryRouteImport } from './routes/owner.gallery'
-import { Route as OwnerEditShopRouteImport } from './routes/owner.edit-shop'
 import { Route as OwnerDashboardRouteImport } from './routes/owner.dashboard'
 import { Route as OwnerCrmRouteImport } from './routes/owner.crm'
 import { Route as OwnerCreateWebsiteRouteImport } from './routes/owner.create-website'
@@ -144,6 +145,8 @@ import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as PortalDistributorsIndexRouteImport } from './routes/portal.distributors.index'
 import { Route as PortalBrandsIndexRouteImport } from './routes/portal.brands.index'
 import { Route as AppOwnerIndexRouteImport } from './routes/app.owner.index'
@@ -157,9 +160,11 @@ import { Route as PortalDistributorsRegisterRouteImport } from './routes/portal.
 import { Route as PortalDistributorsSlugRouteImport } from './routes/portal.distributors.$slug'
 import { Route as PortalBrandsRegisterRouteImport } from './routes/portal.brands.register'
 import { Route as PortalBrandsSlugRouteImport } from './routes/portal.brands.$slug'
+import { Route as OwnerWebsiteEditRouteImport } from './routes/owner.website.edit'
 import { Route as OwnerJobsNewRouteImport } from './routes/owner.jobs.new'
 import { Route as JobsApplicationsJobIdRouteImport } from './routes/jobs.applications.$jobId'
 import { Route as DashboardBookingsIdRouteImport } from './routes/dashboard.bookings.$id'
+import { Route as AppOwnerWebsiteEditorRouteImport } from './routes/app.owner.website-editor'
 import { Route as AppOwnerWebsiteRouteImport } from './routes/app.owner.website'
 import { Route as AppOwnerWalletRouteImport } from './routes/app.owner.wallet'
 import { Route as AppOwnerSupportRouteImport } from './routes/app.owner.support'
@@ -174,6 +179,7 @@ import { Route as AppCustomerSearchRouteImport } from './routes/app.customer.sea
 import { Route as AppCustomerRewardsRouteImport } from './routes/app.customer.rewards'
 import { Route as AppCustomerProfileRouteImport } from './routes/app.customer.profile'
 import { Route as AppCustomerBookingsRouteImport } from './routes/app.customer.bookings'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -286,6 +292,11 @@ const MembershipRulesRoute = MembershipRulesRouteImport.update({
 const MembershipRoute = MembershipRouteImport.update({
   id: '/membership',
   path: '/membership',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -423,6 +434,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const WWebsiteIdRoute = WWebsiteIdRouteImport.update({
+  id: '/w/$websiteId',
+  path: '/w/$websiteId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TemplatePreviewKeyRoute = TemplatePreviewKeyRouteImport.update({
   id: '/template-preview/$key',
   path: '/template-preview/$key',
@@ -558,9 +574,9 @@ const OwnerStaffRoute = OwnerStaffRouteImport.update({
   path: '/staff',
   getParentRoute: () => OwnerRoute,
 } as any)
-const OwnerSetupWizardRoute = OwnerSetupWizardRouteImport.update({
-  id: '/setup-wizard',
-  path: '/setup-wizard',
+const OwnerSettingsRoute = OwnerSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => OwnerRoute,
 } as any)
 const OwnerServicesRoute = OwnerServicesRouteImport.update({
@@ -611,11 +627,6 @@ const OwnerJobsRoute = OwnerJobsRouteImport.update({
 const OwnerGalleryRoute = OwnerGalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
-  getParentRoute: () => OwnerRoute,
-} as any)
-const OwnerEditShopRoute = OwnerEditShopRouteImport.update({
-  id: '/edit-shop',
-  path: '/edit-shop',
   getParentRoute: () => OwnerRoute,
 } as any)
 const OwnerDashboardRoute = OwnerDashboardRouteImport.update({
@@ -859,6 +870,18 @@ const AdminAdvertisingRoute = AdminAdvertisingRouteImport.update({
   path: '/advertising',
   getParentRoute: () => AdminRoute,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const PortalDistributorsIndexRoute = PortalDistributorsIndexRouteImport.update({
   id: '/portal/distributors/',
   path: '/portal/distributors/',
@@ -925,6 +948,11 @@ const PortalBrandsSlugRoute = PortalBrandsSlugRouteImport.update({
   path: '/portal/brands/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OwnerWebsiteEditRoute = OwnerWebsiteEditRouteImport.update({
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => OwnerWebsiteRoute,
+} as any)
 const OwnerJobsNewRoute = OwnerJobsNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -939,6 +967,11 @@ const DashboardBookingsIdRoute = DashboardBookingsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => DashboardBookingsRoute,
+} as any)
+const AppOwnerWebsiteEditorRoute = AppOwnerWebsiteEditorRouteImport.update({
+  id: '/website-editor',
+  path: '/website-editor',
+  getParentRoute: () => AppOwnerRoute,
 } as any)
 const AppOwnerWebsiteRoute = AppOwnerWebsiteRouteImport.update({
   id: '/website',
@@ -1010,6 +1043,12 @@ const AppCustomerBookingsRoute = AppCustomerBookingsRouteImport.update({
   path: '/bookings',
   getParentRoute: () => AppCustomerRoute,
 } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -1078,6 +1117,7 @@ export interface FileRoutesByFullPath {
   '/help': typeof HelpRoute
   '/jobs-app': typeof JobsAppRoute
   '/login': typeof LoginRoute
+  '/mcp': typeof McpRoute
   '/membership': typeof MembershipRoute
   '/membership-rules': typeof MembershipRulesRoute
   '/offline': typeof OfflineRoute
@@ -1099,6 +1139,8 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/website-builder': typeof WebsiteBuilderRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -1147,7 +1189,6 @@ export interface FileRoutesByFullPath {
   '/owner/create-website': typeof OwnerCreateWebsiteRoute
   '/owner/crm': typeof OwnerCrmRoute
   '/owner/dashboard': typeof OwnerDashboardRoute
-  '/owner/edit-shop': typeof OwnerEditShopRoute
   '/owner/gallery': typeof OwnerGalleryRoute
   '/owner/jobs': typeof OwnerJobsRouteWithChildren
   '/owner/marketing': typeof OwnerMarketingRoute
@@ -1158,10 +1199,10 @@ export interface FileRoutesByFullPath {
   '/owner/register-business': typeof OwnerRegisterBusinessRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
-  '/owner/setup-wizard': typeof OwnerSetupWizardRoute
+  '/owner/settings': typeof OwnerSettingsRoute
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
-  '/owner/website': typeof OwnerWebsiteRoute
+  '/owner/website': typeof OwnerWebsiteRouteWithChildren
   '/owner/welcome': typeof OwnerWelcomeRoute
   '/partner/commission': typeof PartnerCommissionRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
@@ -1186,6 +1227,7 @@ export interface FileRoutesByFullPath {
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/staff/dashboard': typeof StaffDashboardRoute
   '/template-preview/$key': typeof TemplatePreviewKeyRoute
+  '/w/$websiteId': typeof WWebsiteIdRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/hire/': typeof HireIndexRoute
@@ -1193,6 +1235,7 @@ export interface FileRoutesByFullPath {
   '/owner/': typeof OwnerIndexRoute
   '/partner/': typeof PartnerIndexRoute
   '/portal/': typeof PortalIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/app/customer/bookings': typeof AppCustomerBookingsRoute
   '/app/customer/profile': typeof AppCustomerProfileRoute
   '/app/customer/rewards': typeof AppCustomerRewardsRoute
@@ -1207,9 +1250,11 @@ export interface FileRoutesByFullPath {
   '/app/owner/support': typeof AppOwnerSupportRoute
   '/app/owner/wallet': typeof AppOwnerWalletRoute
   '/app/owner/website': typeof AppOwnerWebsiteRoute
+  '/app/owner/website-editor': typeof AppOwnerWebsiteEditorRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
+  '/owner/website/edit': typeof OwnerWebsiteEditRoute
   '/portal/brands/$slug': typeof PortalBrandsSlugRoute
   '/portal/brands/register': typeof PortalBrandsRegisterRoute
   '/portal/distributors/$slug': typeof PortalDistributorsSlugRoute
@@ -1251,6 +1296,7 @@ export interface FileRoutesByTo {
   '/help': typeof HelpRoute
   '/jobs-app': typeof JobsAppRoute
   '/login': typeof LoginRoute
+  '/mcp': typeof McpRoute
   '/membership': typeof MembershipRoute
   '/membership-rules': typeof MembershipRulesRoute
   '/offline': typeof OfflineRoute
@@ -1270,6 +1316,8 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/website-builder': typeof WebsiteBuilderRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -1315,7 +1363,6 @@ export interface FileRoutesByTo {
   '/owner/create-website': typeof OwnerCreateWebsiteRoute
   '/owner/crm': typeof OwnerCrmRoute
   '/owner/dashboard': typeof OwnerDashboardRoute
-  '/owner/edit-shop': typeof OwnerEditShopRoute
   '/owner/gallery': typeof OwnerGalleryRoute
   '/owner/jobs': typeof OwnerJobsRouteWithChildren
   '/owner/marketing': typeof OwnerMarketingRoute
@@ -1326,10 +1373,10 @@ export interface FileRoutesByTo {
   '/owner/register-business': typeof OwnerRegisterBusinessRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
-  '/owner/setup-wizard': typeof OwnerSetupWizardRoute
+  '/owner/settings': typeof OwnerSettingsRoute
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
-  '/owner/website': typeof OwnerWebsiteRoute
+  '/owner/website': typeof OwnerWebsiteRouteWithChildren
   '/owner/welcome': typeof OwnerWelcomeRoute
   '/partner/commission': typeof PartnerCommissionRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
@@ -1354,6 +1401,7 @@ export interface FileRoutesByTo {
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/staff/dashboard': typeof StaffDashboardRoute
   '/template-preview/$key': typeof TemplatePreviewKeyRoute
+  '/w/$websiteId': typeof WWebsiteIdRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/hire': typeof HireIndexRoute
@@ -1361,6 +1409,7 @@ export interface FileRoutesByTo {
   '/owner': typeof OwnerIndexRoute
   '/partner': typeof PartnerIndexRoute
   '/portal': typeof PortalIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/app/customer/bookings': typeof AppCustomerBookingsRoute
   '/app/customer/profile': typeof AppCustomerProfileRoute
   '/app/customer/rewards': typeof AppCustomerRewardsRoute
@@ -1375,9 +1424,11 @@ export interface FileRoutesByTo {
   '/app/owner/support': typeof AppOwnerSupportRoute
   '/app/owner/wallet': typeof AppOwnerWalletRoute
   '/app/owner/website': typeof AppOwnerWebsiteRoute
+  '/app/owner/website-editor': typeof AppOwnerWebsiteEditorRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
+  '/owner/website/edit': typeof OwnerWebsiteEditRoute
   '/portal/brands/$slug': typeof PortalBrandsSlugRoute
   '/portal/brands/register': typeof PortalBrandsRegisterRoute
   '/portal/distributors/$slug': typeof PortalDistributorsSlugRoute
@@ -1422,6 +1473,7 @@ export interface FileRoutesById {
   '/help': typeof HelpRoute
   '/jobs-app': typeof JobsAppRoute
   '/login': typeof LoginRoute
+  '/mcp': typeof McpRoute
   '/membership': typeof MembershipRoute
   '/membership-rules': typeof MembershipRulesRoute
   '/offline': typeof OfflineRoute
@@ -1443,6 +1495,8 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/website-builder': typeof WebsiteBuilderRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -1491,7 +1545,6 @@ export interface FileRoutesById {
   '/owner/create-website': typeof OwnerCreateWebsiteRoute
   '/owner/crm': typeof OwnerCrmRoute
   '/owner/dashboard': typeof OwnerDashboardRoute
-  '/owner/edit-shop': typeof OwnerEditShopRoute
   '/owner/gallery': typeof OwnerGalleryRoute
   '/owner/jobs': typeof OwnerJobsRouteWithChildren
   '/owner/marketing': typeof OwnerMarketingRoute
@@ -1502,10 +1555,10 @@ export interface FileRoutesById {
   '/owner/register-business': typeof OwnerRegisterBusinessRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/services': typeof OwnerServicesRoute
-  '/owner/setup-wizard': typeof OwnerSetupWizardRoute
+  '/owner/settings': typeof OwnerSettingsRoute
   '/owner/staff': typeof OwnerStaffRoute
   '/owner/templates': typeof OwnerTemplatesRoute
-  '/owner/website': typeof OwnerWebsiteRoute
+  '/owner/website': typeof OwnerWebsiteRouteWithChildren
   '/owner/welcome': typeof OwnerWelcomeRoute
   '/partner/commission': typeof PartnerCommissionRoute
   '/partner/dashboard': typeof PartnerDashboardRoute
@@ -1530,6 +1583,7 @@ export interface FileRoutesById {
   '/site/$businessSlug': typeof SiteBusinessSlugRoute
   '/staff/dashboard': typeof StaffDashboardRoute
   '/template-preview/$key': typeof TemplatePreviewKeyRoute
+  '/w/$websiteId': typeof WWebsiteIdRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/hire/': typeof HireIndexRoute
@@ -1537,6 +1591,7 @@ export interface FileRoutesById {
   '/owner/': typeof OwnerIndexRoute
   '/partner/': typeof PartnerIndexRoute
   '/portal/': typeof PortalIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/app/customer/bookings': typeof AppCustomerBookingsRoute
   '/app/customer/profile': typeof AppCustomerProfileRoute
   '/app/customer/rewards': typeof AppCustomerRewardsRoute
@@ -1551,9 +1606,11 @@ export interface FileRoutesById {
   '/app/owner/support': typeof AppOwnerSupportRoute
   '/app/owner/wallet': typeof AppOwnerWalletRoute
   '/app/owner/website': typeof AppOwnerWebsiteRoute
+  '/app/owner/website-editor': typeof AppOwnerWebsiteEditorRoute
   '/dashboard/bookings/$id': typeof DashboardBookingsIdRoute
   '/jobs/applications/$jobId': typeof JobsApplicationsJobIdRoute
   '/owner/jobs/new': typeof OwnerJobsNewRoute
+  '/owner/website/edit': typeof OwnerWebsiteEditRoute
   '/portal/brands/$slug': typeof PortalBrandsSlugRoute
   '/portal/brands/register': typeof PortalBrandsRegisterRoute
   '/portal/distributors/$slug': typeof PortalDistributorsSlugRoute
@@ -1599,6 +1656,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/jobs-app'
     | '/login'
+    | '/mcp'
     | '/membership'
     | '/membership-rules'
     | '/offline'
@@ -1620,6 +1678,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/website-builder'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/advertising'
     | '/admin/analytics'
     | '/admin/audit'
@@ -1668,7 +1728,6 @@ export interface FileRouteTypes {
     | '/owner/create-website'
     | '/owner/crm'
     | '/owner/dashboard'
-    | '/owner/edit-shop'
     | '/owner/gallery'
     | '/owner/jobs'
     | '/owner/marketing'
@@ -1679,7 +1738,7 @@ export interface FileRouteTypes {
     | '/owner/register-business'
     | '/owner/reviews'
     | '/owner/services'
-    | '/owner/setup-wizard'
+    | '/owner/settings'
     | '/owner/staff'
     | '/owner/templates'
     | '/owner/website'
@@ -1707,6 +1766,7 @@ export interface FileRouteTypes {
     | '/site/$businessSlug'
     | '/staff/dashboard'
     | '/template-preview/$key'
+    | '/w/$websiteId'
     | '/admin/'
     | '/dashboard/'
     | '/hire/'
@@ -1714,6 +1774,7 @@ export interface FileRouteTypes {
     | '/owner/'
     | '/partner/'
     | '/portal/'
+    | '/.mcp/invoke-tool/$tool'
     | '/app/customer/bookings'
     | '/app/customer/profile'
     | '/app/customer/rewards'
@@ -1728,9 +1789,11 @@ export interface FileRouteTypes {
     | '/app/owner/support'
     | '/app/owner/wallet'
     | '/app/owner/website'
+    | '/app/owner/website-editor'
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
     | '/owner/jobs/new'
+    | '/owner/website/edit'
     | '/portal/brands/$slug'
     | '/portal/brands/register'
     | '/portal/distributors/$slug'
@@ -1772,6 +1835,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/jobs-app'
     | '/login'
+    | '/mcp'
     | '/membership'
     | '/membership-rules'
     | '/offline'
@@ -1791,6 +1855,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/website-builder'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/advertising'
     | '/admin/analytics'
     | '/admin/audit'
@@ -1836,7 +1902,6 @@ export interface FileRouteTypes {
     | '/owner/create-website'
     | '/owner/crm'
     | '/owner/dashboard'
-    | '/owner/edit-shop'
     | '/owner/gallery'
     | '/owner/jobs'
     | '/owner/marketing'
@@ -1847,7 +1912,7 @@ export interface FileRouteTypes {
     | '/owner/register-business'
     | '/owner/reviews'
     | '/owner/services'
-    | '/owner/setup-wizard'
+    | '/owner/settings'
     | '/owner/staff'
     | '/owner/templates'
     | '/owner/website'
@@ -1875,6 +1940,7 @@ export interface FileRouteTypes {
     | '/site/$businessSlug'
     | '/staff/dashboard'
     | '/template-preview/$key'
+    | '/w/$websiteId'
     | '/admin'
     | '/dashboard'
     | '/hire'
@@ -1882,6 +1948,7 @@ export interface FileRouteTypes {
     | '/owner'
     | '/partner'
     | '/portal'
+    | '/.mcp/invoke-tool/$tool'
     | '/app/customer/bookings'
     | '/app/customer/profile'
     | '/app/customer/rewards'
@@ -1896,9 +1963,11 @@ export interface FileRouteTypes {
     | '/app/owner/support'
     | '/app/owner/wallet'
     | '/app/owner/website'
+    | '/app/owner/website-editor'
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
     | '/owner/jobs/new'
+    | '/owner/website/edit'
     | '/portal/brands/$slug'
     | '/portal/brands/register'
     | '/portal/distributors/$slug'
@@ -1942,6 +2011,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/jobs-app'
     | '/login'
+    | '/mcp'
     | '/membership'
     | '/membership-rules'
     | '/offline'
@@ -1963,6 +2033,8 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/website-builder'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/advertising'
     | '/admin/analytics'
     | '/admin/audit'
@@ -2011,7 +2083,6 @@ export interface FileRouteTypes {
     | '/owner/create-website'
     | '/owner/crm'
     | '/owner/dashboard'
-    | '/owner/edit-shop'
     | '/owner/gallery'
     | '/owner/jobs'
     | '/owner/marketing'
@@ -2022,7 +2093,7 @@ export interface FileRouteTypes {
     | '/owner/register-business'
     | '/owner/reviews'
     | '/owner/services'
-    | '/owner/setup-wizard'
+    | '/owner/settings'
     | '/owner/staff'
     | '/owner/templates'
     | '/owner/website'
@@ -2050,6 +2121,7 @@ export interface FileRouteTypes {
     | '/site/$businessSlug'
     | '/staff/dashboard'
     | '/template-preview/$key'
+    | '/w/$websiteId'
     | '/admin/'
     | '/dashboard/'
     | '/hire/'
@@ -2057,6 +2129,7 @@ export interface FileRouteTypes {
     | '/owner/'
     | '/partner/'
     | '/portal/'
+    | '/.mcp/invoke-tool/$tool'
     | '/app/customer/bookings'
     | '/app/customer/profile'
     | '/app/customer/rewards'
@@ -2071,9 +2144,11 @@ export interface FileRouteTypes {
     | '/app/owner/support'
     | '/app/owner/wallet'
     | '/app/owner/website'
+    | '/app/owner/website-editor'
     | '/dashboard/bookings/$id'
     | '/jobs/applications/$jobId'
     | '/owner/jobs/new'
+    | '/owner/website/edit'
     | '/portal/brands/$slug'
     | '/portal/brands/register'
     | '/portal/distributors/$slug'
@@ -2118,6 +2193,7 @@ export interface RootRouteChildren {
   HelpRoute: typeof HelpRoute
   JobsAppRoute: typeof JobsAppRoute
   LoginRoute: typeof LoginRoute
+  McpRoute: typeof McpRoute
   MembershipRoute: typeof MembershipRoute
   MembershipRulesRoute: typeof MembershipRulesRoute
   OfflineRoute: typeof OfflineRoute
@@ -2139,6 +2215,8 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   WebsiteBuilderRoute: typeof WebsiteBuilderRoute
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   AppCustomerRoute: typeof AppCustomerRouteWithChildren
   AppJobsRoute: typeof AppJobsRouteWithChildren
   AppOwnerRoute: typeof AppOwnerRouteWithChildren
@@ -2168,9 +2246,11 @@ export interface RootRouteChildren {
   SiteBusinessSlugRoute: typeof SiteBusinessSlugRoute
   StaffDashboardRoute: typeof StaffDashboardRoute
   TemplatePreviewKeyRoute: typeof TemplatePreviewKeyRoute
+  WWebsiteIdRoute: typeof WWebsiteIdRoute
   HireIndexRoute: typeof HireIndexRoute
   JobsIndexRoute: typeof JobsIndexRoute
   PortalIndexRoute: typeof PortalIndexRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   PortalBrandsSlugRoute: typeof PortalBrandsSlugRoute
   PortalBrandsRegisterRoute: typeof PortalBrandsRegisterRoute
   PortalDistributorsSlugRoute: typeof PortalDistributorsSlugRoute
@@ -2338,6 +2418,13 @@ declare module '@tanstack/react-router' {
       path: '/membership'
       fullPath: '/membership'
       preLoaderRoute: typeof MembershipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -2529,6 +2616,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/w/$websiteId': {
+      id: '/w/$websiteId'
+      path: '/w/$websiteId'
+      fullPath: '/w/$websiteId'
+      preLoaderRoute: typeof WWebsiteIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/template-preview/$key': {
       id: '/template-preview/$key'
       path: '/template-preview/$key'
@@ -2718,11 +2812,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OwnerStaffRouteImport
       parentRoute: typeof OwnerRoute
     }
-    '/owner/setup-wizard': {
-      id: '/owner/setup-wizard'
-      path: '/setup-wizard'
-      fullPath: '/owner/setup-wizard'
-      preLoaderRoute: typeof OwnerSetupWizardRouteImport
+    '/owner/settings': {
+      id: '/owner/settings'
+      path: '/settings'
+      fullPath: '/owner/settings'
+      preLoaderRoute: typeof OwnerSettingsRouteImport
       parentRoute: typeof OwnerRoute
     }
     '/owner/services': {
@@ -2793,13 +2887,6 @@ declare module '@tanstack/react-router' {
       path: '/gallery'
       fullPath: '/owner/gallery'
       preLoaderRoute: typeof OwnerGalleryRouteImport
-      parentRoute: typeof OwnerRoute
-    }
-    '/owner/edit-shop': {
-      id: '/owner/edit-shop'
-      path: '/edit-shop'
-      fullPath: '/owner/edit-shop'
-      preLoaderRoute: typeof OwnerEditShopRouteImport
       parentRoute: typeof OwnerRoute
     }
     '/owner/dashboard': {
@@ -3138,6 +3225,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdvertisingRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/portal/distributors/': {
       id: '/portal/distributors/'
       path: '/portal/distributors'
@@ -3229,6 +3330,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalBrandsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/owner/website/edit': {
+      id: '/owner/website/edit'
+      path: '/edit'
+      fullPath: '/owner/website/edit'
+      preLoaderRoute: typeof OwnerWebsiteEditRouteImport
+      parentRoute: typeof OwnerWebsiteRoute
+    }
     '/owner/jobs/new': {
       id: '/owner/jobs/new'
       path: '/new'
@@ -3249,6 +3357,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/bookings/$id'
       preLoaderRoute: typeof DashboardBookingsIdRouteImport
       parentRoute: typeof DashboardBookingsRoute
+    }
+    '/app/owner/website-editor': {
+      id: '/app/owner/website-editor'
+      path: '/website-editor'
+      fullPath: '/app/owner/website-editor'
+      preLoaderRoute: typeof AppOwnerWebsiteEditorRouteImport
+      parentRoute: typeof AppOwnerRoute
     }
     '/app/owner/website': {
       id: '/app/owner/website'
@@ -3347,6 +3462,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/customer/bookings'
       preLoaderRoute: typeof AppCustomerBookingsRouteImport
       parentRoute: typeof AppCustomerRoute
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
@@ -3508,13 +3630,24 @@ const OwnerJobsRouteWithChildren = OwnerJobsRoute._addFileChildren(
   OwnerJobsRouteChildren,
 )
 
+interface OwnerWebsiteRouteChildren {
+  OwnerWebsiteEditRoute: typeof OwnerWebsiteEditRoute
+}
+
+const OwnerWebsiteRouteChildren: OwnerWebsiteRouteChildren = {
+  OwnerWebsiteEditRoute: OwnerWebsiteEditRoute,
+}
+
+const OwnerWebsiteRouteWithChildren = OwnerWebsiteRoute._addFileChildren(
+  OwnerWebsiteRouteChildren,
+)
+
 interface OwnerRouteChildren {
   OwnerAnalyticsRoute: typeof OwnerAnalyticsRoute
   OwnerBookingsRoute: typeof OwnerBookingsRoute
   OwnerCreateWebsiteRoute: typeof OwnerCreateWebsiteRoute
   OwnerCrmRoute: typeof OwnerCrmRoute
   OwnerDashboardRoute: typeof OwnerDashboardRoute
-  OwnerEditShopRoute: typeof OwnerEditShopRoute
   OwnerGalleryRoute: typeof OwnerGalleryRoute
   OwnerJobsRoute: typeof OwnerJobsRouteWithChildren
   OwnerMarketingRoute: typeof OwnerMarketingRoute
@@ -3525,10 +3658,10 @@ interface OwnerRouteChildren {
   OwnerRegisterBusinessRoute: typeof OwnerRegisterBusinessRoute
   OwnerReviewsRoute: typeof OwnerReviewsRoute
   OwnerServicesRoute: typeof OwnerServicesRoute
-  OwnerSetupWizardRoute: typeof OwnerSetupWizardRoute
+  OwnerSettingsRoute: typeof OwnerSettingsRoute
   OwnerStaffRoute: typeof OwnerStaffRoute
   OwnerTemplatesRoute: typeof OwnerTemplatesRoute
-  OwnerWebsiteRoute: typeof OwnerWebsiteRoute
+  OwnerWebsiteRoute: typeof OwnerWebsiteRouteWithChildren
   OwnerWelcomeRoute: typeof OwnerWelcomeRoute
   OwnerIndexRoute: typeof OwnerIndexRoute
 }
@@ -3539,7 +3672,6 @@ const OwnerRouteChildren: OwnerRouteChildren = {
   OwnerCreateWebsiteRoute: OwnerCreateWebsiteRoute,
   OwnerCrmRoute: OwnerCrmRoute,
   OwnerDashboardRoute: OwnerDashboardRoute,
-  OwnerEditShopRoute: OwnerEditShopRoute,
   OwnerGalleryRoute: OwnerGalleryRoute,
   OwnerJobsRoute: OwnerJobsRouteWithChildren,
   OwnerMarketingRoute: OwnerMarketingRoute,
@@ -3550,10 +3682,10 @@ const OwnerRouteChildren: OwnerRouteChildren = {
   OwnerRegisterBusinessRoute: OwnerRegisterBusinessRoute,
   OwnerReviewsRoute: OwnerReviewsRoute,
   OwnerServicesRoute: OwnerServicesRoute,
-  OwnerSetupWizardRoute: OwnerSetupWizardRoute,
+  OwnerSettingsRoute: OwnerSettingsRoute,
   OwnerStaffRoute: OwnerStaffRoute,
   OwnerTemplatesRoute: OwnerTemplatesRoute,
-  OwnerWebsiteRoute: OwnerWebsiteRoute,
+  OwnerWebsiteRoute: OwnerWebsiteRouteWithChildren,
   OwnerWelcomeRoute: OwnerWelcomeRoute,
   OwnerIndexRoute: OwnerIndexRoute,
 }
@@ -3636,6 +3768,7 @@ interface AppOwnerRouteChildren {
   AppOwnerSupportRoute: typeof AppOwnerSupportRoute
   AppOwnerWalletRoute: typeof AppOwnerWalletRoute
   AppOwnerWebsiteRoute: typeof AppOwnerWebsiteRoute
+  AppOwnerWebsiteEditorRoute: typeof AppOwnerWebsiteEditorRoute
   AppOwnerIndexRoute: typeof AppOwnerIndexRoute
 }
 
@@ -3645,6 +3778,7 @@ const AppOwnerRouteChildren: AppOwnerRouteChildren = {
   AppOwnerSupportRoute: AppOwnerSupportRoute,
   AppOwnerWalletRoute: AppOwnerWalletRoute,
   AppOwnerWebsiteRoute: AppOwnerWebsiteRoute,
+  AppOwnerWebsiteEditorRoute: AppOwnerWebsiteEditorRoute,
   AppOwnerIndexRoute: AppOwnerIndexRoute,
 }
 
@@ -3684,6 +3818,7 @@ const rootRouteChildren: RootRouteChildren = {
   HelpRoute: HelpRoute,
   JobsAppRoute: JobsAppRoute,
   LoginRoute: LoginRoute,
+  McpRoute: McpRoute,
   MembershipRoute: MembershipRoute,
   MembershipRulesRoute: MembershipRulesRoute,
   OfflineRoute: OfflineRoute,
@@ -3705,6 +3840,9 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   WebsiteBuilderRoute: WebsiteBuilderRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   AppCustomerRoute: AppCustomerRouteWithChildren,
   AppJobsRoute: AppJobsRouteWithChildren,
   AppOwnerRoute: AppOwnerRouteWithChildren,
@@ -3734,9 +3872,11 @@ const rootRouteChildren: RootRouteChildren = {
   SiteBusinessSlugRoute: SiteBusinessSlugRoute,
   StaffDashboardRoute: StaffDashboardRoute,
   TemplatePreviewKeyRoute: TemplatePreviewKeyRoute,
+  WWebsiteIdRoute: WWebsiteIdRoute,
   HireIndexRoute: HireIndexRoute,
   JobsIndexRoute: JobsIndexRoute,
   PortalIndexRoute: PortalIndexRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   PortalBrandsSlugRoute: PortalBrandsSlugRoute,
   PortalBrandsRegisterRoute: PortalBrandsRegisterRoute,
   PortalDistributorsSlugRoute: PortalDistributorsSlugRoute,

@@ -45,7 +45,7 @@ export async function createPublicAppointment(input: {
   staffId?: string | null;
 }): Promise<PublicAppointmentReceipt> {
   await ensurePublicBookingSession();
-  const { data, error } = await supabase.rpc("create_public_appointment", {
+  const { data, error } = await (supabase.rpc as any)("create_public_appointment", {
     _tenant_id: input.tenantId,
     _service_id: input.serviceId,
     _appointment_date: input.date,
@@ -68,8 +68,8 @@ export async function getPublicAppointmentReceipt(bookingId: string) {
   const { data: session } = await supabase.auth.getSession();
   if (!session.session) return null;
 
-  const { data, error } = await supabase
-    .from("bookings")
+  const { data, error } = await (supabase
+    .from("bookings") as any)
     .select(
       "id, booking_reference, salon_id, service_id, service_name, staff_id, booking_date, booking_time, price, advance_amount, status, payment_status, salons(name, slug), staff(name)",
     )
@@ -78,8 +78,9 @@ export async function getPublicAppointmentReceipt(bookingId: string) {
   if (error) throw new Error(error.message);
   if (!data) return null;
 
+  const row = data as { price: number | null; advance_amount: number | null };
   return {
     ...data,
-    remaining: Math.max(0, Number(data.price) - Number(data.advance_amount ?? 0)),
+    remaining: Math.max(0, Number(row.price ?? 0) - Number(row.advance_amount ?? 0)),
   };
 }

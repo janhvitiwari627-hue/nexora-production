@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -142,6 +142,69 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
     [rawShops, filters, sort, q],
   );
 
+  // Scroll restoration for browser back/forward navigation.
+  // Persists window scrollY per history entry (keyed by history.state.key which
+  // TanStack Router assigns), and re-applies it once results have rendered.
+  const isPoppingRef = useRef(false);
+  const pendingRestoreRef = useRef<number | null>(null);
+
+  const historyKey = () => {
+    if (typeof window === "undefined") return "";
+    const state = window.history.state as { key?: string } | null;
+    return state?.key ?? window.location.href;
+  };
+
+  // Continuously save scroll position for the current history entry.
+  useEffect(() => {
+    let raf = 0;
+    const save = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        try {
+          sessionStorage.setItem(`search-scroll:${historyKey()}`, String(window.scrollY));
+        } catch {
+          /* ignore quota / privacy errors */
+        }
+      });
+    };
+    window.addEventListener("scroll", save, { passive: true });
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", save);
+    };
+  }, []);
+
+  // Detect back/forward so we know to restore instead of preserving current pos.
+  useEffect(() => {
+    const onPop = () => {
+      isPoppingRef.current = true;
+      const saved = sessionStorage.getItem(`search-scroll:${historyKey()}`);
+      pendingRestoreRef.current = saved != null ? Number(saved) : null;
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
+  // Once results for the popped entry render, restore the saved scrollY.
+  // Retries via rAF for up to ~1.5s so async re-renders don't fight us.
+  useEffect(() => {
+    if (!isPoppingRef.current) return;
+    if (isFetching) return;
+    const target = pendingRestoreRef.current;
+    isPoppingRef.current = false;
+    pendingRestoreRef.current = null;
+    if (target == null) return;
+
+    const deadline = performance.now() + 1500;
+    const restore = () => {
+      window.scrollTo({ top: target, behavior: "auto" });
+      if (Math.abs(window.scrollY - target) < 2) return;
+      if (performance.now() < deadline) requestAnimationFrame(restore);
+    };
+    requestAnimationFrame(() => requestAnimationFrame(restore));
+  }, [filtered, isFetching]);
+
   // Comparison badges
   const badges = useMemo(() => {
     if (filtered.length === 0) return { lowest: "", best: "", popular: "" };
@@ -169,6 +232,27 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
   const setView = (next: "grid" | "map") => {
     const { view: _omit, ...rest } = search;
     onSearchChange(next === "grid" ? rest : { ...rest, view: next });
+  };
+
+  const scrollResultsIntoView = (behavior: ScrollBehavior = "smooth") => {
+    const target = document.getElementById("search-results");
+    if (!target) return;
+
+    const header = document.querySelector<HTMLElement>('[data-testid="public-header"]');
+    const headerOffset = (header?.getBoundingClientRect().height ?? 0) + 14;
+    const top = target.getBoundingClientRect().top + window.scrollY - headerOffset;
+
+    window.scrollTo({ top: Math.max(0, top), behavior });
+  };
+
+  const scrollToResultsAfterFiltering = () => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => scrollResultsIntoView("smooth"));
+    });
+
+    [120, 320, 650].forEach((delay) => {
+      window.setTimeout(() => scrollResultsIntoView("smooth"), delay);
+    });
   };
 
   // Anchor-based scroll restore: pin the topmost visible result card so the
@@ -350,16 +434,20 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
                 onApplyFilters={(f) => {
                   setDraft(f);
                   commitFilters(f);
+                  scrollToResultsAfterFiltering();
                 }}
                 onSelectCategory={(cat) => {
                   const { category: _omit, ...rest } = search;
                   onSearchChange({ ...rest, category: cat });
+                  scrollToResultsAfterFiltering();
                 }}
               />
               <InstantBookingSection shops={filtered} />
             </div>
 
             {/* Results */}
+            <div id="search-results" className="scroll-mt-24">
+
             <AnimatePresence mode="wait">
               {isFetching ? (
                 <motion.div
@@ -410,6 +498,8 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
                 </motion.div>
               )}
             </AnimatePresence>
+            </div>
+
           </main>
         </div>
       </div>

@@ -27,7 +27,7 @@ export function WHero({ shop, template }: { shop: ShopData; template: TemplateCo
           </div>
           <div className="flex flex-wrap gap-3">
             <Button size="lg" style={{ backgroundColor: template.colors.primary, color: "white", borderRadius: template.radius }} asChild>
-              <Link to="/book/$slug" params={{ slug: shop.slug }}><Calendar className="h-4 w-4" /> Book Now</Link>
+              <Link to="/site/$slug/book" params={{ slug: shop.slug }} search={{ service: undefined }}><Calendar className="h-4 w-4" /> Book Now</Link>
             </Button>
             <Button size="lg" variant="outline" style={{ borderRadius: template.radius }} asChild>
               <a href="#services">View Services</a>
@@ -59,7 +59,7 @@ export function WHero({ shop, template }: { shop: ShopData; template: TemplateCo
             <div className="blossom-divider max-w-xs" />
             <div className="flex flex-wrap items-center gap-3">
               <Button size="lg" className="rounded-full px-7" style={{ backgroundColor: template.colors.primary, color: "white" }} asChild>
-                <Link to="/book/$slug" params={{ slug: shop.slug }}>Book Beauty Session</Link>
+                <Link to="/site/$slug/book" params={{ slug: shop.slug }} search={{ service: undefined }}>Book Beauty Session</Link>
               </Button>
               <ShareButton title={`${shop.name} — ${shop.tagline}`} label="Share Portfolio" />
             </div>
@@ -92,7 +92,7 @@ export function WHero({ shop, template }: { shop: ShopData; template: TemplateCo
         poster={shop.coverImage}
         className="absolute inset-0 h-full w-full object-cover"
       >
-        <source src="https://cdn.coverr.co/videos/coverr-luxury-spa-treatment-2417/1080p.mp4" type="video/mp4" />
+        <source src={shop.videoUrl ?? "https://cdn.coverr.co/videos/coverr-luxury-spa-treatment-2417/1080p.mp4"} type="video/mp4" />
       </video>
       <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/55 to-black" />
       <div className="absolute inset-0 opacity-30" style={{ background: "radial-gradient(circle at 50% 60%, rgba(212,175,55,0.25), transparent 55%)" }} />
@@ -111,7 +111,7 @@ export function WHero({ shop, template }: { shop: ShopData; template: TemplateCo
         <p className="mx-auto max-w-xl text-base font-light tracking-wide opacity-85 md:text-lg">{shop.tagline}</p>
         <div className="flex flex-wrap justify-center gap-3 pt-4">
           <Button size="lg" className="royal-shimmer relative overflow-hidden border-0 px-8 py-6 text-sm font-medium uppercase tracking-[0.25em]" style={{ backgroundColor: template.colors.secondary, color: "#0A0A0A", borderRadius: 2 }} asChild>
-            <Link to="/book/$slug" params={{ slug: shop.slug }}><Calendar className="h-4 w-4" /> Reserve Your Visit</Link>
+            <Link to="/site/$slug/book" params={{ slug: shop.slug }} search={{ service: undefined }}><Calendar className="h-4 w-4" /> Reserve Your Visit</Link>
           </Button>
           <Button size="lg" variant="outline" className="border px-8 py-6 text-sm font-medium uppercase tracking-[0.25em] text-white hover:bg-white/10" style={{ borderColor: "rgba(212,175,55,0.5)", borderRadius: 2, backgroundColor: "transparent" }} asChild>
             <a href="#services">Discover Services</a>
