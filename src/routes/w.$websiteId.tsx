@@ -41,28 +41,13 @@ function PublicWebsitePage() {
     ? { sections: q.data.sections as WebsiteSection[], theme: q.data.theme as WebsiteTheme | null }
     : null);
 
-  if (q.isLoading && !bundle) {
-    return <div className="p-8">Loading…</div>;
-  }
-
-  if (!bundle && !isPreview) {
-    return (
-      <div className="flex min-h-screen items-center justify-center p-8 text-center">
-        <div>
-          <h1 className="text-2xl font-semibold">This website isn’t published yet</h1>
-          <p className="mt-2 text-muted-foreground">The owner is still building it. Check back soon!</p>
-        </div>
-      </div>
-    );
-  }
-
   const theme = bundle?.theme;
   const headingFont = theme?.heading_font || "Inter";
   const bodyFont = theme?.body_font || "Inter";
   const btnStyle = theme?.button_style || "rounded";
   const btnRadius = btnStyle === "pill" ? "9999px" : btnStyle === "square" ? "0" : "0.5rem";
 
-  // Load Google Fonts for the theme
+  // Load Google Fonts for the theme. Keep this hook before early returns.
   useEffect(() => {
     const families = Array.from(new Set([headingFont, bodyFont]))
       .map((f) => `family=${encodeURIComponent(f)}:wght@400;500;600;700`)
@@ -78,6 +63,21 @@ function PublicWebsitePage() {
     }
     if (link.href !== href) link.href = href;
   }, [headingFont, bodyFont]);
+
+  if (q.isLoading && !bundle) {
+    return <div className="p-8">Loading…</div>;
+  }
+
+  if (!bundle && !isPreview) {
+    return (
+      <div className="flex min-h-screen items-center justify-center p-8 text-center">
+        <div>
+          <h1 className="text-2xl font-semibold">This website isn’t published yet</h1>
+          <p className="mt-2 text-muted-foreground">The owner is still building it. Check back soon!</p>
+        </div>
+      </div>
+    );
+  }
 
   const extras = ((theme as unknown as { extras?: Record<string, unknown> } | null)?.extras) ?? {};
   const headerBg = (extras.header_bg as string) || "#FFFFFF";
