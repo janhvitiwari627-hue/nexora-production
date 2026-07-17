@@ -321,6 +321,58 @@ export function WebsiteEditorPage() {
     patchSection(selected.id, { content: nextContent as WebsiteSection["content"] });
   }
 
+  // ---- Versions / Undo ----
+  type VersionRow = { id: string; note: string | null; created_at: string };
+  const [versions, setVersions] = useState<VersionRow[]>([]);
+  const [versionsOpen, setVersionsOpen] = useState(false);
+  const [versionsLoading, setVersionsLoading] = useState(false);
+  const [restoring, setRestoring] = useState<string | null>(null);
+  const [savingVersion, setSavingVersion] = useState(false);
+
+  async function refreshVersions() {
+    if (!websiteId) return;
+    setVersionsLoading(true);
+    try {
+      const rows = await fetchVersions({ data: { websiteId } });
+      setVersions(rows as VersionRow[]);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to load history");
+    } finally {
+      setVersionsLoading(false);
+    }
+  }
+
+  async function handleSaveVersion() {
+    if (!websiteId) return;
+    setSavingVersion(true);
+    try {
+      await doSaveVersion({ data: { websiteId } });
+      toast.success("Version saved");
+      await refreshVersions();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Save version failed");
+    } finally {
+      setSavingVersion(false);
+    }
+  }
+
+  async function handleRestoreVersion(versionId: string) {
+    if (!websiteId) return;
+    setRestoring(versionId);
+    try {
+      await doRestoreVersion({ data: { versionId } });
+      toast.success("Restored");
+      await bundleQ.refetch();
+      await refreshVersions();
+      setVersionsOpen(false);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Restore failed");
+    } finally {
+      setRestoring(null);
+    }
+  }
+
+
   async function handlePublish() {
     if (!websiteId) return;
     setPublishing(true);
