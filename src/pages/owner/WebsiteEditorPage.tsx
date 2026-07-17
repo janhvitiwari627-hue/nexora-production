@@ -955,8 +955,8 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
 }
 
 function NavLinksEditor({ links, onChange }: { links: NavLink[]; onChange: (next: NavLink[]) => void }) {
-  const [dragId, setDragId] = React.useState<string | null>(null);
-  const [overId, setOverId] = React.useState<string | null>(null);
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [overId, setOverId] = useState<string | null>(null);
 
   const patch = (id: string, p: Partial<NavLink>) =>
     onChange(links.map((l) => (l.id === id ? { ...l, ...p } : l)));
