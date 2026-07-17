@@ -106,6 +106,13 @@ export function PartnerOnboardingChecklist() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [localPreview, setLocalPreview] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadErrorDetails, setUploadErrorDetails] = useState<{
+    status?: number;
+    statusText?: string;
+    code?: string;
+    raw: string;
+  } | null>(null);
+  const [showErrorDetails, setShowErrorDetails] = useState(false);
   const cloudinaryReady = isCloudinaryConfigured();
 
   const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
