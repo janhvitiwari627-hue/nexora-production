@@ -79,12 +79,24 @@ function PublicWebsitePage() {
     if (link.href !== href) link.href = href;
   }, [headingFont, bodyFont]);
 
+  const extras = ((theme as unknown as { extras?: Record<string, string> } | null)?.extras) ?? {};
+  const headerBg = extras.header_bg || "#FFFFFF";
+  const headerText = extras.header_text || "#111827";
+  const linkColor = extras.link_color || "#4F46E5";
+  const linkStyle = extras.link_style || "hover-underline";
+
+  const linkClass =
+    linkStyle === "underline" ? "underline" : linkStyle === "none" ? "no-underline" : "hover:underline";
+
   const styleVars = {
     ["--w-primary" as string]: theme?.primary_color ?? "#111827",
     ["--w-secondary" as string]: theme?.secondary_color ?? "#F59E0B",
     ["--w-accent" as string]: theme?.accent_color ?? "#10B981",
     ["--w-bg" as string]: theme?.background_color ?? "#FFFFFF",
     ["--w-text" as string]: theme?.text_color ?? "#111827",
+    ["--w-header-bg" as string]: headerBg,
+    ["--w-header-text" as string]: headerText,
+    ["--w-link" as string]: linkColor,
     ["--w-heading-font" as string]: `'${headingFont}', sans-serif`,
     ["--w-body-font" as string]: `'${bodyFont}', sans-serif`,
     ["--w-btn-radius" as string]: btnRadius,
@@ -95,10 +107,37 @@ function PublicWebsitePage() {
     .filter((s) => s.is_visible)
     .sort((a, b) => a.sort_order - b.sort_order);
 
+  // Find a contact section for header links, plus general nav based on visible sections
+  const navItems = sections
+    .filter((s) => ["about", "services", "gallery", "contact"].includes(s.section_type))
+    .map((s) => ({ id: s.section_type, label: s.section_type.replace("_", " ") }));
+
   return (
     <div style={{ ...styleVars, background: "var(--w-bg)", color: "var(--w-text)" }}>
+      <header
+        className="sticky top-0 z-10 flex items-center justify-between border-b px-6 py-3"
+        style={{ background: "var(--w-header-bg)", color: "var(--w-header-text)" }}
+      >
+        <div className="text-lg font-semibold" style={{ fontFamily: "var(--w-heading-font)" }}>
+          Home
+        </div>
+        <nav className="flex gap-4 text-sm capitalize">
+          {navItems.map((n) => (
+            <a
+              key={n.id}
+              href={`#${n.id}`}
+              className={linkClass}
+              style={{ color: "var(--w-link)" }}
+            >
+              {n.label}
+            </a>
+          ))}
+        </nav>
+      </header>
       {sections.map((s) => (
-        <SectionRenderer key={s.id} section={s} />
+        <div key={s.id} id={s.section_type}>
+          <SectionRenderer key={s.id} section={s} />
+        </div>
       ))}
       {sections.length === 0 && (
         <div className="p-16 text-center text-muted-foreground">
