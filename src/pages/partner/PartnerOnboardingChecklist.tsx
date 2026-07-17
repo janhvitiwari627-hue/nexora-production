@@ -86,6 +86,30 @@ export function PartnerOnboardingChecklist() {
     success_story: "",
   });
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const cloudinaryReady = isCloudinaryConfigured();
+
+  const onPickLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (e.target) e.target.value = "";
+    if (!file) return;
+    if (!cloudinaryReady) {
+      toast.error("Cloudinary is not configured");
+      return;
+    }
+    setUploading(true);
+    try {
+      const res = await uploadToCloudinary(file, { folder: "partner-logos" });
+      setForm((f) => ({ ...f, photo_url: res.secure_url }));
+      toast.success("Logo uploaded — save karke pakka karo");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   useEffect(() => {
     if (!profile) return;
     setForm({
