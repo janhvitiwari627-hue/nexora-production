@@ -326,6 +326,30 @@ export function WebsiteEditorPage() {
     }
   }
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  async function handleDragEnd(evt: DragEndEvent) {
+    const { active, over } = evt;
+    if (!over || active.id === over.id || !websiteId) return;
+    const oldIndex = localSections.findIndex((s) => s.id === active.id);
+    const newIndex = localSections.findIndex((s) => s.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+    const next = arrayMove(localSections, oldIndex, newIndex).map((s, i) => ({ ...s, sort_order: i }));
+    setLocalSections(next);
+    try {
+      setSaving(true);
+      await saveOrder({ data: { websiteId, order: next.map((s) => s.id) } });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Reorder failed");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+
   if (salonsQ.isLoading || websiteQ.isLoading || bundleQ.isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
