@@ -453,6 +453,66 @@ export function WebsiteEditorPage() {
               <Eye className="h-4 w-4" /> Preview
             </a>
           )}
+          <Button variant="outline" size="sm" onClick={handleSaveVersion} disabled={savingVersion || !websiteId}>
+            {savingVersion ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Save className="mr-1 h-4 w-4" />}
+            Save version
+          </Button>
+          <Popover
+            open={versionsOpen}
+            onOpenChange={(o) => {
+              setVersionsOpen(o);
+              if (o) void refreshVersions();
+            }}
+          >
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" disabled={!websiteId}>
+                <History className="mr-1 h-4 w-4" /> History
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-80 p-0">
+              <div className="border-b p-3">
+                <div className="text-sm font-semibold">Version history</div>
+                <div className="text-xs text-muted-foreground">Last {10} saves. Restore to undo.</div>
+              </div>
+              <div className="max-h-80 overflow-y-auto">
+                {versionsLoading ? (
+                  <div className="flex items-center justify-center p-6">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  </div>
+                ) : versions.length === 0 ? (
+                  <p className="p-4 text-sm text-muted-foreground">
+                    No versions yet. Click <strong>Save version</strong> or publish to create one.
+                  </p>
+                ) : (
+                  <ul className="divide-y">
+                    {versions.map((v) => (
+                      <li key={v.id} className="flex items-center justify-between gap-2 p-3">
+                        <div className="min-w-0">
+                          <div className="truncate text-sm font-medium">{v.note || "Draft"}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {new Date(v.created_at).toLocaleString()}
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => handleRestoreVersion(v.id)}
+                          disabled={restoring !== null}
+                        >
+                          {restoring === v.id ? (
+                            <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                          ) : (
+                            <Undo2 className="mr-1 h-3 w-3" />
+                          )}
+                          Restore
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
           <Button onClick={handlePublish} disabled={publishing}>
             {publishing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Globe className="mr-2 h-4 w-4" />}
             Publish
