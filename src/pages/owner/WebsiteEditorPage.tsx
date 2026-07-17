@@ -627,6 +627,7 @@ export function WebsiteEditorPage() {
   }
 
   function patchSection(id: string, patch: Partial<WebsiteSection>) {
+    markDirty();
     setLocalSections((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)));
     // Debounced autosave
     if (saveTimers.current[id]) clearTimeout(saveTimers.current[id]);
