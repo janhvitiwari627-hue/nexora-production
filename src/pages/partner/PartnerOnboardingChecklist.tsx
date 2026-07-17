@@ -498,11 +498,12 @@ export function PartnerOnboardingChecklist() {
                         ? "Replace logo"
                         : "Upload logo"}
                   </Button>
-                  <p className="text-[10px] text-slate-500">
+                  <p id="logo-dropzone-hint" className="text-[10px] text-slate-500" aria-live="polite">
                     {isDragging
                       ? "Release to upload"
-                      : "Drag & drop image here, ya button click karein"}
+                      : "Drag & drop image here, Enter/Space press karein, ya button click karein"}
                   </p>
+
 
                   {uploading && (
                     <div
