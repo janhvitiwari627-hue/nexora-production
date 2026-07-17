@@ -764,6 +764,68 @@ function GenericItemsEditor({
 }
 
 
+function SortableSectionItem({
+  section,
+  label,
+  active,
+  onSelect,
+  onToggleVisible,
+}: {
+  section: WebsiteSection;
+  label: string;
+  active: boolean;
+  onSelect: () => void;
+  onToggleVisible: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: section.id });
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.6 : 1,
+  };
+  return (
+    <li ref={setNodeRef} style={style}>
+      <div
+        className={`flex items-center gap-1 rounded-md pr-1 text-sm ${
+          active ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+        }`}
+      >
+        <button
+          type="button"
+          className="flex h-8 w-6 shrink-0 cursor-grab items-center justify-center opacity-60 hover:opacity-100 active:cursor-grabbing"
+          aria-label="Drag to reorder"
+          title="Drag to reorder"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          onClick={onSelect}
+          className="flex flex-1 items-center justify-between py-2 pr-2 text-left"
+        >
+          <span className={section.is_visible ? "" : "line-through opacity-60"}>{label}</span>
+          {!section.is_visible && (
+            <span className={`text-[10px] ${active ? "opacity-80" : "opacity-60"}`}>hidden</span>
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onToggleVisible(); }}
+          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded ${
+            active ? "hover:bg-primary-foreground/20" : "hover:bg-background"
+          }`}
+          aria-label={section.is_visible ? "Hide section" : "Show section"}
+          title={section.is_visible ? "Hide section" : "Show section"}
+        >
+          {section.is_visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4 opacity-60" />}
+        </button>
+      </div>
+    </li>
+  );
+}
+
 function ImageField({
   label,
   value,
