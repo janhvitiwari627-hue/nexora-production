@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import type { ComponentType } from "react";
 import { PartnerPageShell } from "./PartnerAppLayout";
+import { PartnerOnboardingChecklist } from "./PartnerOnboardingChecklist";
 import { getPartnerOverview } from "@/lib/partner.functions";
 
 const inr = (n: number) =>
