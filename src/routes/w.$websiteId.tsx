@@ -392,10 +392,14 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
     }
 
     case "gallery": {
-      const images = asArray(raw.images);
-      const urls: string[] = Array.isArray(raw.images)
-        ? (raw.images as unknown[]).map((x) => (typeof x === "string" ? x : String((x as Item)?.url ?? ""))).filter(Boolean)
-        : images.map((x) => String(x.url ?? "")).filter(Boolean);
+      // Editor stores items[] with { image }. Also tolerate legacy raw.images (strings or {url}).
+      const items = asArray(raw.items);
+      let urls: string[] = items.map((x) => String(x.image ?? "")).filter(Boolean);
+      if (urls.length === 0 && Array.isArray(raw.images)) {
+        urls = (raw.images as unknown[])
+          .map((x) => (typeof x === "string" ? x : String((x as Item)?.url ?? (x as Item)?.image ?? "")))
+          .filter(Boolean);
+      }
       return (
         <section className="mx-auto max-w-6xl px-6 py-20">
           <SectionHeading>{c.heading || "Gallery"}</SectionHeading>
@@ -413,7 +417,8 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
     }
 
     case "blog": {
-      const posts = asArray(raw.posts);
+      // Editor stores items[] with { name (title), description (excerpt), image, date }. Fallback to raw.posts.
+      const posts = asArray(raw.items).length ? asArray(raw.items) : asArray(raw.posts);
       return (
         <section className="mx-auto max-w-5xl px-6 py-20">
           <SectionHeading>{c.heading || "Blog"}</SectionHeading>
@@ -421,19 +426,25 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
             <p className="text-center text-sm opacity-60">No posts yet.</p>
           ) : (
             <div className="grid gap-6 md:grid-cols-2">
-              {posts.map((p, i) => (
-                <article key={i} className="rounded-lg border overflow-hidden shadow-sm">
-                  {p.image && <img src={String(p.image)} alt={String(p.title ?? "")} className="h-44 w-full object-cover" />}
-                  <div className="p-5">
-                    <h3 className="font-semibold" style={{ fontFamily: "var(--w-heading-font)" }}>{String(p.title ?? "Untitled")}</h3>
-                    {p.date && <p className="mt-1 text-xs opacity-60">{String(p.date)}</p>}
-                    {p.excerpt && <p className="mt-2 text-sm opacity-80">{String(p.excerpt)}</p>}
-                  </div>
-                </article>
-              ))}
+              {posts.map((p, i) => {
+                const title = String(p.title ?? p.name ?? "Untitled");
+                const excerpt = String(p.excerpt ?? p.description ?? "");
+                const date = p.date ? String(p.date) : "";
+                return (
+                  <article key={i} className="rounded-lg border overflow-hidden shadow-sm">
+                    {p.image && <img src={String(p.image)} alt={title} className="h-44 w-full object-cover" />}
+                    <div className="p-5">
+                      <h3 className="font-semibold" style={{ fontFamily: "var(--w-heading-font)" }}>{title}</h3>
+                      {date && <p className="mt-1 text-xs opacity-60">{date}</p>}
+                      {excerpt && <p className="mt-2 text-sm opacity-80">{excerpt}</p>}
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           )}
         </section>
+
       );
     }
 
