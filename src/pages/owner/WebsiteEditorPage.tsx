@@ -576,16 +576,23 @@ export function WebsiteEditorPage() {
 
   // Push live-preview updates to iframe
   useEffect(() => {
-    iframeRef.current?.contentWindow?.postMessage(
-      { type: "editor:bundle", bundle: { sections: localSections, theme: localTheme } },
-      "*",
-    );
+    postPreviewBundle();
+    const retry = window.setTimeout(postPreviewBundle, 300);
+    return () => window.clearTimeout(retry);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localSections, localTheme]);
 
   const selected = useMemo(
     () => localSections.find((s) => s.id === selectedId) ?? null,
     [localSections, selectedId],
   );
+
+  function postPreviewBundle() {
+    iframeRef.current?.contentWindow?.postMessage(
+      { type: "editor:bundle", bundle: { sections: localSections, theme: localTheme } },
+      "*",
+    );
+  }
 
   function patchTheme(patch: Partial<ThemeState>) {
     setLocalTheme((prev) => {
