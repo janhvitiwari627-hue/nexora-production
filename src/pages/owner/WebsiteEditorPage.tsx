@@ -19,6 +19,7 @@ import {
 } from "@/lib/website-editor.functions";
 import { TemplateGalleryDialog } from "./editor/TemplateGalleryDialog";
 import { TEMPLATE_CATALOG, type TemplateCatalogItem } from "./editor/templateCatalog";
+import { TemplateUsageGuide } from "./editor/TemplateUsageGuide";
 import { getMyOwnedSalons, listOwnerServices } from "@/lib/owner.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -1798,6 +1799,7 @@ export function WebsiteEditorPage() {
               {selectedTemplateKey ? "Change Template" : "Choose Template"}
             </Button>
           </div>
+          <TemplateUsageGuide />
           <div className="mb-2 flex items-center justify-between">
             <div className="text-xs font-semibold uppercase text-muted-foreground">Sections</div>
             <div className="text-[10px] text-muted-foreground">Drag to reorder</div>
