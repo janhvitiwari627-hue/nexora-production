@@ -604,6 +604,7 @@ export function WebsiteEditorPage() {
   }
 
   function patchTheme(patch: Partial<ThemeState>) {
+    markDirty();
     setLocalTheme((prev) => {
       const nextExtras = patch.extras ? { ...prev.extras, ...patch.extras } : prev.extras;
       const next = { ...prev, ...patch, extras: nextExtras };
