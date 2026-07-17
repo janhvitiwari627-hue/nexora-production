@@ -554,11 +554,13 @@ function ItemsEditor({
   kind,
   items,
   salonId,
+  websiteId,
   onChange,
 }: {
   kind: "services" | "rate_card" | "packages" | "staff";
   items: Item[];
   salonId: string | null;
+  websiteId: string | null;
   onChange: (next: Item[]) => void;
 }) {
   const isStaff = kind === "staff";
