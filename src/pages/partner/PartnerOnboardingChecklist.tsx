@@ -165,38 +165,87 @@ export function PartnerOnboardingChecklist() {
     }
   };
 
+  const MIN_DIM = 200;
+  const MAX_DIM = 4000;
+  const MIN_BYTES = 2 * 1024; // 2 KB — catches empty/corrupt files
+
+  const readImageDimensions = (objectUrl: string): Promise<{ width: number; height: number }> =>
+    new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
+      img.onerror = () => reject(new Error("Image file corrupt lag rahi hai — dobara chunein"));
+      img.src = objectUrl;
+    });
+
+  const failFast = (msg: string, keepPreview = false) => {
+    setUploadError(msg);
+    setUploadErrorDetails({ code: "CLIENT_VALIDATION", raw: msg });
+    toast.error(msg);
+    if (!keepPreview && localPreview) {
+      URL.revokeObjectURL(localPreview);
+      setLocalPreview(null);
+    }
+  };
+
   const onPickLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (e.target) e.target.value = "";
     if (!file) return;
     setUploadError(null);
+    setUploadErrorDetails(null);
 
+    // MIME type — trust file.type but also require image/*
+    if (!file.type || !file.type.startsWith("image/")) {
+      failFast("Sirf image files allowed hain (JPG, PNG, WEBP, GIF)");
+      return;
+    }
     if (!ALLOWED_TYPES.includes(file.type)) {
-      const msg = "Sirf JPG, PNG, WEBP ya GIF allowed hain";
-      setUploadError(msg);
-      toast.error(msg);
+      failFast(`"${file.type}" allowed nahi hai — JPG, PNG, WEBP ya GIF chunein`);
+      return;
+    }
+    // Size
+    if (file.size < MIN_BYTES) {
+      failFast("File bahut choti/khali hai — dobara chunein");
       return;
     }
     if (file.size > MAX_BYTES) {
-      const msg = `File 5 MB se choti honi chahiye (abhi ${(file.size / 1024 / 1024).toFixed(1)} MB)`;
-      setUploadError(msg);
-      toast.error(msg);
+      failFast(`File 5 MB se choti honi chahiye (abhi ${(file.size / 1024 / 1024).toFixed(1)} MB)`);
       return;
     }
     if (!cloudinaryReady) {
-      const msg = "Cloudinary is not configured";
-      setUploadError(msg);
-      toast.error(msg);
+      failFast("Cloudinary configure nahi hai — admin se contact karein");
       return;
     }
 
-    // Instant local preview while upload runs
+    // Instant local preview while dimensions load / upload runs
     if (localPreview) URL.revokeObjectURL(localPreview);
     const objectUrl = URL.createObjectURL(file);
     setLocalPreview(objectUrl);
 
+    // Dimension validation (skip animated GIFs — first frame is enough)
+    try {
+      const { width, height } = await readImageDimensions(objectUrl);
+      if (width < MIN_DIM || height < MIN_DIM) {
+        failFast(`Image chhoti hai (${width}×${height}px) — kam se kam ${MIN_DIM}×${MIN_DIM}px chahiye`, true);
+        return;
+      }
+      if (width > MAX_DIM || height > MAX_DIM) {
+        failFast(`Image bahut badi hai (${width}×${height}px) — max ${MAX_DIM}×${MAX_DIM}px`, true);
+        return;
+      }
+      const ratio = Math.max(width, height) / Math.min(width, height);
+      if (ratio > 4) {
+        failFast(`Aspect ratio bahut extreme hai (${width}×${height}) — square-ish logo behtar rahega`, true);
+        return;
+      }
+    } catch (err) {
+      failFast(err instanceof Error ? err.message : "Image read nahi ho payi");
+      return;
+    }
+
     await doUpload(file, objectUrl);
   };
+
 
   const onRetryUpload = async () => {
     const file = lastFileRef.current;
