@@ -446,9 +446,10 @@ export const getWebsiteVersionSnapshot = createServerFn({ method: "GET" })
       id: (version as { id: string }).id,
       note: (version as { note: string | null }).note,
       created_at: (version as { created_at: string }).created_at,
-      sections: snap.sections ?? [],
-      theme: snap.theme ?? null,
+      sections: (snap.sections ?? []) as unknown as Json,
+      theme: (snap.theme ?? null) as unknown as Json,
     };
   });
+
 
 
