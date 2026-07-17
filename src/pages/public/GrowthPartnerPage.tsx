@@ -34,7 +34,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
-import { JoinPartnerDialog } from "./JoinPartnerDialog";
+import { GrowthPartnerApplicationForm } from "@/components/partner/GrowthPartnerApplicationForm";
 import rewardWelcomeKit from "@/assets/reward-welcome-kit.jpg";
 import rewardTablet from "@/assets/reward-tablet-badge.jpg";
 import rewardLaptop from "@/assets/reward-laptop.jpg";
@@ -222,16 +222,9 @@ export function GrowthPartnerPage() {
               long-term growth banao.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <JoinPartnerDialog
-                trigger={
-                  <button
-                    type="button"
-                    className="inline-flex items-center gap-2 rounded-xl bg-[#0B1330] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_10px_30px_-10px_rgba(11,19,48,0.5)] transition-transform hover:-translate-y-0.5"
-                  >
-                    Apply as Growth Partner <ArrowRight className="h-4 w-4" />
-                  </button>
-                }
-              />
+              <a href="#partner-application" className="inline-flex items-center gap-2 rounded-xl bg-[#0B1330] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_10px_30px_-10px_rgba(11,19,48,0.5)] transition-transform hover:-translate-y-0.5">
+                Apply as Growth Partner <ArrowRight className="h-4 w-4" />
+              </a>
               <a
                 href="https://wa.me/919999999999"
                 target="_blank"
@@ -1054,74 +1047,8 @@ export function GrowthPartnerPage() {
             </div>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="rounded-3xl border border-slate-200 bg-white p-8 shadow-[0_30px_60px_-30px_rgba(11,19,48,0.25)]"
-          >
-            <div className="flex items-center justify-between">
-              <div className="text-sm font-bold text-[#0B1330]">Growth Partner Application</div>
-              <span className="rounded-full bg-[#EEF2FF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#4F46E5]">
-                Free
-              </span>
-            </div>
-
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              {[
-                "Full Name",
-                "Mobile Number",
-                "WhatsApp Number",
-                "Email",
-                "State",
-                "District",
-                "City",
-                "Current Work Type",
-                "Beauty Industry Experience",
-                "Salons in Network",
-              ].map((f) => (
-                <div key={f} className="rounded-xl border border-slate-200 bg-[#FAFBFF] px-4 py-3">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    {f}
-                  </div>
-                  <div className="mt-1 h-4 rounded bg-slate-200/70" />
-                </div>
-              ))}
-              <div className="sm:col-span-2 rounded-xl border border-dashed border-slate-300 bg-[#FAFBFF] px-4 py-5 text-center">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                  ID / KYC Upload
-                </div>
-                <div className="mt-1 text-sm font-medium text-slate-600">
-                  Aadhaar / PAN / Business proof
-                </div>
-              </div>
-              <label className="sm:col-span-2 flex items-start gap-3 rounded-xl bg-[#FAFBFF] p-4 ring-1 ring-slate-200/70">
-                <input
-                  type="checkbox"
-                  className="mt-1 h-4 w-4 rounded border-slate-300 text-[#4F46E5]"
-                />
-                <span className="text-xs text-slate-600">
-                  Main Nexora Growth Partner Agreement ke terms accept karta/karti hoon.
-                </span>
-              </label>
-            </div>
-
-            <div className="mt-6">
-              <JoinPartnerDialog
-                trigger={
-                  <button
-                    type="button"
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0B1330] px-6 py-3.5 text-sm font-bold text-white transition-transform hover:-translate-y-0.5"
-                  >
-                    Submit Application <ArrowRight className="h-4 w-4" />
-                  </button>
-                }
-              />
-              <p className="mt-3 text-center text-[11px] text-slate-500">
-                Application submitted successfully. Nexora team verify karke dashboard activate
-                karegi.
-              </p>
-            </div>
+          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <GrowthPartnerApplicationForm />
           </motion.div>
         </div>
       </section>
@@ -1149,16 +1076,9 @@ export function GrowthPartnerPage() {
                 share earn karo.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <JoinPartnerDialog
-                  trigger={
-                    <button
-                      type="button"
-                      className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-[#0B1330] transition-transform hover:-translate-y-0.5"
-                    >
-                      Apply as Growth Partner <ArrowRight className="h-4 w-4" />
-                    </button>
-                  }
-                />
+                <a href="#partner-application" className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-[#0B1330] transition-transform hover:-translate-y-0.5">
+                  Apply as Growth Partner <ArrowRight className="h-4 w-4" />
+                </a>
                 <a
                   href="https://wa.me/919999999999"
                   target="_blank"
