@@ -48,6 +48,8 @@ import { CSS } from "@dnd-kit/utilities";
 
 type NavLink = { id: string; label: string; url: string };
 
+type BgStyle = "solid" | "gradient" | "dots" | "grid" | "diagonal" | "soft-radial";
+
 type ThemeExtras = {
   header_bg?: string;
   header_text?: string;
@@ -55,6 +57,12 @@ type ThemeExtras = {
   link_style?: "underline" | "none" | "hover-underline";
   nav_links?: NavLink[];
   site_title?: string;
+  bg_style?: BgStyle;
+  bg_gradient_from?: string;
+  bg_gradient_to?: string;
+  bg_gradient_angle?: number;
+  bg_pattern_color?: string;
+  bg_pattern_size?: number;
 };
 
 type ThemeState = {
@@ -82,7 +90,22 @@ const DEFAULT_EXTRAS: ThemeExtras = {
   link_style: "hover-underline",
   nav_links: DEFAULT_NAV,
   site_title: "Home",
+  bg_style: "solid",
+  bg_gradient_from: "#FFFFFF",
+  bg_gradient_to: "#F1F5F9",
+  bg_gradient_angle: 135,
+  bg_pattern_color: "#E5E7EB",
+  bg_pattern_size: 24,
 };
+
+const BG_STYLES: { value: BgStyle; label: string; description: string }[] = [
+  { value: "solid", label: "Solid", description: "Flat background color" },
+  { value: "gradient", label: "Gradient", description: "Two-color smooth blend" },
+  { value: "soft-radial", label: "Soft Glow", description: "Radial highlight from center" },
+  { value: "dots", label: "Dots", description: "Subtle dotted pattern" },
+  { value: "grid", label: "Grid", description: "Fine grid lines" },
+  { value: "diagonal", label: "Stripes", description: "Diagonal stripes" },
+];
 
 const DEFAULT_THEME: ThemeState = {
   primary_color: "#111827",
@@ -1374,6 +1397,41 @@ function ColorField({ label, value, onChange }: { label: string; value: string; 
   );
 }
 
+function buildBgPreview(style: BgStyle, theme: ThemeState): CSSProperties {
+  const from = theme.extras.bg_gradient_from ?? theme.background_color;
+  const to = theme.extras.bg_gradient_to ?? "#F1F5F9";
+  const angle = theme.extras.bg_gradient_angle ?? 135;
+  const patternColor = theme.extras.bg_pattern_color ?? "#E5E7EB";
+  const size = theme.extras.bg_pattern_size ?? 24;
+  const base = theme.background_color;
+  switch (style) {
+    case "gradient":
+      return { background: `linear-gradient(${angle}deg, ${from}, ${to})` };
+    case "soft-radial":
+      return { background: `radial-gradient(circle at 30% 20%, ${from}, ${to})` };
+    case "dots":
+      return {
+        backgroundColor: base,
+        backgroundImage: `radial-gradient(${patternColor} 1.2px, transparent 1.2px)`,
+        backgroundSize: `${size}px ${size}px`,
+      };
+    case "grid":
+      return {
+        backgroundColor: base,
+        backgroundImage: `linear-gradient(${patternColor} 1px, transparent 1px), linear-gradient(90deg, ${patternColor} 1px, transparent 1px)`,
+        backgroundSize: `${size}px ${size}px`,
+      };
+    case "diagonal":
+      return {
+        backgroundColor: base,
+        backgroundImage: `repeating-linear-gradient(45deg, ${patternColor} 0, ${patternColor} 1px, transparent 1px, transparent ${size}px)`,
+      };
+    case "solid":
+    default:
+      return { background: base };
+  }
+}
+
 function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch: Partial<ThemeState>) => void }) {
   return (
     <div className="mx-auto max-w-xl space-y-6">
@@ -1496,6 +1554,95 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
           </div>
         </div>
       </div>
+
+      <div className="space-y-4 rounded-lg border bg-card p-4">
+        <h3 className="text-sm font-semibold uppercase text-muted-foreground">Background Style</h3>
+        <p className="text-xs text-muted-foreground">Choose how the page background looks behind your sections.</p>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {BG_STYLES.map((s) => {
+            const active = (theme.extras.bg_style ?? "solid") === s.value;
+            return (
+              <button
+                key={s.value}
+                type="button"
+                onClick={() => onChange({ extras: { bg_style: s.value } })}
+                className={`rounded-lg border p-2 text-left transition ${
+                  active ? "border-primary ring-2 ring-primary/30" : "hover:border-primary/60"
+                }`}
+              >
+                <div
+                  className="h-12 w-full rounded"
+                  style={buildBgPreview(s.value, theme)}
+                />
+                <div className="mt-1.5 text-xs font-semibold">{s.label}</div>
+                <div className="text-[10px] text-muted-foreground">{s.description}</div>
+              </button>
+            );
+          })}
+        </div>
+
+        {(theme.extras.bg_style ?? "solid") === "gradient" || (theme.extras.bg_style ?? "solid") === "soft-radial" ? (
+          <div className="space-y-3 pt-2">
+            <div className="grid grid-cols-2 gap-3">
+              <ColorField
+                label="Gradient From"
+                value={theme.extras.bg_gradient_from ?? theme.background_color}
+                onChange={(v) => onChange({ extras: { bg_gradient_from: v } })}
+              />
+              <ColorField
+                label="Gradient To"
+                value={theme.extras.bg_gradient_to ?? "#F1F5F9"}
+                onChange={(v) => onChange({ extras: { bg_gradient_to: v } })}
+              />
+            </div>
+            {(theme.extras.bg_style ?? "solid") === "gradient" && (
+              <div className="space-y-1.5">
+                <Label>Angle: {theme.extras.bg_gradient_angle ?? 135}°</Label>
+                <input
+                  type="range"
+                  min={0}
+                  max={360}
+                  step={5}
+                  value={theme.extras.bg_gradient_angle ?? 135}
+                  onChange={(e) => onChange({ extras: { bg_gradient_angle: Number(e.target.value) } })}
+                  className="w-full"
+                />
+              </div>
+            )}
+          </div>
+        ) : null}
+
+        {["dots", "grid", "diagonal"].includes(theme.extras.bg_style ?? "solid") && (
+          <div className="grid grid-cols-2 gap-3 pt-2">
+            <ColorField
+              label="Pattern Color"
+              value={theme.extras.bg_pattern_color ?? "#E5E7EB"}
+              onChange={(v) => onChange({ extras: { bg_pattern_color: v } })}
+            />
+            <div className="space-y-1.5">
+              <Label>Pattern Size: {theme.extras.bg_pattern_size ?? 24}px</Label>
+              <input
+                type="range"
+                min={8}
+                max={64}
+                step={2}
+                value={theme.extras.bg_pattern_size ?? 24}
+                onChange={(e) => onChange({ extras: { bg_pattern_size: Number(e.target.value) } })}
+                className="w-full"
+              />
+            </div>
+          </div>
+        )}
+
+        <div className="mt-3">
+          <div className="text-xs text-muted-foreground mb-1">Live preview</div>
+          <div
+            className="h-24 w-full rounded-lg border"
+            style={buildBgPreview(theme.extras.bg_style ?? "solid", theme)}
+          />
+        </div>
+      </div>
+
 
       <div className="space-y-4 rounded-lg border bg-card p-4">
         <h3 className="text-sm font-semibold uppercase text-muted-foreground">Header</h3>
