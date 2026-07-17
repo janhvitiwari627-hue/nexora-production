@@ -620,3 +620,97 @@ function TextField({
   );
 }
 
+
+function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="space-y-1.5">
+      <Label>{label}</Label>
+      <div className="flex items-center gap-2">
+        <input
+          type="color"
+          value={value || "#000000"}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-10 w-14 cursor-pointer rounded-md border bg-background p-1"
+        />
+        <Input value={value} onChange={(e) => onChange(e.target.value)} className="font-mono text-xs" />
+      </div>
+    </div>
+  );
+}
+
+function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch: Partial<ThemeState>) => void }) {
+  return (
+    <div className="mx-auto max-w-xl space-y-6">
+      <div>
+        <h2 className="text-xl font-semibold">Theme &amp; Typography</h2>
+        <p className="text-sm text-muted-foreground">Changes apply instantly to the live preview.</p>
+      </div>
+
+      <div className="space-y-4 rounded-lg border bg-card p-4">
+        <h3 className="text-sm font-semibold uppercase text-muted-foreground">Colors</h3>
+        <div className="grid grid-cols-2 gap-3">
+          <ColorField label="Primary" value={theme.primary_color} onChange={(v) => onChange({ primary_color: v })} />
+          <ColorField label="Secondary" value={theme.secondary_color} onChange={(v) => onChange({ secondary_color: v })} />
+          <ColorField label="Accent" value={theme.accent_color} onChange={(v) => onChange({ accent_color: v })} />
+          <ColorField label="Background" value={theme.background_color} onChange={(v) => onChange({ background_color: v })} />
+          <ColorField label="Text" value={theme.text_color} onChange={(v) => onChange({ text_color: v })} />
+        </div>
+      </div>
+
+      <div className="space-y-4 rounded-lg border bg-card p-4">
+        <h3 className="text-sm font-semibold uppercase text-muted-foreground">Typography</h3>
+        <div className="space-y-1.5">
+          <Label>Heading Font</Label>
+          <Select value={theme.heading_font} onValueChange={(v) => onChange({ heading_font: v })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {FONT_OPTIONS.map((f) => (
+                <SelectItem key={f} value={f} style={{ fontFamily: f }}>{f}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-1.5">
+          <Label>Body Font</Label>
+          <Select value={theme.body_font} onValueChange={(v) => onChange({ body_font: v })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {FONT_OPTIONS.map((f) => (
+                <SelectItem key={f} value={f} style={{ fontFamily: f }}>{f}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className="space-y-4 rounded-lg border bg-card p-4">
+        <h3 className="text-sm font-semibold uppercase text-muted-foreground">Buttons</h3>
+        <div className="space-y-1.5">
+          <Label>Button Style</Label>
+          <Select value={theme.button_style} onValueChange={(v) => onChange({ button_style: v })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {BUTTON_STYLES.map((b) => (
+                <SelectItem key={b.value} value={b.value}>{b.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <div className="mt-3 flex items-center gap-3">
+            <span className="text-xs text-muted-foreground">Preview:</span>
+            <span
+              className="inline-block px-5 py-2 text-sm font-medium"
+              style={{
+                background: theme.secondary_color,
+                color: "#000",
+                borderRadius: theme.button_style === "pill" ? "9999px" : theme.button_style === "square" ? "0" : "0.5rem",
+                fontFamily: theme.body_font,
+              }}
+            >
+              Book Now
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
