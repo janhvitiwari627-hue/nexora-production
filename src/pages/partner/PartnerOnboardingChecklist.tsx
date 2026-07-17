@@ -261,6 +261,8 @@ export function PartnerOnboardingChecklist() {
       setUploadError(null);
       lastFileRef.current = null;
       setUploadProgress(100);
+      updateStatus(statusId, { status: "success", progress: 100 });
+
       const sizeKb = Math.max(1, Math.round(file.size / 1024));
       announceStatus(
         `Success: ${file.name} (${sizeKb} KB) uploaded to Cloudinary. Logo preview updated. Save karke pakka karo.`,
