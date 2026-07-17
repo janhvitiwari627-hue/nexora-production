@@ -6,7 +6,7 @@ import { useOwnerContext } from "@/hooks/use-owner-context";
 const NAV = [
   { to: "/app/owner", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/app/owner/bookings", label: "Bookings", icon: CalendarDays },
-  { to: "/owner/website/edit", label: "Website", icon: Globe2 },
+  { to: "/owner/website", label: "Website", icon: Globe2 },
   { to: "/app/owner/wallet", label: "Wallet", icon: WalletCards },
   { to: "/app/owner/profile", label: "Profile", icon: UserRound },
 ] as const;

@@ -10,7 +10,7 @@ import { useAuthStore } from "@/stores/authStore";
 const NAV = [
   { label: "Explore", to: "/search", icon: Sparkles, desc: "Salons, spas & barbers near you" },
   { label: "Job Portal", to: "/jobs", icon: Briefcase, desc: "Find your next role in beauty" },
-  { label: "Final Website Editor", to: "/owner/website/edit", icon: Building2, desc: "Edit theme, content and publish in one place" },
+  { label: "Final Website Editor", to: "/owner/website", icon: Building2, desc: "Edit theme, content and publish in one place" },
 ] as const;
 
 export function MobileMenuOverlay({

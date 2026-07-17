@@ -11,7 +11,7 @@ export const Route = createFileRoute("/owner")({
       "/owner/register-business",
       "/owner/templates",
       "/owner/create-website",
-      "/owner/website/edit",
+      "/owner/website",
     ];
     if (publicPaths.some((p) => location.pathname.startsWith(p))) return;
 

@@ -14,7 +14,7 @@ export function ViralGrowthWidget() {
         <div className="text-sm">
           <div className="font-semibold">Build Your Own Salon Website</div>
           <p className="text-muted-foreground text-xs mt-0.5">Get a free white-label site like this in minutes.</p>
-          <a href="/owner/website/edit" className="text-primary mt-2 inline-block text-xs font-semibold hover:underline">Open Final Editor →</a>
+          <a href="/owner/website" className="text-primary mt-2 inline-block text-xs font-semibold hover:underline">Open Final Editor →</a>
         </div>
       </div>
     </div>

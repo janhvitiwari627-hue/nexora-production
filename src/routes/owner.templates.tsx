@@ -2,7 +2,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/owner/templates")({
   beforeLoad: () => {
-    throw redirect({ to: "/owner/website/edit", replace: true });
+    throw redirect({ to: "/owner/website", replace: true });
   },
   head: () => ({
     meta: [

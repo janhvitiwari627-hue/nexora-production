@@ -32,14 +32,14 @@ export default function WhiteLabelBuilder() {
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link
-                  to="/owner/website/edit"
+                  to="/owner/website"
                   className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
                 >
                   <Globe className="h-4 w-4" />
                   Open Final Editor
                 </Link>
                 <Link
-                  to="/owner/website/edit"
+                  to="/owner/website"
                   className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition-colors hover:border-indigo-300 hover:text-indigo-700"
                 >
                   <Paintbrush className="h-4 w-4" />
@@ -146,7 +146,7 @@ export default function WhiteLabelBuilder() {
                           </ul>
                         </div>
                         <Link
-                          to="/owner/website/edit"
+                          to="/owner/website"
                           aria-label={`Use ${tpl.template_name}`}
                           className="rounded-full bg-slate-900 p-2.5 text-white transition-transform hover:scale-110 active:scale-95"
                         >

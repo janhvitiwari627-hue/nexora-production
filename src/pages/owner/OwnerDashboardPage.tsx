@@ -136,7 +136,7 @@ function TopBar({
           </div>
           {showWebsiteActions && (
             <Button variant="outline" size="sm" className="hidden gap-1.5 md:inline-flex" asChild>
-              <a href="/owner/website/edit">
+              <a href="/owner/website">
                 <Globe className="h-4 w-4" /> Final Website Editor
               </a>
             </Button>
@@ -773,8 +773,8 @@ function QuickActionsRow() {
   };
 
   const handleShare = () =>
-    requireOwner("Share Website", "/owner/website/edit", async () => {
-      const url = `${window.location.origin}/owner/website/edit`;
+    requireOwner("Share Website", "/owner/website", async () => {
+      const url = `${window.location.origin}/owner/website`;
       try {
         if (navigator.share) {
           await navigator.share({ title: "My Salon Website", url });
@@ -792,7 +792,7 @@ function QuickActionsRow() {
     { icon: UserPlus, label: "Add Staff", onClick: () => requireOwner("Add Staff", "/owner/staff") },
     { icon: Tag, label: "Create Offer", onClick: () => requireOwner("Create Offer", "/owner/marketing") },
     { icon: Share2, label: "Share Website", onClick: handleShare },
-    { icon: QrCode, label: "Generate QR", onClick: () => requireOwner("Generate QR", "/owner/website/edit") },
+    { icon: QrCode, label: "Generate QR", onClick: () => requireOwner("Generate QR", "/owner/website") },
     { icon: BarChart3, label: "View Analytics", onClick: () => requireOwner("View Analytics", "/owner/analytics") },
   ];
   return (
@@ -879,7 +879,7 @@ export function OwnerDashboardPage({ ownerPortalOnly = false }: { ownerPortalOnl
   // Mandatory onboarding: redirect approved owners with no website yet to template gallery.
   const needsWebsite = !!activeSalon && activeSalon.website_created === false;
   useEffect(() => {
-    if (!ownerPortalOnly && needsWebsite) navigate({ to: "/owner/website/edit" });
+    if (!ownerPortalOnly && needsWebsite) navigate({ to: "/owner/website" });
   }, [needsWebsite, navigate, ownerPortalOnly]);
 
   // Compute greeting on the client only to avoid SSR/CSR hydration mismatch
@@ -908,7 +908,7 @@ export function OwnerDashboardPage({ ownerPortalOnly = false }: { ownerPortalOnl
                   </div>
                 </div>
               </div>
-              <Button onClick={() => navigate({ to: "/owner/website/edit" })}>Open Final Editor</Button>
+              <Button onClick={() => navigate({ to: "/owner/website" })}>Open Final Editor</Button>
             </div>
           </Card>
         )}

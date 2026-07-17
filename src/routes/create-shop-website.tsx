@@ -5,7 +5,7 @@ export const Route = createFileRoute("/create-shop-website")({
     throw redirect({
       to: "/auth-notice",
       search: {
-        to: "/owner/website/edit",
+        to: "/owner/website",
         reason: "create-website",
         delay: 1100,
       },
