@@ -12,6 +12,7 @@ import {
   listWebsiteVersions,
   saveDraftVersion,
   restoreWebsiteVersion,
+  getWebsiteVersionSnapshot,
   type WebsiteSection,
   type SectionType,
 } from "@/lib/website-editor.functions";
@@ -25,7 +26,8 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "sonner";
-import { Loader2, Eye, EyeOff, Globe, Plus, Trash2, Upload, Image as ImageIcon, Palette, GripVertical, History, Undo2, Save } from "lucide-react";
+import { Loader2, Eye, EyeOff, Globe, Plus, Trash2, Upload, Image as ImageIcon, Palette, GripVertical, History, Undo2, Save, GitCompare } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import {
   DndContext,
   closestCenter,
@@ -215,6 +217,7 @@ export function WebsiteEditorPage() {
   const fetchVersions = useServerFn(listWebsiteVersions);
   const doSaveVersion = useServerFn(saveDraftVersion);
   const doRestoreVersion = useServerFn(restoreWebsiteVersion);
+  const fetchVersionSnapshot = useServerFn(getWebsiteVersionSnapshot);
 
 
 
@@ -328,6 +331,130 @@ export function WebsiteEditorPage() {
   const [versionsLoading, setVersionsLoading] = useState(false);
   const [restoring, setRestoring] = useState<string | null>(null);
   const [savingVersion, setSavingVersion] = useState(false);
+
+  // ---- Diff viewer ----
+  type DiffChange =
+    | { kind: "added"; label: string }
+    | { kind: "removed"; label: string }
+    | { kind: "modified"; label: string; details: string[] };
+  type DiffResult = { sections: DiffChange[]; theme: DiffChange[] };
+  const [diffOpen, setDiffOpen] = useState(false);
+  const [diffLoading, setDiffLoading] = useState(false);
+  const [diffVersion, setDiffVersion] = useState<VersionRow | null>(null);
+  const [diffResult, setDiffResult] = useState<DiffResult | null>(null);
+
+  function shortValue(v: unknown): string {
+    if (v === null || v === undefined) return "—";
+    if (typeof v === "string") return v.length > 60 ? v.slice(0, 60) + "…" : v;
+    if (typeof v === "number" || typeof v === "boolean") return String(v);
+    try {
+      const s = JSON.stringify(v);
+      return s.length > 60 ? s.slice(0, 60) + "…" : s;
+    } catch {
+      return String(v);
+    }
+  }
+  function stableStringify(v: unknown): string {
+    try { return JSON.stringify(v); } catch { return ""; }
+  }
+  function diffObjects(a: Record<string, unknown>, b: Record<string, unknown>): string[] {
+    const keys = new Set([...Object.keys(a ?? {}), ...Object.keys(b ?? {})]);
+    const out: string[] = [];
+    for (const k of keys) {
+      const av = a?.[k];
+      const bv = b?.[k];
+      if (stableStringify(av) !== stableStringify(bv)) {
+        out.push(`${k}: ${shortValue(av)} → ${shortValue(bv)}`);
+      }
+    }
+    return out;
+  }
+
+  async function handleViewDiff(v: VersionRow) {
+    setDiffVersion(v);
+    setDiffOpen(true);
+    setDiffLoading(true);
+    setDiffResult(null);
+    try {
+      const snap = await fetchVersionSnapshot({ data: { versionId: v.id } });
+      const oldSections = (snap.sections as unknown as Array<{ id?: string; section_type: string; content: unknown; is_visible?: boolean; sort_order?: number }>) ?? [];
+      const newSections = localSections;
+
+      // Match by id when present, else fall back by section_type order.
+      const oldById = new Map<string, typeof oldSections[number]>();
+      const oldByType: Record<string, typeof oldSections[number][]> = {};
+      for (const s of oldSections) {
+        if (s.id) oldById.set(s.id, s);
+        (oldByType[s.section_type] ??= []).push(s);
+      }
+      const usedOldIds = new Set<string>();
+      const sectionChanges: DiffChange[] = [];
+
+      for (const cur of newSections) {
+        const label = (SECTION_LABELS as Record<string, string>)[cur.section_type] ?? cur.section_type;
+        let match = cur.id && oldById.has(cur.id) ? oldById.get(cur.id)! : undefined;
+        if (!match) {
+          const bucket = oldByType[cur.section_type] ?? [];
+          match = bucket.find((s) => !(s.id && usedOldIds.has(s.id)));
+        }
+        if (!match) {
+          sectionChanges.push({ kind: "added", label });
+          continue;
+        }
+        if (match.id) usedOldIds.add(match.id);
+        const details: string[] = [];
+        if ((match.is_visible ?? true) !== (cur.is_visible ?? true)) {
+          details.push(`visibility: ${match.is_visible === false ? "hidden" : "visible"} → ${cur.is_visible === false ? "hidden" : "visible"}`);
+        }
+        if (stableStringify(match.content) !== stableStringify(cur.content)) {
+          const inner = diffObjects(
+            (match.content ?? {}) as Record<string, unknown>,
+            (cur.content ?? {}) as Record<string, unknown>,
+          );
+          if (inner.length) details.push(...inner);
+          else details.push("content changed");
+        }
+        if (details.length) sectionChanges.push({ kind: "modified", label, details });
+      }
+      // Anything in old not matched → removed
+      for (const s of oldSections) {
+        if (s.id && usedOldIds.has(s.id)) continue;
+        if (!s.id) {
+          // For id-less, if new has one of same type unmatched, we'd have used it above.
+          const stillThere = newSections.some((n) => n.section_type === s.section_type);
+          if (stillThere) continue;
+        } else if (newSections.some((n) => n.id === s.id)) continue;
+        sectionChanges.push({ kind: "removed", label: (SECTION_LABELS as Record<string, string>)[s.section_type] ?? s.section_type });
+      }
+
+      // Theme diff
+      const oldTheme = (snap.theme as Record<string, unknown> | null) ?? {};
+      const themeFields = [
+        "primary_color", "secondary_color", "accent_color", "background_color",
+        "text_color", "heading_font", "body_font", "button_style",
+      ] as const;
+      const themeChanges: DiffChange[] = [];
+      for (const k of themeFields) {
+        const ov = oldTheme[k];
+        const nv = (localTheme as unknown as Record<string, unknown>)[k];
+        if (stableStringify(ov) !== stableStringify(nv)) {
+          themeChanges.push({ kind: "modified", label: k.replace(/_/g, " "), details: [`${shortValue(ov)} → ${shortValue(nv)}`] });
+        }
+      }
+      const oldExtras = (oldTheme.extras as Record<string, unknown>) ?? {};
+      const newExtras = (localTheme.extras as unknown as Record<string, unknown>) ?? {};
+      const extraDiff = diffObjects(oldExtras, newExtras);
+      if (extraDiff.length) themeChanges.push({ kind: "modified", label: "extras", details: extraDiff });
+
+      setDiffResult({ sections: sectionChanges, theme: themeChanges });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to load diff");
+      setDiffOpen(false);
+    } finally {
+      setDiffLoading(false);
+    }
+  }
+
 
   async function refreshVersions() {
     if (!websiteId) return;
@@ -493,19 +620,30 @@ export function WebsiteEditorPage() {
                             {new Date(v.created_at).toLocaleString()}
                           </div>
                         </div>
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={() => handleRestoreVersion(v.id)}
-                          disabled={restoring !== null}
-                        >
-                          {restoring === v.id ? (
-                            <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                          ) : (
-                            <Undo2 className="mr-1 h-3 w-3" />
-                          )}
-                          Restore
-                        </Button>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleViewDiff(v)}
+                            title="View changes vs. current draft"
+                          >
+                            <GitCompare className="mr-1 h-3 w-3" />
+                            Diff
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => handleRestoreVersion(v.id)}
+                            disabled={restoring !== null}
+                          >
+                            {restoring === v.id ? (
+                              <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                            ) : (
+                              <Undo2 className="mr-1 h-3 w-3" />
+                            )}
+                            Restore
+                          </Button>
+                        </div>
                       </li>
                     ))}
                   </ul>
@@ -519,6 +657,112 @@ export function WebsiteEditorPage() {
           </Button>
         </div>
       </header>
+
+      <Dialog open={diffOpen} onOpenChange={setDiffOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <GitCompare className="h-4 w-4" /> Changes vs. current draft
+            </DialogTitle>
+            <DialogDescription>
+              {diffVersion ? (
+                <>
+                  Comparing <strong>{diffVersion.note || "Draft"}</strong>{" "}
+                  ({new Date(diffVersion.created_at).toLocaleString()}) to your current unsaved draft.
+                </>
+              ) : null}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[60vh] overflow-y-auto pr-1">
+            {diffLoading ? (
+              <div className="flex items-center justify-center py-10">
+                <Loader2 className="h-5 w-5 animate-spin" />
+              </div>
+            ) : !diffResult ? null : diffResult.sections.length === 0 && diffResult.theme.length === 0 ? (
+              <p className="py-6 text-center text-sm text-muted-foreground">
+                No differences — this version matches your current draft.
+              </p>
+            ) : (
+              <div className="space-y-4">
+                <section>
+                  <h4 className="mb-2 text-sm font-semibold">Sections</h4>
+                  {diffResult.sections.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">No section changes.</p>
+                  ) : (
+                    <ul className="space-y-2">
+                      {diffResult.sections.map((c, i) => (
+                        <li key={i} className="rounded-md border p-2 text-sm">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={
+                                "rounded px-1.5 py-0.5 text-[10px] font-medium uppercase " +
+                                (c.kind === "added"
+                                  ? "bg-emerald-100 text-emerald-700"
+                                  : c.kind === "removed"
+                                  ? "bg-red-100 text-red-700"
+                                  : "bg-amber-100 text-amber-700")
+                              }
+                            >
+                              {c.kind}
+                            </span>
+                            <span className="font-medium">{c.label}</span>
+                          </div>
+                          {c.kind === "modified" && c.details.length > 0 && (
+                            <ul className="mt-1 ml-1 list-disc pl-5 text-xs text-muted-foreground">
+                              {c.details.map((d, j) => (
+                                <li key={j} className="break-all">{d}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </section>
+                <section>
+                  <h4 className="mb-2 text-sm font-semibold">Theme</h4>
+                  {diffResult.theme.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">No theme changes.</p>
+                  ) : (
+                    <ul className="space-y-1 text-sm">
+                      {diffResult.theme.map((c, i) => (
+                        <li key={i} className="rounded-md border p-2">
+                          <div className="font-medium capitalize">{c.label}</div>
+                          {c.kind === "modified" && (
+                            <ul className="mt-1 ml-1 list-disc pl-5 text-xs text-muted-foreground">
+                              {c.details.map((d, j) => (
+                                <li key={j} className="break-all">{d}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </section>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setDiffOpen(false)}>
+              Close
+            </Button>
+            {diffVersion && (
+              <Button
+                onClick={async () => {
+                  setDiffOpen(false);
+                  await handleRestoreVersion(diffVersion.id);
+                }}
+                disabled={restoring !== null}
+              >
+                <Undo2 className="mr-1 h-4 w-4" /> Restore this version
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+
 
       <div className="grid flex-1 grid-cols-[240px_1fr_1fr] overflow-hidden">
         {/* Section list */}

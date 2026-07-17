@@ -418,3 +418,38 @@ export const restoreWebsiteVersion = createServerFn({ method: "POST" })
     return { ok: true, websiteId };
   });
 
+export const getWebsiteVersionSnapshot = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ versionId: z.string().uuid() }).parse(d))
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    const { data: version, error } = await supabase
+      .from("website_versions")
+      .select("id, website_id, snapshot, note, created_at")
+      .eq("id", data.versionId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!version) throw new Error("Version not found");
+    const websiteId = (version as { website_id: string }).website_id;
+    const { data: w } = await supabase
+      .from("user_websites")
+      .select("id")
+      .eq("id", websiteId)
+      .eq("owner_id", userId)
+      .maybeSingle();
+    if (!w) throw new Error("Not authorized");
+    const snap = (version as { snapshot: unknown }).snapshot as {
+      sections?: Array<Record<string, unknown>>;
+      theme?: Record<string, unknown> | null;
+    };
+    return {
+      id: (version as { id: string }).id,
+      note: (version as { note: string | null }).note,
+      created_at: (version as { created_at: string }).created_at,
+      sections: (snap.sections ?? []) as unknown as Json,
+      theme: (snap.theme ?? null) as unknown as Json,
+    };
+  });
+
+
+
