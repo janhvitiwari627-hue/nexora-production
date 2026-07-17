@@ -51,6 +51,90 @@ const BUTTON_STYLES = [
   { value: "square", label: "Square" },
 ];
 
+const THEME_PRESETS: { key: string; name: string; description: string; theme: ThemeState }[] = [
+  {
+    key: "default",
+    name: "Default",
+    description: "Reset to defaults",
+    theme: DEFAULT_THEME,
+  },
+  {
+    key: "classic",
+    name: "Classic",
+    description: "Warm gold on deep navy",
+    theme: {
+      primary_color: "#1E293B",
+      secondary_color: "#D4A24C",
+      accent_color: "#B45309",
+      background_color: "#FAF7F2",
+      text_color: "#1E293B",
+      heading_font: "Playfair Display",
+      body_font: "Lora",
+      button_style: "rounded",
+    },
+  },
+  {
+    key: "modern",
+    name: "Modern",
+    description: "Bold indigo, clean sans",
+    theme: {
+      primary_color: "#4F46E5",
+      secondary_color: "#F59E0B",
+      accent_color: "#10B981",
+      background_color: "#FFFFFF",
+      text_color: "#0F172A",
+      heading_font: "Space Grotesk",
+      body_font: "Inter",
+      button_style: "pill",
+    },
+  },
+  {
+    key: "minimal",
+    name: "Minimal",
+    description: "Monochrome, lots of white",
+    theme: {
+      primary_color: "#000000",
+      secondary_color: "#111111",
+      accent_color: "#666666",
+      background_color: "#FFFFFF",
+      text_color: "#111111",
+      heading_font: "Montserrat",
+      body_font: "Inter",
+      button_style: "square",
+    },
+  },
+  {
+    key: "luxury",
+    name: "Luxury",
+    description: "Rich rose on charcoal",
+    theme: {
+      primary_color: "#111111",
+      secondary_color: "#E5B8A6",
+      accent_color: "#8B5E3C",
+      background_color: "#0F0F0F",
+      text_color: "#F5F0EB",
+      heading_font: "Playfair Display",
+      body_font: "Montserrat",
+      button_style: "pill",
+    },
+  },
+  {
+    key: "fresh",
+    name: "Fresh",
+    description: "Mint & coral, playful",
+    theme: {
+      primary_color: "#0F766E",
+      secondary_color: "#FB7185",
+      accent_color: "#FDE68A",
+      background_color: "#F0FDFA",
+      text_color: "#134E4A",
+      heading_font: "Poppins",
+      body_font: "Poppins",
+      button_style: "rounded",
+    },
+  },
+];
+
 const SECTION_LABELS: Record<SectionType, string> = {
   hero: "Hero / Banner",
   about: "About Us",
@@ -645,6 +729,55 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
         <h2 className="text-xl font-semibold">Theme &amp; Typography</h2>
         <p className="text-sm text-muted-foreground">Changes apply instantly to the live preview.</p>
       </div>
+
+      <div className="space-y-3 rounded-lg border bg-card p-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold uppercase text-muted-foreground">Presets</h3>
+          <button
+            type="button"
+            onClick={() => onChange(DEFAULT_THEME)}
+            className="text-xs text-primary underline-offset-2 hover:underline"
+          >
+            Reset to default
+          </button>
+        </div>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {THEME_PRESETS.map((p) => {
+            const active =
+              theme.primary_color === p.theme.primary_color &&
+              theme.secondary_color === p.theme.secondary_color &&
+              theme.heading_font === p.theme.heading_font &&
+              theme.button_style === p.theme.button_style;
+            return (
+              <button
+                key={p.key}
+                type="button"
+                onClick={() => onChange(p.theme)}
+                className={`group rounded-lg border p-2 text-left transition ${
+                  active ? "border-primary ring-2 ring-primary/30" : "hover:border-primary/60"
+                }`}
+                style={{ background: p.theme.background_color }}
+              >
+                <div className="flex gap-1">
+                  {[p.theme.primary_color, p.theme.secondary_color, p.theme.accent_color, p.theme.text_color].map((c, i) => (
+                    <span key={i} className="h-5 w-5 rounded-full border" style={{ background: c }} />
+                  ))}
+                </div>
+                <div
+                  className="mt-2 text-sm font-semibold"
+                  style={{ color: p.theme.text_color, fontFamily: p.theme.heading_font }}
+                >
+                  {p.name}
+                </div>
+                <div className="text-[11px] opacity-70" style={{ color: p.theme.text_color }}>
+                  {p.description}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
 
       <div className="space-y-4 rounded-lg border bg-card p-4">
         <h3 className="text-sm font-semibold uppercase text-muted-foreground">Colors</h3>
