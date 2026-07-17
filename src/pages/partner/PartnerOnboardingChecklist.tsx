@@ -246,12 +246,12 @@ export function PartnerOnboardingChecklist() {
         err instanceof CloudinaryUploadError && err.status
           ? ` Status ${err.status}${err.statusText ? ` ${err.statusText}` : ""}.`
           : "";
+      // Combined per-file + end-of-batch summary in one assertive announcement
+      // (two setState calls in the same tick would collapse to the last one).
       announceAlert(
-        `Upload failed for ${file.name}.${statusPart} Reason: ${friendly}. Retry button available.`,
+        `All uploads failed. 1 of 1 file failed: ${file.name}.${statusPart} Reason: ${friendly}. Retry button available.`,
       );
-      // Final batch summary — mirrors the success path so end-of-upload state
-      // is always announced explicitly, even without user interaction.
-      announceAlert(`All uploads failed. 1 of 1 file failed: ${file.name}. ${friendly}`);
+
 
       toast.error(friendly);
       lastFileRef.current = file;
