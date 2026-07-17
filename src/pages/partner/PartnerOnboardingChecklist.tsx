@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { motion } from "framer-motion";
-import { CheckCircle2, Circle, ClipboardList, Image as ImageIcon, MapPin, Phone, Sparkles, Loader2, Upload, X } from "lucide-react";
+import { CheckCircle2, Circle, ClipboardList, Image as ImageIcon, MapPin, Phone, Sparkles, Loader2, Upload, X, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -101,6 +101,30 @@ export function PartnerOnboardingChecklist() {
     };
   }, [localPreview]);
 
+  const lastFileRef = useRef<File | null>(null);
+
+  const doUpload = async (file: File, keepPreview?: string) => {
+    setUploading(true);
+    try {
+      const res = await uploadToCloudinary(file, { folder: "partner-logos" });
+      setForm((f) => ({ ...f, photo_url: res.secure_url }));
+      setUploadError(null);
+      lastFileRef.current = null;
+      toast.success("Logo uploaded — save karke pakka karo");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Upload failed";
+      setUploadError(msg);
+      toast.error(msg);
+      lastFileRef.current = file;
+      if (!keepPreview && localPreview) {
+        URL.revokeObjectURL(localPreview);
+        setLocalPreview(null);
+      }
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const onPickLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (e.target) e.target.value = "";
@@ -131,20 +155,17 @@ export function PartnerOnboardingChecklist() {
     const objectUrl = URL.createObjectURL(file);
     setLocalPreview(objectUrl);
 
-    setUploading(true);
-    try {
-      const res = await uploadToCloudinary(file, { folder: "partner-logos" });
-      setForm((f) => ({ ...f, photo_url: res.secure_url }));
-      toast.success("Logo uploaded — save karke pakka karo");
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Upload failed";
-      setUploadError(msg);
-      toast.error(msg);
-      setLocalPreview(null);
-      URL.revokeObjectURL(objectUrl);
-    } finally {
-      setUploading(false);
+    await doUpload(file, objectUrl);
+  };
+
+  const onRetryUpload = async () => {
+    const file = lastFileRef.current;
+    if (!file) {
+      fileInputRef.current?.click();
+      return;
     }
+    setUploadError(null);
+    await doUpload(file, localPreview ?? undefined);
   };
 
 
@@ -319,7 +340,24 @@ export function PartnerOnboardingChecklist() {
                     onChange={onPickLogo}
                   />
                   {uploadError && (
-                    <p className="text-[11px] font-medium text-red-600">{uploadError}</p>
+                    <div className="flex flex-wrap items-center gap-2 rounded-md border border-red-200 bg-red-50 px-2 py-1.5">
+                      <p className="flex-1 text-[11px] font-medium text-red-600">{uploadError}</p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={onRetryUpload}
+                        disabled={uploading || !cloudinaryReady}
+                        className="h-7 border-red-300 px-2 text-[11px] text-red-700 hover:bg-red-100"
+                      >
+                        {uploading ? (
+                          <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                        ) : (
+                          <RefreshCw className="mr-1 h-3 w-3" />
+                        )}
+                        {lastFileRef.current ? "Retry upload" : "Choose file"}
+                      </Button>
+                    </div>
                   )}
                 </div>
               </div>
