@@ -249,6 +249,10 @@ export function PartnerOnboardingChecklist() {
       announceAlert(
         `Upload failed for ${file.name}.${statusPart} Reason: ${friendly}. Retry button available.`,
       );
+      // Final batch summary — mirrors the success path so end-of-upload state
+      // is always announced explicitly, even without user interaction.
+      announceAlert(`All uploads failed. 1 of 1 file failed: ${file.name}. ${friendly}`);
+
       toast.error(friendly);
       lastFileRef.current = file;
       if (!keepPreview && localPreview) {
