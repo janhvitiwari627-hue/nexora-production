@@ -978,6 +978,8 @@ type Item = {
   image?: string;
   date?: string;
   discount?: string;
+  objectPosition?: string; // e.g. "center", "top", "left top", used for gallery crop focus
+  thumbShape?: "square" | "portrait" | "landscape" | "wide" | "auto"; // per-image override
 };
 
 
