@@ -113,6 +113,12 @@ export function PartnerOnboardingChecklist() {
     raw: string;
   } | null>(null);
   const [showErrorDetails, setShowErrorDetails] = useState(false);
+  // Screen-reader announcements for upload lifecycle (progress milestones + final result)
+  const [srStatus, setSrStatus] = useState("");
+  const [srAlert, setSrAlert] = useState("");
+  const lastAnnouncedMilestoneRef = useRef<number>(-1);
+  const announceStatus = (msg: string) => setSrStatus(msg);
+  const announceAlert = (msg: string) => setSrAlert(msg);
   const cloudinaryReady = isCloudinaryConfigured();
 
   const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
