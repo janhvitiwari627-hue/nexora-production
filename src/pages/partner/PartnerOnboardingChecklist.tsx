@@ -165,7 +165,9 @@ export function PartnerOnboardingChecklist() {
           }
           if (pct >= 100 && lastAnnouncedMilestoneRef.current < 100) {
             lastAnnouncedMilestoneRef.current = 100;
-            announceStatus("Upload complete. Cloudinary is processing the image.");
+            announceStatus(
+              `Upload complete for ${file.name}. Cloudinary is processing the image.`,
+            );
           }
         },
         signal: controller.signal,
@@ -174,7 +176,10 @@ export function PartnerOnboardingChecklist() {
       setUploadError(null);
       lastFileRef.current = null;
       setUploadProgress(100);
-      announceStatus("Logo uploaded successfully. Save karke pakka karo.");
+      const sizeKb = Math.max(1, Math.round(file.size / 1024));
+      announceStatus(
+        `Success: ${file.name} (${sizeKb} KB) uploaded to Cloudinary. Logo preview updated. Save karke pakka karo.`,
+      );
       toast.success("Logo uploaded — save karke pakka karo");
     } catch (err) {
       const isAbort =
