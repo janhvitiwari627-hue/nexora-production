@@ -869,6 +869,62 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
           </div>
         </div>
       </div>
+
+      <div className="space-y-4 rounded-lg border bg-card p-4">
+        <h3 className="text-sm font-semibold uppercase text-muted-foreground">Header</h3>
+        <div className="grid grid-cols-2 gap-3">
+          <ColorField
+            label="Header Background"
+            value={theme.extras.header_bg ?? "#FFFFFF"}
+            onChange={(v) => onChange({ extras: { header_bg: v } })}
+          />
+          <ColorField
+            label="Header Text"
+            value={theme.extras.header_text ?? "#111827"}
+            onChange={(v) => onChange({ extras: { header_text: v } })}
+          />
+        </div>
+      </div>
+
+      <div className="space-y-4 rounded-lg border bg-card p-4">
+        <h3 className="text-sm font-semibold uppercase text-muted-foreground">Links</h3>
+        <ColorField
+          label="Link Color"
+          value={theme.extras.link_color ?? "#4F46E5"}
+          onChange={(v) => onChange({ extras: { link_color: v } })}
+        />
+        <div className="space-y-1.5">
+          <Label>Link Style</Label>
+          <Select
+            value={theme.extras.link_style ?? "hover-underline"}
+            onValueChange={(v) => onChange({ extras: { link_style: v as ThemeExtras["link_style"] } })}
+          >
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">No underline</SelectItem>
+              <SelectItem value="hover-underline">Underline on hover</SelectItem>
+              <SelectItem value="underline">Always underlined</SelectItem>
+            </SelectContent>
+          </Select>
+          <div className="mt-2 text-sm" style={{ color: theme.text_color }}>
+            Preview:{" "}
+            <a
+              href="#"
+              onClick={(e) => e.preventDefault()}
+              className={
+                (theme.extras.link_style ?? "hover-underline") === "underline"
+                  ? "underline"
+                  : (theme.extras.link_style ?? "hover-underline") === "hover-underline"
+                    ? "hover:underline"
+                    : "no-underline"
+              }
+              style={{ color: theme.extras.link_color ?? "#4F46E5" }}
+            >
+              Sample link
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
