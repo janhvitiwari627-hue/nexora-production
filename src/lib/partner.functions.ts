@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type PartnerOverview = {
@@ -46,4 +47,61 @@ export const getPartnerOverview = createServerFn({ method: "GET" })
       pendingEarnings: Number(metrics?.pending_earnings ?? 0),
       currentMonthPayout: Number(metrics?.current_month_payout ?? 0),
     };
+  });
+
+export type PartnerProfile = {
+  id: string;
+  full_name: string;
+  mobile: string | null;
+  email: string | null;
+  district: string;
+  state: string | null;
+  pincode: string | null;
+  tagline: string | null;
+  success_story: string | null;
+  photo_url: string | null;
+  status: string;
+};
+
+export const getPartnerProfile = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<PartnerProfile | null> => {
+    const { supabase, userId } = context;
+    const { data } = await supabase
+      .from("district_business_partners")
+      .select("id,full_name,mobile,email,district,state,pincode,tagline,success_story,photo_url,status")
+      .eq("user_id", userId)
+      .maybeSingle();
+    return (data as PartnerProfile) ?? null;
+  });
+
+const profileUpdateSchema = z.object({
+  mobile: z.string().trim().min(10).max(20).optional().nullable(),
+  email: z.string().trim().email().max(255).optional().nullable(),
+  state: z.string().trim().min(2).max(80).optional().nullable(),
+  pincode: z.string().trim().regex(/^\d{4,10}$/).optional().nullable(),
+  tagline: z.string().trim().max(140).optional().nullable(),
+  success_story: z.string().trim().max(2000).optional().nullable(),
+  photo_url: z.string().trim().url().max(500).optional().nullable(),
+});
+
+export const updatePartnerProfile = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => profileUpdateSchema.parse(data))
+  .handler(async ({ context, data }): Promise<PartnerProfile> => {
+    const { supabase, userId } = context;
+    const patch: Record<string, string | null> = {};
+    for (const [k, v] of Object.entries(data)) {
+      if (v === undefined) continue;
+      patch[k] = v === "" ? null : (v as string | null);
+    }
+    const { data: row, error } = await supabase
+      .from("district_business_partners")
+      .update(patch)
+      .eq("user_id", userId)
+      .select("id,full_name,mobile,email,district,state,pincode,tagline,success_story,photo_url,status")
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!row) throw new Error("Partner profile not found");
+    return row as PartnerProfile;
   });
