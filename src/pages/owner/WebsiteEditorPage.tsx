@@ -1617,6 +1617,10 @@ function ItemsEditor({
   const isStaff = kind === "staff";
   const canPickServices = kind === "services" || kind === "rate_card";
   const selectedServiceIds = new Set(items.map((item) => item.id));
+  const dndSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
   const addLabel =
     kind === "services" ? "Add Service" :
     kind === "rate_card" ? "Add Rate" :
@@ -1699,47 +1703,55 @@ function ItemsEditor({
         </p>
       )}
 
-      <ul className="space-y-3">
-        {items.map((it, idx) => (
-          <li key={it.id} className="rounded-lg border bg-card p-3 space-y-3">
-            <div className="flex items-start justify-between gap-2">
-              <span className="text-xs text-muted-foreground">#{idx + 1}</span>
-              <Button type="button" size="sm" variant="ghost" onClick={() => remove(it.id)}>
-                <Trash2 className="h-4 w-4 text-destructive" />
-              </Button>
-            </div>
+      <DndContext
+        sensors={dndSensors}
+        collisionDetection={closestCenter}
+        onDragEnd={(e) => {
+          const { active, over } = e;
+          if (!over || active.id === over.id) return;
+          const from = items.findIndex((it) => it.id === active.id);
+          const to = items.findIndex((it) => it.id === over.id);
+          if (from < 0 || to < 0) return;
+          onChange(arrayMove(items, from, to));
+        }}
+      >
+        <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
+          <ul className="space-y-3">
+            {items.map((it, idx) => (
+              <SortableItemCard key={it.id} id={it.id} index={idx} onRemove={() => remove(it.id)}>
+                <ImageField
+                  label="Image"
+                  value={it.image ?? ""}
+                  salonId={salonId}
+                  websiteId={websiteId}
+                  folder={isStaff ? "staff" : "services"}
+                  compact
+                  onChange={(v) => patch(it.id, { image: v })}
+                />
 
-            <ImageField
-              label="Image"
-              value={it.image ?? ""}
-              salonId={salonId}
-              websiteId={websiteId}
-              folder={isStaff ? "staff" : "services"}
-              compact
-              onChange={(v) => patch(it.id, { image: v })}
-            />
+                <Field label="Name" value={it.name ?? ""} onChange={(v) => patch(it.id, { name: v })} />
 
-            <Field label="Name" value={it.name ?? ""} onChange={(v) => patch(it.id, { name: v })} />
-
-            {isStaff ? (
-              <>
-                <RoleSelect value={it.role ?? ""} onChange={(v) => patch(it.id, { role: v })} />
-                <TextField label="Bio" value={it.bio ?? ""} onChange={(v) => patch(it.id, { bio: v })} />
-              </>
-            ) : (
-              <>
-                <div className="grid grid-cols-2 gap-2">
-                  <Field label="Price" value={it.price ?? ""} onChange={(v) => patch(it.id, { price: v })} />
-                  {kind !== "packages" && (
-                    <Field label="Duration" value={it.duration ?? ""} onChange={(v) => patch(it.id, { duration: v })} />
-                  )}
-                </div>
-                <TextField label="Description" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
-              </>
-            )}
-          </li>
-        ))}
-      </ul>
+                {isStaff ? (
+                  <>
+                    <RoleSelect value={it.role ?? ""} onChange={(v) => patch(it.id, { role: v })} />
+                    <TextField label="Bio" value={it.bio ?? ""} onChange={(v) => patch(it.id, { bio: v })} />
+                  </>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Field label="Price" value={it.price ?? ""} onChange={(v) => patch(it.id, { price: v })} />
+                      {kind !== "packages" && (
+                        <Field label="Duration" value={it.duration ?? ""} onChange={(v) => patch(it.id, { duration: v })} />
+                      )}
+                    </div>
+                    <TextField label="Description" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
+                  </>
+                )}
+              </SortableItemCard>
+            ))}
+          </ul>
+        </SortableContext>
+      </DndContext>
     </div>
   );
 }
@@ -1889,19 +1901,22 @@ function GenericItemsEditor({
           </SortableContext>
         </DndContext>
       ) : (
-        <ul className="space-y-3">
-          {items.map((it, idx) => (
-            <li key={it.id} className="rounded-lg border bg-card p-3 space-y-3">
-              <div className="flex items-start justify-between gap-2">
-                <span className="text-xs text-muted-foreground">#{idx + 1}</span>
-                <Button type="button" size="sm" variant="ghost" onClick={() => remove(it.id)}>
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
-              </div>
-              {renderBody(it)}
-            </li>
-          ))}
-        </ul>
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
+            <ul className="space-y-3">
+              {items.map((it, idx) => (
+                <SortableItemCard
+                  key={it.id}
+                  id={it.id}
+                  index={idx}
+                  onRemove={() => remove(it.id)}
+                >
+                  {renderBody(it)}
+                </SortableItemCard>
+              ))}
+            </ul>
+          </SortableContext>
+        </DndContext>
       )}
     </div>
   );
