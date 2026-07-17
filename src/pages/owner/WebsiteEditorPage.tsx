@@ -22,6 +22,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Loader2, Eye, Globe, Plus, Trash2, Upload, Image as ImageIcon, Palette } from "lucide-react";
 
+type ThemeExtras = {
+  header_bg?: string;
+  header_text?: string;
+  link_color?: string;
+  link_style?: "underline" | "none" | "hover-underline";
+};
+
 type ThemeState = {
   primary_color: string;
   secondary_color: string;
@@ -31,6 +38,14 @@ type ThemeState = {
   heading_font: string;
   body_font: string;
   button_style: string;
+  extras: ThemeExtras;
+};
+
+const DEFAULT_EXTRAS: ThemeExtras = {
+  header_bg: "#FFFFFF",
+  header_text: "#111827",
+  link_color: "#4F46E5",
+  link_style: "hover-underline",
 };
 
 const DEFAULT_THEME: ThemeState = {
@@ -42,6 +57,7 @@ const DEFAULT_THEME: ThemeState = {
   heading_font: "Inter",
   body_font: "Inter",
   button_style: "rounded",
+  extras: DEFAULT_EXTRAS,
 };
 
 const FONT_OPTIONS = ["Inter", "Poppins", "Playfair Display", "Montserrat", "Lora", "Roboto", "Merriweather", "Space Grotesk"];
@@ -71,6 +87,7 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       heading_font: "Playfair Display",
       body_font: "Lora",
       button_style: "rounded",
+      extras: { header_bg: "#1E293B", header_text: "#FAF7F2", link_color: "#D4A24C", link_style: "hover-underline" },
     },
   },
   {
@@ -86,6 +103,7 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       heading_font: "Space Grotesk",
       body_font: "Inter",
       button_style: "pill",
+      extras: { header_bg: "#FFFFFF", header_text: "#0F172A", link_color: "#4F46E5", link_style: "hover-underline" },
     },
   },
   {
@@ -101,6 +119,7 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       heading_font: "Montserrat",
       body_font: "Inter",
       button_style: "square",
+      extras: { header_bg: "#FFFFFF", header_text: "#111111", link_color: "#111111", link_style: "underline" },
     },
   },
   {
@@ -116,6 +135,7 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       heading_font: "Playfair Display",
       body_font: "Montserrat",
       button_style: "pill",
+      extras: { header_bg: "#0F0F0F", header_text: "#F5F0EB", link_color: "#E5B8A6", link_style: "hover-underline" },
     },
   },
   {
@@ -131,6 +151,7 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       heading_font: "Poppins",
       body_font: "Poppins",
       button_style: "rounded",
+      extras: { header_bg: "#0F766E", header_text: "#F0FDFA", link_color: "#FB7185", link_style: "hover-underline" },
     },
   },
 ];
@@ -189,8 +210,9 @@ export function WebsiteEditorPage() {
       if (!selectedId && !showTheme && bundleQ.data.sections.length) setSelectedId(bundleQ.data.sections[0].id);
     }
     if (bundleQ.data?.theme) {
-      const t = bundleQ.data.theme as Partial<ThemeState>;
-      setLocalTheme({ ...DEFAULT_THEME, ...t });
+      const t = bundleQ.data.theme as Partial<ThemeState> & { extras?: unknown };
+      const extras = { ...DEFAULT_EXTRAS, ...(t.extras as ThemeExtras | undefined) };
+      setLocalTheme({ ...DEFAULT_THEME, ...t, extras });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bundleQ.data]);
@@ -210,13 +232,16 @@ export function WebsiteEditorPage() {
 
   function patchTheme(patch: Partial<ThemeState>) {
     setLocalTheme((prev) => {
-      const next = { ...prev, ...patch };
+      const nextExtras = patch.extras ? { ...prev.extras, ...patch.extras } : prev.extras;
+      const next = { ...prev, ...patch, extras: nextExtras };
       if (themeTimer.current) clearTimeout(themeTimer.current);
+      const persistPatch: Partial<ThemeState> = { ...patch };
+      if (patch.extras) persistPatch.extras = nextExtras;
       themeTimer.current = setTimeout(async () => {
         if (!websiteId) return;
         try {
           setSaving(true);
-          await saveTheme({ data: { websiteId, patch } });
+          await saveTheme({ data: { websiteId, patch: persistPatch } });
         } catch (e) {
           toast.error(e instanceof Error ? e.message : "Theme save failed");
         } finally {
@@ -841,6 +866,62 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
             >
               Book Now
             </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-4 rounded-lg border bg-card p-4">
+        <h3 className="text-sm font-semibold uppercase text-muted-foreground">Header</h3>
+        <div className="grid grid-cols-2 gap-3">
+          <ColorField
+            label="Header Background"
+            value={theme.extras.header_bg ?? "#FFFFFF"}
+            onChange={(v) => onChange({ extras: { header_bg: v } })}
+          />
+          <ColorField
+            label="Header Text"
+            value={theme.extras.header_text ?? "#111827"}
+            onChange={(v) => onChange({ extras: { header_text: v } })}
+          />
+        </div>
+      </div>
+
+      <div className="space-y-4 rounded-lg border bg-card p-4">
+        <h3 className="text-sm font-semibold uppercase text-muted-foreground">Links</h3>
+        <ColorField
+          label="Link Color"
+          value={theme.extras.link_color ?? "#4F46E5"}
+          onChange={(v) => onChange({ extras: { link_color: v } })}
+        />
+        <div className="space-y-1.5">
+          <Label>Link Style</Label>
+          <Select
+            value={theme.extras.link_style ?? "hover-underline"}
+            onValueChange={(v) => onChange({ extras: { link_style: v as ThemeExtras["link_style"] } })}
+          >
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">No underline</SelectItem>
+              <SelectItem value="hover-underline">Underline on hover</SelectItem>
+              <SelectItem value="underline">Always underlined</SelectItem>
+            </SelectContent>
+          </Select>
+          <div className="mt-2 text-sm" style={{ color: theme.text_color }}>
+            Preview:{" "}
+            <a
+              href="#"
+              onClick={(e) => e.preventDefault()}
+              className={
+                (theme.extras.link_style ?? "hover-underline") === "underline"
+                  ? "underline"
+                  : (theme.extras.link_style ?? "hover-underline") === "hover-underline"
+                    ? "hover:underline"
+                    : "no-underline"
+              }
+              style={{ color: theme.extras.link_color ?? "#4F46E5" }}
+            >
+              Sample link
+            </a>
           </div>
         </div>
       </div>

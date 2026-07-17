@@ -197,6 +197,7 @@ export const updateTheme = createServerFn({ method: "POST" })
             heading_font: z.string().optional(),
             body_font: z.string().optional(),
             button_style: z.string().optional(),
+            extras: z.record(z.string(), z.unknown()).optional(),
           })
           .partial(),
       })
@@ -204,9 +205,11 @@ export const updateTheme = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) => {
     const { supabase } = context;
+    const patch = { ...data.patch } as Record<string, unknown>;
+    if (patch.extras !== undefined) patch.extras = patch.extras as Json;
     const { data: row, error } = await supabase
       .from("website_theme")
-      .update(data.patch)
+      .update(patch as never)
       .eq("website_id", data.websiteId)
       .select("*")
       .single();
