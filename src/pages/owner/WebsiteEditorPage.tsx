@@ -21,6 +21,7 @@ import { TemplateGalleryDialog } from "./editor/TemplateGalleryDialog";
 import { TEMPLATE_CATALOG, type TemplateCatalogItem } from "./editor/templateCatalog";
 import { TemplateUsageGuide } from "./editor/TemplateUsageGuide";
 import { TemplateHeroImagePicker } from "./editor/TemplateHeroImagePicker";
+import { TemplatePackageSuggestions } from "./editor/TemplatePackageSuggestions";
 import { getMyOwnedSalons, listOwnerServices } from "@/lib/owner.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -2256,6 +2257,24 @@ function SectionEditor({
             value={str("description")}
             onChange={(v) => onFieldChange("description", v)}
           />
+          {section.section_type === "packages" && (
+            <TemplatePackageSuggestions
+              templateKey={templateKey}
+              existingNames={items.map((item) => item.name ?? "")}
+              onAdd={(item) =>
+                setItems([
+                  ...items,
+                  {
+                    id: newId(),
+                    name: item.name,
+                    price: item.price,
+                    duration: item.duration,
+                    description: item.description,
+                  },
+                ])
+              }
+            />
+          )}
           <ItemsEditor
             kind={section.section_type}
             items={items}
