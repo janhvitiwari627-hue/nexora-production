@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   getOrCreateMyWebsite,
@@ -8,6 +8,7 @@ import {
   updateSection,
   updateTheme,
   publishWebsite,
+  reorderSections,
   type WebsiteSection,
   type SectionType,
 } from "@/lib/website-editor.functions";
@@ -20,7 +21,24 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Eye, Globe, Plus, Trash2, Upload, Image as ImageIcon, Palette, GripVertical } from "lucide-react";
+import { Loader2, Eye, EyeOff, Globe, Plus, Trash2, Upload, Image as ImageIcon, Palette, GripVertical } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 type NavLink = { id: string; label: string; url: string };
 
@@ -189,6 +207,7 @@ export function WebsiteEditorPage() {
   const saveSection = useServerFn(updateSection);
   const saveTheme = useServerFn(updateTheme);
   const doPublish = useServerFn(publishWebsite);
+  const saveOrder = useServerFn(reorderSections);
 
   const salonsQ = useQuery({ queryKey: ["my-owned-salons-editor"], queryFn: () => fetchSalons() });
   const salonId = salonsQ.data?.[0]?.salon?.id;
@@ -307,6 +326,30 @@ export function WebsiteEditorPage() {
     }
   }
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  async function handleDragEnd(evt: DragEndEvent) {
+    const { active, over } = evt;
+    if (!over || active.id === over.id || !websiteId) return;
+    const oldIndex = localSections.findIndex((s) => s.id === active.id);
+    const newIndex = localSections.findIndex((s) => s.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+    const next = arrayMove(localSections, oldIndex, newIndex).map((s, i) => ({ ...s, sort_order: i }));
+    setLocalSections(next);
+    try {
+      setSaving(true);
+      await saveOrder({ data: { websiteId, order: next.map((s) => s.id) } });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Reorder failed");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+
   if (salonsQ.isLoading || websiteQ.isLoading || bundleQ.isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -359,24 +402,27 @@ export function WebsiteEditorPage() {
       <div className="grid flex-1 grid-cols-[240px_1fr_1fr] overflow-hidden">
         {/* Section list */}
         <aside className="overflow-y-auto border-r bg-muted/30 p-3">
-          <div className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Sections</div>
-          <ul className="space-y-1">
-            {localSections.map((s) => (
-              <li key={s.id}>
-                <button
-                  onClick={() => { setSelectedId(s.id); setShowTheme(false); }}
-                  className={`w-full rounded-md px-3 py-2 text-left text-sm ${
-                    selectedId === s.id && !showTheme ? "bg-primary text-primary-foreground" : "hover:bg-muted"
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span>{SECTION_LABELS[s.section_type]}</span>
-                    {!s.is_visible && <span className="text-xs opacity-60">hidden</span>}
-                  </div>
-                </button>
-              </li>
-            ))}
-          </ul>
+          <div className="mb-2 flex items-center justify-between">
+            <div className="text-xs font-semibold uppercase text-muted-foreground">Sections</div>
+            <div className="text-[10px] text-muted-foreground">Drag to reorder</div>
+          </div>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={localSections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+              <ul className="space-y-1">
+                {localSections.map((s) => (
+                  <SortableSectionItem
+                    key={s.id}
+                    section={s}
+                    label={SECTION_LABELS[s.section_type]}
+                    active={selectedId === s.id && !showTheme}
+                    onSelect={() => { setSelectedId(s.id); setShowTheme(false); }}
+                    onToggleVisible={() => patchSection(s.id, { is_visible: !s.is_visible })}
+                  />
+                ))}
+              </ul>
+            </SortableContext>
+          </DndContext>
+
           <div className="mt-4 mb-2 text-xs font-semibold uppercase text-muted-foreground">Design</div>
           <button
             onClick={() => setShowTheme(true)}
@@ -717,6 +763,68 @@ function GenericItemsEditor({
   );
 }
 
+
+function SortableSectionItem({
+  section,
+  label,
+  active,
+  onSelect,
+  onToggleVisible,
+}: {
+  section: WebsiteSection;
+  label: string;
+  active: boolean;
+  onSelect: () => void;
+  onToggleVisible: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: section.id });
+  const style: CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.6 : 1,
+  };
+  return (
+    <li ref={setNodeRef} style={style}>
+      <div
+        className={`flex items-center gap-1 rounded-md pr-1 text-sm ${
+          active ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+        }`}
+      >
+        <button
+          type="button"
+          className="flex h-8 w-6 shrink-0 cursor-grab items-center justify-center opacity-60 hover:opacity-100 active:cursor-grabbing"
+          aria-label="Drag to reorder"
+          title="Drag to reorder"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          onClick={onSelect}
+          className="flex flex-1 items-center justify-between py-2 pr-2 text-left"
+        >
+          <span className={section.is_visible ? "" : "line-through opacity-60"}>{label}</span>
+          {!section.is_visible && (
+            <span className={`text-[10px] ${active ? "opacity-80" : "opacity-60"}`}>hidden</span>
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onToggleVisible(); }}
+          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded ${
+            active ? "hover:bg-primary-foreground/20" : "hover:bg-background"
+          }`}
+          aria-label={section.is_visible ? "Hide section" : "Show section"}
+          title={section.is_visible ? "Hide section" : "Show section"}
+        >
+          {section.is_visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4 opacity-60" />}
+        </button>
+      </div>
+    </li>
+  );
+}
 
 function ImageField({
   label,
