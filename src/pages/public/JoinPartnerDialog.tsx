@@ -129,6 +129,12 @@ export function JoinPartnerDialog({ trigger }: Props) {
       return;
     }
 
+    // Guard: if we already know an application exists, block immediately.
+    if (existing) {
+      toast.error("You already have an application on file.");
+      return;
+    }
+
     const name = form.name.trim();
     const phone = form.phone.trim();
     const email = form.email.trim();
@@ -150,6 +156,20 @@ export function JoinPartnerDialog({ trigger }: Props) {
       return toast.error("Please tell us why you want to join (at least 20 characters)");
 
     setLoading(true);
+
+    // Server-side pre-check: even if this races, the UNIQUE(user_id) DB
+    // constraint on district_business_partners guarantees only one row.
+    const { data: preCheck } = await supabase
+      .from("district_business_partners")
+      .select("id,status,district,full_name,rejection_reason,created_at")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (preCheck) {
+      setExisting(preCheck as ExistingApp);
+      setLoading(false);
+      toast.error("You already have an application on file.");
+      return;
+    }
     const baseSlug = slugify(`${name}-${district}`) || slugify(user.id);
     const slug = `${baseSlug}-${user.id.slice(0, 6)}`;
 
