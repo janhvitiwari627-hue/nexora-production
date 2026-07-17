@@ -727,13 +727,24 @@ export function PartnerOnboardingChecklist() {
                           variant="outline"
                           size="sm"
                           onClick={onRetryUpload}
+                          onFocus={() => {
+                            retryHadFocusRef.current = true;
+                          }}
                           disabled={uploading}
+                          aria-busy={uploading}
+                          aria-label={
+                            uploading
+                              ? `Retrying upload, ${uploadProgress}% complete`
+                              : lastFileRef.current
+                                ? `Retry upload of ${lastFileRef.current.name}`
+                                : "Choose file to upload"
+                          }
                           className="h-7 border-red-300 px-2 text-[11px] text-red-700 hover:bg-red-100"
                         >
                           {uploading ? (
-                            <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                            <Loader2 className="mr-1 h-3 w-3 animate-spin" aria-hidden="true" />
                           ) : (
-                            <RefreshCw className="mr-1 h-3 w-3" />
+                            <RefreshCw className="mr-1 h-3 w-3" aria-hidden="true" />
                           )}
                           {uploading
                             ? `Retrying… ${uploadProgress}%`
@@ -741,6 +752,7 @@ export function PartnerOnboardingChecklist() {
                               ? "Retry upload"
                               : "Choose file"}
                         </Button>
+
                       </div>
                       {uploadErrorDetails && (
                         <div className="mt-1.5">
