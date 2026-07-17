@@ -88,27 +88,65 @@ export function PartnerOnboardingChecklist() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [localPreview, setLocalPreview] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const cloudinaryReady = isCloudinaryConfigured();
+
+  const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+  const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
+
+  useEffect(() => {
+    return () => {
+      if (localPreview) URL.revokeObjectURL(localPreview);
+    };
+  }, [localPreview]);
 
   const onPickLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (e.target) e.target.value = "";
     if (!file) return;
-    if (!cloudinaryReady) {
-      toast.error("Cloudinary is not configured");
+    setUploadError(null);
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      const msg = "Sirf JPG, PNG, WEBP ya GIF allowed hain";
+      setUploadError(msg);
+      toast.error(msg);
       return;
     }
+    if (file.size > MAX_BYTES) {
+      const msg = `File 5 MB se choti honi chahiye (abhi ${(file.size / 1024 / 1024).toFixed(1)} MB)`;
+      setUploadError(msg);
+      toast.error(msg);
+      return;
+    }
+    if (!cloudinaryReady) {
+      const msg = "Cloudinary is not configured";
+      setUploadError(msg);
+      toast.error(msg);
+      return;
+    }
+
+    // Instant local preview while upload runs
+    if (localPreview) URL.revokeObjectURL(localPreview);
+    const objectUrl = URL.createObjectURL(file);
+    setLocalPreview(objectUrl);
+
     setUploading(true);
     try {
       const res = await uploadToCloudinary(file, { folder: "partner-logos" });
       setForm((f) => ({ ...f, photo_url: res.secure_url }));
       toast.success("Logo uploaded — save karke pakka karo");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Upload failed");
+      const msg = err instanceof Error ? err.message : "Upload failed";
+      setUploadError(msg);
+      toast.error(msg);
+      setLocalPreview(null);
+      URL.revokeObjectURL(objectUrl);
     } finally {
       setUploading(false);
     }
   };
+
 
   useEffect(() => {
     if (!profile) return;
@@ -216,19 +254,38 @@ export function PartnerOnboardingChecklist() {
             <DialogDescription>Ye details shop owners aur admin ko dikhengi.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <Field label="Logo / Photo" hint={cloudinaryReady ? "Upload karo ya URL paste karo" : "Cloudinary configure nahi hai — URL paste karein"}>
+            <Field
+              label="Logo / Photo"
+              hint={cloudinaryReady ? "JPG, PNG, WEBP ya GIF — max 5 MB" : "Cloudinary configure nahi hai — URL paste karein"}
+            >
               <div className="flex items-start gap-3">
-                {form.photo_url ? (
+                {(localPreview || form.photo_url) ? (
                   <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
-                    <img src={form.photo_url} alt="Logo preview" className="h-full w-full object-cover" />
-                    <button
-                      type="button"
-                      onClick={() => setForm({ ...form, photo_url: "" })}
-                      className="absolute right-0 top-0 grid h-5 w-5 place-items-center rounded-bl bg-black/60 text-white"
-                      aria-label="Remove logo"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
+                    <img
+                      src={localPreview ?? form.photo_url}
+                      alt="Logo preview"
+                      className="h-full w-full object-cover"
+                    />
+                    {uploading && (
+                      <div className="absolute inset-0 grid place-items-center bg-black/40">
+                        <Loader2 className="h-5 w-5 animate-spin text-white" />
+                      </div>
+                    )}
+                    {!uploading && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setForm({ ...form, photo_url: "" });
+                          if (localPreview) URL.revokeObjectURL(localPreview);
+                          setLocalPreview(null);
+                          setUploadError(null);
+                        }}
+                        className="absolute right-0 top-0 grid h-5 w-5 place-items-center rounded-bl bg-black/60 text-white"
+                        aria-label="Remove logo"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <div className="grid h-20 w-20 shrink-0 place-items-center rounded-xl border border-dashed border-slate-300 bg-slate-50 text-slate-400">
@@ -249,15 +306,21 @@ export function PartnerOnboardingChecklist() {
                   <Input
                     placeholder="https://..."
                     value={form.photo_url}
-                    onChange={(e) => setForm({ ...form, photo_url: e.target.value })}
+                    onChange={(e) => {
+                      setForm({ ...form, photo_url: e.target.value });
+                      setUploadError(null);
+                    }}
                   />
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
                     className="hidden"
                     onChange={onPickLogo}
                   />
+                  {uploadError && (
+                    <p className="text-[11px] font-medium text-red-600">{uploadError}</p>
+                  )}
                 </div>
               </div>
             </Field>
