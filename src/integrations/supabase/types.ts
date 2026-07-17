@@ -5030,6 +5030,10 @@ export type Database = {
         Args: { _approve: boolean; _owner_request_id: string }
         Returns: Json
       }
+      review_partner_application: {
+        Args: { _approve: boolean; _partner_id: string; _reason?: string }
+        Returns: Json
+      }
       shops_search: {
         Args: { _category?: string; _limit?: number; _q?: string }
         Returns: {
