@@ -634,6 +634,90 @@ function ItemsEditor({
   );
 }
 
+function GenericItemsEditor({
+  kind,
+  items,
+  salonId,
+  websiteId,
+  onChange,
+}: {
+  kind: "offers" | "membership" | "gallery" | "blog";
+  items: Item[];
+  salonId: string | null;
+  websiteId: string | null;
+  onChange: (next: Item[]) => void;
+}) {
+  const addLabel =
+    kind === "offers" ? "Add Offer" :
+    kind === "membership" ? "Add Plan" :
+    kind === "gallery" ? "Add Image" : "Add Post";
+
+  const patch = (id: string, p: Partial<Item>) =>
+    onChange(items.map((it) => (it.id === id ? { ...it, ...p } : it)));
+  const remove = (id: string) => onChange(items.filter((it) => it.id !== id));
+  const add = () => onChange([...items, { id: newId() }]);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <Label className="text-sm">Items ({items.length})</Label>
+        <Button type="button" size="sm" variant="secondary" onClick={add}>
+          <Plus className="mr-1 h-4 w-4" /> {addLabel}
+        </Button>
+      </div>
+
+      {items.length === 0 && (
+        <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+          No items yet. Click <strong>{addLabel}</strong> to create one.
+        </p>
+      )}
+
+      <ul className="space-y-3">
+        {items.map((it, idx) => (
+          <li key={it.id} className="rounded-lg border bg-card p-3 space-y-3">
+            <div className="flex items-start justify-between gap-2">
+              <span className="text-xs text-muted-foreground">#{idx + 1}</span>
+              <Button type="button" size="sm" variant="ghost" onClick={() => remove(it.id)}>
+                <Trash2 className="h-4 w-4 text-destructive" />
+              </Button>
+            </div>
+
+            <ImageField
+              label="Image"
+              value={it.image ?? ""}
+              salonId={salonId}
+              websiteId={websiteId}
+              folder={kind}
+              compact
+              onChange={(v) => patch(it.id, { image: v })}
+            />
+
+            {kind !== "gallery" && (
+              <Field label="Title" value={it.name ?? ""} onChange={(v) => patch(it.id, { name: v })} />
+            )}
+
+            {kind === "offers" || kind === "membership" ? (
+              <>
+                {kind === "membership" && (
+                  <Field label="Price" value={it.price ?? ""} onChange={(v) => patch(it.id, { price: v })} />
+                )}
+                <TextField label="Description" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
+              </>
+            ) : kind === "blog" ? (
+              <>
+                <TextField label="Excerpt" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
+              </>
+            ) : (
+              <TextField label="Caption" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+
 function ImageField({
   label,
   value,
