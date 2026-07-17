@@ -620,19 +620,30 @@ export function WebsiteEditorPage() {
                             {new Date(v.created_at).toLocaleString()}
                           </div>
                         </div>
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={() => handleRestoreVersion(v.id)}
-                          disabled={restoring !== null}
-                        >
-                          {restoring === v.id ? (
-                            <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                          ) : (
-                            <Undo2 className="mr-1 h-3 w-3" />
-                          )}
-                          Restore
-                        </Button>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleViewDiff(v)}
+                            title="View changes vs. current draft"
+                          >
+                            <GitCompare className="mr-1 h-3 w-3" />
+                            Diff
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => handleRestoreVersion(v.id)}
+                            disabled={restoring !== null}
+                          >
+                            {restoring === v.id ? (
+                              <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                            ) : (
+                              <Undo2 className="mr-1 h-3 w-3" />
+                            )}
+                            Restore
+                          </Button>
+                        </div>
                       </li>
                     ))}
                   </ul>
