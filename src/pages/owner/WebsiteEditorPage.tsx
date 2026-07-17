@@ -12,6 +12,7 @@ import {
   listWebsiteVersions,
   saveDraftVersion,
   restoreWebsiteVersion,
+  getWebsiteVersionSnapshot,
   type WebsiteSection,
   type SectionType,
 } from "@/lib/website-editor.functions";
