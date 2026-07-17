@@ -424,7 +424,7 @@ export function WebsiteEditorPage() {
           const stillThere = newSections.some((n) => n.section_type === s.section_type);
           if (stillThere) continue;
         } else if (newSections.some((n) => n.id === s.id)) continue;
-        sectionChanges.push({ kind: "removed", label: SECTION_LABELS[s.section_type] ?? s.section_type });
+        sectionChanges.push({ kind: "removed", label: (SECTION_LABELS as Record<string, string>)[s.section_type] ?? s.section_type });
       }
 
       // Theme diff
