@@ -953,3 +953,58 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
     </div>
   );
 }
+
+function NavLinksEditor({ links, onChange }: { links: NavLink[]; onChange: (next: NavLink[]) => void }) {
+  const patch = (id: string, p: Partial<NavLink>) =>
+    onChange(links.map((l) => (l.id === id ? { ...l, ...p } : l)));
+  const remove = (id: string) => onChange(links.filter((l) => l.id !== id));
+  const add = () => onChange([...links, { id: newId(), label: "New link", url: "#" }]);
+  const move = (idx: number, dir: -1 | 1) => {
+    const next = [...links];
+    const j = idx + dir;
+    if (j < 0 || j >= next.length) return;
+    [next[idx], next[j]] = [next[j], next[idx]];
+    onChange(next);
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <Label className="text-sm">Menu links ({links.length})</Label>
+        <Button type="button" size="sm" variant="secondary" onClick={add}>
+          <Plus className="mr-1 h-4 w-4" /> Add link
+        </Button>
+      </div>
+      {links.length === 0 && (
+        <p className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">
+          No menu links yet. Click <strong>Add link</strong> to create one.
+        </p>
+      )}
+      <ul className="space-y-2">
+        {links.map((l, idx) => (
+          <li key={l.id} className="rounded-md border bg-card p-2">
+            <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
+              <Input
+                placeholder="Label"
+                value={l.label}
+                onChange={(e) => patch(l.id, { label: e.target.value })}
+              />
+              <Input
+                placeholder="URL or #section"
+                value={l.url}
+                onChange={(e) => patch(l.id, { url: e.target.value })}
+              />
+              <div className="flex items-center gap-1">
+                <Button type="button" size="sm" variant="ghost" onClick={() => move(idx, -1)} disabled={idx === 0}>↑</Button>
+                <Button type="button" size="sm" variant="ghost" onClick={() => move(idx, 1)} disabled={idx === links.length - 1}>↓</Button>
+                <Button type="button" size="sm" variant="ghost" onClick={() => remove(l.id)}>
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
