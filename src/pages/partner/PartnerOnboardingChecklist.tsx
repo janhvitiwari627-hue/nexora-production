@@ -295,8 +295,9 @@ export function PartnerOnboardingChecklist() {
                       className="h-full w-full object-cover"
                     />
                     {uploading && (
-                      <div className="absolute inset-0 grid place-items-center bg-black/40">
-                        <Loader2 className="h-5 w-5 animate-spin text-white" />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/50">
+                        <Loader2 className="h-4 w-4 animate-spin text-white" />
+                        <span className="text-[10px] font-bold text-white">{uploadProgress}%</span>
                       </div>
                     )}
                     {!uploading && (
