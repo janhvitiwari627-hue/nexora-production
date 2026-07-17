@@ -1147,10 +1147,10 @@ export function WebsiteEditorPage() {
               <Wand2 className="h-3.5 w-3.5" /> Ready Templates
             </div>
             <p className="mb-2 text-[11px] text-muted-foreground">
-              Pick one of our 3 starter templates and edit everything below.
+              Pick one of our 3 ready templates — content, colours and layout are pre-filled. Just edit and publish.
             </p>
             <div className="space-y-2">
-              {["salon-30-min", "barber-fast", "makeup-portfolio"]
+              {["royal-luxe", "urban-pro", "professional-beauty"]
                 .map((key) => WEBSITE_STARTER_TEMPLATES.find((t) => t.key === key))
                 .filter((t): t is StarterTemplate => Boolean(t))
                 .map((template) => (
