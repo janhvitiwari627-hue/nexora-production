@@ -430,12 +430,14 @@ function SectionEditor({
   section,
   content,
   salonId,
+  websiteId,
   onFieldChange,
   onToggleVisible,
 }: {
   section: WebsiteSection;
   content: Record<string, unknown>;
   salonId: string | null;
+  websiteId: string | null;
   onFieldChange: (field: string, value: unknown) => void;
   onToggleVisible: (v: boolean) => void;
 }) {
@@ -458,22 +460,27 @@ function SectionEditor({
         <>
           <Field label="Heading" value={str("heading")} onChange={(v) => onFieldChange("heading", v)} />
           <Field label="Sub-heading" value={str("subheading")} onChange={(v) => onFieldChange("subheading", v)} />
+          <TextField label="Description" value={str("description")} onChange={(v) => onFieldChange("description", v)} />
           <Field label="Button Text" value={str("buttonText")} onChange={(v) => onFieldChange("buttonText", v)} />
           <Field label="Button Link" value={str("buttonLink")} onChange={(v) => onFieldChange("buttonLink", v)} />
-          <ImageField label="Background Image" value={str("imageUrl")} salonId={salonId} folder="hero" onChange={(v) => onFieldChange("imageUrl", v)} />
+          <ImageField label="Background Image" value={str("imageUrl")} salonId={salonId} websiteId={websiteId} folder="hero" onChange={(v) => onFieldChange("imageUrl", v)} />
         </>
       )}
 
       {section.section_type === "about" && (
         <>
           <Field label="Heading" value={str("heading")} onChange={(v) => onFieldChange("heading", v)} />
-          <TextField label="Body" value={str("body")} onChange={(v) => onFieldChange("body", v)} />
+          <TextField label="Description" value={str("body")} onChange={(v) => onFieldChange("body", v)} />
+          <Field label="Button Text" value={str("buttonText")} onChange={(v) => onFieldChange("buttonText", v)} />
+          <Field label="Button Link" value={str("buttonLink")} onChange={(v) => onFieldChange("buttonLink", v)} />
+          <ImageField label="Image" value={str("imageUrl")} salonId={salonId} websiteId={websiteId} folder="about" onChange={(v) => onFieldChange("imageUrl", v)} />
         </>
       )}
 
       {section.section_type === "contact" && (
         <>
           <Field label="Heading" value={str("heading")} onChange={(v) => onFieldChange("heading", v)} />
+          <TextField label="Description" value={str("description")} onChange={(v) => onFieldChange("description", v)} />
           <Field label="Phone" value={str("phone")} onChange={(v) => onFieldChange("phone", v)} />
           <Field label="WhatsApp" value={str("whatsapp")} onChange={(v) => onFieldChange("whatsapp", v)} />
           <Field label="Email" value={str("email")} onChange={(v) => onFieldChange("email", v)} />
@@ -488,10 +495,12 @@ function SectionEditor({
         section.section_type === "staff") && (
         <>
           <Field label="Heading" value={str("heading")} onChange={(v) => onFieldChange("heading", v)} />
+          <TextField label="Description" value={str("description")} onChange={(v) => onFieldChange("description", v)} />
           <ItemsEditor
             kind={section.section_type}
             items={items}
             salonId={salonId}
+            websiteId={websiteId}
             onChange={setItems}
           />
         </>
@@ -503,14 +512,26 @@ function SectionEditor({
         section.section_type === "blog") && (
         <>
           <Field label="Heading" value={str("heading")} onChange={(v) => onFieldChange("heading", v)} />
-          <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-            Detailed item editor for <strong>{SECTION_LABELS[section.section_type]}</strong> aa raha hai next update me.
-          </p>
+          <TextField label="Description" value={str("description")} onChange={(v) => onFieldChange("description", v)} />
+          {section.section_type !== "gallery" && (
+            <>
+              <Field label="Button Text" value={str("buttonText")} onChange={(v) => onFieldChange("buttonText", v)} />
+              <Field label="Button Link" value={str("buttonLink")} onChange={(v) => onFieldChange("buttonLink", v)} />
+            </>
+          )}
+          <GenericItemsEditor
+            kind={section.section_type}
+            items={items}
+            salonId={salonId}
+            websiteId={websiteId}
+            onChange={setItems}
+          />
         </>
       )}
     </div>
   );
 }
+
 
 type Item = {
   id: string;
