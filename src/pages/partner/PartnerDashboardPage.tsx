@@ -114,6 +114,9 @@ export function PartnerDashboardPage() {
       icon={LayoutDashboard}
     >
       {/* Overview cards — live partner metrics */}
+      <PartnerOnboardingChecklist />
+
+      {/* Overview cards — live partner metrics */}
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map((o, i) => (
 
