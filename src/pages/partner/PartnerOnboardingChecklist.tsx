@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { motion } from "framer-motion";
-import { CheckCircle2, Circle, ClipboardList, Image as ImageIcon, MapPin, Phone, Sparkles, Loader2, Upload, X, RefreshCw, ChevronDown } from "lucide-react";
+import { CheckCircle2, Circle, ClipboardList, Image as ImageIcon, MapPin, Phone, Sparkles, Loader2, Upload, X, RefreshCw, ChevronDown, AlertCircle, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -121,6 +121,43 @@ export function PartnerOnboardingChecklist() {
   const announceAlert = (msg: string) => setSrAlert(msg);
   const cloudinaryReady = isCloudinaryConfigured();
 
+  // Per-file status list — tracks every upload attempt (including retries) so
+  // the user sees a running log of uploading / success / failure per file.
+  type FileStatus = {
+    id: string;
+    name: string;
+    size: number;
+    status: "uploading" | "success" | "error" | "cancelled";
+    progress: number;
+    error?: string;
+    attempt: number;
+  };
+  const [fileStatuses, setFileStatuses] = useState<FileStatus[]>([]);
+  const currentStatusIdRef = useRef<string | null>(null);
+  const attemptCountRef = useRef<Map<string, number>>(new Map());
+
+  const updateStatus = (id: string, patch: Partial<FileStatus>) => {
+    setFileStatuses((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)));
+  };
+  const addStatus = (file: File): string => {
+    const key = `${file.name}::${file.size}`;
+    const attempt = (attemptCountRef.current.get(key) ?? 0) + 1;
+    attemptCountRef.current.set(key, attempt);
+    const id = `${key}::${attempt}::${Date.now()}`;
+    setFileStatuses((prev) => [
+      ...prev,
+      { id, name: file.name, size: file.size, status: "uploading", progress: 0, attempt },
+    ]);
+    currentStatusIdRef.current = id;
+    return id;
+  };
+  const clearFileStatuses = () => {
+    setFileStatuses([]);
+    attemptCountRef.current.clear();
+    currentStatusIdRef.current = null;
+  };
+
+
   const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
   const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
 
@@ -184,6 +221,8 @@ export function PartnerOnboardingChecklist() {
     setUploadError(null);
     lastAnnouncedMilestoneRef.current = -1;
     setSrAlert("");
+    const statusId = addStatus(file);
+
     // File X of Y context — single-file flow today, but keep the phrasing so
     // screen-reader users hear a consistent "file 1 of 1" summary that scales
     // when batch uploads land.
@@ -198,6 +237,8 @@ export function PartnerOnboardingChecklist() {
         folder: "partner-logos",
         onProgress: (pct) => {
           setUploadProgress(pct);
+          updateStatus(statusId, { progress: pct });
+
           // Announce at 25/50/75 milestones to avoid flooding the screen reader
           const milestone = pct >= 75 ? 75 : pct >= 50 ? 50 : pct >= 25 ? 25 : 0;
           if (milestone > lastAnnouncedMilestoneRef.current && milestone > 0 && pct < 100) {
@@ -220,6 +261,8 @@ export function PartnerOnboardingChecklist() {
       setUploadError(null);
       lastFileRef.current = null;
       setUploadProgress(100);
+      updateStatus(statusId, { status: "success", progress: 100 });
+
       const sizeKb = Math.max(1, Math.round(file.size / 1024));
       announceStatus(
         `Success: ${file.name} (${sizeKb} KB) uploaded to Cloudinary. Logo preview updated. Save karke pakka karo.`,
@@ -236,6 +279,8 @@ export function PartnerOnboardingChecklist() {
       if (isAbort) {
         setUploadError("Upload cancel ho gaya");
         setUploadErrorDetails({ code: "ABORTED", raw: "User cancelled upload" });
+        updateStatus(statusId, { status: "cancelled", error: "Cancelled by user" });
+
         announceStatus(`Upload cancelled for ${file.name}. Retry button available.`);
         toast.info("Upload cancel");
         lastFileRef.current = file;
@@ -248,6 +293,8 @@ export function PartnerOnboardingChecklist() {
       const raw = err instanceof Error ? err.message : String(err);
       const friendly = friendlyUploadError(raw);
       setUploadError(friendly);
+      updateStatus(statusId, { status: "error", error: friendly });
+
       if (err instanceof CloudinaryUploadError) {
         setUploadErrorDetails({
           status: err.status,
@@ -701,6 +748,100 @@ export function PartnerOnboardingChecklist() {
                       </p>
                     </div>
                   )}
+
+                  {fileStatuses.length > 0 && (
+                    <div className="space-y-1 rounded-md border border-slate-200 bg-white/70 p-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                          Upload log ({fileStatuses.length})
+                        </p>
+                        {!uploading && (
+                          <button
+                            type="button"
+                            onClick={clearFileStatuses}
+                            className="text-[10px] font-semibold text-slate-500 hover:text-slate-700 hover:underline"
+                          >
+                            Clear
+                          </button>
+                        )}
+                      </div>
+                      <ul className="space-y-1" role="list" aria-label="Per-file upload status">
+                        {fileStatuses.map((s) => {
+                          const sizeKb = Math.max(1, Math.round(s.size / 1024));
+                          const canRetry = (s.status === "error" || s.status === "cancelled") && !uploading;
+                          return (
+                            <li
+                              key={s.id}
+                              className={`rounded border px-2 py-1 text-[11px] ${
+                                s.status === "success"
+                                  ? "border-emerald-200 bg-emerald-50"
+                                  : s.status === "error"
+                                    ? "border-red-200 bg-red-50"
+                                    : s.status === "cancelled"
+                                      ? "border-amber-200 bg-amber-50"
+                                      : "border-slate-200 bg-slate-50"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                <span aria-hidden="true" className="shrink-0">
+                                  {s.status === "uploading" && <Loader2 className="h-3.5 w-3.5 animate-spin text-[#4F46E5]" />}
+                                  {s.status === "success" && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />}
+                                  {s.status === "error" && <XCircle className="h-3.5 w-3.5 text-red-600" />}
+                                  {s.status === "cancelled" && <AlertCircle className="h-3.5 w-3.5 text-amber-600" />}
+                                </span>
+                                <span className="flex-1 truncate font-semibold text-slate-700" title={s.name}>
+                                  {s.name}
+                                  {s.attempt > 1 && (
+                                    <span className="ml-1 rounded bg-slate-200 px-1 text-[9px] font-bold uppercase text-slate-600">
+                                      try {s.attempt}
+                                    </span>
+                                  )}
+                                </span>
+                                <span className="shrink-0 tabular-nums text-[10px] text-slate-500">
+                                  {sizeKb} KB
+                                </span>
+                                <span
+                                  className={`shrink-0 rounded px-1.5 py-0.5 text-[9px] font-bold uppercase ${
+                                    s.status === "success"
+                                      ? "bg-emerald-600 text-white"
+                                      : s.status === "error"
+                                        ? "bg-red-600 text-white"
+                                        : s.status === "cancelled"
+                                          ? "bg-amber-500 text-white"
+                                          : "bg-[#4F46E5] text-white"
+                                  }`}
+                                >
+                                  {s.status === "uploading" ? `${s.progress}%` : s.status}
+                                </span>
+                                {canRetry && lastFileRef.current && lastFileRef.current.name === s.name && (
+                                  <button
+                                    type="button"
+                                    onClick={onRetryUpload}
+                                    className="shrink-0 rounded border border-red-300 px-1.5 py-0.5 text-[10px] font-semibold text-red-700 hover:bg-red-100"
+                                    aria-label={`Retry upload of ${s.name}`}
+                                  >
+                                    Retry
+                                  </button>
+                                )}
+                              </div>
+                              {s.status === "uploading" && (
+                                <div className="mt-1 h-1 overflow-hidden rounded-full bg-white">
+                                  <div
+                                    className="h-full bg-[#4F46E5] transition-[width] duration-200"
+                                    style={{ width: `${s.progress}%` }}
+                                  />
+                                </div>
+                              )}
+                              {s.error && s.status !== "uploading" && (
+                                <p className="mt-0.5 line-clamp-2 text-[10px] text-slate-600">{s.error}</p>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  )}
+
 
                   <Input
                     placeholder="https://..."
