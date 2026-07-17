@@ -1017,13 +1017,35 @@ export function WebsiteEditorPage() {
         <div className="min-w-0">
           <h1 className="truncate text-lg font-semibold">Final Website Editor</h1>
           <p className="text-xs text-muted-foreground">
-            {saving ? "Saving latest changes..." : "Edit sections, theme and preview here."}
+            {saving
+              ? "Saving latest changes..."
+              : lastSnapshotAt
+                ? `Auto-saved draft at ${new Date(lastSnapshotAt).toLocaleTimeString()}`
+                : "Edits auto-save; drafts snapshot every 2 min."}
           </p>
         </div>
-        <Button onClick={handlePublish} disabled={publishing || !websiteId} className="shrink-0">
-          {publishing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Globe className="mr-2 h-4 w-4" />}
-          Final Save &amp; Publish
-        </Button>
+        <div className="flex shrink-0 items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => { setVersionsOpen(true); void refreshVersions(); }}
+            disabled={!websiteId}
+          >
+            <History className="mr-2 h-4 w-4" />
+            History
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleSaveVersion}
+            disabled={savingVersion || !websiteId}
+          >
+            {savingVersion ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+            Save draft
+          </Button>
+          <Button onClick={handlePublish} disabled={publishing || !websiteId}>
+            {publishing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Globe className="mr-2 h-4 w-4" />}
+            Final Save &amp; Publish
+          </Button>
+        </div>
       </header>
 
 
