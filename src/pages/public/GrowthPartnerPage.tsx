@@ -895,6 +895,48 @@ export function GrowthPartnerPage() {
         </div>
       </section>
 
+      {/* 6b. ELIGIBILITY, FAQ & TERMS — requirements not repeated elsewhere */}
+      <section className="mx-auto max-w-7xl px-6 py-24">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm md:p-9">
+            <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[#4F46E5]"><FileCheck2 className="h-4 w-4" /> Eligibility & requirements</span>
+            <h2 className="mt-4 text-3xl font-black tracking-tight text-[#0B1330]">Ready before you apply.</h2>
+            <p className="mt-3 text-sm leading-relaxed text-slate-600">Application review ke liye ye basic details aur commitments zaroori hain.</p>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              {[
+                "Minimum 18 years", "Valid mobile number", "Identity verification", "Bank account after approval",
+                "District selection", "Agreement acceptance", "Training completion", "Admin approval",
+              ].map((item) => <div key={item} className="flex items-center gap-2 rounded-xl bg-[#FAFBFF] p-3 text-sm font-semibold text-[#0B1330]"><CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />{item}</div>)}
+            </div>
+          </div>
+          <div className="rounded-3xl bg-[#0B1330] p-7 text-white shadow-[0_24px_60px_-28px_rgba(11,19,48,.7)] md:p-9">
+            <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-indigo-200"><ShieldAlert className="h-4 w-4" /> Program terms</span>
+            <h2 className="mt-4 text-3xl font-black tracking-tight">Fair earning. Clear rules.</h2>
+            <ul className="mt-6 space-y-3 text-sm leading-relaxed text-slate-200">
+              {[
+                "No salary guarantee or fake earning promise.", "Commission only on verified, active shops and successful Nexora platform revenue.",
+                "Refunded, fraudulent or cancelled transactions are not payable.", "Company may hold payouts during a fraud or policy review.",
+                "Partners must follow Nexora brand policy; reward and dispute decisions follow company policy.",
+              ].map((item) => <li key={item} className="flex gap-3"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" />{item}</li>)}
+            </ul>
+          </div>
+        </div>
+
+        <div className="mt-16 mx-auto max-w-4xl">
+          <div className="text-center"><span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#4F46E5]">FAQs</span><h2 className="mt-3 text-3xl font-black tracking-tight text-[#0B1330] md:text-4xl">Questions, answered clearly.</h2></div>
+          <div className="mt-8 space-y-3">
+            {[
+              ["Is this a job, salary plan or franchise?", "No. This is a performance-based Growth Partner program, not a job, salary plan, franchise or MLM."],
+              ["How do I earn?", "You earn commission only from successful Nexora platform revenue of shops you personally onboard that become verified, published and active."],
+              ["When is payout processed?", "Commission is calculated daily. Eligible balance is processed in the weekly payout cycle; available balance may be requested as per policy."],
+              ["What is an active shop?", "A verified, published, QR/payment-active and fraud-free shop with at least one successful collection in the last 30 days."],
+              ["What happens if a transaction is refunded?", "Refunded, cancelled, suspicious or fraudulent transactions are excluded and may be held for review."],
+              ["Can I onboard shops in another district?", "Work is normally mapped to your approved district. Any territory change needs Nexora team approval."],
+            ].map(([question, answer]) => <details key={question} className="group rounded-2xl border border-slate-200 bg-white p-5 open:border-[#4F46E5]/30"><summary className="cursor-pointer list-none pr-8 text-sm font-bold text-[#0B1330]">{question}<span className="float-right text-lg text-[#4F46E5] group-open:hidden">+</span><span className="float-right hidden text-lg text-[#4F46E5] group-open:inline">−</span></summary><p className="mt-3 text-sm leading-relaxed text-slate-600">{answer}</p></details>)}
+          </div>
+        </div>
+      </section>
+
       {/* 9. MILESTONE REWARDS */}
       <section className="bg-[#F6F7FB] px-4 py-12 sm:px-6 sm:py-20">
         <div className="mx-auto max-w-7xl overflow-hidden rounded-[28px] bg-[radial-gradient(circle_at_50%_110%,rgba(245,158,11,.22),transparent_38%),linear-gradient(135deg,#050719,#090d24)] px-5 py-14 text-white shadow-2xl sm:px-8 sm:py-20 lg:px-12">
