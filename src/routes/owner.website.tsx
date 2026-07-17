@@ -15,5 +15,9 @@ export const Route = createFileRoute("/owner/website")({
       { name: "description", content: "Customize your booking website: branding, SEO, domain, sections and socials." },
     ],
   }),
-  component: Outlet,
+  component: OwnerWebsiteLayout,
 });
+
+function OwnerWebsiteLayout() {
+  return <Outlet />;
+}
