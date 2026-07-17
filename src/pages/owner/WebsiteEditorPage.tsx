@@ -955,6 +955,9 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
 }
 
 function NavLinksEditor({ links, onChange }: { links: NavLink[]; onChange: (next: NavLink[]) => void }) {
+  const [dragId, setDragId] = React.useState<string | null>(null);
+  const [overId, setOverId] = React.useState<string | null>(null);
+
   const patch = (id: string, p: Partial<NavLink>) =>
     onChange(links.map((l) => (l.id === id ? { ...l, ...p } : l)));
   const remove = (id: string) => onChange(links.filter((l) => l.id !== id));
@@ -964,6 +967,16 @@ function NavLinksEditor({ links, onChange }: { links: NavLink[]; onChange: (next
     const j = idx + dir;
     if (j < 0 || j >= next.length) return;
     [next[idx], next[j]] = [next[j], next[idx]];
+    onChange(next);
+  };
+  const reorder = (fromId: string, toId: string) => {
+    if (fromId === toId) return;
+    const from = links.findIndex((l) => l.id === fromId);
+    const to = links.findIndex((l) => l.id === toId);
+    if (from < 0 || to < 0) return;
+    const next = [...links];
+    const [moved] = next.splice(from, 1);
+    next.splice(to, 0, moved);
     onChange(next);
   };
 
@@ -980,30 +993,74 @@ function NavLinksEditor({ links, onChange }: { links: NavLink[]; onChange: (next
           No menu links yet. Click <strong>Add link</strong> to create one.
         </p>
       )}
+      {links.length > 0 && (
+        <p className="text-xs text-muted-foreground">Drag the handle to reorder.</p>
+      )}
       <ul className="space-y-2">
-        {links.map((l, idx) => (
-          <li key={l.id} className="rounded-md border bg-card p-2">
-            <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
-              <Input
-                placeholder="Label"
-                value={l.label}
-                onChange={(e) => patch(l.id, { label: e.target.value })}
-              />
-              <Input
-                placeholder="URL or #section"
-                value={l.url}
-                onChange={(e) => patch(l.id, { url: e.target.value })}
-              />
-              <div className="flex items-center gap-1">
-                <Button type="button" size="sm" variant="ghost" onClick={() => move(idx, -1)} disabled={idx === 0}>↑</Button>
-                <Button type="button" size="sm" variant="ghost" onClick={() => move(idx, 1)} disabled={idx === links.length - 1}>↓</Button>
-                <Button type="button" size="sm" variant="ghost" onClick={() => remove(l.id)}>
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
+        {links.map((l, idx) => {
+          const isDragging = dragId === l.id;
+          const isOver = overId === l.id && dragId !== l.id;
+          return (
+            <li
+              key={l.id}
+              draggable
+              onDragStart={(e) => {
+                setDragId(l.id);
+                e.dataTransfer.effectAllowed = "move";
+                e.dataTransfer.setData("text/plain", l.id);
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = "move";
+                if (overId !== l.id) setOverId(l.id);
+              }}
+              onDragLeave={() => {
+                if (overId === l.id) setOverId(null);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                const fromId = e.dataTransfer.getData("text/plain") || dragId;
+                if (fromId) reorder(fromId, l.id);
+                setDragId(null);
+                setOverId(null);
+              }}
+              onDragEnd={() => {
+                setDragId(null);
+                setOverId(null);
+              }}
+              className={`rounded-md border bg-card p-2 transition ${
+                isDragging ? "opacity-50" : ""
+              } ${isOver ? "border-primary ring-2 ring-primary/30" : ""}`}
+            >
+              <div className="grid grid-cols-[auto_1fr_1fr_auto] gap-2 items-center">
+                <span
+                  className="flex h-9 w-6 cursor-grab items-center justify-center text-muted-foreground active:cursor-grabbing"
+                  title="Drag to reorder"
+                  aria-label="Drag to reorder"
+                >
+                  <GripVertical className="h-4 w-4" />
+                </span>
+                <Input
+                  placeholder="Label"
+                  value={l.label}
+                  onChange={(e) => patch(l.id, { label: e.target.value })}
+                />
+                <Input
+                  placeholder="URL or #section"
+                  value={l.url}
+                  onChange={(e) => patch(l.id, { url: e.target.value })}
+                />
+                <div className="flex items-center gap-1">
+                  <Button type="button" size="sm" variant="ghost" onClick={() => move(idx, -1)} disabled={idx === 0}>↑</Button>
+                  <Button type="button" size="sm" variant="ghost" onClick={() => move(idx, 1)} disabled={idx === links.length - 1}>↓</Button>
+                  <Button type="button" size="sm" variant="ghost" onClick={() => remove(l.id)}>
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
               </div>
-            </div>
-          </li>
-        ))}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
