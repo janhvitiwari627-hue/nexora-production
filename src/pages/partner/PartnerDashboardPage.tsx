@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import type { ComponentType } from "react";
 import { PartnerPageShell } from "./PartnerAppLayout";
+import { PartnerOnboardingChecklist } from "./PartnerOnboardingChecklist";
 import { getPartnerOverview } from "@/lib/partner.functions";
 
 const inr = (n: number) =>
@@ -112,6 +113,9 @@ export function PartnerDashboardPage() {
       subtitle="Aapke district ki growth ek jagah."
       icon={LayoutDashboard}
     >
+      {/* Overview cards — live partner metrics */}
+      <PartnerOnboardingChecklist />
+
       {/* Overview cards — live partner metrics */}
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map((o, i) => (
