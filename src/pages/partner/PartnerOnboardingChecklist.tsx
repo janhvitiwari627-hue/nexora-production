@@ -221,6 +221,8 @@ export function PartnerOnboardingChecklist() {
     setUploadError(null);
     lastAnnouncedMilestoneRef.current = -1;
     setSrAlert("");
+    const statusId = addStatus(file);
+
     // File X of Y context — single-file flow today, but keep the phrasing so
     // screen-reader users hear a consistent "file 1 of 1" summary that scales
     // when batch uploads land.
