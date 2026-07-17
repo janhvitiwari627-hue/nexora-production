@@ -26,7 +26,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "sonner";
-import { Loader2, Eye, EyeOff, Globe, Plus, Trash2, Upload, Image as ImageIcon, Palette, GripVertical, History, Undo2, Save, GitCompare } from "lucide-react";
+import { Loader2, Eye, EyeOff, Globe, Plus, Trash2, Upload, Image as ImageIcon, Palette, GripVertical, History, Undo2, Save, GitCompare, Monitor, Tablet, Smartphone } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import {
   DndContext,
@@ -269,6 +269,7 @@ export function WebsiteEditorPage() {
   const saveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const themeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "tablet" | "mobile">("desktop");
 
   useEffect(() => {
     if (bundleQ.data?.sections) {
@@ -844,16 +845,60 @@ export function WebsiteEditorPage() {
         </section>
 
         {/* Live preview */}
-        <section className="overflow-hidden border-l bg-muted/20">
-          {websiteId && (
-            <iframe
-              ref={iframeRef}
-              key={websiteId}
-              src={`/w/${websiteId}?preview=1`}
-              className="h-full w-full border-0"
-              title="Live preview"
-            />
-          )}
+        <section className="flex flex-col overflow-hidden border-l bg-muted/20">
+          <div className="flex items-center justify-between border-b bg-background/60 px-3 py-2">
+            <span className="text-xs font-medium text-muted-foreground">
+              Preview · {previewDevice === "desktop" ? "Desktop" : previewDevice === "tablet" ? "Tablet 768px" : "Mobile 390px"}
+            </span>
+            <div className="inline-flex rounded-md border bg-background p-0.5">
+              {([
+                { key: "desktop", icon: Monitor, label: "Desktop" },
+                { key: "tablet", icon: Tablet, label: "Tablet" },
+                { key: "mobile", icon: Smartphone, label: "Mobile" },
+              ] as const).map(({ key, icon: Icon, label }) => {
+                const active = previewDevice === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setPreviewDevice(key)}
+                    className={`inline-flex h-7 items-center gap-1 rounded px-2 text-xs transition ${
+                      active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
+                    }`}
+                    title={label}
+                    aria-label={label}
+                    aria-pressed={active}
+                  >
+                    <Icon className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">{label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div className="flex flex-1 items-start justify-center overflow-auto p-3">
+            {websiteId && (
+              <div
+                className="h-full bg-background shadow-md transition-[max-width] duration-200"
+                style={{
+                  width: "100%",
+                  maxWidth:
+                    previewDevice === "mobile" ? 390 : previewDevice === "tablet" ? 768 : "100%",
+                  borderRadius: previewDevice === "desktop" ? 0 : 12,
+                  overflow: "hidden",
+                  border: previewDevice === "desktop" ? "none" : "1px solid hsl(var(--border))",
+                }}
+              >
+                <iframe
+                  ref={iframeRef}
+                  key={websiteId}
+                  src={`/w/${websiteId}?preview=1`}
+                  className="h-full w-full border-0"
+                  title="Live preview"
+                />
+              </div>
+            )}
+          </div>
         </section>
       </div>
     </div>
