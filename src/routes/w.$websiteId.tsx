@@ -34,6 +34,7 @@ function PublicWebsitePage() {
       }
     }
     window.addEventListener("message", onMsg);
+    window.parent?.postMessage({ type: "website-preview-ready" }, "*");
     return () => window.removeEventListener("message", onMsg);
   }, [isPreview]);
 
