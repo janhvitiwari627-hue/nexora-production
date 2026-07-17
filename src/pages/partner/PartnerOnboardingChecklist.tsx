@@ -132,6 +132,23 @@ export function PartnerOnboardingChecklist() {
 
   const lastFileRef = useRef<File | null>(null);
   const uploadAbortRef = useRef<AbortController | null>(null);
+  const dropzoneRef = useRef<HTMLDivElement>(null);
+  const cancelHadFocusRef = useRef(false);
+  const wasUploadingRef = useRef(false);
+
+  // When the upload finishes (success, error, or cancel) and the Cancel button
+  // had focus, move focus back to the dropzone so the described-by hint is
+  // re-announced and keyboard users don't lose their place.
+  useEffect(() => {
+    if (wasUploadingRef.current && !uploading) {
+      if (cancelHadFocusRef.current) {
+        cancelHadFocusRef.current = false;
+        // Defer past the unmount of the Cancel button
+        requestAnimationFrame(() => dropzoneRef.current?.focus());
+      }
+    }
+    wasUploadingRef.current = uploading;
+  }, [uploading]);
 
   const cancelUpload = () => {
     if (uploadAbortRef.current) {
