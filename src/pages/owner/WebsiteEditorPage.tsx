@@ -658,6 +658,112 @@ export function WebsiteEditorPage() {
         </div>
       </header>
 
+      <Dialog open={diffOpen} onOpenChange={setDiffOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <GitCompare className="h-4 w-4" /> Changes vs. current draft
+            </DialogTitle>
+            <DialogDescription>
+              {diffVersion ? (
+                <>
+                  Comparing <strong>{diffVersion.note || "Draft"}</strong>{" "}
+                  ({new Date(diffVersion.created_at).toLocaleString()}) to your current unsaved draft.
+                </>
+              ) : null}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[60vh] overflow-y-auto pr-1">
+            {diffLoading ? (
+              <div className="flex items-center justify-center py-10">
+                <Loader2 className="h-5 w-5 animate-spin" />
+              </div>
+            ) : !diffResult ? null : diffResult.sections.length === 0 && diffResult.theme.length === 0 ? (
+              <p className="py-6 text-center text-sm text-muted-foreground">
+                No differences — this version matches your current draft.
+              </p>
+            ) : (
+              <div className="space-y-4">
+                <section>
+                  <h4 className="mb-2 text-sm font-semibold">Sections</h4>
+                  {diffResult.sections.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">No section changes.</p>
+                  ) : (
+                    <ul className="space-y-2">
+                      {diffResult.sections.map((c, i) => (
+                        <li key={i} className="rounded-md border p-2 text-sm">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={
+                                "rounded px-1.5 py-0.5 text-[10px] font-medium uppercase " +
+                                (c.kind === "added"
+                                  ? "bg-emerald-100 text-emerald-700"
+                                  : c.kind === "removed"
+                                  ? "bg-red-100 text-red-700"
+                                  : "bg-amber-100 text-amber-700")
+                              }
+                            >
+                              {c.kind}
+                            </span>
+                            <span className="font-medium">{c.label}</span>
+                          </div>
+                          {c.kind === "modified" && c.details.length > 0 && (
+                            <ul className="mt-1 ml-1 list-disc pl-5 text-xs text-muted-foreground">
+                              {c.details.map((d, j) => (
+                                <li key={j} className="break-all">{d}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </section>
+                <section>
+                  <h4 className="mb-2 text-sm font-semibold">Theme</h4>
+                  {diffResult.theme.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">No theme changes.</p>
+                  ) : (
+                    <ul className="space-y-1 text-sm">
+                      {diffResult.theme.map((c, i) => (
+                        <li key={i} className="rounded-md border p-2">
+                          <div className="font-medium capitalize">{c.label}</div>
+                          {c.kind === "modified" && (
+                            <ul className="mt-1 ml-1 list-disc pl-5 text-xs text-muted-foreground">
+                              {c.details.map((d, j) => (
+                                <li key={j} className="break-all">{d}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </section>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setDiffOpen(false)}>
+              Close
+            </Button>
+            {diffVersion && (
+              <Button
+                onClick={async () => {
+                  setDiffOpen(false);
+                  await handleRestoreVersion(diffVersion.id);
+                }}
+                disabled={restoring !== null}
+              >
+                <Undo2 className="mr-1 h-4 w-4" /> Restore this version
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+
+
       <div className="grid flex-1 grid-cols-[240px_1fr_1fr] overflow-hidden">
         {/* Section list */}
         <aside className="overflow-y-auto border-r bg-muted/30 p-3">
