@@ -1699,16 +1699,11 @@ function ItemsEditor({
         </p>
       )}
 
-      <ul className="space-y-3">
-        {items.map((it, idx) => (
-          <li key={it.id} className="rounded-lg border bg-card p-3 space-y-3">
-            <div className="flex items-start justify-between gap-2">
-              <span className="text-xs text-muted-foreground">#{idx + 1}</span>
-              <Button type="button" size="sm" variant="ghost" onClick={() => remove(it.id)}>
-                <Trash2 className="h-4 w-4 text-destructive" />
-              </Button>
-            </div>
-
+      <ItemsDndList
+        items={items}
+        onReorder={onChange}
+        renderItem={(it, idx) => (
+          <>
             <ImageField
               label="Image"
               value={it.image ?? ""}
@@ -1737,9 +1732,12 @@ function ItemsEditor({
                 <TextField label="Description" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
               </>
             )}
-          </li>
-        ))}
-      </ul>
+            {/* idx used to keep signature compatible */}
+            <span className="sr-only">Item {idx + 1}</span>
+          </>
+        )}
+        onRemove={(id) => remove(id)}
+      />
     </div>
   );
 }
