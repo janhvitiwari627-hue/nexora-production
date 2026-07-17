@@ -22,11 +22,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Loader2, Eye, Globe, Plus, Trash2, Upload, Image as ImageIcon, Palette } from "lucide-react";
 
+type NavLink = { id: string; label: string; url: string };
+
 type ThemeExtras = {
   header_bg?: string;
   header_text?: string;
   link_color?: string;
   link_style?: "underline" | "none" | "hover-underline";
+  nav_links?: NavLink[];
+  site_title?: string;
 };
 
 type ThemeState = {
@@ -41,11 +45,20 @@ type ThemeState = {
   extras: ThemeExtras;
 };
 
+const DEFAULT_NAV: NavLink[] = [
+  { id: "n1", label: "About", url: "#about" },
+  { id: "n2", label: "Services", url: "#services" },
+  { id: "n3", label: "Contact", url: "#contact" },
+];
+
 const DEFAULT_EXTRAS: ThemeExtras = {
   header_bg: "#FFFFFF",
   header_text: "#111827",
   link_color: "#4F46E5",
   link_style: "hover-underline",
+  nav_links: DEFAULT_NAV,
+  site_title: "Home",
+};
 };
 
 const DEFAULT_THEME: ThemeState = {
