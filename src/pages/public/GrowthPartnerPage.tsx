@@ -39,6 +39,9 @@ import rewardWelcomeKit from "@/assets/reward-welcome-kit.jpg";
 import rewardTablet from "@/assets/reward-tablet-badge.jpg";
 import rewardLaptop from "@/assets/reward-laptop.jpg";
 import rewardCar from "@/assets/reward-car.jpg";
+import partnerHeroSalon from "@/assets/partner-hero-salon.jpg";
+import partnerBeautyParlour from "@/assets/partner-beauty-parlour.jpg";
+import partnerBarber from "@/assets/partner-barber.jpg";
 
 const TRUST_STRIP = ["Free Joining", "No Investment", "Weekly Payout", "Transparent Dashboard"];
 
@@ -493,6 +496,13 @@ export function GrowthPartnerPage() {
             </p>
           </div>
 
+          <div className="mx-auto mt-8 max-w-4xl overflow-hidden rounded-3xl border border-indigo-100 bg-[#EEF2FF] text-left shadow-[0_28px_70px_-38px_rgba(79,70,229,.6)]">
+            <div className="grid sm:grid-cols-[0.9fr_1.1fr]">
+              <img src={partnerHeroSalon} alt="Nexora Growth Partner helping a salon business grow" className="h-48 w-full object-cover sm:h-full" loading="lazy" />
+              <div className="p-5 sm:p-6"><div className="text-[10px] font-bold uppercase tracking-[.14em] text-[#4F46E5]">Growth that keeps working</div><p className="mt-2 text-base font-black leading-snug text-[#0B1330]">Ek verified, published aur active shop aapke liye long-term platform revenue share create kar sakti hai.</p><div className="mt-3 inline-flex rounded-lg bg-white px-3 py-2 text-xs font-bold text-[#312E81]">Platform revenue only · customer ke total bill par nahi</div></div>
+            </div>
+          </div>
+
           <div className="mt-14 grid gap-5 md:grid-cols-3">
             {[
               {
@@ -641,18 +651,24 @@ export function GrowthPartnerPage() {
                 rate: "10%",
                 tone: "from-[#4F46E5] to-[#6366F1]",
                 ring: "ring-[#4F46E5]/20",
+                image: partnerBarber,
+                caption: "Onboard & activate",
               },
               {
                 tier: "Month 7 – 12",
                 rate: "5%",
                 tone: "from-[#6366F1] to-[#818CF8]",
                 ring: "ring-[#6366F1]/20",
+                image: partnerBeautyParlour,
+                caption: "Keep the shop growing",
               },
               {
                 tier: "After 12 Months",
                 rate: "2%",
                 tone: "from-[#818CF8] to-[#A5B4FC]",
                 ring: "ring-[#818CF8]/20",
+                image: partnerHeroSalon,
+                caption: "Long-term growth share",
               },
             ].map((t, i) => (
               <motion.div
@@ -663,9 +679,11 @@ export function GrowthPartnerPage() {
                 transition={{ delay: i * 0.06 }}
                 className={`relative overflow-hidden rounded-3xl border border-slate-200/70 bg-white p-8 ring-1 ${t.ring}`}
               >
-                <div
-                  className={`absolute -right-8 -top-8 h-32 w-32 rounded-full bg-gradient-to-br ${t.tone} opacity-10`}
-                />
+                <div className="relative -mx-3 -mt-3 mb-6 h-36 overflow-hidden rounded-2xl">
+                  <img src={t.image} alt={t.caption} className="h-full w-full object-cover" loading="lazy" />
+                  <div className={`absolute inset-0 bg-gradient-to-t ${t.tone} opacity-40`} />
+                  <span className="absolute bottom-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-[10px] font-black text-[#0B1330]">{t.caption}</span>
+                </div>
                 <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
                   {t.tier}
                 </div>
@@ -682,7 +700,7 @@ export function GrowthPartnerPage() {
             ))}
           </div>
 
-          <div className="mx-auto mt-10 max-w-3xl rounded-2xl border border-amber-200 bg-amber-50 p-5">
+          <div className="mx-auto mt-10 max-w-4xl rounded-2xl border-2 border-amber-300 bg-amber-50 p-5 shadow-[0_16px_40px_-30px_rgba(217,119,6,.7)]">
             <div className="flex items-start gap-3">
               <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
               <div className="text-sm leading-relaxed text-amber-900">
