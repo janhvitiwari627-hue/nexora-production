@@ -88,6 +88,7 @@ export function PartnerOnboardingChecklist() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [localPreview, setLocalPreview] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const cloudinaryReady = isCloudinaryConfigured();
@@ -105,11 +106,17 @@ export function PartnerOnboardingChecklist() {
 
   const doUpload = async (file: File, keepPreview?: string) => {
     setUploading(true);
+    setUploadProgress(0);
+    setUploadError(null);
     try {
-      const res = await uploadToCloudinary(file, { folder: "partner-logos" });
+      const res = await uploadToCloudinary(file, {
+        folder: "partner-logos",
+        onProgress: (pct) => setUploadProgress(pct),
+      });
       setForm((f) => ({ ...f, photo_url: res.secure_url }));
       setUploadError(null);
       lastFileRef.current = null;
+      setUploadProgress(100);
       toast.success("Logo uploaded — save karke pakka karo");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Upload failed";
@@ -288,8 +295,9 @@ export function PartnerOnboardingChecklist() {
                       className="h-full w-full object-cover"
                     />
                     {uploading && (
-                      <div className="absolute inset-0 grid place-items-center bg-black/40">
-                        <Loader2 className="h-5 w-5 animate-spin text-white" />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/50">
+                        <Loader2 className="h-4 w-4 animate-spin text-white" />
+                        <span className="text-[10px] font-bold text-white">{uploadProgress}%</span>
                       </div>
                     )}
                     {!uploading && (
@@ -320,13 +328,33 @@ export function PartnerOnboardingChecklist() {
                     size="sm"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading || !cloudinaryReady}
+                    aria-busy={uploading}
                   >
                     {uploading ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Upload className="mr-1 h-4 w-4" />}
-                    {form.photo_url ? "Replace logo" : "Upload logo"}
+                    {uploading
+                      ? `Uploading… ${uploadProgress}%`
+                      : form.photo_url
+                        ? "Replace logo"
+                        : "Upload logo"}
                   </Button>
+                  {uploading && (
+                    <div
+                      className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100"
+                      role="progressbar"
+                      aria-valuenow={uploadProgress}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                    >
+                      <div
+                        className="h-full bg-[#4F46E5] transition-[width] duration-200 ease-out"
+                        style={{ width: `${uploadProgress}%` }}
+                      />
+                    </div>
+                  )}
                   <Input
                     placeholder="https://..."
                     value={form.photo_url}
+                    disabled={uploading}
                     onChange={(e) => {
                       setForm({ ...form, photo_url: e.target.value });
                       setUploadError(null);
@@ -355,7 +383,11 @@ export function PartnerOnboardingChecklist() {
                         ) : (
                           <RefreshCw className="mr-1 h-3 w-3" />
                         )}
-                        {lastFileRef.current ? "Retry upload" : "Choose file"}
+                        {uploading
+                          ? `Retrying… ${uploadProgress}%`
+                          : lastFileRef.current
+                            ? "Retry upload"
+                            : "Choose file"}
                       </Button>
                     </div>
                   )}
