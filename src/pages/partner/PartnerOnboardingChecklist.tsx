@@ -208,7 +208,11 @@ export function PartnerOnboardingChecklist() {
       announceStatus(
         `Success: ${file.name} (${sizeKb} KB) uploaded to Cloudinary. Logo preview updated. Save karke pakka karo.`,
       );
+      // Final summary in the assertive region so screen readers get a clear
+      // end-of-batch message even when the upload finishes automatically.
+      announceAlert(`Upload complete. 1 of 1 file uploaded successfully: ${file.name}.`);
       toast.success("Logo uploaded — save karke pakka karo");
+
     } catch (err) {
       const isAbort =
         (err instanceof CloudinaryUploadError && err.code === "ABORTED") ||
