@@ -22,7 +22,7 @@ const NAV: NavItem[] = [
 
 export function PortalLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="nexora-pwa-surface min-h-[100dvh] bg-background">
       <PublicHeader />
       <div className="border-b border-border/60 bg-card/40 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto px-4 py-3 md:px-6">

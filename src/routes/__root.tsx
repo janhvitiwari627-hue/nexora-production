@@ -131,6 +131,9 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
+        {/* Keep this static in the HTML shell: mobile browsers calculate their
+            layout viewport before route-level head tags hydrate. */}
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <HeadContent />
       </head>
       <body>

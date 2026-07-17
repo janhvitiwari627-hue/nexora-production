@@ -29,7 +29,7 @@ const NAV: NavItem[] = [
 export function PartnerAppLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
-    <div className="min-h-screen bg-[#F6F7FB]">
+    <div className="nexora-pwa-surface min-h-[100dvh] bg-[#F6F7FB]">
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between px-4 py-3 md:px-6">
           <Link to="/partner/dashboard" className="flex items-center gap-2">

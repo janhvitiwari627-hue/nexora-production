@@ -16,7 +16,7 @@ export function JobsAppShell() {
   const { user, profile } = useAuthStore();
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-950">
+    <div className="nexora-pwa-surface min-h-[100dvh] bg-slate-50 text-slate-950">
       <header className="sticky top-0 z-40 border-b bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3">
           <Link to="/app/jobs" className="flex min-w-0 items-center gap-2">
@@ -57,10 +57,10 @@ export function JobsAppShell() {
 
       <nav
         aria-label="Beauty jobs app navigation"
-        className="fixed inset-x-0 bottom-0 z-50 border-t bg-white/95 backdrop-blur"
+        className="pwa-bottom-nav fixed inset-x-0 bottom-0 z-50 border-t bg-white/95 backdrop-blur"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
-        <ul className="mx-auto grid max-w-xl grid-cols-5">
+        <ul className="mx-auto grid w-full max-w-xl grid-cols-5">
           {NAV.map((item) => {
             const active = item.exact
               ? pathname === item.to || pathname === `${item.to}/`

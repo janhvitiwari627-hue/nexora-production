@@ -183,8 +183,17 @@
 
 @layer base {
   * { border-color: var(--color-border); }
-  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  html {
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
   body {
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
     background-color: var(--color-background);
     color: var(--color-body);
     font-family: var(--font-sans);
@@ -217,6 +226,27 @@
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 18px 40px -18px rgba(11, 20, 55, 0.18);
+  }
+}
+
+/* Every installed app must be contained by the actual device viewport.
+   Without this guard, a late-inserted viewport tag can make Android render a
+   desktop-width layout first, which cuts cards and bottom navigation in half. */
+.nexora-pwa-surface {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: clip;
+}
+
+@media (max-width: 767px) {
+  .nexora-pwa-surface :where(main, section, article, div, form, header, footer, nav) {
+    min-width: 0;
+  }
+
+  .nexora-pwa-surface .pwa-bottom-nav {
+    width: 100%;
+    max-width: none;
   }
 }
 
