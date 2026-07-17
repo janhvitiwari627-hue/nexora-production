@@ -337,27 +337,33 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
             <p className="text-center text-sm opacity-60">No active offers.</p>
           ) : (
             <div className="grid gap-6 md:grid-cols-2">
-              {items.map((it, i) => (
-                <div
-                  key={i}
-                  className="rounded-lg p-6 text-white shadow-md"
-                  style={{ background: `linear-gradient(135deg, var(--w-primary), var(--w-secondary))` }}
-                >
-                  <div className="text-xs font-semibold uppercase tracking-wider opacity-80">Offer</div>
-                  <h3 className="mt-1 text-xl font-bold">{String(it.title ?? "Special Offer")}</h3>
-                  {it.description && <p className="mt-2 text-sm opacity-90">{String(it.description)}</p>}
-                  {it.discount && (
-                    <div className="mt-4 inline-block rounded-full bg-white/20 px-3 py-1 text-sm font-medium">
-                      {String(it.discount)}
-                    </div>
-                  )}
-                </div>
-              ))}
+              {items.map((it, i) => {
+                const title = String(it.title ?? it.name ?? "Special Offer");
+                const desc = it.description ? String(it.description) : "";
+                const discount = it.discount ? String(it.discount) : "";
+                return (
+                  <div
+                    key={i}
+                    className="rounded-lg p-6 text-white shadow-md"
+                    style={{ background: `linear-gradient(135deg, var(--w-primary), var(--w-secondary))` }}
+                  >
+                    <div className="text-xs font-semibold uppercase tracking-wider opacity-80">Offer</div>
+                    <h3 className="mt-1 text-xl font-bold">{title}</h3>
+                    {desc && <p className="mt-2 text-sm opacity-90">{desc}</p>}
+                    {discount && (
+                      <div className="mt-4 inline-block rounded-full bg-white/20 px-3 py-1 text-sm font-medium">
+                        {discount}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </section>
       );
     }
+
 
     case "staff": {
       const items = asArray(raw.items);
