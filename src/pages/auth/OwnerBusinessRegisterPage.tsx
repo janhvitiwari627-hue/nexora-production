@@ -139,8 +139,7 @@ export default function OwnerBusinessRegisterPage() {
   const [success, setSuccess] = useState(false);
 
   const update =
-    (k: keyof FormState) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const v = e.target.value;
       setForm((f) => ({ ...f, [k]: v }));
       if (errors[k]) setErrors((p) => ({ ...p, [k]: "" }));
@@ -195,6 +194,7 @@ export default function OwnerBusinessRegisterPage() {
             role: "shop_owner",
             shop_name: payload.shop_name,
             category: payload.category,
+            business_category: payload.category,
             district: payload.district,
             address: payload.address,
           },
@@ -399,7 +399,6 @@ export default function OwnerBusinessRegisterPage() {
                 />
                 {errors.address && <p className="text-xs text-destructive">{errors.address}</p>}
               </div>
-
 
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="password">Password *</Label>

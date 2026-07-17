@@ -1,7 +1,42 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
-import type { Json } from "@/integrations/supabase/types";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database, Json } from "@/integrations/supabase/types";
+
+type WebsiteAuthContext = {
+  supabase: SupabaseClient<Database>;
+  userId: string;
+};
+
+async function assertCanManageOwnerWebsite(
+  context: WebsiteAuthContext,
+  salonId?: string,
+): Promise<void> {
+  const { supabase, userId } = context;
+  let ownerLinkQuery = supabase
+    .from("salon_owners")
+    .select("salon_id")
+    .eq("user_id", userId)
+    .eq("is_approved", true)
+    .limit(1);
+  if (salonId) ownerLinkQuery = ownerLinkQuery.eq("salon_id", salonId);
+
+  const [ownerRole, shopOwnerRole, adminRole, superAdminRole, ownerLink] = await Promise.all([
+    supabase.rpc("has_role", { _user_id: userId, _role: "owner" }),
+    supabase.rpc("has_role", { _user_id: userId, _role: "shop_owner" }),
+    supabase.rpc("has_role", { _user_id: userId, _role: "admin" }),
+    supabase.rpc("has_role", { _user_id: userId, _role: "super_admin" }),
+    ownerLinkQuery,
+  ]);
+
+  if (adminRole.data === true || superAdminRole.data === true) return;
+  const hasOwnerRole = ownerRole.data === true || shopOwnerRole.data === true;
+  const hasApprovedShop = !ownerLink.error && (ownerLink.data?.length ?? 0) > 0;
+  if (!hasOwnerRole || !hasApprovedShop) {
+    throw new Error("Only an approved shop owner can create or edit a shop website");
+  }
+}
 
 // ---- Types shared with UI ----
 export type SectionType =
@@ -52,6 +87,7 @@ export const getOrCreateMyWebsite = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
+    await assertCanManageOwnerWebsite(context, data.salonId);
 
     // Try existing
     let query = supabase.from("user_websites").select("*").eq("owner_id", userId);
@@ -94,6 +130,7 @@ export const getMyWebsiteBundle = createServerFn({ method: "GET" })
   .inputValidator((d) => z.object({ websiteId: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
+    await assertCanManageOwnerWebsite(context);
     const { data: website, error } = await supabase
       .from("user_websites")
       .select("*")
@@ -132,6 +169,7 @@ export const saveWebsiteTemplateSelection = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
+    await assertCanManageOwnerWebsite(context);
     const { data: template, error: templateError } = await supabase
       .from("website_templates")
       .select("id, template_key")
@@ -180,6 +218,7 @@ export const updateSection = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) => {
     const { supabase } = context;
+    await assertCanManageOwnerWebsite(context);
     const patch: {
       content?: Json;
       is_visible?: boolean;
@@ -217,6 +256,7 @@ export const reorderSections = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) => {
     const { supabase } = context;
+    await assertCanManageOwnerWebsite(context);
     for (let i = 0; i < data.order.length; i++) {
       await supabase
         .from("website_sections")
@@ -252,6 +292,7 @@ export const updateTheme = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) => {
     const { supabase } = context;
+    await assertCanManageOwnerWebsite(context);
     const patch = { ...data.patch } as Record<string, unknown>;
     if (patch.extras !== undefined) patch.extras = patch.extras as Json;
     const { data: row, error } = await supabase
@@ -270,6 +311,7 @@ export const publishWebsite = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ websiteId: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
+    await assertCanManageOwnerWebsite(context);
     // Snapshot current draft
     const [{ data: sections }, { data: theme }] = await Promise.all([
       supabase.from("website_sections").select("*").eq("website_id", data.websiteId),
@@ -369,6 +411,7 @@ export const listWebsiteVersions = createServerFn({ method: "GET" })
   .inputValidator((d) => z.object({ websiteId: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase } = context;
+    await assertCanManageOwnerWebsite(context);
     const { data: rows, error } = await supabase
       .from("website_versions")
       .select("id, note, created_at, created_by")
@@ -386,6 +429,7 @@ export const saveDraftVersion = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
+    await assertCanManageOwnerWebsite(context);
     // Verify ownership
     const { data: w, error } = await supabase
       .from("user_websites")
@@ -404,6 +448,7 @@ export const restoreWebsiteVersion = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ versionId: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
+    await assertCanManageOwnerWebsite(context);
     const { data: version, error } = await supabase
       .from("website_versions")
       .select("id, website_id, snapshot")
@@ -484,6 +529,7 @@ export const getWebsiteVersionSnapshot = createServerFn({ method: "GET" })
   .inputValidator((d) => z.object({ versionId: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
+    await assertCanManageOwnerWebsite(context);
     const { data: version, error } = await supabase
       .from("website_versions")
       .select("id, website_id, snapshot, note, created_at")

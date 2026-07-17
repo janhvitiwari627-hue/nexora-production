@@ -7,12 +7,9 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/owner")({
   ssr: false,
   beforeLoad: async ({ location }) => {
-    const publicPaths = [
-      "/owner/register-business",
-      "/owner/templates",
-      "/owner/create-website",
-      "/owner/website",
-    ];
+    // Only the owner-registration entry is public. The website editor and every
+    // owner business screen must pass the authenticated role guard below.
+    const publicPaths = ["/owner/register-business"];
     if (publicPaths.some((p) => location.pathname.startsWith(p))) return;
 
     // Friendly interstitial for unauthenticated visitors before the login redirect.
@@ -27,7 +24,7 @@ export const Route = createFileRoute("/owner")({
       });
     }
 
-    return requireRole(["owner", "admin"], location.pathname);
+    return requireRole(["owner", "shop_owner", "shop_manager", "admin"], location.pathname);
   },
   component: OwnerLayout,
 });

@@ -10,6 +10,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Loader2,
   Mail,
   User,
@@ -39,6 +46,17 @@ import { getEmailRole, roleConflictMessage } from "@/lib/auth-check.functions";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 type AccountType = "customer" | "owner" | "district_partner";
+
+const BUSINESS_CATEGORIES = [
+  "Barber Shop",
+  "Hair Salon",
+  "Beauty Parlour",
+  "Unisex Salon",
+  "Spa",
+  "Tattoo Studio",
+  "Massage Center",
+  "Nail Art Studio",
+] as const;
 
 const normalizeEmail = (value: string) => value.trim().toLowerCase();
 
@@ -147,6 +165,7 @@ const ownerSchema = baseSchema
   .innerType()
   .extend({
     business_name: z.string().trim().min(2, "Business name is required").max(120),
+    business_category: z.string().trim().min(1, "Business category is required").max(80),
     business_city: z.string().trim().max(80).optional().or(z.literal("")),
   })
   .refine((d) => d.password === d.confirm_password, {
@@ -180,6 +199,7 @@ export default function CustomerRegistrationPage() {
     confirm_password: "",
     referred_by: "",
     business_name: "",
+    business_category: "",
     business_city: "",
     district: "",
     state: "",
@@ -349,6 +369,7 @@ export default function CustomerRegistrationPage() {
             referred_by: parsed.data.referred_by || null,
             role: accountType,
             gender: accountType === "customer" ? form.gender : null,
+            business_category: accountType === "owner" ? form.business_category : null,
           },
         },
       });
@@ -393,6 +414,7 @@ export default function CustomerRegistrationPage() {
             data: {
               name: form.business_name,
               phone: form.mobile,
+              category: form.business_category,
               city: form.business_city || undefined,
             },
           });
@@ -936,6 +958,31 @@ export default function CustomerRegistrationPage() {
                   />
                   {errors.business_name && (
                     <p className="text-xs text-destructive">{errors.business_name}</p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="business_category">Business category</Label>
+                  <Select
+                    value={form.business_category}
+                    onValueChange={(value) => {
+                      setForm((current) => ({ ...current, business_category: value }));
+                      setErrors((current) => ({ ...current, business_category: "" }));
+                    }}
+                    disabled={submitting}
+                  >
+                    <SelectTrigger id="business_category">
+                      <SelectValue placeholder="Select your shop category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {BUSINESS_CATEGORIES.map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.business_category && (
+                    <p className="text-xs text-destructive">{errors.business_category}</p>
                   )}
                 </div>
                 <div className="space-y-1">

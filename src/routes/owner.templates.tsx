@@ -1,8 +1,10 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { requireRole } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/owner/templates")({
-  beforeLoad: () => {
-    throw redirect({ to: "/owner/website", replace: true });
+  beforeLoad: async ({ location }) => {
+    await requireRole(["owner", "shop_owner", "admin"], location.pathname);
+    throw redirect({ to: "/owner/website", search: {}, replace: true });
   },
   head: () => ({
     meta: [

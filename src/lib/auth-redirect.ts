@@ -31,6 +31,33 @@ const ROLE_ROUTES: Record<UserRole, string> = {
   customer: "/app/customer",
 };
 
+function isRoleAllowedPath(path: string, role: UserRole): boolean {
+  if (path.startsWith("/admin")) return role === "admin" || role === "super_admin";
+  if (path.startsWith("/owner")) {
+    return (
+      role === "owner" ||
+      role === "shop_owner" ||
+      role === "shop_manager" ||
+      role === "admin" ||
+      role === "super_admin"
+    );
+  }
+  if (path.startsWith("/partner")) {
+    return (
+      role === "growth_partner" ||
+      role === "district_partner" ||
+      role === "admin" ||
+      role === "super_admin"
+    );
+  }
+  if (path.startsWith("/portal/brands")) {
+    return role === "brand" || role === "admin" || role === "super_admin";
+  }
+  if (path.startsWith("/app/customer")) return role === "customer";
+  // Public booking, salon and marketing pages can be resumed by any role.
+  return !path.startsWith("/app/") && !path.startsWith("/portal/");
+}
+
 export async function fetchUserRoles(userId: string): Promise<UserRole[]> {
   const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", userId);
   if (error) return [];
@@ -65,27 +92,25 @@ async function hasApprovedOwnerLink(userId: string): Promise<boolean> {
 }
 
 export async function resolvePostLoginRedirect(userId: string): Promise<string> {
-  // 1. Restore booking/post-login flow if it was interrupted
+  // Resolve the authoritative database role before restoring any saved URL.
+  // This prevents a customer from saving /owner/website before login and being
+  // sent into the owner editor afterwards.
+  const roles = await fetchUserRoles(userId);
+  const primary = pickPrimaryRole(roles);
+
   if (typeof window !== "undefined") {
     const pending = sessionStorage.getItem("nexora:postLoginRedirect");
     if (pending) {
       sessionStorage.removeItem("nexora:postLoginRedirect");
-      return pending;
+      if (isRoleAllowedPath(pending, primary)) return pending;
     }
   }
-  // 2. Role-based default
-  const roles = await fetchUserRoles(userId);
-  const primary = pickPrimaryRole(roles);
 
   // Shop owners: route based on whether they already own a shop
   if (primary === "shop_owner" || primary === "owner" || primary === "shop_manager") {
     if (!(await hasApprovedOwnerLink(userId))) return "/owner/register-business";
     return "/owner/templates";
   }
-
-  // Some existing shop owners may have a salon link but no role row yet.
-  // Send them to the owner flow instead of the customer dashboard.
-  if (await hasApprovedOwnerLink(userId)) return "/owner/templates";
 
   return routeForRole(primary);
 }

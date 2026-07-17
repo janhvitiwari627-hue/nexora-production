@@ -141,6 +141,7 @@ export const validateReferralCode = createServerFn({ method: "GET" })
 // ---------- Salon owner self-registration ----------
 const RegisterSalonInput = z.object({
   name: z.string().trim().min(2).max(120),
+  category: z.string().trim().min(1).max(80),
   phone: z
     .string()
     .trim()
@@ -159,6 +160,7 @@ export const registerMySalon = createServerFn({ method: "POST" })
       _district: data.city ?? "Not provided",
       _owner_name: "Salon owner",
       _mobile: data.phone,
+      _category: data.category,
       _address: data.address,
     });
     if (error) throw new Error(error.message);
@@ -569,9 +571,7 @@ const SalonUpdateInput = z.object({
     cover_image_url: nullableUrl,
     owner_profile_image_url: nullableUrl,
     video_url: nullableUrl,
-    selected_template_key: z
-      .enum(["royal-luxe", "modern-salon", "professional-beauty"])
-      .optional(),
+    selected_template_key: z.enum(["royal-luxe", "modern-salon", "professional-beauty"]).optional(),
     brand_primary: z
       .string()
       .regex(/^#[0-9a-fA-F]{6}$/)
