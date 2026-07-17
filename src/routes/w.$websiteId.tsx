@@ -79,20 +79,56 @@ function PublicWebsitePage() {
     if (link.href !== href) link.href = href;
   }, [headingFont, bodyFont]);
 
-  const extras = ((theme as unknown as { extras?: Record<string, string> } | null)?.extras) ?? {};
-  const headerBg = extras.header_bg || "#FFFFFF";
-  const headerText = extras.header_text || "#111827";
-  const linkColor = extras.link_color || "#4F46E5";
-  const linkStyle = extras.link_style || "hover-underline";
+  const extras = ((theme as unknown as { extras?: Record<string, unknown> } | null)?.extras) ?? {};
+  const headerBg = (extras.header_bg as string) || "#FFFFFF";
+  const headerText = (extras.header_text as string) || "#111827";
+  const linkColor = (extras.link_color as string) || "#4F46E5";
+  const linkStyle = (extras.link_style as string) || "hover-underline";
 
   const linkClass =
     linkStyle === "underline" ? "underline" : linkStyle === "none" ? "no-underline" : "hover:underline";
+
+  const bgBase = theme?.background_color ?? "#FFFFFF";
+  const bgStyle = (extras.bg_style as string) || "solid";
+  const bgFrom = (extras.bg_gradient_from as string) || bgBase;
+  const bgTo = (extras.bg_gradient_to as string) || "#F1F5F9";
+  const bgAngle = typeof extras.bg_gradient_angle === "number" ? (extras.bg_gradient_angle as number) : 135;
+  const bgPatternColor = (extras.bg_pattern_color as string) || "#E5E7EB";
+  const bgPatternSize = typeof extras.bg_pattern_size === "number" ? (extras.bg_pattern_size as number) : 24;
+
+  const bgStyleProps: React.CSSProperties = (() => {
+    switch (bgStyle) {
+      case "gradient":
+        return { background: `linear-gradient(${bgAngle}deg, ${bgFrom}, ${bgTo})` };
+      case "soft-radial":
+        return { background: `radial-gradient(circle at 30% 20%, ${bgFrom}, ${bgTo})` };
+      case "dots":
+        return {
+          backgroundColor: bgBase,
+          backgroundImage: `radial-gradient(${bgPatternColor} 1.2px, transparent 1.2px)`,
+          backgroundSize: `${bgPatternSize}px ${bgPatternSize}px`,
+        };
+      case "grid":
+        return {
+          backgroundColor: bgBase,
+          backgroundImage: `linear-gradient(${bgPatternColor} 1px, transparent 1px), linear-gradient(90deg, ${bgPatternColor} 1px, transparent 1px)`,
+          backgroundSize: `${bgPatternSize}px ${bgPatternSize}px`,
+        };
+      case "diagonal":
+        return {
+          backgroundColor: bgBase,
+          backgroundImage: `repeating-linear-gradient(45deg, ${bgPatternColor} 0, ${bgPatternColor} 1px, transparent 1px, transparent ${bgPatternSize}px)`,
+        };
+      default:
+        return { background: bgBase };
+    }
+  })();
 
   const styleVars = {
     ["--w-primary" as string]: theme?.primary_color ?? "#111827",
     ["--w-secondary" as string]: theme?.secondary_color ?? "#F59E0B",
     ["--w-accent" as string]: theme?.accent_color ?? "#10B981",
-    ["--w-bg" as string]: theme?.background_color ?? "#FFFFFF",
+    ["--w-bg" as string]: bgBase,
     ["--w-text" as string]: theme?.text_color ?? "#111827",
     ["--w-header-bg" as string]: headerBg,
     ["--w-header-text" as string]: headerText,
@@ -120,7 +156,8 @@ function PublicWebsitePage() {
   const siteTitle = (extras.site_title as string | undefined) || "Home";
 
   return (
-    <div style={{ ...styleVars, background: "var(--w-bg)", color: "var(--w-text)" }}>
+    <div style={{ ...styleVars, ...bgStyleProps, color: "var(--w-text)", minHeight: "100vh" }}>
+
       <header
         className="sticky top-0 z-10 flex items-center justify-between border-b px-6 py-3"
         style={{ background: "var(--w-header-bg)", color: "var(--w-header-text)" }}
