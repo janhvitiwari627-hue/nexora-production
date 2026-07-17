@@ -269,6 +269,7 @@ export function WebsiteEditorPage() {
   const saveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const themeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "tablet" | "mobile">("desktop");
 
   useEffect(() => {
     if (bundleQ.data?.sections) {
