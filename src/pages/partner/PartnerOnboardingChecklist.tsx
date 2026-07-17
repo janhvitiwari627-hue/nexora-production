@@ -401,27 +401,64 @@ export function PartnerOnboardingChecklist() {
                     onChange={onPickLogo}
                   />
                   {uploadError && (
-                    <div className="flex flex-wrap items-center gap-2 rounded-md border border-red-200 bg-red-50 px-2 py-1.5">
-                      <p className="flex-1 text-[11px] font-medium text-red-600">{uploadError}</p>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={onRetryUpload}
-                        disabled={uploading}
-                        className="h-7 border-red-300 px-2 text-[11px] text-red-700 hover:bg-red-100"
-                      >
-                        {uploading ? (
-                          <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                        ) : (
-                          <RefreshCw className="mr-1 h-3 w-3" />
-                        )}
-                        {uploading
-                          ? `Retrying… ${uploadProgress}%`
-                          : lastFileRef.current
-                            ? "Retry upload"
-                            : "Choose file"}
-                      </Button>
+                    <div className="rounded-md border border-red-200 bg-red-50 px-2 py-1.5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="flex-1 text-[11px] font-medium text-red-600">{uploadError}</p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={onRetryUpload}
+                          disabled={uploading}
+                          className="h-7 border-red-300 px-2 text-[11px] text-red-700 hover:bg-red-100"
+                        >
+                          {uploading ? (
+                            <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                          ) : (
+                            <RefreshCw className="mr-1 h-3 w-3" />
+                          )}
+                          {uploading
+                            ? `Retrying… ${uploadProgress}%`
+                            : lastFileRef.current
+                              ? "Retry upload"
+                              : "Choose file"}
+                        </Button>
+                      </div>
+                      {uploadErrorDetails && (
+                        <div className="mt-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setShowErrorDetails((v) => !v)}
+                            className="flex items-center gap-1 text-[10px] font-semibold text-red-700 hover:underline"
+                            aria-expanded={showErrorDetails}
+                          >
+                            <ChevronDown
+                              className={`h-3 w-3 transition-transform ${showErrorDetails ? "rotate-180" : ""}`}
+                            />
+                            {showErrorDetails ? "Hide details" : "Details"}
+                          </button>
+                          {showErrorDetails && (
+                            <div className="mt-1 space-y-0.5 rounded border border-red-200 bg-white/60 p-1.5 text-[10px] font-mono text-red-800">
+                              {typeof uploadErrorDetails.status === "number" && (
+                                <div>
+                                  <span className="opacity-60">HTTP:</span> {uploadErrorDetails.status}
+                                  {uploadErrorDetails.statusText ? ` ${uploadErrorDetails.statusText}` : ""}
+                                </div>
+                              )}
+                              {uploadErrorDetails.code && (
+                                <div>
+                                  <span className="opacity-60">Code:</span> {uploadErrorDetails.code}
+                                </div>
+                              )}
+                              {uploadErrorDetails.raw && (
+                                <div className="max-h-24 overflow-auto whitespace-pre-wrap break-all">
+                                  <span className="opacity-60">Raw:</span> {uploadErrorDetails.raw.slice(0, 500)}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
