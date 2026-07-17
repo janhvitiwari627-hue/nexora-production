@@ -73,10 +73,10 @@ export const getOrCreateMyWebsite = createServerFn({ method: "POST" })
       templateId = tpl.id;
     }
 
-    const { data: newId, error } = await supabase.rpc(
-      "create_user_website_from_template",
-      { _template_id: templateId, _salon_id: data.salonId ?? undefined },
-    );
+    const { data: newId, error } = await supabase.rpc("create_user_website_from_template", {
+      _template_id: templateId,
+      _salon_id: data.salonId ?? undefined,
+    });
     if (error) throw new Error(error.message);
 
     const { data: created, error: e2 } = await supabase
@@ -116,6 +116,45 @@ export const getMyWebsiteBundle = createServerFn({ method: "GET" })
       sections: (sections ?? []) as unknown as WebsiteSection[],
       theme: (theme ?? null) as unknown as WebsiteTheme | null,
     };
+  });
+
+// ---- Persist the active master template without touching owner content ----
+export const saveWebsiteTemplateSelection = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z
+      .object({
+        websiteId: z.string().uuid(),
+        templateKey: z.string().min(1).max(100),
+        businessCategory: z.string().min(1).max(80),
+      })
+      .parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    const { data: template, error: templateError } = await supabase
+      .from("website_templates")
+      .select("id, template_key")
+      .eq("template_key", data.templateKey)
+      .eq("is_active", true)
+      .single();
+    if (templateError || !template)
+      throw new Error(templateError?.message ?? "Template is not available");
+
+    const { data: website, error } = await supabase
+      .from("user_websites")
+      .update({
+        template_id: template.id,
+        template_key: template.template_key,
+        business_category: data.businessCategory,
+        draft_updated_at: new Date().toISOString(),
+      })
+      .eq("id", data.websiteId)
+      .eq("owner_id", userId)
+      .select("id, template_id, template_key, business_category")
+      .single();
+    if (error) throw new Error(error.message);
+    return website;
   });
 
 // ---- Update a single section (draft autosave) ----
@@ -309,7 +348,10 @@ async function snapshotAndPrune(
     await supabase
       .from("website_versions")
       .delete()
-      .in("id", excess.map((r) => (r as { id: string }).id));
+      .in(
+        "id",
+        excess.map((r) => (r as { id: string }).id),
+      );
   }
   return snapshot;
 }
@@ -387,9 +429,10 @@ export const restoreWebsiteVersion = createServerFn({ method: "POST" })
       website_id: websiteId,
       section_type: (s as { section_type: string }).section_type,
       content: (s as { content: unknown }).content as Json,
-      sort_order: typeof (s as { sort_order: number }).sort_order === "number"
-        ? (s as { sort_order: number }).sort_order
-        : i,
+      sort_order:
+        typeof (s as { sort_order: number }).sort_order === "number"
+          ? (s as { sort_order: number }).sort_order
+          : i,
       is_visible: (s as { is_visible?: boolean }).is_visible ?? true,
     }));
     if (toInsert.length > 0) {
@@ -402,12 +445,22 @@ export const restoreWebsiteVersion = createServerFn({ method: "POST" })
       const t = snap.theme as Record<string, unknown>;
       const themePatch: Record<string, unknown> = {};
       for (const k of [
-        "primary_color", "secondary_color", "accent_color", "background_color",
-        "text_color", "heading_font", "body_font", "button_style", "extras",
+        "primary_color",
+        "secondary_color",
+        "accent_color",
+        "background_color",
+        "text_color",
+        "heading_font",
+        "body_font",
+        "button_style",
+        "extras",
       ]) {
         if (k in t) themePatch[k] = t[k];
       }
-      await supabase.from("website_theme").update(themePatch as never).eq("website_id", websiteId);
+      await supabase
+        .from("website_theme")
+        .update(themePatch as never)
+        .eq("website_id", websiteId);
     }
 
     await supabase
@@ -450,6 +503,3 @@ export const getWebsiteVersionSnapshot = createServerFn({ method: "GET" })
       theme: (snap.theme ?? null) as unknown as Json,
     };
   });
-
-
-

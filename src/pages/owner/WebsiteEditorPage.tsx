@@ -13,9 +13,12 @@ import {
   saveDraftVersion,
   restoreWebsiteVersion,
   getWebsiteVersionSnapshot,
+  saveWebsiteTemplateSelection,
   type WebsiteSection,
   type SectionType,
 } from "@/lib/website-editor.functions";
+import { TemplateGalleryDialog } from "./editor/TemplateGalleryDialog";
+import { TEMPLATE_CATALOG, type TemplateCatalogItem } from "./editor/templateCatalog";
 import { getMyOwnedSalons, listOwnerServices } from "@/lib/owner.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -23,11 +26,45 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "sonner";
-import { Loader2, Eye, EyeOff, Globe, Plus, Trash2, Upload, Image as ImageIcon, Palette, GripVertical, History, Undo2, Save, GitCompare, Monitor, Tablet, Smartphone, Wand2, MapPinned, ListChecks } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import {
+  Loader2,
+  Eye,
+  EyeOff,
+  Globe,
+  Plus,
+  Trash2,
+  Upload,
+  Image as ImageIcon,
+  Palette,
+  GripVertical,
+  History,
+  Undo2,
+  Save,
+  GitCompare,
+  Monitor,
+  Tablet,
+  Smartphone,
+  Wand2,
+  MapPinned,
+  ListChecks,
+} from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import {
   DndContext,
   closestCenter,
@@ -119,7 +156,16 @@ const DEFAULT_THEME: ThemeState = {
   extras: DEFAULT_EXTRAS,
 };
 
-const FONT_OPTIONS = ["Inter", "Poppins", "Playfair Display", "Montserrat", "Lora", "Roboto", "Merriweather", "Space Grotesk"];
+const FONT_OPTIONS = [
+  "Inter",
+  "Poppins",
+  "Playfair Display",
+  "Montserrat",
+  "Lora",
+  "Roboto",
+  "Merriweather",
+  "Space Grotesk",
+];
 const BUTTON_STYLES = [
   { value: "rounded", label: "Rounded" },
   { value: "pill", label: "Pill" },
@@ -147,8 +193,14 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       body_font: "Lora",
       button_style: "rounded",
       extras: {
-        header_bg: "#1E293B", header_text: "#FAF7F2", link_color: "#D4A24C", link_style: "hover-underline",
-        bg_style: "soft-radial", bg_gradient_from: "#FAF7F2", bg_gradient_to: "#EFE7D6", bg_gradient_angle: 135,
+        header_bg: "#1E293B",
+        header_text: "#FAF7F2",
+        link_color: "#D4A24C",
+        link_style: "hover-underline",
+        bg_style: "soft-radial",
+        bg_gradient_from: "#FAF7F2",
+        bg_gradient_to: "#EFE7D6",
+        bg_gradient_angle: 135,
       },
     },
   },
@@ -166,8 +218,14 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       body_font: "Inter",
       button_style: "pill",
       extras: {
-        header_bg: "#FFFFFF", header_text: "#0F172A", link_color: "#4F46E5", link_style: "hover-underline",
-        bg_style: "gradient", bg_gradient_from: "#EEF2FF", bg_gradient_to: "#FFFFFF", bg_gradient_angle: 160,
+        header_bg: "#FFFFFF",
+        header_text: "#0F172A",
+        link_color: "#4F46E5",
+        link_style: "hover-underline",
+        bg_style: "gradient",
+        bg_gradient_from: "#EEF2FF",
+        bg_gradient_to: "#FFFFFF",
+        bg_gradient_angle: 160,
       },
     },
   },
@@ -185,8 +243,13 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       body_font: "Inter",
       button_style: "square",
       extras: {
-        header_bg: "#FFFFFF", header_text: "#111111", link_color: "#111111", link_style: "underline",
-        bg_style: "grid", bg_pattern_color: "#EEEEEE", bg_pattern_size: 32,
+        header_bg: "#FFFFFF",
+        header_text: "#111111",
+        link_color: "#111111",
+        link_style: "underline",
+        bg_style: "grid",
+        bg_pattern_color: "#EEEEEE",
+        bg_pattern_size: 32,
       },
     },
   },
@@ -204,8 +267,14 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       body_font: "Montserrat",
       button_style: "pill",
       extras: {
-        header_bg: "#0F0F0F", header_text: "#F5F0EB", link_color: "#E5B8A6", link_style: "hover-underline",
-        bg_style: "soft-radial", bg_gradient_from: "#1A1A1A", bg_gradient_to: "#0F0F0F", bg_gradient_angle: 135,
+        header_bg: "#0F0F0F",
+        header_text: "#F5F0EB",
+        link_color: "#E5B8A6",
+        link_style: "hover-underline",
+        bg_style: "soft-radial",
+        bg_gradient_from: "#1A1A1A",
+        bg_gradient_to: "#0F0F0F",
+        bg_gradient_angle: 135,
       },
     },
   },
@@ -223,8 +292,13 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       body_font: "Poppins",
       button_style: "rounded",
       extras: {
-        header_bg: "#0F766E", header_text: "#F0FDFA", link_color: "#FB7185", link_style: "hover-underline",
-        bg_style: "dots", bg_pattern_color: "#A7F3D0", bg_pattern_size: 22,
+        header_bg: "#0F766E",
+        header_text: "#F0FDFA",
+        link_color: "#FB7185",
+        link_style: "hover-underline",
+        bg_style: "dots",
+        bg_pattern_color: "#A7F3D0",
+        bg_pattern_size: 22,
       },
     },
   },
@@ -242,7 +316,10 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       body_font: "Merriweather",
       button_style: "square",
       extras: {
-        header_bg: "#F5F3EE", header_text: "#1A1A1A", link_color: "#B91C1C", link_style: "underline",
+        header_bg: "#F5F3EE",
+        header_text: "#1A1A1A",
+        link_color: "#B91C1C",
+        link_style: "underline",
         bg_style: "solid",
       },
     },
@@ -261,8 +338,14 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       body_font: "Inter",
       button_style: "rounded",
       extras: {
-        header_bg: "#0C2340", header_text: "#F0F9FF", link_color: "#2D8A9E", link_style: "hover-underline",
-        bg_style: "gradient", bg_gradient_from: "#E0F2FE", bg_gradient_to: "#F0F9FF", bg_gradient_angle: 180,
+        header_bg: "#0C2340",
+        header_text: "#F0F9FF",
+        link_color: "#2D8A9E",
+        link_style: "hover-underline",
+        bg_style: "gradient",
+        bg_gradient_from: "#E0F2FE",
+        bg_gradient_to: "#F0F9FF",
+        bg_gradient_angle: 180,
       },
     },
   },
@@ -280,8 +363,14 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       body_font: "Inter",
       button_style: "pill",
       extras: {
-        header_bg: "#FFFFFF", header_text: "#1F2937", link_color: "#E84393", link_style: "hover-underline",
-        bg_style: "gradient", bg_gradient_from: "#FED7AA", bg_gradient_to: "#FBCFE8", bg_gradient_angle: 135,
+        header_bg: "#FFFFFF",
+        header_text: "#1F2937",
+        link_color: "#E84393",
+        link_style: "hover-underline",
+        bg_style: "gradient",
+        bg_gradient_from: "#FED7AA",
+        bg_gradient_to: "#FBCFE8",
+        bg_gradient_angle: 135,
       },
     },
   },
@@ -299,8 +388,13 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       body_font: "Nunito Sans",
       button_style: "rounded",
       extras: {
-        header_bg: "#1A3C2A", header_text: "#F5F0E8", link_color: "#7D9B76", link_style: "hover-underline",
-        bg_style: "dots", bg_pattern_color: "#DCE5D4", bg_pattern_size: 26,
+        header_bg: "#1A3C2A",
+        header_text: "#F5F0E8",
+        link_color: "#7D9B76",
+        link_style: "hover-underline",
+        bg_style: "dots",
+        bg_pattern_color: "#DCE5D4",
+        bg_pattern_size: 26,
       },
     },
   },
@@ -318,8 +412,13 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       body_font: "Inter",
       button_style: "square",
       extras: {
-        header_bg: "#0A0A0A", header_text: "#FFEB3B", link_color: "#FF5722", link_style: "underline",
-        bg_style: "diagonal", bg_pattern_color: "#F5F5F5", bg_pattern_size: 20,
+        header_bg: "#0A0A0A",
+        header_text: "#FFEB3B",
+        link_color: "#FF5722",
+        link_style: "underline",
+        bg_style: "diagonal",
+        bg_pattern_color: "#F5F5F5",
+        bg_pattern_size: 20,
       },
     },
   },
@@ -337,8 +436,14 @@ const THEME_PRESETS: { key: string; name: string; description: string; theme: Th
       body_font: "Inter",
       button_style: "pill",
       extras: {
-        header_bg: "#0A0A1A", header_text: "#E0E7FF", link_color: "#818CF8", link_style: "hover-underline",
-        bg_style: "soft-radial", bg_gradient_from: "#1E1B4B", bg_gradient_to: "#0A0A1A", bg_gradient_angle: 135,
+        header_bg: "#0A0A1A",
+        header_text: "#E0E7FF",
+        link_color: "#818CF8",
+        link_style: "hover-underline",
+        bg_style: "soft-radial",
+        bg_gradient_from: "#1E1B4B",
+        bg_gradient_to: "#0A0A1A",
+        bg_gradient_angle: 135,
       },
     },
   },
@@ -419,7 +524,15 @@ type StarterTemplate = {
   description: string;
   theme: ThemeState;
   visibleOrder: SectionType[];
-  content: Partial<Record<SectionType, (ctx: { salon?: SalonBasics | null; services: OwnerServiceOption[] }) => Record<string, unknown>>>;
+  content: Partial<
+    Record<
+      SectionType,
+      (ctx: {
+        salon?: SalonBasics | null;
+        services: OwnerServiceOption[];
+      }) => Record<string, unknown>
+    >
+  >;
 };
 
 const demoServiceItems = (services: OwnerServiceOption[], fallback: Item[]): Item[] => {
@@ -428,36 +541,204 @@ const demoServiceItems = (services: OwnerServiceOption[], fallback: Item[]): Ite
 };
 
 const ROYAL_LUXE_SERVICES: Item[] = [
-  { id: "rl-s1", name: "Signature Hair Spa", price: "2499", duration: "60 min", description: "Deep-conditioning ritual with scalp massage.", image: "", category: "Hair" },
-  { id: "rl-s2", name: "Luxury Facial", price: "3499", duration: "75 min", description: "Premium brightening facial with gold serum.", image: "", category: "Skin" },
-  { id: "rl-s3", name: "Keratin Smoothening", price: "5999", duration: "120 min", description: "Salon-grade frizz control and shine.", image: "", category: "Hair" },
-  { id: "rl-s4", name: "Bridal Makeup", price: "12999", duration: "180 min", description: "HD bridal look with premium products.", image: "", category: "Makeup" },
-  { id: "rl-s5", name: "Body Polishing", price: "3999", duration: "90 min", description: "Full-body glow and detox therapy.", image: "", category: "Spa" },
-  { id: "rl-s6", name: "Manicure & Pedicure", price: "1499", duration: "60 min", description: "Luxury hand and foot care ritual.", image: "", category: "Nails" },
+  {
+    id: "rl-s1",
+    name: "Signature Hair Spa",
+    price: "2499",
+    duration: "60 min",
+    description: "Deep-conditioning ritual with scalp massage.",
+    image: "",
+    category: "Hair",
+  },
+  {
+    id: "rl-s2",
+    name: "Luxury Facial",
+    price: "3499",
+    duration: "75 min",
+    description: "Premium brightening facial with gold serum.",
+    image: "",
+    category: "Skin",
+  },
+  {
+    id: "rl-s3",
+    name: "Keratin Smoothening",
+    price: "5999",
+    duration: "120 min",
+    description: "Salon-grade frizz control and shine.",
+    image: "",
+    category: "Hair",
+  },
+  {
+    id: "rl-s4",
+    name: "Bridal Makeup",
+    price: "12999",
+    duration: "180 min",
+    description: "HD bridal look with premium products.",
+    image: "",
+    category: "Makeup",
+  },
+  {
+    id: "rl-s5",
+    name: "Body Polishing",
+    price: "3999",
+    duration: "90 min",
+    description: "Full-body glow and detox therapy.",
+    image: "",
+    category: "Spa",
+  },
+  {
+    id: "rl-s6",
+    name: "Manicure & Pedicure",
+    price: "1499",
+    duration: "60 min",
+    description: "Luxury hand and foot care ritual.",
+    image: "",
+    category: "Nails",
+  },
 ];
 
 const URBAN_PRO_SERVICES: Item[] = [
-  { id: "up-s1", name: "Classic Haircut", price: "399", duration: "30 min", description: "Precision cut with wash and style.", image: "", category: "Hair" },
-  { id: "up-s2", name: "Beard Trim & Shape", price: "249", duration: "20 min", description: "Sharp lines and clean edges.", image: "", category: "Beard" },
-  { id: "up-s3", name: "Hair Colour", price: "999", duration: "45 min", description: "Grey coverage or fashion shade.", image: "", category: "Hair" },
-  { id: "up-s4", name: "Head Massage", price: "349", duration: "20 min", description: "Relaxing scalp massage with oil.", image: "", category: "Care" },
-  { id: "up-s5", name: "Fade Cut", price: "499", duration: "40 min", description: "Modern skin fade with styling.", image: "", category: "Hair" },
-  { id: "up-s6", name: "Shave & Facial", price: "699", duration: "45 min", description: "Hot-towel shave with clean-up.", image: "", category: "Beard" },
+  {
+    id: "up-s1",
+    name: "Classic Haircut",
+    price: "399",
+    duration: "30 min",
+    description: "Precision cut with wash and style.",
+    image: "",
+    category: "Hair",
+  },
+  {
+    id: "up-s2",
+    name: "Beard Trim & Shape",
+    price: "249",
+    duration: "20 min",
+    description: "Sharp lines and clean edges.",
+    image: "",
+    category: "Beard",
+  },
+  {
+    id: "up-s3",
+    name: "Hair Colour",
+    price: "999",
+    duration: "45 min",
+    description: "Grey coverage or fashion shade.",
+    image: "",
+    category: "Hair",
+  },
+  {
+    id: "up-s4",
+    name: "Head Massage",
+    price: "349",
+    duration: "20 min",
+    description: "Relaxing scalp massage with oil.",
+    image: "",
+    category: "Care",
+  },
+  {
+    id: "up-s5",
+    name: "Fade Cut",
+    price: "499",
+    duration: "40 min",
+    description: "Modern skin fade with styling.",
+    image: "",
+    category: "Hair",
+  },
+  {
+    id: "up-s6",
+    name: "Shave & Facial",
+    price: "699",
+    duration: "45 min",
+    description: "Hot-towel shave with clean-up.",
+    image: "",
+    category: "Beard",
+  },
 ];
 
 const BEAUTY_SERVICES: Item[] = [
-  { id: "pb-s1", name: "Bridal Makeup", price: "9999", duration: "150 min", description: "Wedding-day look with trial session.", image: "", category: "Makeup" },
-  { id: "pb-s2", name: "Party Makeup", price: "2999", duration: "60 min", description: "Glam look for events and parties.", image: "", category: "Makeup" },
-  { id: "pb-s3", name: "Nail Art", price: "1499", duration: "60 min", description: "Custom nail art with gel finish.", image: "", category: "Nails" },
-  { id: "pb-s4", name: "Gel Extensions", price: "2499", duration: "90 min", description: "Long-lasting gel nail extensions.", image: "", category: "Nails" },
-  { id: "pb-s5", name: "Airbrush Makeup", price: "4999", duration: "75 min", description: "HD airbrush for a flawless finish.", image: "", category: "Makeup" },
-  { id: "pb-s6", name: "Hair Styling", price: "999", duration: "45 min", description: "Curls, waves and updos.", image: "", category: "Hair" },
+  {
+    id: "pb-s1",
+    name: "Bridal Makeup",
+    price: "9999",
+    duration: "150 min",
+    description: "Wedding-day look with trial session.",
+    image: "",
+    category: "Makeup",
+  },
+  {
+    id: "pb-s2",
+    name: "Party Makeup",
+    price: "2999",
+    duration: "60 min",
+    description: "Glam look for events and parties.",
+    image: "",
+    category: "Makeup",
+  },
+  {
+    id: "pb-s3",
+    name: "Nail Art",
+    price: "1499",
+    duration: "60 min",
+    description: "Custom nail art with gel finish.",
+    image: "",
+    category: "Nails",
+  },
+  {
+    id: "pb-s4",
+    name: "Gel Extensions",
+    price: "2499",
+    duration: "90 min",
+    description: "Long-lasting gel nail extensions.",
+    image: "",
+    category: "Nails",
+  },
+  {
+    id: "pb-s5",
+    name: "Airbrush Makeup",
+    price: "4999",
+    duration: "75 min",
+    description: "HD airbrush for a flawless finish.",
+    image: "",
+    category: "Makeup",
+  },
+  {
+    id: "pb-s6",
+    name: "Hair Styling",
+    price: "999",
+    duration: "45 min",
+    description: "Curls, waves and updos.",
+    image: "",
+    category: "Hair",
+  },
 ];
 
 const DEMO_STAFF: Item[] = [
-  { id: "st1", name: "Priya Sharma", price: "", duration: "", description: "Senior Stylist · 8 yrs experience", image: "", category: "Team" },
-  { id: "st2", name: "Rahul Kapoor", price: "", duration: "", description: "Master Colourist · Advanced trained", image: "", category: "Team" },
-  { id: "st3", name: "Neha Verma", price: "", duration: "", description: "Makeup Artist · Bridal specialist", image: "", category: "Team" },
+  {
+    id: "st1",
+    name: "Priya Sharma",
+    price: "",
+    duration: "",
+    description: "Senior Stylist · 8 yrs experience",
+    image: "",
+    category: "Team",
+  },
+  {
+    id: "st2",
+    name: "Rahul Kapoor",
+    price: "",
+    duration: "",
+    description: "Master Colourist · Advanced trained",
+    image: "",
+    category: "Team",
+  },
+  {
+    id: "st3",
+    name: "Neha Verma",
+    price: "",
+    duration: "",
+    description: "Makeup Artist · Bridal specialist",
+    image: "",
+    category: "Team",
+  },
 ];
 
 const ROYAL_LUXE_THEME: ThemeState = {
@@ -530,26 +811,114 @@ const WEBSITE_STARTER_TEMPLATES: StarterTemplate[] = [
     role: "Salon",
     description: "Luxury black & gold. Premium salon and spa ready-to-publish.",
     theme: ROYAL_LUXE_THEME,
-    visibleOrder: ["hero", "about", "services", "staff", "gallery", "rate_card", "packages", "membership", "offers", "contact"],
+    visibleOrder: [
+      "hero",
+      "about",
+      "services",
+      "staff",
+      "gallery",
+      "rate_card",
+      "packages",
+      "membership",
+      "offers",
+      "contact",
+    ],
     content: {
-      hero: ({ salon }) => ({ heading: salon?.name ?? "Royal Luxe Salon & Spa", subheading: "Luxury Hair · Skin · Bridal Studio", description: "Premium salon experience with expert stylists and signature rituals.", buttonText: "Book Appointment", buttonLink: "#services", imageUrl: "" }),
-      about: ({ salon }) => ({ heading: "About Us", body: `${salon?.name ?? "Royal Luxe"} is a premium salon and spa offering signature hair, skin and bridal services in a luxurious ambience.` }),
-      services: ({ services }) => ({ heading: "Signature Services", description: "Handpicked premium services for our guests.", items: demoServiceItems(services, ROYAL_LUXE_SERVICES.slice(0, 6)) }),
-      staff: () => ({ heading: "Meet Our Experts", description: "Award-winning stylists and therapists.", items: DEMO_STAFF }),
-      gallery: () => ({ heading: "Our Salon", description: "A glimpse of our premium studio.", items: [], gridAspect: "square", gridColumns: 4, imageFit: "cover", gridGap: 12 }),
-      rate_card: ({ services }) => ({ heading: "Rate Card", description: "Transparent premium pricing.", items: demoServiceItems(services, ROYAL_LUXE_SERVICES) }),
-      packages: () => ({ heading: "Signature Packages", description: "Curated bundles for a complete experience.", items: [
-        { id: newId(), name: "Bridal Glow Package", price: "24999", description: "Pre-bridal + wedding-day makeup + hair styling.", duration: "Full day" },
-        { id: newId(), name: "Luxury Spa Day", price: "6999", description: "Hair spa + facial + body polish.", duration: "3 hours" },
-      ] }),
-      membership: () => ({ heading: "Membership", description: "Exclusive privileges for loyal guests.", items: [
-        { id: newId(), name: "Gold Member", price: "4999", description: "10% off on all services + priority booking." },
-        { id: newId(), name: "Platinum Member", price: "9999", description: "20% off + free monthly hair spa." },
-      ] }),
-      offers: () => ({ heading: "Current Offers", description: "Limited-time luxury deals.", items: [
-        { id: newId(), name: "First Visit", discount: "20% OFF", description: "Welcome offer for new guests." },
-      ] }),
-      contact: ({ salon }) => ({ heading: "Visit Us", description: "Call, WhatsApp or drop in.", phone: salon?.phone ?? "", whatsapp: salon?.phone ?? "", email: "", address: salon?.address ?? salon?.location ?? "", mapEmbed: mapsEmbedFromAddress(salon?.address ?? salon?.location) }),
+      hero: ({ salon }) => ({
+        heading: salon?.name ?? "Royal Luxe Salon & Spa",
+        subheading: "Luxury Hair · Skin · Bridal Studio",
+        description: "Premium salon experience with expert stylists and signature rituals.",
+        buttonText: "Book Appointment",
+        buttonLink: "#services",
+        imageUrl: "",
+      }),
+      about: ({ salon }) => ({
+        heading: "About Us",
+        body: `${salon?.name ?? "Royal Luxe"} is a premium salon and spa offering signature hair, skin and bridal services in a luxurious ambience.`,
+      }),
+      services: ({ services }) => ({
+        heading: "Signature Services",
+        description: "Handpicked premium services for our guests.",
+        items: demoServiceItems(services, ROYAL_LUXE_SERVICES.slice(0, 6)),
+      }),
+      staff: () => ({
+        heading: "Meet Our Experts",
+        description: "Award-winning stylists and therapists.",
+        items: DEMO_STAFF,
+      }),
+      gallery: () => ({
+        heading: "Our Salon",
+        description: "A glimpse of our premium studio.",
+        items: [],
+        gridAspect: "square",
+        gridColumns: 4,
+        imageFit: "cover",
+        gridGap: 12,
+      }),
+      rate_card: ({ services }) => ({
+        heading: "Rate Card",
+        description: "Transparent premium pricing.",
+        items: demoServiceItems(services, ROYAL_LUXE_SERVICES),
+      }),
+      packages: () => ({
+        heading: "Signature Packages",
+        description: "Curated bundles for a complete experience.",
+        items: [
+          {
+            id: newId(),
+            name: "Bridal Glow Package",
+            price: "24999",
+            description: "Pre-bridal + wedding-day makeup + hair styling.",
+            duration: "Full day",
+          },
+          {
+            id: newId(),
+            name: "Luxury Spa Day",
+            price: "6999",
+            description: "Hair spa + facial + body polish.",
+            duration: "3 hours",
+          },
+        ],
+      }),
+      membership: () => ({
+        heading: "Membership",
+        description: "Exclusive privileges for loyal guests.",
+        items: [
+          {
+            id: newId(),
+            name: "Gold Member",
+            price: "4999",
+            description: "10% off on all services + priority booking.",
+          },
+          {
+            id: newId(),
+            name: "Platinum Member",
+            price: "9999",
+            description: "20% off + free monthly hair spa.",
+          },
+        ],
+      }),
+      offers: () => ({
+        heading: "Current Offers",
+        description: "Limited-time luxury deals.",
+        items: [
+          {
+            id: newId(),
+            name: "First Visit",
+            discount: "20% OFF",
+            description: "Welcome offer for new guests.",
+          },
+        ],
+      }),
+      contact: ({ salon }) => ({
+        heading: "Visit Us",
+        description: "Call, WhatsApp or drop in.",
+        phone: salon?.phone ?? "",
+        whatsapp: salon?.phone ?? "",
+        email: "",
+        address: salon?.address ?? salon?.location ?? "",
+        mapEmbed: mapsEmbedFromAddress(salon?.address ?? salon?.location),
+      }),
     },
   },
   {
@@ -558,18 +927,74 @@ const WEBSITE_STARTER_TEMPLATES: StarterTemplate[] = [
     role: "Barber",
     description: "Modern red & white barber shop. Fast booking, sharp look.",
     theme: URBAN_PRO_THEME,
-    visibleOrder: ["hero", "about", "services", "rate_card", "staff", "gallery", "offers", "contact"],
+    visibleOrder: [
+      "hero",
+      "about",
+      "services",
+      "rate_card",
+      "staff",
+      "gallery",
+      "offers",
+      "contact",
+    ],
     content: {
-      hero: ({ salon }) => ({ heading: salon?.name ?? "Urban Pro Barber", subheading: "Sharp cuts. Clean fades. Book in 3 clicks.", description: "Modern grooming studio for men. Walk-ins welcome.", buttonText: "Book Now", buttonLink: "#services", imageUrl: "" }),
-      about: ({ salon }) => ({ heading: "About The Shop", body: `${salon?.name ?? "Urban Pro"} is a modern barber shop offering precision cuts, beard styling and grooming services.` }),
-      services: ({ services }) => ({ heading: "Our Services", description: "Grooming essentials for the modern man.", items: demoServiceItems(services, URBAN_PRO_SERVICES.slice(0, 6)) }),
-      rate_card: ({ services }) => ({ heading: "Rate Card", description: "Clear, honest pricing.", items: demoServiceItems(services, URBAN_PRO_SERVICES) }),
-      staff: () => ({ heading: "Our Barbers", description: "Skilled professionals ready to serve you.", items: DEMO_STAFF }),
-      gallery: () => ({ heading: "Recent Cuts", description: "Fresh work from the chair.", items: [], gridAspect: "landscape", gridColumns: 3, imageFit: "cover", gridGap: 10 }),
-      offers: () => ({ heading: "Combo Offers", description: "Save more with combos.", items: [
-        { id: newId(), name: "Cut + Beard Combo", discount: "15% OFF", description: "Haircut + beard trim combo deal." },
-      ] }),
-      contact: ({ salon }) => ({ heading: "Visit The Shop", description: "Location and contact.", phone: salon?.phone ?? "", whatsapp: salon?.phone ?? "", email: "", address: salon?.address ?? salon?.location ?? "", mapEmbed: mapsEmbedFromAddress(salon?.address ?? salon?.location) }),
+      hero: ({ salon }) => ({
+        heading: salon?.name ?? "Urban Pro Barber",
+        subheading: "Sharp cuts. Clean fades. Book in 3 clicks.",
+        description: "Modern grooming studio for men. Walk-ins welcome.",
+        buttonText: "Book Now",
+        buttonLink: "#services",
+        imageUrl: "",
+      }),
+      about: ({ salon }) => ({
+        heading: "About The Shop",
+        body: `${salon?.name ?? "Urban Pro"} is a modern barber shop offering precision cuts, beard styling and grooming services.`,
+      }),
+      services: ({ services }) => ({
+        heading: "Our Services",
+        description: "Grooming essentials for the modern man.",
+        items: demoServiceItems(services, URBAN_PRO_SERVICES.slice(0, 6)),
+      }),
+      rate_card: ({ services }) => ({
+        heading: "Rate Card",
+        description: "Clear, honest pricing.",
+        items: demoServiceItems(services, URBAN_PRO_SERVICES),
+      }),
+      staff: () => ({
+        heading: "Our Barbers",
+        description: "Skilled professionals ready to serve you.",
+        items: DEMO_STAFF,
+      }),
+      gallery: () => ({
+        heading: "Recent Cuts",
+        description: "Fresh work from the chair.",
+        items: [],
+        gridAspect: "landscape",
+        gridColumns: 3,
+        imageFit: "cover",
+        gridGap: 10,
+      }),
+      offers: () => ({
+        heading: "Combo Offers",
+        description: "Save more with combos.",
+        items: [
+          {
+            id: newId(),
+            name: "Cut + Beard Combo",
+            discount: "15% OFF",
+            description: "Haircut + beard trim combo deal.",
+          },
+        ],
+      }),
+      contact: ({ salon }) => ({
+        heading: "Visit The Shop",
+        description: "Location and contact.",
+        phone: salon?.phone ?? "",
+        whatsapp: salon?.phone ?? "",
+        email: "",
+        address: salon?.address ?? salon?.location ?? "",
+        mapEmbed: mapsEmbedFromAddress(salon?.address ?? salon?.location),
+      }),
     },
   },
   {
@@ -578,24 +1003,128 @@ const WEBSITE_STARTER_TEMPLATES: StarterTemplate[] = [
     role: "Makeup Studio",
     description: "Elegant pink beauty studio. Bridal, makeup & nail portfolio.",
     theme: BEAUTY_THEME,
-    visibleOrder: ["hero", "about", "services", "packages", "staff", "gallery", "offers", "contact"],
+    visibleOrder: [
+      "hero",
+      "about",
+      "services",
+      "packages",
+      "staff",
+      "gallery",
+      "offers",
+      "contact",
+    ],
     content: {
-      hero: ({ salon }) => ({ heading: salon?.name ?? "Professional Beauty Studio", subheading: "Bridal · Party · Editorial Makeup", description: "Expert makeup artists creating flawless looks for your special day.", buttonText: "See Packages", buttonLink: "#packages", imageUrl: "" }),
-      about: ({ salon }) => ({ heading: "About The Studio", body: `${salon?.name ?? "Our studio"} specialises in bridal, party and editorial makeup with premium products and airbrush finish.` }),
-      services: ({ services }) => ({ heading: "Beauty Services", description: "Makeup, hair and nail services.", items: demoServiceItems(services, BEAUTY_SERVICES.slice(0, 6)) }),
-      packages: () => ({ heading: "Bridal Packages", description: "Ready-made packages for your big day.", items: [
-        { id: newId(), name: "Classic Bridal", price: "14999", description: "HD makeup + hair styling + saree draping.", duration: "3 hours" },
-        { id: newId(), name: "Premium Bridal", price: "24999", description: "Trial + wedding + reception looks.", duration: "Full day" },
-      ] }),
-      staff: () => ({ heading: "Our Artists", description: "Certified makeup and nail artists.", items: DEMO_STAFF }),
-      gallery: () => ({ heading: "Portfolio", description: "Recent bridal and party looks.", items: [], gridAspect: "portrait", gridColumns: 3, imageFit: "cover", gridGap: 12 }),
-      offers: () => ({ heading: "Seasonal Offers", description: "Book early and save more.", items: [
-        { id: newId(), name: "Trial + Wedding", discount: "10% OFF", description: "Book trial and wedding together." },
-      ] }),
-      contact: ({ salon }) => ({ heading: "Book Consultation", description: "Share your event date and location.", phone: salon?.phone ?? "", whatsapp: salon?.phone ?? "", email: "", address: salon?.address ?? salon?.location ?? "", mapEmbed: mapsEmbedFromAddress(salon?.address ?? salon?.location) }),
+      hero: ({ salon }) => ({
+        heading: salon?.name ?? "Professional Beauty Studio",
+        subheading: "Bridal · Party · Editorial Makeup",
+        description: "Expert makeup artists creating flawless looks for your special day.",
+        buttonText: "See Packages",
+        buttonLink: "#packages",
+        imageUrl: "",
+      }),
+      about: ({ salon }) => ({
+        heading: "About The Studio",
+        body: `${salon?.name ?? "Our studio"} specialises in bridal, party and editorial makeup with premium products and airbrush finish.`,
+      }),
+      services: ({ services }) => ({
+        heading: "Beauty Services",
+        description: "Makeup, hair and nail services.",
+        items: demoServiceItems(services, BEAUTY_SERVICES.slice(0, 6)),
+      }),
+      packages: () => ({
+        heading: "Bridal Packages",
+        description: "Ready-made packages for your big day.",
+        items: [
+          {
+            id: newId(),
+            name: "Classic Bridal",
+            price: "14999",
+            description: "HD makeup + hair styling + saree draping.",
+            duration: "3 hours",
+          },
+          {
+            id: newId(),
+            name: "Premium Bridal",
+            price: "24999",
+            description: "Trial + wedding + reception looks.",
+            duration: "Full day",
+          },
+        ],
+      }),
+      staff: () => ({
+        heading: "Our Artists",
+        description: "Certified makeup and nail artists.",
+        items: DEMO_STAFF,
+      }),
+      gallery: () => ({
+        heading: "Portfolio",
+        description: "Recent bridal and party looks.",
+        items: [],
+        gridAspect: "portrait",
+        gridColumns: 3,
+        imageFit: "cover",
+        gridGap: 12,
+      }),
+      offers: () => ({
+        heading: "Seasonal Offers",
+        description: "Book early and save more.",
+        items: [
+          {
+            id: newId(),
+            name: "Trial + Wedding",
+            discount: "10% OFF",
+            description: "Book trial and wedding together.",
+          },
+        ],
+      }),
+      contact: ({ salon }) => ({
+        heading: "Book Consultation",
+        description: "Share your event date and location.",
+        phone: salon?.phone ?? "",
+        whatsapp: salon?.phone ?? "",
+        email: "",
+        address: salon?.address ?? salon?.location ?? "",
+        mapEmbed: mapsEmbedFromAddress(salon?.address ?? salon?.location),
+      }),
     },
   },
 ];
+
+function starterFromCatalog(template: TemplateCatalogItem): StarterTemplate {
+  const categoryBase =
+    template.category === "Barber"
+      ? WEBSITE_STARTER_TEMPLATES[1]
+      : template.category === "Beauty Parlour" || template.category === "Nail Art"
+        ? WEBSITE_STARTER_TEMPLATES[2]
+        : WEBSITE_STARTER_TEMPLATES[0];
+  return {
+    ...categoryBase,
+    key: template.key,
+    name: template.name,
+    description: template.description,
+    visibleOrder: template.visibleOrder,
+    theme: {
+      ...categoryBase.theme,
+      primary_color: template.primary,
+      secondary_color: template.secondary,
+      accent_color: template.secondary,
+      background_color: template.background,
+      text_color: template.text,
+      heading_font: template.headingFont,
+      body_font: template.bodyFont,
+      button_style: template.buttonStyle,
+      extras: {
+        ...categoryBase.theme.extras,
+        header_bg: template.background,
+        header_text: template.text,
+        link_color: template.primary,
+        hero_layout: template.heroStyle,
+      } as ThemeExtras,
+    },
+  };
+}
+
+const CATEGORY_STARTER_TEMPLATES = TEMPLATE_CATALOG.map(starterFromCatalog);
 
 export function WebsiteEditorPage() {
   const fetchSalons = useServerFn(getMyOwnedSalons);
@@ -610,8 +1139,7 @@ export function WebsiteEditorPage() {
   const doSaveVersion = useServerFn(saveDraftVersion);
   const doRestoreVersion = useServerFn(restoreWebsiteVersion);
   const fetchVersionSnapshot = useServerFn(getWebsiteVersionSnapshot);
-
-
+  const saveTemplateSelection = useServerFn(saveWebsiteTemplateSelection);
 
   const salonsQ = useQuery({ queryKey: ["my-owned-salons-editor"], queryFn: () => fetchSalons() });
   const selectedSalon = salonsQ.data?.[0]?.salon as (SalonBasics & { id?: string }) | undefined;
@@ -644,6 +1172,9 @@ export function WebsiteEditorPage() {
   const [publishing, setPublishing] = useState(false);
   // Templates are shown as a fixed set of 3; no role filter needed.
   const [applyingTemplate, setApplyingTemplate] = useState<string | null>(null);
+  const [templateGalleryOpen, setTemplateGalleryOpen] = useState(false);
+  const [templateToApply, setTemplateToApply] = useState<TemplateCatalogItem | null>(null);
+  const [selectedTemplateKey, setSelectedTemplateKey] = useState<string | null>(null);
   const saveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const themeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -652,13 +1183,16 @@ export function WebsiteEditorPage() {
   useEffect(() => {
     if (bundleQ.data?.sections) {
       setLocalSections(bundleQ.data.sections);
-      if (!selectedId && !showTheme && bundleQ.data.sections.length) setSelectedId(bundleQ.data.sections[0].id);
+      if (!selectedId && !showTheme && bundleQ.data.sections.length)
+        setSelectedId(bundleQ.data.sections[0].id);
     }
     if (bundleQ.data?.theme) {
       const t = bundleQ.data.theme as Partial<ThemeState> & { extras?: unknown };
       const extras = { ...DEFAULT_EXTRAS, ...(t.extras as ThemeExtras | undefined) };
       setLocalTheme({ ...DEFAULT_THEME, ...t, extras });
     }
+    if (bundleQ.data?.website?.template_key)
+      setSelectedTemplateKey(bundleQ.data.website.template_key);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bundleQ.data]);
 
@@ -781,7 +1315,11 @@ export function WebsiteEditorPage() {
     }
   }
   function stableStringify(v: unknown): string {
-    try { return JSON.stringify(v); } catch { return ""; }
+    try {
+      return JSON.stringify(v);
+    } catch {
+      return "";
+    }
   }
   function diffObjects(a: Record<string, unknown>, b: Record<string, unknown>): string[] {
     const keys = new Set([...Object.keys(a ?? {}), ...Object.keys(b ?? {})]);
@@ -803,12 +1341,19 @@ export function WebsiteEditorPage() {
     setDiffResult(null);
     try {
       const snap = await fetchVersionSnapshot({ data: { versionId: v.id } });
-      const oldSections = (snap.sections as unknown as Array<{ id?: string; section_type: string; content: unknown; is_visible?: boolean; sort_order?: number }>) ?? [];
+      const oldSections =
+        (snap.sections as unknown as Array<{
+          id?: string;
+          section_type: string;
+          content: unknown;
+          is_visible?: boolean;
+          sort_order?: number;
+        }>) ?? [];
       const newSections = localSections;
 
       // Match by id when present, else fall back by section_type order.
-      const oldById = new Map<string, typeof oldSections[number]>();
-      const oldByType: Record<string, typeof oldSections[number][]> = {};
+      const oldById = new Map<string, (typeof oldSections)[number]>();
+      const oldByType: Record<string, (typeof oldSections)[number][]> = {};
       for (const s of oldSections) {
         if (s.id) oldById.set(s.id, s);
         (oldByType[s.section_type] ??= []).push(s);
@@ -817,7 +1362,8 @@ export function WebsiteEditorPage() {
       const sectionChanges: DiffChange[] = [];
 
       for (const cur of newSections) {
-        const label = (SECTION_LABELS as Record<string, string>)[cur.section_type] ?? cur.section_type;
+        const label =
+          (SECTION_LABELS as Record<string, string>)[cur.section_type] ?? cur.section_type;
         let match = cur.id && oldById.has(cur.id) ? oldById.get(cur.id)! : undefined;
         if (!match) {
           const bucket = oldByType[cur.section_type] ?? [];
@@ -830,7 +1376,9 @@ export function WebsiteEditorPage() {
         if (match.id) usedOldIds.add(match.id);
         const details: string[] = [];
         if ((match.is_visible ?? true) !== (cur.is_visible ?? true)) {
-          details.push(`visibility: ${match.is_visible === false ? "hidden" : "visible"} → ${cur.is_visible === false ? "hidden" : "visible"}`);
+          details.push(
+            `visibility: ${match.is_visible === false ? "hidden" : "visible"} → ${cur.is_visible === false ? "hidden" : "visible"}`,
+          );
         }
         if (stableStringify(match.content) !== stableStringify(cur.content)) {
           const inner = diffObjects(
@@ -850,27 +1398,41 @@ export function WebsiteEditorPage() {
           const stillThere = newSections.some((n) => n.section_type === s.section_type);
           if (stillThere) continue;
         } else if (newSections.some((n) => n.id === s.id)) continue;
-        sectionChanges.push({ kind: "removed", label: (SECTION_LABELS as Record<string, string>)[s.section_type] ?? s.section_type });
+        sectionChanges.push({
+          kind: "removed",
+          label: (SECTION_LABELS as Record<string, string>)[s.section_type] ?? s.section_type,
+        });
       }
 
       // Theme diff
       const oldTheme = (snap.theme as Record<string, unknown> | null) ?? {};
       const themeFields = [
-        "primary_color", "secondary_color", "accent_color", "background_color",
-        "text_color", "heading_font", "body_font", "button_style",
+        "primary_color",
+        "secondary_color",
+        "accent_color",
+        "background_color",
+        "text_color",
+        "heading_font",
+        "body_font",
+        "button_style",
       ] as const;
       const themeChanges: DiffChange[] = [];
       for (const k of themeFields) {
         const ov = oldTheme[k];
         const nv = (localTheme as unknown as Record<string, unknown>)[k];
         if (stableStringify(ov) !== stableStringify(nv)) {
-          themeChanges.push({ kind: "modified", label: k.replace(/_/g, " "), details: [`${shortValue(ov)} → ${shortValue(nv)}`] });
+          themeChanges.push({
+            kind: "modified",
+            label: k.replace(/_/g, " "),
+            details: [`${shortValue(ov)} → ${shortValue(nv)}`],
+          });
         }
       }
       const oldExtras = (oldTheme.extras as Record<string, unknown>) ?? {};
       const newExtras = (localTheme.extras as unknown as Record<string, unknown>) ?? {};
       const extraDiff = diffObjects(oldExtras, newExtras);
-      if (extraDiff.length) themeChanges.push({ kind: "modified", label: "extras", details: extraDiff });
+      if (extraDiff.length)
+        themeChanges.push({ kind: "modified", label: "extras", details: extraDiff });
 
       setDiffResult({ sections: sectionChanges, theme: themeChanges });
     } catch (e) {
@@ -880,7 +1442,6 @@ export function WebsiteEditorPage() {
       setDiffLoading(false);
     }
   }
-
 
   async function refreshVersions() {
     if (!websiteId) return;
@@ -953,9 +1514,6 @@ export function WebsiteEditorPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [websiteId]);
 
-
-
-
   async function handlePublish() {
     if (!websiteId) return;
     setPublishing(true);
@@ -1003,7 +1561,10 @@ export function WebsiteEditorPage() {
     const oldIndex = localSections.findIndex((s) => s.id === active.id);
     const newIndex = localSections.findIndex((s) => s.id === over.id);
     if (oldIndex < 0 || newIndex < 0) return;
-    const next = arrayMove(localSections, oldIndex, newIndex).map((s, i) => ({ ...s, sort_order: i }));
+    const next = arrayMove(localSections, oldIndex, newIndex).map((s, i) => ({
+      ...s,
+      sort_order: i,
+    }));
     setLocalSections(next);
     markDirty();
     try {
@@ -1016,7 +1577,7 @@ export function WebsiteEditorPage() {
     }
   }
 
-  async function applyStarterTemplate(template: StarterTemplate) {
+  async function applyStarterTemplate(template: StarterTemplate, catalog?: TemplateCatalogItem) {
     if (!websiteId) return;
     setApplyingTemplate(template.key);
     try {
@@ -1030,7 +1591,9 @@ export function WebsiteEditorPage() {
       const services = (ownerServicesQ.data ?? []) as OwnerServiceOption[];
       const ctx = { salon: selectedSalon, services };
       const visible = new Set<SectionType>(template.visibleOrder);
-      const order = new Map<SectionType, number>(template.visibleOrder.map((type, index) => [type, index]));
+      const order = new Map<SectionType, number>(
+        template.visibleOrder.map((type, index) => [type, index]),
+      );
       const nextTheme = {
         ...template.theme,
         extras: { ...DEFAULT_EXTRAS, ...template.theme.extras },
@@ -1039,9 +1602,17 @@ export function WebsiteEditorPage() {
         .map((section, index) => {
           const buildContent = template.content[section.section_type];
           const currentContent = (section.content ?? {}) as Record<string, unknown>;
+          const generatedContent = buildContent ? buildContent(ctx) : {};
+          const preservedContent = Object.fromEntries(
+            Object.entries(currentContent).filter(([, value]) => {
+              if (value === null || value === undefined || value === "") return false;
+              if (Array.isArray(value)) return value.length > 0;
+              return true;
+            }),
+          );
           return {
             ...section,
-            content: (buildContent ? { ...currentContent, ...buildContent(ctx) } : currentContent) as WebsiteSection["content"],
+            content: { ...generatedContent, ...preservedContent } as WebsiteSection["content"],
             is_visible: visible.has(section.section_type),
             sort_order: order.get(section.section_type) ?? template.visibleOrder.length + index,
           };
@@ -1051,7 +1622,9 @@ export function WebsiteEditorPage() {
       setSaving(true);
       setLocalTheme(nextTheme);
       setLocalSections(nextSections);
-      setSelectedId(nextSections.find((section) => section.is_visible)?.id ?? nextSections[0]?.id ?? null);
+      setSelectedId(
+        nextSections.find((section) => section.is_visible)?.id ?? nextSections[0]?.id ?? null,
+      );
       setShowTheme(false);
 
       await saveTheme({ data: { websiteId, patch: nextTheme } });
@@ -1068,15 +1641,21 @@ export function WebsiteEditorPage() {
         ),
       );
       await saveOrder({ data: { websiteId, order: nextSections.map((section) => section.id) } });
+      if (catalog) {
+        await saveTemplateSelection({
+          data: { websiteId, templateKey: catalog.key, businessCategory: catalog.category },
+        });
+        setSelectedTemplateKey(catalog.key);
+      }
       toast.success(`${template.name} applied`);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Template apply failed");
     } finally {
       setSaving(false);
       setApplyingTemplate(null);
+      setTemplateToApply(null);
     }
   }
-
 
   if (salonsQ.isLoading || websiteQ.isLoading || bundleQ.isLoading) {
     return (
@@ -1116,7 +1695,10 @@ export function WebsiteEditorPage() {
         <div className="flex shrink-0 items-center gap-2">
           <Button
             variant="outline"
-            onClick={() => { setVersionsOpen(true); void refreshVersions(); }}
+            onClick={() => {
+              setVersionsOpen(true);
+              void refreshVersions();
+            }}
             disabled={!websiteId}
           >
             <History className="mr-2 h-4 w-4" />
@@ -1127,55 +1709,108 @@ export function WebsiteEditorPage() {
             onClick={handleSaveVersion}
             disabled={savingVersion || !websiteId}
           >
-            {savingVersion ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+            {savingVersion ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Save className="mr-2 h-4 w-4" />
+            )}
             Save draft
           </Button>
           <Button onClick={handlePublish} disabled={publishing || !websiteId}>
-            {publishing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Globe className="mr-2 h-4 w-4" />}
+            {publishing ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Globe className="mr-2 h-4 w-4" />
+            )}
             Final Save &amp; Publish
           </Button>
         </div>
       </header>
 
-
+      <TemplateGalleryDialog
+        open={templateGalleryOpen}
+        onOpenChange={setTemplateGalleryOpen}
+        templates={TEMPLATE_CATALOG}
+        selectedKey={selectedTemplateKey}
+        applyingKey={applyingTemplate}
+        initialCategory={bundleQ.data?.website?.business_category}
+        onApply={(template) => setTemplateToApply(template)}
+      />
+      <Dialog
+        open={!!templateToApply}
+        onOpenChange={(open) => {
+          if (!open) setTemplateToApply(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Apply {templateToApply?.name}?</DialogTitle>
+            <DialogDescription>
+              Changing the template may replace the current layout and design. Your business
+              details, services, contact information and uploaded media will remain safe.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTemplateToApply(null)}>
+              Cancel
+            </Button>
+            <Button
+              disabled={!templateToApply || !!applyingTemplate}
+              onClick={() => {
+                if (!templateToApply) return;
+                const starter = CATEGORY_STARTER_TEMPLATES.find(
+                  (item) => item.key === templateToApply.key,
+                );
+                if (starter) void applyStarterTemplate(starter, templateToApply);
+              }}
+            >
+              {applyingTemplate && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Apply Template
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid flex-1 grid-cols-[240px_1fr_1fr] overflow-hidden">
         {/* Section list */}
         <aside className="overflow-y-auto border-r bg-muted/30 p-3">
           <div className="mb-4 rounded-lg border bg-background p-3 shadow-sm">
             <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase text-muted-foreground">
-              <Wand2 className="h-3.5 w-3.5" /> Ready Templates
+              <Wand2 className="h-3.5 w-3.5" /> Website Template
             </div>
-            <p className="mb-2 text-[11px] text-muted-foreground">
-              Pick one of our 3 ready templates — content, colours and layout are pre-filled. Just edit and publish.
+            <p className="hidden">
+              Pick one of our 3 ready templates — content, colours and layout are pre-filled. Just
+              edit and publish.
             </p>
-            <div className="space-y-2">
-              {["royal-luxe", "urban-pro", "professional-beauty"]
-                .map((key) => WEBSITE_STARTER_TEMPLATES.find((t) => t.key === key))
-                .filter((t): t is StarterTemplate => Boolean(t))
-                .map((template) => (
-                  <button
-                    key={template.key}
-                    type="button"
-                    onClick={() => void applyStarterTemplate(template)}
-                    disabled={!!applyingTemplate || !websiteId}
-                    className="w-full rounded-md border p-2 text-left text-xs transition hover:border-primary hover:bg-muted/50 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    <span className="flex items-center justify-between gap-2 font-semibold">
-                      {template.name}
-                      {applyingTemplate === template.key && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                    </span>
-                    <span className="mt-1 block text-[11px] leading-snug text-muted-foreground">{template.description}</span>
-                  </button>
-                ))}
-            </div>
+            <p className="mb-3 text-[11px] text-muted-foreground">
+              {selectedTemplateKey
+                ? `${TEMPLATE_CATALOG.find((item) => item.key === selectedTemplateKey)?.name ?? "Custom template"} is selected.`
+                : "Choose from 21 professional designs across seven business categories."}
+            </p>
+            <Button
+              type="button"
+              size="sm"
+              className="w-full"
+              onClick={() => setTemplateGalleryOpen(true)}
+              disabled={!websiteId}
+            >
+              <Wand2 className="mr-2 h-4 w-4" />{" "}
+              {selectedTemplateKey ? "Change Template" : "Choose Template"}
+            </Button>
           </div>
           <div className="mb-2 flex items-center justify-between">
             <div className="text-xs font-semibold uppercase text-muted-foreground">Sections</div>
             <div className="text-[10px] text-muted-foreground">Drag to reorder</div>
           </div>
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={localSections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={localSections.map((s) => s.id)}
+              strategy={verticalListSortingStrategy}
+            >
               <ul className="space-y-1">
                 {localSections.map((s) => (
                   <SortableSectionItem
@@ -1183,7 +1818,10 @@ export function WebsiteEditorPage() {
                     section={s}
                     label={SECTION_LABELS[s.section_type]}
                     active={selectedId === s.id && !showTheme}
-                    onSelect={() => { setSelectedId(s.id); setShowTheme(false); }}
+                    onSelect={() => {
+                      setSelectedId(s.id);
+                      setShowTheme(false);
+                    }}
                     onToggleVisible={() => patchSection(s.id, { is_visible: !s.is_visible })}
                   />
                 ))}
@@ -1191,7 +1829,9 @@ export function WebsiteEditorPage() {
             </SortableContext>
           </DndContext>
 
-          <div className="mt-4 mb-2 text-xs font-semibold uppercase text-muted-foreground">Design</div>
+          <div className="mt-4 mb-2 text-xs font-semibold uppercase text-muted-foreground">
+            Design
+          </div>
           <button
             onClick={() => setShowTheme(true)}
             className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm ${
@@ -1217,9 +1857,6 @@ export function WebsiteEditorPage() {
               onFieldChange={updateContent}
               onToggleVisible={(v) => patchSection(selected.id, { is_visible: v })}
             />
-
-
-
           ) : (
             <p className="text-muted-foreground">Select a section to edit</p>
           )}
@@ -1229,14 +1866,21 @@ export function WebsiteEditorPage() {
         <section className="flex flex-col overflow-hidden border-l bg-muted/20">
           <div className="flex items-center justify-between border-b bg-background/60 px-3 py-2">
             <span className="text-xs font-medium text-muted-foreground">
-              Preview · {previewDevice === "desktop" ? "Desktop" : previewDevice === "tablet" ? "Tablet 768px" : "Mobile 390px"}
+              Preview ·{" "}
+              {previewDevice === "desktop"
+                ? "Desktop"
+                : previewDevice === "tablet"
+                  ? "Tablet 768px"
+                  : "Mobile 390px"}
             </span>
             <div className="inline-flex rounded-md border bg-background p-0.5">
-              {([
-                { key: "desktop", icon: Monitor, label: "Desktop" },
-                { key: "tablet", icon: Tablet, label: "Tablet" },
-                { key: "mobile", icon: Smartphone, label: "Mobile" },
-              ] as const).map(({ key, icon: Icon, label }) => {
+              {(
+                [
+                  { key: "desktop", icon: Monitor, label: "Desktop" },
+                  { key: "tablet", icon: Tablet, label: "Tablet" },
+                  { key: "mobile", icon: Smartphone, label: "Mobile" },
+                ] as const
+              ).map(({ key, icon: Icon, label }) => {
                 const active = previewDevice === key;
                 return (
                   <button
@@ -1244,7 +1888,9 @@ export function WebsiteEditorPage() {
                     type="button"
                     onClick={() => setPreviewDevice(key)}
                     className={`inline-flex h-7 items-center gap-1 rounded px-2 text-xs transition ${
-                      active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
+                      active
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:bg-muted"
                     }`}
                     title={label}
                     aria-label={label}
@@ -1290,7 +1936,8 @@ export function WebsiteEditorPage() {
           <DialogHeader>
             <DialogTitle>Draft history</DialogTitle>
             <DialogDescription>
-              Auto-saved every 2 minutes while you edit. Restore any snapshot to switch back to that draft.
+              Auto-saved every 2 minutes while you edit. Restore any snapshot to switch back to that
+              draft.
             </DialogDescription>
           </DialogHeader>
           <div className="max-h-[60vh] overflow-y-auto">
@@ -1338,11 +1985,19 @@ export function WebsiteEditorPage() {
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => void refreshVersions()} disabled={versionsLoading}>
+            <Button
+              variant="outline"
+              onClick={() => void refreshVersions()}
+              disabled={versionsLoading}
+            >
               Refresh
             </Button>
             <Button onClick={handleSaveVersion} disabled={savingVersion || !websiteId}>
-              {savingVersion ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+              {savingVersion ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="mr-2 h-4 w-4" />
+              )}
               Save current as draft
             </Button>
           </DialogFooter>
@@ -1366,7 +2021,9 @@ export function WebsiteEditorPage() {
             ) : (
               <>
                 <div>
-                  <div className="mb-1 text-xs font-semibold uppercase text-muted-foreground">Sections</div>
+                  <div className="mb-1 text-xs font-semibold uppercase text-muted-foreground">
+                    Sections
+                  </div>
                   {diffResult.sections.length === 0 ? (
                     <p className="text-xs text-muted-foreground">No section changes.</p>
                   ) : (
@@ -1378,7 +2035,9 @@ export function WebsiteEditorPage() {
                           </div>
                           {c.kind === "modified" && (
                             <ul className="mt-1 list-disc pl-5 text-xs text-muted-foreground">
-                              {c.details.map((d, j) => <li key={j}>{d}</li>)}
+                              {c.details.map((d, j) => (
+                                <li key={j}>{d}</li>
+                              ))}
                             </ul>
                           )}
                         </li>
@@ -1387,7 +2046,9 @@ export function WebsiteEditorPage() {
                   )}
                 </div>
                 <div>
-                  <div className="mb-1 text-xs font-semibold uppercase text-muted-foreground">Theme</div>
+                  <div className="mb-1 text-xs font-semibold uppercase text-muted-foreground">
+                    Theme
+                  </div>
                   {diffResult.theme.length === 0 ? (
                     <p className="text-xs text-muted-foreground">No theme changes.</p>
                   ) : (
@@ -1397,7 +2058,9 @@ export function WebsiteEditorPage() {
                           <div className="font-medium">{c.label}</div>
                           {c.kind === "modified" && (
                             <ul className="mt-1 list-disc pl-5 text-xs text-muted-foreground">
-                              {c.details.map((d, j) => <li key={j}>{d}</li>)}
+                              {c.details.map((d, j) => (
+                                <li key={j}>{d}</li>
+                              ))}
                             </ul>
                           )}
                         </li>
@@ -1458,38 +2121,102 @@ function SectionEditor({
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">{SECTION_LABELS[section.section_type]}</h2>
         <div className="flex items-center gap-2">
-          <Label htmlFor="visible" className="text-sm">Show</Label>
+          <Label htmlFor="visible" className="text-sm">
+            Show
+          </Label>
           <Switch id="visible" checked={section.is_visible} onCheckedChange={onToggleVisible} />
         </div>
       </div>
 
       {section.section_type === "hero" && (
         <>
-          <Field label="Heading" value={str("heading")} onChange={(v) => onFieldChange("heading", v)} />
-          <Field label="Sub-heading" value={str("subheading")} onChange={(v) => onFieldChange("subheading", v)} />
-          <TextField label="Description" value={str("description")} onChange={(v) => onFieldChange("description", v)} />
-          <Field label="Button Text" value={str("buttonText")} onChange={(v) => onFieldChange("buttonText", v)} />
-          <Field label="Button Link" value={str("buttonLink")} onChange={(v) => onFieldChange("buttonLink", v)} />
-          <ImageField label="Background Image" value={str("imageUrl")} salonId={salonId} websiteId={websiteId} folder="hero" onChange={(v) => onFieldChange("imageUrl", v)} />
+          <Field
+            label="Heading"
+            value={str("heading")}
+            onChange={(v) => onFieldChange("heading", v)}
+          />
+          <Field
+            label="Sub-heading"
+            value={str("subheading")}
+            onChange={(v) => onFieldChange("subheading", v)}
+          />
+          <TextField
+            label="Description"
+            value={str("description")}
+            onChange={(v) => onFieldChange("description", v)}
+          />
+          <Field
+            label="Button Text"
+            value={str("buttonText")}
+            onChange={(v) => onFieldChange("buttonText", v)}
+          />
+          <Field
+            label="Button Link"
+            value={str("buttonLink")}
+            onChange={(v) => onFieldChange("buttonLink", v)}
+          />
+          <ImageField
+            label="Background Image"
+            value={str("imageUrl")}
+            salonId={salonId}
+            websiteId={websiteId}
+            folder="hero"
+            onChange={(v) => onFieldChange("imageUrl", v)}
+          />
         </>
       )}
 
       {section.section_type === "about" && (
         <>
-          <Field label="Heading" value={str("heading")} onChange={(v) => onFieldChange("heading", v)} />
-          <TextField label="Description" value={str("body")} onChange={(v) => onFieldChange("body", v)} />
-          <Field label="Button Text" value={str("buttonText")} onChange={(v) => onFieldChange("buttonText", v)} />
-          <Field label="Button Link" value={str("buttonLink")} onChange={(v) => onFieldChange("buttonLink", v)} />
-          <ImageField label="Image" value={str("imageUrl")} salonId={salonId} websiteId={websiteId} folder="about" onChange={(v) => onFieldChange("imageUrl", v)} />
+          <Field
+            label="Heading"
+            value={str("heading")}
+            onChange={(v) => onFieldChange("heading", v)}
+          />
+          <TextField
+            label="Description"
+            value={str("body")}
+            onChange={(v) => onFieldChange("body", v)}
+          />
+          <Field
+            label="Button Text"
+            value={str("buttonText")}
+            onChange={(v) => onFieldChange("buttonText", v)}
+          />
+          <Field
+            label="Button Link"
+            value={str("buttonLink")}
+            onChange={(v) => onFieldChange("buttonLink", v)}
+          />
+          <ImageField
+            label="Image"
+            value={str("imageUrl")}
+            salonId={salonId}
+            websiteId={websiteId}
+            folder="about"
+            onChange={(v) => onFieldChange("imageUrl", v)}
+          />
         </>
       )}
 
       {section.section_type === "contact" && (
         <>
-          <Field label="Heading" value={str("heading")} onChange={(v) => onFieldChange("heading", v)} />
-          <TextField label="Description" value={str("description")} onChange={(v) => onFieldChange("description", v)} />
+          <Field
+            label="Heading"
+            value={str("heading")}
+            onChange={(v) => onFieldChange("heading", v)}
+          />
+          <TextField
+            label="Description"
+            value={str("description")}
+            onChange={(v) => onFieldChange("description", v)}
+          />
           <Field label="Phone" value={str("phone")} onChange={(v) => onFieldChange("phone", v)} />
-          <Field label="WhatsApp" value={str("whatsapp")} onChange={(v) => onFieldChange("whatsapp", v)} />
+          <Field
+            label="WhatsApp"
+            value={str("whatsapp")}
+            onChange={(v) => onFieldChange("whatsapp", v)}
+          />
           <Field label="Email" value={str("email")} onChange={(v) => onFieldChange("email", v)} />
           <MapEmbedControls
             address={str("address")}
@@ -1506,8 +2233,16 @@ function SectionEditor({
         section.section_type === "packages" ||
         section.section_type === "staff") && (
         <>
-          <Field label="Heading" value={str("heading")} onChange={(v) => onFieldChange("heading", v)} />
-          <TextField label="Description" value={str("description")} onChange={(v) => onFieldChange("description", v)} />
+          <Field
+            label="Heading"
+            value={str("heading")}
+            onChange={(v) => onFieldChange("heading", v)}
+          />
+          <TextField
+            label="Description"
+            value={str("description")}
+            onChange={(v) => onFieldChange("description", v)}
+          />
           <ItemsEditor
             kind={section.section_type}
             items={items}
@@ -1524,18 +2259,36 @@ function SectionEditor({
         section.section_type === "gallery" ||
         section.section_type === "blog") && (
         <>
-          <Field label="Heading" value={str("heading")} onChange={(v) => onFieldChange("heading", v)} />
-          <TextField label="Description" value={str("description")} onChange={(v) => onFieldChange("description", v)} />
+          <Field
+            label="Heading"
+            value={str("heading")}
+            onChange={(v) => onFieldChange("heading", v)}
+          />
+          <TextField
+            label="Description"
+            value={str("description")}
+            onChange={(v) => onFieldChange("description", v)}
+          />
           {section.section_type !== "gallery" && (
             <>
-              <Field label="Button Text" value={str("buttonText")} onChange={(v) => onFieldChange("buttonText", v)} />
-              <Field label="Button Link" value={str("buttonLink")} onChange={(v) => onFieldChange("buttonLink", v)} />
+              <Field
+                label="Button Text"
+                value={str("buttonText")}
+                onChange={(v) => onFieldChange("buttonText", v)}
+              />
+              <Field
+                label="Button Link"
+                value={str("buttonLink")}
+                onChange={(v) => onFieldChange("buttonLink", v)}
+              />
             </>
           )}
           {section.section_type === "gallery" && (
             <GalleryGridControls
               gridAspect={(content.gridAspect as string) || "square"}
-              gridColumns={typeof content.gridColumns === "number" ? (content.gridColumns as number) : 4}
+              gridColumns={
+                typeof content.gridColumns === "number" ? (content.gridColumns as number) : 4
+              }
               imageFit={(content.imageFit as string) || "cover"}
               gap={typeof content.gridGap === "number" ? (content.gridGap as number) : 12}
               onChange={(patch) => {
@@ -1556,7 +2309,6 @@ function SectionEditor({
   );
 }
 
-
 type Item = {
   id: string;
   name?: string;
@@ -1573,9 +2325,8 @@ type Item = {
   thumbShape?: "square" | "portrait" | "landscape" | "wide" | "auto"; // per-image override
 };
 
-
 function newId() {
-  return (typeof crypto !== "undefined" && "randomUUID" in crypto)
+  return typeof crypto !== "undefined" && "randomUUID" in crypto
     ? crypto.randomUUID()
     : `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
@@ -1585,17 +2336,28 @@ function RoleSelect({ value, onChange }: { value: string; onChange: (v: string) 
   return (
     <div className="space-y-1.5">
       <Label>Role</Label>
-      <Select value={custom ? "custom" : value} onValueChange={(v) => onChange(v === "custom" ? value : v)}>
-        <SelectTrigger><SelectValue placeholder="Choose role" /></SelectTrigger>
+      <Select
+        value={custom ? "custom" : value}
+        onValueChange={(v) => onChange(v === "custom" ? value : v)}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Choose role" />
+        </SelectTrigger>
         <SelectContent>
           {STAFF_ROLE_OPTIONS.map((role) => (
-            <SelectItem key={role} value={role}>{role}</SelectItem>
+            <SelectItem key={role} value={role}>
+              {role}
+            </SelectItem>
           ))}
           <SelectItem value="custom">Custom role</SelectItem>
         </SelectContent>
       </Select>
       {(custom || value === "") && (
-        <Input placeholder="Type custom role" value={value} onChange={(e) => onChange(e.target.value)} />
+        <Input
+          placeholder="Type custom role"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        />
       )}
     </div>
   );
@@ -1660,7 +2422,11 @@ function MapEmbedControls({
           Generate map from address
         </Button>
         <Button type="button" variant="outline" onClick={useCurrentLocation} disabled={locating}>
-          {locating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <MapPinned className="mr-2 h-4 w-4" />}
+          {locating ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <MapPinned className="mr-2 h-4 w-4" />
+          )}
           Use current location
         </Button>
       </div>
@@ -1679,7 +2445,12 @@ function MapEmbedControls({
       )}
       <Field label="Google Map Embed URL" value={mapEmbed} onChange={onMapEmbedChange} />
       {mapEmbed && (
-        <iframe title="Map preview" src={mapEmbed} className="h-44 w-full rounded-md border-0" loading="lazy" />
+        <iframe
+          title="Map preview"
+          src={mapEmbed}
+          className="h-44 w-full rounded-md border-0"
+          loading="lazy"
+        />
       )}
     </div>
   );
@@ -1708,9 +2479,13 @@ function ItemsEditor({
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
   const addLabel =
-    kind === "services" ? "Add Service" :
-    kind === "rate_card" ? "Add Rate" :
-    kind === "packages" ? "Add Package" : "Add Team Member";
+    kind === "services"
+      ? "Add Service"
+      : kind === "rate_card"
+        ? "Add Rate"
+        : kind === "packages"
+          ? "Add Package"
+          : "Add Team Member";
 
   const patch = (id: string, p: Partial<Item>) =>
     onChange(items.map((it) => (it.id === id ? { ...it, ...p } : it)));
@@ -1753,30 +2528,33 @@ function ItemsEditor({
           </div>
           {serviceOptions.length === 0 ? (
             <p className="rounded-md border border-dashed bg-background p-3 text-xs text-muted-foreground">
-              No saved services yet. Add services from the Services section or create manual items below.
+              No saved services yet. Add services from the Services section or create manual items
+              below.
             </p>
           ) : (
             <div className="max-h-48 space-y-1 overflow-y-auto pr-1">
               {serviceOptions.map((service) => {
-              const selected = selectedServiceIds.has(service.id);
-              return (
-                <button
-                  key={service.id}
-                  type="button"
-                  onClick={() => toggleService(service)}
-                  className={`flex w-full items-center justify-between gap-3 rounded-md border px-3 py-2 text-left text-xs transition ${
-                    selected ? "border-primary bg-primary/10" : "bg-background hover:border-primary/60"
-                  }`}
-                >
-                  <span className="min-w-0">
-                    <span className="block truncate font-medium">{service.name}</span>
-                    <span className="block truncate text-muted-foreground">
-                      {service.category ?? "General"} · {service.duration_minutes ?? 30} min
+                const selected = selectedServiceIds.has(service.id);
+                return (
+                  <button
+                    key={service.id}
+                    type="button"
+                    onClick={() => toggleService(service)}
+                    className={`flex w-full items-center justify-between gap-3 rounded-md border px-3 py-2 text-left text-xs transition ${
+                      selected
+                        ? "border-primary bg-primary/10"
+                        : "bg-background hover:border-primary/60"
+                    }`}
+                  >
+                    <span className="min-w-0">
+                      <span className="block truncate font-medium">{service.name}</span>
+                      <span className="block truncate text-muted-foreground">
+                        {service.category ?? "General"} · {service.duration_minutes ?? 30} min
+                      </span>
                     </span>
-                  </span>
-                  <span className="shrink-0 font-semibold">₹{String(service.price ?? 0)}</span>
-                </button>
-              );
+                    <span className="shrink-0 font-semibold">₹{String(service.price ?? 0)}</span>
+                  </button>
+                );
               })}
             </div>
           )}
@@ -1815,22 +2593,42 @@ function ItemsEditor({
                   onChange={(v) => patch(it.id, { image: v })}
                 />
 
-                <Field label="Name" value={it.name ?? ""} onChange={(v) => patch(it.id, { name: v })} />
+                <Field
+                  label="Name"
+                  value={it.name ?? ""}
+                  onChange={(v) => patch(it.id, { name: v })}
+                />
 
                 {isStaff ? (
                   <>
                     <RoleSelect value={it.role ?? ""} onChange={(v) => patch(it.id, { role: v })} />
-                    <TextField label="Bio" value={it.bio ?? ""} onChange={(v) => patch(it.id, { bio: v })} />
+                    <TextField
+                      label="Bio"
+                      value={it.bio ?? ""}
+                      onChange={(v) => patch(it.id, { bio: v })}
+                    />
                   </>
                 ) : (
                   <>
                     <div className="grid grid-cols-2 gap-2">
-                      <Field label="Price" value={it.price ?? ""} onChange={(v) => patch(it.id, { price: v })} />
+                      <Field
+                        label="Price"
+                        value={it.price ?? ""}
+                        onChange={(v) => patch(it.id, { price: v })}
+                      />
                       {kind !== "packages" && (
-                        <Field label="Duration" value={it.duration ?? ""} onChange={(v) => patch(it.id, { duration: v })} />
+                        <Field
+                          label="Duration"
+                          value={it.duration ?? ""}
+                          onChange={(v) => patch(it.id, { duration: v })}
+                        />
                       )}
                     </div>
-                    <TextField label="Description" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
+                    <TextField
+                      label="Description"
+                      value={it.description ?? ""}
+                      onChange={(v) => patch(it.id, { description: v })}
+                    />
                   </>
                 )}
               </SortableItemCard>
@@ -1856,9 +2654,13 @@ function GenericItemsEditor({
   onChange: (next: Item[]) => void;
 }) {
   const addLabel =
-    kind === "offers" ? "Add Offer" :
-    kind === "membership" ? "Add Plan" :
-    kind === "gallery" ? "Add Image" : "Add Post";
+    kind === "offers"
+      ? "Add Offer"
+      : kind === "membership"
+        ? "Add Plan"
+        : kind === "gallery"
+          ? "Add Image"
+          : "Add Post";
 
   const patch = (id: string, p: Partial<Item>) =>
     onChange(items.map((it) => (it.id === id ? { ...it, ...p } : it)));
@@ -1897,22 +2699,46 @@ function GenericItemsEditor({
 
       {kind === "offers" ? (
         <>
-          <Field label="Discount (e.g. 20% OFF)" value={it.discount ?? ""} onChange={(v) => patch(it.id, { discount: v })} />
-          <TextField label="Description" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
+          <Field
+            label="Discount (e.g. 20% OFF)"
+            value={it.discount ?? ""}
+            onChange={(v) => patch(it.id, { discount: v })}
+          />
+          <TextField
+            label="Description"
+            value={it.description ?? ""}
+            onChange={(v) => patch(it.id, { description: v })}
+          />
         </>
       ) : kind === "membership" ? (
         <>
-          <Field label="Price" value={it.price ?? ""} onChange={(v) => patch(it.id, { price: v })} />
-          <TextField label="Description" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
+          <Field
+            label="Price"
+            value={it.price ?? ""}
+            onChange={(v) => patch(it.id, { price: v })}
+          />
+          <TextField
+            label="Description"
+            value={it.description ?? ""}
+            onChange={(v) => patch(it.id, { description: v })}
+          />
         </>
       ) : kind === "blog" ? (
         <>
           <Field label="Date" value={it.date ?? ""} onChange={(v) => patch(it.id, { date: v })} />
-          <TextField label="Excerpt" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
+          <TextField
+            label="Excerpt"
+            value={it.description ?? ""}
+            onChange={(v) => patch(it.id, { description: v })}
+          />
         </>
       ) : (
         <>
-          <TextField label="Caption" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
+          <TextField
+            label="Caption"
+            value={it.description ?? ""}
+            onChange={(v) => patch(it.id, { description: v })}
+          />
           {it.image && (
             <GalleryImageCropControl
               image={it.image}
@@ -1932,7 +2758,9 @@ function GenericItemsEditor({
         <Label className="text-sm">
           Items ({items.length})
           {kind === "gallery" && items.length > 1 && (
-            <span className="ml-2 text-xs font-normal text-muted-foreground">· drag to reorder</span>
+            <span className="ml-2 text-xs font-normal text-muted-foreground">
+              · drag to reorder
+            </span>
           )}
         </Label>
         <Button type="button" size="sm" variant="secondary" onClick={add}>
@@ -1974,12 +2802,7 @@ function GenericItemsEditor({
           <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
             <ul className="space-y-3">
               {items.map((it, idx) => (
-                <SortableItemCard
-                  key={it.id}
-                  id={it.id}
-                  index={idx}
-                  onRemove={() => remove(it.id)}
-                >
+                <SortableItemCard key={it.id} id={it.id} index={idx} onRemove={() => remove(it.id)}>
                   {renderBody(it)}
                 </SortableItemCard>
               ))}
@@ -1991,12 +2814,7 @@ function GenericItemsEditor({
           <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
             <ul className="space-y-3">
               {items.map((it, idx) => (
-                <SortableItemCard
-                  key={it.id}
-                  id={it.id}
-                  index={idx}
-                  onRemove={() => remove(it.id)}
-                >
+                <SortableItemCard key={it.id} id={it.id} index={idx} onRemove={() => remove(it.id)}>
                   {renderBody(it)}
                 </SortableItemCard>
               ))}
@@ -2019,7 +2837,9 @@ function SortableItemCard({
   onRemove: () => void;
   children: React.ReactNode;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  });
   const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -2051,7 +2871,9 @@ function SortableItemCard({
 }
 
 function GalleryThumbTile({ item, index }: { item: Item; index: number }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: item.id,
+  });
   const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -2088,8 +2910,6 @@ function GalleryThumbTile({ item, index }: { item: Item; index: number }) {
   );
 }
 
-
-
 function SortableSectionItem({
   section,
   label,
@@ -2103,7 +2923,9 @@ function SortableSectionItem({
   onSelect: () => void;
   onToggleVisible: () => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: section.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: section.id,
+  });
   const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -2138,14 +2960,21 @@ function SortableSectionItem({
         </button>
         <button
           type="button"
-          onClick={(e) => { e.stopPropagation(); onToggleVisible(); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleVisible();
+          }}
           className={`flex h-7 w-7 shrink-0 items-center justify-center rounded ${
             active ? "hover:bg-primary-foreground/20" : "hover:bg-background"
           }`}
           aria-label={section.is_visible ? "Hide section" : "Show section"}
           title={section.is_visible ? "Hide section" : "Show section"}
         >
-          {section.is_visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4 opacity-60" />}
+          {section.is_visible ? (
+            <Eye className="h-4 w-4" />
+          ) : (
+            <EyeOff className="h-4 w-4 opacity-60" />
+          )}
         </button>
       </div>
     </li>
@@ -2184,7 +3013,8 @@ function GalleryGridControls({
         <h3 className="text-sm font-semibold uppercase text-muted-foreground">Grid & Thumbnails</h3>
       </div>
       <p className="text-xs text-muted-foreground">
-        Yeh controls sabhi gallery images par apply hoti hain — grid me perfect fit aur consistent look ke liye.
+        Yeh controls sabhi gallery images par apply hoti hain — grid me perfect fit aur consistent
+        look ke liye.
       </p>
 
       <div className="space-y-1.5">
@@ -2242,7 +3072,9 @@ function GalleryGridControls({
       <div className="space-y-1.5">
         <Label>Image Fit</Label>
         <Select value={imageFit} onValueChange={(v) => onChange({ imageFit: v })}>
-          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="cover">Cover — fill the thumbnail (may crop)</SelectItem>
             <SelectItem value="contain">Contain — show entire image (letterbox)</SelectItem>
@@ -2285,11 +3117,15 @@ function GalleryImageCropControl({
           value={thumbShape}
           onValueChange={(v) => onChange({ thumbShape: v as Item["thumbShape"] })}
         >
-          <SelectTrigger className="h-7 w-[140px] text-xs"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="h-7 w-[140px] text-xs">
+            <SelectValue />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="auto">Use grid shape</SelectItem>
             {GRID_ASPECTS.filter((a) => a.value !== "auto").map((a) => (
-              <SelectItem key={a.value} value={a.value}>{a.label}</SelectItem>
+              <SelectItem key={a.value} value={a.value}>
+                {a.label}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -2315,7 +3151,9 @@ function GalleryImageCropControl({
                 type="button"
                 onClick={() => onChange({ objectPosition: p.value })}
                 className={`flex h-8 w-8 items-center justify-center rounded border text-sm transition ${
-                  active ? "border-primary bg-primary text-primary-foreground" : "hover:border-primary/60"
+                  active
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "hover:border-primary/60"
                 }`}
                 title={p.value}
               >
@@ -2402,12 +3240,13 @@ function ImageField({
     toast.success("Image uploaded");
   };
 
-
   return (
     <div className="space-y-1.5">
       <Label>{label}</Label>
       <div className="flex items-center gap-3">
-        <div className={`bg-muted flex ${compact ? "h-16 w-16" : "h-20 w-28"} shrink-0 items-center justify-center overflow-hidden rounded-md border`}>
+        <div
+          className={`bg-muted flex ${compact ? "h-16 w-16" : "h-20 w-28"} shrink-0 items-center justify-center overflow-hidden rounded-md border`}
+        >
           {value ? (
             <img src={value} alt="" className="h-full w-full object-cover" />
           ) : (
@@ -2423,7 +3262,11 @@ function ImageField({
               disabled={uploading}
               onClick={() => inputRef.current?.click()}
             >
-              {uploading ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Upload className="mr-1 h-4 w-4" />}
+              {uploading ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Upload className="mr-1 h-4 w-4" />
+              )}
               Upload
             </Button>
             {value && (
@@ -2489,8 +3332,15 @@ function TextField({
   );
 }
 
-
-function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function ColorField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
   return (
     <div className="space-y-1.5">
       <Label>{label}</Label>
@@ -2501,7 +3351,11 @@ function ColorField({ label, value, onChange }: { label: string; value: string; 
           onChange={(e) => onChange(e.target.value)}
           className="h-10 w-14 cursor-pointer rounded-md border bg-background p-1"
         />
-        <Input value={value} onChange={(e) => onChange(e.target.value)} className="font-mono text-xs" />
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="font-mono text-xs"
+        />
       </div>
     </div>
   );
@@ -2567,7 +3421,13 @@ function saveCustomPresets(list: CustomPreset[]) {
   }
 }
 
-function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch: Partial<ThemeState>) => void }) {
+function ThemeEditor({
+  theme,
+  onChange,
+}: {
+  theme: ThemeState;
+  onChange: (patch: Partial<ThemeState>) => void;
+}) {
   const [customPresets, setCustomPresets] = useState<CustomPreset[]>([]);
   const [saveOpen, setSaveOpen] = useState(false);
   const [presetName, setPresetName] = useState("");
@@ -2608,7 +3468,10 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
     toast.success(`"${name}" preset removed`);
   };
 
-  const renderPresetCard = (p: { key: string; name: string; description?: string; theme: ThemeState }, opts?: { onDelete?: () => void }) => {
+  const renderPresetCard = (
+    p: { key: string; name: string; description?: string; theme: ThemeState },
+    opts?: { onDelete?: () => void },
+  ) => {
     const active =
       theme.primary_color === p.theme.primary_color &&
       theme.secondary_color === p.theme.secondary_color &&
@@ -2630,8 +3493,17 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
         >
           <div className="relative p-2" style={bgPreview}>
             <div className="flex gap-1">
-              {[p.theme.primary_color, p.theme.secondary_color, p.theme.accent_color, p.theme.text_color].map((c, i) => (
-                <span key={i} className="h-4 w-4 rounded-full border border-black/10 shadow-sm" style={{ background: c }} />
+              {[
+                p.theme.primary_color,
+                p.theme.secondary_color,
+                p.theme.accent_color,
+                p.theme.text_color,
+              ].map((c, i) => (
+                <span
+                  key={i}
+                  className="h-4 w-4 rounded-full border border-black/10 shadow-sm"
+                  style={{ background: c }}
+                />
               ))}
             </div>
             <div
@@ -2647,22 +3519,35 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
                 color: p.theme.background_color,
                 fontFamily: p.theme.body_font,
                 borderRadius:
-                  p.theme.button_style === "pill" ? "9999px" :
-                  p.theme.button_style === "square" ? "0" : "4px",
+                  p.theme.button_style === "pill"
+                    ? "9999px"
+                    : p.theme.button_style === "square"
+                      ? "0"
+                      : "4px",
               }}
             >
               Book
             </span>
           </div>
           <div className="border-t bg-card px-2 py-1.5">
-            <div className="truncate text-xs font-semibold" style={{ fontFamily: p.theme.heading_font }}>{p.name}</div>
-            {p.description && <div className="truncate text-[10px] text-muted-foreground">{p.description}</div>}
+            <div
+              className="truncate text-xs font-semibold"
+              style={{ fontFamily: p.theme.heading_font }}
+            >
+              {p.name}
+            </div>
+            {p.description && (
+              <div className="truncate text-[10px] text-muted-foreground">{p.description}</div>
+            )}
           </div>
         </button>
         {opts?.onDelete && (
           <button
             type="button"
-            onClick={(e) => { e.stopPropagation(); opts.onDelete?.(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              opts.onDelete?.();
+            }}
             className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full border bg-background text-destructive shadow-sm hover:bg-destructive hover:text-destructive-foreground"
             title="Delete preset"
             aria-label={`Delete preset ${p.name}`}
@@ -2678,7 +3563,9 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
     <div className="mx-auto max-w-xl space-y-6">
       <div>
         <h2 className="text-xl font-semibold">Theme &amp; Typography</h2>
-        <p className="text-sm text-muted-foreground">Changes apply instantly to the live preview.</p>
+        <p className="text-sm text-muted-foreground">
+          Changes apply instantly to the live preview.
+        </p>
       </div>
 
       <div className="space-y-3 rounded-lg border bg-card p-4">
@@ -2714,14 +3601,30 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
               value={presetName}
               onChange={(e) => setPresetName(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") { e.preventDefault(); handleSavePreset(); }
-                if (e.key === "Escape") { setSaveOpen(false); setPresetName(""); }
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleSavePreset();
+                }
+                if (e.key === "Escape") {
+                  setSaveOpen(false);
+                  setPresetName("");
+                }
               }}
               className="h-8 text-sm"
               maxLength={40}
             />
-            <Button type="button" size="sm" onClick={handleSavePreset}>Save</Button>
-            <Button type="button" size="sm" variant="ghost" onClick={() => { setSaveOpen(false); setPresetName(""); }}>
+            <Button type="button" size="sm" onClick={handleSavePreset}>
+              Save
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                setSaveOpen(false);
+                setPresetName("");
+              }}
+            >
               Cancel
             </Button>
           </div>
@@ -2729,7 +3632,9 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
 
         {customPresets.length > 0 && (
           <div className="space-y-2">
-            <div className="text-[11px] font-medium uppercase text-muted-foreground">My presets</div>
+            <div className="text-[11px] font-medium uppercase text-muted-foreground">
+              My presets
+            </div>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {customPresets.map((p) =>
                 renderPresetCard(
@@ -2751,19 +3656,34 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
         </div>
       </div>
 
-
-
-
-
-
       <div className="space-y-4 rounded-lg border bg-card p-4">
         <h3 className="text-sm font-semibold uppercase text-muted-foreground">Colors</h3>
         <div className="grid grid-cols-2 gap-3">
-          <ColorField label="Primary" value={theme.primary_color} onChange={(v) => onChange({ primary_color: v })} />
-          <ColorField label="Secondary" value={theme.secondary_color} onChange={(v) => onChange({ secondary_color: v })} />
-          <ColorField label="Accent" value={theme.accent_color} onChange={(v) => onChange({ accent_color: v })} />
-          <ColorField label="Background" value={theme.background_color} onChange={(v) => onChange({ background_color: v })} />
-          <ColorField label="Text" value={theme.text_color} onChange={(v) => onChange({ text_color: v })} />
+          <ColorField
+            label="Primary"
+            value={theme.primary_color}
+            onChange={(v) => onChange({ primary_color: v })}
+          />
+          <ColorField
+            label="Secondary"
+            value={theme.secondary_color}
+            onChange={(v) => onChange({ secondary_color: v })}
+          />
+          <ColorField
+            label="Accent"
+            value={theme.accent_color}
+            onChange={(v) => onChange({ accent_color: v })}
+          />
+          <ColorField
+            label="Background"
+            value={theme.background_color}
+            onChange={(v) => onChange({ background_color: v })}
+          />
+          <ColorField
+            label="Text"
+            value={theme.text_color}
+            onChange={(v) => onChange({ text_color: v })}
+          />
         </div>
       </div>
 
@@ -2772,10 +3692,14 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
         <div className="space-y-1.5">
           <Label>Heading Font</Label>
           <Select value={theme.heading_font} onValueChange={(v) => onChange({ heading_font: v })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               {FONT_OPTIONS.map((f) => (
-                <SelectItem key={f} value={f} style={{ fontFamily: f }}>{f}</SelectItem>
+                <SelectItem key={f} value={f} style={{ fontFamily: f }}>
+                  {f}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -2783,10 +3707,14 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
         <div className="space-y-1.5">
           <Label>Body Font</Label>
           <Select value={theme.body_font} onValueChange={(v) => onChange({ body_font: v })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               {FONT_OPTIONS.map((f) => (
-                <SelectItem key={f} value={f} style={{ fontFamily: f }}>{f}</SelectItem>
+                <SelectItem key={f} value={f} style={{ fontFamily: f }}>
+                  {f}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -2798,10 +3726,14 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
         <div className="space-y-1.5">
           <Label>Button Style</Label>
           <Select value={theme.button_style} onValueChange={(v) => onChange({ button_style: v })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               {BUTTON_STYLES.map((b) => (
-                <SelectItem key={b.value} value={b.value}>{b.label}</SelectItem>
+                <SelectItem key={b.value} value={b.value}>
+                  {b.label}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -2812,7 +3744,12 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
               style={{
                 background: theme.secondary_color,
                 color: "#000",
-                borderRadius: theme.button_style === "pill" ? "9999px" : theme.button_style === "square" ? "0" : "0.5rem",
+                borderRadius:
+                  theme.button_style === "pill"
+                    ? "9999px"
+                    : theme.button_style === "square"
+                      ? "0"
+                      : "0.5rem",
                 fontFamily: theme.body_font,
               }}
             >
@@ -2824,7 +3761,9 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
 
       <div className="space-y-4 rounded-lg border bg-card p-4">
         <h3 className="text-sm font-semibold uppercase text-muted-foreground">Background Style</h3>
-        <p className="text-xs text-muted-foreground">Choose how the page background looks behind your sections.</p>
+        <p className="text-xs text-muted-foreground">
+          Choose how the page background looks behind your sections.
+        </p>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {BG_STYLES.map((s) => {
             const active = (theme.extras.bg_style ?? "solid") === s.value;
@@ -2837,10 +3776,7 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
                   active ? "border-primary ring-2 ring-primary/30" : "hover:border-primary/60"
                 }`}
               >
-                <div
-                  className="h-12 w-full rounded"
-                  style={buildBgPreview(s.value, theme)}
-                />
+                <div className="h-12 w-full rounded" style={buildBgPreview(s.value, theme)} />
                 <div className="mt-1.5 text-xs font-semibold">{s.label}</div>
                 <div className="text-[10px] text-muted-foreground">{s.description}</div>
               </button>
@@ -2848,7 +3784,8 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
           })}
         </div>
 
-        {(theme.extras.bg_style ?? "solid") === "gradient" || (theme.extras.bg_style ?? "solid") === "soft-radial" ? (
+        {(theme.extras.bg_style ?? "solid") === "gradient" ||
+        (theme.extras.bg_style ?? "solid") === "soft-radial" ? (
           <div className="space-y-3 pt-2">
             <div className="grid grid-cols-2 gap-3">
               <ColorField
@@ -2871,7 +3808,9 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
                   max={360}
                   step={5}
                   value={theme.extras.bg_gradient_angle ?? 135}
-                  onChange={(e) => onChange({ extras: { bg_gradient_angle: Number(e.target.value) } })}
+                  onChange={(e) =>
+                    onChange({ extras: { bg_gradient_angle: Number(e.target.value) } })
+                  }
                   className="w-full"
                 />
               </div>
@@ -2910,7 +3849,6 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
         </div>
       </div>
 
-
       <div className="space-y-4 rounded-lg border bg-card p-4">
         <h3 className="text-sm font-semibold uppercase text-muted-foreground">Header</h3>
         <div className="grid grid-cols-2 gap-3">
@@ -2938,9 +3876,13 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
           <Label>Link Style</Label>
           <Select
             value={theme.extras.link_style ?? "hover-underline"}
-            onValueChange={(v) => onChange({ extras: { link_style: v as ThemeExtras["link_style"] } })}
+            onValueChange={(v) =>
+              onChange({ extras: { link_style: v as ThemeExtras["link_style"] } })
+            }
           >
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="none">No underline</SelectItem>
               <SelectItem value="hover-underline">Underline on hover</SelectItem>
@@ -2983,7 +3925,13 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
   );
 }
 
-function NavLinksEditor({ links, onChange }: { links: NavLink[]; onChange: (next: NavLink[]) => void }) {
+function NavLinksEditor({
+  links,
+  onChange,
+}: {
+  links: NavLink[];
+  onChange: (next: NavLink[]) => void;
+}) {
   const [dragId, setDragId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
 
@@ -3080,8 +4028,24 @@ function NavLinksEditor({ links, onChange }: { links: NavLink[]; onChange: (next
                   onChange={(e) => patch(l.id, { url: e.target.value })}
                 />
                 <div className="flex items-center gap-1">
-                  <Button type="button" size="sm" variant="ghost" onClick={() => move(idx, -1)} disabled={idx === 0}>↑</Button>
-                  <Button type="button" size="sm" variant="ghost" onClick={() => move(idx, 1)} disabled={idx === links.length - 1}>↓</Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => move(idx, -1)}
+                    disabled={idx === 0}
+                  >
+                    ↑
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => move(idx, 1)}
+                    disabled={idx === links.length - 1}
+                  >
+                    ↓
+                  </Button>
                   <Button type="button" size="sm" variant="ghost" onClick={() => remove(l.id)}>
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
