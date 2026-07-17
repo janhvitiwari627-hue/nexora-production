@@ -147,6 +147,7 @@ export function PartnerOnboardingChecklist() {
     if (wasUploadingRef.current && !uploading) {
       const shouldRestore = (() => {
         if (cancelHadFocusRef.current) return true;
+        if (retryHadFocusRef.current) return true;
         const active = typeof document !== "undefined" ? document.activeElement : null;
         if (!active || active === document.body) return true;
         const dz = dropzoneRef.current;
@@ -154,10 +155,12 @@ export function PartnerOnboardingChecklist() {
         return false;
       })();
       cancelHadFocusRef.current = false;
+      retryHadFocusRef.current = false;
       if (shouldRestore) {
-        // Defer past the unmount of the Cancel button / progress region
+        // Defer past the unmount of the Cancel / Retry button / progress region
         requestAnimationFrame(() => dropzoneRef.current?.focus());
       }
+
     }
     wasUploadingRef.current = uploading;
   }, [uploading]);
