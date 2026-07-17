@@ -1,8 +1,8 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { motion } from "framer-motion";
-import { CheckCircle2, Circle, ClipboardList, Image as ImageIcon, MapPin, Phone, Sparkles, Loader2 } from "lucide-react";
+import { CheckCircle2, Circle, ClipboardList, Image as ImageIcon, MapPin, Phone, Sparkles, Loader2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { getPartnerProfile, updatePartnerProfile, type PartnerProfile } from "@/lib/partner.functions";
+import { uploadToCloudinary, isCloudinaryConfigured } from "@/lib/cloudinary";
 
 type ChecklistItem = {
   key: "logo" | "contact" | "location" | "tagline" | "story";
@@ -84,6 +85,30 @@ export function PartnerOnboardingChecklist() {
     tagline: "",
     success_story: "",
   });
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const cloudinaryReady = isCloudinaryConfigured();
+
+  const onPickLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (e.target) e.target.value = "";
+    if (!file) return;
+    if (!cloudinaryReady) {
+      toast.error("Cloudinary is not configured");
+      return;
+    }
+    setUploading(true);
+    try {
+      const res = await uploadToCloudinary(file, { folder: "partner-logos" });
+      setForm((f) => ({ ...f, photo_url: res.secure_url }));
+      toast.success("Logo uploaded — save karke pakka karo");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   useEffect(() => {
     if (!profile) return;
@@ -191,12 +216,50 @@ export function PartnerOnboardingChecklist() {
             <DialogDescription>Ye details shop owners aur admin ko dikhengi.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <Field label="Logo / Photo URL" hint="Public image link (Google Drive/Cloudinary/etc.)">
-              <Input
-                placeholder="https://..."
-                value={form.photo_url}
-                onChange={(e) => setForm({ ...form, photo_url: e.target.value })}
-              />
+            <Field label="Logo / Photo" hint={cloudinaryReady ? "Upload karo ya URL paste karo" : "Cloudinary configure nahi hai — URL paste karein"}>
+              <div className="flex items-start gap-3">
+                {form.photo_url ? (
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+                    <img src={form.photo_url} alt="Logo preview" className="h-full w-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => setForm({ ...form, photo_url: "" })}
+                      className="absolute right-0 top-0 grid h-5 w-5 place-items-center rounded-bl bg-black/60 text-white"
+                      aria-label="Remove logo"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid h-20 w-20 shrink-0 place-items-center rounded-xl border border-dashed border-slate-300 bg-slate-50 text-slate-400">
+                    <ImageIcon className="h-6 w-6" />
+                  </div>
+                )}
+                <div className="flex-1 space-y-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading || !cloudinaryReady}
+                  >
+                    {uploading ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Upload className="mr-1 h-4 w-4" />}
+                    {form.photo_url ? "Replace logo" : "Upload logo"}
+                  </Button>
+                  <Input
+                    placeholder="https://..."
+                    value={form.photo_url}
+                    onChange={(e) => setForm({ ...form, photo_url: e.target.value })}
+                  />
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={onPickLogo}
+                  />
+                </div>
+              </div>
             </Field>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Mobile">
