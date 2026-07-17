@@ -402,24 +402,27 @@ export function WebsiteEditorPage() {
       <div className="grid flex-1 grid-cols-[240px_1fr_1fr] overflow-hidden">
         {/* Section list */}
         <aside className="overflow-y-auto border-r bg-muted/30 p-3">
-          <div className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Sections</div>
-          <ul className="space-y-1">
-            {localSections.map((s) => (
-              <li key={s.id}>
-                <button
-                  onClick={() => { setSelectedId(s.id); setShowTheme(false); }}
-                  className={`w-full rounded-md px-3 py-2 text-left text-sm ${
-                    selectedId === s.id && !showTheme ? "bg-primary text-primary-foreground" : "hover:bg-muted"
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span>{SECTION_LABELS[s.section_type]}</span>
-                    {!s.is_visible && <span className="text-xs opacity-60">hidden</span>}
-                  </div>
-                </button>
-              </li>
-            ))}
-          </ul>
+          <div className="mb-2 flex items-center justify-between">
+            <div className="text-xs font-semibold uppercase text-muted-foreground">Sections</div>
+            <div className="text-[10px] text-muted-foreground">Drag to reorder</div>
+          </div>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={localSections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+              <ul className="space-y-1">
+                {localSections.map((s) => (
+                  <SortableSectionItem
+                    key={s.id}
+                    section={s}
+                    label={SECTION_LABELS[s.section_type]}
+                    active={selectedId === s.id && !showTheme}
+                    onSelect={() => { setSelectedId(s.id); setShowTheme(false); }}
+                    onToggleVisible={() => patchSection(s.id, { is_visible: !s.is_visible })}
+                  />
+                ))}
+              </ul>
+            </SortableContext>
+          </DndContext>
+
           <div className="mt-4 mb-2 text-xs font-semibold uppercase text-muted-foreground">Design</div>
           <button
             onClick={() => setShowTheme(true)}
