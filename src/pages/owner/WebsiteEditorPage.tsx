@@ -16,7 +16,7 @@ import {
   type WebsiteSection,
   type SectionType,
 } from "@/lib/website-editor.functions";
-import { getMyOwnedSalons } from "@/lib/owner.functions";
+import { getMyOwnedSalons, listOwnerServices } from "@/lib/owner.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,7 +26,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "sonner";
-import { Loader2, Eye, EyeOff, Globe, Plus, Trash2, Upload, Image as ImageIcon, Palette, GripVertical, History, Undo2, Save, GitCompare, Monitor, Tablet, Smartphone } from "lucide-react";
+import { Loader2, Eye, EyeOff, Globe, Plus, Trash2, Upload, Image as ImageIcon, Palette, GripVertical, History, Undo2, Save, GitCompare, Monitor, Tablet, Smartphone, Wand2, MapPinned, ListChecks } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import {
   DndContext,
