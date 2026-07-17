@@ -1397,6 +1397,41 @@ function ColorField({ label, value, onChange }: { label: string; value: string; 
   );
 }
 
+function buildBgPreview(style: BgStyle, theme: ThemeState): CSSProperties {
+  const from = theme.extras.bg_gradient_from ?? theme.background_color;
+  const to = theme.extras.bg_gradient_to ?? "#F1F5F9";
+  const angle = theme.extras.bg_gradient_angle ?? 135;
+  const patternColor = theme.extras.bg_pattern_color ?? "#E5E7EB";
+  const size = theme.extras.bg_pattern_size ?? 24;
+  const base = theme.background_color;
+  switch (style) {
+    case "gradient":
+      return { background: `linear-gradient(${angle}deg, ${from}, ${to})` };
+    case "soft-radial":
+      return { background: `radial-gradient(circle at 30% 20%, ${from}, ${to})` };
+    case "dots":
+      return {
+        backgroundColor: base,
+        backgroundImage: `radial-gradient(${patternColor} 1.2px, transparent 1.2px)`,
+        backgroundSize: `${size}px ${size}px`,
+      };
+    case "grid":
+      return {
+        backgroundColor: base,
+        backgroundImage: `linear-gradient(${patternColor} 1px, transparent 1px), linear-gradient(90deg, ${patternColor} 1px, transparent 1px)`,
+        backgroundSize: `${size}px ${size}px`,
+      };
+    case "diagonal":
+      return {
+        backgroundColor: base,
+        backgroundImage: `repeating-linear-gradient(45deg, ${patternColor} 0, ${patternColor} 1px, transparent 1px, transparent ${size}px)`,
+      };
+    case "solid":
+    default:
+      return { background: base };
+  }
+}
+
 function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch: Partial<ThemeState>) => void }) {
   return (
     <div className="mx-auto max-w-xl space-y-6">
