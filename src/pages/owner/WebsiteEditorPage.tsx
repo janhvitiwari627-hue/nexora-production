@@ -20,6 +20,7 @@ import {
 import { TemplateGalleryDialog } from "./editor/TemplateGalleryDialog";
 import { TEMPLATE_CATALOG, type TemplateCatalogItem } from "./editor/templateCatalog";
 import { TemplateUsageGuide } from "./editor/TemplateUsageGuide";
+import { TemplateHeroImagePicker } from "./editor/TemplateHeroImagePicker";
 import { getMyOwnedSalons, listOwnerServices } from "@/lib/owner.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -1858,6 +1859,7 @@ export function WebsiteEditorPage() {
               websiteId={websiteId ?? null}
               salon={selectedSalon ?? null}
               serviceOptions={(ownerServicesQ.data ?? []) as OwnerServiceOption[]}
+              templateKey={selectedTemplateKey}
               onFieldChange={updateContent}
               onToggleVisible={(v) => patchSection(selected.id, { is_visible: v })}
             />
@@ -2103,6 +2105,7 @@ function SectionEditor({
   websiteId,
   salon,
   serviceOptions,
+  templateKey,
   onFieldChange,
   onToggleVisible,
 }: {
@@ -2112,6 +2115,7 @@ function SectionEditor({
   websiteId: string | null;
   salon: SalonBasics | null;
   serviceOptions: OwnerServiceOption[];
+  templateKey: string | null;
   onFieldChange: (field: string, value: unknown) => void;
   onToggleVisible: (v: boolean) => void;
 }) {
@@ -2166,6 +2170,11 @@ function SectionEditor({
             websiteId={websiteId}
             folder="hero"
             onChange={(v) => onFieldChange("imageUrl", v)}
+          />
+          <TemplateHeroImagePicker
+            templateKey={templateKey}
+            value={str("imageUrl")}
+            onSelect={(url) => onFieldChange("imageUrl", url)}
           />
         </>
       )}
