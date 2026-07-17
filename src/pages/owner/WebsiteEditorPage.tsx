@@ -1273,17 +1273,21 @@ function newId() {
 function ItemsEditor({
   kind,
   items,
+  serviceOptions,
   salonId,
   websiteId,
   onChange,
 }: {
   kind: "services" | "rate_card" | "packages" | "staff";
   items: Item[];
+  serviceOptions: OwnerServiceOption[];
   salonId: string | null;
   websiteId: string | null;
   onChange: (next: Item[]) => void;
 }) {
   const isStaff = kind === "staff";
+  const canPickServices = kind === "services" || kind === "rate_card";
+  const selectedServiceIds = new Set(items.map((item) => item.id));
   const addLabel =
     kind === "services" ? "Add Service" :
     kind === "rate_card" ? "Add Rate" :
@@ -1293,6 +1297,21 @@ function ItemsEditor({
     onChange(items.map((it) => (it.id === id ? { ...it, ...p } : it)));
   const remove = (id: string) => onChange(items.filter((it) => it.id !== id));
   const add = () => onChange([...items, { id: newId() }]);
+  const toggleService = (service: OwnerServiceOption) => {
+    if (selectedServiceIds.has(service.id)) {
+      remove(service.id);
+      return;
+    }
+    onChange([...items, normalizeServiceItem(service)]);
+  };
+  const addAllServices = () => {
+    const existing = new Set(items.map((item) => item.id));
+    const next = [
+      ...items,
+      ...serviceOptions.filter((service) => !existing.has(service.id)).map(normalizeServiceItem),
+    ];
+    onChange(next);
+  };
 
   return (
     <div className="space-y-3">
@@ -1302,6 +1321,42 @@ function ItemsEditor({
           <Plus className="mr-1 h-4 w-4" /> {addLabel}
         </Button>
       </div>
+
+      {canPickServices && serviceOptions.length > 0 && (
+        <div className="space-y-2 rounded-lg border bg-muted/30 p-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <ListChecks className="h-4 w-4 text-muted-foreground" /> Select from saved services
+            </div>
+            <Button type="button" size="sm" variant="ghost" onClick={addAllServices}>
+              Add all
+            </Button>
+          </div>
+          <div className="max-h-48 space-y-1 overflow-y-auto pr-1">
+            {serviceOptions.map((service) => {
+              const selected = selectedServiceIds.has(service.id);
+              return (
+                <button
+                  key={service.id}
+                  type="button"
+                  onClick={() => toggleService(service)}
+                  className={`flex w-full items-center justify-between gap-3 rounded-md border px-3 py-2 text-left text-xs transition ${
+                    selected ? "border-primary bg-primary/10" : "bg-background hover:border-primary/60"
+                  }`}
+                >
+                  <span className="min-w-0">
+                    <span className="block truncate font-medium">{service.name}</span>
+                    <span className="block truncate text-muted-foreground">
+                      {service.category ?? "General"} · {service.duration_minutes ?? 30} min
+                    </span>
+                  </span>
+                  <span className="shrink-0 font-semibold">₹{String(service.price ?? 0)}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {items.length === 0 && (
         <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
@@ -1333,7 +1388,7 @@ function ItemsEditor({
 
             {isStaff ? (
               <>
-                <Field label="Role" value={it.role ?? ""} onChange={(v) => patch(it.id, { role: v })} />
+                <RoleSelect value={it.role ?? ""} onChange={(v) => patch(it.id, { role: v })} />
                 <TextField label="Bio" value={it.bio ?? ""} onChange={(v) => patch(it.id, { bio: v })} />
               </>
             ) : (
