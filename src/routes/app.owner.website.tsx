@@ -1,6 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { OwnerWebsitePage } from "@/pages/owner/OwnerWebsitePage";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/app/owner/website")({
-  component: OwnerWebsitePage,
+  beforeLoad: () => {
+    throw redirect({ to: "/owner/website/edit", replace: true });
+  },
 });

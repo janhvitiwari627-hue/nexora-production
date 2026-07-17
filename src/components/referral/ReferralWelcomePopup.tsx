@@ -12,7 +12,7 @@ import {
   Wallet,
   ArrowRight,
 } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -29,14 +29,18 @@ export function ReferralWelcomePopup() {
   const user = useAuthStore((s) => s.user);
   const profile = useAuthStore((s) => s.profile);
   const isInitialized = useAuthStore((s) => s.isInitialized);
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [open, setOpen] = useState(false);
   const [howOpen, setHowOpen] = useState(false);
+  const isWorkspaceRoute =
+    pathname.startsWith("/owner") || pathname.startsWith("/app/owner") || pathname.startsWith("/admin");
 
   const code = profile?.referral_code ?? null;
   const link = code ? buildReferralSignupUrl(code) : "";
   const shareText = `Join me on Nexora & build your own salon website in minutes! Use my referral code ${code}: ${link}`;
 
   useEffect(() => {
+    if (isWorkspaceRoute) return;
     if (!isInitialized || !user || !code) return;
     const key = `nexora_ref_popup_shown_${user.id}`;
     if (typeof window === "undefined") return;
@@ -47,9 +51,9 @@ export function ReferralWelcomePopup() {
       window.sessionStorage.setItem(key, "1");
     }, 900);
     return () => clearTimeout(t);
-  }, [isInitialized, user, code]);
+  }, [isInitialized, user, code, isWorkspaceRoute]);
 
-  if (!code) return null;
+  if (!code || isWorkspaceRoute) return null;
 
   const copy = async (value: string, label: string) => {
     try {
