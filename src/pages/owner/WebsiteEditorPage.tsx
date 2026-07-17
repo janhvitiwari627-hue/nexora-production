@@ -22,11 +22,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Loader2, Eye, Globe, Plus, Trash2, Upload, Image as ImageIcon, Palette } from "lucide-react";
 
+type NavLink = { id: string; label: string; url: string };
+
 type ThemeExtras = {
   header_bg?: string;
   header_text?: string;
   link_color?: string;
   link_style?: "underline" | "none" | "hover-underline";
+  nav_links?: NavLink[];
+  site_title?: string;
 };
 
 type ThemeState = {
@@ -41,11 +45,19 @@ type ThemeState = {
   extras: ThemeExtras;
 };
 
+const DEFAULT_NAV: NavLink[] = [
+  { id: "n1", label: "About", url: "#about" },
+  { id: "n2", label: "Services", url: "#services" },
+  { id: "n3", label: "Contact", url: "#contact" },
+];
+
 const DEFAULT_EXTRAS: ThemeExtras = {
   header_bg: "#FFFFFF",
   header_text: "#111827",
   link_color: "#4F46E5",
   link_style: "hover-underline",
+  nav_links: DEFAULT_NAV,
+  site_title: "Home",
 };
 
 const DEFAULT_THEME: ThemeState = {
@@ -925,6 +937,74 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
           </div>
         </div>
       </div>
+
+      <div className="space-y-4 rounded-lg border bg-card p-4">
+        <h3 className="text-sm font-semibold uppercase text-muted-foreground">Header Navigation</h3>
+        <Field
+          label="Site title"
+          value={theme.extras.site_title ?? ""}
+          onChange={(v) => onChange({ extras: { site_title: v } })}
+        />
+        <NavLinksEditor
+          links={theme.extras.nav_links ?? []}
+          onChange={(next) => onChange({ extras: { nav_links: next } })}
+        />
+      </div>
+    </div>
+  );
+}
+
+function NavLinksEditor({ links, onChange }: { links: NavLink[]; onChange: (next: NavLink[]) => void }) {
+  const patch = (id: string, p: Partial<NavLink>) =>
+    onChange(links.map((l) => (l.id === id ? { ...l, ...p } : l)));
+  const remove = (id: string) => onChange(links.filter((l) => l.id !== id));
+  const add = () => onChange([...links, { id: newId(), label: "New link", url: "#" }]);
+  const move = (idx: number, dir: -1 | 1) => {
+    const next = [...links];
+    const j = idx + dir;
+    if (j < 0 || j >= next.length) return;
+    [next[idx], next[j]] = [next[j], next[idx]];
+    onChange(next);
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <Label className="text-sm">Menu links ({links.length})</Label>
+        <Button type="button" size="sm" variant="secondary" onClick={add}>
+          <Plus className="mr-1 h-4 w-4" /> Add link
+        </Button>
+      </div>
+      {links.length === 0 && (
+        <p className="rounded-md border border-dashed p-3 text-sm text-muted-foreground">
+          No menu links yet. Click <strong>Add link</strong> to create one.
+        </p>
+      )}
+      <ul className="space-y-2">
+        {links.map((l, idx) => (
+          <li key={l.id} className="rounded-md border bg-card p-2">
+            <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
+              <Input
+                placeholder="Label"
+                value={l.label}
+                onChange={(e) => patch(l.id, { label: e.target.value })}
+              />
+              <Input
+                placeholder="URL or #section"
+                value={l.url}
+                onChange={(e) => patch(l.id, { url: e.target.value })}
+              />
+              <div className="flex items-center gap-1">
+                <Button type="button" size="sm" variant="ghost" onClick={() => move(idx, -1)} disabled={idx === 0}>↑</Button>
+                <Button type="button" size="sm" variant="ghost" onClick={() => move(idx, 1)} disabled={idx === links.length - 1}>↓</Button>
+                <Button type="button" size="sm" variant="ghost" onClick={() => remove(l.id)}>
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

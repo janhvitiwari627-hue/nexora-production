@@ -107,10 +107,17 @@ function PublicWebsitePage() {
     .filter((s) => s.is_visible)
     .sort((a, b) => a.sort_order - b.sort_order);
 
-  // Find a contact section for header links, plus general nav based on visible sections
-  const navItems = sections
+  // Header nav from saved extras, with a fallback derived from visible sections
+  const savedNav = Array.isArray(extras.nav_links) ? (extras.nav_links as { id?: string; label: string; url: string }[]) : null;
+  const fallbackNav = sections
     .filter((s) => ["about", "services", "gallery", "contact"].includes(s.section_type))
-    .map((s) => ({ id: s.section_type, label: s.section_type.replace("_", " ") }));
+    .map((s) => ({ id: s.section_type, label: s.section_type.replace("_", " "), url: `#${s.section_type}` }));
+  const navItems = (savedNav && savedNav.length ? savedNav : fallbackNav).map((n, i) => ({
+    id: n.id ?? `n${i}`,
+    label: n.label,
+    url: n.url,
+  }));
+  const siteTitle = (extras.site_title as string | undefined) || "Home";
 
   return (
     <div style={{ ...styleVars, background: "var(--w-bg)", color: "var(--w-text)" }}>
@@ -119,13 +126,13 @@ function PublicWebsitePage() {
         style={{ background: "var(--w-header-bg)", color: "var(--w-header-text)" }}
       >
         <div className="text-lg font-semibold" style={{ fontFamily: "var(--w-heading-font)" }}>
-          Home
+          {siteTitle}
         </div>
-        <nav className="flex gap-4 text-sm capitalize">
+        <nav className="flex flex-wrap gap-4 text-sm">
           {navItems.map((n) => (
             <a
               key={n.id}
-              href={`#${n.id}`}
+              href={n.url}
               className={linkClass}
               style={{ color: "var(--w-link)" }}
             >
