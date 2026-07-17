@@ -22,6 +22,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Loader2, Eye, Globe, Plus, Trash2, Upload, Image as ImageIcon, Palette } from "lucide-react";
 
+type ThemeExtras = {
+  header_bg?: string;
+  header_text?: string;
+  link_color?: string;
+  link_style?: "underline" | "none" | "hover-underline";
+};
+
 type ThemeState = {
   primary_color: string;
   secondary_color: string;
@@ -31,6 +38,14 @@ type ThemeState = {
   heading_font: string;
   body_font: string;
   button_style: string;
+  extras: ThemeExtras;
+};
+
+const DEFAULT_EXTRAS: ThemeExtras = {
+  header_bg: "#FFFFFF",
+  header_text: "#111827",
+  link_color: "#4F46E5",
+  link_style: "hover-underline",
 };
 
 const DEFAULT_THEME: ThemeState = {
@@ -42,6 +57,7 @@ const DEFAULT_THEME: ThemeState = {
   heading_font: "Inter",
   body_font: "Inter",
   button_style: "rounded",
+  extras: DEFAULT_EXTRAS,
 };
 
 const FONT_OPTIONS = ["Inter", "Poppins", "Playfair Display", "Montserrat", "Lora", "Roboto", "Merriweather", "Space Grotesk"];
