@@ -661,6 +661,12 @@ export function WebsiteEditorPage() {
   const [versionsLoading, setVersionsLoading] = useState(false);
   const [restoring, setRestoring] = useState<string | null>(null);
   const [savingVersion, setSavingVersion] = useState(false);
+  const dirtySinceSnapshotRef = useRef(false);
+  const lastAutoSnapshotRef = useRef<number>(Date.now());
+  const [lastSnapshotAt, setLastSnapshotAt] = useState<number | null>(null);
+  function markDirty() {
+    dirtySinceSnapshotRef.current = true;
+  }
 
   // ---- Diff viewer ----
   type DiffChange =
