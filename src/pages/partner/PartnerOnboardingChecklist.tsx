@@ -536,19 +536,49 @@ export function PartnerOnboardingChecklist() {
 
 
                   {uploading && (
-                    <div
-                      className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100"
-                      role="progressbar"
-                      aria-valuenow={uploadProgress}
-                      aria-valuemin={0}
-                      aria-valuemax={100}
-                    >
-                      <div
-                        className="h-full bg-[#4F46E5] transition-[width] duration-200 ease-out"
-                        style={{ width: `${uploadProgress}%` }}
-                      />
+                    <div className="space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100"
+                          role="progressbar"
+                          aria-valuenow={uploadProgress}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                          aria-label={`Upload progress ${uploadProgress}%`}
+                        >
+                          <div
+                            className={`h-full bg-[#4F46E5] transition-[width] duration-200 ease-out ${
+                              uploadProgress >= 100 ? "animate-pulse" : ""
+                            }`}
+                            style={{ width: `${uploadProgress}%` }}
+                          />
+                        </div>
+                        <span
+                          className="min-w-[3ch] text-right text-[11px] font-bold tabular-nums text-slate-600"
+                          aria-live="polite"
+                        >
+                          {uploadProgress}%
+                        </span>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={cancelUpload}
+                          className="h-7 border-red-200 px-2 text-[11px] text-red-600 hover:bg-red-50"
+                          aria-label="Cancel upload"
+                        >
+                          <X className="mr-1 h-3 w-3" />
+                          Cancel
+                        </Button>
+                      </div>
+                      <p className="text-[10px] text-slate-500">
+                        {uploadProgress >= 100
+                          ? "Cloudinary process kar raha hai…"
+                          : "Uploading to Cloudinary…"}
+                      </p>
                     </div>
                   )}
+
                   <Input
                     placeholder="https://..."
                     value={form.photo_url}
