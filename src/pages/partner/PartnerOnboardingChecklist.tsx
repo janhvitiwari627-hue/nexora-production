@@ -254,19 +254,38 @@ export function PartnerOnboardingChecklist() {
             <DialogDescription>Ye details shop owners aur admin ko dikhengi.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <Field label="Logo / Photo" hint={cloudinaryReady ? "Upload karo ya URL paste karo" : "Cloudinary configure nahi hai — URL paste karein"}>
+            <Field
+              label="Logo / Photo"
+              hint={cloudinaryReady ? "JPG, PNG, WEBP ya GIF — max 5 MB" : "Cloudinary configure nahi hai — URL paste karein"}
+            >
               <div className="flex items-start gap-3">
-                {form.photo_url ? (
+                {(localPreview || form.photo_url) ? (
                   <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
-                    <img src={form.photo_url} alt="Logo preview" className="h-full w-full object-cover" />
-                    <button
-                      type="button"
-                      onClick={() => setForm({ ...form, photo_url: "" })}
-                      className="absolute right-0 top-0 grid h-5 w-5 place-items-center rounded-bl bg-black/60 text-white"
-                      aria-label="Remove logo"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
+                    <img
+                      src={localPreview ?? form.photo_url}
+                      alt="Logo preview"
+                      className="h-full w-full object-cover"
+                    />
+                    {uploading && (
+                      <div className="absolute inset-0 grid place-items-center bg-black/40">
+                        <Loader2 className="h-5 w-5 animate-spin text-white" />
+                      </div>
+                    )}
+                    {!uploading && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setForm({ ...form, photo_url: "" });
+                          if (localPreview) URL.revokeObjectURL(localPreview);
+                          setLocalPreview(null);
+                          setUploadError(null);
+                        }}
+                        className="absolute right-0 top-0 grid h-5 w-5 place-items-center rounded-bl bg-black/60 text-white"
+                        aria-label="Remove logo"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <div className="grid h-20 w-20 shrink-0 place-items-center rounded-xl border border-dashed border-slate-300 bg-slate-50 text-slate-400">
@@ -287,15 +306,21 @@ export function PartnerOnboardingChecklist() {
                   <Input
                     placeholder="https://..."
                     value={form.photo_url}
-                    onChange={(e) => setForm({ ...form, photo_url: e.target.value })}
+                    onChange={(e) => {
+                      setForm({ ...form, photo_url: e.target.value });
+                      setUploadError(null);
+                    }}
                   />
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
                     className="hidden"
                     onChange={onPickLogo}
                   />
+                  {uploadError && (
+                    <p className="text-[11px] font-medium text-red-600">{uploadError}</p>
+                  )}
                 </div>
               </div>
             </Field>
