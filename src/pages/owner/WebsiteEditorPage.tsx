@@ -396,6 +396,10 @@ function mapsEmbedFromAddress(address?: string | null) {
   return q ? `https://www.google.com/maps?q=${encodeURIComponent(q)}&output=embed` : "";
 }
 
+function mapsEmbedFromCoords(lat: number, lng: number) {
+  return `https://www.google.com/maps?q=${encodeURIComponent(`${lat},${lng}`)}&z=16&output=embed`;
+}
+
 function normalizeServiceItem(s: OwnerServiceOption): Item {
   return {
     id: s.id,
@@ -1268,6 +1272,111 @@ function newId() {
   return (typeof crypto !== "undefined" && "randomUUID" in crypto)
     ? crypto.randomUUID()
     : `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function RoleSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const custom = value && !STAFF_ROLE_OPTIONS.includes(value);
+  return (
+    <div className="space-y-1.5">
+      <Label>Role</Label>
+      <Select value={custom ? "custom" : value} onValueChange={(v) => onChange(v === "custom" ? value : v)}>
+        <SelectTrigger><SelectValue placeholder="Choose role" /></SelectTrigger>
+        <SelectContent>
+          {STAFF_ROLE_OPTIONS.map((role) => (
+            <SelectItem key={role} value={role}>{role}</SelectItem>
+          ))}
+          <SelectItem value="custom">Custom role</SelectItem>
+        </SelectContent>
+      </Select>
+      {(custom || value === "") && (
+        <Input placeholder="Type custom role" value={value} onChange={(e) => onChange(e.target.value)} />
+      )}
+    </div>
+  );
+}
+
+function MapEmbedControls({
+  address,
+  mapEmbed,
+  salon,
+  onAddressChange,
+  onMapEmbedChange,
+}: {
+  address: string;
+  mapEmbed: string;
+  salon: SalonBasics | null;
+  onAddressChange: (v: string) => void;
+  onMapEmbedChange: (v: string) => void;
+}) {
+  const [locating, setLocating] = useState(false);
+  const salonAddress = salon?.address ?? salon?.location ?? "";
+
+  const generateFromAddress = (value: string) => {
+    if (!value.trim()) {
+      toast.error("Address add karein pehle");
+      return;
+    }
+    onMapEmbedChange(mapsEmbedFromAddress(value));
+    toast.success("Map embed URL ready");
+  };
+
+  const useCurrentLocation = () => {
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      toast.error("Location access is not available in this browser");
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const text = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+        onAddressChange(text);
+        onMapEmbedChange(mapsEmbedFromCoords(latitude, longitude));
+        setLocating(false);
+        toast.success("Current location added");
+      },
+      () => {
+        setLocating(false);
+        toast.error("Location permission nahi mili");
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  };
+
+  return (
+    <div className="space-y-3 rounded-lg border bg-card p-3">
+      <div className="flex items-center gap-2 text-sm font-semibold">
+        <MapPinned className="h-4 w-4 text-muted-foreground" /> Google Map & Location
+      </div>
+      <TextField label="Address / Location" value={address} onChange={onAddressChange} />
+      <div className="grid gap-2 sm:grid-cols-2">
+        <Button type="button" variant="secondary" onClick={() => generateFromAddress(address)}>
+          Generate map from address
+        </Button>
+        <Button type="button" variant="outline" onClick={useCurrentLocation} disabled={locating}>
+          {locating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <MapPinned className="mr-2 h-4 w-4" />}
+          Use current location
+        </Button>
+      </div>
+      {salonAddress && (
+        <Button
+          type="button"
+          variant="ghost"
+          className="w-full justify-start text-left"
+          onClick={() => {
+            onAddressChange(salonAddress);
+            onMapEmbedChange(mapsEmbedFromAddress(salonAddress));
+          }}
+        >
+          Use saved salon address: {salonAddress}
+        </Button>
+      )}
+      <Field label="Google Map Embed URL" value={mapEmbed} onChange={onMapEmbedChange} />
+      {mapEmbed && (
+        <iframe title="Map preview" src={mapEmbed} className="h-44 w-full rounded-md border-0" loading="lazy" />
+      )}
+    </div>
+  );
 }
 
 function ItemsEditor({
