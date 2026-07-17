@@ -144,6 +144,16 @@ export function PartnerOnboardingChecklist() {
       const raw = err instanceof Error ? err.message : String(err);
       const friendly = friendlyUploadError(raw);
       setUploadError(friendly);
+      if (err instanceof CloudinaryUploadError) {
+        setUploadErrorDetails({
+          status: err.status,
+          statusText: err.statusText,
+          code: err.code,
+          raw: err.rawResponse || err.message,
+        });
+      } else {
+        setUploadErrorDetails({ raw });
+      }
       toast.error(friendly);
       lastFileRef.current = file;
       if (!keepPreview && localPreview) {
