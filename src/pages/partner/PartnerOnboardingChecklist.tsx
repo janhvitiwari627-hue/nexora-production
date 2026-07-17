@@ -125,8 +125,21 @@ export function PartnerOnboardingChecklist() {
   }, [localPreview]);
 
   const lastFileRef = useRef<File | null>(null);
+  const uploadAbortRef = useRef<AbortController | null>(null);
+
+  const cancelUpload = () => {
+    if (uploadAbortRef.current) {
+      uploadAbortRef.current.abort();
+      uploadAbortRef.current = null;
+    }
+  };
 
   const doUpload = async (file: File, keepPreview?: string) => {
+    // Cancel any previous in-flight upload before starting a new one
+    if (uploadAbortRef.current) uploadAbortRef.current.abort();
+    const controller = new AbortController();
+    uploadAbortRef.current = controller;
+
     setUploading(true);
     setUploadProgress(0);
     setUploadError(null);
@@ -134,6 +147,7 @@ export function PartnerOnboardingChecklist() {
       const res = await uploadToCloudinary(file, {
         folder: "partner-logos",
         onProgress: (pct) => setUploadProgress(pct),
+        signal: controller.signal,
       });
       setForm((f) => ({ ...f, photo_url: res.secure_url }));
       setUploadError(null);
@@ -141,6 +155,20 @@ export function PartnerOnboardingChecklist() {
       setUploadProgress(100);
       toast.success("Logo uploaded — save karke pakka karo");
     } catch (err) {
+      const isAbort =
+        (err instanceof CloudinaryUploadError && err.code === "ABORTED") ||
+        controller.signal.aborted;
+      if (isAbort) {
+        setUploadError("Upload cancel ho gaya");
+        setUploadErrorDetails({ code: "ABORTED", raw: "User cancelled upload" });
+        toast.info("Upload cancel");
+        lastFileRef.current = file;
+        if (!keepPreview && localPreview) {
+          URL.revokeObjectURL(localPreview);
+          setLocalPreview(null);
+        }
+        return;
+      }
       const raw = err instanceof Error ? err.message : String(err);
       const friendly = friendlyUploadError(raw);
       setUploadError(friendly);
@@ -161,9 +189,11 @@ export function PartnerOnboardingChecklist() {
         setLocalPreview(null);
       }
     } finally {
+      if (uploadAbortRef.current === controller) uploadAbortRef.current = null;
       setUploading(false);
     }
   };
+
 
   const MIN_DIM = 200;
   const MAX_DIM = 4000;
@@ -506,19 +536,49 @@ export function PartnerOnboardingChecklist() {
 
 
                   {uploading && (
-                    <div
-                      className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100"
-                      role="progressbar"
-                      aria-valuenow={uploadProgress}
-                      aria-valuemin={0}
-                      aria-valuemax={100}
-                    >
-                      <div
-                        className="h-full bg-[#4F46E5] transition-[width] duration-200 ease-out"
-                        style={{ width: `${uploadProgress}%` }}
-                      />
+                    <div className="space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100"
+                          role="progressbar"
+                          aria-valuenow={uploadProgress}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                          aria-label={`Upload progress ${uploadProgress}%`}
+                        >
+                          <div
+                            className={`h-full bg-[#4F46E5] transition-[width] duration-200 ease-out ${
+                              uploadProgress >= 100 ? "animate-pulse" : ""
+                            }`}
+                            style={{ width: `${uploadProgress}%` }}
+                          />
+                        </div>
+                        <span
+                          className="min-w-[3ch] text-right text-[11px] font-bold tabular-nums text-slate-600"
+                          aria-live="polite"
+                        >
+                          {uploadProgress}%
+                        </span>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={cancelUpload}
+                          className="h-7 border-red-200 px-2 text-[11px] text-red-600 hover:bg-red-50"
+                          aria-label="Cancel upload"
+                        >
+                          <X className="mr-1 h-3 w-3" />
+                          Cancel
+                        </Button>
+                      </div>
+                      <p className="text-[10px] text-slate-500">
+                        {uploadProgress >= 100
+                          ? "Cloudinary process kar raha hai…"
+                          : "Uploading to Cloudinary…"}
+                      </p>
                     </div>
                   )}
+
                   <Input
                     placeholder="https://..."
                     value={form.photo_url}
