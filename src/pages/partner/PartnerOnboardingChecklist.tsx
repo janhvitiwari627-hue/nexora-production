@@ -88,6 +88,7 @@ export function PartnerOnboardingChecklist() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [localPreview, setLocalPreview] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const cloudinaryReady = isCloudinaryConfigured();
@@ -105,11 +106,17 @@ export function PartnerOnboardingChecklist() {
 
   const doUpload = async (file: File, keepPreview?: string) => {
     setUploading(true);
+    setUploadProgress(0);
+    setUploadError(null);
     try {
-      const res = await uploadToCloudinary(file, { folder: "partner-logos" });
+      const res = await uploadToCloudinary(file, {
+        folder: "partner-logos",
+        onProgress: (pct) => setUploadProgress(pct),
+      });
       setForm((f) => ({ ...f, photo_url: res.secure_url }));
       setUploadError(null);
       lastFileRef.current = null;
+      setUploadProgress(100);
       toast.success("Logo uploaded — save karke pakka karo");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Upload failed";
