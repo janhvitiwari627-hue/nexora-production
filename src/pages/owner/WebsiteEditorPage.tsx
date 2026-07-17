@@ -18,8 +18,38 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Eye, Globe, Plus, Trash2, Upload, Image as ImageIcon } from "lucide-react";
+import { Loader2, Eye, Globe, Plus, Trash2, Upload, Image as ImageIcon, Palette } from "lucide-react";
+
+type ThemeState = {
+  primary_color: string;
+  secondary_color: string;
+  accent_color: string;
+  background_color: string;
+  text_color: string;
+  heading_font: string;
+  body_font: string;
+  button_style: string;
+};
+
+const DEFAULT_THEME: ThemeState = {
+  primary_color: "#111827",
+  secondary_color: "#F59E0B",
+  accent_color: "#10B981",
+  background_color: "#FFFFFF",
+  text_color: "#111827",
+  heading_font: "Inter",
+  body_font: "Inter",
+  button_style: "rounded",
+};
+
+const FONT_OPTIONS = ["Inter", "Poppins", "Playfair Display", "Montserrat", "Lora", "Roboto", "Merriweather", "Space Grotesk"];
+const BUTTON_STYLES = [
+  { value: "rounded", label: "Rounded" },
+  { value: "pill", label: "Pill" },
+  { value: "square", label: "Square" },
+];
 
 const SECTION_LABELS: Record<SectionType, string> = {
   hero: "Hero / Banner",
@@ -60,16 +90,23 @@ export function WebsiteEditorPage() {
   });
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [showTheme, setShowTheme] = useState(false);
   const [localSections, setLocalSections] = useState<WebsiteSection[]>([]);
+  const [localTheme, setLocalTheme] = useState<ThemeState>(DEFAULT_THEME);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const saveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const themeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
     if (bundleQ.data?.sections) {
       setLocalSections(bundleQ.data.sections);
-      if (!selectedId && bundleQ.data.sections.length) setSelectedId(bundleQ.data.sections[0].id);
+      if (!selectedId && !showTheme && bundleQ.data.sections.length) setSelectedId(bundleQ.data.sections[0].id);
+    }
+    if (bundleQ.data?.theme) {
+      const t = bundleQ.data.theme as Partial<ThemeState>;
+      setLocalTheme({ ...DEFAULT_THEME, ...t });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bundleQ.data]);
@@ -77,15 +114,34 @@ export function WebsiteEditorPage() {
   // Push live-preview updates to iframe
   useEffect(() => {
     iframeRef.current?.contentWindow?.postMessage(
-      { type: "editor:bundle", bundle: { sections: localSections, theme: bundleQ.data?.theme ?? null } },
+      { type: "editor:bundle", bundle: { sections: localSections, theme: localTheme } },
       "*",
     );
-  }, [localSections, bundleQ.data?.theme]);
+  }, [localSections, localTheme]);
 
   const selected = useMemo(
     () => localSections.find((s) => s.id === selectedId) ?? null,
     [localSections, selectedId],
   );
+
+  function patchTheme(patch: Partial<ThemeState>) {
+    setLocalTheme((prev) => {
+      const next = { ...prev, ...patch };
+      if (themeTimer.current) clearTimeout(themeTimer.current);
+      themeTimer.current = setTimeout(async () => {
+        if (!websiteId) return;
+        try {
+          setSaving(true);
+          await saveTheme({ data: { websiteId, patch } });
+        } catch (e) {
+          toast.error(e instanceof Error ? e.message : "Theme save failed");
+        } finally {
+          setSaving(false);
+        }
+      }, 600);
+      return next;
+    });
+  }
 
   function patchSection(id: string, patch: Partial<WebsiteSection>) {
     setLocalSections((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)));
@@ -187,9 +243,9 @@ export function WebsiteEditorPage() {
             {localSections.map((s) => (
               <li key={s.id}>
                 <button
-                  onClick={() => setSelectedId(s.id)}
+                  onClick={() => { setSelectedId(s.id); setShowTheme(false); }}
                   className={`w-full rounded-md px-3 py-2 text-left text-sm ${
-                    selectedId === s.id ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+                    selectedId === s.id && !showTheme ? "bg-primary text-primary-foreground" : "hover:bg-muted"
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -200,11 +256,22 @@ export function WebsiteEditorPage() {
               </li>
             ))}
           </ul>
+          <div className="mt-4 mb-2 text-xs font-semibold uppercase text-muted-foreground">Design</div>
+          <button
+            onClick={() => setShowTheme(true)}
+            className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm ${
+              showTheme ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+            }`}
+          >
+            <Palette className="h-4 w-4" /> Theme &amp; Typography
+          </button>
         </aside>
 
         {/* Editor form */}
         <section className="overflow-y-auto p-6">
-          {selected ? (
+          {showTheme ? (
+            <ThemeEditor theme={localTheme} onChange={patchTheme} />
+          ) : selected ? (
             <SectionEditor
               section={selected}
               content={content}
@@ -212,6 +279,7 @@ export function WebsiteEditorPage() {
               onFieldChange={updateContent}
               onToggleVisible={(v) => patchSection(selected.id, { is_visible: v })}
             />
+
           ) : (
             <p className="text-muted-foreground">Select a section to edit</p>
           )}
@@ -552,3 +620,97 @@ function TextField({
   );
 }
 
+
+function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="space-y-1.5">
+      <Label>{label}</Label>
+      <div className="flex items-center gap-2">
+        <input
+          type="color"
+          value={value || "#000000"}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-10 w-14 cursor-pointer rounded-md border bg-background p-1"
+        />
+        <Input value={value} onChange={(e) => onChange(e.target.value)} className="font-mono text-xs" />
+      </div>
+    </div>
+  );
+}
+
+function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch: Partial<ThemeState>) => void }) {
+  return (
+    <div className="mx-auto max-w-xl space-y-6">
+      <div>
+        <h2 className="text-xl font-semibold">Theme &amp; Typography</h2>
+        <p className="text-sm text-muted-foreground">Changes apply instantly to the live preview.</p>
+      </div>
+
+      <div className="space-y-4 rounded-lg border bg-card p-4">
+        <h3 className="text-sm font-semibold uppercase text-muted-foreground">Colors</h3>
+        <div className="grid grid-cols-2 gap-3">
+          <ColorField label="Primary" value={theme.primary_color} onChange={(v) => onChange({ primary_color: v })} />
+          <ColorField label="Secondary" value={theme.secondary_color} onChange={(v) => onChange({ secondary_color: v })} />
+          <ColorField label="Accent" value={theme.accent_color} onChange={(v) => onChange({ accent_color: v })} />
+          <ColorField label="Background" value={theme.background_color} onChange={(v) => onChange({ background_color: v })} />
+          <ColorField label="Text" value={theme.text_color} onChange={(v) => onChange({ text_color: v })} />
+        </div>
+      </div>
+
+      <div className="space-y-4 rounded-lg border bg-card p-4">
+        <h3 className="text-sm font-semibold uppercase text-muted-foreground">Typography</h3>
+        <div className="space-y-1.5">
+          <Label>Heading Font</Label>
+          <Select value={theme.heading_font} onValueChange={(v) => onChange({ heading_font: v })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {FONT_OPTIONS.map((f) => (
+                <SelectItem key={f} value={f} style={{ fontFamily: f }}>{f}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-1.5">
+          <Label>Body Font</Label>
+          <Select value={theme.body_font} onValueChange={(v) => onChange({ body_font: v })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {FONT_OPTIONS.map((f) => (
+                <SelectItem key={f} value={f} style={{ fontFamily: f }}>{f}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className="space-y-4 rounded-lg border bg-card p-4">
+        <h3 className="text-sm font-semibold uppercase text-muted-foreground">Buttons</h3>
+        <div className="space-y-1.5">
+          <Label>Button Style</Label>
+          <Select value={theme.button_style} onValueChange={(v) => onChange({ button_style: v })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {BUTTON_STYLES.map((b) => (
+                <SelectItem key={b.value} value={b.value}>{b.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <div className="mt-3 flex items-center gap-3">
+            <span className="text-xs text-muted-foreground">Preview:</span>
+            <span
+              className="inline-block px-5 py-2 text-sm font-medium"
+              style={{
+                background: theme.secondary_color,
+                color: "#000",
+                borderRadius: theme.button_style === "pill" ? "9999px" : theme.button_style === "square" ? "0" : "0.5rem",
+                fontFamily: theme.body_font,
+              }}
+            >
+              Book Now
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

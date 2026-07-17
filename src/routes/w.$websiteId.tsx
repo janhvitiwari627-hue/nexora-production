@@ -57,12 +57,38 @@ function PublicWebsitePage() {
   }
 
   const theme = bundle?.theme;
+  const headingFont = theme?.heading_font || "Inter";
+  const bodyFont = theme?.body_font || "Inter";
+  const btnStyle = theme?.button_style || "rounded";
+  const btnRadius = btnStyle === "pill" ? "9999px" : btnStyle === "square" ? "0" : "0.5rem";
+
+  // Load Google Fonts for the theme
+  useEffect(() => {
+    const families = Array.from(new Set([headingFont, bodyFont]))
+      .map((f) => `family=${encodeURIComponent(f)}:wght@400;500;600;700`)
+      .join("&");
+    const id = "w-google-fonts";
+    let link = document.getElementById(id) as HTMLLinkElement | null;
+    const href = `https://fonts.googleapis.com/css2?${families}&display=swap`;
+    if (!link) {
+      link = document.createElement("link");
+      link.id = id;
+      link.rel = "stylesheet";
+      document.head.appendChild(link);
+    }
+    if (link.href !== href) link.href = href;
+  }, [headingFont, bodyFont]);
+
   const styleVars = {
     ["--w-primary" as string]: theme?.primary_color ?? "#111827",
     ["--w-secondary" as string]: theme?.secondary_color ?? "#F59E0B",
     ["--w-accent" as string]: theme?.accent_color ?? "#10B981",
     ["--w-bg" as string]: theme?.background_color ?? "#FFFFFF",
     ["--w-text" as string]: theme?.text_color ?? "#111827",
+    ["--w-heading-font" as string]: `'${headingFont}', sans-serif`,
+    ["--w-body-font" as string]: `'${bodyFont}', sans-serif`,
+    ["--w-btn-radius" as string]: btnRadius,
+    fontFamily: `var(--w-body-font)`,
   } as React.CSSProperties;
 
   const sections = (bundle?.sections ?? [])
@@ -99,13 +125,13 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
         >
           {c.imageUrl && <div className="absolute inset-0 bg-black/40" />}
           <div className="relative max-w-3xl">
-            <h1 className="text-4xl font-bold md:text-6xl">{c.heading || "Welcome"}</h1>
+            <h1 className="text-4xl font-bold md:text-6xl" style={{ fontFamily: "var(--w-heading-font)" }}>{c.heading || "Welcome"}</h1>
             {c.subheading && <p className="mt-4 text-lg opacity-90">{c.subheading}</p>}
             {c.buttonText && (
               <a
                 href={c.buttonLink || "#"}
-                className="mt-8 inline-block rounded-md px-6 py-3 font-medium"
-                style={{ background: "var(--w-secondary)", color: "#000" }}
+                className="mt-8 inline-block px-6 py-3 font-medium"
+                style={{ background: "var(--w-secondary)", color: "#000", borderRadius: "var(--w-btn-radius)" }}
               >
                 {c.buttonText}
               </a>
@@ -116,7 +142,7 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
     case "about":
       return (
         <section className="mx-auto max-w-3xl px-6 py-16">
-          <h2 className="mb-4 text-3xl font-semibold" style={{ color: "var(--w-primary)" }}>
+          <h2 className="mb-4 text-3xl font-semibold" style={{ color: "var(--w-primary)", fontFamily: "var(--w-heading-font)" }}>
             {c.heading || "About Us"}
           </h2>
           <p className="whitespace-pre-wrap leading-relaxed opacity-90">{c.body}</p>
@@ -125,7 +151,7 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
     case "contact":
       return (
         <section className="mx-auto max-w-3xl px-6 py-16">
-          <h2 className="mb-6 text-3xl font-semibold" style={{ color: "var(--w-primary)" }}>
+          <h2 className="mb-6 text-3xl font-semibold" style={{ color: "var(--w-primary)", fontFamily: "var(--w-heading-font)" }}>
             {c.heading || "Contact Us"}
           </h2>
           <div className="space-y-2">
@@ -147,7 +173,7 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
     default:
       return (
         <section className="mx-auto max-w-4xl px-6 py-12">
-          <h2 className="mb-4 text-2xl font-semibold" style={{ color: "var(--w-primary)" }}>
+          <h2 className="mb-4 text-2xl font-semibold" style={{ color: "var(--w-primary)", fontFamily: "var(--w-heading-font)" }}>
             {c.heading || section.section_type}
           </h2>
           <p className="text-sm opacity-70">
