@@ -132,6 +132,23 @@ export function PartnerOnboardingChecklist() {
 
   const lastFileRef = useRef<File | null>(null);
   const uploadAbortRef = useRef<AbortController | null>(null);
+  const dropzoneRef = useRef<HTMLDivElement>(null);
+  const cancelHadFocusRef = useRef(false);
+  const wasUploadingRef = useRef(false);
+
+  // When the upload finishes (success, error, or cancel) and the Cancel button
+  // had focus, move focus back to the dropzone so the described-by hint is
+  // re-announced and keyboard users don't lose their place.
+  useEffect(() => {
+    if (wasUploadingRef.current && !uploading) {
+      if (cancelHadFocusRef.current) {
+        cancelHadFocusRef.current = false;
+        // Defer past the unmount of the Cancel button
+        requestAnimationFrame(() => dropzoneRef.current?.focus());
+      }
+    }
+    wasUploadingRef.current = uploading;
+  }, [uploading]);
 
   const cancelUpload = () => {
     if (uploadAbortRef.current) {
@@ -477,6 +494,7 @@ export function PartnerOnboardingChecklist() {
               hint={cloudinaryReady ? "JPG, PNG, WEBP ya GIF — max 5 MB" : "Cloudinary configure nahi hai — URL paste karein"}
             >
               <div
+                ref={dropzoneRef}
                 onDragEnter={onDragEnter}
                 onDragOver={onDragOver}
                 onDragLeave={onDragLeave}
@@ -625,6 +643,9 @@ export function PartnerOnboardingChecklist() {
                           variant="outline"
                           size="sm"
                           onClick={cancelUpload}
+                          onFocus={() => {
+                            cancelHadFocusRef.current = true;
+                          }}
                           className="h-7 border-red-200 px-2 text-[11px] text-red-600 hover:bg-red-50"
                           aria-label="Cancel upload"
                         >
