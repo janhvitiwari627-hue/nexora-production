@@ -377,7 +377,7 @@ type SalonBasics = {
 
 type BusinessRole = "Salon" | "Barber" | "Makeup Studio" | "Spa" | "Nail Studio";
 
-const BUSINESS_ROLES: BusinessRole[] = ["Salon", "Barber", "Makeup Studio", "Spa", "Nail Studio"];
+// BUSINESS_ROLES retained for template metadata typing (BusinessRole) even though the picker is no longer role-filtered.
 
 const STAFF_ROLE_OPTIONS = [
   "Senior Stylist",
@@ -554,7 +554,7 @@ export function WebsiteEditorPage() {
   const [localTheme, setLocalTheme] = useState<ThemeState>(DEFAULT_THEME);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
-  const [templateRole, setTemplateRole] = useState<BusinessRole>("Salon");
+  // Templates are shown as a fixed set of 3; no role filter needed.
   const [applyingTemplate, setApplyingTemplate] = useState<string | null>(null);
   const saveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const themeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -1058,30 +1058,28 @@ export function WebsiteEditorPage() {
             <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase text-muted-foreground">
               <Wand2 className="h-3.5 w-3.5" /> Ready Templates
             </div>
-            <Select value={templateRole} onValueChange={(v) => setTemplateRole(v as BusinessRole)}>
-              <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {BUSINESS_ROLES.map((role) => (
-                  <SelectItem key={role} value={role}>{role}</SelectItem>
+            <p className="mb-2 text-[11px] text-muted-foreground">
+              Pick one of our 3 starter templates and edit everything below.
+            </p>
+            <div className="space-y-2">
+              {["salon-30-min", "barber-fast", "makeup-portfolio"]
+                .map((key) => WEBSITE_STARTER_TEMPLATES.find((t) => t.key === key))
+                .filter((t): t is StarterTemplate => Boolean(t))
+                .map((template) => (
+                  <button
+                    key={template.key}
+                    type="button"
+                    onClick={() => void applyStarterTemplate(template)}
+                    disabled={!!applyingTemplate || !websiteId}
+                    className="w-full rounded-md border p-2 text-left text-xs transition hover:border-primary hover:bg-muted/50 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    <span className="flex items-center justify-between gap-2 font-semibold">
+                      {template.name}
+                      {applyingTemplate === template.key && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                    </span>
+                    <span className="mt-1 block text-[11px] leading-snug text-muted-foreground">{template.description}</span>
+                  </button>
                 ))}
-              </SelectContent>
-            </Select>
-            <div className="mt-3 space-y-2">
-              {WEBSITE_STARTER_TEMPLATES.filter((template) => template.role === templateRole).map((template) => (
-                <button
-                  key={template.key}
-                  type="button"
-                  onClick={() => void applyStarterTemplate(template)}
-                  disabled={!!applyingTemplate || !websiteId}
-                  className="w-full rounded-md border p-2 text-left text-xs transition hover:border-primary hover:bg-muted/50 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  <span className="flex items-center justify-between gap-2 font-semibold">
-                    {template.name}
-                    {applyingTemplate === template.key && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                  </span>
-                  <span className="mt-1 block text-[11px] leading-snug text-muted-foreground">{template.description}</span>
-                </button>
-              ))}
             </div>
           </div>
           <div className="mb-2 flex items-center justify-between">
