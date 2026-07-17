@@ -293,6 +293,8 @@ export function PartnerOnboardingChecklist() {
       const raw = err instanceof Error ? err.message : String(err);
       const friendly = friendlyUploadError(raw);
       setUploadError(friendly);
+      updateStatus(statusId, { status: "error", error: friendly });
+
       if (err instanceof CloudinaryUploadError) {
         setUploadErrorDetails({
           status: err.status,
