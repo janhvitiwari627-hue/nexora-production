@@ -483,6 +483,12 @@ export function PartnerOnboardingChecklist() {
                         ? "Replace logo"
                         : "Upload logo"}
                   </Button>
+                  <p className="text-[10px] text-slate-500">
+                    {isDragging
+                      ? "Release to upload"
+                      : "Drag & drop image here, ya button click karein"}
+                  </p>
+
                   {uploading && (
                     <div
                       className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100"
