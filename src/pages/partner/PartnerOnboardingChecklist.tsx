@@ -149,16 +149,32 @@ export function PartnerOnboardingChecklist() {
     setUploading(true);
     setUploadProgress(0);
     setUploadError(null);
+    lastAnnouncedMilestoneRef.current = -1;
+    setSrAlert("");
+    announceStatus(`Uploading ${file.name}. 0 percent complete.`);
     try {
       const res = await uploadToCloudinary(file, {
         folder: "partner-logos",
-        onProgress: (pct) => setUploadProgress(pct),
+        onProgress: (pct) => {
+          setUploadProgress(pct);
+          // Announce at 25/50/75 milestones to avoid flooding the screen reader
+          const milestone = pct >= 75 ? 75 : pct >= 50 ? 50 : pct >= 25 ? 25 : 0;
+          if (milestone > lastAnnouncedMilestoneRef.current && milestone > 0 && pct < 100) {
+            lastAnnouncedMilestoneRef.current = milestone;
+            announceStatus(`Upload ${milestone} percent complete.`);
+          }
+          if (pct >= 100 && lastAnnouncedMilestoneRef.current < 100) {
+            lastAnnouncedMilestoneRef.current = 100;
+            announceStatus("Upload complete. Cloudinary is processing the image.");
+          }
+        },
         signal: controller.signal,
       });
       setForm((f) => ({ ...f, photo_url: res.secure_url }));
       setUploadError(null);
       lastFileRef.current = null;
       setUploadProgress(100);
+      announceStatus("Logo uploaded successfully. Save karke pakka karo.");
       toast.success("Logo uploaded — save karke pakka karo");
     } catch (err) {
       const isAbort =
@@ -167,6 +183,7 @@ export function PartnerOnboardingChecklist() {
       if (isAbort) {
         setUploadError("Upload cancel ho gaya");
         setUploadErrorDetails({ code: "ABORTED", raw: "User cancelled upload" });
+        announceStatus("Upload cancelled.");
         toast.info("Upload cancel");
         lastFileRef.current = file;
         if (!keepPreview && localPreview) {
@@ -188,6 +205,7 @@ export function PartnerOnboardingChecklist() {
       } else {
         setUploadErrorDetails({ raw });
       }
+      announceAlert(`Upload failed. ${friendly}. Retry button available.`);
       toast.error(friendly);
       lastFileRef.current = file;
       if (!keepPreview && localPreview) {
