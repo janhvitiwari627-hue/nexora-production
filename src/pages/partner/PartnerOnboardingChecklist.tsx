@@ -134,7 +134,9 @@ export function PartnerOnboardingChecklist() {
   const uploadAbortRef = useRef<AbortController | null>(null);
   const dropzoneRef = useRef<HTMLDivElement>(null);
   const cancelHadFocusRef = useRef(false);
+  const retryHadFocusRef = useRef(false);
   const wasUploadingRef = useRef(false);
+
 
   // When the upload finishes (success, error, or cancel), restore focus to the
   // dropzone so its describedby hint is announced and keyboard users don't lose
