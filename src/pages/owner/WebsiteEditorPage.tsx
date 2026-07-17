@@ -232,13 +232,16 @@ export function WebsiteEditorPage() {
 
   function patchTheme(patch: Partial<ThemeState>) {
     setLocalTheme((prev) => {
-      const next = { ...prev, ...patch };
+      const nextExtras = patch.extras ? { ...prev.extras, ...patch.extras } : prev.extras;
+      const next = { ...prev, ...patch, extras: nextExtras };
       if (themeTimer.current) clearTimeout(themeTimer.current);
+      const persistPatch: Partial<ThemeState> = { ...patch };
+      if (patch.extras) persistPatch.extras = nextExtras;
       themeTimer.current = setTimeout(async () => {
         if (!websiteId) return;
         try {
           setSaving(true);
-          await saveTheme({ data: { websiteId, patch } });
+          await saveTheme({ data: { websiteId, patch: persistPatch as Record<string, unknown> } });
         } catch (e) {
           toast.error(e instanceof Error ? e.message : "Theme save failed");
         } finally {
