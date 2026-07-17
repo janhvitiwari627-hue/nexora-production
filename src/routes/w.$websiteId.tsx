@@ -142,7 +142,7 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
     case "about":
       return (
         <section className="mx-auto max-w-3xl px-6 py-16">
-          <h2 className="mb-4 text-3xl font-semibold" style={{ color: "var(--w-primary)" }}>
+          <h2 className="mb-4 text-3xl font-semibold" style={{ color: "var(--w-primary)", fontFamily: "var(--w-heading-font)" }}>
             {c.heading || "About Us"}
           </h2>
           <p className="whitespace-pre-wrap leading-relaxed opacity-90">{c.body}</p>
@@ -151,7 +151,7 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
     case "contact":
       return (
         <section className="mx-auto max-w-3xl px-6 py-16">
-          <h2 className="mb-6 text-3xl font-semibold" style={{ color: "var(--w-primary)" }}>
+          <h2 className="mb-6 text-3xl font-semibold" style={{ color: "var(--w-primary)", fontFamily: "var(--w-heading-font)" }}>
             {c.heading || "Contact Us"}
           </h2>
           <div className="space-y-2">
@@ -173,7 +173,7 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
     default:
       return (
         <section className="mx-auto max-w-4xl px-6 py-12">
-          <h2 className="mb-4 text-2xl font-semibold" style={{ color: "var(--w-primary)" }}>
+          <h2 className="mb-4 text-2xl font-semibold" style={{ color: "var(--w-primary)", fontFamily: "var(--w-heading-font)" }}>
             {c.heading || section.section_type}
           </h2>
           <p className="text-sm opacity-70">
