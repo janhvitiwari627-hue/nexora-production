@@ -119,9 +119,10 @@ export function PartnerOnboardingChecklist() {
       setUploadProgress(100);
       toast.success("Logo uploaded — save karke pakka karo");
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Upload failed";
-      setUploadError(msg);
-      toast.error(msg);
+      const raw = err instanceof Error ? err.message : String(err);
+      const friendly = friendlyUploadError(raw);
+      setUploadError(friendly);
+      toast.error(friendly);
       lastFileRef.current = file;
       if (!keepPreview && localPreview) {
         URL.revokeObjectURL(localPreview);
