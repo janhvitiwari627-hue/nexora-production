@@ -730,6 +730,55 @@ function ThemeEditor({ theme, onChange }: { theme: ThemeState; onChange: (patch:
         <p className="text-sm text-muted-foreground">Changes apply instantly to the live preview.</p>
       </div>
 
+      <div className="space-y-3 rounded-lg border bg-card p-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold uppercase text-muted-foreground">Presets</h3>
+          <button
+            type="button"
+            onClick={() => onChange(DEFAULT_THEME)}
+            className="text-xs text-primary underline-offset-2 hover:underline"
+          >
+            Reset to default
+          </button>
+        </div>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {THEME_PRESETS.map((p) => {
+            const active =
+              theme.primary_color === p.theme.primary_color &&
+              theme.secondary_color === p.theme.secondary_color &&
+              theme.heading_font === p.theme.heading_font &&
+              theme.button_style === p.theme.button_style;
+            return (
+              <button
+                key={p.key}
+                type="button"
+                onClick={() => onChange(p.theme)}
+                className={`group rounded-lg border p-2 text-left transition ${
+                  active ? "border-primary ring-2 ring-primary/30" : "hover:border-primary/60"
+                }`}
+                style={{ background: p.theme.background_color }}
+              >
+                <div className="flex gap-1">
+                  {[p.theme.primary_color, p.theme.secondary_color, p.theme.accent_color, p.theme.text_color].map((c, i) => (
+                    <span key={i} className="h-5 w-5 rounded-full border" style={{ background: c }} />
+                  ))}
+                </div>
+                <div
+                  className="mt-2 text-sm font-semibold"
+                  style={{ color: p.theme.text_color, fontFamily: p.theme.heading_font }}
+                >
+                  {p.name}
+                </div>
+                <div className="text-[11px] opacity-70" style={{ color: p.theme.text_color }}>
+                  {p.description}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+
       <div className="space-y-4 rounded-lg border bg-card p-4">
         <h3 className="text-sm font-semibold uppercase text-muted-foreground">Colors</h3>
         <div className="grid grid-cols-2 gap-3">
