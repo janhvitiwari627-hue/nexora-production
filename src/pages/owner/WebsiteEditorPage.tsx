@@ -1699,45 +1699,55 @@ function ItemsEditor({
         </p>
       )}
 
-      <ItemsDndList
-        items={items}
-        onReorder={onChange}
-        renderItem={(it, idx) => (
-          <>
-            <ImageField
-              label="Image"
-              value={it.image ?? ""}
-              salonId={salonId}
-              websiteId={websiteId}
-              folder={isStaff ? "staff" : "services"}
-              compact
-              onChange={(v) => patch(it.id, { image: v })}
-            />
+      <DndContext
+        sensors={dndSensors}
+        collisionDetection={closestCenter}
+        onDragEnd={(e) => {
+          const { active, over } = e;
+          if (!over || active.id === over.id) return;
+          const from = items.findIndex((it) => it.id === active.id);
+          const to = items.findIndex((it) => it.id === over.id);
+          if (from < 0 || to < 0) return;
+          onChange(arrayMove(items, from, to));
+        }}
+      >
+        <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
+          <ul className="space-y-3">
+            {items.map((it, idx) => (
+              <SortableItemCard key={it.id} id={it.id} index={idx} onRemove={() => remove(it.id)}>
+                <ImageField
+                  label="Image"
+                  value={it.image ?? ""}
+                  salonId={salonId}
+                  websiteId={websiteId}
+                  folder={isStaff ? "staff" : "services"}
+                  compact
+                  onChange={(v) => patch(it.id, { image: v })}
+                />
 
-            <Field label="Name" value={it.name ?? ""} onChange={(v) => patch(it.id, { name: v })} />
+                <Field label="Name" value={it.name ?? ""} onChange={(v) => patch(it.id, { name: v })} />
 
-            {isStaff ? (
-              <>
-                <RoleSelect value={it.role ?? ""} onChange={(v) => patch(it.id, { role: v })} />
-                <TextField label="Bio" value={it.bio ?? ""} onChange={(v) => patch(it.id, { bio: v })} />
-              </>
-            ) : (
-              <>
-                <div className="grid grid-cols-2 gap-2">
-                  <Field label="Price" value={it.price ?? ""} onChange={(v) => patch(it.id, { price: v })} />
-                  {kind !== "packages" && (
-                    <Field label="Duration" value={it.duration ?? ""} onChange={(v) => patch(it.id, { duration: v })} />
-                  )}
-                </div>
-                <TextField label="Description" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
-              </>
-            )}
-            {/* idx used to keep signature compatible */}
-            <span className="sr-only">Item {idx + 1}</span>
-          </>
-        )}
-        onRemove={(id) => remove(id)}
-      />
+                {isStaff ? (
+                  <>
+                    <RoleSelect value={it.role ?? ""} onChange={(v) => patch(it.id, { role: v })} />
+                    <TextField label="Bio" value={it.bio ?? ""} onChange={(v) => patch(it.id, { bio: v })} />
+                  </>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Field label="Price" value={it.price ?? ""} onChange={(v) => patch(it.id, { price: v })} />
+                      {kind !== "packages" && (
+                        <Field label="Duration" value={it.duration ?? ""} onChange={(v) => patch(it.id, { duration: v })} />
+                      )}
+                    </div>
+                    <TextField label="Description" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
+                  </>
+                )}
+              </SortableItemCard>
+            ))}
+          </ul>
+        </SortableContext>
+      </DndContext>
     </div>
   );
 }
