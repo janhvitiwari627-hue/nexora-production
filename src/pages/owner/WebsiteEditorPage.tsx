@@ -1901,19 +1901,22 @@ function GenericItemsEditor({
           </SortableContext>
         </DndContext>
       ) : (
-        <ul className="space-y-3">
-          {items.map((it, idx) => (
-            <li key={it.id} className="rounded-lg border bg-card p-3 space-y-3">
-              <div className="flex items-start justify-between gap-2">
-                <span className="text-xs text-muted-foreground">#{idx + 1}</span>
-                <Button type="button" size="sm" variant="ghost" onClick={() => remove(it.id)}>
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
-              </div>
-              {renderBody(it)}
-            </li>
-          ))}
-        </ul>
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
+            <ul className="space-y-3">
+              {items.map((it, idx) => (
+                <SortableItemCard
+                  key={it.id}
+                  id={it.id}
+                  index={idx}
+                  onRemove={() => remove(it.id)}
+                >
+                  {renderBody(it)}
+                </SortableItemCard>
+              ))}
+            </ul>
+          </SortableContext>
+        </DndContext>
       )}
     </div>
   );
