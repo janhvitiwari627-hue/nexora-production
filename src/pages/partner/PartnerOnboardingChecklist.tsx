@@ -134,7 +134,9 @@ export function PartnerOnboardingChecklist() {
   const uploadAbortRef = useRef<AbortController | null>(null);
   const dropzoneRef = useRef<HTMLDivElement>(null);
   const cancelHadFocusRef = useRef(false);
+  const retryHadFocusRef = useRef(false);
   const wasUploadingRef = useRef(false);
+
 
   // When the upload finishes (success, error, or cancel), restore focus to the
   // dropzone so its describedby hint is announced and keyboard users don't lose
@@ -145,6 +147,7 @@ export function PartnerOnboardingChecklist() {
     if (wasUploadingRef.current && !uploading) {
       const shouldRestore = (() => {
         if (cancelHadFocusRef.current) return true;
+        if (retryHadFocusRef.current) return true;
         const active = typeof document !== "undefined" ? document.activeElement : null;
         if (!active || active === document.body) return true;
         const dz = dropzoneRef.current;
@@ -152,10 +155,12 @@ export function PartnerOnboardingChecklist() {
         return false;
       })();
       cancelHadFocusRef.current = false;
+      retryHadFocusRef.current = false;
       if (shouldRestore) {
-        // Defer past the unmount of the Cancel button / progress region
+        // Defer past the unmount of the Cancel / Retry button / progress region
         requestAnimationFrame(() => dropzoneRef.current?.focus());
       }
+
     }
     wasUploadingRef.current = uploading;
   }, [uploading]);
@@ -405,12 +410,18 @@ export function PartnerOnboardingChecklist() {
   const onRetryUpload = async () => {
     const file = lastFileRef.current;
     if (!file) {
+      announceStatus("No previous file to retry. Opening file picker.");
       fileInputRef.current?.click();
       return;
     }
     setUploadError(null);
-    await doUpload(file, localPreview ?? undefined);
+    setUploadErrorDetails(null);
+    announceStatus(`Retrying upload for ${file.name}.`);
+    // Re-run the same validation the initial upload went through so a stale
+    // file that no longer passes checks doesn't silently fail again.
+    await validateAndUpload(file);
   };
+
 
 
   useEffect(() => {
@@ -716,13 +727,24 @@ export function PartnerOnboardingChecklist() {
                           variant="outline"
                           size="sm"
                           onClick={onRetryUpload}
+                          onFocus={() => {
+                            retryHadFocusRef.current = true;
+                          }}
                           disabled={uploading}
+                          aria-busy={uploading}
+                          aria-label={
+                            uploading
+                              ? `Retrying upload, ${uploadProgress}% complete`
+                              : lastFileRef.current
+                                ? `Retry upload of ${lastFileRef.current.name}`
+                                : "Choose file to upload"
+                          }
                           className="h-7 border-red-300 px-2 text-[11px] text-red-700 hover:bg-red-100"
                         >
                           {uploading ? (
-                            <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                            <Loader2 className="mr-1 h-3 w-3 animate-spin" aria-hidden="true" />
                           ) : (
-                            <RefreshCw className="mr-1 h-3 w-3" />
+                            <RefreshCw className="mr-1 h-3 w-3" aria-hidden="true" />
                           )}
                           {uploading
                             ? `Retrying… ${uploadProgress}%`
@@ -730,6 +752,7 @@ export function PartnerOnboardingChecklist() {
                               ? "Retry upload"
                               : "Choose file"}
                         </Button>
+
                       </div>
                       {uploadErrorDetails && (
                         <div className="mt-1.5">
