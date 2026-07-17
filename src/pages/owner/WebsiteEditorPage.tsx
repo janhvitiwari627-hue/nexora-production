@@ -332,6 +332,130 @@ export function WebsiteEditorPage() {
   const [restoring, setRestoring] = useState<string | null>(null);
   const [savingVersion, setSavingVersion] = useState(false);
 
+  // ---- Diff viewer ----
+  type DiffChange =
+    | { kind: "added"; label: string }
+    | { kind: "removed"; label: string }
+    | { kind: "modified"; label: string; details: string[] };
+  type DiffResult = { sections: DiffChange[]; theme: DiffChange[] };
+  const [diffOpen, setDiffOpen] = useState(false);
+  const [diffLoading, setDiffLoading] = useState(false);
+  const [diffVersion, setDiffVersion] = useState<VersionRow | null>(null);
+  const [diffResult, setDiffResult] = useState<DiffResult | null>(null);
+
+  function shortValue(v: unknown): string {
+    if (v === null || v === undefined) return "—";
+    if (typeof v === "string") return v.length > 60 ? v.slice(0, 60) + "…" : v;
+    if (typeof v === "number" || typeof v === "boolean") return String(v);
+    try {
+      const s = JSON.stringify(v);
+      return s.length > 60 ? s.slice(0, 60) + "…" : s;
+    } catch {
+      return String(v);
+    }
+  }
+  function stableStringify(v: unknown): string {
+    try { return JSON.stringify(v); } catch { return ""; }
+  }
+  function diffObjects(a: Record<string, unknown>, b: Record<string, unknown>): string[] {
+    const keys = new Set([...Object.keys(a ?? {}), ...Object.keys(b ?? {})]);
+    const out: string[] = [];
+    for (const k of keys) {
+      const av = a?.[k];
+      const bv = b?.[k];
+      if (stableStringify(av) !== stableStringify(bv)) {
+        out.push(`${k}: ${shortValue(av)} → ${shortValue(bv)}`);
+      }
+    }
+    return out;
+  }
+
+  async function handleViewDiff(v: VersionRow) {
+    setDiffVersion(v);
+    setDiffOpen(true);
+    setDiffLoading(true);
+    setDiffResult(null);
+    try {
+      const snap = await fetchVersionSnapshot({ data: { versionId: v.id } });
+      const oldSections = (snap.sections as unknown as Array<{ id?: string; section_type: string; content: unknown; is_visible?: boolean; sort_order?: number }>) ?? [];
+      const newSections = localSections;
+
+      // Match by id when present, else fall back by section_type order.
+      const oldById = new Map<string, typeof oldSections[number]>();
+      const oldByType: Record<string, typeof oldSections[number][]> = {};
+      for (const s of oldSections) {
+        if (s.id) oldById.set(s.id, s);
+        (oldByType[s.section_type] ??= []).push(s);
+      }
+      const usedOldIds = new Set<string>();
+      const sectionChanges: DiffChange[] = [];
+
+      for (const cur of newSections) {
+        const label = SECTION_LABELS[cur.section_type] ?? cur.section_type;
+        let match = cur.id && oldById.has(cur.id) ? oldById.get(cur.id)! : undefined;
+        if (!match) {
+          const bucket = oldByType[cur.section_type] ?? [];
+          match = bucket.find((s) => !(s.id && usedOldIds.has(s.id)));
+        }
+        if (!match) {
+          sectionChanges.push({ kind: "added", label });
+          continue;
+        }
+        if (match.id) usedOldIds.add(match.id);
+        const details: string[] = [];
+        if ((match.is_visible ?? true) !== (cur.is_visible ?? true)) {
+          details.push(`visibility: ${match.is_visible === false ? "hidden" : "visible"} → ${cur.is_visible === false ? "hidden" : "visible"}`);
+        }
+        if (stableStringify(match.content) !== stableStringify(cur.content)) {
+          const inner = diffObjects(
+            (match.content ?? {}) as Record<string, unknown>,
+            (cur.content ?? {}) as Record<string, unknown>,
+          );
+          if (inner.length) details.push(...inner);
+          else details.push("content changed");
+        }
+        if (details.length) sectionChanges.push({ kind: "modified", label, details });
+      }
+      // Anything in old not matched → removed
+      for (const s of oldSections) {
+        if (s.id && usedOldIds.has(s.id)) continue;
+        if (!s.id) {
+          // For id-less, if new has one of same type unmatched, we'd have used it above.
+          const stillThere = newSections.some((n) => n.section_type === s.section_type);
+          if (stillThere) continue;
+        } else if (newSections.some((n) => n.id === s.id)) continue;
+        sectionChanges.push({ kind: "removed", label: SECTION_LABELS[s.section_type] ?? s.section_type });
+      }
+
+      // Theme diff
+      const oldTheme = (snap.theme as Record<string, unknown> | null) ?? {};
+      const themeFields = [
+        "primary_color", "secondary_color", "accent_color", "background_color",
+        "text_color", "heading_font", "body_font", "button_style",
+      ] as const;
+      const themeChanges: DiffChange[] = [];
+      for (const k of themeFields) {
+        const ov = oldTheme[k];
+        const nv = (localTheme as unknown as Record<string, unknown>)[k];
+        if (stableStringify(ov) !== stableStringify(nv)) {
+          themeChanges.push({ kind: "modified", label: k.replace(/_/g, " "), details: [`${shortValue(ov)} → ${shortValue(nv)}`] });
+        }
+      }
+      const oldExtras = (oldTheme.extras as Record<string, unknown>) ?? {};
+      const newExtras = (localTheme.extras as unknown as Record<string, unknown>) ?? {};
+      const extraDiff = diffObjects(oldExtras, newExtras);
+      if (extraDiff.length) themeChanges.push({ kind: "modified", label: "extras", details: extraDiff });
+
+      setDiffResult({ sections: sectionChanges, theme: themeChanges });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to load diff");
+      setDiffOpen(false);
+    } finally {
+      setDiffLoading(false);
+    }
+  }
+
+
   async function refreshVersions() {
     if (!websiteId) return;
     setVersionsLoading(true);
