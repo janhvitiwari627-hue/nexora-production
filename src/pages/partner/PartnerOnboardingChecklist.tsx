@@ -354,6 +354,7 @@ export function PartnerOnboardingChecklist() {
                   <Input
                     placeholder="https://..."
                     value={form.photo_url}
+                    disabled={uploading}
                     onChange={(e) => {
                       setForm({ ...form, photo_url: e.target.value });
                       setUploadError(null);
