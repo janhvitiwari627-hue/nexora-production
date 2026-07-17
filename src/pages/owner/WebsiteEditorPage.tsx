@@ -1152,10 +1152,76 @@ function GenericItemsEditor({
   const remove = (id: string) => onChange(items.filter((it) => it.id !== id));
   const add = () => onChange([...items, { id: newId() }]);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  const handleDragEnd = (e: DragEndEvent) => {
+    const { active, over } = e;
+    if (!over || active.id === over.id) return;
+    const from = items.findIndex((it) => it.id === active.id);
+    const to = items.findIndex((it) => it.id === over.id);
+    if (from < 0 || to < 0) return;
+    onChange(arrayMove(items, from, to));
+  };
+
+  const renderBody = (it: Item) => (
+    <>
+      <ImageField
+        label="Image"
+        value={it.image ?? ""}
+        salonId={salonId}
+        websiteId={websiteId}
+        folder={kind}
+        compact
+        onChange={(v) => patch(it.id, { image: v })}
+      />
+
+      {kind !== "gallery" && (
+        <Field label="Title" value={it.name ?? ""} onChange={(v) => patch(it.id, { name: v })} />
+      )}
+
+      {kind === "offers" ? (
+        <>
+          <Field label="Discount (e.g. 20% OFF)" value={it.discount ?? ""} onChange={(v) => patch(it.id, { discount: v })} />
+          <TextField label="Description" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
+        </>
+      ) : kind === "membership" ? (
+        <>
+          <Field label="Price" value={it.price ?? ""} onChange={(v) => patch(it.id, { price: v })} />
+          <TextField label="Description" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
+        </>
+      ) : kind === "blog" ? (
+        <>
+          <Field label="Date" value={it.date ?? ""} onChange={(v) => patch(it.id, { date: v })} />
+          <TextField label="Excerpt" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
+        </>
+      ) : (
+        <>
+          <TextField label="Caption" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
+          {it.image && (
+            <GalleryImageCropControl
+              image={it.image}
+              objectPosition={it.objectPosition ?? "center"}
+              thumbShape={it.thumbShape ?? "auto"}
+              onChange={(p) => patch(it.id, p)}
+            />
+          )}
+        </>
+      )}
+    </>
+  );
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <Label className="text-sm">Items ({items.length})</Label>
+        <Label className="text-sm">
+          Items ({items.length})
+          {kind === "gallery" && items.length > 1 && (
+            <span className="ml-2 text-xs font-normal text-muted-foreground">· drag to reorder</span>
+          )}
+        </Label>
         <Button type="button" size="sm" variant="secondary" onClick={add}>
           <Plus className="mr-1 h-4 w-4" /> {addLabel}
         </Button>
@@ -1167,65 +1233,145 @@ function GenericItemsEditor({
         </p>
       )}
 
-      <ul className="space-y-3">
-        {items.map((it, idx) => (
-          <li key={it.id} className="rounded-lg border bg-card p-3 space-y-3">
-            <div className="flex items-start justify-between gap-2">
-              <span className="text-xs text-muted-foreground">#{idx + 1}</span>
-              <Button type="button" size="sm" variant="ghost" onClick={() => remove(it.id)}>
-                <Trash2 className="h-4 w-4 text-destructive" />
-              </Button>
+      {kind === "gallery" && items.length > 0 && (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={(e) => {
+            const { active, over } = e;
+            if (!over || active.id === over.id) return;
+            const from = items.findIndex((it) => it.id === active.id);
+            const to = items.findIndex((it) => it.id === over.id);
+            if (from < 0 || to < 0) return;
+            onChange(arrayMove(items, from, to));
+          }}
+        >
+          <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
+            <div className="grid grid-cols-3 gap-2 rounded-lg border bg-muted/30 p-2 sm:grid-cols-4">
+              {items.map((it, idx) => (
+                <GalleryThumbTile key={it.id} item={it} index={idx} />
+              ))}
             </div>
+          </SortableContext>
+        </DndContext>
+      )}
 
-            <ImageField
-              label="Image"
-              value={it.image ?? ""}
-              salonId={salonId}
-              websiteId={websiteId}
-              folder={kind}
-              compact
-              onChange={(v) => patch(it.id, { image: v })}
-            />
-
-            {kind !== "gallery" && (
-              <Field label="Title" value={it.name ?? ""} onChange={(v) => patch(it.id, { name: v })} />
-            )}
-
-            {kind === "offers" ? (
-              <>
-                <Field label="Discount (e.g. 20% OFF)" value={it.discount ?? ""} onChange={(v) => patch(it.id, { discount: v })} />
-                <TextField label="Description" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
-              </>
-            ) : kind === "membership" ? (
-              <>
-                <Field label="Price" value={it.price ?? ""} onChange={(v) => patch(it.id, { price: v })} />
-                <TextField label="Description" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
-              </>
-            ) : kind === "blog" ? (
-              <>
-                <Field label="Date" value={it.date ?? ""} onChange={(v) => patch(it.id, { date: v })} />
-                <TextField label="Excerpt" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
-              </>
-            ) : (
-              <>
-                <TextField label="Caption" value={it.description ?? ""} onChange={(v) => patch(it.id, { description: v })} />
-                {it.image && (
-                  <GalleryImageCropControl
-                    image={it.image}
-                    objectPosition={it.objectPosition ?? "center"}
-                    thumbShape={it.thumbShape ?? "auto"}
-                    onChange={(p) => patch(it.id, p)}
-                  />
-                )}
-              </>
-            )}
-
-          </li>
-        ))}
-      </ul>
+      {kind === "gallery" ? (
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
+            <ul className="space-y-3">
+              {items.map((it, idx) => (
+                <SortableItemCard
+                  key={it.id}
+                  id={it.id}
+                  index={idx}
+                  onRemove={() => remove(it.id)}
+                >
+                  {renderBody(it)}
+                </SortableItemCard>
+              ))}
+            </ul>
+          </SortableContext>
+        </DndContext>
+      ) : (
+        <ul className="space-y-3">
+          {items.map((it, idx) => (
+            <li key={it.id} className="rounded-lg border bg-card p-3 space-y-3">
+              <div className="flex items-start justify-between gap-2">
+                <span className="text-xs text-muted-foreground">#{idx + 1}</span>
+                <Button type="button" size="sm" variant="ghost" onClick={() => remove(it.id)}>
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              </div>
+              {renderBody(it)}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
+
+function SortableItemCard({
+  id,
+  index,
+  onRemove,
+  children,
+}: {
+  id: string;
+  index: number;
+  onRemove: () => void;
+  children: React.ReactNode;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style: CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.6 : 1,
+  };
+  return (
+    <li ref={setNodeRef} style={style} className="rounded-lg border bg-card p-3 space-y-3">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            className="flex h-7 w-6 cursor-grab items-center justify-center rounded text-muted-foreground opacity-70 hover:opacity-100 active:cursor-grabbing"
+            aria-label="Drag to reorder"
+            title="Drag to reorder"
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical className="h-4 w-4" />
+          </button>
+          <span className="text-xs text-muted-foreground">#{index + 1}</span>
+        </div>
+        <Button type="button" size="sm" variant="ghost" onClick={onRemove}>
+          <Trash2 className="h-4 w-4 text-destructive" />
+        </Button>
+      </div>
+      {children}
+    </li>
+  );
+}
+
+function GalleryThumbTile({ item, index }: { item: Item; index: number }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
+  const style: CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="group relative aspect-square cursor-grab overflow-hidden rounded-md border bg-background active:cursor-grabbing"
+      title="Drag to reorder"
+    >
+      {item.image ? (
+        <img
+          src={item.image}
+          alt=""
+          className="h-full w-full"
+          style={{ objectFit: "cover", objectPosition: item.objectPosition ?? "center" }}
+        />
+      ) : (
+        <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+          <ImageIcon className="h-5 w-5" />
+        </div>
+      )}
+      <div className="absolute left-1 top-1 rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-medium text-white">
+        {index + 1}
+      </div>
+      <div className="absolute right-1 top-1 rounded bg-black/60 p-1 text-white opacity-0 transition group-hover:opacity-100">
+        <GripVertical className="h-3 w-3" />
+      </div>
+    </div>
+  );
+}
+
 
 
 function SortableSectionItem({
