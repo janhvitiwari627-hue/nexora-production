@@ -422,89 +422,177 @@ type StarterTemplate = {
   content: Partial<Record<SectionType, (ctx: { salon?: SalonBasics | null; services: OwnerServiceOption[] }) => Record<string, unknown>>>;
 };
 
+const demoServiceItems = (services: OwnerServiceOption[], fallback: Item[]): Item[] => {
+  if (services.length > 0) return services.slice(0, 8).map(normalizeServiceItem);
+  return fallback;
+};
+
+const ROYAL_LUXE_SERVICES: Item[] = [
+  { id: "rl-s1", name: "Signature Hair Spa", price: "2499", duration: "60 min", description: "Deep-conditioning ritual with scalp massage.", image: "", category: "Hair" },
+  { id: "rl-s2", name: "Luxury Facial", price: "3499", duration: "75 min", description: "Premium brightening facial with gold serum.", image: "", category: "Skin" },
+  { id: "rl-s3", name: "Keratin Smoothening", price: "5999", duration: "120 min", description: "Salon-grade frizz control and shine.", image: "", category: "Hair" },
+  { id: "rl-s4", name: "Bridal Makeup", price: "12999", duration: "180 min", description: "HD bridal look with premium products.", image: "", category: "Makeup" },
+  { id: "rl-s5", name: "Body Polishing", price: "3999", duration: "90 min", description: "Full-body glow and detox therapy.", image: "", category: "Spa" },
+  { id: "rl-s6", name: "Manicure & Pedicure", price: "1499", duration: "60 min", description: "Luxury hand and foot care ritual.", image: "", category: "Nails" },
+];
+
+const URBAN_PRO_SERVICES: Item[] = [
+  { id: "up-s1", name: "Classic Haircut", price: "399", duration: "30 min", description: "Precision cut with wash and style.", image: "", category: "Hair" },
+  { id: "up-s2", name: "Beard Trim & Shape", price: "249", duration: "20 min", description: "Sharp lines and clean edges.", image: "", category: "Beard" },
+  { id: "up-s3", name: "Hair Colour", price: "999", duration: "45 min", description: "Grey coverage or fashion shade.", image: "", category: "Hair" },
+  { id: "up-s4", name: "Head Massage", price: "349", duration: "20 min", description: "Relaxing scalp massage with oil.", image: "", category: "Care" },
+  { id: "up-s5", name: "Fade Cut", price: "499", duration: "40 min", description: "Modern skin fade with styling.", image: "", category: "Hair" },
+  { id: "up-s6", name: "Shave & Facial", price: "699", duration: "45 min", description: "Hot-towel shave with clean-up.", image: "", category: "Beard" },
+];
+
+const BEAUTY_SERVICES: Item[] = [
+  { id: "pb-s1", name: "Bridal Makeup", price: "9999", duration: "150 min", description: "Wedding-day look with trial session.", image: "", category: "Makeup" },
+  { id: "pb-s2", name: "Party Makeup", price: "2999", duration: "60 min", description: "Glam look for events and parties.", image: "", category: "Makeup" },
+  { id: "pb-s3", name: "Nail Art", price: "1499", duration: "60 min", description: "Custom nail art with gel finish.", image: "", category: "Nails" },
+  { id: "pb-s4", name: "Gel Extensions", price: "2499", duration: "90 min", description: "Long-lasting gel nail extensions.", image: "", category: "Nails" },
+  { id: "pb-s5", name: "Airbrush Makeup", price: "4999", duration: "75 min", description: "HD airbrush for a flawless finish.", image: "", category: "Makeup" },
+  { id: "pb-s6", name: "Hair Styling", price: "999", duration: "45 min", description: "Curls, waves and updos.", image: "", category: "Hair" },
+];
+
+const DEMO_STAFF: Item[] = [
+  { id: "st1", name: "Priya Sharma", price: "", duration: "", description: "Senior Stylist · 8 yrs experience", image: "", category: "Team" },
+  { id: "st2", name: "Rahul Kapoor", price: "", duration: "", description: "Master Colourist · Advanced trained", image: "", category: "Team" },
+  { id: "st3", name: "Neha Verma", price: "", duration: "", description: "Makeup Artist · Bridal specialist", image: "", category: "Team" },
+];
+
+const ROYAL_LUXE_THEME: ThemeState = {
+  primary_color: "#D4AF37",
+  secondary_color: "#F5E6C8",
+  accent_color: "#B8932F",
+  background_color: "#0B0B0B",
+  text_color: "#FFFFFF",
+  heading_font: "Playfair Display",
+  body_font: "Lora",
+  button_style: "rounded",
+  extras: {
+    ...DEFAULT_EXTRAS,
+    header_bg: "#0B0B0B",
+    header_text: "#F5E6C8",
+    link_color: "#D4AF37",
+    link_style: "hover-underline",
+    bg_style: "soft-radial",
+    bg_gradient_from: "#0B0B0B",
+    bg_gradient_to: "#161616",
+    bg_gradient_angle: 135,
+  },
+};
+
+const URBAN_PRO_THEME: ThemeState = {
+  primary_color: "#C62828",
+  secondary_color: "#212121",
+  accent_color: "#C62828",
+  background_color: "#FFFFFF",
+  text_color: "#212121",
+  heading_font: "Inter",
+  body_font: "Inter",
+  button_style: "square",
+  extras: {
+    ...DEFAULT_EXTRAS,
+    header_bg: "#FFFFFF",
+    header_text: "#212121",
+    link_color: "#C62828",
+    link_style: "underline",
+    bg_style: "solid",
+  },
+};
+
+const BEAUTY_THEME: ThemeState = {
+  primary_color: "#E11D48",
+  secondary_color: "#F9A8D4",
+  accent_color: "#FFE4EC",
+  background_color: "#FFFDFD",
+  text_color: "#1F2937",
+  heading_font: "Playfair Display",
+  body_font: "Lora",
+  button_style: "pill",
+  extras: {
+    ...DEFAULT_EXTRAS,
+    header_bg: "#FFFDFD",
+    header_text: "#1F2937",
+    link_color: "#E11D48",
+    link_style: "hover-underline",
+    bg_style: "gradient",
+    bg_gradient_from: "#FFFDFD",
+    bg_gradient_to: "#FFE4EC",
+    bg_gradient_angle: 160,
+  },
+};
+
 const WEBSITE_STARTER_TEMPLATES: StarterTemplate[] = [
   {
-    key: "salon-30-min",
-    name: "30-min Salon Website",
+    key: "royal-luxe",
+    name: "Royal Luxe",
     role: "Salon",
-    description: "Hero, services, rate card, gallery, team, contact and map ready.",
-    theme: THEME_PRESETS.find((p) => p.key === "classic")?.theme ?? DEFAULT_THEME,
-    visibleOrder: ["hero", "about", "services", "rate_card", "gallery", "staff", "offers", "contact"],
+    description: "Luxury black & gold. Premium salon and spa ready-to-publish.",
+    theme: ROYAL_LUXE_THEME,
+    visibleOrder: ["hero", "about", "services", "staff", "gallery", "rate_card", "packages", "membership", "offers", "contact"],
     content: {
-      hero: ({ salon }) => ({ heading: salon?.name ?? "Premium Salon", subheading: "Hair, beauty and care in one place", description: "Book trusted salon services with transparent pricing.", buttonText: "Book Now", buttonLink: "#services", imageUrl: "" }),
-      about: ({ salon }) => ({ heading: "About Us", body: `${salon?.name ?? "Our salon"} delivers professional beauty services with trained experts and hygienic care.` }),
-      services: ({ services }) => ({ heading: "Popular Services", description: "Choose services and publish instantly.", items: services.slice(0, 6).map(normalizeServiceItem) }),
-      rate_card: ({ services }) => ({ heading: "Rate Card", description: "Transparent prices for quick booking decisions.", items: services.slice(0, 8).map(normalizeServiceItem) }),
-      gallery: () => ({ heading: "Gallery", description: "Show your best salon work.", items: [], gridAspect: "square", gridColumns: 4, imageFit: "cover", gridGap: 12 }),
-      staff: () => ({ heading: "Meet the Team", description: "Introduce your experts.", items: [] }),
-      offers: () => ({ heading: "Current Offers", description: "Limited time deals for new and returning customers.", items: [{ id: newId(), name: "First Visit Offer", discount: "20% OFF", description: "Welcome offer for first-time customers." }] }),
-      contact: ({ salon }) => ({ heading: "Contact Us", description: "Call, WhatsApp or visit us.", phone: salon?.phone ?? "", whatsapp: salon?.phone ?? "", email: "", address: salon?.address ?? salon?.location ?? "", mapEmbed: mapsEmbedFromAddress(salon?.address ?? salon?.location) }),
+      hero: ({ salon }) => ({ heading: salon?.name ?? "Royal Luxe Salon & Spa", subheading: "Luxury Hair · Skin · Bridal Studio", description: "Premium salon experience with expert stylists and signature rituals.", buttonText: "Book Appointment", buttonLink: "#services", imageUrl: "" }),
+      about: ({ salon }) => ({ heading: "About Us", body: `${salon?.name ?? "Royal Luxe"} is a premium salon and spa offering signature hair, skin and bridal services in a luxurious ambience.` }),
+      services: ({ services }) => ({ heading: "Signature Services", description: "Handpicked premium services for our guests.", items: demoServiceItems(services, ROYAL_LUXE_SERVICES.slice(0, 6)) }),
+      staff: () => ({ heading: "Meet Our Experts", description: "Award-winning stylists and therapists.", items: DEMO_STAFF }),
+      gallery: () => ({ heading: "Our Salon", description: "A glimpse of our premium studio.", items: [], gridAspect: "square", gridColumns: 4, imageFit: "cover", gridGap: 12 }),
+      rate_card: ({ services }) => ({ heading: "Rate Card", description: "Transparent premium pricing.", items: demoServiceItems(services, ROYAL_LUXE_SERVICES) }),
+      packages: () => ({ heading: "Signature Packages", description: "Curated bundles for a complete experience.", items: [
+        { id: newId(), name: "Bridal Glow Package", price: "24999", description: "Pre-bridal + wedding-day makeup + hair styling.", duration: "Full day" },
+        { id: newId(), name: "Luxury Spa Day", price: "6999", description: "Hair spa + facial + body polish.", duration: "3 hours" },
+      ] }),
+      membership: () => ({ heading: "Membership", description: "Exclusive privileges for loyal guests.", items: [
+        { id: newId(), name: "Gold Member", price: "4999", description: "10% off on all services + priority booking." },
+        { id: newId(), name: "Platinum Member", price: "9999", description: "20% off + free monthly hair spa." },
+      ] }),
+      offers: () => ({ heading: "Current Offers", description: "Limited-time luxury deals.", items: [
+        { id: newId(), name: "First Visit", discount: "20% OFF", description: "Welcome offer for new guests." },
+      ] }),
+      contact: ({ salon }) => ({ heading: "Visit Us", description: "Call, WhatsApp or drop in.", phone: salon?.phone ?? "", whatsapp: salon?.phone ?? "", email: "", address: salon?.address ?? salon?.location ?? "", mapEmbed: mapsEmbedFromAddress(salon?.address ?? salon?.location) }),
     },
   },
   {
-    key: "barber-fast",
-    name: "Barber Fast Booking",
+    key: "urban-pro",
+    name: "Urban Pro",
     role: "Barber",
-    description: "Bold layout for haircut, beard and grooming price lists.",
-    theme: THEME_PRESETS.find((p) => p.key === "modern")?.theme ?? DEFAULT_THEME,
-    visibleOrder: ["hero", "services", "rate_card", "gallery", "staff", "contact"],
+    description: "Modern red & white barber shop. Fast booking, sharp look.",
+    theme: URBAN_PRO_THEME,
+    visibleOrder: ["hero", "about", "services", "rate_card", "staff", "gallery", "offers", "contact"],
     content: {
-      hero: ({ salon }) => ({ heading: salon?.name ?? "Modern Barber Shop", subheading: "Sharp cuts. Clean fades. Fast booking.", description: "Pick your grooming service and visit today.", buttonText: "View Rates", buttonLink: "#rate_card", imageUrl: "" }),
-      services: ({ services }) => ({ heading: "Grooming Services", description: "Haircut, beard, shave and styling.", items: services.slice(0, 6).map(normalizeServiceItem) }),
-      rate_card: ({ services }) => ({ heading: "Barber Rate Card", description: "Quick list for walk-ins and bookings.", items: services.slice(0, 10).map(normalizeServiceItem) }),
-      gallery: () => ({ heading: "Work Gallery", description: "Show fades, beard trims and transformations.", items: [], gridAspect: "landscape", gridColumns: 3, imageFit: "cover", gridGap: 10 }),
-      staff: () => ({ heading: "Barbers", description: "Your grooming specialists.", items: [] }),
-      contact: ({ salon }) => ({ heading: "Visit The Shop", description: "Directions and contact details.", phone: salon?.phone ?? "", whatsapp: salon?.phone ?? "", email: "", address: salon?.address ?? salon?.location ?? "", mapEmbed: mapsEmbedFromAddress(salon?.address ?? salon?.location) }),
+      hero: ({ salon }) => ({ heading: salon?.name ?? "Urban Pro Barber", subheading: "Sharp cuts. Clean fades. Book in 3 clicks.", description: "Modern grooming studio for men. Walk-ins welcome.", buttonText: "Book Now", buttonLink: "#services", imageUrl: "" }),
+      about: ({ salon }) => ({ heading: "About The Shop", body: `${salon?.name ?? "Urban Pro"} is a modern barber shop offering precision cuts, beard styling and grooming services.` }),
+      services: ({ services }) => ({ heading: "Our Services", description: "Grooming essentials for the modern man.", items: demoServiceItems(services, URBAN_PRO_SERVICES.slice(0, 6)) }),
+      rate_card: ({ services }) => ({ heading: "Rate Card", description: "Clear, honest pricing.", items: demoServiceItems(services, URBAN_PRO_SERVICES) }),
+      staff: () => ({ heading: "Our Barbers", description: "Skilled professionals ready to serve you.", items: DEMO_STAFF }),
+      gallery: () => ({ heading: "Recent Cuts", description: "Fresh work from the chair.", items: [], gridAspect: "landscape", gridColumns: 3, imageFit: "cover", gridGap: 10 }),
+      offers: () => ({ heading: "Combo Offers", description: "Save more with combos.", items: [
+        { id: newId(), name: "Cut + Beard Combo", discount: "15% OFF", description: "Haircut + beard trim combo deal." },
+      ] }),
+      contact: ({ salon }) => ({ heading: "Visit The Shop", description: "Location and contact.", phone: salon?.phone ?? "", whatsapp: salon?.phone ?? "", email: "", address: salon?.address ?? salon?.location ?? "", mapEmbed: mapsEmbedFromAddress(salon?.address ?? salon?.location) }),
     },
   },
   {
-    key: "makeup-portfolio",
-    name: "Makeup Portfolio",
+    key: "professional-beauty",
+    name: "Professional Beauty",
     role: "Makeup Studio",
-    description: "Portfolio-first template for bridal and event makeup.",
-    theme: THEME_PRESETS.find((p) => p.key === "blush")?.theme ?? THEME_PRESETS.find((p) => p.key === "classic")?.theme ?? DEFAULT_THEME,
-    visibleOrder: ["hero", "about", "services", "packages", "gallery", "offers", "contact"],
+    description: "Elegant pink beauty studio. Bridal, makeup & nail portfolio.",
+    theme: BEAUTY_THEME,
+    visibleOrder: ["hero", "about", "services", "packages", "staff", "gallery", "offers", "contact"],
     content: {
-      hero: ({ salon }) => ({ heading: salon?.name ?? "Makeup Studio", subheading: "Bridal, party and editorial makeup", description: "Showcase your best transformations and packages.", buttonText: "See Packages", buttonLink: "#packages", imageUrl: "" }),
-      about: () => ({ heading: "Artist Profile", body: "Professional makeup services for weddings, shoots and special occasions." }),
-      services: ({ services }) => ({ heading: "Makeup Services", description: "Choose from studio and event services.", items: services.slice(0, 6).map(normalizeServiceItem) }),
-      packages: () => ({ heading: "Packages", description: "Ready-made offers customers can understand fast.", items: [{ id: newId(), name: "Bridal Glow Package", price: "12999", description: "Consultation, makeup trial and wedding-day look.", duration: "Full day" }] }),
-      gallery: () => ({ heading: "Portfolio", description: "Upload bridal and before/after photos.", items: [], gridAspect: "portrait", gridColumns: 3, imageFit: "cover", gridGap: 12 }),
-      offers: () => ({ heading: "Special Offers", description: "Promote seasonal bookings.", items: [] }),
+      hero: ({ salon }) => ({ heading: salon?.name ?? "Professional Beauty Studio", subheading: "Bridal · Party · Editorial Makeup", description: "Expert makeup artists creating flawless looks for your special day.", buttonText: "See Packages", buttonLink: "#packages", imageUrl: "" }),
+      about: ({ salon }) => ({ heading: "About The Studio", body: `${salon?.name ?? "Our studio"} specialises in bridal, party and editorial makeup with premium products and airbrush finish.` }),
+      services: ({ services }) => ({ heading: "Beauty Services", description: "Makeup, hair and nail services.", items: demoServiceItems(services, BEAUTY_SERVICES.slice(0, 6)) }),
+      packages: () => ({ heading: "Bridal Packages", description: "Ready-made packages for your big day.", items: [
+        { id: newId(), name: "Classic Bridal", price: "14999", description: "HD makeup + hair styling + saree draping.", duration: "3 hours" },
+        { id: newId(), name: "Premium Bridal", price: "24999", description: "Trial + wedding + reception looks.", duration: "Full day" },
+      ] }),
+      staff: () => ({ heading: "Our Artists", description: "Certified makeup and nail artists.", items: DEMO_STAFF }),
+      gallery: () => ({ heading: "Portfolio", description: "Recent bridal and party looks.", items: [], gridAspect: "portrait", gridColumns: 3, imageFit: "cover", gridGap: 12 }),
+      offers: () => ({ heading: "Seasonal Offers", description: "Book early and save more.", items: [
+        { id: newId(), name: "Trial + Wedding", discount: "10% OFF", description: "Book trial and wedding together." },
+      ] }),
       contact: ({ salon }) => ({ heading: "Book Consultation", description: "Share your event date and location.", phone: salon?.phone ?? "", whatsapp: salon?.phone ?? "", email: "", address: salon?.address ?? salon?.location ?? "", mapEmbed: mapsEmbedFromAddress(salon?.address ?? salon?.location) }),
-    },
-  },
-  {
-    key: "spa-calm",
-    name: "Spa & Wellness",
-    role: "Spa",
-    description: "Calm wellness pages with memberships and packages.",
-    theme: THEME_PRESETS.find((p) => p.key === "botanical")?.theme ?? THEME_PRESETS.find((p) => p.key === "fresh")?.theme ?? DEFAULT_THEME,
-    visibleOrder: ["hero", "about", "services", "packages", "membership", "gallery", "contact"],
-    content: {
-      hero: ({ salon }) => ({ heading: salon?.name ?? "Spa & Wellness", subheading: "Relax, refresh and recharge", description: "A ready wellness website with service menu and booking CTA.", buttonText: "Book Session", buttonLink: "#services", imageUrl: "" }),
-      about: () => ({ heading: "Our Wellness Space", body: "Relaxing treatments, trained therapists and a clean, peaceful environment." }),
-      services: ({ services }) => ({ heading: "Spa Services", description: "Massages, facials and wellness rituals.", items: services.slice(0, 6).map(normalizeServiceItem) }),
-      packages: () => ({ heading: "Wellness Packages", description: "Bundle your best services.", items: [{ id: newId(), name: "Relaxation Day", price: "4999", description: "Massage, facial and refreshment ritual.", duration: "3 hours" }] }),
-      membership: () => ({ heading: "Membership", description: "Monthly wellness plans for repeat customers.", items: [{ id: newId(), name: "Gold Wellness", price: "999", description: "Priority booking and member discounts." }] }),
-      gallery: () => ({ heading: "Spa Gallery", description: "Show ambience and treatment rooms.", items: [], gridAspect: "landscape", gridColumns: 3, imageFit: "cover", gridGap: 14 }),
-      contact: ({ salon }) => ({ heading: "Find Us", description: "Call or get directions.", phone: salon?.phone ?? "", whatsapp: salon?.phone ?? "", email: "", address: salon?.address ?? salon?.location ?? "", mapEmbed: mapsEmbedFromAddress(salon?.address ?? salon?.location) }),
-    },
-  },
-  {
-    key: "nails-clean",
-    name: "Nail Studio",
-    role: "Nail Studio",
-    description: "Visual grid for nail art, prices and offers.",
-    theme: THEME_PRESETS.find((p) => p.key === "fresh")?.theme ?? DEFAULT_THEME,
-    visibleOrder: ["hero", "services", "rate_card", "gallery", "offers", "contact"],
-    content: {
-      hero: ({ salon }) => ({ heading: salon?.name ?? "Nail Studio", subheading: "Nail art, extensions and care", description: "A simple template customers can scan quickly.", buttonText: "See Nail Menu", buttonLink: "#services", imageUrl: "" }),
-      services: ({ services }) => ({ heading: "Nail Services", description: "Manicure, pedicure, nail art and extensions.", items: services.slice(0, 6).map(normalizeServiceItem) }),
-      rate_card: ({ services }) => ({ heading: "Nail Rate Card", description: "Clear menu for every customer.", items: services.slice(0, 10).map(normalizeServiceItem) }),
-      gallery: () => ({ heading: "Nail Art Gallery", description: "Upload your best designs.", items: [], gridAspect: "square", gridColumns: 4, imageFit: "cover", gridGap: 8 }),
-      offers: () => ({ heading: "Offers", description: "Feature combo offers.", items: [{ id: newId(), name: "Mani + Pedi Combo", discount: "15% OFF", description: "Limited-time combo deal." }] }),
-      contact: ({ salon }) => ({ heading: "Visit Studio", description: "Location and WhatsApp booking.", phone: salon?.phone ?? "", whatsapp: salon?.phone ?? "", email: "", address: salon?.address ?? salon?.location ?? "", mapEmbed: mapsEmbedFromAddress(salon?.address ?? salon?.location) }),
     },
   },
 ];
