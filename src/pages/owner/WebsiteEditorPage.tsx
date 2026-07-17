@@ -1245,6 +1245,186 @@ function SortableSectionItem({
   );
 }
 
+const GRID_ASPECTS: { value: string; label: string; ratio: string }[] = [
+  { value: "square", label: "Square 1:1", ratio: "1 / 1" },
+  { value: "portrait", label: "Portrait 3:4", ratio: "3 / 4" },
+  { value: "landscape", label: "Landscape 4:3", ratio: "4 / 3" },
+  { value: "wide", label: "Wide 16:9", ratio: "16 / 9" },
+  { value: "auto", label: "Original (no crop)", ratio: "auto" },
+];
+
+function aspectRatioFor(v: string): string {
+  return GRID_ASPECTS.find((a) => a.value === v)?.ratio ?? "1 / 1";
+}
+
+function GalleryGridControls({
+  gridAspect,
+  gridColumns,
+  imageFit,
+  gap,
+  onChange,
+}: {
+  gridAspect: string;
+  gridColumns: number;
+  imageFit: string;
+  gap: number;
+  onChange: (patch: Record<string, unknown>) => void;
+}) {
+  return (
+    <div className="space-y-4 rounded-lg border bg-card p-3">
+      <div className="flex items-center gap-2">
+        <ImageIcon className="h-4 w-4 text-muted-foreground" />
+        <h3 className="text-sm font-semibold uppercase text-muted-foreground">Grid & Thumbnails</h3>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Yeh controls sabhi gallery images par apply hoti hain — grid me perfect fit aur consistent look ke liye.
+      </p>
+
+      <div className="space-y-1.5">
+        <Label>Thumbnail Aspect</Label>
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+          {GRID_ASPECTS.map((a) => {
+            const active = gridAspect === a.value;
+            return (
+              <button
+                key={a.value}
+                type="button"
+                onClick={() => onChange({ gridAspect: a.value })}
+                className={`rounded-md border p-2 text-center text-[11px] transition ${
+                  active ? "border-primary ring-2 ring-primary/30" : "hover:border-primary/60"
+                }`}
+              >
+                <div
+                  className="mx-auto mb-1 w-8 rounded-sm bg-muted"
+                  style={{ aspectRatio: a.ratio === "auto" ? "4 / 3" : a.ratio }}
+                />
+                {a.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1.5">
+          <Label>Columns: {gridColumns}</Label>
+          <input
+            type="range"
+            min={2}
+            max={6}
+            step={1}
+            value={gridColumns}
+            onChange={(e) => onChange({ gridColumns: Number(e.target.value) })}
+            className="w-full"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label>Gap: {gap}px</Label>
+          <input
+            type="range"
+            min={0}
+            max={32}
+            step={2}
+            value={gap}
+            onChange={(e) => onChange({ gridGap: Number(e.target.value) })}
+            className="w-full"
+          />
+        </div>
+      </div>
+
+      <div className="space-y-1.5">
+        <Label>Image Fit</Label>
+        <Select value={imageFit} onValueChange={(v) => onChange({ imageFit: v })}>
+          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="cover">Cover — fill the thumbnail (may crop)</SelectItem>
+            <SelectItem value="contain">Contain — show entire image (letterbox)</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  );
+}
+
+const CROP_POSITIONS: { value: string; label: string }[] = [
+  { value: "left top", label: "↖" },
+  { value: "top", label: "↑" },
+  { value: "right top", label: "↗" },
+  { value: "left", label: "←" },
+  { value: "center", label: "•" },
+  { value: "right", label: "→" },
+  { value: "left bottom", label: "↙" },
+  { value: "bottom", label: "↓" },
+  { value: "right bottom", label: "↘" },
+];
+
+function GalleryImageCropControl({
+  image,
+  objectPosition,
+  thumbShape,
+  onChange,
+}: {
+  image: string;
+  objectPosition: string;
+  thumbShape: "square" | "portrait" | "landscape" | "wide" | "auto";
+  onChange: (p: Partial<Item>) => void;
+}) {
+  const ratio = aspectRatioFor(thumbShape === "auto" ? "square" : thumbShape);
+  return (
+    <div className="space-y-2 rounded-md border bg-muted/30 p-2">
+      <div className="flex items-center justify-between">
+        <Label className="text-xs">Crop / Focal Point</Label>
+        <Select
+          value={thumbShape}
+          onValueChange={(v) => onChange({ thumbShape: v as Item["thumbShape"] })}
+        >
+          <SelectTrigger className="h-7 w-[140px] text-xs"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="auto">Use grid shape</SelectItem>
+            {GRID_ASPECTS.filter((a) => a.value !== "auto").map((a) => (
+              <SelectItem key={a.value} value={a.value}>{a.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="flex items-start gap-3">
+        <div
+          className="relative w-28 shrink-0 overflow-hidden rounded-md border bg-background"
+          style={{ aspectRatio: ratio }}
+        >
+          <img
+            src={image}
+            alt=""
+            className="h-full w-full"
+            style={{ objectFit: "cover", objectPosition }}
+          />
+        </div>
+        <div className="grid grid-cols-3 gap-1">
+          {CROP_POSITIONS.map((p) => {
+            const active = objectPosition === p.value;
+            return (
+              <button
+                key={p.value}
+                type="button"
+                onClick={() => onChange({ objectPosition: p.value })}
+                className={`flex h-8 w-8 items-center justify-center rounded border text-sm transition ${
+                  active ? "border-primary bg-primary text-primary-foreground" : "hover:border-primary/60"
+                }`}
+                title={p.value}
+              >
+                {p.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <p className="text-[10px] text-muted-foreground">
+        Preview me dekhein — jo hissa dikhna chahiye uske arrow par tap karein.
+      </p>
+    </div>
+  );
+}
+
 function ImageField({
   label,
   value,
