@@ -377,7 +377,7 @@ type SalonBasics = {
 
 type BusinessRole = "Salon" | "Barber" | "Makeup Studio" | "Spa" | "Nail Studio";
 
-const BUSINESS_ROLES: BusinessRole[] = ["Salon", "Barber", "Makeup Studio", "Spa", "Nail Studio"];
+// BUSINESS_ROLES retained for template metadata typing (BusinessRole) even though the picker is no longer role-filtered.
 
 const STAFF_ROLE_OPTIONS = [
   "Senior Stylist",
