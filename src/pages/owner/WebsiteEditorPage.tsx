@@ -241,7 +241,7 @@ export function WebsiteEditorPage() {
         if (!websiteId) return;
         try {
           setSaving(true);
-          await saveTheme({ data: { websiteId, patch: persistPatch as Record<string, unknown> } });
+          await saveTheme({ data: { websiteId, patch: persistPatch } });
         } catch (e) {
           toast.error(e instanceof Error ? e.message : "Theme save failed");
         } finally {
