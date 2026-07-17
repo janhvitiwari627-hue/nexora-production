@@ -494,6 +494,7 @@ export function PartnerOnboardingChecklist() {
               hint={cloudinaryReady ? "JPG, PNG, WEBP ya GIF — max 5 MB" : "Cloudinary configure nahi hai — URL paste karein"}
             >
               <div
+                ref={dropzoneRef}
                 onDragEnter={onDragEnter}
                 onDragOver={onDragOver}
                 onDragLeave={onDragLeave}
