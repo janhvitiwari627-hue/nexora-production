@@ -603,6 +603,7 @@ function ItemsEditor({
               label="Image"
               value={it.image ?? ""}
               salonId={salonId}
+              websiteId={websiteId}
               folder={isStaff ? "staff" : "services"}
               compact
               onChange={(v) => patch(it.id, { image: v })}
