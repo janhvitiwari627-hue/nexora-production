@@ -554,7 +554,7 @@ export function WebsiteEditorPage() {
   const [localTheme, setLocalTheme] = useState<ThemeState>(DEFAULT_THEME);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
-  const [templateRole, setTemplateRole] = useState<BusinessRole>("Salon");
+  // Templates are shown as a fixed set of 3; no role filter needed.
   const [applyingTemplate, setApplyingTemplate] = useState<string | null>(null);
   const saveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const themeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
