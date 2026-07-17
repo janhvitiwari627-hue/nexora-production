@@ -507,6 +507,7 @@ const WEBSITE_STARTER_TEMPLATES: StarterTemplate[] = [
 
 export function WebsiteEditorPage() {
   const fetchSalons = useServerFn(getMyOwnedSalons);
+  const fetchServices = useServerFn(listOwnerServices);
   const fetchOrCreate = useServerFn(getOrCreateMyWebsite);
   const fetchBundle = useServerFn(getMyWebsiteBundle);
   const saveSection = useServerFn(updateSection);
@@ -521,7 +522,14 @@ export function WebsiteEditorPage() {
 
 
   const salonsQ = useQuery({ queryKey: ["my-owned-salons-editor"], queryFn: () => fetchSalons() });
-  const salonId = salonsQ.data?.[0]?.salon?.id;
+  const selectedSalon = salonsQ.data?.[0]?.salon as (SalonBasics & { id?: string }) | undefined;
+  const salonId = selectedSalon?.id;
+
+  const ownerServicesQ = useQuery({
+    queryKey: ["owner-services-for-website", salonId],
+    queryFn: () => fetchServices({ data: { salon_id: salonId! } }),
+    enabled: !!salonId,
+  });
 
   const websiteQ = useQuery({
     queryKey: ["editor-website", salonId],
@@ -542,6 +550,8 @@ export function WebsiteEditorPage() {
   const [localTheme, setLocalTheme] = useState<ThemeState>(DEFAULT_THEME);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [templateRole, setTemplateRole] = useState<BusinessRole>("Salon");
+  const [applyingTemplate, setApplyingTemplate] = useState<string | null>(null);
   const saveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const themeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -859,6 +869,67 @@ export function WebsiteEditorPage() {
     }
   }
 
+  async function applyStarterTemplate(template: StarterTemplate) {
+    if (!websiteId) return;
+    setApplyingTemplate(template.key);
+    try {
+      if (themeTimer.current) {
+        clearTimeout(themeTimer.current);
+        themeTimer.current = null;
+      }
+      Object.values(saveTimers.current).forEach((timer) => clearTimeout(timer));
+      saveTimers.current = {};
+
+      const services = (ownerServicesQ.data ?? []) as OwnerServiceOption[];
+      const ctx = { salon: selectedSalon, services };
+      const visible = new Set<SectionType>(template.visibleOrder);
+      const order = new Map<SectionType, number>(template.visibleOrder.map((type, index) => [type, index]));
+      const nextTheme = {
+        ...template.theme,
+        extras: { ...DEFAULT_EXTRAS, ...template.theme.extras },
+      };
+      const nextSections = localSections
+        .map((section, index) => {
+          const buildContent = template.content[section.section_type];
+          const currentContent = (section.content ?? {}) as Record<string, unknown>;
+          return {
+            ...section,
+            content: (buildContent ? { ...currentContent, ...buildContent(ctx) } : currentContent) as WebsiteSection["content"],
+            is_visible: visible.has(section.section_type),
+            sort_order: order.get(section.section_type) ?? template.visibleOrder.length + index,
+          };
+        })
+        .sort((a, b) => a.sort_order - b.sort_order);
+
+      setSaving(true);
+      setLocalTheme(nextTheme);
+      setLocalSections(nextSections);
+      setSelectedId(nextSections.find((section) => section.is_visible)?.id ?? nextSections[0]?.id ?? null);
+      setShowTheme(false);
+
+      await saveTheme({ data: { websiteId, patch: nextTheme } });
+      await Promise.all(
+        nextSections.map((section) =>
+          saveSection({
+            data: {
+              sectionId: section.id,
+              content: section.content as Record<string, unknown>,
+              is_visible: section.is_visible,
+              sort_order: section.sort_order,
+            },
+          }),
+        ),
+      );
+      await saveOrder({ data: { websiteId, order: nextSections.map((section) => section.id) } });
+      toast.success(`${template.name} applied`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Template apply failed");
+    } finally {
+      setSaving(false);
+      setApplyingTemplate(null);
+    }
+  }
+
 
   if (salonsQ.isLoading || websiteQ.isLoading || bundleQ.isLoading) {
     return (
@@ -902,6 +973,36 @@ export function WebsiteEditorPage() {
       <div className="grid flex-1 grid-cols-[240px_1fr_1fr] overflow-hidden">
         {/* Section list */}
         <aside className="overflow-y-auto border-r bg-muted/30 p-3">
+          <div className="mb-4 rounded-lg border bg-background p-3 shadow-sm">
+            <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase text-muted-foreground">
+              <Wand2 className="h-3.5 w-3.5" /> Ready Templates
+            </div>
+            <Select value={templateRole} onValueChange={(v) => setTemplateRole(v as BusinessRole)}>
+              <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {BUSINESS_ROLES.map((role) => (
+                  <SelectItem key={role} value={role}>{role}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="mt-3 space-y-2">
+              {WEBSITE_STARTER_TEMPLATES.filter((template) => template.role === templateRole).map((template) => (
+                <button
+                  key={template.key}
+                  type="button"
+                  onClick={() => void applyStarterTemplate(template)}
+                  disabled={!!applyingTemplate || !websiteId}
+                  className="w-full rounded-md border p-2 text-left text-xs transition hover:border-primary hover:bg-muted/50 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <span className="flex items-center justify-between gap-2 font-semibold">
+                    {template.name}
+                    {applyingTemplate === template.key && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                  </span>
+                  <span className="mt-1 block text-[11px] leading-snug text-muted-foreground">{template.description}</span>
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="mb-2 flex items-center justify-between">
             <div className="text-xs font-semibold uppercase text-muted-foreground">Sections</div>
             <div className="text-[10px] text-muted-foreground">Drag to reorder</div>
