@@ -90,16 +90,23 @@ export function WebsiteEditorPage() {
   });
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [showTheme, setShowTheme] = useState(false);
   const [localSections, setLocalSections] = useState<WebsiteSection[]>([]);
+  const [localTheme, setLocalTheme] = useState<ThemeState>(DEFAULT_THEME);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const saveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const themeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
     if (bundleQ.data?.sections) {
       setLocalSections(bundleQ.data.sections);
-      if (!selectedId && bundleQ.data.sections.length) setSelectedId(bundleQ.data.sections[0].id);
+      if (!selectedId && !showTheme && bundleQ.data.sections.length) setSelectedId(bundleQ.data.sections[0].id);
+    }
+    if (bundleQ.data?.theme) {
+      const t = bundleQ.data.theme as Partial<ThemeState>;
+      setLocalTheme({ ...DEFAULT_THEME, ...t });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bundleQ.data]);
@@ -107,15 +114,34 @@ export function WebsiteEditorPage() {
   // Push live-preview updates to iframe
   useEffect(() => {
     iframeRef.current?.contentWindow?.postMessage(
-      { type: "editor:bundle", bundle: { sections: localSections, theme: bundleQ.data?.theme ?? null } },
+      { type: "editor:bundle", bundle: { sections: localSections, theme: localTheme } },
       "*",
     );
-  }, [localSections, bundleQ.data?.theme]);
+  }, [localSections, localTheme]);
 
   const selected = useMemo(
     () => localSections.find((s) => s.id === selectedId) ?? null,
     [localSections, selectedId],
   );
+
+  function patchTheme(patch: Partial<ThemeState>) {
+    setLocalTheme((prev) => {
+      const next = { ...prev, ...patch };
+      if (themeTimer.current) clearTimeout(themeTimer.current);
+      themeTimer.current = setTimeout(async () => {
+        if (!websiteId) return;
+        try {
+          setSaving(true);
+          await saveTheme({ data: { websiteId, patch } });
+        } catch (e) {
+          toast.error(e instanceof Error ? e.message : "Theme save failed");
+        } finally {
+          setSaving(false);
+        }
+      }, 600);
+      return next;
+    });
+  }
 
   function patchSection(id: string, patch: Partial<WebsiteSection>) {
     setLocalSections((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)));
