@@ -18,6 +18,22 @@ export type CloudinaryUploadResult = {
   bytes: number;
 };
 
+export class CloudinaryUploadError extends Error {
+  status?: number;
+  statusText?: string;
+  code?: string;
+  rawResponse?: string;
+  constructor(message: string, init: { status?: number; statusText?: string; code?: string; rawResponse?: string } = {}) {
+    super(message);
+    this.name = "CloudinaryUploadError";
+    this.status = init.status;
+    this.statusText = init.statusText;
+    this.code = init.code;
+    this.rawResponse = init.rawResponse;
+  }
+}
+
+
 export function isCloudinaryConfigured(): boolean {
   return Boolean(CLOUD_NAME && UPLOAD_PRESET);
 }
