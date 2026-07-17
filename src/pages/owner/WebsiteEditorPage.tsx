@@ -8,6 +8,7 @@ import {
   updateSection,
   updateTheme,
   publishWebsite,
+  reorderSections,
   type WebsiteSection,
   type SectionType,
 } from "@/lib/website-editor.functions";
