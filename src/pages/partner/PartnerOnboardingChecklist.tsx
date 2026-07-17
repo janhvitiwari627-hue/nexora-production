@@ -208,7 +208,11 @@ export function PartnerOnboardingChecklist() {
       announceStatus(
         `Success: ${file.name} (${sizeKb} KB) uploaded to Cloudinary. Logo preview updated. Save karke pakka karo.`,
       );
+      // Final summary in the assertive region so screen readers get a clear
+      // end-of-batch message even when the upload finishes automatically.
+      announceAlert(`Upload complete. 1 of 1 file uploaded successfully: ${file.name}.`);
       toast.success("Logo uploaded — save karke pakka karo");
+
     } catch (err) {
       const isAbort =
         (err instanceof CloudinaryUploadError && err.code === "ABORTED") ||
@@ -242,9 +246,13 @@ export function PartnerOnboardingChecklist() {
         err instanceof CloudinaryUploadError && err.status
           ? ` Status ${err.status}${err.statusText ? ` ${err.statusText}` : ""}.`
           : "";
+      // Combined per-file + end-of-batch summary in one assertive announcement
+      // (two setState calls in the same tick would collapse to the last one).
       announceAlert(
-        `Upload failed for ${file.name}.${statusPart} Reason: ${friendly}. Retry button available.`,
+        `All uploads failed. 1 of 1 file failed: ${file.name}.${statusPart} Reason: ${friendly}. Retry button available.`,
       );
+
+
       toast.error(friendly);
       lastFileRef.current = file;
       if (!keepPreview && localPreview) {
