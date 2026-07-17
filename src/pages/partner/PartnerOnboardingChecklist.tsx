@@ -643,6 +643,9 @@ export function PartnerOnboardingChecklist() {
                           variant="outline"
                           size="sm"
                           onClick={cancelUpload}
+                          onFocus={() => {
+                            cancelHadFocusRef.current = true;
+                          }}
                           className="h-7 border-red-200 px-2 text-[11px] text-red-600 hover:bg-red-50"
                           aria-label="Cancel upload"
                         >
