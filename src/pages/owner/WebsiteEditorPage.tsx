@@ -638,6 +638,7 @@ function ImageField({
   label,
   value,
   salonId,
+  websiteId,
   folder,
   compact,
   onChange,
@@ -645,6 +646,7 @@ function ImageField({
   label: string;
   value: string;
   salonId: string | null;
+  websiteId?: string | null;
   folder: string;
   compact?: boolean;
   onChange: (v: string) => void;
@@ -672,15 +674,36 @@ function ImageField({
       cacheControl: "3600",
       upsert: false,
     });
-    setUploading(false);
     if (error) {
+      setUploading(false);
       toast.error(error.message);
       return;
     }
     const { data } = supabase.storage.from("salon-media").getPublicUrl(path);
+    // Log into media_library (best-effort; do not block on failure)
+    try {
+      const { data: userRes } = await supabase.auth.getUser();
+      const ownerId = userRes.user?.id;
+      if (ownerId) {
+        await supabase.from("media_library").insert({
+          owner_id: ownerId,
+          website_id: websiteId ?? null,
+          url: data.publicUrl,
+          storage_path: path,
+          file_name: file.name,
+          mime_type: file.type,
+          size_bytes: file.size,
+          folder,
+        });
+      }
+    } catch {
+      // silent; media_library is only for reuse tracking
+    }
+    setUploading(false);
     onChange(data.publicUrl);
     toast.success("Image uploaded");
   };
+
 
   return (
     <div className="space-y-1.5">
