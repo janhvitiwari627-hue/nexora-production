@@ -143,11 +143,9 @@ export const saveWebsiteTemplateSelection = createServerFn({ method: "POST" })
     const patch: {
       template_id?: string;
       template_key: string;
-      business_category: string;
       draft_updated_at: string;
     } = {
       template_key: data.templateKey,
-      business_category: data.businessCategory,
       draft_updated_at: new Date().toISOString(),
     };
     // Lovable Cloud can apply frontend code before a newly seeded catalogue row
@@ -160,7 +158,7 @@ export const saveWebsiteTemplateSelection = createServerFn({ method: "POST" })
       .update(patch)
       .eq("id", data.websiteId)
       .eq("owner_id", userId)
-      .select("id, template_id, template_key, business_category")
+      .select("id, template_id, template_key")
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!website) throw new Error("Website was not found or you do not have permission to edit it");

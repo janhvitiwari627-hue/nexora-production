@@ -1734,7 +1734,9 @@ export function WebsiteEditorPage() {
         templates={TEMPLATE_CATALOG}
         selectedKey={selectedTemplateKey}
         applyingKey={applyingTemplate}
-        initialCategory={bundleQ.data?.website?.business_category}
+        initialCategory={
+          TEMPLATE_CATALOG.find((item) => item.key === selectedTemplateKey)?.category ?? null
+        }
         onApply={(template) => setTemplateToApply(template)}
       />
       <Dialog
