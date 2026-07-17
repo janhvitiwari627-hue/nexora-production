@@ -57,12 +57,38 @@ function PublicWebsitePage() {
   }
 
   const theme = bundle?.theme;
+  const headingFont = theme?.heading_font || "Inter";
+  const bodyFont = theme?.body_font || "Inter";
+  const btnStyle = theme?.button_style || "rounded";
+  const btnRadius = btnStyle === "pill" ? "9999px" : btnStyle === "square" ? "0" : "0.5rem";
+
+  // Load Google Fonts for the theme
+  useEffect(() => {
+    const families = Array.from(new Set([headingFont, bodyFont]))
+      .map((f) => `family=${encodeURIComponent(f)}:wght@400;500;600;700`)
+      .join("&");
+    const id = "w-google-fonts";
+    let link = document.getElementById(id) as HTMLLinkElement | null;
+    const href = `https://fonts.googleapis.com/css2?${families}&display=swap`;
+    if (!link) {
+      link = document.createElement("link");
+      link.id = id;
+      link.rel = "stylesheet";
+      document.head.appendChild(link);
+    }
+    if (link.href !== href) link.href = href;
+  }, [headingFont, bodyFont]);
+
   const styleVars = {
     ["--w-primary" as string]: theme?.primary_color ?? "#111827",
     ["--w-secondary" as string]: theme?.secondary_color ?? "#F59E0B",
     ["--w-accent" as string]: theme?.accent_color ?? "#10B981",
     ["--w-bg" as string]: theme?.background_color ?? "#FFFFFF",
     ["--w-text" as string]: theme?.text_color ?? "#111827",
+    ["--w-heading-font" as string]: `'${headingFont}', sans-serif`,
+    ["--w-body-font" as string]: `'${bodyFont}', sans-serif`,
+    ["--w-btn-radius" as string]: btnRadius,
+    fontFamily: `var(--w-body-font)`,
   } as React.CSSProperties;
 
   const sections = (bundle?.sections ?? [])
