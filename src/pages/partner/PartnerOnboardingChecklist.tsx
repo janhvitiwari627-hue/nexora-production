@@ -187,10 +187,7 @@ export function PartnerOnboardingChecklist() {
     }
   };
 
-  const onPickLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (e.target) e.target.value = "";
-    if (!file) return;
+  const validateAndUpload = async (file: File) => {
     setUploadError(null);
     setUploadErrorDetails(null);
 
@@ -245,6 +242,52 @@ export function PartnerOnboardingChecklist() {
 
     await doUpload(file, objectUrl);
   };
+
+  const onPickLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (e.target) e.target.value = "";
+    if (!file) return;
+    await validateAndUpload(file);
+  };
+
+  const [isDragging, setIsDragging] = useState(false);
+  const dragCounterRef = useRef(0);
+
+  const onDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (uploading) return;
+    dragCounterRef.current += 1;
+    if (e.dataTransfer.types.includes("Files")) setIsDragging(true);
+  };
+  const onDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!uploading) e.dataTransfer.dropEffect = "copy";
+  };
+  const onDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current -= 1;
+    if (dragCounterRef.current <= 0) {
+      dragCounterRef.current = 0;
+      setIsDragging(false);
+    }
+  };
+  const onDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current = 0;
+    setIsDragging(false);
+    if (uploading) return;
+    const files = Array.from(e.dataTransfer.files ?? []);
+    if (files.length === 0) return;
+    if (files.length > 1) {
+      toast.info("Ek time par ek hi logo — pehli file use kar rahe hain");
+    }
+    await validateAndUpload(files[0]);
+  };
+
 
 
   const onRetryUpload = async () => {
@@ -368,7 +411,28 @@ export function PartnerOnboardingChecklist() {
               label="Logo / Photo"
               hint={cloudinaryReady ? "JPG, PNG, WEBP ya GIF — max 5 MB" : "Cloudinary configure nahi hai — URL paste karein"}
             >
-              <div className="flex items-start gap-3">
+              <div
+                onDragEnter={onDragEnter}
+                onDragOver={onDragOver}
+                onDragLeave={onDragLeave}
+                onDrop={onDrop}
+                onClick={() => {
+                  if (!uploading && cloudinaryReady && !form.photo_url && !localPreview) {
+                    fileInputRef.current?.click();
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                aria-label="Drag and drop logo here or click to browse"
+                className={`flex items-start gap-3 rounded-xl border-2 border-dashed p-3 transition ${
+                  isDragging
+                    ? "border-[#4F46E5] bg-[#EEF2FF]"
+                    : uploading
+                      ? "border-slate-200 bg-slate-50/50"
+                      : "border-slate-200 bg-slate-50/40 hover:border-[#4F46E5]/50 hover:bg-[#EEF2FF]/30"
+                }`}
+              >
+
                 {(localPreview || form.photo_url) ? (
                   <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
                     <img
@@ -419,6 +483,12 @@ export function PartnerOnboardingChecklist() {
                         ? "Replace logo"
                         : "Upload logo"}
                   </Button>
+                  <p className="text-[10px] text-slate-500">
+                    {isDragging
+                      ? "Release to upload"
+                      : "Drag & drop image here, ya button click karein"}
+                  </p>
+
                   {uploading && (
                     <div
                       className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100"
