@@ -197,6 +197,7 @@ export const updateTheme = createServerFn({ method: "POST" })
             heading_font: z.string().optional(),
             body_font: z.string().optional(),
             button_style: z.string().optional(),
+            extras: z.record(z.string(), z.unknown()).optional(),
           })
           .partial(),
       })
