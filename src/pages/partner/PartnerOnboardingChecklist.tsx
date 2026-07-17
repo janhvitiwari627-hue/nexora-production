@@ -587,7 +587,14 @@ export function PartnerOnboardingChecklist() {
                           aria-valuenow={uploadProgress}
                           aria-valuemin={0}
                           aria-valuemax={100}
-                          aria-label={`Upload progress ${uploadProgress}%`}
+                          aria-valuetext={
+                            uploadProgress >= 100
+                              ? "Upload complete, processing on Cloudinary"
+                              : `Uploading to Cloudinary, ${uploadProgress}% complete`
+                          }
+                          aria-label="Cloudinary upload progress"
+                          aria-live="polite"
+                          aria-busy={uploadProgress < 100}
                         >
                           <div
                             className={`h-full bg-[#4F46E5] transition-[width] duration-200 ease-out ${
