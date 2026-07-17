@@ -12,6 +12,7 @@ import {
   Truck,
   UserRound,
 } from "lucide-react";
+import { InstallAppButton } from "@/components/pwa/InstallAppButton";
 
 const ROLE_CARDS = [
   {
@@ -20,6 +21,8 @@ const ROLE_CARDS = [
     text: "Salons खोजें, prices compare करें और appointment book करें.",
     to: "/customer-app",
     action: "Customer App",
+    kind: "customer",
+    startPath: "/app/customer",
   },
   {
     icon: Store,
@@ -27,6 +30,8 @@ const ROLE_CARDS = [
     text: "Salon setup, services, bookings और website एक simple owner app में.",
     to: "/shop-owner-app",
     action: "Owner App",
+    kind: "owner",
+    startPath: "/app/owner",
   },
   {
     icon: Target,
@@ -34,6 +39,8 @@ const ROLE_CARDS = [
     text: "Local salons onboard करें, leads और partner progress track करें.",
     to: "/growth-partner-app",
     action: "Partner App",
+    kind: "partner",
+    startPath: "/partner",
   },
   {
     icon: Truck,
@@ -41,6 +48,8 @@ const ROLE_CARDS = [
     text: "Products showcase करें और salon business leads manage करें.",
     to: "/distributor-app",
     action: "Trade App",
+    kind: "distributor",
+    startPath: "/portal",
   },
   {
     icon: BriefcaseBusiness,
@@ -48,6 +57,8 @@ const ROLE_CARDS = [
     text: "Jobs खोजें, apply करें या salon vacancy post करें.",
     to: "/jobs-app",
     action: "Jobs App",
+    kind: "jobs",
+    startPath: "/app/jobs",
   },
 ] as const;
 
@@ -112,19 +123,28 @@ export function PlatformOverviewSections() {
           </div>
           <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
             {ROLE_CARDS.map((card) => (
-              <Link
+              <article
                 key={card.title}
-                to={card.to}
-                className="group rounded-3xl border border-slate-200 bg-slate-50 p-6 transition hover:-translate-y-1 hover:border-violet-300 hover:bg-white hover:shadow-xl"
+                className="group flex min-w-0 flex-col rounded-3xl border border-slate-200 bg-slate-50 p-6 transition hover:-translate-y-1 hover:border-violet-300 hover:bg-white hover:shadow-xl"
               >
                 <card.icon className="h-7 w-7 text-violet-700" />
                 <h3 className="mt-5 text-lg font-bold">{card.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-600">{card.text}</p>
-                <span className="mt-5 inline-flex items-center gap-1 text-sm font-bold text-violet-700">
-                  {card.action}{" "}
-                  <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
-                </span>
-              </Link>
+                <p className="mt-2 flex-1 text-sm leading-6 text-slate-600">{card.text}</p>
+                <div className="mt-5 space-y-3">
+                  <InstallAppButton
+                    kind={card.kind}
+                    fallbackHref={card.startPath}
+                    className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-slate-950 px-3 text-xs font-bold text-white"
+                  />
+                  <Link
+                    to={card.to}
+                    className="inline-flex min-h-11 w-full items-center justify-center gap-1 rounded-xl border bg-white px-3 text-sm font-bold text-violet-700"
+                  >
+                    View {card.action}{" "}
+                    <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                  </Link>
+                </div>
+              </article>
             ))}
           </div>
         </div>

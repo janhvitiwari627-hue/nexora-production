@@ -49,7 +49,7 @@ export function TemplateGalleryDialog({
         if (!next) setPreview(null);
       }}
     >
-      <DialogContent className="flex h-[92dvh] w-[min(96vw,1200px)] max-w-none flex-col overflow-hidden p-0">
+      <DialogContent className="flex h-[100dvh] w-screen max-w-none flex-col overflow-hidden rounded-none p-0 sm:h-[92dvh] sm:w-[min(96vw,1200px)] sm:rounded-lg">
         <DialogHeader className="border-b px-5 py-4 pr-12">
           <DialogTitle>{preview ? preview.name : "Choose a website template"}</DialogTitle>
           <DialogDescription>
@@ -116,7 +116,7 @@ export function TemplateGalleryDialog({
                 </Button>
               ))}
             </div>
-            <div className="min-h-0 flex-1 overflow-y-auto p-5">
+            <div className="min-h-0 flex-1 overflow-y-auto p-3 sm:p-5">
               {visible.length === 0 ? (
                 <div className="rounded-xl border border-dashed p-12 text-center text-muted-foreground">
                   No active templates in this category.
@@ -155,7 +155,7 @@ export function TemplateGalleryDialog({
                               </Badge>
                             ))}
                           </div>
-                          <div className="grid grid-cols-2 gap-2">
+                          <div className="grid gap-2 min-[380px]:grid-cols-2">
                             <Button
                               variant="outline"
                               size="sm"

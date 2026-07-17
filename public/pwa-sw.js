@@ -1,9 +1,12 @@
-const CACHE_NAME = "nexora-role-apps-v1";
+const CACHE_NAME = "nexora-role-apps-v2";
 const OFFLINE_URL = "/offline.html";
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.add(OFFLINE_URL)));
-  self.skipWaiting();
+  event.waitUntil(
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => cache.addAll([OFFLINE_URL, "/icon-192.png", "/icon-512.png"])),
+  );
 });
 
 self.addEventListener("activate", (event) => {
@@ -25,4 +28,8 @@ self.addEventListener("fetch", (event) => {
       return cached || Response.error();
     }),
   );
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
 });

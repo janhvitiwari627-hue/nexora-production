@@ -1182,6 +1182,7 @@ export function WebsiteEditorPage() {
   const themeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [previewDevice, setPreviewDevice] = useState<"desktop" | "tablet" | "mobile">("desktop");
+  const [mobilePanel, setMobilePanel] = useState<"sections" | "edit" | "preview">("sections");
 
   useEffect(() => {
     if (bundleQ.data?.sections) {
@@ -1684,7 +1685,7 @@ export function WebsiteEditorPage() {
   return (
     <div className="flex h-screen flex-col bg-background">
       {/* Top bar */}
-      <header className="flex items-center justify-between gap-4 border-b bg-card px-4 py-3">
+      <header className="flex min-w-0 items-center justify-between gap-3 border-b bg-card px-3 py-3 sm:px-4">
         <div className="min-w-0">
           <h1 className="truncate text-lg font-semibold">Final Website Editor</h1>
           <p className="text-xs text-muted-foreground">
@@ -1695,7 +1696,7 @@ export function WebsiteEditorPage() {
                 : "Edits auto-save; drafts snapshot every 2 min."}
           </p>
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="hidden shrink-0 items-center gap-2 lg:flex">
           <Button
             variant="outline"
             onClick={() => {
@@ -1729,6 +1730,22 @@ export function WebsiteEditorPage() {
           </Button>
         </div>
       </header>
+
+      <nav className="grid grid-cols-3 border-b bg-card p-1 lg:hidden" aria-label="Editor panels">
+        {(["sections", "edit", "preview"] as const).map((panel) => (
+          <button
+            key={panel}
+            type="button"
+            onClick={() => setMobilePanel(panel)}
+            className={`min-h-11 rounded-md px-2 text-sm font-semibold capitalize ${
+              mobilePanel === panel ? "bg-primary text-primary-foreground" : "text-muted-foreground"
+            }`}
+            aria-pressed={mobilePanel === panel}
+          >
+            {panel}
+          </button>
+        ))}
+      </nav>
 
       <TemplateGalleryDialog
         open={templateGalleryOpen}
@@ -1776,9 +1793,11 @@ export function WebsiteEditorPage() {
         </DialogContent>
       </Dialog>
 
-      <div className="grid flex-1 grid-cols-[240px_1fr_1fr] overflow-hidden">
+      <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden lg:grid-cols-[240px_minmax(0,1fr)_minmax(0,1fr)]">
         {/* Section list */}
-        <aside className="overflow-y-auto border-r bg-muted/30 p-3">
+        <aside
+          className={`${mobilePanel === "sections" ? "block" : "hidden"} min-h-0 overflow-y-auto border-r bg-muted/30 p-3 lg:block`}
+        >
           <div className="mb-4 rounded-lg border bg-background p-3 shadow-sm">
             <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase text-muted-foreground">
               <Wand2 className="h-3.5 w-3.5" /> Website Template
@@ -1827,6 +1846,7 @@ export function WebsiteEditorPage() {
                     onSelect={() => {
                       setSelectedId(s.id);
                       setShowTheme(false);
+                      setMobilePanel("edit");
                     }}
                     onToggleVisible={() => patchSection(s.id, { is_visible: !s.is_visible })}
                   />
@@ -1849,7 +1869,9 @@ export function WebsiteEditorPage() {
         </aside>
 
         {/* Editor form */}
-        <section className="overflow-y-auto p-6">
+        <section
+          className={`${mobilePanel === "edit" ? "block" : "hidden"} min-h-0 overflow-y-auto p-4 sm:p-6 lg:block`}
+        >
           {showTheme ? (
             <ThemeEditor theme={localTheme} onChange={patchTheme} />
           ) : selected ? (
@@ -1870,7 +1892,9 @@ export function WebsiteEditorPage() {
         </section>
 
         {/* Live preview */}
-        <section className="flex flex-col overflow-hidden border-l bg-muted/20">
+        <section
+          className={`${mobilePanel === "preview" ? "flex" : "hidden"} min-h-0 flex-col overflow-hidden border-l bg-muted/20 lg:flex`}
+        >
           <div className="flex items-center justify-between border-b bg-background/60 px-3 py-2">
             <span className="text-xs font-medium text-muted-foreground">
               Preview ·{" "}
@@ -1935,6 +1959,30 @@ export function WebsiteEditorPage() {
             )}
           </div>
         </section>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 border-t bg-card p-2 pb-[max(env(safe-area-inset-bottom),0.5rem)] shadow-[0_-8px_24px_rgba(15,23,42,0.08)] lg:hidden">
+        <Button
+          variant="outline"
+          onClick={handleSaveVersion}
+          disabled={savingVersion || !websiteId}
+          className="min-h-11"
+        >
+          {savingVersion ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Save className="mr-2 h-4 w-4" />
+          )}
+          Save Draft
+        </Button>
+        <Button onClick={handlePublish} disabled={publishing || !websiteId} className="min-h-11">
+          {publishing ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Globe className="mr-2 h-4 w-4" />
+          )}
+          Publish
+        </Button>
       </div>
 
       {/* Version history dialog */}

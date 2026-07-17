@@ -13,7 +13,6 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import nexoraLogo from "@/assets/nexora-logo.jpg.asset.json";
 
-
 import { NotFoundPage } from "@/pages/public/NotFoundPage";
 import {
   SupabaseErrorFallback,
@@ -22,6 +21,7 @@ import {
 import { Toaster } from "@/components/ui/sonner";
 import { useApplicationStatusNotifications } from "@/hooks/useApplicationStatusNotifications";
 import { ReferralWelcomePopup } from "@/components/referral/ReferralWelcomePopup";
+import { RolePwaManager } from "@/components/pwa/RolePwaManager";
 
 function NotFoundComponent() {
   return <NotFoundPage />;
@@ -94,23 +94,43 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "Nexora — Book salons, spas & barbers in Jaipur" },
       {
         property: "og:description",
-        content: "Discover top-rated salons, spas and barbershops in Jaipur. Instant booking, member rewards, and exclusive offers on Nexora SalonOS.",
+        content:
+          "Discover top-rated salons, spas and barbershops in Jaipur. Instant booking, member rewards, and exclusive offers on Nexora SalonOS.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Nexora — Book salons, spas & barbers in Jaipur" },
-      { name: "description", content: "Discover top-rated salons, spas and barbershops in Jaipur. Instant booking, member rewards, and exclusive offers on Nexora SalonOS." },
-      { property: "og:description", content: "Discover top-rated salons, spas and barbershops in Jaipur. Instant booking, member rewards, and exclusive offers on Nexora SalonOS." },
-      { name: "twitter:description", content: "Discover top-rated salons, spas and barbershops in Jaipur. Instant booking, member rewards, and exclusive offers on Nexora SalonOS." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/4Aw7bpKI5ubBovpSR654qvAsfD53/social-images/social-1784208883865-photo_2026-07-14_15-33-48.webp" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/4Aw7bpKI5ubBovpSR654qvAsfD53/social-images/social-1784208883865-photo_2026-07-14_15-33-48.webp" },
+      {
+        name: "description",
+        content:
+          "Discover top-rated salons, spas and barbershops in Jaipur. Instant booking, member rewards, and exclusive offers on Nexora SalonOS.",
+      },
+      {
+        property: "og:description",
+        content:
+          "Discover top-rated salons, spas and barbershops in Jaipur. Instant booking, member rewards, and exclusive offers on Nexora SalonOS.",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "Discover top-rated salons, spas and barbershops in Jaipur. Instant booking, member rewards, and exclusive offers on Nexora SalonOS.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/4Aw7bpKI5ubBovpSR654qvAsfD53/social-images/social-1784208883865-photo_2026-07-14_15-33-48.webp",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/4Aw7bpKI5ubBovpSR654qvAsfD53/social-images/social-1784208883865-photo_2026-07-14_15-33-48.webp",
+      },
     ],
     links: [
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon", sizes: "any" },
       { rel: "shortcut icon", href: "/favicon.ico", type: "image/x-icon" },
-      { rel: "apple-touch-icon", href: nexoraLogo.url, sizes: "180x180" },
+      { rel: "apple-touch-icon", href: "/icon-192.png", sizes: "192x192" },
       { rel: "manifest", href: "/manifest.webmanifest" },
-
 
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
@@ -152,9 +172,12 @@ function RootComponent() {
     let timer: ReturnType<typeof setTimeout> | undefined;
     const initializeAuthStore = () => {
       void import("@/stores/authStore").then(({ useAuthStore }) => {
-        useAuthStore.getState().initialize().then((unsub) => {
-          unsubscribe = unsub;
-        });
+        useAuthStore
+          .getState()
+          .initialize()
+          .then((unsub) => {
+            unsubscribe = unsub;
+          });
       });
     };
 
@@ -162,16 +185,6 @@ function RootComponent() {
       timer = setTimeout(initializeAuthStore, 3000);
     } else {
       initializeAuthStore();
-    }
-
-    // Kill-switch: any previously-installed customer-app service worker
-    // gets replaced by /sw.js which unregisters itself on activate. We
-    // additionally best-effort unregister here so returning visitors on
-    // browsers that already cached the old SW get evicted immediately.
-    if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
-      navigator.serviceWorker.getRegistrations?.()
-        .then((regs) => regs.forEach((r) => { void r.unregister(); }))
-        .catch(() => { /* ignore */ });
     }
 
     void import("@/lib/booking-offline-sync").then(({ initBookingOfflineSync }) => {
@@ -187,6 +200,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AppSideEffects />
+      <RolePwaManager />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <ReferralWelcomePopup />
