@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { OwnerWebsitePage } from "@/pages/owner/OwnerWebsitePage";
+import { WebsiteEditorPage } from "@/pages/owner/WebsiteEditorPage";
 
 export const Route = createFileRoute("/owner/website")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -11,5 +11,5 @@ export const Route = createFileRoute("/owner/website")({
       { name: "description", content: "Customize your booking website: branding, SEO, domain, sections and socials." },
     ],
   }),
-  component: OwnerWebsitePage,
+  component: WebsiteEditorPage,
 });

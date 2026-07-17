@@ -135,18 +135,11 @@ function TopBar({
             <Switch checked={open} onCheckedChange={onToggle} className="ml-1" />
           </div>
           {showWebsiteActions && (
-            <>
-              <Button variant="ghost" size="sm" className="hidden gap-1.5 md:inline-flex" asChild>
-                <a href="/owner/templates">
-                  <Globe className="h-4 w-4" /> Website
-                </a>
-              </Button>
-              <Button variant="outline" size="sm" className="hidden gap-1.5 md:inline-flex" asChild>
-                <a href="/owner/website">
-                  <Settings className="h-4 w-4" /> Edit Website
-                </a>
-              </Button>
-            </>
+            <Button variant="outline" size="sm" className="hidden gap-1.5 md:inline-flex" asChild>
+              <a href="/owner/website">
+                <Globe className="h-4 w-4" /> Final Website Editor
+              </a>
+            </Button>
           )}
           {showWebsiteActions && (
             <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
@@ -886,7 +879,7 @@ export function OwnerDashboardPage({ ownerPortalOnly = false }: { ownerPortalOnl
   // Mandatory onboarding: redirect approved owners with no website yet to template gallery.
   const needsWebsite = !!activeSalon && activeSalon.website_created === false;
   useEffect(() => {
-    if (!ownerPortalOnly && needsWebsite) navigate({ to: "/owner/templates" });
+    if (!ownerPortalOnly && needsWebsite) navigate({ to: "/owner/website" });
   }, [needsWebsite, navigate, ownerPortalOnly]);
 
   // Compute greeting on the client only to avoid SSR/CSR hydration mismatch
@@ -915,7 +908,7 @@ export function OwnerDashboardPage({ ownerPortalOnly = false }: { ownerPortalOnl
                   </div>
                 </div>
               </div>
-              <Button onClick={() => navigate({ to: "/owner/templates" })}>Create Website</Button>
+              <Button onClick={() => navigate({ to: "/owner/website" })}>Open Final Editor</Button>
             </div>
           </Card>
         )}

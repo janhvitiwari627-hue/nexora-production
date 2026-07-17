@@ -1,9 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { WebsiteEditorPage } from "@/pages/owner/WebsiteEditorPage";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/owner/website/edit")({
+  beforeLoad: () => {
+    throw redirect({ to: "/owner/website", replace: true });
+  },
   head: () => ({
-    meta: [{ title: "Website Editor — Nexora" }, { name: "robots", content: "noindex" }],
+    meta: [{ title: "Final Website Editor — Nexora" }, { name: "robots", content: "noindex" }],
   }),
-  component: WebsiteEditorPage,
 });
