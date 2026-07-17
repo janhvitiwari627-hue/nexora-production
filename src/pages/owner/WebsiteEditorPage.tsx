@@ -391,7 +391,7 @@ export function WebsiteEditorPage() {
       const sectionChanges: DiffChange[] = [];
 
       for (const cur of newSections) {
-        const label = SECTION_LABELS[cur.section_type] ?? cur.section_type;
+        const label = (SECTION_LABELS as Record<string, string>)[cur.section_type] ?? cur.section_type;
         let match = cur.id && oldById.has(cur.id) ? oldById.get(cur.id)! : undefined;
         if (!match) {
           const bucket = oldByType[cur.section_type] ?? [];
