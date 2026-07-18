@@ -301,6 +301,13 @@ export function PartnerApplicationsPage() {
                             {l.district}
                           </span>
                         </TableCell>
+                        <TableCell>
+                          <KycDocumentPreview
+                            kycPath={kycPath}
+                            applicantName={l.full_name}
+                            variant="thumb"
+                          />
+                        </TableCell>
                         <TableCell className="text-sm text-muted-foreground max-w-[180px] truncate">
                           {role}
                         </TableCell>
