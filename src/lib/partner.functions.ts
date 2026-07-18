@@ -49,6 +49,22 @@ export const getPartnerOverview = createServerFn({ method: "GET" })
     };
   });
 
+export type PartnerKycReview = {
+  status?: "pending" | "approved" | "rejected";
+  notes?: string;
+  reviewed_at?: string | null;
+  reviewed_by?: string | null;
+};
+
+export type PartnerMetadata = {
+  kyc_review?: PartnerKycReview;
+  kyc_document_url?: string;
+  agreement_signed_at?: string;
+  agreement_version?: string;
+  notification_prefs?: Record<string, { email?: boolean; whatsapp?: boolean; push?: boolean }>;
+  language?: string;
+};
+
 export type PartnerProfile = {
   id: string;
   full_name: string;
@@ -61,7 +77,7 @@ export type PartnerProfile = {
   success_story: string | null;
   photo_url: string | null;
   status: string;
-  metadata: Record<string, unknown> | null;
+  metadata: PartnerMetadata | null;
   verified_at: string | null;
 };
 
