@@ -579,17 +579,35 @@ export function PersonalInfoPanel() {
           {saveError}
         </p>
       )}
+      {autoSaveError && (
+        <div
+          role="alert"
+          className="border-destructive/40 bg-destructive/5 text-destructive mt-3 flex flex-wrap items-center justify-between gap-2 rounded-md border px-3 py-2 text-xs"
+        >
+          <span>{autoSaveError}</span>
+          <button
+            type="button"
+            onClick={retryAutoSave}
+            className="border-destructive/50 hover:bg-destructive/10 rounded-md border px-2 py-1 text-xs font-semibold"
+          >
+            Try again
+          </button>
+        </div>
+      )}
       <div className="text-muted-foreground mt-3 flex items-center gap-2 text-xs" aria-live="polite">
         {saving ? (
           <>
             <Loader2 className="h-3 w-3 animate-spin" /> Saving…
           </>
+        ) : autoSaveError ? (
+          <span>Auto-save paused · your edits are still here.</span>
         ) : autoSavedAt ? (
           <span>Draft saved on this device · {new Date(autoSavedAt).toLocaleTimeString()}</span>
         ) : (
           <span>Your unfinished form is saved on this device.</span>
         )}
       </div>
+
       <SaveBar onSave={handleSave} onCancel={handleCancel} saving={saving} />
 
     </PanelShell>
