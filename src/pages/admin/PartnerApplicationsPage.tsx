@@ -230,6 +230,11 @@ export function PartnerApplicationsPage() {
   });
 
 
+  useEffect(() => {
+    if (detail) setKycNotesDraft(extractKycReview(detail).notes);
+    else setKycNotesDraft("");
+  }, [detail]);
+
   const counts = useMemo(() => {
     const map: Record<string, number> = { all: data.length };
     STATUSES.forEach((s) => (map[s] = 0));
