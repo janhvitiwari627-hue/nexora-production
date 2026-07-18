@@ -8,22 +8,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Mail, CheckCircle2 } from "lucide-react";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
+import { requestPasswordReset } from "@/lib/password-reset";
 
 const schema = z.object({
   email: z.string().trim().email("Invalid email address").max(255),
 });
 
 const normalizeEmail = (value: string) => value.trim().toLowerCase();
-
-async function requestPasswordReset(email: string) {
-  await fetch("/api/public/auth/forgot-password", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
-  }).catch(() => {
-    /* always show generic success — never leak account or network state */
-  });
-}
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -39,10 +30,13 @@ export default function ForgotPasswordPage() {
       setError(parsed.error.issues[0]?.message ?? "Invalid email");
       return;
     }
+
     setSubmitting(true);
     try {
       await requestPasswordReset(parsed.data.email);
       setSent(true);
+    } catch {
+      setError("We couldn't send the reset link. Please try again in a moment.");
     } finally {
       setSubmitting(false);
     }

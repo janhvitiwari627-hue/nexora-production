@@ -12,18 +12,11 @@ import { Loader2, Eye, EyeOff } from "lucide-react";
 import { BackButton } from "@/components/shared/BackButton";
 import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
 import { useAuthStore } from "@/stores/authStore";
+import { requestPasswordReset } from "@/lib/password-reset";
 
 const normalizeEmail = (value: string) => value.trim().toLowerCase();
 const RECOVERY_ERROR_MESSAGE =
   "Reset link expired or already used. Please request a new password reset link.";
-
-async function requestPasswordReset(email: string) {
-  await fetch("/api/public/auth/forgot-password", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
-  });
-}
 
 const safeAuthErrorMessage = (err: unknown, fallback: string) => {
   const message = err instanceof Error ? err.message : fallback;

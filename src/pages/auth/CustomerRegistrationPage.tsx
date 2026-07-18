@@ -37,18 +37,11 @@ import { useAuthStore } from "@/stores/authStore";
 import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
 import { getEmailRole, roleConflictMessage } from "@/lib/auth-check.functions";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
+import { requestPasswordReset } from "@/lib/password-reset";
 
 type AccountType = "customer" | "owner" | "district_partner";
 
 const normalizeEmail = (value: string) => value.trim().toLowerCase();
-
-async function requestPasswordReset(email: string) {
-  await fetch("/api/public/auth/forgot-password", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
-  });
-}
 
 /**
  * Normalize any thrown or returned error value into a user-facing string.
