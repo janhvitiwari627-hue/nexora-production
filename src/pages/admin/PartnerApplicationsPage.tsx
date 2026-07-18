@@ -676,7 +676,7 @@ export function PartnerApplicationsPage() {
         onOpenChange={(o) => {
           if (!o) {
             setKycConfirm(null);
-            setRejectReason("");
+            setKycRejectReason("");
             setKycRejectReasonError(null);
           }
         }}
@@ -712,9 +712,9 @@ export function PartnerApplicationsPage() {
                 autoFocus
                 rows={4}
                 maxLength={500}
-                value={rejectReason}
+                value={kycRejectReason}
                 onChange={(e) => {
-                  setRejectReason(e.target.value);
+                  setKycRejectReason(e.target.value);
                   if (kycRejectReasonError) setKycRejectReasonError(null);
                 }}
                 placeholder="Explain why this KYC is being rejected (e.g. Aadhaar blurry, name mismatch, expired document)…"
@@ -726,7 +726,7 @@ export function PartnerApplicationsPage() {
                 <span className={kycRejectReasonError ? "text-destructive" : "text-muted-foreground"}>
                   {kycRejectReasonError ?? "Required — shared with the applicant and saved in reviewer notes."}
                 </span>
-                <span className="text-muted-foreground tabular-nums">{rejectReason.length}/500</span>
+                <span className="text-muted-foreground tabular-nums">{kycRejectReason.length}/500</span>
               </div>
             </div>
           )}
@@ -745,7 +745,7 @@ export function PartnerApplicationsPage() {
                 if (!kycConfirm) return;
                 let payload = kycConfirm;
                 if (kycConfirm.status === "rejected") {
-                  const reason = rejectReason.trim();
+                  const reason = kycRejectReason.trim();
                   if (reason.length < 5) {
                     setKycRejectReasonError(
                       reason.length === 0
@@ -763,7 +763,7 @@ export function PartnerApplicationsPage() {
                 setKyc.mutate(payload, {
                   onSuccess: () => {
                     setKycConfirm(null);
-                    setRejectReason("");
+                    setKycRejectReason("");
                     setKycRejectReasonError(null);
                   },
                 });
