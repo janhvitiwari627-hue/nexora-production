@@ -269,10 +269,6 @@ export function PartnerApplicationsPage() {
                         <TableCell>
                           <button
                             className="font-medium text-left hover:underline"
-                      <TableRow key={l.id}>
-                        <TableCell>
-                          <button
-                            className="font-medium text-left hover:underline"
                             onClick={() => setDetail(l)}
                           >
                             {l.full_name}
