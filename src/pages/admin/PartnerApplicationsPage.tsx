@@ -114,6 +114,8 @@ export function PartnerApplicationsPage() {
   const [detail, setDetail] = useState<PartnerApp | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [rejectOpen, setRejectOpen] = useState<PartnerApp | null>(null);
+  const [kycNotesDraft, setKycNotesDraft] = useState("");
+
 
   const { data = [], isLoading } = useQuery({
     queryKey: ["admin", "partner-applications-dbp"],
