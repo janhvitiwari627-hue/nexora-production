@@ -343,13 +343,31 @@ export default function SignupPage() {
               </Alert>
             )}
 
-            {referredBy && (
+            {referredBy && !refInvalid && (
               <Alert className="mb-4 border-primary/20 bg-primary/5">
                 <AlertDescription className="text-sm">
-                  Joining with referral code <strong className="font-mono">{referredBy}</strong>.
+                  {referrerName ? (
+                    <>
+                      Invited by <strong>{referrerName}</strong> · code{" "}
+                      <strong className="font-mono">{referredBy}</strong>
+                    </>
+                  ) : (
+                    <>
+                      Joining with referral code{" "}
+                      <strong className="font-mono">{referredBy}</strong>.
+                    </>
+                  )}
                   <span className="block text-xs text-muted-foreground mt-0.5">
-                    Referral rewards will be activated soon.
+                    You'll be credited to this referrer on signup.
                   </span>
+                </AlertDescription>
+              </Alert>
+            )}
+            {referredBy && refInvalid && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertDescription className="text-sm">
+                  Referral code <strong className="font-mono">{referredBy}</strong> is invalid or
+                  expired. You can still sign up without it.
                 </AlertDescription>
               </Alert>
             )}
