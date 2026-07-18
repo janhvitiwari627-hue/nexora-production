@@ -315,9 +315,14 @@ function PdfViewer({ url, applicantName, downloadUrl }: { url: string; applicant
         <Button size="icon" variant="outline" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} aria-label="Previous page">
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <span className="min-w-[5rem] text-center text-xs tabular-nums">
-          {page} / {numPages || "…"}
-        </span>
+        <div
+          className="inline-flex min-w-[6rem] items-center justify-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2 py-1 text-xs font-semibold tabular-nums text-primary"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          Page <span className="text-sm">{page}</span>
+          <span className="text-primary/60">/ {numPages || "…"}</span>
+        </div>
         <Button size="icon" variant="outline" onClick={() => setPage((p) => Math.min(numPages, p + 1))} disabled={page >= numPages} aria-label="Next page">
           <ChevronRight className="h-4 w-4" />
         </Button>
