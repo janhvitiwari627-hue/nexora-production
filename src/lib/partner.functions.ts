@@ -126,7 +126,45 @@ export const updatePartnerProfile = createServerFn({ method: "POST" })
       .from("district_business_partners")
       .update(patch)
       .eq("user_id", userId)
-      .select("id,full_name,mobile,email,district,state,pincode,tagline,success_story,photo_url,status")
+      .select("id,full_name,mobile,email,district,state,pincode,tagline,success_story,photo_url,status,metadata,verified_at")
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!row) throw new Error("Partner profile not found");
+    return row as PartnerProfile;
+  });
+
+const notifPrefSchema = z.object({
+  email: z.boolean().optional(),
+  whatsapp: z.boolean().optional(),
+  push: z.boolean().optional(),
+});
+
+const metadataUpdateSchema = z.object({
+  language: z.enum(["en", "hi", "hinglish"]).optional(),
+  notif_new_lead: notifPrefSchema.optional(),
+  notif_payout: notifPrefSchema.optional(),
+  notif_shop_activation: notifPrefSchema.optional(),
+  notif_milestone: notifPrefSchema.optional(),
+  notif_training: notifPrefSchema.optional(),
+});
+
+export const updatePartnerMetadata = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => metadataUpdateSchema.parse(data))
+  .handler(async ({ context, data }): Promise<PartnerProfile> => {
+    const { supabase, userId } = context;
+    const { data: existing } = await supabase
+      .from("district_business_partners")
+      .select("metadata")
+      .eq("user_id", userId)
+      .maybeSingle();
+    const current = (existing?.metadata ?? {}) as PartnerMetadata;
+    const nextMeta: PartnerMetadata = { ...current, ...data };
+    const { data: row, error } = await supabase
+      .from("district_business_partners")
+      .update({ metadata: nextMeta })
+      .eq("user_id", userId)
+      .select("id,full_name,mobile,email,district,state,pincode,tagline,success_story,photo_url,status,metadata,verified_at")
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!row) throw new Error("Partner profile not found");
