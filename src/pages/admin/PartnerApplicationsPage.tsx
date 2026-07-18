@@ -388,7 +388,7 @@ export function PartnerApplicationsPage() {
 
       {/* Detail dialog */}
       <Dialog open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>{detail?.full_name}</DialogTitle>
             <DialogDescription>
