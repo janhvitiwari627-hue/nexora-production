@@ -18,6 +18,7 @@ import { BackButton } from "@/components/shared/BackButton";
 import { useAuthStore } from "@/stores/authStore";
 import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
 import { requestPasswordReset } from "@/lib/password-reset";
+import { validateReferralCode } from "@/lib/owner.functions";
 
 const normalizeEmail = (value: string) => value.trim().toLowerCase();
 
