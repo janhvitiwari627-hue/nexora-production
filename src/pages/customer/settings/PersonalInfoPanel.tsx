@@ -297,35 +297,37 @@ export function PersonalInfoPanel() {
     else setPincodeError(null);
   }
 
-  async function handleSave() {
+  async function doSave(snapshot: typeof form, opts: { silent?: boolean } = {}) {
+    const { silent = false } = opts;
     const { data: authData, error: authError } = await supabase.auth.getUser();
     const activeUser = authData.user;
     if (authError || !activeUser || (user && activeUser.id !== user.id)) {
-      toast.error("Please sign in to save changes");
-      return;
+      if (!silent) toast.error("Please sign in to save changes");
+      return false;
     }
-    if (form.pincode && pincodeError) {
-      toast.error(pincodeError);
-      return;
+    if (snapshot.pincode && pincodeError) {
+      if (!silent) toast.error(pincodeError);
+      return false;
     }
+    savingRef.current = true;
     setSaving(true);
     setSaveError(null);
     try {
-      const username = form.username.trim() || null;
+      const username = snapshot.username.trim() || null;
       const { data: savedProfile, error } = await supabase
         .from("profiles")
         .upsert(
           {
             id: activeUser.id,
             email: activeUser.email ?? profile?.email ?? null,
-            full_name: form.fullName.trim() || null,
+            full_name: snapshot.fullName.trim() || null,
             username,
-            gender: form.gender || null,
-            date_of_birth: form.dob || null,
-            state: form.state || null,
-            district: form.district || null,
-            block: form.block || null,
-            pincode: form.pincode || null,
+            gender: snapshot.gender || null,
+            date_of_birth: snapshot.dob || null,
+            state: snapshot.state || null,
+            district: snapshot.district || null,
+            block: snapshot.block || null,
+            pincode: snapshot.pincode || null,
           },
           { onConflict: "id" },
         )
@@ -336,7 +338,10 @@ export function PersonalInfoPanel() {
         throw new Error("The profile update could not be verified. Please try again.");
       }
       setProfile(savedProfile);
-      toast.success("Personal information saved");
+      lastSavedSnapshotRef.current = JSON.stringify(snapshot);
+      setAutoSavedAt(Date.now());
+      if (!silent) toast.success("Personal information saved");
+      return true;
     } catch (err: unknown) {
       const details = errorDetails(err);
       const message =
@@ -344,11 +349,80 @@ export function PersonalInfoPanel() {
           ? "This username is already taken. Please choose another one."
           : details.message || "Could not save changes";
       setSaveError(message);
-      toast.error(message);
+      if (!silent) toast.error(message);
+      return false;
     } finally {
+      savingRef.current = false;
       setSaving(false);
     }
   }
+
+  async function handleSave() {
+    await doSave(form);
+  }
+
+  // Auto-save: debounce form changes and persist silently.
+  useEffect(() => {
+    if (!user || !profile) return;
+    if (hydratedForUserRef.current !== profile.id) return;
+    const snapshot = JSON.stringify(form);
+    if (snapshot === lastSavedSnapshotRef.current) return;
+    if (form.pincode && pincodeError) return;
+    if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+    autoSaveTimerRef.current = setTimeout(() => {
+      if (savingRef.current) {
+        pendingAutoSaveRef.current = true;
+        return;
+      }
+      void doSave(form, { silent: true });
+    }, 1200);
+    return () => {
+      if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form, pincodeError, user, profile]);
+
+  // If a save was requested while another was in flight, run it after.
+  useEffect(() => {
+    if (!saving && pendingAutoSaveRef.current) {
+      pendingAutoSaveRef.current = false;
+      const snapshot = JSON.stringify(form);
+      if (snapshot !== lastSavedSnapshotRef.current) {
+        void doSave(form, { silent: true });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [saving]);
+
+  // Best-effort flush on unmount / tab hide.
+  useEffect(() => {
+    const flush = () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+        autoSaveTimerRef.current = null;
+      }
+      const snapshot = JSON.stringify(form);
+      if (
+        user &&
+        profile &&
+        snapshot !== lastSavedSnapshotRef.current &&
+        !(form.pincode && pincodeError)
+      ) {
+        void doSave(form, { silent: true });
+      }
+    };
+    const onVis = () => {
+      if (document.visibilityState === "hidden") flush();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      document.removeEventListener("visibilitychange", onVis);
+      flush();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form, pincodeError, user, profile]);
+
+
 
   function handleCancel() {
     if (!profile) return;
