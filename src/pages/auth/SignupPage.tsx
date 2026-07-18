@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import { Loader2, Eye, EyeOff, CheckCircle2, AlertTriangle } from "lucide-react";
 import {
   PasswordStrengthIndicator,
   scorePassword,
@@ -101,14 +101,22 @@ export default function SignupPage() {
   const validateRefFn = useServerFn(validateReferralCode);
   const [referrerName, setReferrerName] = useState<string | null>(null);
   const [refInvalid, setRefInvalid] = useState(false);
+  const [refChecking, setRefChecking] = useState(false);
+  const [refCheckFailed, setRefCheckFailed] = useState(false);
 
   useEffect(() => {
     if (!referredBy) {
       setReferrerName(null);
       setRefInvalid(false);
+      setRefChecking(false);
+      setRefCheckFailed(false);
       return;
     }
     let cancelled = false;
+    setRefChecking(true);
+    setRefCheckFailed(false);
+    setRefInvalid(false);
+    setReferrerName(null);
     void validateRefFn({ data: { code: referredBy } })
       .then((res) => {
         if (cancelled) return;
@@ -126,12 +134,25 @@ export default function SignupPage() {
         }
       })
       .catch(() => {
-        /* keep code, let backend trigger decide */
+        if (cancelled) return;
+        // Fail-closed: if we can't verify, do NOT credit anyone.
+        setReferrerName(null);
+        setRefInvalid(true);
+        setRefCheckFailed(true);
+      })
+      .finally(() => {
+        if (!cancelled) setRefChecking(false);
       });
     return () => {
       cancelled = true;
     };
   }, [referredBy, validateRefFn]);
+
+  // Only send referral to backend when we have CONFIRMED it's valid (name resolved).
+  const referralConfirmed = Boolean(
+    referredBy && !refInvalid && !refChecking && referrerName,
+  );
+
 
   useEffect(() => {
     if (!isInitialized || !user) return;
@@ -222,7 +243,7 @@ export default function SignupPage() {
           data: {
             full_name: parsed.data.full_name,
             mobile: parsed.data.mobile,
-            referred_by: refInvalid ? null : (referredBy || null),
+            referred_by: referralConfirmed ? referredBy : null,
             gender: parsed.data.gender,
             // Force customer role — trigger ignores unknown/disallowed roles
             role: "customer",
@@ -343,34 +364,53 @@ export default function SignupPage() {
               </Alert>
             )}
 
-            {referredBy && !refInvalid && (
+            {referredBy && refChecking && (
+              <Alert className="mb-4">
+                <AlertDescription className="text-sm flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Verifying referral code{" "}
+                  <strong className="font-mono">{referredBy}</strong>…
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {referralConfirmed && (
               <Alert className="mb-4 border-primary/20 bg-primary/5">
                 <AlertDescription className="text-sm">
-                  {referrerName ? (
-                    <>
+                  <span className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                    <span>
                       Invited by <strong>{referrerName}</strong> · code{" "}
                       <strong className="font-mono">{referredBy}</strong>
-                    </>
-                  ) : (
-                    <>
-                      Joining with referral code{" "}
-                      <strong className="font-mono">{referredBy}</strong>.
-                    </>
-                  )}
-                  <span className="block text-xs text-muted-foreground mt-0.5">
-                    You'll be credited to this referrer on signup.
+                    </span>
+                  </span>
+                  <span className="block text-xs text-muted-foreground mt-1">
+                    Credit will go to this referrer only.
                   </span>
                 </AlertDescription>
               </Alert>
             )}
+
             {referredBy && refInvalid && (
               <Alert variant="destructive" className="mb-4">
+                <AlertTriangle className="h-4 w-4" />
                 <AlertDescription className="text-sm">
-                  Referral code <strong className="font-mono">{referredBy}</strong> is invalid or
-                  expired. You can still sign up without it.
+                  <strong className="block mb-1">
+                    {refCheckFailed
+                      ? "Referral code could not be verified"
+                      : "Invalid or expired referral code"}
+                  </strong>
+                  <span className="block">
+                    Code <strong className="font-mono">{referredBy}</strong>{" "}
+                    {refCheckFailed
+                      ? "couldn't be checked right now. To protect the wrong account from getting credit, we won't apply any referral."
+                      : "doesn't match any active referrer. No referral credit will be applied."}
+                    {" "}You can continue signing up without a referral, or double-check the link with the person who shared it.
+                  </span>
                 </AlertDescription>
               </Alert>
             )}
+
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">
