@@ -416,6 +416,39 @@ function PdfViewer({ url, applicantName, downloadUrl }: { url: string; applicant
   );
 }
 
+function ThumbButton({
+  active,
+  onSelect,
+  ariaLabel,
+  children,
+}: {
+  active: boolean;
+  onSelect: () => void;
+  ariaLabel: string;
+  children: React.ReactNode;
+}) {
+  const ref = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (active && ref.current) {
+      ref.current.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+  }, [active]);
+  return (
+    <button
+      ref={ref}
+      type="button"
+      onClick={onSelect}
+      className={`block w-full overflow-hidden rounded border bg-white transition hover:border-primary ${
+        active ? "border-primary ring-2 ring-primary shadow-md" : "border-border"
+      }`}
+      aria-label={ariaLabel}
+      aria-current={active ? "page" : undefined}
+    >
+      {children}
+    </button>
+  );
+}
+
 function PdfThumb({ doc, pageNumber }: { doc: PdfDoc | null; pageNumber: number }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
