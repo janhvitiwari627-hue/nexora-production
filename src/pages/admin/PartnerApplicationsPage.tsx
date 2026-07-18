@@ -252,7 +252,18 @@ export function PartnerApplicationsPage() {
                     <TableHead>Applicant</TableHead>
                     <TableHead>Contact</TableHead>
                     <TableHead>District</TableHead>
+                    <TableHead>KYC</TableHead>
                     <TableHead>Role</TableHead>
+                    <TableHead>Applied</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filtered.map((l) => {
+                    const role =
+                      typeof l.metadata?.role === "string" ? (l.metadata.role as string) : "—";
+                    const kycPath = extractKycPath(l);
                     <TableHead>Applied</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
