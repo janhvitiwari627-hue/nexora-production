@@ -557,7 +557,19 @@ export function PersonalInfoPanel() {
           {saveError}
         </p>
       )}
+      <div className="text-muted-foreground mt-3 flex items-center gap-2 text-xs" aria-live="polite">
+        {saving ? (
+          <>
+            <Loader2 className="h-3 w-3 animate-spin" /> Saving…
+          </>
+        ) : autoSavedAt ? (
+          <span>Auto-saved · {new Date(autoSavedAt).toLocaleTimeString()}</span>
+        ) : (
+          <span>Changes save automatically.</span>
+        )}
+      </div>
       <SaveBar onSave={handleSave} onCancel={handleCancel} saving={saving} />
+
     </PanelShell>
   );
 }
