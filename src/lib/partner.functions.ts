@@ -56,12 +56,18 @@ export type PartnerKycReview = {
   reviewed_by?: string | null;
 };
 
+export type PartnerNotificationPref = { email?: boolean; whatsapp?: boolean; push?: boolean };
+
 export type PartnerMetadata = {
   kyc_review?: PartnerKycReview;
   kyc_document_url?: string;
   agreement_signed_at?: string;
   agreement_version?: string;
-  notification_prefs?: Record<string, { email?: boolean; whatsapp?: boolean; push?: boolean }>;
+  notif_new_lead?: PartnerNotificationPref;
+  notif_payout?: PartnerNotificationPref;
+  notif_shop_activation?: PartnerNotificationPref;
+  notif_milestone?: PartnerNotificationPref;
+  notif_training?: PartnerNotificationPref;
   language?: string;
 };
 
