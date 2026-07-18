@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { sendLovableEmail } from "@lovable.dev/email-js";
 import { z } from "zod";
 
 const bodySchema = z.object({
@@ -11,9 +12,13 @@ const GENERIC_OK = {
   message: "If this email is registered, a reset link has been sent.",
 };
 
+const DELIVERY_UNAVAILABLE = {
+  ok: false,
+  message: "Password reset email is temporarily unavailable. Please try again shortly.",
+};
+
 const PRODUCTION_ORIGIN = "https://meripahalfasthelp.online";
 const RESET_REDIRECT_TO = `${PRODUCTION_ORIGIN}/auth/callback?next=/reset-password`;
-const RESEND_ENDPOINT = "https://connector-gateway.lovable.dev/resend/emails";
 
 function resetEmailHtml(actionLink: string) {
   return `<!doctype html>
@@ -69,11 +74,10 @@ export const Route = createFileRoute("/api/public/auth/forgot-password")({
         const { email } = parsed.data;
 
         try {
-          const resendApiKey = process.env.RESEND_API_KEY;
           const lovableApiKey = process.env.LOVABLE_API_KEY;
-          if (!resendApiKey || !lovableApiKey) {
-            console.warn("[forgot-password] email environment missing");
-            return Response.json(GENERIC_OK);
+          if (!lovableApiKey) {
+            console.error("[forgot-password] LOVABLE_API_KEY missing");
+            return Response.json(DELIVERY_UNAVAILABLE, { status: 503 });
           }
 
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -86,35 +90,31 @@ export const Route = createFileRoute("/api/public/auth/forgot-password")({
           });
           if (error) {
             console.error("[forgot-password] recovery link status", error.status ?? "failed");
-            return Response.json(GENERIC_OK);
+            return Response.json(DELIVERY_UNAVAILABLE, { status: 503 });
           }
 
           const actionLink = data.properties?.action_link;
           if (!actionLink) {
             console.error("[forgot-password] recovery link missing");
-            return Response.json(GENERIC_OK);
+            return Response.json(DELIVERY_UNAVAILABLE, { status: 503 });
           }
 
-          const emailResponse = await fetch(RESEND_ENDPOINT, {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${lovableApiKey}`,
-              "X-Connection-Api-Key": resendApiKey,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              from: "Nexora SalonOS <no-reply@meripahalfasthelp.online>",
-              to: [email],
+          await sendLovableEmail(
+            {
+              to: email,
+              from: "Nexora SalonOS <noreply@notify.meripahalfasthelp.online>",
+              sender_domain: "notify.meripahalfasthelp.online",
               subject: "Reset your Nexora SalonOS password",
               html: resetEmailHtml(actionLink),
-            }),
-          });
-
-          if (!emailResponse.ok) {
-            console.error("[forgot-password] resend status", emailResponse.status);
-          }
+              text: "Use the password reset link in this email to set a new Nexora SalonOS password.",
+              purpose: "transactional",
+              idempotency_key: crypto.randomUUID(),
+            },
+            { apiKey: lovableApiKey, sendUrl: process.env.LOVABLE_SEND_URL },
+          );
         } catch (err) {
           console.error("[forgot-password] handler error", (err as Error)?.message);
+          return Response.json(DELIVERY_UNAVAILABLE, { status: 503 });
         }
 
         return Response.json(GENERIC_OK);

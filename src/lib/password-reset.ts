@@ -1,10 +1,10 @@
-import { supabase } from "@/integrations/supabase/client";
-
-/** Starts Supabase's configured password-recovery email flow. */
+/** Requests a reset link from the server-side transactional email flow. */
 export async function requestPasswordReset(email: string) {
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
+  const response = await fetch("/api/public/auth/forgot-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
   });
 
-  if (error) throw error;
+  if (!response.ok) throw new Error("Password reset email could not be sent.");
 }
