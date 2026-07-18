@@ -98,6 +98,40 @@ export default function SignupPage() {
 
   const pwStrength = useMemo(() => scorePassword(form.password), [form.password]);
   const checkEmailRoleFn = useServerFn(getEmailRole);
+  const validateRefFn = useServerFn(validateReferralCode);
+  const [referrerName, setReferrerName] = useState<string | null>(null);
+  const [refInvalid, setRefInvalid] = useState(false);
+
+  useEffect(() => {
+    if (!referredBy) {
+      setReferrerName(null);
+      setRefInvalid(false);
+      return;
+    }
+    let cancelled = false;
+    void validateRefFn({ data: { code: referredBy } })
+      .then((res) => {
+        if (cancelled) return;
+        if (res.valid) {
+          setReferrerName(res.referrerName ?? null);
+          setRefInvalid(false);
+        } else {
+          setReferrerName(null);
+          setRefInvalid(true);
+          try {
+            window.sessionStorage.removeItem("nexora_pending_ref");
+          } catch {
+            /* ignore */
+          }
+        }
+      })
+      .catch(() => {
+        /* keep code, let backend trigger decide */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [referredBy, validateRefFn]);
 
   useEffect(() => {
     if (!isInitialized || !user) return;
