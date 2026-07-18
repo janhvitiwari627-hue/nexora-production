@@ -42,6 +42,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 
+type MetaPatch = {
+  language?: "en" | "hi" | "hinglish";
+  notif_new_lead?: PartnerNotificationPref;
+  notif_payout?: PartnerNotificationPref;
+  notif_shop_activation?: PartnerNotificationPref;
+  notif_milestone?: PartnerNotificationPref;
+  notif_training?: PartnerNotificationPref;
+};
+
 type NotifKey =
   | "notif_new_lead"
   | "notif_payout"
@@ -115,7 +124,7 @@ export function PartnerSettingsPage() {
   });
 
   const metaMutation = useMutation({
-    mutationFn: (data: Parameters<typeof saveMetadata>[0]["data"]) => saveMetadata({ data }),
+    mutationFn: (data: MetaPatch) => saveMetadata({ data }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["partner", "profile"] });
     },
@@ -255,7 +264,7 @@ export function PartnerSettingsPage() {
                     const set = (channel: keyof PartnerNotificationPref) =>
                       metaMutation.mutate({
                         [row.key]: { ...pref, [channel]: !pref[channel] },
-                      } as Parameters<typeof saveMetadata>[0]["data"]);
+                      } as MetaPatch);
                     return (
                       <tr key={row.key}>
                         <td className="px-4 py-3 text-slate-700">{row.label}</td>
