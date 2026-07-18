@@ -96,7 +96,7 @@ export function PersonalInfoPanel() {
     if (!profile) return;
     if (hydratedForUserRef.current === profile.id) return;
     hydratedForUserRef.current = profile.id;
-    setForm({
+    const next = {
       fullName: profile.full_name || "",
       username: profile.username || "",
       gender: (profile.gender || "prefer_not") as string,
@@ -105,10 +105,13 @@ export function PersonalInfoPanel() {
       district: profile.district || "",
       block: profile.block || "",
       pincode: profile.pincode || "",
-    });
+    };
+    setForm(next);
+    lastSavedSnapshotRef.current = JSON.stringify(next);
     setAvatar(profile.avatar_url || "");
     setUsernameTouched(!!profile.username);
   }, [profile]);
+
 
 
   const districts = useMemo(() => getDistricts(form.state), [form.state]);
