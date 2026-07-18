@@ -190,6 +190,44 @@ export function PartnerApplicationsPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const setKyc = useMutation({
+    mutationFn: async ({
+      app,
+      status,
+      notes,
+    }: {
+      app: PartnerApp;
+      status: KycStatus;
+      notes: string;
+    }) => {
+      const { data: userRes } = await supabase.auth.getUser();
+      const nextMeta = {
+        ...(app.metadata ?? {}),
+        kyc_review: {
+          status,
+          notes,
+          reviewed_at: new Date().toISOString(),
+          reviewed_by: userRes.user?.id ?? null,
+        },
+      };
+      const { error } = await supabase
+        .from("district_business_partners")
+        .update({ metadata: nextMeta })
+        .eq("id", app.id);
+      if (error) throw error;
+      return nextMeta;
+    },
+    onSuccess: (nextMeta, vars) => {
+      qc.invalidateQueries({ queryKey: ["admin", "partner-applications-dbp"] });
+      toast.success(`KYC marked ${vars.status}`);
+      if (detail && detail.id === vars.app.id) {
+        setDetail({ ...detail, metadata: nextMeta });
+      }
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+
   const counts = useMemo(() => {
     const map: Record<string, number> = { all: data.length };
     STATUSES.forEach((s) => (map[s] = 0));
