@@ -127,7 +127,7 @@ export function PartnerApplicationsPage() {
   const [kycNotesDraft, setKycNotesDraft] = useState("");
   const [kycConfirm, setKycConfirm] = useState<{ app: PartnerApp; status: KycStatus; notes: string } | null>(null);
   const [rejectReason, setRejectReason] = useState("");
-  const [rejectReasonError, setRejectReasonError] = useState<string | null>(null);
+  const [kycRejectReasonError, setKycRejectReasonError] = useState<string | null>(null);
 
   const requestKycChange = (app: PartnerApp, next: KycStatus, notes: string) => {
     const current = extractKycReview(app).status;
@@ -677,7 +677,7 @@ export function PartnerApplicationsPage() {
           if (!o) {
             setKycConfirm(null);
             setRejectReason("");
-            setRejectReasonError(null);
+            setKycRejectReasonError(null);
           }
         }}
       >
@@ -715,16 +715,16 @@ export function PartnerApplicationsPage() {
                 value={rejectReason}
                 onChange={(e) => {
                   setRejectReason(e.target.value);
-                  if (rejectReasonError) setRejectReasonError(null);
+                  if (kycRejectReasonError) setKycRejectReasonError(null);
                 }}
                 placeholder="Explain why this KYC is being rejected (e.g. Aadhaar blurry, name mismatch, expired document)…"
-                aria-invalid={!!rejectReasonError}
+                aria-invalid={!!kycRejectReasonError}
                 aria-describedby="kyc-reject-reason-help"
-                className={rejectReasonError ? "border-destructive focus-visible:ring-destructive" : ""}
+                className={kycRejectReasonError ? "border-destructive focus-visible:ring-destructive" : ""}
               />
               <div id="kyc-reject-reason-help" className="flex justify-between text-xs">
-                <span className={rejectReasonError ? "text-destructive" : "text-muted-foreground"}>
-                  {rejectReasonError ?? "Required — shared with the applicant and saved in reviewer notes."}
+                <span className={kycRejectReasonError ? "text-destructive" : "text-muted-foreground"}>
+                  {kycRejectReasonError ?? "Required — shared with the applicant and saved in reviewer notes."}
                 </span>
                 <span className="text-muted-foreground tabular-nums">{rejectReason.length}/500</span>
               </div>
@@ -747,7 +747,7 @@ export function PartnerApplicationsPage() {
                 if (kycConfirm.status === "rejected") {
                   const reason = rejectReason.trim();
                   if (reason.length < 5) {
-                    setRejectReasonError(
+                    setKycRejectReasonError(
                       reason.length === 0
                         ? "Please enter a rejection reason before confirming."
                         : "Reason must be at least 5 characters."
@@ -764,7 +764,7 @@ export function PartnerApplicationsPage() {
                   onSuccess: () => {
                     setKycConfirm(null);
                     setRejectReason("");
-                    setRejectReasonError(null);
+                    setKycRejectReasonError(null);
                   },
                 });
               }}
