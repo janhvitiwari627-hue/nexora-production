@@ -2,6 +2,7 @@ import type { ShopData } from "../types";
 import type { TemplateConfig } from "../templates";
 import { ShareButton } from "./ShareButton";
 import { Clock, Star } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 export function WServices({ shop, template }: { shop: ShopData; template: TemplateConfig }) {
   return (
@@ -22,7 +23,14 @@ export function WServices({ shop, template }: { shop: ShopData; template: Templa
                 <Star className="h-2.5 w-2.5 fill-current" /> Popular
               </span>
             )}
-            {s.image && <img src={s.image} alt={s.name} loading="lazy" className="aspect-video w-full object-cover" />}
+            {s.image && (
+              <img
+                src={s.image}
+                alt={s.name}
+                loading="lazy"
+                className="aspect-video w-full object-cover"
+              />
+            )}
             <div className="space-y-2 p-5">
               <div className="flex items-baseline justify-between gap-2">
                 <h3 className="text-lg font-semibold">{s.name}</h3>
@@ -30,25 +38,37 @@ export function WServices({ shop, template }: { shop: ShopData; template: Templa
                   {s.discountPrice ? (
                     <>
                       <div className="text-muted-foreground text-xs line-through">₹{s.price}</div>
-                      <div className="font-bold" style={{ color: template.colors.primary }}>₹{s.discountPrice}</div>
+                      <div className="font-bold" style={{ color: template.colors.primary }}>
+                        ₹{s.discountPrice}
+                      </div>
                     </>
                   ) : (
-                    <span className="font-bold" style={{ color: template.colors.primary }}>₹{s.price}</span>
+                    <span className="font-bold" style={{ color: template.colors.primary }}>
+                      ₹{s.price}
+                    </span>
                   )}
                 </div>
               </div>
               <p className="text-muted-foreground text-sm">{s.desc}</p>
               <div className="text-muted-foreground flex items-center justify-between text-xs">
-                <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" /> {s.duration} min</span>
-                <ShareButton title={`${s.name} at ${shop.name}`} label="Share" className="!px-2 !py-0.5 !text-[10px]" />
+                <span className="inline-flex items-center gap-1">
+                  <Clock className="h-3 w-3" /> {s.duration} min
+                </span>
+                <ShareButton
+                  title={`${s.name} at ${shop.name}`}
+                  label="Share"
+                  className="!px-2 !py-0.5 !text-[10px]"
+                />
               </div>
-              <a
-                href="#appointment"
+              <Link
+                to="/site/$slug/book"
+                params={{ slug: shop.slug }}
+                search={{ service: s.id }}
                 className="mt-2 block rounded-md py-2 text-center text-sm font-semibold text-white transition hover:opacity-90"
                 style={{ backgroundColor: template.colors.primary, borderRadius: template.radius }}
               >
                 Book Service
-              </a>
+              </Link>
             </div>
           </article>
         ))}
@@ -58,5 +78,9 @@ export function WServices({ shop, template }: { shop: ShopData; template: Templa
 }
 
 export function SectionTitle({ children, font }: { children: React.ReactNode; font?: string }) {
-  return <h2 className="text-center text-3xl font-bold md:text-4xl" style={{ fontFamily: font }}>{children}</h2>;
+  return (
+    <h2 className="text-center text-3xl font-bold md:text-4xl" style={{ fontFamily: font }}>
+      {children}
+    </h2>
+  );
 }

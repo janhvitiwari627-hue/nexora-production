@@ -20,8 +20,10 @@ const searchSchema = z.object({
   mp: z.coerce.number().pipe(z.literal(1)).optional(),
   oo: z.coerce.number().pipe(z.literal(1)).optional(),
   hs: z.coerce.number().pipe(z.literal(1)).optional(),
+  pk: z.coerce.number().pipe(z.literal(1)).optional(),
+  ac: z.coerce.number().pipe(z.literal(1)).optional(),
   sort: z
-    .enum(["relevance", "rating", "distance", "price_low", "price_high", "popular"])
+    .enum(["relevance", "rating", "distance", "price_low", "price_high", "popular", "newest"])
     .optional(),
   view: z.enum(["grid", "map"]).optional(),
 });
@@ -30,8 +32,7 @@ export const Route = createFileRoute("/search")({
   validateSearch: searchSchema,
   // Only q/category/area affect the underlying data query; remaining params are client-side filters.
   loaderDeps: ({ search }) => ({ q: search.q, category: search.category, area: search.area }),
-  loader: ({ context, deps }) =>
-    context.queryClient.ensureQueryData(shopsQueryOptions(deps)),
+  loader: ({ context, deps }) => context.queryClient.ensureQueryData(shopsQueryOptions(deps)),
   head: () => ({
     meta: [
       { title: "Search salons & spas — Nexora" },

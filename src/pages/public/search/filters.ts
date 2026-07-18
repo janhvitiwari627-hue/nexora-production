@@ -4,15 +4,17 @@ export type SortKey =
   | "distance"
   | "price_low"
   | "price_high"
-  | "popular";
+  | "popular"
+  | "newest";
 
 export const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: "relevance", label: "Recommended" },
-  { key: "rating", label: "Rating: High to Low" },
-  { key: "price_low", label: "Price: Low to High" },
-  { key: "price_high", label: "Price: High to Low" },
-  { key: "popular", label: "Popularity" },
-  { key: "distance", label: "Distance: Near to Far" },
+  { key: "distance", label: "Nearest" },
+  { key: "rating", label: "Highest Rated" },
+  { key: "price_low", label: "Lowest Price" },
+  { key: "price_high", label: "Highest Price" },
+  { key: "popular", label: "Trending" },
+  { key: "newest", label: "Newest" },
 ];
 
 export const CATEGORIES = [
@@ -43,6 +45,8 @@ export type Filters = {
   mostPopular: boolean;
   offersOnly: boolean;
   homeService: boolean;
+  parking: boolean;
+  airConditioned: boolean;
 };
 
 export const DEFAULT_FILTERS: Filters = {
@@ -57,6 +61,8 @@ export const DEFAULT_FILTERS: Filters = {
   mostPopular: false,
   offersOnly: false,
   homeService: false,
+  parking: false,
+  airConditioned: false,
 };
 
 export function isDefault(f: Filters): boolean {
@@ -72,7 +78,9 @@ export function isDefault(f: Filters): boolean {
     !f.topRated &&
     !f.mostPopular &&
     !f.offersOnly &&
-    !f.homeService
+    !f.homeService &&
+    !f.parking &&
+    !f.airConditioned
   );
 }
 
@@ -98,6 +106,8 @@ export type SearchUrlParams = {
   mp?: 1;
   oo?: 1;
   hs?: 1;
+  pk?: 1;
+  ac?: 1;
   sort?: SortKey;
   view?: "grid" | "map";
 };
@@ -110,24 +120,23 @@ const SORTS: SortKey[] = [
   "price_low",
   "price_high",
   "popular",
+  "newest",
 ];
 
 export function filtersFromSearch(s: SearchUrlParams): Filters {
   const g = s.g && GENDERS.includes(s.g) ? s.g : DEFAULT_FILTERS.gender;
   const cats = s.cats
-    ? s.cats.split(",").map((x) => x.trim()).filter(Boolean)
+    ? s.cats
+        .split(",")
+        .map((x) => x.trim())
+        .filter(Boolean)
     : [];
-  const pmin =
-    typeof s.pmin === "number" && !Number.isNaN(s.pmin) ? s.pmin : PRICE_MIN;
-  const pmax =
-    typeof s.pmax === "number" && !Number.isNaN(s.pmax) ? s.pmax : PRICE_MAX;
+  const pmin = typeof s.pmin === "number" && !Number.isNaN(s.pmin) ? s.pmin : PRICE_MIN;
+  const pmax = typeof s.pmax === "number" && !Number.isNaN(s.pmax) ? s.pmax : PRICE_MAX;
   return {
     minRating:
-      typeof s.mr === "number" && s.mr >= 1 && s.mr <= 5
-        ? s.mr
-        : DEFAULT_FILTERS.minRating,
-    maxDistance:
-      typeof s.md === "number" && s.md > 0 ? s.md : DEFAULT_FILTERS.maxDistance,
+      typeof s.mr === "number" && s.mr >= 1 && s.mr <= 5 ? s.mr : DEFAULT_FILTERS.minRating,
+    maxDistance: typeof s.md === "number" && s.md > 0 ? s.md : DEFAULT_FILTERS.maxDistance,
     priceRange: [Math.min(pmin, pmax), Math.max(pmin, pmax)],
     categories: cats,
     gender: g,
@@ -137,6 +146,8 @@ export function filtersFromSearch(s: SearchUrlParams): Filters {
     mostPopular: s.mp === 1,
     offersOnly: s.oo === 1,
     homeService: s.hs === 1,
+    parking: s.pk === 1,
+    airConditioned: s.ac === 1,
   };
 }
 
@@ -154,6 +165,8 @@ export function filtersToSearch(f: Filters): Partial<SearchUrlParams> {
   if (f.mostPopular) out.mp = 1;
   if (f.offersOnly) out.oo = 1;
   if (f.homeService) out.hs = 1;
+  if (f.parking) out.pk = 1;
+  if (f.airConditioned) out.ac = 1;
   return out;
 }
 
@@ -164,4 +177,3 @@ export function sortFromSearch(s: SearchUrlParams): SortKey {
 export function viewFromSearch(s: SearchUrlParams): "grid" | "map" {
   return s.view === "map" ? "map" : "grid";
 }
-

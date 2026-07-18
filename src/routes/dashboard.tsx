@@ -20,7 +20,7 @@ export const Route = createFileRoute("/dashboard")({
 
 function DashboardLayout() {
   return (
-    <>
+    <div className="nexora-pwa-surface min-h-[100dvh]">
       <div className="pb-20 md:pb-0">
         <div className="sticky top-0 z-30 border-b border-border/60 bg-card/90 backdrop-blur">
           <div className="mx-auto flex max-w-7xl items-center gap-2 px-4 py-3">
@@ -32,6 +32,6 @@ function DashboardLayout() {
       </div>
       <MobileBottomNav />
       <LocationPermissionModal />
-    </>
+    </div>
   );
 }

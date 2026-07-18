@@ -1,47 +1,69 @@
-## Goal
-Stop expanding scope. Lock V1 to the four items your own "Final Recommendation" lists, ship them to production-ready quality, and pilot in Jaipur before touching anything else on the gap list.
+Aapki uploaded file ke hisaab se pura **form-based live template editor** banana hai. Ye ek bada system hai, isliye main ise **phases** me build karunga — har phase ke baad aap test kar sakte ho.
 
-## In Scope (V1 — ship these only)
+## Architecture (spec ke according)
 
-1. **Supabase schema + RLS hardening** (already ~90% done)
-   - Audit existing tables against SSOT; confirm RLS on every public table.
-   - Add only the 3 truly-blocking operational tables: `audit_events`, `system_settings`, `notification_queue`. Everything else on the "missing modules" list is deferred.
-   - Re-run security scanner; fix any findings.
+Template ko HTML ki tarah edit nahi karenge. Har section ek **structured JSON component** hoga:
+```json
+{ "type": "hero", "heading": "...", "imageUrl": "...", "visible": true, "order": 1 }
+```
+Website is JSON se render hogi. Editor sirf JSON badlega → template kabhi tootega nahi.
 
-2. **30-Minute White-Label Website Builder** (wizard already shipped last turn)
-   - Lock template gallery to the 3 approved templates: Luxury Salon (royal-luxe), Modern Professional (modern-salon), Spa & Wellness (professional-beauty).
-   - Verify: content persists across template switches, live preview works, mobile-first, "Powered by Nexora" only in footer, Nexora QR block present, no owner QR anywhere.
-   - Add a publish checklist gate (re-use `markSalonSetupComplete`).
+## Database Schema (nayi tables)
 
-3. **60-Second Booking Flow** (already wired)
-   - Verify Search → Business → Service → Staff → Date → Time → Confirm → WhatsApp end-to-end on mobile.
-   - Add: booking slot buffer (configurable, default 0), 90-day max advance window (already enforced as 30; bump to 90), min cancellation window (24h already), review eligibility = completed bookings only.
-   - WhatsApp deep link confirmation after booking.
+```
+website_templates      – original templates (read-only master copies)
+user_websites          – har user ki apni website (draft + published)
+website_sections       – hero/services/gallery/about/contact… har section ka JSON content, order, visible flag
+website_theme          – colors, fonts, button styles per user_website
+website_versions       – snapshots for undo / version history
+media_library          – uploaded images/logos per user
+```
+RLS: har user sirf apni `user_websites` aur uske children edit kar sake.
 
-4. **Nexora QR + Daily 10 PM Settlement**
-   - Confirm only Nexora QR is rendered on public sites / booking confirmation (remove any owner-QR paths).
-   - Schedule `process_pending_settlements` via pg_cron at 22:00 IST daily.
-   - Owner wallet shows daily settlement entries.
+## Build Order (spec ke exact order me)
 
-## Explicitly Deferred (NOT in V1)
+**Phase 1 — Schema + Template Copy System**
+- Migration: upar wali tables + RLS + GRANTs
+- "Use This Template" button → template ka snapshot user ke account me copy
+- Har section JSON structure ke saath insert ho
 
-Everything else in your message:
-- Legal/help/status/press pages (stub with placeholder routes only if missing)
-- 16 operational DB modules beyond the 3 above
-- Owner Referral 2%/8% split, District Partner 10/5/2% commission ladder, Distributor portal expansion, Super Admin fraud/AI suite
-- AI Marketing / Posters / Content / Revenue Advisor / Return Manager
-- 30 enterprise doc volumes
-- Search ranking algorithm, idempotency standard, correlation IDs, webhook management API, feature flags, support tickets, media processing jobs
+**Phase 2 — Section-based Editor Shell**
+- `/owner/website/edit` route: left = form controls, right = live iframe preview
+- Section list sidebar (Hero, About, Services, Gallery, Staff, Packages, Offers, Rate Card, Membership, Blog, Contact)
+- Har section ke liye alag form panel
 
-These re-enter scope **after** the Jaipur pilot validates V1.
+**Phase 3 — Text & Image Editors**
+- Har field (heading, description, button text/link) form input
+- Image upload (file picker + optional URL) — media_library me store
+- Debounced live preview via postMessage (jaise abhi hai)
 
-## Execution Order
-1. Run security scan → fix blockers (1 turn)
-2. Template gallery audit + publish-checklist gate (1 turn)
-3. Booking flow rule tweaks (buffer, 90-day window, review gating) (1 turn)
-4. pg_cron 22:00 IST settlement job + owner wallet verification (1 turn)
-5. Add `audit_events`, `system_settings`, `notification_queue` tables with RLS (1 migration)
-6. End-to-end Playwright smoke on mobile viewport, then publish "Nexora SalonOS V1 — Jaipur Pilot"
+**Phase 4 — Theme Editor**
+- Colors (primary/secondary/accent/bg), fonts, button style
+- Live CSS variable injection in preview
 
-## Confirm before I start
-Reply **"go V1"** to proceed exactly as above, or tell me which of the deferred items must move into V1 (each one added pushes pilot launch).
+**Phase 5 — Section Show/Hide + Reorder**
+- Toggle switch per section (`visible`)
+- Drag-to-reorder (dnd-kit) → `order` field update
+
+**Phase 6 — Draft / Publish / Undo**
+- Save Draft (auto, jo abhi partially hai)
+- Publish button → draft → published copy
+- Undo: last N versions se restore
+
+**Phase 7 — Desktop/Mobile Preview Toggle**
+- Iframe width switch
+
+**Phase 8 — Domain + Version History UI** (last)
+
+## Renderer Refactor (important)
+
+Abhi `WhiteLabelWebsitePage` har section ko hardcoded tables (`shop`, `services`, `staff`…) se read karta hai. Isko refactor karunga taaki wo **`website_sections` JSON array** ko iterate karke render kare. Isse:
+- Section reorder / hide automatically work karega
+- Naye section types easily add honge
+- Editor aur renderer dono ek hi schema use karenge
+
+Existing data (shop/services/staff tables) ko migration me `website_sections` JSON me convert kar denge — kuch bhi lose nahi hoga.
+
+## Aaj kya start karun?
+
+Main **Phase 1 (schema + template copy)** se start karunga. Ye foundation hai — iske bina baaki sab patchwork hoga (jaisa abhi ho raha hai). Approve karo to migration likhta hun.

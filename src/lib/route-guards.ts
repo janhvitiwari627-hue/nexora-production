@@ -1,32 +1,17 @@
 import { redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import type { UserRole } from "@/lib/auth-redirect";
-import { fetchUserRoles } from "@/lib/auth-redirect";
+import { fetchUserRoles, pickPrimaryRole, routeForRole } from "@/lib/auth-redirect";
 
-/**
- * Spec role names map to existing app_role enum values. The `app_role`
- * enum has no `staff`, `shop_owner`, `shop_manager`, or `super_admin`
- * values yet, so we translate spec names to the closest existing enum
- * value when evaluating guards.
- */
-export type AllowedRole =
-  | UserRole
-  | "super_admin"
-  | "shop_owner"
-  | "shop_manager"
-  | "staff";
+export type AllowedRole = UserRole;
 
 function normalizeRole(role: AllowedRole): UserRole {
-  if (role === "super_admin") return "admin";
-  if (role === "shop_owner" || role === "shop_manager") return "owner";
-  if (role === "staff") return "owner"; // no `staff` enum yet — owners cover staff dashboard access
-  return role;
+  return role === "super_admin" ? "admin" : role;
 }
 
 /**
- * Client-side route guard. Use inside `beforeLoad` on a pathless layout
- * route declared with `ssr: false`. Redirects to /login (and remembers
- * the originating URL in sessionStorage so booking flows can resume).
+ * Authenticated route guard backed by user_roles. A saved URL never grants
+ * access: users who open another role's dashboard are returned to their own.
  */
 export async function requireRole(allowed: AllowedRole[], currentPath: string) {
   const { data, error } = await supabase.auth.getUser();
@@ -40,31 +25,19 @@ export async function requireRole(allowed: AllowedRole[], currentPath: string) {
     throw redirect({ to: "/login" });
   }
 
-  const shouldAllowOwnerMembership = allowed.some((role) => normalizeRole(role) === "owner");
-  const [roles, ownerLink] = await Promise.all([
+  const [roles, adminRpc, superAdminRpc] = await Promise.all([
     fetchUserRoles(data.user.id),
-    shouldAllowOwnerMembership
-      ? supabase
-        .from("salon_owners")
-        .select("id")
-        .eq("user_id", data.user.id)
-        .eq("is_approved", true)
-        .limit(1)
-      : Promise.resolve({ data: null, error: null }),
+    supabase.rpc("has_role", { _user_id: data.user.id, _role: "admin" }),
+    supabase.rpc("has_role", { _user_id: data.user.id, _role: "super_admin" }),
   ]);
-  const normalized = new Set(allowed.map(normalizeRole));
-  // Treat shop_owner/shop_manager DB roles as equivalent to "owner" guard.
-  const effectiveRoles = new Set<string>(roles);
-  if (roles.includes("shop_owner" as UserRole) || roles.includes("shop_manager" as UserRole)) {
-    effectiveRoles.add("owner");
-  }
-  if (!ownerLink.error && (ownerLink.data?.length ?? 0) > 0) {
-    effectiveRoles.add("owner");
-  }
-  if (roles.includes("super_admin" as UserRole)) effectiveRoles.add("admin");
-  const ok = Array.from(normalized).some((r) => effectiveRoles.has(r));
+  const allowedRoles = new Set(allowed.map(normalizeRole));
+  const effectiveRoles = new Set<UserRole>(roles);
+  if (roles.includes("super_admin") || superAdminRpc.data === true) effectiveRoles.add("admin");
+  if (adminRpc.data === true) effectiveRoles.add("admin");
+
+  const ok = Array.from(allowedRoles).some((role) => effectiveRoles.has(role));
   if (!ok) {
-    throw redirect({ to: "/" });
+    throw redirect({ to: routeForRole(pickPrimaryRole(Array.from(effectiveRoles))) });
   }
   return { user: data.user, roles };
 }

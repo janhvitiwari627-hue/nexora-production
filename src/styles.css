@@ -131,14 +131,91 @@
   --input: oklch(1 0 0 / 12%);
 }
 
+/* -------------------------------------------------------------------------
+ * Customer App theme (mobile PWA)
+ *
+ * Scoped to `.customer-app` so the public marketing site keeps its indigo
+ * brand while /customer/* uses the lighter, app-like Nexora palette.
+ * Because tokens are mapped through `@theme inline`, overriding the raw
+ * variables here re-themes every utility (bg-background, text-foreground,
+ * border-border, bg-primary, etc.) for the customer-app subtree only.
+ * ------------------------------------------------------------------------- */
+.customer-app {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --heading: #0f172a;
+  --body: #0f172a;
+
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
+  --primary-dark: #1d4ed8;
+  --secondary: #6d28d9;
+  --secondary-foreground: #ffffff;
+  --accent: #3b82f6;
+  --accent-foreground: #ffffff;
+
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #2563eb;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f172a;
+  --sidebar-primary: #2563eb;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f1f5f9;
+  --sidebar-accent-foreground: #0f172a;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #2563eb;
+
+  --gradient-hero: linear-gradient(135deg, #2563eb 0%, #6d28d9 100%);
+  --gradient-cta: linear-gradient(135deg, #2563eb, #3b82f6);
+
+  color: var(--foreground);
+  background-color: var(--background);
+}
+
 @layer base {
   * { border-color: var(--color-border); }
-  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  html {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
   body {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: hidden;
     background-color: var(--color-background);
     color: var(--color-body);
     font-family: var(--font-sans);
     font-feature-settings: "cv11", "ss01";
+  }
+  #root {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+  body > div,
+  main {
+    max-width: 100%;
+    overflow-x: clip;
+  }
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
   }
   h1, h2, h3, h4, h5, h6 { color: var(--color-heading); font-weight: 700; letter-spacing: -0.02em; }
 }
@@ -167,6 +244,27 @@
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 18px 40px -18px rgba(11, 20, 55, 0.18);
+  }
+}
+
+/* Every installed app must be contained by the actual device viewport.
+   Without this guard, a late-inserted viewport tag can make Android render a
+   desktop-width layout first, which cuts cards and bottom navigation in half. */
+.nexora-pwa-surface {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: clip;
+}
+
+@media (max-width: 767px) {
+  .nexora-pwa-surface :where(main, section, article, div, form, header, footer, nav) {
+    min-width: 0;
+  }
+
+  .nexora-pwa-surface .pwa-bottom-nav {
+    width: 100%;
+    max-width: none;
   }
 }
 
@@ -782,3 +880,276 @@
 }
 .hide-scrollbar::-webkit-scrollbar { display: none; }
 .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ===== Partner Page — Nexora SalonOS SaaS theme (Stripe × Apple × Airbnb) ===== */
+/* Kept `.partner-noir` classname to avoid rewiring the page — palette is now
+   Deep Indigo / Premium Purple / Electric Blue on Soft Light Grey. */
+.partner-noir {
+  --pn-bg: #f6f7fb;              /* soft light grey */
+  --pn-bg-2: #eef0f7;
+  --pn-surface: #ffffff;         /* pure white cards */
+  --pn-surface-2: #fafbff;
+  --pn-border: rgba(15, 23, 42, 0.08);
+  --pn-border-strong: rgba(79, 70, 229, 0.22);
+  --pn-text: #0b1220;             /* dark navy */
+  --pn-text-muted: #4b5563;
+  --pn-indigo: #4f46e5;           /* primary — deep indigo */
+  --pn-indigo-2: #6366f1;
+  --pn-purple: #7c3aed;           /* secondary — premium purple */
+  --pn-blue: #2563eb;             /* accent — electric blue */
+  --pn-ring: 0 1px 2px rgba(15,23,42,0.04), 0 8px 24px -12px rgba(15,23,42,0.10);
+  --pn-ring-strong: 0 10px 30px -12px rgba(79,70,229,0.28);
+  background: var(--pn-bg);
+  color: var(--pn-text);
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "cv11", "ss01", "ss03";
+  -webkit-font-smoothing: antialiased;
+}
+.partner-noir p,
+.partner-noir span,
+.partner-noir button,
+.partner-noir a,
+.partner-noir input,
+.partner-noir label,
+.partner-noir li,
+.partner-noir div,
+.partner-noir h1,
+.partner-noir h2,
+.partner-noir h3,
+.partner-noir h4 {
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+.partner-noir h1,
+.partner-noir h2,
+.partner-noir h3 {
+  color: var(--pn-text);
+  letter-spacing: -0.025em;
+  font-weight: 700;
+}
+.partner-noir h1 {
+  font-weight: 800;
+  font-size: clamp(2.25rem, 4.6vw, 4rem);
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+}
+.partner-noir h2 {
+  font-size: clamp(1.75rem, 3vw, 2.75rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+.partner-noir h3 { font-size: clamp(1.15rem, 1.6vw, 1.5rem); }
+
+/* Neutralize base tokens to the light SaaS palette */
+.partner-noir .bg-background { background-color: var(--pn-bg) !important; }
+.partner-noir .bg-card,
+.partner-noir .bg-white,
+.partner-noir .bg-muted,
+.partner-noir .bg-muted\/30,
+.partner-noir .bg-muted\/40,
+.partner-noir .bg-muted\/50,
+.partner-noir .bg-slate-50,
+.partner-noir .bg-slate-100,
+.partner-noir .bg-neutral-50 {
+  background-color: var(--pn-surface) !important;
+}
+.partner-noir .bg-amber-50,
+.partner-noir .bg-amber-50\/60,
+.partner-noir .bg-amber-50\/70,
+.partner-noir .bg-orange-50,
+.partner-noir .bg-yellow-50,
+.partner-noir .bg-yellow-100 {
+  background-color: rgba(79, 70, 229, 0.06) !important;
+  color: var(--pn-indigo) !important;
+}
+.partner-noir .border,
+.partner-noir .border-t,
+.partner-noir .border-b,
+.partner-noir .border-l,
+.partner-noir .border-r,
+.partner-noir .border-border,
+.partner-noir .border-border\/60,
+.partner-noir .border-amber-500\/30,
+.partner-noir .border-amber-400\/40,
+.partner-noir .border-yellow-400\/40 {
+  border-color: var(--pn-border) !important;
+}
+.partner-noir .text-foreground,
+.partner-noir .text-heading,
+.partner-noir .text-slate-900,
+.partner-noir .text-neutral-900,
+.partner-noir .text-black {
+  color: var(--pn-text) !important;
+}
+/* text-white stays white ONLY on dark gradient surfaces — otherwise → dark navy */
+.partner-noir .text-white {
+  color: var(--pn-text) !important;
+}
+.partner-noir [class*="from-[#0A2540]"],
+.partner-noir [class*="from-[#0A2540]"] *,
+.partner-noir [class*="from-amber-400"],
+.partner-noir [class*="from-amber-400"] *,
+.partner-noir [class*="from-yellow-"],
+.partner-noir [class*="from-yellow-"] *,
+.partner-noir .bg-gradient-cta,
+.partner-noir .bg-gradient-cta *,
+.partner-noir button[class*="bg-gradient-to-r"],
+.partner-noir button[class*="bg-gradient-to-r"] *,
+.partner-noir a[class*="bg-gradient-to-r"],
+.partner-noir a[class*="bg-gradient-to-r"] * {
+  color: #ffffff !important;
+}
+.partner-noir [class*="from-[#0A2540]"] .text-white\/70,
+.partner-noir [class*="from-[#0A2540]"] .text-white\/80 {
+  color: rgba(255,255,255,0.78) !important;
+}
+.partner-noir .text-muted-foreground,
+.partner-noir .text-slate-500,
+.partner-noir .text-slate-600,
+.partner-noir .text-neutral-500,
+.partner-noir .text-neutral-600,
+.partner-noir .text-gray-500,
+.partner-noir .text-gray-600,
+.partner-noir .text-white\/70,
+.partner-noir .text-white\/80 {
+  color: var(--pn-text-muted) !important;
+}
+.partner-noir .text-primary,
+.partner-noir .text-indigo-600,
+.partner-noir .text-violet-600,
+.partner-noir .text-purple-600,
+.partner-noir .text-blue-600,
+.partner-noir .text-amber-500,
+.partner-noir .text-amber-400,
+.partner-noir .text-yellow-400,
+.partner-noir .text-yellow-300 {
+  color: var(--pn-indigo) !important;
+}
+.partner-noir .bg-primary\/10,
+.partner-noir .bg-indigo-100,
+.partner-noir .bg-violet-100,
+.partner-noir .bg-purple-100,
+.partner-noir .bg-blue-100 {
+  background-color: rgba(79, 70, 229, 0.10) !important;
+  color: var(--pn-indigo) !important;
+}
+.partner-noir .bg-gradient-cta,
+.partner-noir [class*="bg-gradient-to-r"],
+.partner-noir [class*="bg-gradient-to-br"] {
+  background-image: linear-gradient(135deg, var(--pn-indigo) 0%, var(--pn-purple) 55%, var(--pn-blue) 100%) !important;
+  color: #ffffff !important;
+}
+.partner-noir .text-primary-foreground { color: #ffffff !important; }
+
+/* Card surface — Stripe-style flat white with soft shadow */
+.partner-noir .rounded-xl,
+.partner-noir .rounded-2xl,
+.partner-noir .rounded-\[var\(--radius-card-lg\)\],
+.partner-noir .rounded-\[24px\] {
+  background-color: var(--pn-surface) !important;
+  border: 1px solid var(--pn-border) !important;
+  box-shadow: var(--pn-ring);
+  transition: box-shadow 200ms ease, border-color 200ms ease, transform 200ms ease;
+}
+.partner-noir .rounded-xl:hover,
+.partner-noir .rounded-2xl:hover {
+  border-color: var(--pn-border-strong) !important;
+  box-shadow: var(--pn-ring-strong);
+}
+
+/* Gradient text → indigo-purple-blue */
+.partner-noir .text-transparent.bg-clip-text {
+  background-image: linear-gradient(135deg, var(--pn-indigo) 0%, var(--pn-purple) 50%, var(--pn-blue) 100%) !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* Hairline section dividers */
+.partner-noir section { position: relative; }
+.partner-noir section + section { border-top: 1px solid var(--pn-border); }
+.partner-noir section::before { content: none !important; }
+.partner-noir section::after { content: none !important; }
+
+/* Hero — light, airy, Stripe/Apple */
+.partner-noir .partner-hero {
+  background:
+    radial-gradient(1200px 500px at 15% 0%, rgba(79,70,229,0.10), transparent 60%),
+    radial-gradient(900px 400px at 85% 20%, rgba(124,58,237,0.08), transparent 60%),
+    linear-gradient(180deg, #ffffff 0%, var(--pn-bg) 100%) !important;
+  color: var(--pn-text) !important;
+}
+.partner-noir .partner-hero::after {
+  content: "";
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(15,23,42,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15,23,42,0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse at center top, black 30%, transparent 75%);
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* Buttons — pill outline switches to indigo hairline */
+.partner-noir .rounded-full.border {
+  border-color: var(--pn-border) !important;
+  color: var(--pn-text) !important;
+  background: var(--pn-surface) !important;
+}
+.partner-noir .rounded-full.border:hover {
+  border-color: var(--pn-indigo) !important;
+  color: var(--pn-indigo) !important;
+  background: rgba(79,70,229,0.04) !important;
+}
+
+/* Range inputs → indigo */
+.partner-noir input[type="range"] { accent-color: var(--pn-indigo); }
+
+/* Eyebrow / chip labels */
+.partner-noir .uppercase.tracking-wider,
+.partner-noir .uppercase.tracking-wide {
+  color: var(--pn-indigo) !important;
+  letter-spacing: 0.18em !important;
+  font-family: "Inter", sans-serif !important;
+  font-weight: 600 !important;
+  font-size: 0.72rem !important;
+}
+
+/* Generous whitespace */
+.partner-noir section { padding-top: clamp(4rem, 8vw, 7rem); padding-bottom: clamp(4rem, 8vw, 7rem); }
+
+/* Kill any leftover dark backdrops the old theme relied on */
+.partner-noir .bg-black,
+.partner-noir [class*="bg-black\/"],
+.partner-noir .bg-neutral-900,
+.partner-noir .bg-neutral-950,
+.partner-noir .bg-slate-900,
+.partner-noir .bg-slate-950,
+.partner-noir .bg-zinc-900 {
+  background-color: rgba(15,23,42,0.04) !important;
+  color: var(--pn-text) !important;
+  box-shadow: none !important;
+}
+/* The hero has a dark absolute overlay gradient — hide it, our .partner-hero background handles it */
+.partner-noir .partner-hero > .absolute.inset-0[class*="bg-gradient-to-b"],
+.partner-noir .partner-hero > .pointer-events-none.absolute.inset-0 {
+  display: none !important;
+}
+/* Stripe-style dark indigo hero cards (from-[#0A2540] via-[#1a1060] to-[#635BFF]) — keep dark, ensure white text/borders stay clean */
+.partner-noir [class*="from-[#0A2540]"] {
+  background-image: linear-gradient(135deg, #0A2540 0%, #1a1060 55%, #635BFF 100%) !important;
+  color: #ffffff !important;
+  border-color: rgba(255,255,255,0.10) !important;
+}
+.partner-noir [class*="from-[#0A2540]"] * {
+  color: inherit !important;
+}
+.partner-noir [class*="from-[#0A2540]"] .text-white\/70,
+.partner-noir [class*="from-[#0A2540]"] .text-white\/80 {
+  color: rgba(255,255,255,0.75) !important;
+}
+/* Yellow "salary nahi" ribbon → indigo/purple ribbon */
+.partner-noir [class*="from-amber-400"],
+.partner-noir [class*="from-yellow-"] {
+  background-image: linear-gradient(90deg, var(--pn-indigo), var(--pn-purple), var(--pn-blue)) !important;
+  color: #ffffff !important;
+}

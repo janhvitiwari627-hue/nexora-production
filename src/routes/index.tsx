@@ -10,10 +10,10 @@ export const Route = createFileRoute("/")({
         content:
           "Discover top-rated salons, spas and barbershops in Jaipur. Instant booking, member rewards, and exclusive offers on Nexora SalonOS.",
       },
-      { property: "og:title", content: "Nexora SalonOS" },
+      { property: "og:title", content: "Nexora — Book salons, spas & barbers in Jaipur" },
       {
         property: "og:description",
-        content: "Discover, book, and grow with the operating system for modern salons.",
+        content: "Discover top-rated salons, spas and barbershops in Jaipur. Instant booking, member rewards, and exclusive offers on Nexora SalonOS.",
       },
     ],
   }),

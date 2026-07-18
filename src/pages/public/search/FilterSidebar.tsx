@@ -17,8 +17,7 @@ interface Props {
 }
 
 export function FilterSidebar({ draft, onChange, onApply, onReset }: Props) {
-  const set = <K extends keyof Filters>(k: K, v: Filters[K]) =>
-    onChange({ ...draft, [k]: v });
+  const set = <K extends keyof Filters>(k: K, v: Filters[K]) => onChange({ ...draft, [k]: v });
 
   const toggleCat = (c: string) => {
     set(
@@ -150,21 +149,13 @@ export function FilterSidebar({ draft, onChange, onApply, onReset }: Props) {
 
       <Section title="Quick Filters">
         <div className="space-y-2.5">
-          <Toggle
-            label="Open Now"
-            checked={draft.openNow}
-            onChange={(v) => set("openNow", v)}
-          />
+          <Toggle label="Open Now" checked={draft.openNow} onChange={(v) => set("openNow", v)} />
           <Toggle
             label="Verified Only"
             checked={draft.verifiedOnly}
             onChange={(v) => set("verifiedOnly", v)}
           />
-          <Toggle
-            label="Top Rated"
-            checked={draft.topRated}
-            onChange={(v) => set("topRated", v)}
-          />
+          <Toggle label="Top Rated" checked={draft.topRated} onChange={(v) => set("topRated", v)} />
           <Toggle
             label="Most Popular"
             checked={draft.mostPopular}
@@ -179,6 +170,12 @@ export function FilterSidebar({ draft, onChange, onApply, onReset }: Props) {
             label="Home Service"
             checked={draft.homeService}
             onChange={(v) => set("homeService", v)}
+          />
+          <Toggle label="Parking" checked={draft.parking} onChange={(v) => set("parking", v)} />
+          <Toggle
+            label="Air Conditioned"
+            checked={draft.airConditioned}
+            onChange={(v) => set("airConditioned", v)}
           />
         </div>
       </Section>

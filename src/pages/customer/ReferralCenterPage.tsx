@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
+import { toast } from "sonner";
 import {
   Copy,
   Check,
@@ -14,11 +15,17 @@ import {
   Sparkles,
   Gift,
   Send,
+  Mail,
+  Twitter,
+  Facebook,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PublicHeader } from "@/components/layout/PublicHeader";
 import { PublicFooter } from "@/components/layout/PublicFooter";
+import { MyReferralsSection } from "@/components/referral/MyReferralsSection";
+import { useAuthStore } from "@/stores/authStore";
+import { buildReferralSignupUrl } from "@/lib/public-app-url";
 import {
   mockReferralCode,
   mockReferralLink,
@@ -35,46 +42,100 @@ const STATUS: Record<ReferralStatus, { label: string; classes: string }> = {
 };
 
 export function ReferralCenterPage() {
+  const profile = useAuthStore((s) => s.profile);
+  const referralCode = profile?.referral_code ?? mockReferralCode;
+  const referralLink = profile?.referral_code
+    ? buildReferralSignupUrl(profile.referral_code)
+    : mockReferralLink;
   const qrRef = useRef<HTMLDivElement>(null);
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [showFallback, setShowFallback] = useState(false);
 
-  const copy = (value: string, kind: "code" | "link") => {
-    navigator.clipboard?.writeText(value).catch(() => {});
+  const shareText = `Join me on Nexora and we both earn 100 points. Use code ${referralCode}: ${referralLink}`;
+
+  const writeToClipboard = async (value: string): Promise<boolean> => {
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(value);
+        return true;
+      }
+      // Legacy fallback for insecure contexts / older browsers
+      const ta = document.createElement("textarea");
+      ta.value = value;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return ok;
+    } catch {
+      return false;
+    }
+  };
+
+  const copy = async (value: string, kind: "code" | "link") => {
+    const ok = await writeToClipboard(value);
+    if (!ok) {
+      toast.error("Couldn't copy — please copy manually", { description: value });
+      return;
+    }
     if (kind === "code") {
       setCopiedCode(true);
       setTimeout(() => setCopiedCode(false), 1500);
+      toast.success("Referral code copied");
     } else {
       setCopiedLink(true);
       setTimeout(() => setCopiedLink(false), 1500);
+      toast.success("Referral link copied");
     }
   };
 
   const downloadQR = () => {
     const canvas = qrRef.current?.querySelector("canvas");
-    if (!canvas) return;
-    const link = document.createElement("a");
-    link.download = `nexora-referral-${mockReferralCode}.png`;
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-  };
-
-  const shareNative = async () => {
-    const text = `Join me on Nexora and we both earn ₹100. Use code ${mockReferralCode}: ${mockReferralLink}`;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: "Join Nexora", text, url: mockReferralLink });
-      } catch {
-        /* user cancelled */
-      }
-    } else {
-      copy(text, "link");
+    if (!canvas) {
+      toast.error("QR code not ready yet");
+      return;
+    }
+    try {
+      const link = document.createElement("a");
+      link.download = `nexora-referral-${referralCode}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+      toast.success("QR code downloaded");
+    } catch {
+      toast.error("Couldn't download QR code");
     }
   };
 
-  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(
-    `Try Nexora and we both earn ₹100. Use code ${mockReferralCode}: ${mockReferralLink}`,
-  )}`;
+  const shareNative = async () => {
+    if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+      try {
+        await navigator.share({ title: "Join Nexora", text: shareText, url: referralLink });
+        toast.success("Thanks for sharing!");
+        return;
+      } catch (err) {
+        // AbortError = user cancelled — stay silent
+        if ((err as DOMException)?.name === "AbortError") return;
+      }
+    }
+    // No native share → open fallback panel + copy the message so users have a shortcut
+    setShowFallback(true);
+    const copied = await writeToClipboard(shareText);
+    toast.message("Sharing not available on this device", {
+      description: copied
+        ? "We've copied your message — pick an app below to paste it."
+        : "Pick an app below to share your referral.",
+    });
+  };
+
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+  const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(shareText)}`;
+  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(referralLink)}`;
+  const emailUrl = `mailto:?subject=${encodeURIComponent("Join me on Nexora")}&body=${encodeURIComponent(shareText)}`;
 
   return (
     <div className="min-h-screen bg-background">
@@ -97,11 +158,11 @@ export function ReferralCenterPage() {
               </p>
               <div className="relative mt-3 flex flex-wrap items-end gap-4">
                 <p className="font-mono text-5xl font-black tracking-[0.18em] sm:text-6xl">
-                  {mockReferralCode}
+                  {referralCode}
                 </p>
                 <button
                   type="button"
-                  onClick={() => copy(mockReferralCode, "code")}
+                  onClick={() => copy(referralCode, "code")}
                   className={cn(
                     "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold transition",
                     copiedCode
@@ -131,12 +192,12 @@ export function ReferralCenterPage() {
                 <LinkIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
                 <input
                   readOnly
-                  value={mockReferralLink}
+                  value={referralLink}
                   className="flex-1 truncate bg-transparent text-sm font-semibold outline-none"
                 />
                 <button
                   type="button"
-                  onClick={() => copy(mockReferralLink, "link")}
+                  onClick={() => copy(referralLink, "link")}
                   className={cn(
                     "shrink-0 inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold transition",
                     copiedLink
@@ -144,7 +205,11 @@ export function ReferralCenterPage() {
                       : "bg-primary text-primary-foreground hover:opacity-90",
                   )}
                 >
-                  {copiedLink ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                  {copiedLink ? (
+                    <Check className="h-3.5 w-3.5" />
+                  ) : (
+                    <Copy className="h-3.5 w-3.5" />
+                  )}
                   {copiedLink ? "Copied" : "Copy"}
                 </button>
               </div>
@@ -153,7 +218,7 @@ export function ReferralCenterPage() {
               <div className="mt-4 grid grid-cols-3 gap-2">
                 <button
                   type="button"
-                  onClick={() => copy(mockReferralLink, "link")}
+                  onClick={() => copy(referralLink, "link")}
                   className="inline-flex flex-col items-center gap-1 rounded-2xl border px-3 py-3 text-xs font-bold transition hover:border-primary/40 hover:bg-primary/5"
                 >
                   <LinkIcon className="h-4 w-4 text-primary" />
@@ -177,6 +242,54 @@ export function ReferralCenterPage() {
                   Share Other
                 </button>
               </div>
+
+              {/* Fallback share panel — shown when Web Share API isn't available */}
+              {showFallback && (
+                <div className="mt-3 rounded-2xl border border-dashed border-primary/40 bg-primary/5 p-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-semibold text-primary">Pick where to share</p>
+                    <button
+                      type="button"
+                      onClick={() => setShowFallback(false)}
+                      className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground"
+                    >
+                      Close
+                    </button>
+                  </div>
+                  <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    <a
+                      href={telegramUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center justify-center gap-1.5 rounded-full border bg-background px-3 py-2 text-xs font-bold transition hover:border-primary/40 hover:bg-primary/5"
+                    >
+                      <Send className="h-3.5 w-3.5 text-sky-600" /> Telegram
+                    </a>
+                    <a
+                      href={twitterUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center justify-center gap-1.5 rounded-full border bg-background px-3 py-2 text-xs font-bold transition hover:border-primary/40 hover:bg-primary/5"
+                    >
+                      <Twitter className="h-3.5 w-3.5 text-sky-500" /> X / Twitter
+                    </a>
+                    <a
+                      href={facebookUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center justify-center gap-1.5 rounded-full border bg-background px-3 py-2 text-xs font-bold transition hover:border-primary/40 hover:bg-primary/5"
+                    >
+                      <Facebook className="h-3.5 w-3.5 text-blue-600" /> Facebook
+                    </a>
+                    <a
+                      href={emailUrl}
+                      className="inline-flex items-center justify-center gap-1.5 rounded-full border bg-background px-3 py-2 text-xs font-bold transition hover:border-primary/40 hover:bg-primary/5"
+                    >
+                      <Mail className="h-3.5 w-3.5 text-primary" /> Email
+                    </a>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -186,11 +299,8 @@ export function ReferralCenterPage() {
             <p className="mt-1 text-xs text-muted-foreground">
               Friends scan to join with your code pre-filled.
             </p>
-            <div
-              ref={qrRef}
-              className="mx-auto mt-4 w-fit rounded-2xl border bg-white p-4"
-            >
-              <QRCodeCanvas value={mockReferralLink} size={180} level="H" />
+            <div ref={qrRef} className="mx-auto mt-4 w-fit rounded-2xl border bg-white p-4">
+              <QRCodeCanvas value={referralLink} size={180} level="H" />
             </div>
             <button
               type="button"
@@ -204,10 +314,30 @@ export function ReferralCenterPage() {
 
         {/* Stats */}
         <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard label="Total Invites" value={mockReferralStats.totalInvites} Icon={Send} tint="bg-sky-100 text-sky-700" />
-          <StatCard label="Successful" value={mockReferralStats.successful} Icon={Users} tint="bg-indigo-100 text-indigo-700" />
-          <StatCard label="Rewards Earned" value={`₹${mockReferralStats.rewardsEarned}`} Icon={Trophy} tint="bg-emerald-100 text-emerald-700" />
-          <StatCard label="Pending Rewards" value={`₹${mockReferralStats.pending}`} Icon={Hourglass} tint="bg-amber-100 text-amber-700" />
+          <StatCard
+            label="Total Invites"
+            value={mockReferralStats.totalInvites}
+            Icon={Send}
+            tint="bg-sky-100 text-sky-700"
+          />
+          <StatCard
+            label="Successful"
+            value={mockReferralStats.successful}
+            Icon={Users}
+            tint="bg-indigo-100 text-indigo-700"
+          />
+          <StatCard
+            label="Rewards Earned"
+            value={`₹${mockReferralStats.rewardsEarned}`}
+            Icon={Trophy}
+            tint="bg-emerald-100 text-emerald-700"
+          />
+          <StatCard
+            label="Pending Rewards"
+            value={`₹${mockReferralStats.pending}`}
+            Icon={Hourglass}
+            tint="bg-amber-100 text-amber-700"
+          />
         </section>
 
         {/* How it works */}
@@ -235,54 +365,8 @@ export function ReferralCenterPage() {
           </div>
         </section>
 
-        {/* History table */}
-        <section className="overflow-hidden rounded-2xl border bg-card shadow-sm">
-          <header className="border-b p-5">
-            <h3 className="text-sm font-bold">Referral history</h3>
-          </header>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/40 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
-                <tr>
-                  <th className="px-5 py-2.5 text-left">Friend</th>
-                  <th className="px-5 py-2.5 text-left">Date</th>
-                  <th className="px-5 py-2.5 text-right">Status</th>
-                  <th className="px-5 py-2.5 text-right">Reward</th>
-                </tr>
-              </thead>
-              <tbody>
-                {mockReferrals.map((r) => {
-                  const s = STATUS[r.status];
-                  return (
-                    <tr key={r.id} className="border-t">
-                      <td className="px-5 py-3 font-semibold">{r.friendName}</td>
-                      <td className="px-5 py-3 text-muted-foreground">
-                        {new Date(r.dateISO).toLocaleDateString("en-IN", {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </td>
-                      <td className="px-5 py-3 text-right">
-                        <span
-                          className={cn(
-                            "inline-block rounded-full px-2.5 py-1 text-[11px] font-bold",
-                            s.classes,
-                          )}
-                        >
-                          {s.label}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3 text-right font-bold text-emerald-600">
-                        {r.rewardAmount ? `+₹${r.rewardAmount}` : "—"}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        {/* Real referrals attribution */}
+        <MyReferralsSection />
       </main>
       <PublicFooter />
     </div>

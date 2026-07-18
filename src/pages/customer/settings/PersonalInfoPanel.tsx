@@ -1,13 +1,21 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Camera, Check, ChevronsUpDown, Loader2, Upload } from "lucide-react";
+import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { PROFILE } from "./mockSettings";
 import { INDIAN_STATES, getDistricts, getBlocks } from "./indiaGeo";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
+import { ProfileImageUpload } from "@/components/shared/ProfileImageUpload";
 
 function slugifyUsername(name: string) {
   return name
@@ -19,12 +27,24 @@ function slugifyUsername(name: string) {
     .slice(0, 30);
 }
 
+function errorDetails(error: unknown) {
+  const value =
+    typeof error === "object" && error !== null ? (error as Record<string, unknown>) : {};
+  return {
+    code: String(value.code ?? ""),
+    message: String(value.message ?? value.error_description ?? value.error ?? ""),
+    status: Number(value.statusCode ?? value.status ?? 0),
+  };
+}
+
 export function PersonalInfoPanel() {
-  const { user, profile, refreshProfile } = useAuthStore();
-  const fileRef = useRef<HTMLInputElement>(null);
+  const { user, profile, refreshProfile, setUser, setProfile } = useAuthStore();
   const [avatar, setAvatar] = useState<string>(profile?.avatar_url || "");
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [autoSavedAt, setAutoSavedAt] = useState<number | null>(null);
   const [usernameTouched, setUsernameTouched] = useState(false);
 
   const [form, setForm] = useState({
@@ -39,10 +59,44 @@ export function PersonalInfoPanel() {
   });
   const [pincodeError, setPincodeError] = useState<string | null>(null);
 
-  // Hydrate when profile arrives
+  // Track which user's profile we've hydrated the form from. We hydrate ONCE
+  // per user so that background profile refreshes (token refresh, auth events,
+  // realtime updates) never wipe the fields the user is currently editing.
+  const hydratedForUserRef = useRef<string | null>(profile ? profile.id : null);
+  const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastSavedSnapshotRef = useRef<string>("");
+  const savingRef = useRef(false);
+  const pendingAutoSaveRef = useRef(false);
+
+
+  // Ensure we have a session; hydrate profile in background only if missing.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase.auth.getUser();
+        if (cancelled) return;
+        if (error || !data.user) return;
+        if (!user) setUser(data.user);
+        if (!profile) await refreshProfile();
+      } catch (e) {
+        console.warn("[PersonalInfoPanel] session hydration failed", e);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // Run once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Hydrate form when profile first arrives for a user. Do NOT re-hydrate on
+  // subsequent profile updates — that would overwrite in-progress edits.
   useEffect(() => {
     if (!profile) return;
-    setForm({
+    if (hydratedForUserRef.current === profile.id) return;
+    hydratedForUserRef.current = profile.id;
+    const next = {
       fullName: profile.full_name || "",
       username: profile.username || "",
       gender: (profile.gender || "prefer_not") as string,
@@ -51,10 +105,14 @@ export function PersonalInfoPanel() {
       district: profile.district || "",
       block: profile.block || "",
       pincode: profile.pincode || "",
-    });
+    };
+    setForm(next);
+    lastSavedSnapshotRef.current = JSON.stringify(next);
     setAvatar(profile.avatar_url || "");
     setUsernameTouched(!!profile.username);
   }, [profile]);
+
+
 
   const districts = useMemo(() => getDistricts(form.state), [form.state]);
   const blocks = useMemo(() => getBlocks(form.state, form.district), [form.state, form.district]);
@@ -67,46 +125,166 @@ export function PersonalInfoPanel() {
     }));
   }
 
-  async function handleAvatar(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    if (!user) {
-      toast.error("Please sign in to upload a photo");
-      return;
+  function friendlyUploadError(
+    err: unknown,
+    stage: "upload" | "sign" | "profile" | "remove",
+  ): string {
+    const { message: raw, status } = errorDetails(err);
+    const lower = raw.toLowerCase();
+
+    if (!navigator.onLine) return "You appear to be offline. Check your connection and try again.";
+    if (lower.includes("network") || lower.includes("fetch") || lower.includes("failed to fetch")) {
+      return "Network error while contacting the server. Please try again.";
     }
-    if (f.size > 5 * 1024 * 1024) {
-      toast.error("Image must be under 5 MB");
+    if (status === 401 || lower.includes("jwt") || lower.includes("unauthorized")) {
+      return "Your session has expired. Please sign in again and retry.";
+    }
+    if (
+      status === 403 ||
+      lower.includes("row-level security") ||
+      lower.includes("not allowed") ||
+      lower.includes("policy")
+    ) {
+      return "You don't have permission to update this photo.";
+    }
+    if (status === 413 || lower.includes("payload too large") || lower.includes("too large")) {
+      return "That image is too large. Please choose a file under 5 MB.";
+    }
+    if (status === 415 || lower.includes("mime") || lower.includes("content type")) {
+      return "Unsupported image type. Please use a JPG, PNG, or WEBP.";
+    }
+    if (status === 429 || lower.includes("rate")) {
+      return "Too many uploads in a short time. Please wait a moment and try again.";
+    }
+    if (status >= 500)
+      return "The server had a problem saving your photo. Please try again shortly.";
+
+    switch (stage) {
+      case "upload":
+        return "We couldn't upload your photo. Please try a different image.";
+      case "sign":
+        return "Uploaded, but we couldn't generate a preview link. Please try again.";
+      case "profile":
+        return "Photo uploaded, but saving it to your profile failed. Please retry.";
+      case "remove":
+        return "We couldn't remove your photo. Please try again.";
+    }
+  }
+
+  function isBucketMissingError(err: unknown): boolean {
+    const { message, status } = errorDetails(err);
+    const raw = message.toLowerCase();
+    return (
+      raw.includes("bucket not found") ||
+      raw.includes("bucket does not exist") ||
+      raw.includes("no such bucket") ||
+      (status === 404 && raw.includes("bucket"))
+    );
+  }
+
+  async function fileToDataUrl(f: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ""));
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(f);
+    });
+  }
+
+  async function handleAvatarFile(f: File) {
+    if (!user) {
+      const msg = "Please sign in to upload a photo";
+      setUploadError(msg);
+      toast.error(msg);
       return;
     }
     setUploading(true);
+    setUploadError(null);
     const preview = URL.createObjectURL(f);
     setAvatar(preview);
+    let stage: "upload" | "sign" | "profile" = "upload";
     try {
       const ext = f.name.split(".").pop()?.toLowerCase() || "jpg";
       const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+      let url: string | null = null;
+
       const { error: upErr } = await supabase.storage
         .from("avatars")
         .upload(path, f, { upsert: true, contentType: f.type });
-      if (upErr) throw upErr;
-      // Bucket is private — generate a long-lived signed URL (1 year)
-      const { data: signed, error: signErr } = await supabase.storage
-        .from("avatars")
-        .createSignedUrl(path, 60 * 60 * 24 * 365);
-      if (signErr) throw signErr;
-      const url = signed.signedUrl;
+
+      if (upErr) {
+        // Graceful fallback: if the bucket is missing, save a data URL to
+        // the profile so editing never gets blocked by storage config.
+        if (isBucketMissingError(upErr)) {
+          console.warn("[avatar upload] avatars bucket missing — falling back to inline data URL");
+          if (f.size > 512 * 1024) {
+            throw new Error(
+              "Storage isn't configured yet. Please choose an image under 500 KB, or ask an admin to create the 'avatars' bucket.",
+            );
+          }
+          url = await fileToDataUrl(f);
+          toast.message("Storage not configured — saved photo inline.", {
+            description: "Ask an admin to enable the 'avatars' bucket for permanent hosting.",
+          });
+        } else {
+          throw upErr;
+        }
+      } else {
+        stage = "sign";
+        const { data: signed, error: signErr } = await supabase.storage
+          .from("avatars")
+          .createSignedUrl(path, 60 * 60 * 24 * 365);
+        if (signErr) throw signErr;
+        url = signed.signedUrl;
+      }
+
+      stage = "profile";
       const { error: updErr } = await supabase
         .from("profiles")
         .update({ avatar_url: url })
         .eq("id", user.id);
       if (updErr) throw updErr;
-      setAvatar(url);
+      if (url) setAvatar(url);
       await refreshProfile();
-      toast.success("Profile photo updated");
-    } catch (err: any) {
-      toast.error(err?.message || "Failed to upload photo");
+      if (stage === "profile" && url && !url.startsWith("data:")) {
+        toast.success("Profile photo updated");
+      } else if (url?.startsWith("data:")) {
+        toast.success("Profile photo saved");
+      }
+    } catch (err: unknown) {
+      const { message } = errorDetails(err);
+      const msg = message.includes("Storage isn't configured")
+        ? message
+        : friendlyUploadError(err, stage);
+      console.error("[avatar upload] stage=", stage, err);
+      setUploadError(msg);
+      toast.error(msg);
       setAvatar(profile?.avatar_url || "");
     } finally {
+      URL.revokeObjectURL(preview);
       setUploading(false);
+    }
+  }
+
+  async function handleAvatarRemove() {
+    if (!user) return;
+    const previous = avatar;
+    setAvatar("");
+    setUploadError(null);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ avatar_url: null })
+        .eq("id", user.id);
+      if (error) throw error;
+      await refreshProfile();
+      toast.success("Profile photo removed");
+    } catch (err: unknown) {
+      const msg = friendlyUploadError(err, "remove");
+      console.error("[avatar remove]", err);
+      setUploadError(msg);
+      toast.error(msg);
+      setAvatar(previous);
     }
   }
 
@@ -119,38 +297,147 @@ export function PersonalInfoPanel() {
     else setPincodeError(null);
   }
 
-  async function handleSave() {
-    if (!user) {
-      toast.error("Please sign in to save changes");
-      return;
+  async function doSave(snapshot: typeof form, opts: { silent?: boolean } = {}) {
+    const { silent = false } = opts;
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    const activeUser = authData.user;
+    if (authError || !activeUser || (user && activeUser.id !== user.id)) {
+      if (!silent) toast.error("Please sign in to save changes");
+      return false;
     }
-    if (form.pincode && pincodeError) {
-      toast.error(pincodeError);
-      return;
+    if (snapshot.pincode && pincodeError) {
+      if (!silent) toast.error(pincodeError);
+      return false;
     }
+    savingRef.current = true;
     setSaving(true);
+    setSaveError(null);
     try {
-      const { error } = await supabase
+      const username = snapshot.username.trim() || null;
+      const { data: savedProfile, error } = await supabase
         .from("profiles")
-        .update({
-          full_name: form.fullName || null,
-          username: form.username || null,
-          gender: form.gender || null,
-          date_of_birth: form.dob || null,
-          state: form.state || null,
-          district: form.district || null,
-          block: form.block || null,
-          pincode: form.pincode || null,
-        })
-        .eq("id", user.id);
+        .upsert(
+          {
+            id: activeUser.id,
+            email: activeUser.email ?? profile?.email ?? null,
+            full_name: snapshot.fullName.trim() || null,
+            username,
+            gender: snapshot.gender || null,
+            date_of_birth: snapshot.dob || null,
+            state: snapshot.state || null,
+            district: snapshot.district || null,
+            block: snapshot.block || null,
+            pincode: snapshot.pincode || null,
+          },
+          { onConflict: "id" },
+        )
+        .select("*")
+        .single();
       if (error) throw error;
-      await refreshProfile();
-      toast.success("Personal information saved");
-    } catch (err: any) {
-      toast.error(err?.message || "Could not save changes");
+      if (!savedProfile || savedProfile.id !== activeUser.id) {
+        throw new Error("The profile update could not be verified. Please try again.");
+      }
+      setProfile(savedProfile);
+      lastSavedSnapshotRef.current = JSON.stringify(snapshot);
+      setAutoSavedAt(Date.now());
+      if (!silent) toast.success("Personal information saved");
+      return true;
+    } catch (err: unknown) {
+      const details = errorDetails(err);
+      const message =
+        details.code === "23505" && details.message.includes("username")
+          ? "This username is already taken. Please choose another one."
+          : details.message || "Could not save changes";
+      setSaveError(message);
+      if (!silent) toast.error(message);
+      return false;
     } finally {
+      savingRef.current = false;
       setSaving(false);
     }
+  }
+
+  async function handleSave() {
+    await doSave(form);
+  }
+
+  // Auto-save: debounce form changes and persist silently.
+  useEffect(() => {
+    if (!user || !profile) return;
+    if (hydratedForUserRef.current !== profile.id) return;
+    const snapshot = JSON.stringify(form);
+    if (snapshot === lastSavedSnapshotRef.current) return;
+    if (form.pincode && pincodeError) return;
+    if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+    autoSaveTimerRef.current = setTimeout(() => {
+      if (savingRef.current) {
+        pendingAutoSaveRef.current = true;
+        return;
+      }
+      void doSave(form, { silent: true });
+    }, 1200);
+    return () => {
+      if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form, pincodeError, user, profile]);
+
+  // If a save was requested while another was in flight, run it after.
+  useEffect(() => {
+    if (!saving && pendingAutoSaveRef.current) {
+      pendingAutoSaveRef.current = false;
+      const snapshot = JSON.stringify(form);
+      if (snapshot !== lastSavedSnapshotRef.current) {
+        void doSave(form, { silent: true });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [saving]);
+
+  // Best-effort flush on unmount / tab hide.
+  useEffect(() => {
+    const flush = () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+        autoSaveTimerRef.current = null;
+      }
+      const snapshot = JSON.stringify(form);
+      if (
+        user &&
+        profile &&
+        snapshot !== lastSavedSnapshotRef.current &&
+        !(form.pincode && pincodeError)
+      ) {
+        void doSave(form, { silent: true });
+      }
+    };
+    const onVis = () => {
+      if (document.visibilityState === "hidden") flush();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      document.removeEventListener("visibilitychange", onVis);
+      flush();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form, pincodeError, user, profile]);
+
+
+
+  function handleCancel() {
+    if (!profile) return;
+    setForm({
+      fullName: profile.full_name || "",
+      username: profile.username || "",
+      gender: profile.gender || "prefer_not",
+      dob: profile.date_of_birth || "",
+      state: profile.state || "",
+      district: profile.district || "",
+      block: profile.block || "",
+      pincode: profile.pincode || "",
+    });
+    setPincodeError(null);
+    setSaveError(null);
   }
 
   const initials = (form.fullName || PROFILE.fullName)
@@ -162,48 +449,23 @@ export function PersonalInfoPanel() {
 
   return (
     <PanelShell title="Personal information" subtitle="How you appear across Nexora.">
-      <div className="flex items-start gap-4">
-        <div className="relative">
-          <div className="bg-muted ring-border grid h-24 w-24 place-items-center overflow-hidden rounded-full ring-2">
-            {avatar ? (
-              <img src={avatar} alt="Avatar" className="h-full w-full object-cover" />
-            ) : (
-              <span className="text-heading text-2xl font-black">{initials}</span>
-            )}
-            {uploading && (
-              <div className="absolute inset-0 grid place-items-center rounded-full bg-black/40">
-                <Loader2 className="h-5 w-5 animate-spin text-white" />
-              </div>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={() => fileRef.current?.click()}
-            disabled={uploading}
-            className="bg-primary text-primary-foreground absolute -bottom-1 -right-1 grid h-8 w-8 place-items-center rounded-full shadow-md disabled:opacity-60"
-            aria-label="Upload avatar"
-          >
-            <Camera className="h-4 w-4" />
-          </button>
-          <input ref={fileRef} type="file" accept="image/*" onChange={handleAvatar} className="hidden" />
-        </div>
-        <div className="flex-1">
-          <p className="text-heading text-sm font-bold">Profile photo</p>
-          <p className="text-muted-foreground text-xs">JPG or PNG, max 5 MB. We'll auto-crop to a circle.</p>
-          <button
-            type="button"
-            onClick={() => fileRef.current?.click()}
-            disabled={uploading}
-            className="border-border hover:bg-accent mt-2 inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-semibold disabled:opacity-60"
-          >
-            <Upload className="h-3.5 w-3.5" /> {uploading ? "Uploading…" : "Upload new"}
-          </button>
-        </div>
-      </div>
+      <ProfileImageUpload
+        value={avatar}
+        onFile={handleAvatarFile}
+        onRemove={handleAvatarRemove}
+        fallback={initials}
+        uploading={uploading}
+        maxSizeMB={5}
+        error={uploadError}
+      />
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <Field label="Full name">
-          <input value={form.fullName} onChange={(e) => onFullNameChange(e.target.value)} className={inputCls} />
+          <input
+            value={form.fullName}
+            onChange={(e) => onFullNameChange(e.target.value)}
+            className={inputCls}
+          />
         </Field>
         <Field label="Username">
           <input
@@ -238,7 +500,13 @@ export function PersonalInfoPanel() {
           </div>
         </Field>
         <Field label="Date of birth">
-          <input type="date" value={form.dob} onChange={(e) => setForm({ ...form, dob: e.target.value })} className={inputCls} />
+          <input
+            type="date"
+            max={new Date().toISOString().slice(0, 10)}
+            value={form.dob}
+            onChange={(e) => setForm({ ...form, dob: e.target.value })}
+            className={inputCls}
+          />
         </Field>
         <Field label="State">
           <SearchableSelect
@@ -284,7 +552,24 @@ export function PersonalInfoPanel() {
         </Field>
       </div>
 
-      <SaveBar onSave={handleSave} saving={saving} />
+      {saveError && (
+        <p role="alert" className="text-destructive mt-4 text-sm">
+          {saveError}
+        </p>
+      )}
+      <div className="text-muted-foreground mt-3 flex items-center gap-2 text-xs" aria-live="polite">
+        {saving ? (
+          <>
+            <Loader2 className="h-3 w-3 animate-spin" /> Saving…
+          </>
+        ) : autoSavedAt ? (
+          <span>Auto-saved · {new Date(autoSavedAt).toLocaleTimeString()}</span>
+        ) : (
+          <span>Changes save automatically.</span>
+        )}
+      </div>
+      <SaveBar onSave={handleSave} onCancel={handleCancel} saving={saving} />
+
     </PanelShell>
   );
 }
@@ -338,7 +623,9 @@ function SearchableSelect({
                     setOpen(false);
                   }}
                 >
-                  <Check className={cn("mr-2 h-4 w-4", value === opt ? "opacity-100" : "opacity-0")} />
+                  <Check
+                    className={cn("mr-2 h-4 w-4", value === opt ? "opacity-100" : "opacity-0")}
+                  />
                   {opt}
                 </CommandItem>
               ))}
@@ -356,13 +643,23 @@ export const inputCls =
 export function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="text-heading mb-1 block text-xs font-bold uppercase tracking-wide">{label}</label>
+      <label className="text-heading mb-1 block text-xs font-bold uppercase tracking-wide">
+        {label}
+      </label>
       {children}
     </div>
   );
 }
 
-export function PanelShell({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
+export function PanelShell({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string;
+  subtitle?: string;
+  children: React.ReactNode;
+}) {
   return (
     <section className="bg-card border-border rounded-[var(--radius-card-lg)] border p-5 md:p-6">
       <header className="mb-4">
@@ -374,10 +671,25 @@ export function PanelShell({ title, subtitle, children }: { title: string; subti
   );
 }
 
-export function SaveBar({ onSave, saving }: { onSave?: () => void; saving?: boolean }) {
+export function SaveBar({
+  onSave,
+  onCancel,
+  saving,
+}: {
+  onSave?: () => void;
+  onCancel?: () => void;
+  saving?: boolean;
+}) {
   return (
     <div className="border-border mt-6 flex justify-end gap-2 border-t pt-4">
-      <button type="button" className="border-border hover:bg-accent rounded-md border px-4 py-2 text-sm font-semibold">Cancel</button>
+      <button
+        type="button"
+        onClick={onCancel}
+        disabled={saving}
+        className="border-border hover:bg-accent rounded-md border px-4 py-2 text-sm font-semibold disabled:opacity-60"
+      >
+        Cancel
+      </button>
       <button
         type="button"
         onClick={onSave}

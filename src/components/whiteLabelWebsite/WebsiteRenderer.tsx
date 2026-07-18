@@ -30,7 +30,15 @@ import { WAwards } from "./sections/WAwards";
 import { WBrands } from "./sections/WBrands";
 
 export function WebsiteRenderer({ shop, config }: { shop: ShopData; config: WebsiteConfig }) {
-  const template = getTemplate(config.template);
+  const baseTemplate = getTemplate(config.template);
+  const template = {
+    ...baseTemplate,
+    colors: {
+      ...baseTemplate.colors,
+      primary: config.branding.primaryColor,
+      secondary: config.branding.secondaryColor,
+    },
+  };
   const enabled = new Set(config.sections.filter((s) => s.enabled).map((s) => s.id));
   const ordered = template.sectionOrder
     .filter((id) => enabled.has(id))
@@ -39,7 +47,11 @@ export function WebsiteRenderer({ shop, config }: { shop: ShopData; config: Webs
   const map: Record<SectionId, ReactNode> = {
     hero: <WHero shop={shop} template={template} />,
     about: <WAbout shop={shop} template={template} />,
-    services: <section id="services"><WServices shop={shop} template={template} /></section>,
+    services: (
+      <section id="services">
+        <WServices shop={shop} template={template} />
+      </section>
+    ),
     rateCard: <WRateCard shop={shop} template={template} />,
     packages: <WPackages shop={shop} template={template} />,
     gallery: <WGallery shop={shop} template={template} />,
@@ -50,7 +62,11 @@ export function WebsiteRenderer({ shop, config }: { shop: ShopData; config: Webs
     offers: <WOffers shop={shop} template={template} />,
     contact: <WContact shop={shop} template={template} />,
     map: <WMap shop={shop} template={template} />,
-    appointment: <section id="appointment"><WAppointmentForm shop={shop} template={template} /></section>,
+    appointment: (
+      <section id="appointment">
+        <WAppointmentForm shop={shop} template={template} />
+      </section>
+    ),
     membership: <WMembership shop={shop} template={template} />,
     loyalty: <WLoyalty shop={shop} template={template} />,
     referral: <WReferral shop={shop} template={template} />,
@@ -66,5 +82,13 @@ export function WebsiteRenderer({ shop, config }: { shop: ShopData; config: Webs
     brands: <WBrands shop={shop} template={template} />,
   };
 
-  return <>{ordered.map((s) => <div key={s.id} data-section={s.id}>{map[s.id]}</div>)}</>;
+  return (
+    <>
+      {ordered.map((s) => (
+        <div key={s.id} data-section={s.id}>
+          {map[s.id]}
+        </div>
+      ))}
+    </>
+  );
 }

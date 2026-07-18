@@ -1,0 +1,109 @@
+name: Build
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  build:
+    name: Build (bun)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install ripgrep
+        run: sudo apt-get update && sudo apt-get install -y ripgrep
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache Bun install
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lockb', 'bun.lock', 'package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Register TypeScript problem matcher
+        run: echo "::add-matcher::.github/matchers/tsc.json"
+
+      - name: Build
+        run: |
+          mkdir -p build-logs
+          set -o pipefail
+          bun run build 2>&1 | tee build-logs/build.log
+
+      - name: Capture TypeScript diagnostics
+        if: always()
+        run: |
+          mkdir -p build-logs
+          bunx tsgo --noEmit --pretty false 2>&1 | tee build-logs/typecheck.log || true
+          {
+            echo "## Environment"
+            echo "node: $(node -v 2>/dev/null || echo n/a)"
+            echo "bun:  $(bun -v 2>/dev/null || echo n/a)"
+            echo "commit: ${GITHUB_SHA}"
+            echo "ref:    ${GITHUB_REF}"
+            echo "status: ${{ job.status }}"
+          } > build-logs/env.txt
+
+      - name: Annotate TypeScript errors
+        if: always()
+        run: |
+          # Emit ::error file=,line=,col=,title=:: annotations parsed from tsc-style
+          # diagnostics in BOTH the build log and the typecheck log, deduped so
+          # errors surfaced by both phases don't double-annotate the PR.
+          logs=""
+          [ -s build-logs/build.log ] && logs="$logs build-logs/build.log"
+          [ -s build-logs/typecheck.log ] && logs="$logs build-logs/typecheck.log"
+          if [ -z "$logs" ]; then
+            exit 0
+          fi
+          # shellcheck disable=SC2086
+          cat $logs | awk '
+            match($0, /^([^ (]+)[(:]([0-9]+)[,:]([0-9]+)\)?:? *-? *(error|warning) +(TS[0-9]+): *(.*)$/, m) {
+              sev = (m[4] == "warning") ? "warning" : "error"
+              msg = m[6]
+              gsub(/%/, "%25", msg); gsub(/\r/, "%0D", msg); gsub(/\n/, "%0A", msg)
+              printf "%s|%s|%s|%s|%s|%s\n", sev, m[1], m[2], m[3], m[5], msg
+            }
+          ' | sort -u | awk -F'|' '{
+            printf "::%s file=%s,line=%s,col=%s,title=%s::%s\n", $1, $2, $3, $4, $5, $6
+          }'
+
+
+
+      - name: Compute artifact name
+        if: always()
+        id: artifact_name
+        run: |
+          if [ -n "${{ github.event.pull_request.number }}" ]; then
+            slug="pr-${{ github.event.pull_request.number }}"
+          else
+            ref="${GITHUB_REF_NAME:-${GITHUB_SHA}}"
+            slug="$(echo "$ref" | tr '/' '-' | tr -cd '[:alnum:]._-')"
+            slug="branch-${slug}"
+          fi
+          echo "name=build-logs-${slug}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload build logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.artifact_name.outputs.name }}
+          path: build-logs/
+          retention-days: 14
+          if-no-files-found: warn
+
+

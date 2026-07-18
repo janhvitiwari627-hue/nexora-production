@@ -11,11 +11,17 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import nexoraLogo from "@/assets/nexora-logo.jpg.asset.json";
 
 import { NotFoundPage } from "@/pages/public/NotFoundPage";
-import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
-import { ServiceWorkerUpdatePrompt } from "@/components/pwa/ServiceWorkerUpdatePrompt";
+import {
+  SupabaseErrorFallback,
+  detectSupabaseErrorKind,
+} from "@/components/shared/SupabaseErrorFallback";
 import { Toaster } from "@/components/ui/sonner";
+import { useApplicationStatusNotifications } from "@/hooks/useApplicationStatusNotifications";
+import { ReferralWelcomePopup } from "@/components/referral/ReferralWelcomePopup";
+import { RolePwaManager } from "@/components/pwa/RolePwaManager";
 
 function NotFoundComponent() {
   return <NotFoundPage />;
@@ -27,6 +33,20 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
+
+  const supabaseKind = detectSupabaseErrorKind(error);
+  if (supabaseKind) {
+    return (
+      <SupabaseErrorFallback
+        kind={supabaseKind}
+        error={error}
+        onRetry={() => {
+          router.invalidate();
+          reset();
+        }}
+      />
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -64,35 +84,59 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { name: "theme-color", content: "#635BFF" },
-      { title: "Nexora — Book salons, spas & barbers near you" },
+      { name: "theme-color", content: "#2563eb" },
+      { title: "Nexora — Book salons, spas & barbers in Jaipur" },
       {
         name: "description",
         content:
-          "Discover top-rated salons, spas and barbershops. Instant booking, member rewards, and exclusive offers on Nexora SalonOS.",
+          "Discover top-rated salons, spas and barbershops in Jaipur. Instant booking, member rewards, and exclusive offers on Nexora SalonOS.",
       },
-      { property: "og:title", content: "Nexora — Book salons, spas & barbers near you" },
+      { property: "og:title", content: "Nexora — Book salons, spas & barbers in Jaipur" },
       {
         property: "og:description",
-        content: "Discover, book, and grow with the operating system for modern salons.",
+        content:
+          "Discover top-rated salons, spas and barbershops in Jaipur. Instant booking, member rewards, and exclusive offers on Nexora SalonOS.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Nexora — Book salons, spas & barbers near you" },
-      { name: "description", content: "Nexora SalonOS is a comprehensive platform for salon discovery, booking, and management." },
-      { property: "og:description", content: "Nexora SalonOS is a comprehensive platform for salon discovery, booking, and management." },
-      { name: "twitter:description", content: "Nexora SalonOS is a comprehensive platform for salon discovery, booking, and management." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/232256ad-c4f3-4f72-84f1-0c97aa408c63/id-preview-d451d0e4--822fe342-2aa4-466c-8092-9280657c85a5.lovable.app-1781852479510.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/232256ad-c4f3-4f72-84f1-0c97aa408c63/id-preview-d451d0e4--822fe342-2aa4-466c-8092-9280657c85a5.lovable.app-1781852479510.png" },
+      { name: "twitter:title", content: "Nexora — Book salons, spas & barbers in Jaipur" },
+      {
+        name: "description",
+        content:
+          "Discover top-rated salons, spas and barbershops in Jaipur. Instant booking, member rewards, and exclusive offers on Nexora SalonOS.",
+      },
+      {
+        property: "og:description",
+        content:
+          "Discover top-rated salons, spas and barbershops in Jaipur. Instant booking, member rewards, and exclusive offers on Nexora SalonOS.",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "Discover top-rated salons, spas and barbershops in Jaipur. Instant booking, member rewards, and exclusive offers on Nexora SalonOS.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/4Aw7bpKI5ubBovpSR654qvAsfD53/social-images/social-1784208883865-photo_2026-07-14_15-33-48.webp",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/4Aw7bpKI5ubBovpSR654qvAsfD53/social-images/social-1784208883865-photo_2026-07-14_15-33-48.webp",
+      },
     ],
     links: [
+      { rel: "icon", href: "/favicon.ico", type: "image/x-icon", sizes: "any" },
+      { rel: "shortcut icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "apple-touch-icon", href: "/icon-192.png", sizes: "192x192" },
       { rel: "manifest", href: "/manifest.webmanifest" },
-      { rel: "apple-touch-icon", href: "/icon-192.png" },
+
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Serif+Display&family=Playfair+Display:wght@500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Lora:wght@400;500;600;700&family=Dancing+Script:wght@600&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Serif+Display&family=Playfair+Display:wght@500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Lora:wght@400;500;600;700&family=Dancing+Script:wght@600&family=Instrument+Serif&family=Work+Sans:wght@400;500;600;700;800&display=swap",
       },
       { rel: "stylesheet", href: appCss },
     ],
@@ -107,6 +151,9 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
+        {/* Keep this static in the HTML shell: mobile browsers calculate their
+            layout viewport before route-level head tags hydrate. */}
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <HeadContent />
       </head>
       <body>
@@ -125,9 +172,12 @@ function RootComponent() {
     let timer: ReturnType<typeof setTimeout> | undefined;
     const initializeAuthStore = () => {
       void import("@/stores/authStore").then(({ useAuthStore }) => {
-        useAuthStore.getState().initialize().then((unsub) => {
-          unsubscribe = unsub;
-        });
+        useAuthStore
+          .getState()
+          .initialize()
+          .then((unsub) => {
+            unsubscribe = unsub;
+          });
       });
     };
 
@@ -137,6 +187,10 @@ function RootComponent() {
       initializeAuthStore();
     }
 
+    void import("@/lib/booking-offline-sync").then(({ initBookingOfflineSync }) => {
+      initBookingOfflineSync();
+    });
+
     return () => {
       if (timer) clearTimeout(timer);
       unsubscribe?.();
@@ -145,11 +199,17 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <AppSideEffects />
+      <RolePwaManager />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
-      <PWAInstallPrompt />
-      <ServiceWorkerUpdatePrompt />
+      <ReferralWelcomePopup />
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );
+}
+
+function AppSideEffects() {
+  useApplicationStatusNotifications();
+  return null;
 }

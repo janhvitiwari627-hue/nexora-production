@@ -1,16 +1,19 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { CreateWebsitePage } from "@/pages/owner/CreateWebsitePage";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { requireRole } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/owner/templates")({
+  beforeLoad: async ({ location }) => {
+    await requireRole(["owner", "shop_owner", "admin"], location.pathname);
+    throw redirect({ to: "/owner/website", search: {}, replace: true });
+  },
   head: () => ({
     meta: [
-      { title: "Choose Your Website Template — Nexora" },
+      { title: "Final Website Editor — Nexora" },
       {
         name: "description",
         content:
-          "Pick one of three Nexora templates — Luxury Salon, Modern Professional, or Spa & Wellness — and launch your booking website in minutes.",
+          "Edit your salon website design, content, theme and final publish action in one place.",
       },
     ],
   }),
-  component: CreateWebsitePage,
 });

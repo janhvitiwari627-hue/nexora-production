@@ -1,167 +1,880 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useMemo, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Check, Plus, QrCode, Star, Trash2, X } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Check, X, RefreshCcw, Search, Loader2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { recordAdminAction } from "@/lib/adminAudit";
+import type { Database } from "@/integrations/supabase/types";
 
-type PM = { id: string; label: string; upi: string; qrUrl: string; enabled: boolean; isDefault: boolean };
-type Pending = { id: string; user: string; amount: number; date: string; screenshot: string; method: string };
-type Settle = { id: string; date: string; count: number; gross: number; fees: number; net: number; status: string };
-type Txn = { id: string; user: string; shop: string; amount: number; status: string; date: string; method: string };
+// ---------- Typed update payload helpers ----------
+// These narrow the shape of admin-issued updates so we never pass a bare
+// Record<string, unknown> into Supabase's typed `.update()` (which surfaces
+// as a RejectExcessProperties error). Each helper returns the exact
+// `Tables<>["Update"]` slice its mutation writes.
+type PaymentUpdate = Database["public"]["Tables"]["payments"]["Update"];
+type PendingPaymentUpdate = Database["public"]["Tables"]["pending_payments"]["Update"];
+type WithdrawalUpdate = Database["public"]["Tables"]["withdrawals"]["Update"];
 
-const initialPMs: PM[] = [
-  { id: "p1", label: "Primary UPI", upi: "nexora@hdfc", qrUrl: "", enabled: true, isDefault: true },
-  { id: "p2", label: "Backup UPI", upi: "nexora2@ybl", qrUrl: "", enabled: true, isDefault: false },
-  { id: "p3", label: "Old QR", upi: "old@paytm", qrUrl: "", enabled: false, isDefault: false },
-];
+type PaymentStatus = "CREATED" | "PENDING" | "SUCCESS" | "FAILED" | "REFUNDED" | "CANCELLED";
+type PendingStatus = "approved" | "rejected";
+type WithdrawalStatus = "PENDING" | "APPROVED" | "PROCESSING" | "COMPLETED" | "REJECTED";
 
-const PENDING: Pending[] = Array.from({ length: 6 }).map((_, i) => ({
-  id: `pv${i + 1}`, user: ["Aarav", "Priya", "Rohan", "Sneha"][i % 4],
-  amount: 499 + i * 230, date: `${i + 1}h ago`, screenshot: "", method: "UPI",
-}));
+function buildRefundPayload(reason: string): PaymentUpdate {
+  return {
+    status: "REFUNDED",
+    failure_reason: reason,
+    processed_at: new Date().toISOString(),
+  };
+}
 
-const SETTLES: Settle[] = Array.from({ length: 8 }).map((_, i) => ({
-  id: `s${i + 1}`, date: `2026-06-${String(18 - i).padStart(2, "0")}`,
-  count: 120 + i * 14, gross: 142000 + i * 8400, fees: 14200 + i * 840,
-  net: 127800 + i * 7560, status: i === 0 ? "Processing" : "Settled",
-}));
+function buildPaymentStatusPayload(status: PaymentStatus, reason?: string): PaymentUpdate {
+  const patch: PaymentUpdate = {
+    status,
+    processed_at: new Date().toISOString(),
+  };
+  if (reason) patch.failure_reason = reason;
+  return patch;
+}
 
-const TXNS: Txn[] = Array.from({ length: 12 }).map((_, i) => ({
-  id: `BK${10000 + i}`, user: ["Aarav", "Priya", "Rohan"][i % 3],
-  shop: ["Luxe Hair", "Glow Spa", "QuickCuts"][i % 3], amount: 599 + i * 110,
-  status: ["Captured", "Captured", "Refunded", "Failed"][i % 4],
-  date: `Jun ${18 - (i % 18)}`, method: ["UPI", "Card", "Wallet"][i % 3],
-}));
+function buildPendingStatusPayload(status: PendingStatus): PendingPaymentUpdate {
+  return {
+    status,
+    updated_at: new Date().toISOString(),
+  };
+}
+
+function buildWithdrawalStatusPayload(status: WithdrawalStatus): WithdrawalUpdate {
+  const patch: WithdrawalUpdate = {
+    status,
+    updated_at: new Date().toISOString(),
+  };
+  if (status === "COMPLETED" || status === "REJECTED") {
+    patch.processed_at = new Date().toISOString();
+  }
+  return patch;
+}
+
+type Payment = {
+  id: string;
+  transaction_id: string;
+  amount: number;
+  status: string;
+  payment_method: string | null;
+  payment_type: string | null;
+  created_at: string;
+  processed_at: string | null;
+  customer_id: string | null;
+  salon_id: string | null;
+  booking_id: string | null;
+  failure_reason: string | null;
+  gateway_response: unknown;
+};
+
+type PendingPayment = {
+  id: string;
+  user_id: string;
+  booking_id: string | null;
+  transaction_id: string;
+  screenshot_url: string | null;
+  status: string;
+  created_at: string;
+};
+
+type Withdrawal = {
+  id: string;
+  salon_id: string;
+  amount: number;
+  status: string;
+  bank_account_details: unknown;
+  processed_at: string | null;
+  created_at: string;
+};
+
+type RejectTarget =
+  | { kind: "payment"; id: string; label: string }
+  | { kind: "pending"; id: string; label: string }
+  | { kind: "withdrawal"; id: string; label: string };
+
+type ConfirmTarget = {
+  title: string;
+  description: string;
+  confirmLabel: string;
+  destructive?: boolean;
+  onConfirm: () => void;
+};
+
+const MIN_REASON = 5;
+
+function fmtINR(n: number) {
+  return `₹${Number(n).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
+}
+function fmtDate(s: string | null) {
+  if (!s) return "—";
+  return new Date(s).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
+}
+
+function statusVariant(s: string): "default" | "secondary" | "destructive" | "outline" {
+  const v = s.toUpperCase();
+  if (v === "SUCCESS" || v === "COMPLETED" || v === "APPROVED") return "default";
+  if (v === "FAILED" || v === "REJECTED" || v === "CANCELLED") return "destructive";
+  if (v === "REFUNDED") return "outline";
+  return "secondary";
+}
 
 export function PaymentManagementPage() {
-  const [pms, setPms] = useState(initialPMs);
-  const [pending, setPending] = useState(PENDING);
-  const [addOpen, setAddOpen] = useState(false);
-  const [newPM, setNewPM] = useState({ label: "", upi: "" });
+  const qc = useQueryClient();
+  const [tab, setTab] = useState("txn");
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  const toggle = (id: string) => setPms(p => p.map(x => x.id === id ? { ...x, enabled: !x.enabled } : x));
-  const setDefault = (id: string) => setPms(p => p.map(x => ({ ...x, isDefault: x.id === id })));
-  const remove = (id: string) => { setPms(p => p.filter(x => x.id !== id)); toast.success("Removed"); };
+  const [refundTarget, setRefundTarget] = useState<Payment | null>(null);
+  const [refundReason, setRefundReason] = useState("");
+  const [refundReasonError, setRefundReasonError] = useState<string | null>(null);
 
-  const add = () => {
-    if (!newPM.label || !newPM.upi) return;
-    setPms(p => [...p, { id: `p${Date.now()}`, ...newPM, qrUrl: "", enabled: true, isDefault: false }]);
-    setNewPM({ label: "", upi: "" });
-    setAddOpen(false);
-    toast.success("Payment method added");
-  };
+  const [rejectTarget, setRejectTarget] = useState<RejectTarget | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
+  const [rejectReasonError, setRejectReasonError] = useState<string | null>(null);
+
+  const [confirmTarget, setConfirmTarget] = useState<ConfirmTarget | null>(null);
+
+  // ---------- Queries ----------
+  const paymentsQ = useQuery({
+    queryKey: ["admin-payments", statusFilter],
+    queryFn: async () => {
+      let q = supabase.from("payments").select("*").order("created_at", { ascending: false }).limit(500);
+      if (statusFilter !== "all") q = q.eq("status", statusFilter);
+      const { data, error } = await q;
+      if (error) throw error;
+      return (data ?? []) as Payment[];
+    },
+  });
+
+  const pendingQ = useQuery({
+    queryKey: ["admin-pending-payments"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("pending_payments")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(200);
+      if (error) throw error;
+      return (data ?? []) as PendingPayment[];
+    },
+  });
+
+  const withdrawalsQ = useQuery({
+    queryKey: ["admin-withdrawals"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("withdrawals")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(200);
+      if (error) throw error;
+      return (data ?? []) as Withdrawal[];
+    },
+  });
+
+  // ---------- Mutations ----------
+  const refundPayment = useMutation({
+    mutationFn: async ({ id, reason }: { id: string; reason: string }) => {
+      const { error } = await supabase
+        .from("payments")
+        .update(buildRefundPayload(reason))
+        .eq("id", id);
+      if (error) throw error;
+      await recordAdminAction({
+        action: "refund",
+        entity: "payment",
+        entityId: id,
+        reason,
+      });
+    },
+    onSuccess: () => {
+      toast.success("Payment refunded");
+      qc.invalidateQueries({ queryKey: ["admin-payments"] });
+      closeRefund();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const markPaymentStatus = useMutation({
+    mutationFn: async ({
+      id,
+      status,
+      reason,
+    }: {
+      id: string;
+      status: PaymentStatus;
+      reason?: string;
+    }) => {
+      const { error } = await supabase
+        .from("payments")
+        .update(buildPaymentStatusPayload(status, reason))
+        .eq("id", id);
+      if (error) throw error;
+      await recordAdminAction({
+        action:
+          status === "SUCCESS"
+            ? "mark_success"
+            : status === "FAILED"
+              ? "mark_failed"
+              : "adjust",
+        entity: "payment",
+        entityId: id,
+        reason,
+        details: { status },
+      });
+    },
+    onSuccess: (_d, v) => {
+      toast.success(`Marked ${v.status}`);
+      qc.invalidateQueries({ queryKey: ["admin-payments"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const setPendingStatus = useMutation({
+    mutationFn: async ({
+      id,
+      status,
+      reason,
+    }: {
+      id: string;
+      status: PendingStatus;
+      reason?: string;
+    }) => {
+      const { error } = await supabase
+        .from("pending_payments")
+        .update(buildPendingStatusPayload(status))
+        .eq("id", id);
+      if (error) throw error;
+      await recordAdminAction({
+        action: status === "approved" ? "approve" : "reject",
+        entity: "pending_payment",
+        entityId: id,
+        reason,
+      });
+    },
+    onSuccess: (_d, v) => {
+      toast.success(
+        v.status === "approved"
+          ? "Payment approved"
+          : `Payment rejected${v.reason ? ` — reason recorded` : ""}`,
+      );
+      qc.invalidateQueries({ queryKey: ["admin-pending-payments"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const setWithdrawalStatus = useMutation({
+    mutationFn: async ({
+      id,
+      status,
+      reason,
+    }: {
+      id: string;
+      status: WithdrawalStatus;
+      reason?: string;
+    }) => {
+      const { error } = await supabase
+        .from("withdrawals")
+        .update(buildWithdrawalStatusPayload(status))
+        .eq("id", id);
+      if (error) throw error;
+      await recordAdminAction({
+        action:
+          status === "REJECTED"
+            ? "reject"
+            : status === "COMPLETED"
+              ? "mark_paid"
+              : "approve",
+        entity: "withdrawal",
+        entityId: id,
+        reason,
+        details: { status },
+      });
+    },
+    onSuccess: (_d, v) => {
+      toast.success(`Withdrawal ${v.status.toLowerCase()}${v.reason ? " — reason recorded" : ""}`);
+      qc.invalidateQueries({ queryKey: ["admin-withdrawals"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  // ---------- Helpers ----------
+  function closeRefund() {
+    setRefundTarget(null);
+    setRefundReason("");
+    setRefundReasonError(null);
+  }
+  function closeReject() {
+    setRejectTarget(null);
+    setRejectReason("");
+    setRejectReasonError(null);
+  }
+
+  function submitRefund() {
+    if (!refundTarget) return;
+    const trimmed = refundReason.trim();
+    if (trimmed.length < MIN_REASON) {
+      setRefundReasonError(`Please provide a reason (at least ${MIN_REASON} characters).`);
+      return;
+    }
+    refundPayment.mutate({ id: refundTarget.id, reason: trimmed });
+  }
+
+  function submitReject() {
+    if (!rejectTarget) return;
+    const trimmed = rejectReason.trim();
+    if (trimmed.length < MIN_REASON) {
+      setRejectReasonError(`Rejection reason is required (at least ${MIN_REASON} characters).`);
+      return;
+    }
+    if (rejectTarget.kind === "payment") {
+      markPaymentStatus.mutate(
+        { id: rejectTarget.id, status: "FAILED", reason: trimmed },
+        { onSuccess: () => closeReject() },
+      );
+    } else if (rejectTarget.kind === "pending") {
+      setPendingStatus.mutate(
+        { id: rejectTarget.id, status: "rejected", reason: trimmed },
+        { onSuccess: () => closeReject() },
+      );
+    } else {
+      setWithdrawalStatus.mutate(
+        { id: rejectTarget.id, status: "REJECTED", reason: trimmed },
+        { onSuccess: () => closeReject() },
+      );
+    }
+  }
+
+  // ---------- Derived ----------
+  const filteredPayments = useMemo(() => {
+    const s = search.trim().toLowerCase();
+    const list = paymentsQ.data ?? [];
+    if (!s) return list;
+    return list.filter(
+      (p) =>
+        p.transaction_id.toLowerCase().includes(s) ||
+        (p.payment_method ?? "").toLowerCase().includes(s) ||
+        (p.customer_id ?? "").toLowerCase().includes(s) ||
+        (p.salon_id ?? "").toLowerCase().includes(s),
+    );
+  }, [search, paymentsQ.data]);
+
+  const stats = useMemo(() => {
+    const list = paymentsQ.data ?? [];
+    const success = list.filter((p) => p.status === "SUCCESS");
+    const refunded = list.filter((p) => p.status === "REFUNDED");
+    return {
+      total: list.length,
+      revenue: success.reduce((s, p) => s + Number(p.amount), 0),
+      refunded: refunded.reduce((s, p) => s + Number(p.amount), 0),
+      pendingCount: (pendingQ.data ?? []).filter((x) => x.status === "pending").length,
+      withdrawalsPending: (withdrawalsQ.data ?? []).filter((w) => w.status === "PENDING").length,
+    };
+  }, [paymentsQ.data, pendingQ.data, withdrawalsQ.data]);
+
+  const rejectMutating =
+    markPaymentStatus.isPending || setPendingStatus.isPending || setWithdrawalStatus.isPending;
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 p-6">
-      <header>
-        <h1 className="text-heading text-2xl font-bold">Payment Management</h1>
-        <p className="text-muted-foreground text-sm">Payment methods, verifications, settlements & transactions</p>
+      <header className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">Payments & Billing</h1>
+          <p className="text-muted-foreground text-sm">
+            All transactions, pending verifications, refunds & shop withdrawals
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            qc.invalidateQueries({ queryKey: ["admin-payments"] });
+            qc.invalidateQueries({ queryKey: ["admin-pending-payments"] });
+            qc.invalidateQueries({ queryKey: ["admin-withdrawals"] });
+          }}
+        >
+          <RefreshCcw className="mr-2 h-4 w-4" /> Refresh
+        </Button>
       </header>
 
-      <Tabs defaultValue="methods">
+      {/* Stats */}
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <StatCard label="Total Transactions" value={String(stats.total)} />
+        <StatCard label="Revenue (Success)" value={fmtINR(stats.revenue)} />
+        <StatCard label="Refunded" value={fmtINR(stats.refunded)} />
+        <StatCard label="Pending Verifications" value={String(stats.pendingCount)} />
+        <StatCard label="Withdrawals Pending" value={String(stats.withdrawalsPending)} />
+      </div>
+
+      <Tabs value={tab} onValueChange={setTab}>
         <TabsList>
-          <TabsTrigger value="methods">Payment Methods</TabsTrigger>
-          <TabsTrigger value="verify">Verification</TabsTrigger>
-          <TabsTrigger value="settle">Settlement History</TabsTrigger>
-          <TabsTrigger value="txn">All Transactions</TabsTrigger>
+          <TabsTrigger value="txn">Transactions</TabsTrigger>
+          <TabsTrigger value="verify">Verifications ({stats.pendingCount})</TabsTrigger>
+          <TabsTrigger value="withdraw">Withdrawals ({stats.withdrawalsPending})</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="methods" className="space-y-3">
-          <div className="flex justify-end">
-            <Button onClick={() => setAddOpen(true)}><Plus className="h-4 w-4" /> Add Method</Button>
+        {/* ---------- Transactions ---------- */}
+        <TabsContent value="txn" className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="relative flex-1 min-w-[220px]">
+              <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search txn id, method, customer/salon id…"
+                className="pl-9"
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All statuses</SelectItem>
+                <SelectItem value="CREATED">Created</SelectItem>
+                <SelectItem value="PENDING">Pending</SelectItem>
+                <SelectItem value="SUCCESS">Success</SelectItem>
+                <SelectItem value="FAILED">Failed</SelectItem>
+                <SelectItem value="REFUNDED">Refunded</SelectItem>
+                <SelectItem value="CANCELLED">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {pms.map(p => (
-              <Card key={p.id}>
-                <CardContent className="space-y-3 p-5">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <div className="flex items-center gap-2 font-semibold">{p.label}{p.isDefault && <Badge>Default</Badge>}</div>
-                      <div className="text-muted-foreground text-sm">{p.upi}</div>
-                    </div>
-                    <Switch checked={p.enabled} onCheckedChange={() => toggle(p.id)} />
-                  </div>
-                  <div className="bg-muted grid h-32 place-items-center rounded-lg"><QrCode className="text-muted-foreground h-16 w-16" /></div>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline" className="flex-1" disabled={p.isDefault} onClick={() => setDefault(p.id)}><Star className="h-3.5 w-3.5" /> Default</Button>
-                    <Button size="sm" variant="ghost" onClick={() => remove(p.id)}><Trash2 className="text-destructive h-4 w-4" /></Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+
+          <Card>
+            <CardContent className="p-0">
+              {paymentsQ.isLoading ? (
+                <div className="flex justify-center p-10"><Loader2 className="h-6 w-6 animate-spin" /></div>
+              ) : filteredPayments.length === 0 ? (
+                <div className="text-muted-foreground p-10 text-center text-sm">No transactions found</div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Txn ID</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Amount</TableHead>
+                      <TableHead>Method</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Created</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredPayments.map((p) => (
+                      <TableRow key={p.id}>
+                        <TableCell className="font-mono text-xs">{p.transaction_id}</TableCell>
+                        <TableCell>{p.payment_type ?? "—"}</TableCell>
+                        <TableCell className="font-semibold">{fmtINR(Number(p.amount))}</TableCell>
+                        <TableCell>{p.payment_method ?? "—"}</TableCell>
+                        <TableCell><Badge variant={statusVariant(p.status)}>{p.status}</Badge></TableCell>
+                        <TableCell className="text-muted-foreground text-xs">{fmtDate(p.created_at)}</TableCell>
+                        <TableCell className="text-right space-x-1">
+                          {p.status === "SUCCESS" && (
+                            <Button size="sm" variant="outline" onClick={() => setRefundTarget(p)}>
+                              Refund
+                            </Button>
+                          )}
+                          {(p.status === "CREATED" || p.status === "PENDING") && (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() =>
+                                  setConfirmTarget({
+                                    title: "Mark payment as Success?",
+                                    description: `Transaction ${p.transaction_id} (${fmtINR(Number(p.amount))}) will be marked SUCCESS. This releases funds and cannot be silently undone.`,
+                                    confirmLabel: "Mark Success",
+                                    onConfirm: () =>
+                                      markPaymentStatus.mutate({ id: p.id, status: "SUCCESS" }),
+                                  })
+                                }
+                              >
+                                Mark Success
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() =>
+                                  setRejectTarget({
+                                    kind: "payment",
+                                    id: p.id,
+                                    label: `${p.transaction_id} (${fmtINR(Number(p.amount))})`,
+                                  })
+                                }
+                              >
+                                Mark Failed
+                              </Button>
+                            </>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
+        {/* ---------- Pending verifications ---------- */}
         <TabsContent value="verify" className="space-y-3">
-          <div className="grid gap-4 md:grid-cols-2">
-            {pending.map(p => (
-              <Card key={p.id}>
-                <CardHeader className="pb-2"><CardTitle className="text-base">{p.user} · ₹{p.amount}</CardTitle></CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="bg-muted grid h-40 place-items-center rounded-lg text-xs">Payment screenshot preview</div>
-                  <div className="text-muted-foreground flex justify-between text-xs"><span>{p.method}</span><span>{p.date}</span></div>
-                  <div className="flex gap-2">
-                    <Button size="sm" className="flex-1" onClick={() => { setPending(prev => prev.filter(x => x.id !== p.id)); toast.success("Approved"); }}><Check className="h-4 w-4" /> Approve</Button>
-                    <Button size="sm" variant="destructive" className="flex-1" onClick={() => { setPending(prev => prev.filter(x => x.id !== p.id)); toast.success("Rejected"); }}><X className="h-4 w-4" /> Reject</Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <Card>
+            <CardContent className="p-0">
+              {pendingQ.isLoading ? (
+                <div className="flex justify-center p-10"><Loader2 className="h-6 w-6 animate-spin" /></div>
+              ) : (pendingQ.data ?? []).length === 0 ? (
+                <div className="text-muted-foreground p-10 text-center text-sm">No pending verifications</div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Txn Ref</TableHead>
+                      <TableHead>User</TableHead>
+                      <TableHead>Booking</TableHead>
+                      <TableHead>Screenshot</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Submitted</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {(pendingQ.data ?? []).map((p) => (
+                      <TableRow key={p.id}>
+                        <TableCell className="font-mono text-xs">{p.transaction_id}</TableCell>
+                        <TableCell className="font-mono text-xs">{p.user_id.slice(0, 8)}…</TableCell>
+                        <TableCell className="font-mono text-xs">{p.booking_id ? p.booking_id.slice(0, 8) + "…" : "—"}</TableCell>
+                        <TableCell>
+                          {p.screenshot_url ? (
+                            <a href={p.screenshot_url} target="_blank" rel="noreferrer" className="text-primary text-xs underline">
+                              View
+                            </a>
+                          ) : "—"}
+                        </TableCell>
+                        <TableCell><Badge variant={statusVariant(p.status)}>{p.status}</Badge></TableCell>
+                        <TableCell className="text-muted-foreground text-xs">{fmtDate(p.created_at)}</TableCell>
+                        <TableCell className="text-right space-x-1">
+                          {p.status === "pending" && (
+                            <>
+                              <Button
+                                size="sm"
+                                onClick={() =>
+                                  setConfirmTarget({
+                                    title: "Approve this payment?",
+                                    description: `Verify that transaction ${p.transaction_id} was received before approving. This will mark the payment as approved.`,
+                                    confirmLabel: "Approve Payment",
+                                    onConfirm: () =>
+                                      setPendingStatus.mutate({ id: p.id, status: "approved" }),
+                                  })
+                                }
+                              >
+                                <Check className="h-4 w-4" /> Approve
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() =>
+                                  setRejectTarget({
+                                    kind: "pending",
+                                    id: p.id,
+                                    label: p.transaction_id,
+                                  })
+                                }
+                              >
+                                <X className="h-4 w-4" /> Reject
+                              </Button>
+                            </>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
-        <TabsContent value="settle">
-          <Card><CardContent className="p-0">
-            <Table>
-              <TableHeader><TableRow><TableHead>Date</TableHead><TableHead>Txns</TableHead><TableHead>Gross</TableHead><TableHead>Fees</TableHead><TableHead>Net</TableHead><TableHead>Status</TableHead></TableRow></TableHeader>
-              <TableBody>{SETTLES.map(s => (
-                <TableRow key={s.id}>
-                  <TableCell>{s.date}</TableCell><TableCell>{s.count}</TableCell>
-                  <TableCell>₹{s.gross.toLocaleString("en-IN")}</TableCell>
-                  <TableCell className="text-muted-foreground">₹{s.fees.toLocaleString("en-IN")}</TableCell>
-                  <TableCell className="font-semibold">₹{s.net.toLocaleString("en-IN")}</TableCell>
-                  <TableCell><Badge variant={s.status === "Settled" ? "default" : "secondary"}>{s.status}</Badge></TableCell>
-                </TableRow>
-              ))}</TableBody>
-            </Table>
-          </CardContent></Card>
-        </TabsContent>
-
-        <TabsContent value="txn">
-          <Card><CardContent className="p-0">
-            <Table>
-              <TableHeader><TableRow><TableHead>Booking ID</TableHead><TableHead>User</TableHead><TableHead>Shop</TableHead><TableHead>Amount</TableHead><TableHead>Method</TableHead><TableHead>Status</TableHead><TableHead>Date</TableHead></TableRow></TableHeader>
-              <TableBody>{TXNS.map(t => (
-                <TableRow key={t.id}>
-                  <TableCell className="font-mono text-xs">{t.id}</TableCell>
-                  <TableCell>{t.user}</TableCell><TableCell>{t.shop}</TableCell>
-                  <TableCell>₹{t.amount}</TableCell><TableCell>{t.method}</TableCell>
-                  <TableCell><Badge variant={t.status === "Captured" ? "default" : t.status === "Failed" ? "destructive" : "secondary"}>{t.status}</Badge></TableCell>
-                  <TableCell className="text-muted-foreground">{t.date}</TableCell>
-                </TableRow>
-              ))}</TableBody>
-            </Table>
-          </CardContent></Card>
+        {/* ---------- Withdrawals ---------- */}
+        <TabsContent value="withdraw" className="space-y-3">
+          <Card>
+            <CardContent className="p-0">
+              {withdrawalsQ.isLoading ? (
+                <div className="flex justify-center p-10"><Loader2 className="h-6 w-6 animate-spin" /></div>
+              ) : (withdrawalsQ.data ?? []).length === 0 ? (
+                <div className="text-muted-foreground p-10 text-center text-sm">No withdrawal requests</div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Salon</TableHead>
+                      <TableHead>Amount</TableHead>
+                      <TableHead>Bank</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Requested</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {(withdrawalsQ.data ?? []).map((w) => {
+                      const bank = (w.bank_account_details ?? {}) as {
+                        accountName?: string; accountNumber?: string; ifsc?: string;
+                      };
+                      const amountLabel = fmtINR(Number(w.amount));
+                      return (
+                        <TableRow key={w.id}>
+                          <TableCell className="font-mono text-xs">{w.salon_id.slice(0, 8)}…</TableCell>
+                          <TableCell className="font-semibold">{amountLabel}</TableCell>
+                          <TableCell className="text-xs">
+                            {bank.accountName ?? "—"}<br />
+                            <span className="text-muted-foreground">
+                              {bank.accountNumber ?? ""} {bank.ifsc ? `· ${bank.ifsc}` : ""}
+                            </span>
+                          </TableCell>
+                          <TableCell><Badge variant={statusVariant(w.status)}>{w.status}</Badge></TableCell>
+                          <TableCell className="text-muted-foreground text-xs">{fmtDate(w.created_at)}</TableCell>
+                          <TableCell className="text-right space-x-1">
+                            {w.status === "PENDING" && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() =>
+                                  setConfirmTarget({
+                                    title: "Approve withdrawal?",
+                                    description: `Move ${amountLabel} to PROCESSING for salon ${w.salon_id.slice(0, 8)}…. You can then mark it Paid once the transfer is completed.`,
+                                    confirmLabel: "Approve",
+                                    onConfirm: () =>
+                                      setWithdrawalStatus.mutate({ id: w.id, status: "PROCESSING" }),
+                                  })
+                                }
+                              >
+                                Approve
+                              </Button>
+                            )}
+                            {(w.status === "PENDING" || w.status === "PROCESSING") && (
+                              <>
+                                <Button
+                                  size="sm"
+                                  onClick={() =>
+                                    setConfirmTarget({
+                                      title: "Mark withdrawal as Paid?",
+                                      description: `Confirm that ${amountLabel} has been transferred to ${bank.accountName ?? "the salon"}${bank.accountNumber ? ` (A/C ${bank.accountNumber})` : ""}. This action is final.`,
+                                      confirmLabel: "Mark Paid",
+                                      onConfirm: () =>
+                                        setWithdrawalStatus.mutate({ id: w.id, status: "COMPLETED" }),
+                                    })
+                                  }
+                                >
+                                  Mark Paid
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() =>
+                                    setRejectTarget({
+                                      kind: "withdrawal",
+                                      id: w.id,
+                                      label: `${amountLabel} · ${w.salon_id.slice(0, 8)}…`,
+                                    })
+                                  }
+                                >
+                                  Reject
+                                </Button>
+                              </>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
 
-      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+      {/* Refund dialog */}
+      <Dialog open={!!refundTarget} onOpenChange={(o) => !o && closeRefund()}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Add Payment Method</DialogTitle></DialogHeader>
-          <div className="space-y-3">
-            <div><Label>Label</Label><Input value={newPM.label} onChange={e => setNewPM({ ...newPM, label: e.target.value })} /></div>
-            <div><Label>UPI ID</Label><Input value={newPM.upi} onChange={e => setNewPM({ ...newPM, upi: e.target.value })} placeholder="name@bank" /></div>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" /> Refund Payment
+            </DialogTitle>
+            <DialogDescription>
+              Refunds are permanent and will be visible to the customer. Please provide a clear reason for audit.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 text-sm">
+            <div>
+              <span className="text-muted-foreground">Transaction: </span>
+              <span className="font-mono">{refundTarget?.transaction_id}</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Amount: </span>
+              <span className="font-semibold">{refundTarget ? fmtINR(Number(refundTarget.amount)) : ""}</span>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="refund-reason">
+                Refund reason <span className="text-destructive">*</span>
+              </Label>
+              <Textarea
+                id="refund-reason"
+                placeholder="Explain why this payment is being refunded (min 5 characters)"
+                value={refundReason}
+                onChange={(e) => {
+                  setRefundReason(e.target.value);
+                  if (refundReasonError) setRefundReasonError(null);
+                }}
+                maxLength={500}
+                aria-invalid={!!refundReasonError}
+              />
+              <div className="flex justify-between text-xs">
+                <span className={refundReasonError ? "text-destructive" : "text-muted-foreground"}>
+                  {refundReasonError ?? `Required, minimum ${MIN_REASON} characters.`}
+                </span>
+                <span className="text-muted-foreground">{refundReason.trim().length}/500</span>
+              </div>
+            </div>
           </div>
-          <DialogFooter><Button variant="ghost" onClick={() => setAddOpen(false)}>Cancel</Button><Button onClick={add}>Add</Button></DialogFooter>
+          <DialogFooter>
+            <Button variant="ghost" onClick={closeRefund} disabled={refundPayment.isPending}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={submitRefund}
+              disabled={refundPayment.isPending || refundReason.trim().length < MIN_REASON}
+            >
+              {refundPayment.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Confirm Refund"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Reject dialog (shared) */}
+      <Dialog open={!!rejectTarget} onOpenChange={(o) => !o && !rejectMutating && closeReject()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="text-destructive h-5 w-5" />
+              {rejectTarget?.kind === "payment"
+                ? "Mark payment as Failed"
+                : rejectTarget?.kind === "withdrawal"
+                  ? "Reject Withdrawal"
+                  : "Reject Payment Verification"}
+            </DialogTitle>
+            <DialogDescription>
+              This action is destructive and cannot be silently reversed. A reason is required and will be
+              recorded for audit.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 text-sm">
+            {rejectTarget && (
+              <div>
+                <span className="text-muted-foreground">Target: </span>
+                <span className="font-mono">{rejectTarget.label}</span>
+              </div>
+            )}
+            <div className="space-y-1.5">
+              <Label htmlFor="reject-reason">
+                Reason <span className="text-destructive">*</span>
+              </Label>
+              <Textarea
+                id="reject-reason"
+                placeholder="Explain why this is being rejected (min 5 characters)"
+                value={rejectReason}
+                onChange={(e) => {
+                  setRejectReason(e.target.value);
+                  if (rejectReasonError) setRejectReasonError(null);
+                }}
+                maxLength={500}
+                aria-invalid={!!rejectReasonError}
+                autoFocus
+              />
+              <div className="flex justify-between text-xs">
+                <span className={rejectReasonError ? "text-destructive" : "text-muted-foreground"}>
+                  {rejectReasonError ?? `Required, minimum ${MIN_REASON} characters.`}
+                </span>
+                <span className="text-muted-foreground">{rejectReason.trim().length}/500</span>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={closeReject} disabled={rejectMutating}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={submitReject}
+              disabled={rejectMutating || rejectReason.trim().length < MIN_REASON}
+            >
+              {rejectMutating ? <Loader2 className="h-4 w-4 animate-spin" /> : "Confirm"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Generic confirm dialog for non-destructive / positive actions */}
+      <AlertDialog
+        open={!!confirmTarget}
+        onOpenChange={(o) => !o && setConfirmTarget(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{confirmTarget?.title}</AlertDialogTitle>
+            <AlertDialogDescription>{confirmTarget?.description}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                confirmTarget?.onConfirm();
+                setConfirmTarget(null);
+              }}
+              className={
+                confirmTarget?.destructive
+                  ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  : undefined
+              }
+            >
+              {confirmTarget?.confirmLabel ?? "Confirm"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
+  );
+}
+
+function StatCard({ label, value }: { label: string; value: string }) {
+  return (
+    <Card>
+      <CardContent className="p-4">
+        <div className="text-muted-foreground text-xs">{label}</div>
+        <div className="mt-1 text-xl font-bold">{value}</div>
+      </CardContent>
+    </Card>
   );
 }

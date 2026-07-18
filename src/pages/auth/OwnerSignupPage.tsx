@@ -21,14 +21,15 @@ import { PasswordStrengthIndicator, scorePassword } from "@/components/auth/Pass
 import { BackButton } from "@/components/shared/BackButton";
 
 const CATEGORIES = [
-  "Salon",
-  "Spa",
+  "Hire Cute Shop",
   "Barber Shop",
+  "Salon",
   "Beauty Parlour",
-  "Nail Studio",
+  "Spa",
   "Tattoo Studio",
   "Massage Center",
-  "Wellness Clinic",
+  "Nail Art Studio",
+  "Unisex",
   "Other",
 ];
 

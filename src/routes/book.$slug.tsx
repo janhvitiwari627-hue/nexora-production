@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { BookingFlowPage, type RealSalonRef } from "@/pages/public/BookingFlowPage";
 import { salonBySlugQueryOptions } from "@/lib/salons.queries";
@@ -6,6 +6,13 @@ import type { Service } from "@/components/shared/ServiceCard";
 import type { Staff } from "@/components/shared/StaffCard";
 
 export const Route = createFileRoute("/book/$slug")({
+  beforeLoad: ({ params }) => {
+    throw redirect({
+      to: "/site/$slug_/book",
+      params: { slug: params.slug },
+      search: { service: undefined },
+    });
+  },
   loader: async ({ context, params }) => {
     try {
       const result = await context.queryClient.ensureQueryData(

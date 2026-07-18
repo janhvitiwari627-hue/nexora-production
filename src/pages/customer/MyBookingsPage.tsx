@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
 import { PublicHeader } from "@/components/layout/PublicHeader";
+import { OfflineBanner } from "@/components/shared/OfflineBanner";
+import { QueuedBookingsList } from "@/components/shared/QueuedBookingsList";
 import { PublicFooter } from "@/components/layout/PublicFooter";
 import { BookingTabBar } from "./bookings/BookingTabBar";
 import { BookingFilterRow, type DateRangeId } from "./bookings/BookingFilterRow";
@@ -94,6 +96,11 @@ export function MyBookingsPage() {
             Manage upcoming visits, revisit past appointments, and rebook your favourites.
           </p>
         </header>
+
+        <div className="mb-4 space-y-3">
+          <OfflineBanner hint="Your bookings list may be out of date until you reconnect." />
+          <QueuedBookingsList />
+        </div>
 
         <div className="space-y-5">
           <BookingTabBar active={tab} counts={counts} onChange={setTab} />

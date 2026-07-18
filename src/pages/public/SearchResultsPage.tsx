@@ -1,8 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Award,
+  BadgeCheck,
+  Clock,
+  Home,
+  Tag,
   Grid3x3,
   Map as MapIcon,
   MapPin,
@@ -62,10 +66,17 @@ function matchesQuery(s: Shop, q: string): boolean {
 }
 
 function applyFilters(shops: Shop[], f: Filters, q: string): Shop[] {
+  const popularityValues = shops
+    .map((shop) => shop.popularity ?? shop.review_count)
+    .sort((a, b) => b - a);
+  const popularityThreshold =
+    popularityValues[Math.max(0, Math.ceil(popularityValues.length * 0.25) - 1)] ?? 0;
   return shops.filter((s) => {
     if (!matchesQuery(s, q)) return false;
     if (s.rating < f.minRating) return false;
-    if (typeof s.distance_km === "number" && s.distance_km > f.maxDistance) return false;
+    if (f.maxDistance < DEFAULT_FILTERS.maxDistance) {
+      if (typeof s.distance_km !== "number" || s.distance_km > f.maxDistance) return false;
+    }
 
     const priceFiltered = f.priceRange[0] !== PRICE_MIN || f.priceRange[1] !== PRICE_MAX;
     if (priceFiltered) {
@@ -79,13 +90,18 @@ function applyFilters(shops: Shop[], f: Filters, q: string): Shop[] {
       if (g !== "unisex" && g !== f.gender) return false;
     }
     if (f.verifiedOnly && !s.is_verified) return false;
-    if (f.topRated && !(s.badges?.includes("top_rated") || s.rating >= 4.7)) return false;
+    if (f.openNow && !s.is_open_now) return false;
+    if (f.topRated && !(s.rating >= 4.5 && s.review_count >= 5)) return false;
+    if (f.mostPopular && (s.popularity ?? s.review_count) < popularityThreshold) return false;
+    if (f.offersOnly && !s.has_offer) return false;
+    if (f.homeService && !s.is_home_service) return false;
+    const amenities = (s.amenities ?? []).map((item) => item.toLowerCase());
+    if (f.parking && !amenities.some((item) => item.includes("parking"))) return false;
     if (
-      f.mostPopular &&
-      !(s.badges?.includes("most_popular") || (s.review_count ?? 0) >= 300)
+      f.airConditioned &&
+      !amenities.some((item) => item === "ac" || item.includes("air condition"))
     )
       return false;
-    if (f.offersOnly && !s.membership_perk) return false;
     return true;
   });
 }
@@ -93,20 +109,23 @@ function applyFilters(shops: Shop[], f: Filters, q: string): Shop[] {
 function sortShops(shops: Shop[], sort: SortKey): Shop[] {
   const arr = [...shops];
   const price = (s: Shop) => shopStartingPrice(s) ?? Number.POSITIVE_INFINITY;
+  const priceDescending = (s: Shop) => shopStartingPrice(s) ?? Number.NEGATIVE_INFINITY;
   switch (sort) {
     case "rating":
       return arr.sort((a, b) => b.rating - a.rating);
     case "distance":
-      return arr.sort(
-        (a, b) => (a.distance_km ?? Infinity) - (b.distance_km ?? Infinity),
-      );
+      return arr.sort((a, b) => (a.distance_km ?? Infinity) - (b.distance_km ?? Infinity));
     case "price_low":
       return arr.sort((a, b) => price(a) - price(b));
     case "price_high":
-      return arr.sort((a, b) => price(b) - price(a));
+      return arr.sort((a, b) => priceDescending(b) - priceDescending(a));
     case "popular":
       return arr.sort(
         (a, b) => (b.popularity ?? b.review_count) - (a.popularity ?? a.review_count),
+      );
+    case "newest":
+      return arr.sort(
+        (a, b) => new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime(),
       );
     default:
       return arr;
@@ -142,6 +161,69 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
     [rawShops, filters, sort, q],
   );
 
+  // Scroll restoration for browser back/forward navigation.
+  // Persists window scrollY per history entry (keyed by history.state.key which
+  // TanStack Router assigns), and re-applies it once results have rendered.
+  const isPoppingRef = useRef(false);
+  const pendingRestoreRef = useRef<number | null>(null);
+
+  const historyKey = () => {
+    if (typeof window === "undefined") return "";
+    const state = window.history.state as { key?: string } | null;
+    return state?.key ?? window.location.href;
+  };
+
+  // Continuously save scroll position for the current history entry.
+  useEffect(() => {
+    let raf = 0;
+    const save = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        try {
+          sessionStorage.setItem(`search-scroll:${historyKey()}`, String(window.scrollY));
+        } catch {
+          /* ignore quota / privacy errors */
+        }
+      });
+    };
+    window.addEventListener("scroll", save, { passive: true });
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", save);
+    };
+  }, []);
+
+  // Detect back/forward so we know to restore instead of preserving current pos.
+  useEffect(() => {
+    const onPop = () => {
+      isPoppingRef.current = true;
+      const saved = sessionStorage.getItem(`search-scroll:${historyKey()}`);
+      pendingRestoreRef.current = saved != null ? Number(saved) : null;
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
+  // Once results for the popped entry render, restore the saved scrollY.
+  // Retries via rAF for up to ~1.5s so async re-renders don't fight us.
+  useEffect(() => {
+    if (!isPoppingRef.current) return;
+    if (isFetching) return;
+    const target = pendingRestoreRef.current;
+    isPoppingRef.current = false;
+    pendingRestoreRef.current = null;
+    if (target == null) return;
+
+    const deadline = performance.now() + 1500;
+    const restore = () => {
+      window.scrollTo({ top: target, behavior: "auto" });
+      if (Math.abs(window.scrollY - target) < 2) return;
+      if (performance.now() < deadline) requestAnimationFrame(restore);
+    };
+    requestAnimationFrame(() => requestAnimationFrame(restore));
+  }, [filtered, isFetching]);
+
   // Comparison badges
   const badges = useMemo(() => {
     if (filtered.length === 0) return { lowest: "", best: "", popular: "" };
@@ -157,6 +239,7 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
     onSearchChange({
       q: search.q,
       category: search.category,
+      area: search.area,
       sort: search.sort,
       view: search.view,
       ...filtersToSearch(f),
@@ -171,13 +254,32 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
     onSearchChange(next === "grid" ? rest : { ...rest, view: next });
   };
 
+  const scrollResultsIntoView = (behavior: ScrollBehavior = "smooth") => {
+    const target = document.getElementById("search-results");
+    if (!target) return;
+
+    const header = document.querySelector<HTMLElement>('[data-testid="public-header"]');
+    const headerOffset = (header?.getBoundingClientRect().height ?? 0) + 14;
+    const top = target.getBoundingClientRect().top + window.scrollY - headerOffset;
+
+    window.scrollTo({ top: Math.max(0, top), behavior });
+  };
+
+  const scrollToResultsAfterFiltering = () => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => scrollResultsIntoView("smooth"));
+    });
+
+    [120, 320, 650].forEach((delay) => {
+      window.setTimeout(() => scrollResultsIntoView("smooth"), delay);
+    });
+  };
+
   // Anchor-based scroll restore: pin the topmost visible result card so the
   // same section stays in view even when the list height changes.
   const preserveScroll = (fn: () => void) => {
     const fallbackY = window.scrollY;
-    const cards = Array.from(
-      document.querySelectorAll<HTMLElement>("[data-result-slug]"),
-    );
+    const cards = Array.from(document.querySelectorAll<HTMLElement>("[data-result-slug]"));
     let anchorSlug: string | null = null;
     let anchorOffset = 0;
     for (const el of cards) {
@@ -205,16 +307,15 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
           return true;
         }
       }
-      const remaining = Array.from(
-        document.querySelectorAll<HTMLElement>("[data-result-slug]"),
-      );
+      const remaining = Array.from(document.querySelectorAll<HTMLElement>("[data-result-slug]"));
       if (remaining.length > 0) {
-        const target = remaining.reduce((best, el) => {
-          const y = el.getBoundingClientRect().top + window.scrollY;
-          return Math.abs(y - fallbackY) < Math.abs(best.y - fallbackY)
-            ? { el, y }
-            : best;
-        }, { el: remaining[0], y: remaining[0].getBoundingClientRect().top + window.scrollY });
+        const target = remaining.reduce(
+          (best, el) => {
+            const y = el.getBoundingClientRect().top + window.scrollY;
+            return Math.abs(y - fallbackY) < Math.abs(best.y - fallbackY) ? { el, y } : best;
+          },
+          { el: remaining[0], y: remaining[0].getBoundingClientRect().top + window.scrollY },
+        );
         window.scrollTo({ top: target.y - anchorOffset, behavior: "auto" });
         return true;
       }
@@ -240,12 +341,18 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
     preserveScroll(() => commitFilters(DEFAULT_FILTERS));
   };
 
+  const toggleQuickFilter = (
+    key: "openNow" | "verifiedOnly" | "offersOnly" | "homeService" | "topRated" | "mostPopular",
+  ) => {
+    const next = { ...filters, [key]: !filters[key] };
+    setDraft(next);
+    commitFilters(next);
+  };
+
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
     preserveScroll(() => onSearchChange({ ...search, q: q || undefined }));
   };
-
-
 
   return (
     <div className="min-h-screen bg-background">
@@ -254,10 +361,7 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
       {/* Search bar */}
       <div className="border-b border-border bg-card">
         <div className="mx-auto max-w-7xl px-4 py-5 md:px-6">
-          <form
-            onSubmit={submitSearch}
-            className="flex flex-col gap-2 md:flex-row md:items-center"
-          >
+          <form onSubmit={submitSearch} className="flex flex-col gap-2 md:flex-row md:items-center">
             <div className="flex flex-1 items-center gap-2 rounded-[var(--radius-card)] border border-border bg-background px-4 py-2.5">
               <Search className="h-5 w-5 text-muted-foreground" />
               <input
@@ -302,114 +406,149 @@ export function SearchResultsPage({ search, onSearchChange }: Props) {
           </aside>
 
           <main className="min-w-0">
-            {/* Toolbar */}
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h1 className="text-xl font-black text-heading md:text-2xl" style={{ fontFamily: "Inter, sans-serif", fontWeight: 600 }}>
-                  {filtered.length} Matching Result{filtered.length === 1 ? "" : "s"}
-                </h1>
-                {search.q && (
-                  <p className="text-xs text-muted-foreground">
-                    for "<span className="font-semibold text-heading">{search.q}</span>"
-                  </p>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setSheetOpen(true)}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-2 text-xs font-semibold text-heading lg:hidden"
-                >
-                  <SlidersHorizontal className="h-4 w-4" />
-                  Filters
-                  {!isDefault(filters) && (
-                    <span className="grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
-                      •
-                    </span>
+            {/* Compact filters + sorting toolbar, kept next to the result set. */}
+            <div className="sticky top-16 z-30 mb-5 rounded-2xl border border-border bg-background/95 p-3 shadow-sm backdrop-blur md:p-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h1
+                    className="text-xl font-black text-heading md:text-2xl"
+                    style={{ fontFamily: "Inter, sans-serif", fontWeight: 600 }}
+                  >
+                    {filtered.length} salon{filtered.length === 1 ? "" : "s"} found
+                  </h1>
+                  {search.q && (
+                    <p className="text-xs text-muted-foreground">
+                      for "<span className="font-semibold text-heading">{search.q}</span>"
+                    </p>
                   )}
-                </button>
-                <SortDropdown value={sort} onChange={setSort} />
-                <MapViewToggle value={view} onChange={setView} />
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSheetOpen(true)}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-2 text-xs font-semibold text-heading lg:hidden"
+                  >
+                    <SlidersHorizontal className="h-4 w-4" />
+                    Filters
+                    {!isDefault(filters) && (
+                      <span className="grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+                        •
+                      </span>
+                    )}
+                  </button>
+                  <SortDropdown value={sort} onChange={setSort} />
+                  <MapViewToggle value={view} onChange={setView} />
+                </div>
+              </div>
+              <div className="mt-3 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {(
+                  [
+                    ["Open Now", "openNow", Clock],
+                    ["Verified", "verifiedOnly", BadgeCheck],
+                    ["Offers", "offersOnly", Tag],
+                    ["Home Service", "homeService", Home],
+                    ["Highest Rated", "topRated", Sparkles],
+                    ["Trending", "mostPopular", TrendingUp],
+                  ] as const
+                ).map(([label, key, Icon]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    aria-pressed={filters[key]}
+                    onClick={() => toggleQuickFilter(key)}
+                    className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                      filters[key]
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-card text-heading hover:border-primary"
+                    }`}
+                  >
+                    <Icon className="h-3.5 w-3.5" />
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-3">
+                <ActiveFiltersBar
+                  filters={filters}
+                  onChange={(f) => {
+                    setDraft(f);
+                    commitFilters(f);
+                  }}
+                  onResetAll={resetFilters}
+                />
               </div>
             </div>
 
-            <div className="mb-4">
-              <ActiveFiltersBar
-                filters={filters}
-                onChange={(f) => {
-                  setDraft(f);
-                  commitFilters(f);
-                }}
-                onResetAll={resetFilters}
-              />
+            {/* Results */}
+            <div id="search-results" className="scroll-mt-24">
+              <AnimatePresence mode="wait">
+                {isFetching ? (
+                  <motion.div
+                    key="skeleton"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="grid gap-5 md:grid-cols-2"
+                  >
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <ShopCardSkeleton key={i} />
+                    ))}
+                  </motion.div>
+                ) : filtered.length === 0 ? (
+                  <motion.div
+                    key="empty"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <EmptyState
+                      title="No matching beauty places found."
+                      description="Try changing your filters or search another area."
+                      ctaLabel="Reset Filters"
+                      onCta={resetFilters}
+                    />
+                  </motion.div>
+                ) : view === "map" ? (
+                  <motion.div
+                    key="map"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <MapView shops={filtered} />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="grid"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="grid gap-5 md:grid-cols-2"
+                  >
+                    {filtered.map((s) => (
+                      <ResultCard key={s.slug} shop={s} badges={badges} />
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            <div className="mb-6">
+            <div className="mt-10">
+              <InstantBookingSection shops={filtered} />
               <DiscoveryRails
                 shops={rawShops}
                 onApplyFilters={(f) => {
                   setDraft(f);
                   commitFilters(f);
+                  scrollToResultsAfterFiltering();
                 }}
                 onSelectCategory={(cat) => {
                   const { category: _omit, ...rest } = search;
                   onSearchChange({ ...rest, category: cat });
+                  scrollToResultsAfterFiltering();
                 }}
               />
-              <InstantBookingSection shops={filtered} />
             </div>
-
-            {/* Results */}
-            <AnimatePresence mode="wait">
-              {isFetching ? (
-                <motion.div
-                  key="skeleton"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="grid gap-5 md:grid-cols-2"
-                >
-                  {Array.from({ length: 6 }).map((_, i) => (
-                    <ShopCardSkeleton key={i} />
-                  ))}
-                </motion.div>
-              ) : filtered.length === 0 ? (
-                <motion.div
-                  key="empty"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <EmptyState
-                    title="No matching beauty places found."
-                    description="Try changing your filters or search another area."
-                    ctaLabel="Reset Filters"
-                    onCta={resetFilters}
-                  />
-                </motion.div>
-              ) : view === "map" ? (
-                <motion.div
-                  key="map"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <MapView shops={filtered} />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="grid"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="grid gap-5 md:grid-cols-2"
-                >
-                  {filtered.map((s) => (
-                    <ResultCard key={s.slug} shop={s} badges={badges} />
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
           </main>
         </div>
       </div>
@@ -438,18 +577,35 @@ function ResultCard({
   badges: { lowest: string; best: string; popular: string };
 }) {
   const tags: { label: string; cls: string; icon: typeof Award }[] = [];
-  if (badges.lowest === shop.slug)
-    tags.push({ label: "Lowest Price", cls: "bg-success text-white", icon: Award });
-  if (badges.best === shop.slug)
+  if (shop.is_open_now)
+    tags.push({ label: "Open Now", cls: "bg-emerald-600 text-white", icon: Clock });
+  if (badges.best === shop.slug && shop.rating >= 4.5 && shop.review_count >= 5)
     tags.push({ label: "Top Rated", cls: "bg-primary text-primary-foreground", icon: Sparkles });
   if (badges.popular === shop.slug)
-    tags.push({ label: "Most Popular", cls: "bg-warning text-heading", icon: TrendingUp });
+    tags.push({ label: "Trending", cls: "bg-warning text-heading", icon: TrendingUp });
+  if (shop.has_offer) tags.push({ label: "Offer", cls: "bg-rose-600 text-white", icon: Tag });
+  if (shop.is_home_service)
+    tags.push({ label: "Home Service", cls: "bg-violet-600 text-white", icon: Home });
+  if (typeof shop.distance_km === "number" && shop.distance_km <= 5)
+    tags.push({ label: "Nearby", cls: "bg-slate-800 text-white", icon: MapPin });
+  const ageDays = shop.created_at
+    ? (Date.now() - new Date(shop.created_at).getTime()) / 86_400_000
+    : Number.POSITIVE_INFINITY;
+  if (ageDays >= 0 && ageDays <= 30)
+    tags.push({ label: "New", cls: "bg-pink-600 text-white", icon: Sparkles });
+  if (shop.price_tier === "luxury")
+    tags.push({ label: "Luxury", cls: "bg-amber-700 text-white", icon: Award });
+  else if (shop.price_tier === "budget" && badges.lowest === shop.slug)
+    tags.push({ label: "Budget", cls: "bg-success text-white", icon: Award });
+  const visibleTagLimit = shop.is_verified ? 2 : 3;
+  const visibleTags = tags.slice(0, visibleTagLimit);
+  const hiddenTagCount = Math.max(0, tags.length - visibleTags.length);
 
   return (
     <div className="relative" data-result-slug={shop.slug}>
-      {tags.length > 0 && (
+      {visibleTags.length > 0 && (
         <div className="pointer-events-none absolute top-5 left-1/2 z-10 flex -translate-x-1/2 flex-wrap justify-center gap-1.5">
-          {tags.map((t) => (
+          {visibleTags.map((t) => (
             <span
               key={t.label}
               className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wider shadow-lg ${t.cls}`}
@@ -457,6 +613,11 @@ function ResultCard({
               <t.icon className="h-3 w-3" /> {t.label}
             </span>
           ))}
+          {hiddenTagCount > 0 && (
+            <span className="rounded-full bg-slate-900 px-2.5 py-1 text-[10px] font-black text-white shadow-lg">
+              +{hiddenTagCount}
+            </span>
+          )}
         </div>
       )}
       <ShopCard shop={shop} />
@@ -521,17 +682,33 @@ function MapView({ shops }: { shops: Shop[] }) {
           preserveAspectRatio="none"
         >
           {Array.from({ length: 14 }).map((_, i) => (
-            <line key={`h${i}`} x1="0" y1={i * 30} x2="400" y2={i * 30} stroke="#94a3b8" strokeWidth="0.5" />
+            <line
+              key={`h${i}`}
+              x1="0"
+              y1={i * 30}
+              x2="400"
+              y2={i * 30}
+              stroke="#94a3b8"
+              strokeWidth="0.5"
+            />
           ))}
           {Array.from({ length: 14 }).map((_, i) => (
-            <line key={`v${i}`} x1={i * 30} y1="0" x2={i * 30} y2="400" stroke="#94a3b8" strokeWidth="0.5" />
+            <line
+              key={`v${i}`}
+              x1={i * 30}
+              y1="0"
+              x2={i * 30}
+              y2="400"
+              stroke="#94a3b8"
+              strokeWidth="0.5"
+            />
           ))}
         </svg>
         {shops.slice(0, 12).map((s, i) => (
           <div
             key={s.slug}
             className="absolute -translate-x-1/2 -translate-y-full"
-            style={{ left: `${10 + (i * 7) % 80}%`, top: `${20 + (i * 11) % 60}%` }}
+            style={{ left: `${10 + ((i * 7) % 80)}%`, top: `${20 + ((i * 11) % 60)}%` }}
           >
             <div className="flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 text-[11px] font-bold text-primary-foreground shadow-lg ring-2 ring-white">
               <Star className="h-3 w-3 fill-warning text-warning" />

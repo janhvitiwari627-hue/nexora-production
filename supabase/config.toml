@@ -2,6 +2,7 @@ project_id = "vtimpncqoufudymunaat"
 
 [auth]
 site_url = "https://meripahalfasthelp.online"
+enable_anonymous_sign_ins = true
 additional_redirect_urls = [
   "https://meripahalfasthelp.online/auth/callback",
   "https://meripahalfasthelp.online/auth/callback?next=/reset-password",

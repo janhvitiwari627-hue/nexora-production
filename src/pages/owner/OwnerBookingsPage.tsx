@@ -2,6 +2,15 @@ import { useMemo, useState } from "react";
 import { CalendarDays, Check, Download, LayoutGrid, List as ListIcon, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import {
   STATUS_META,
@@ -36,6 +45,10 @@ export function OwnerBookingsPage() {
   const [view, setView] = useState<ViewMode>("cards");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [openBooking, setOpenBooking] = useState<OwnerBooking | null>(null);
+  const [suggestBooking, setSuggestBooking] = useState<OwnerBooking | null>(null);
+  const [suggestDate, setSuggestDate] = useState("");
+  const [suggestTime, setSuggestTime] = useState("");
+  const [suggestNote, setSuggestNote] = useState("");
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -85,7 +98,18 @@ export function OwnerBookingsPage() {
   };
 
   const exportCsv = () => {
-    const headers = ["ID", "Customer", "Mobile", "Service", "Staff", "Date", "Time", "Advance", "Total", "Status"];
+    const headers = [
+      "ID",
+      "Customer",
+      "Mobile",
+      "Service",
+      "Staff",
+      "Date",
+      "Time",
+      "Advance",
+      "Total",
+      "Status",
+    ];
     const rows = filtered.map((b) =>
       [b.id, b.customer, b.mobile, b.service, b.staff, b.date, b.time, b.advance, b.total, b.status]
         .map((v) => `"${String(v).replace(/"/g, '""')}"`)
@@ -101,15 +125,13 @@ export function OwnerBookingsPage() {
     URL.revokeObjectURL(url);
   };
 
-  const allFilteredSelected =
-    filtered.length > 0 && filtered.every((b) => selectedIds.has(b.id));
+  const allFilteredSelected = filtered.length > 0 && filtered.every((b) => selectedIds.has(b.id));
 
   return (
-    <div className="bg-background min-h-screen">
-      <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
-        <header className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            
+    <div className="bg-background min-h-screen w-full max-w-full overflow-x-hidden">
+      <div className="mx-auto w-full max-w-7xl space-y-6 overflow-x-hidden px-3 py-5 sm:px-6 sm:py-6 lg:px-8">
+        <header className="grid grid-cols-1 items-end gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+          <div className="min-w-0">
             <h1 className="text-heading text-2xl font-bold">Bookings</h1>
             <p className="text-muted-foreground text-sm">
               {isLive && activeSalon
@@ -117,19 +139,23 @@ export function OwnerBookingsPage() {
                 : "No salon linked yet — create your shop website to start receiving bookings."}
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="bg-card border-border inline-flex rounded-lg border p-0.5">
-              {([
-                { k: "cards", icon: LayoutGrid, label: "Cards" },
-                { k: "calendar", icon: CalendarDays, label: "Calendar" },
-                { k: "list", icon: ListIcon, label: "List" },
-              ] as const).map(({ k, icon: Icon, label }) => (
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            <div className="bg-card border-border inline-flex max-w-full overflow-x-auto rounded-lg border p-0.5">
+              {(
+                [
+                  { k: "cards", icon: LayoutGrid, label: "Cards" },
+                  { k: "calendar", icon: CalendarDays, label: "Calendar" },
+                  { k: "list", icon: ListIcon, label: "List" },
+                ] as const
+              ).map(({ k, icon: Icon, label }) => (
                 <button
                   key={k}
                   onClick={() => setView(k)}
                   className={cn(
                     "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition",
-                    view === k ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-heading",
+                    view === k
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-heading",
                   )}
                 >
                   <Icon className="h-3.5 w-3.5" /> {label}
@@ -143,8 +169,8 @@ export function OwnerBookingsPage() {
         </header>
 
         {/* Search + bulk */}
-        <div className="bg-card border-border flex flex-wrap items-center gap-3 rounded-xl border p-3">
-          <div className="relative min-w-[240px] flex-1">
+        <div className="bg-card border-border grid grid-cols-1 items-center gap-3 rounded-xl border p-3 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
+          <div className="relative min-w-0 flex-1">
             <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
               placeholder="Search by name, mobile, or booking ID"
@@ -153,7 +179,7 @@ export function OwnerBookingsPage() {
               className="pl-9"
             />
           </div>
-          <label className="text-muted-foreground inline-flex items-center gap-2 text-sm">
+          <label className="text-muted-foreground inline-flex min-w-0 items-center gap-2 text-sm">
             <input
               type="checkbox"
               checked={allFilteredSelected}
@@ -173,7 +199,7 @@ export function OwnerBookingsPage() {
         </div>
 
         {/* Tabs */}
-        <div className="border-border flex flex-wrap gap-1 overflow-x-auto border-b">
+        <div className="border-border flex gap-1 overflow-x-auto border-b [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {TABS.map((t) => {
             const active = tab === t.key;
             const count = counts[t.key] ?? 0;
@@ -227,6 +253,12 @@ export function OwnerBookingsPage() {
                 onSelect={handleSelect}
                 onView={setOpenBooking}
                 onAction={updateStatus}
+                onSuggest={(booking) => {
+                  setSuggestBooking(booking);
+                  setSuggestDate(booking.date);
+                  setSuggestTime(booking.time.slice(0, 5));
+                  setSuggestNote("");
+                }}
               />
             ))}
           </div>
@@ -245,6 +277,72 @@ export function OwnerBookingsPage() {
       </div>
 
       <BookingDetailModal booking={openBooking} onClose={() => setOpenBooking(null)} />
+      <Dialog
+        open={Boolean(suggestBooking)}
+        onOpenChange={(open) => !open && setSuggestBooking(null)}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Suggest a new time</DialogTitle>
+            <DialogDescription>
+              The customer will be notified and can accept or reject this time.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-2">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-sm font-medium">Date</label>
+                <Input
+                  type="date"
+                  min={new Date().toISOString().slice(0, 10)}
+                  value={suggestDate}
+                  onChange={(e) => setSuggestDate(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Time</label>
+                <Input
+                  type="time"
+                  value={suggestTime}
+                  onChange={(e) => setSuggestTime(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium">Message (optional)</label>
+              <Textarea
+                maxLength={300}
+                value={suggestNote}
+                onChange={(e) => setSuggestNote(e.target.value)}
+                placeholder="For example: The stylist is available at this time."
+                className="mt-1"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSuggestBooking(null)}>
+              Cancel
+            </Button>
+            <Button
+              disabled={!suggestDate || !suggestTime || live.isUpdating}
+              onClick={() => {
+                if (!suggestBooking) return;
+                live.suggestTime(
+                  suggestBooking.id,
+                  suggestDate,
+                  suggestTime,
+                  suggestNote || undefined,
+                );
+                setSuggestBooking(null);
+              }}
+            >
+              Send New Time
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   BadgeCheck,
   Calendar,
+  Clock,
+  ExternalLink,
   ChevronLeft,
   ChevronRight,
   MapPin,
@@ -22,6 +24,7 @@ const route = getRouteApi("/s/$slug");
 export function SalonProfileRealPage() {
   const { slug } = route.useParams();
   const { data } = useSuspenseQuery(salonBySlugQueryOptions(slug));
+  const [lightbox, setLightbox] = useState<number | null>(null);
   if (!data) {
     return (
       <div className="mx-auto max-w-xl px-4 py-16 text-center">
@@ -31,12 +34,24 @@ export function SalonProfileRealPage() {
   }
   const { salon, services, staff, reviews } = data;
 
-  const gallery = [
-    ...(salon.image_url ? [salon.image_url] : []),
-    ...((salon.gallery_images as string[] | null) ?? []),
-  ].filter(Boolean);
-  const [lightbox, setLightbox] = useState<number | null>(null);
-
+  const gallery = Array.from(
+    new Set(
+      [
+        ...(salon.cover_image_url ? [salon.cover_image_url] : []),
+        ...(salon.image_url ? [salon.image_url] : []),
+        ...((salon.gallery_images as string[] | null) ?? []),
+      ].filter(Boolean),
+    ),
+  );
+  const heroImage = salon.cover_image_url || salon.image_url;
+  const hours = (salon.hours ?? {}) as Record<
+    string,
+    { open?: string; close?: string; closed?: boolean }
+  >;
+  const mapUrl =
+    salon.latitude && salon.longitude
+      ? `https://www.google.com/maps/search/?api=1&query=${salon.latitude},${salon.longitude}`
+      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(salon.address || salon.location || salon.name || "")}`;
   const close = () => setLightbox(null);
   const next = () => setLightbox((i) => (i === null ? null : (i + 1) % gallery.length));
   const prev = () =>
@@ -47,9 +62,9 @@ export function SalonProfileRealPage() {
       <PublicPageHeader />
       {/* Hero */}
       <div className="relative h-72 w-full overflow-hidden md:h-96">
-        {salon.image_url ? (
+        {heroImage ? (
           <img
-            src={salon.image_url}
+            src={heroImage}
             alt={salon.name}
             className="absolute inset-0 h-full w-full object-cover"
           />
@@ -94,10 +109,23 @@ export function SalonProfileRealPage() {
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 md:px-6 lg:grid-cols-[1fr_320px]">
         <main className="min-w-0 space-y-10">
           {/* About */}
-          {salon.description && (
+          {(salon.about_us || salon.description) && (
             <section>
               <h2 className="text-heading mb-3 text-xl font-black">About</h2>
-              <p className="text-muted-foreground leading-relaxed">{salon.description}</p>
+              <p className="text-muted-foreground whitespace-pre-line leading-relaxed">
+                {salon.about_us || salon.description}
+              </p>
+            </section>
+          )}
+
+          {salon.video_url && (
+            <section>
+              <h2 className="text-heading mb-3 text-xl font-black">Visit Our Salon</h2>
+              <video
+                controls
+                src={salon.video_url}
+                className="max-h-[480px] w-full rounded-[var(--radius-card-lg)] border border-border bg-black"
+              />
             </section>
           )}
 
@@ -239,6 +267,15 @@ export function SalonProfileRealPage() {
             <p className="mt-1 text-xs text-muted-foreground">
               Pay 25% advance, rest at the salon.
             </p>
+            {salon.is_home_service && (
+              <div className="mt-3 rounded-lg bg-primary/10 p-3 text-sm text-heading">
+                <div className="font-bold">Home service available</div>
+                <div className="mt-0.5 text-xs text-muted-foreground">
+                  Within {salon.home_service_radius_km ?? 0} km · Extra ₹
+                  {Number(salon.home_service_charge ?? 0).toLocaleString("en-IN")}
+                </div>
+              </div>
+            )}
             <Button asChild size="lg" className="mt-4 w-full">
               <Link to="/book/$slug" params={{ slug: salon.slug }}>
                 <Calendar className="mr-2 h-4 w-4" /> Book Now
@@ -252,6 +289,38 @@ export function SalonProfileRealPage() {
                 <Phone className="h-4 w-4" /> {salon.phone}
               </a>
             )}
+          </div>
+          <div className="mt-4 rounded-[var(--radius-card-lg)] border border-border bg-card p-5">
+            <h2 className="text-heading flex items-center gap-2 font-black">
+              <Clock className="h-4 w-4" /> Working Hours
+            </h2>
+            <div className="mt-3 space-y-1.5 text-xs">
+              {Object.entries(hours).map(([day, value]) => (
+                <div key={day} className="flex justify-between gap-3">
+                  <span className="capitalize text-muted-foreground">{day}</span>
+                  <span className="font-medium">
+                    {value.closed ? "Closed" : `${value.open ?? "—"} – ${value.close ?? "—"}`}
+                  </span>
+                </div>
+              ))}
+              {Object.keys(hours).length === 0 && (
+                <p className="text-muted-foreground">Hours will be updated soon.</p>
+              )}
+            </div>
+            {(salon.address || salon.location) && (
+              <p className="mt-4 text-sm text-muted-foreground">
+                <MapPin className="mr-1 inline h-4 w-4" />
+                {salon.address || salon.location}
+              </p>
+            )}
+            <a
+              href={mapUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-primary"
+            >
+              View on Google Maps <ExternalLink className="h-3.5 w-3.5" />
+            </a>
           </div>
         </aside>
       </div>

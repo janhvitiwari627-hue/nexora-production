@@ -1,16 +1,25 @@
 {
   "name": "Nexora SalonOS",
   "short_name": "Nexora",
-  "description": "Discover, book, and grow with the OS for modern salons.",
+  "id": "/",
+  "description": "India's complete beauty industry operating system.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#F6F9FC",
-  "theme_color": "#635BFF",
-  "categories": ["lifestyle", "business", "shopping"],
+  "background_color": "#f8fafc",
+  "theme_color": "#2563eb",
   "icons": [
-    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }

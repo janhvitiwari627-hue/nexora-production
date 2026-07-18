@@ -2,6 +2,7 @@ import { createFileRoute, useParams } from "@tanstack/react-router";
 import { WhiteLabelWebsitePage } from "@/pages/whiteLabelWebsite/WhiteLabelWebsitePage";
 import { getMockBusinesses } from "@/lib/mock-businesses";
 import { normalizeTemplateKey, TEMPLATES } from "@/components/whiteLabelWebsite/templates";
+import { BookingMockDevToggle } from "@/components/dev/BookingMockDevToggle";
 
 export const Route = createFileRoute("/template-preview/$key")({
   head: ({ params }) => {
@@ -29,5 +30,11 @@ function PreviewRoute() {
   const cats = pickFor[tplKey] ?? [];
   const demo =
     all.find((b) => cats.includes(b.category)) ?? all[0];
-  return <WhiteLabelWebsitePage slug={demo?.slug ?? "demo"} routeSearch={{ t: tplKey, preview: 1 }} />;
+  const slug = demo?.slug ?? "demo";
+  return (
+    <>
+      <WhiteLabelWebsitePage slug={slug} routeSearch={{ t: tplKey, preview: 1 }} />
+      <BookingMockDevToggle slug={slug} />
+    </>
+  );
 }

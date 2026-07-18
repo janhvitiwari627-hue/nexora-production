@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "sdk_version": "0.22.2",
+  "path": "/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "nexora-mcp",
+      "version": "0.1.0",
+      "title": "Nexora SalonOS"
+    },
+    "tools": [
+      {
+        "name": "search_salons",
+        "title": "Search salons",
+        "description": "Search Nexora's public directory of salons, spas, and barbershops. Filters by optional query text (matched against name), category, and city/location. Returns up to 20 results.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "maxLength": 200,
+              "description": "Free-text search matched against salon name."
+            },
+            "category": {
+              "type": "string",
+              "maxLength": 100,
+              "description": "Category filter, e.g. 'Hair Salon', 'Spa', 'Barber Shop'."
+            },
+            "location": {
+              "type": "string",
+              "maxLength": 200,
+              "description": "City or area name to filter by (matched against location field)."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "description": "Max results (default 10)."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_salon",
+        "title": "Get salon details",
+        "description": "Fetch detailed public information for a single Nexora salon by its slug, including services and recent reviews.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "slug": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "description": "Salon slug (from search_salons results)."
+            }
+          },
+          "required": [
+            "slug"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}

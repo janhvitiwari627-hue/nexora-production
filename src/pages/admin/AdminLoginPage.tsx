@@ -25,12 +25,16 @@ export function AdminLoginPage() {
         toast.error(error?.message ?? "Invalid credentials");
         return;
       }
-      const roles = await fetchUserRoles(data.user.id);
-      if (!roles.includes("admin")) {
+      const { data: isAdmin } = await supabase.rpc("has_role", {
+        _user_id: data.user.id,
+        _role: "admin",
+      });
+      if (!isAdmin) {
         await supabase.auth.signOut();
         toast.error("This account does not have admin access");
         return;
       }
+
       toast.success("Welcome, Admin");
       navigate({ to: "/admin/dashboard" });
     } finally {

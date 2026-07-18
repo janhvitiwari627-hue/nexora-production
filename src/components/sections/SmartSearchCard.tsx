@@ -127,20 +127,22 @@ export function SmartSearchCard() {
   };
 
   return (
-    <div ref={wrapRef} className="relative mx-auto w-[95%] max-w-[1400px]">
+    <div ref={wrapRef} className="relative mx-auto w-full max-w-[1400px] px-[max(env(safe-area-inset-left),0.75rem)] pr-[max(env(safe-area-inset-right),0.75rem)] sm:w-[95%] sm:px-0">
       <div className="rounded-[24px] border border-[#E6EBF1] bg-white p-3 shadow-[0_10px_40px_-12px_rgba(50,50,93,0.12),0_4px_10px_-4px_rgba(10,37,64,0.06)] md:p-4">
         <div className="flex flex-col gap-2 md:flex-row md:items-stretch">
           {/* Service */}
-          <div className="flex flex-[2] items-center gap-3 rounded-[16px] bg-[#F6F9FC] px-4 py-3">
+          <div className="flex flex-[2] min-w-0 items-center gap-2 rounded-[16px] bg-[#F6F9FC] px-3 py-3 sm:gap-3 sm:px-4">
             <Search className="h-5 w-5 shrink-0 text-[#635BFF]" />
+
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onFocus={() => setFocused(true)}
               onKeyDown={(e) => e.key === "Enter" && submit()}
               placeholder={PLACEHOLDERS[placeholderIdx]}
-              className="w-full bg-transparent text-sm font-medium text-[#0A2540] outline-none placeholder:text-[#8A95A8] md:text-base"
+              className="w-full min-w-0 bg-transparent text-base font-medium text-[#0A2540] outline-none placeholder:text-[#8A95A8]"
             />
+
             <button
               type="button"
               onClick={toggleVoice}
@@ -165,7 +167,8 @@ export function SmartSearchCard() {
 
           {/* Location */}
           <button
-            className="flex flex-1 items-center gap-3 rounded-[16px] bg-[#F6F9FC] px-4 py-3 text-left"
+            className="flex flex-1 min-w-0 items-center gap-3 rounded-[16px] bg-[#F6F9FC] px-3 py-3 text-left sm:px-4"
+
             type="button"
             onClick={() => !location && requestGps()}
           >
@@ -190,10 +193,11 @@ export function SmartSearchCard() {
           {/* CTA */}
           <button
             onClick={() => submit()}
-            className="ripple relative overflow-hidden rounded-[16px] bg-gradient-to-r from-[#635BFF] to-[#7A73FF] px-7 py-4 text-sm font-bold text-white shadow-[0_10px_30px_-10px_rgba(99,91,255,0.55)] transition hover:scale-[1.02] active:scale-[0.98]"
+            className="ripple relative w-full overflow-hidden rounded-[16px] bg-gradient-to-r from-[#635BFF] to-[#7A73FF] px-7 py-3.5 text-sm font-bold text-white shadow-[0_10px_30px_-10px_rgba(99,91,255,0.55)] transition hover:scale-[1.02] active:scale-[0.98] md:w-auto md:py-4"
           >
             Find Services
           </button>
+
         </div>
 
         {/* Trending chips */}

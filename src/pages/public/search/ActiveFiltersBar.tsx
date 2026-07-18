@@ -1,11 +1,5 @@
 import { X } from "lucide-react";
-import {
-  DEFAULT_FILTERS,
-  PRICE_MAX,
-  PRICE_MIN,
-  formatRupees,
-  type Filters,
-} from "./filters";
+import { DEFAULT_FILTERS, PRICE_MAX, PRICE_MIN, formatRupees, type Filters } from "./filters";
 
 interface Chip {
   key: string;
@@ -46,8 +40,7 @@ export function ActiveFiltersBar({
     chips.push({
       key: `cat-${c}`,
       label: c,
-      clear: () =>
-        onChange({ ...filters, categories: filters.categories.filter((x) => x !== c) }),
+      clear: () => onChange({ ...filters, categories: filters.categories.filter((x) => x !== c) }),
     }),
   );
   if (filters.gender !== "all")
@@ -91,6 +84,18 @@ export function ActiveFiltersBar({
       key: "home",
       label: "Home Service",
       clear: () => onChange({ ...filters, homeService: false }),
+    });
+  if (filters.parking)
+    chips.push({
+      key: "parking",
+      label: "Parking",
+      clear: () => onChange({ ...filters, parking: false }),
+    });
+  if (filters.airConditioned)
+    chips.push({
+      key: "ac",
+      label: "AC",
+      clear: () => onChange({ ...filters, airConditioned: false }),
     });
 
   if (chips.length === 0) return null;

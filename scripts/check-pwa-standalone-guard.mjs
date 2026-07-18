@@ -1,0 +1,59 @@
+#!/usr/bin/env node
+/**
+ * Guard against reintroduction of the deleted `pwa-standalone-guard` module.
+ *
+ * The file src/lib/pwa-standalone-guard.ts was removed as part of the
+ * customer-app / PWA cleanup. It must NOT be referenced anywhere in the
+ * codebase, and it must NOT be recreated. Any reference is almost certainly
+ * a stale import that will break the build.
+ */
+import { spawnSync } from "node:child_process";
+import { existsSync } from "node:fs";
+
+const FILE = "src/lib/pwa-standalone-guard.ts";
+const TERM = "pwa-standalone-guard";
+
+const errors = [];
+
+if (existsSync(FILE)) {
+  errors.push(
+    `${FILE} exists — this module was removed during the customer-app cleanup and must not be recreated.`,
+  );
+}
+
+const INCLUDE_GLOBS = ["src", "app"].filter((d) => existsSync(d));
+const EXCLUDES = [
+  "--glob=!**/node_modules/**",
+  "--glob=!**/dist/**",
+  "--glob=!**/.output/**",
+  "--glob=!**/.vinxi/**",
+  "--glob=!**/routeTree.gen.ts",
+];
+
+if (INCLUDE_GLOBS.length > 0) {
+  const result = spawnSync(
+    "rg",
+    ["-n", "--no-heading", "-S", ...EXCLUDES, "--", TERM, ...INCLUDE_GLOBS],
+    { encoding: "utf8" },
+  );
+  if (result.status === 0 && result.stdout.trim()) {
+    errors.push(
+      `Found stale reference(s) to \`${TERM}\` in source (module was deleted):\n${result.stdout}`,
+    );
+  } else if (result.status !== 1) {
+    console.error(`[pwa-standalone-guard] scan error:`, result.stderr || result.error?.message);
+    process.exit(2);
+  }
+}
+
+if (errors.length) {
+  console.error("\n❌ [pwa-standalone-guard] check FAILED:\n");
+  for (const e of errors) console.error("  • " + e + "\n");
+  console.error(
+    "The `pwa-standalone-guard` module was intentionally removed. " +
+      "Delete the reference — do NOT recreate the file.",
+  );
+  process.exit(1);
+}
+
+console.log("✅ [pwa-standalone-guard] no stale references, file correctly absent.");

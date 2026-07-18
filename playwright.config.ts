@@ -16,6 +16,7 @@ export default defineConfig({
     // HTML report uploaded as a CI artifact on failure.
     ["html", { outputFolder: "playwright-report", open: "never" }],
   ],
+  outputDir: "test-results",
   use: {
     baseURL: process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:8080",
     trace: "retain-on-failure",
@@ -26,7 +27,12 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: {
+        ...devices["Desktop Chrome"],
+        launchOptions: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
+          ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH }
+          : undefined,
+      },
     },
   ],
 });

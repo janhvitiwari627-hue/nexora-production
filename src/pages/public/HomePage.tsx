@@ -28,12 +28,14 @@ import {
   TrendingUp,
   Layers,
 } from "lucide-react";
-import Footer from "@/components/nexora-design/sections/Footer";
+import GrowthPartnerRewardsSection from "@/components/sections/GrowthPartnerRewardsSection";
 import { PublicHeader } from "@/components/layout/PublicHeader";
+import { PublicFooter } from "@/components/layout/PublicFooter";
 import { shopsQueryOptions } from "@/lib/shops.queries";
 import { getCategoryCounts, getMockBusinesses, type MockBusiness } from "@/lib/mock-businesses";
 import { useAuthStore } from "@/stores/authStore";
 import { DiscoveryHome } from "./sections/DiscoveryHome";
+import { PlatformOverviewSections } from "./sections/PlatformOverviewSections";
 
 /* =========================================================
  * NEXORA SALONOS — PREMIUM HOMEPAGE (Stripe × Apple × Airbnb)
@@ -127,9 +129,9 @@ const CATEGORIES = [
 ];
 
 const CATEGORY_IMAGES: Record<string, string> = {
-  "Salon": "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&q=80",
+  Salon: "https://images.unsplash.com/photo-1562322140-8baeececf3df?w=600&q=80",
   "Beauty Parlour": "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=600&q=80",
-  "Spa": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=80",
+  Spa: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=80",
   "Tattoo Studio": "https://images.unsplash.com/photo-1611501275019-9b5cda994e8d?w=600&q=80",
   "Massage Center": "https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=600&q=80",
   "Nail Art Studio": "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600&q=80",
@@ -469,7 +471,10 @@ function SearchPanel() {
       >
         <div className="grid grid-cols-1 gap-2 sm:gap-3 lg:grid-cols-[1.4fr_1fr_1fr_auto]">
           {/* Query */}
-          <FieldShell label="What are you looking for?" icon={<Search className="h-4 w-4 text-slate-400" />}>
+          <FieldShell
+            label="What are you looking for?"
+            icon={<Search className="h-4 w-4 text-slate-400" />}
+          >
             <input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -511,7 +516,9 @@ function SearchPanel() {
                     type="button"
                     onClick={() => pickLocation(loc)}
                     className={`block w-full rounded-xl px-4 py-2.5 text-left text-[14px] font-medium transition hover:bg-slate-100 ${
-                      selectedLocation === loc ? "bg-slate-900 text-white hover:bg-slate-800" : "text-slate-800"
+                      selectedLocation === loc
+                        ? "bg-slate-900 text-white hover:bg-slate-800"
+                        : "text-slate-800"
                     }`}
                   >
                     {loc}
@@ -554,7 +561,9 @@ function SearchPanel() {
                     type="button"
                     onClick={() => pickCategory(c)}
                     className={`block w-full rounded-xl px-4 py-2.5 text-left text-[14px] font-medium transition hover:bg-slate-100 ${
-                      selectedCategory === c ? "bg-slate-900 text-white hover:bg-slate-800" : "text-slate-800"
+                      selectedCategory === c
+                        ? "bg-slate-900 text-white hover:bg-slate-800"
+                        : "text-slate-800"
                     }`}
                   >
                     {c}
@@ -619,9 +628,7 @@ function SearchPanel() {
         <div ref={resultsRef} className="mt-10 scroll-mt-24">
           <div className="mb-5 flex items-center justify-between">
             <h2 className="text-[20px] font-bold text-slate-900">
-              {filteredBusinesses.length === 0
-                ? "No businesses found"
-                : resultCountText}
+              {filteredBusinesses.length === 0 ? "No businesses found" : resultCountText}
             </h2>
             {(selectedLocation !== ALL_AREAS_LABEL ||
               selectedCategory !== ALL_CATS_LABEL ||
@@ -776,7 +783,9 @@ function CategoryGrid() {
               </div>
               <div className="p-4 sm:p-5">
                 <p className="text-[15px] font-bold text-slate-900 sm:text-[16px]">{name}</p>
-                <p className="mt-1 text-[12px] text-slate-500 sm:text-[13px] line-clamp-1">{desc}</p>
+                <p className="mt-1 text-[12px] text-slate-500 sm:text-[13px] line-clamp-1">
+                  {desc}
+                </p>
                 <div className="mt-3 inline-flex items-center gap-1 text-[12px] font-semibold text-slate-900">
                   View Shops <ArrowUpRight className="h-3.5 w-3.5" />
                 </div>
@@ -788,7 +797,6 @@ function CategoryGrid() {
     </Section>
   );
 }
-
 
 /* ============= SHOP LISTINGS ============= */
 type ShopRow = {
@@ -1246,7 +1254,7 @@ function Section({
 export function HomePage() {
   const filters = useHomeFilters();
   return (
-    <div className="min-h-screen bg-[#F8FAFC] font-sans text-slate-900 antialiased">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#F8FAFC] font-sans text-slate-900 antialiased">
       <PublicHeader showBackButton={false} />
       <main className="pb-24 md:pb-0">
         <Hero />
@@ -1262,9 +1270,11 @@ export function HomePage() {
         <SmartPicks />
         <WebsiteBuilder />
         <MembershipCards />
+        <GrowthPartnerRewardsSection />
+        <PlatformOverviewSections />
         <FinalCTA />
       </main>
-      <Footer />
+      <PublicFooter />
       <MobileBottomNav />
     </div>
   );

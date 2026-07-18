@@ -9,7 +9,7 @@ export interface ReferralRow {
 }
 
 export const mockReferralCode = "ANANYA240";
-export const mockReferralLink = `https://nexora.app/r/${mockReferralCode}`;
+export const mockReferralLink = buildReferralSignupUrl(mockReferralCode);
 
 export const mockReferralStats = {
   totalInvites: 14,
@@ -28,3 +28,4 @@ export const mockReferrals: ReferralRow[] = [
   { id: "f5", friendName: "Meera Kapoor", dateISO: d(20), status: "pending", rewardAmount: 0 },
   { id: "f6", friendName: "Vihaan Patel", dateISO: d(28), status: "rewarded", rewardAmount: 100 },
 ];
+import { buildReferralSignupUrl } from "@/lib/public-app-url";

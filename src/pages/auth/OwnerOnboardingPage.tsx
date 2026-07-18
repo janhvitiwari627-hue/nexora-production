@@ -26,7 +26,17 @@ import { useAuthStore } from "@/stores/authStore";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 
 const STEPS = ["Account", "Business", "Services", "Staff", "Gallery", "Payment", "Review"];
-const CATEGORIES = ["Salon", "Spa", "Tattoo", "Barber", "Bridal", "Nail Art"];
+const CATEGORIES = [
+  "Hire Cute Shop",
+  "Barber Shop",
+  "Salon",
+  "Beauty Parlour",
+  "Spa",
+  "Tattoo Studio",
+  "Massage Center",
+  "Nail Art Studio",
+  "Unisex",
+];
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 const DRAFT_KEY_PREFIX = "nexora:ownerOnboardingDraft:";

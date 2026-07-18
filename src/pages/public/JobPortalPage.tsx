@@ -1,8 +1,11 @@
-import { useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { Briefcase, GraduationCap, MapPin, Search, Sparkles, Star, TrendingUp } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { AlertCircle, Briefcase, GraduationCap, Loader2, MapPin, RefreshCw, Search, Sparkles, Star, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BackButton } from "@/components/shared/BackButton";
+import { useAuthStore } from "@/stores/authStore";
+import { listPublishedJobs, type JobRow } from "@/lib/jobs";
+import { EmployerSetupModal } from "@/pages/jobs/EmployerSetupModal";
 
 const JOBS = [
   {
@@ -81,19 +84,113 @@ const JOBS = [
 
 const TYPES = ["All types", "Full-time", "Part-time", "Freelance"];
 
-export function JobPortalPage() {
-  const [role, setRole] = useState<"seeker" | "employer">("seeker");
+type JobCardData = {
+  id: string;
+  title: string;
+  salon: string;
+  area: string;
+  city: string;
+  salary: string;
+  type: string;
+  featured: boolean;
+  posted: string;
+  tags: string[];
+  href?: string;
+};
+
+function fmtSalary(min: number | null, max: number | null, period: string | null): string {
+  if (!min && !max) return "Salary not disclosed";
+  const p = period === "hourly" ? "/hr" : period === "yearly" ? "/yr" : "/mo";
+  const f = (v: number) => (v >= 1000 ? `${Math.round(v / 1000)}k` : `${v}`);
+  if (min && max) return `₹${f(min)}–${f(max)}${p}`;
+  return `₹${f((min || max) as number)}${p}`;
+}
+
+function relTime(iso: string | null): string {
+  if (!iso) return "recently";
+  const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  if (days <= 0) return "Today";
+  if (days < 7) return `${days}d ago`;
+  if (days < 30) return `${Math.floor(days / 7)}w ago`;
+  return `${Math.floor(days / 30)}mo ago`;
+}
+
+function toCardData(j: JobRow): JobCardData {
+  return {
+    id: j.id,
+    title: j.title,
+    salon: j.employer?.business_name ?? "Nexora Partner",
+    area: j.area ?? "",
+    city: j.city,
+    salary: fmtSalary(j.salary_min, j.salary_max, j.salary_period),
+    type: j.job_type,
+    featured: false,
+    posted: relTime(j.published_at),
+    tags: j.skills ?? [],
+    href: `/jobs/${j.id}`,
+  };
+}
+
+export function JobPortalPage({ initialRole = "seeker" }: { initialRole?: "seeker" | "employer" }) {
+  const [role, setRole] = useState<"seeker" | "employer">(initialRole);
   const [q, setQ] = useState("");
   const [type, setType] = useState(TYPES[0]);
+  const [remoteJobs, setRemoteJobs] = useState<JobCardData[]>([]);
+  const [showEmployerModal, setShowEmployerModal] = useState(false);
+  const { user, isInitialized, initError, retryInitialize } = useAuthStore();
+  const [retrying, setRetrying] = useState(false);
 
-  const filtered = JOBS.filter(
+  const handleRetryAuth = async () => {
+    setRetrying(true);
+    try {
+      await retryInitialize();
+    } finally {
+      setRetrying(false);
+    }
+  };
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setRole(initialRole);
+  }, [initialRole]);
+
+  useEffect(() => {
+    listPublishedJobs(50)
+      .then((rows) => setRemoteJobs(rows.map(toCardData)))
+      .catch(() => setRemoteJobs([]));
+  }, []);
+
+  const allJobs: JobCardData[] = useMemo(() => {
+    if (remoteJobs.length === 0) return JOBS as JobCardData[];
+    return [...remoteJobs, ...(JOBS as JobCardData[])];
+  }, [remoteJobs]);
+
+  const filtered = allJobs.filter(
     (j) =>
       (type === "All types" || j.type === type) &&
       (q === "" ||
         j.title.toLowerCase().includes(q.toLowerCase()) ||
         j.salon.toLowerCase().includes(q.toLowerCase())),
   );
-  const featured = JOBS.filter((j) => j.featured);
+  const featured = allJobs.filter((j) => j.featured).slice(0, 6);
+  const featuredForDisplay = featured.length > 0 ? featured : allJobs.slice(0, 6);
+
+  function handlePostJob() {
+    // If auth hasn't hydrated yet, still route to the post-job page.
+    // That page runs its own auth + employer-profile checks and will
+    // redirect to /login (with a redirect back) if the user is signed out,
+    // or open the employer setup modal if the profile is missing.
+    if (!user && isInitialized) {
+      try {
+        sessionStorage.setItem("nexora:postLoginRedirect", "/hire/post-job");
+      } catch {
+        // ignore storage failures (private mode, etc.)
+      }
+      navigate({ to: "/login", search: { redirect: "/hire/post-job" } as never });
+      return;
+    }
+    navigate({ to: "/hire/post-job" });
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -114,18 +211,24 @@ export function JobPortalPage() {
       <section className="from-primary/10 to-accent/10 border-border border-b bg-gradient-to-br py-16 md:py-20">
         <div className="mx-auto max-w-6xl px-4 md:px-6">
           <div className="bg-card border-border mx-auto mb-6 inline-flex rounded-full border p-1">
-            {(["seeker", "employer"] as const).map((r) => (
-              <button
-                key={r}
-                onClick={() => setRole(r)}
-                className={cn(
-                  "rounded-full px-5 py-2 text-sm font-bold transition",
-                  role === r ? "bg-gradient-cta text-primary-foreground" : "text-muted-foreground",
-                )}
-              >
-                {r === "seeker" ? "Find a job" : "Hire talent"}
-              </button>
-            ))}
+            <Link
+              to="/jobs"
+              className={cn(
+                "rounded-full px-5 py-2 text-sm font-bold transition",
+                role === "seeker" ? "bg-gradient-cta text-primary-foreground" : "text-muted-foreground",
+              )}
+            >
+              Find a job
+            </Link>
+            <Link
+              to="/hire"
+              className={cn(
+                "rounded-full px-5 py-2 text-sm font-bold transition",
+                role === "employer" ? "bg-gradient-cta text-primary-foreground" : "text-muted-foreground",
+              )}
+            >
+              Hire talent
+            </Link>
           </div>
           <h1
             className="text-heading text-center text-4xl font-black tracking-tight md:text-6xl"
@@ -165,13 +268,72 @@ export function JobPortalPage() {
             </div>
           ) : (
             <div className="mt-8 text-center">
-              <button className="bg-gradient-cta text-primary-foreground rounded-[var(--radius-button)] px-6 py-3 text-sm font-bold shadow-[var(--shadow-glow)]">
-                Post a job free
-              </button>
+              {initError ? (
+                <div
+                  role="alert"
+                  className="border-destructive/40 bg-destructive/10 text-destructive mx-auto flex max-w-md flex-col items-center gap-3 rounded-[var(--radius-card)] border p-4 text-sm"
+                >
+                  <div className="flex items-start gap-2 text-left">
+                    <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+                    <div>
+                      <div className="font-semibold">Couldn't initialize sign-in</div>
+                      <div className="text-destructive/90 mt-0.5 text-xs">{initError}</div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRetryAuth}
+                    disabled={retrying}
+                    className="border-destructive/40 hover:bg-destructive/20 inline-flex items-center gap-2 rounded-[var(--radius-button)] border px-4 py-2 text-xs font-bold disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {retrying ? (
+                      <>
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+                        Retrying…
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="h-3.5 w-3.5" aria-hidden />
+                        Try again
+                      </>
+                    )}
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={handlePostJob}
+                    disabled={!isInitialized}
+                    aria-busy={!isInitialized}
+                    aria-live="polite"
+                    className="bg-gradient-cta text-primary-foreground inline-flex items-center justify-center gap-2 rounded-[var(--radius-button)] px-6 py-3 text-sm font-bold shadow-[var(--shadow-glow)] transition disabled:cursor-not-allowed disabled:opacity-70"
+                  >
+                    {isInitialized ? (
+                      "Post a job free"
+                    ) : (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                        <span>Auth initializing…</span>
+                      </>
+                    )}
+                  </button>
+                  {!user && isInitialized && (
+                    <p className="text-muted-foreground mt-3 text-xs">
+                      Create an employer account to post your beauty job for free.
+                    </p>
+                  )}
+                </>
+              )}
             </div>
           )}
         </div>
       </section>
+
+      <EmployerSetupModal
+        open={showEmployerModal}
+        onClose={() => setShowEmployerModal(false)}
+      />
 
       {/* Featured carousel */}
       <section className="mx-auto max-w-7xl px-4 py-12 md:px-6">
@@ -179,7 +341,7 @@ export function JobPortalPage() {
           <TrendingUp className="text-warning h-5 w-5" /> Featured jobs
         </h2>
         <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 md:mx-0 md:px-0">
-          {featured.map((j) => (
+          {featuredForDisplay.map((j) => (
             <JobCard key={j.id} job={j} compact />
           ))}
         </div>
@@ -216,7 +378,7 @@ export function JobPortalPage() {
   );
 }
 
-function JobCard({ job, compact }: { job: (typeof JOBS)[number]; compact?: boolean }) {
+function JobCard({ job, compact }: { job: JobCardData; compact?: boolean }) {
   return (
     <article
       className={cn(
@@ -255,9 +417,13 @@ function JobCard({ job, compact }: { job: (typeof JOBS)[number]; compact?: boole
             {job.type} · {job.posted}
           </div>
         </div>
-        <button className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-1 rounded-[var(--radius-button)] px-4 py-2 text-xs font-bold">
+        <Link
+          to="/jobs/$jobId"
+          params={{ jobId: job.id }}
+          className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-1 rounded-[var(--radius-button)] px-4 py-2 text-xs font-bold"
+        >
           <Briefcase className="h-3.5 w-3.5" /> Apply
-        </button>
+        </Link>
       </div>
     </article>
   );

@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MyBookingsPage } from "@/pages/customer/MyBookingsPage";
+import { PublicBookingsPage } from "@/pages/customer/PublicBookingsPage";
+import { OwnerBookingsPage } from "@/pages/owner/OwnerBookingsPage";
+import { useOwnerContext } from "@/hooks/use-owner-context";
 
 export const Route = createFileRoute("/dashboard/bookings")({
   head: () => ({
@@ -17,5 +19,17 @@ export const Route = createFileRoute("/dashboard/bookings")({
       },
     ],
   }),
-  component: MyBookingsPage,
+  component: BookingsDashboard,
 });
+
+function BookingsDashboard() {
+  const owner = useOwnerContext();
+  if (owner.isLoading) {
+    return (
+      <main className="grid min-h-[60vh] place-items-center text-sm text-muted-foreground">
+        Loading bookings…
+      </main>
+    );
+  }
+  return owner.hasSalon ? <OwnerBookingsPage /> : <PublicBookingsPage />;
+}

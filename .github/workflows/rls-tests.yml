@@ -1,0 +1,24 @@
+name: RLS Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: rls-tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      # Lovable Cloud does not expose administrative database credentials to
+      # repository Actions. Validate the migration history without asking for
+      # or storing a managed service credential. Behavioural RLS verification
+      # remains a Lovable Cloud acceptance step with provisioned test users.
+      - name: Audit RLS migration coverage
+        run: node scripts/audit-rls-migrations.mjs

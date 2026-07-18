@@ -4,6 +4,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import { motion } from "framer-motion";
 import { Calendar, Check, CheckCircle2, Copy, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { QueuedBookingsList } from "@/components/shared/QueuedBookingsList";
 import {
   advancePayable,
   formatINR,
@@ -136,6 +137,9 @@ export function BookingConfirmationScreen({
           We've sent the details to your phone. Show the QR at the salon for instant check-in.
         </p>
       </div>
+
+      <QueuedBookingsList className="mt-6" />
+
 
       <div className="border-border bg-card mt-8 rounded-[var(--radius-card-lg)] border p-6 shadow-[var(--shadow-card)]">
         <div className="text-muted-foreground text-[11px] uppercase tracking-wider">

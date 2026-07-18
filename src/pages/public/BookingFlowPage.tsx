@@ -25,6 +25,10 @@ import type { Service } from "@/components/shared/ServiceCard";
 import type { Staff } from "@/components/shared/StaffCard";
 import { createBooking, confirmBookingPayment } from "@/lib/bookings.functions";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
+import { OfflineBanner, OfflinePill } from "@/components/shared/OfflineBanner";
+import { QueuedBookingsList } from "@/components/shared/QueuedBookingsList";
+import { useOnlineStatus } from "@/hooks/use-online-status";
+import { enqueueCreateAndConfirmBooking } from "@/lib/booking-offline-sync";
 
 export type RealSalonRef = {
   id: string;
@@ -43,6 +47,7 @@ export function BookingFlowPage({ salon }: { salon?: RealSalonRef } = {}) {
   const queryClient = useQueryClient();
   const createFn = useServerFn(createBooking);
   const confirmFn = useServerFn(confirmBookingPayment);
+  const online = useOnlineStatus();
 
   const shop = MOCK_SHOP;
   const allServices = useMemo<Service[]>(() => {
@@ -144,6 +149,38 @@ export function BookingFlowPage({ salon }: { salon?: RealSalonRef } = {}) {
 
   const onPay = () => {
     if (paying) return;
+    if (!online) {
+      // Queue for background sync when the connection returns.
+      if (!salon || !isUuid(salon.id)) {
+        toast.error("You're offline. Reconnect to complete this booking.");
+        return;
+      }
+      if (!booking.date || !booking.time) {
+        toast.error("Pick a date and time first.");
+        return;
+      }
+      const selected = selectedServices(booking);
+      if (selected.length === 0) {
+        toast.error("Pick at least one service.");
+        return;
+      }
+      const totalPrice = selected.reduce((sum, s) => sum + (s.offer_price ?? s.price), 0);
+      enqueueCreateAndConfirmBooking({
+        salon_id: salon.id,
+        service_name:
+          selected
+            .map((s) => s.name)
+            .join(", ")
+            .slice(0, 200) || selected[0].name,
+        price: totalPrice,
+        booking_date: booking.date,
+        booking_time: booking.time,
+        advance_amount: Math.round(totalPrice * 0.25 * 100) / 100,
+        shop_name: booking.shopName,
+      });
+      toast.success("Saved offline — we'll confirm your booking automatically once you're back online.");
+      return;
+    }
     setPaying(true);
     payMutation.mutate(undefined, { onSettled: () => setPaying(false) });
   };
@@ -162,15 +199,34 @@ export function BookingFlowPage({ salon }: { salon?: RealSalonRef } = {}) {
       {/* Header */}
       <div className="border-border bg-card/95 sticky top-0 z-30 border-b backdrop-blur">
         <div className="mx-auto max-w-7xl px-4 py-4 md:px-6">
-          <button
-            type="button"
-            onClick={step === 0 ? () => navigate({ to: "/search" }) : goBack}
-            className="text-muted-foreground hover:text-heading mb-3 inline-flex items-center gap-1 text-xs font-semibold"
-          >
-            <ChevronLeft className="h-4 w-4" /> Back
-          </button>
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <button
+              type="button"
+              onClick={step === 0 ? () => navigate({ to: "/search" }) : goBack}
+              className="text-muted-foreground hover:text-heading inline-flex items-center gap-1 text-xs font-semibold"
+            >
+              <ChevronLeft className="h-4 w-4" /> Back
+            </button>
+            <OfflinePill />
+          </div>
           <StepProgressIndicator active={step} />
         </div>
+      </div>
+
+      <div className="mx-auto max-w-7xl space-y-3 px-4 pt-4 md:px-6">
+        <OfflineBanner
+          message={
+            step === 3
+              ? "You're offline — we'll save your booking and confirm it when you're back"
+              : "You're offline — keep going, we'll finish the booking once you're back online"
+          }
+          hint={
+            step === 3
+              ? "Tap Pay to queue this booking. It syncs automatically the moment your connection returns."
+              : "Selections are saved on this device. Staff availability updates when you reconnect."
+          }
+        />
+        <QueuedBookingsList />
       </div>
 
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 md:px-6 md:py-10 lg:grid-cols-[1fr_320px]">

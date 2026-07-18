@@ -1,0 +1,15 @@
+{
+  "name": "Nexora Brand & Distributor",
+  "short_name": "Nexora Trade",
+  "id": "/apps/distributor",
+  "description": "Manage products, promotions and salon leads.",
+  "start_url": "/portal?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#0f766e",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

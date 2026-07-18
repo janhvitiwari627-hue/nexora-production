@@ -1,0 +1,2 @@
+ALTER TABLE public.portal_leads DROP CONSTRAINT portal_leads_target_type_check;
+ALTER TABLE public.portal_leads ADD CONSTRAINT portal_leads_target_type_check CHECK (target_type = ANY (ARRAY['brand'::text, 'distributor'::text, 'partner'::text]));

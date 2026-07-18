@@ -10,6 +10,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Loader2,
   Mail,
   User,
@@ -40,6 +47,17 @@ import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 import { requestPasswordReset } from "@/lib/password-reset";
 
 type AccountType = "customer" | "owner" | "district_partner";
+
+const BUSINESS_CATEGORIES = [
+  "Barber Shop",
+  "Hair Salon",
+  "Beauty Parlour",
+  "Unisex Salon",
+  "Spa",
+  "Tattoo Studio",
+  "Massage Center",
+  "Nail Art Studio",
+] as const;
 
 const normalizeEmail = (value: string) => value.trim().toLowerCase();
 
@@ -126,33 +144,37 @@ const baseSchema = z
       .trim()
       .min(1, "Mobile number is required")
       .transform((v) => v.replace(/[\s-]/g, ""))
-      .pipe(
-        z
-          .string()
-          .regex(/^(\+91)?[6-9]\d{9}$/, "Enter a valid 10-digit mobile number"),
-      ),
+      .pipe(z.string().regex(/^(\+91)?[6-9]\d{9}$/, "Enter a valid 10-digit mobile number")),
     password: z.string().min(8, "Password must be at least 8 characters").max(72),
     confirm_password: z.string().min(1, "Confirm your password"),
     referred_by: z.string().trim().max(20).optional().or(z.literal("")),
+    gender: z.enum(["male", "female"]).optional().or(z.literal("")),
   })
   .refine((d) => d.password === d.confirm_password, {
     path: ["confirm_password"],
     message: "Passwords do not match",
   });
-const ownerSchema = baseSchema.innerType().extend({
-  business_name: z.string().trim().min(2, "Business name is required").max(120),
-  business_city: z.string().trim().max(80).optional().or(z.literal("")),
-}).refine((d) => d.password === d.confirm_password, {
-  path: ["confirm_password"],
-  message: "Passwords do not match",
-});
-const dbpSchema = baseSchema.innerType().extend({
-  district: z.string().trim().min(2, "District is required").max(80),
-  state: z.string().trim().max(80).optional().or(z.literal("")),
-}).refine((d) => d.password === d.confirm_password, {
-  path: ["confirm_password"],
-  message: "Passwords do not match",
-});
+const ownerSchema = baseSchema
+  .innerType()
+  .extend({
+    business_name: z.string().trim().min(2, "Business name is required").max(120),
+    business_category: z.string().trim().min(1, "Business category is required").max(80),
+    business_city: z.string().trim().max(80).optional().or(z.literal("")),
+  })
+  .refine((d) => d.password === d.confirm_password, {
+    path: ["confirm_password"],
+    message: "Passwords do not match",
+  });
+const dbpSchema = baseSchema
+  .innerType()
+  .extend({
+    district: z.string().trim().min(2, "District is required").max(80),
+    state: z.string().trim().max(80).optional().or(z.literal("")),
+  })
+  .refine((d) => d.password === d.confirm_password, {
+    path: ["confirm_password"],
+    message: "Passwords do not match",
+  });
 
 export default function CustomerRegistrationPage() {
   const navigate = useNavigate();
@@ -170,9 +192,11 @@ export default function CustomerRegistrationPage() {
     confirm_password: "",
     referred_by: "",
     business_name: "",
+    business_category: "",
     business_city: "",
     district: "",
     state: "",
+    gender: "" as "" | "male" | "female",
   });
 
   useEffect(() => {
@@ -295,6 +319,10 @@ export default function CustomerRegistrationPage() {
       setErrors((e) => ({ ...e, password: "Password is too weak" }));
       return;
     }
+    if (accountType === "customer" && !form.gender) {
+      setErrors((current) => ({ ...current, gender: "Please select Male or Female" }));
+      return;
+    }
     if (form.referred_by && refStatus === "invalid") {
       setErrors((e) => ({ ...e, referred_by: "Referral code not found" }));
       return;
@@ -313,7 +341,7 @@ export default function CustomerRegistrationPage() {
             accountType === "owner"
               ? "Salon Owner"
               : accountType === "district_partner"
-                ? "District Partner"
+                ? "Growth Partner"
                 : "Customer";
           setAlreadyRegisteredEmail(email);
           setServerError(roleConflictMessage(check.roleLabel, attemptedLabel));
@@ -333,6 +361,8 @@ export default function CustomerRegistrationPage() {
             mobile: parsed.data.mobile,
             referred_by: parsed.data.referred_by || null,
             role: accountType,
+            gender: accountType === "customer" ? form.gender : null,
+            business_category: accountType === "owner" ? form.business_category : null,
           },
         },
       });
@@ -377,6 +407,7 @@ export default function CustomerRegistrationPage() {
             data: {
               name: form.business_name,
               phone: form.mobile,
+              category: form.business_category,
               city: form.business_city || undefined,
             },
           });
@@ -419,8 +450,6 @@ export default function CustomerRegistrationPage() {
 
         if (accountType === "owner") {
           navigate({ to: "/owner/pending" });
-        } else if (accountType === "district_partner") {
-          navigate({ to: "/partner/district" });
         } else {
           const redirectTo = await resolvePostLoginRedirect(session.user.id);
           navigate({ to: redirectTo });
@@ -436,6 +465,12 @@ export default function CustomerRegistrationPage() {
 
   const handleGoogle = async () => {
     setServerError(null);
+    if (!form.gender) {
+      setErrors((current) => ({ ...current, gender: "Please select Male or Female first" }));
+      setServerError("Google signup se pehle Male ya Female select karein.");
+      return;
+    }
+    window.sessionStorage.setItem("nexora_pending_customer_gender", form.gender);
     setGoogleSubmitting(true);
     try {
       console.log("[Register] Initiating Google OAuth...");
@@ -493,7 +528,7 @@ export default function CustomerRegistrationPage() {
               </TabsTrigger>
               <TabsTrigger value="district_partner" className="gap-1.5 text-xs sm:text-sm">
                 <Crown className="h-3.5 w-3.5" />
-                District Partner
+                Growth Partner
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -502,8 +537,8 @@ export default function CustomerRegistrationPage() {
             <div className="space-y-4">
               <Alert>
                 <AlertDescription className="text-xs">
-                  District Business Partner application. After signup your application goes for
-                  verification — no joining fee, no investment, performance-based rewards.
+                  Growth Partner application. After signup your application goes for verification —
+                  no joining fee, no investment, performance-based rewards.
                 </AlertDescription>
               </Alert>
 
@@ -865,6 +900,43 @@ export default function CustomerRegistrationPage() {
               {errors.mobile && <p className="text-xs text-destructive">{errors.mobile}</p>}
             </div>
 
+            {accountType === "customer" && (
+              <div className="space-y-1">
+                <Label>Gender</Label>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { value: "male", label: "Male" },
+                    { value: "female", label: "Female" },
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => {
+                        setForm((current) => ({
+                          ...current,
+                          gender: option.value as "male" | "female",
+                        }));
+                        setErrors((current) => ({ ...current, gender: "" }));
+                      }}
+                      disabled={submitting}
+                      className={`rounded-xl border px-4 py-3 text-sm font-bold transition ${
+                        form.gender === option.value
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "bg-background text-foreground hover:border-primary/40"
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Male users see barber and men&apos;s salons first. Female users see beauty
+                  parlours first.
+                </p>
+                {errors.gender ? <p className="text-xs text-destructive">{errors.gender}</p> : null}
+              </div>
+            )}
+
             {accountType === "owner" && (
               <>
                 <div className="space-y-1">
@@ -879,6 +951,31 @@ export default function CustomerRegistrationPage() {
                   />
                   {errors.business_name && (
                     <p className="text-xs text-destructive">{errors.business_name}</p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="business_category">Business category</Label>
+                  <Select
+                    value={form.business_category}
+                    onValueChange={(value) => {
+                      setForm((current) => ({ ...current, business_category: value }));
+                      setErrors((current) => ({ ...current, business_category: "" }));
+                    }}
+                    disabled={submitting}
+                  >
+                    <SelectTrigger id="business_category">
+                      <SelectValue placeholder="Select your shop category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {BUSINESS_CATEGORIES.map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.business_category && (
+                    <p className="text-xs text-destructive">{errors.business_category}</p>
                   )}
                 </div>
                 <div className="space-y-1">
@@ -1015,7 +1112,6 @@ export default function CustomerRegistrationPage() {
               )}
             </div>
 
-
             <div className="space-y-1">
               <Label htmlFor="referred_by">
                 Referral code <span className="text-xs text-muted-foreground">(optional)</span>
@@ -1060,7 +1156,7 @@ export default function CustomerRegistrationPage() {
               {accountType === "owner"
                 ? "Register business"
                 : accountType === "district_partner"
-                  ? "Apply as District Partner"
+                  ? "Apply as Growth Partner"
                   : "Create account"}
             </Button>
           </form>

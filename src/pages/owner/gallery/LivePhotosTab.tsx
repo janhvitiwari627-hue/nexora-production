@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { getSalonGallery, setSalonGallery } from "@/lib/owner.functions";
 
-const MAX_PHOTOS = 20;
-const MAX_BYTES = 5 * 1024 * 1024;
+const MAX_PHOTOS = 5;
+const MAX_BYTES = 2 * 1024 * 1024;
 
 export function LivePhotosTab({ salonId }: { salonId: string }) {
   const qc = useQueryClient();
@@ -44,13 +44,14 @@ export function LivePhotosTab({ salonId }: { salonId: string }) {
     try {
       for (const file of slice) {
         if (file.size > MAX_BYTES) {
-          toast.error(`${file.name} exceeds 5MB — skipped`);
+          toast.error(`${file.name} exceeds 2MB — skipped`);
           continue;
         }
         const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
         const path = `${salonId}/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
         const { error: upErr } = await supabase.storage
-          .from("salon-media").upload(path, file, { contentType: file.type, upsert: false });
+          .from("salon-media")
+          .upload(path, file, { contentType: file.type, upsert: false });
         if (upErr) {
           toast.error(upErr.message);
           continue;
@@ -116,14 +117,14 @@ export function LivePhotosTab({ salonId }: { salonId: string }) {
         <p className="text-heading font-semibold">
           {uploading ? "Uploading…" : "Drag photos here or click to browse"}
         </p>
-        <p className="text-sm text-muted-foreground mt-1">PNG, JPG up to 5MB each</p>
+        <p className="text-sm text-muted-foreground mt-1">PNG, JPG up to 2MB each</p>
       </div>
 
       <div className="flex items-center justify-between text-sm">
         <span className="text-muted-foreground">
           <span className="font-semibold text-heading">{images.length}</span> of {MAX_PHOTOS} photos
         </span>
-        <span className="text-muted-foreground">5MB limit per photo</span>
+        <span className="text-muted-foreground">2MB limit per photo</span>
       </div>
 
       {isLoading ? (
