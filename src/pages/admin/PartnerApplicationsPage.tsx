@@ -669,7 +669,16 @@ export function PartnerApplicationsPage() {
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={!!kycConfirm} onOpenChange={(o) => !o && setKycConfirm(null)}>
+      <AlertDialog
+        open={!!kycConfirm}
+        onOpenChange={(o) => {
+          if (!o) {
+            setKycConfirm(null);
+            setRejectReason("");
+            setRejectReasonError(null);
+          }
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
@@ -690,6 +699,36 @@ export function PartnerApplicationsPage() {
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
+
+          {kycConfirm?.status === "rejected" && (
+            <div className="space-y-1.5">
+              <label htmlFor="kyc-reject-reason" className="text-sm font-medium">
+                Rejection reason <span className="text-destructive">*</span>
+              </label>
+              <Textarea
+                id="kyc-reject-reason"
+                autoFocus
+                rows={4}
+                maxLength={500}
+                value={rejectReason}
+                onChange={(e) => {
+                  setRejectReason(e.target.value);
+                  if (rejectReasonError) setRejectReasonError(null);
+                }}
+                placeholder="Explain why this KYC is being rejected (e.g. Aadhaar blurry, name mismatch, expired document)…"
+                aria-invalid={!!rejectReasonError}
+                aria-describedby="kyc-reject-reason-help"
+                className={rejectReasonError ? "border-destructive focus-visible:ring-destructive" : ""}
+              />
+              <div id="kyc-reject-reason-help" className="flex justify-between text-xs">
+                <span className={rejectReasonError ? "text-destructive" : "text-muted-foreground"}>
+                  {rejectReasonError ?? "Required — shared with the applicant and saved in reviewer notes."}
+                </span>
+                <span className="text-muted-foreground tabular-nums">{rejectReason.length}/500</span>
+              </div>
+            </div>
+          )}
+
           <AlertDialogFooter>
             <AlertDialogCancel disabled={setKyc.isPending}>Cancel</AlertDialogCancel>
             <AlertDialogAction
@@ -702,8 +741,29 @@ export function PartnerApplicationsPage() {
               onClick={(e) => {
                 e.preventDefault();
                 if (!kycConfirm) return;
-                setKyc.mutate(kycConfirm, {
-                  onSuccess: () => setKycConfirm(null),
+                let payload = kycConfirm;
+                if (kycConfirm.status === "rejected") {
+                  const reason = rejectReason.trim();
+                  if (reason.length < 5) {
+                    setRejectReasonError(
+                      reason.length === 0
+                        ? "Please enter a rejection reason before confirming."
+                        : "Reason must be at least 5 characters."
+                    );
+                    return;
+                  }
+                  const existing = kycConfirm.notes?.trim();
+                  const mergedNotes = existing
+                    ? `${existing}\n\nRejection reason: ${reason}`
+                    : `Rejection reason: ${reason}`;
+                  payload = { ...kycConfirm, notes: mergedNotes };
+                }
+                setKyc.mutate(payload, {
+                  onSuccess: () => {
+                    setKycConfirm(null);
+                    setRejectReason("");
+                    setRejectReasonError(null);
+                  },
                 });
               }}
             >
