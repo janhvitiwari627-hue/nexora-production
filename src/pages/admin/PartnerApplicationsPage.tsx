@@ -532,16 +532,63 @@ export function PartnerApplicationsPage() {
                   </div>
                 </div>
               </div>
-              <div>
-                <div className="mb-1.5 text-xs font-semibold text-muted-foreground">
-                  KYC Document
+              <div className="rounded-md border p-3 space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-xs font-semibold text-muted-foreground">KYC Document</div>
+                  {(() => {
+                    const r = extractKycReview(detail);
+                    return (
+                      <Badge className={KYC_TONE[r.status]}>
+                        KYC: {r.status}
+                        {r.reviewed_at && (
+                          <span className="ml-1 opacity-70">
+                            · {new Date(r.reviewed_at).toLocaleDateString("en-IN")}
+                          </span>
+                        )}
+                      </Badge>
+                    );
+                  })()}
                 </div>
                 <KycDocumentPreview
                   kycPath={extractKycPath(detail)}
                   applicantName={detail.full_name}
                   variant="inline"
                 />
+                <div className="space-y-2">
+                  <div className="text-xs font-semibold text-muted-foreground">
+                    Reviewer notes
+                  </div>
+                  <Textarea
+                    value={kycNotesDraft}
+                    onChange={(e) => setKycNotesDraft(e.target.value)}
+                    placeholder="Add reviewer notes (e.g. Aadhaar clearly visible, name matches)…"
+                    rows={3}
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    {KYC_STATUSES.map((s) => {
+                      const current = extractKycReview(detail).status === s;
+                      return (
+                        <Button
+                          key={s}
+                          size="sm"
+                          variant={s === "approved" ? "default" : s === "rejected" ? "destructive" : "outline"}
+                          disabled={setKyc.isPending}
+                          onClick={() =>
+                            setKyc.mutate({
+                              app: detail,
+                              status: s,
+                              notes: kycNotesDraft.trim(),
+                            })
+                          }
+                        >
+                          {current && "✓ "}Mark {s}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
+
               {detail.tagline && (
                 <div>
                   <div className="text-xs text-muted-foreground">Tagline</div>
