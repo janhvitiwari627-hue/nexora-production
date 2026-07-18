@@ -420,6 +420,16 @@ export function PartnerApplicationsPage() {
                   </div>
                 </div>
               </div>
+              <div>
+                <div className="mb-1.5 text-xs font-semibold text-muted-foreground">
+                  KYC Document
+                </div>
+                <KycDocumentPreview
+                  kycPath={extractKycPath(detail)}
+                  applicantName={detail.full_name}
+                  variant="inline"
+                />
+              </div>
               {detail.tagline && (
                 <div>
                   <div className="text-xs text-muted-foreground">Tagline</div>
