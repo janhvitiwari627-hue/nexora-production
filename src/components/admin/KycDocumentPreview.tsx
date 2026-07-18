@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -315,9 +315,14 @@ function PdfViewer({ url, applicantName, downloadUrl }: { url: string; applicant
         <Button size="icon" variant="outline" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} aria-label="Previous page">
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <span className="min-w-[5rem] text-center text-xs tabular-nums">
-          {page} / {numPages || "…"}
-        </span>
+        <div
+          className="inline-flex min-w-[6rem] items-center justify-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2 py-1 text-xs font-semibold tabular-nums text-primary"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          Page <span className="text-sm">{page}</span>
+          <span className="text-primary/60">/ {numPages || "…"}</span>
+        </div>
         <Button size="icon" variant="outline" onClick={() => setPage((p) => Math.min(numPages, p + 1))} disabled={page >= numPages} aria-label="Next page">
           <ChevronRight className="h-4 w-4" />
         </Button>
@@ -362,18 +367,27 @@ function PdfViewer({ url, applicantName, downloadUrl }: { url: string; applicant
           <ul className="space-y-2">
             {pages.map((n) => (
               <li key={n}>
-                <button
-                  type="button"
-                  onClick={() => setPage(n)}
-                  className={`block w-full overflow-hidden rounded border bg-white transition hover:border-primary ${
-                    n === page ? "border-primary ring-2 ring-primary/40" : "border-border"
-                  }`}
-                  aria-label={`Go to page ${n}`}
-                  aria-current={n === page ? "page" : undefined}
+                <ThumbButton
+                  active={n === page}
+                  onSelect={() => setPage(n)}
+                  ariaLabel={`Go to page ${n}${n === page ? " (current)" : ""}`}
                 >
-                  <PdfThumb doc={doc} pageNumber={n} />
-                  <span className="block py-1 text-center text-[10px] font-medium text-muted-foreground">{n}</span>
-                </button>
+                  <div className="relative">
+                    <PdfThumb doc={doc} pageNumber={n} />
+                    {n === page && (
+                      <span className="pointer-events-none absolute right-1 top-1 rounded bg-primary px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-primary-foreground shadow">
+                        Current
+                      </span>
+                    )}
+                  </div>
+                  <span
+                    className={`block py-1 text-center text-[10px] font-medium ${
+                      n === page ? "bg-primary text-primary-foreground" : "text-muted-foreground"
+                    }`}
+                  >
+                    Page {n}
+                  </span>
+                </ThumbButton>
               </li>
             ))}
           </ul>
@@ -399,6 +413,39 @@ function PdfViewer({ url, applicantName, downloadUrl }: { url: string; applicant
         </div>
       </div>
     </div>
+  );
+}
+
+function ThumbButton({
+  active,
+  onSelect,
+  ariaLabel,
+  children,
+}: {
+  active: boolean;
+  onSelect: () => void;
+  ariaLabel: string;
+  children: ReactNode;
+}) {
+  const ref = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (active && ref.current) {
+      ref.current.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+  }, [active]);
+  return (
+    <button
+      ref={ref}
+      type="button"
+      onClick={onSelect}
+      className={`block w-full overflow-hidden rounded border bg-white transition hover:border-primary ${
+        active ? "border-primary ring-2 ring-primary shadow-md" : "border-border"
+      }`}
+      aria-label={ariaLabel}
+      aria-current={active ? "page" : undefined}
+    >
+      {children}
+    </button>
   );
 }
 
