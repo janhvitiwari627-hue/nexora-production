@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -44,6 +44,41 @@ function extractKycPath(app: { metadata: Record<string, unknown> | null }): stri
   return null;
 }
 
+const KYC_STATUSES = ["pending", "approved", "rejected"] as const;
+type KycStatus = (typeof KYC_STATUSES)[number];
+
+type KycReview = {
+  status: KycStatus;
+  notes: string;
+  reviewed_at: string | null;
+  reviewed_by: string | null;
+};
+
+function extractKycReview(app: { metadata: Record<string, unknown> | null }): KycReview {
+  const m = app.metadata;
+  const fallback: KycReview = { status: "pending", notes: "", reviewed_at: null, reviewed_by: null };
+  if (!m || typeof m !== "object") return fallback;
+  const kyc = (m as Record<string, unknown>).kyc_review;
+  if (!kyc || typeof kyc !== "object") return fallback;
+  const k = kyc as Record<string, unknown>;
+  const status = typeof k.status === "string" && (KYC_STATUSES as readonly string[]).includes(k.status)
+    ? (k.status as KycStatus)
+    : "pending";
+  return {
+    status,
+    notes: typeof k.notes === "string" ? k.notes : "",
+    reviewed_at: typeof k.reviewed_at === "string" ? k.reviewed_at : null,
+    reviewed_by: typeof k.reviewed_by === "string" ? k.reviewed_by : null,
+  };
+}
+
+const KYC_TONE: Record<KycStatus, string> = {
+  pending: "bg-amber-100 text-amber-800 border-amber-200",
+  approved: "bg-emerald-100 text-emerald-700 border-emerald-200",
+  rejected: "bg-red-100 text-red-700 border-red-200",
+};
+
+
 const STATUSES = ["pending", "verified", "rejected", "suspended"] as const;
 type Status = (typeof STATUSES)[number];
 
@@ -79,6 +114,8 @@ export function PartnerApplicationsPage() {
   const [detail, setDetail] = useState<PartnerApp | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [rejectOpen, setRejectOpen] = useState<PartnerApp | null>(null);
+  const [kycNotesDraft, setKycNotesDraft] = useState("");
+
 
   const { data = [], isLoading } = useQuery({
     queryKey: ["admin", "partner-applications-dbp"],
@@ -154,6 +191,49 @@ export function PartnerApplicationsPage() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  const setKyc = useMutation({
+    mutationFn: async ({
+      app,
+      status,
+      notes,
+    }: {
+      app: PartnerApp;
+      status: KycStatus;
+      notes: string;
+    }) => {
+      const { data: userRes } = await supabase.auth.getUser();
+      const nextMeta = {
+        ...(app.metadata ?? {}),
+        kyc_review: {
+          status,
+          notes,
+          reviewed_at: new Date().toISOString(),
+          reviewed_by: userRes.user?.id ?? null,
+        },
+      };
+      const { error } = await supabase
+        .from("district_business_partners")
+        .update({ metadata: nextMeta })
+        .eq("id", app.id);
+      if (error) throw error;
+      return nextMeta;
+    },
+    onSuccess: (nextMeta, vars) => {
+      qc.invalidateQueries({ queryKey: ["admin", "partner-applications-dbp"] });
+      toast.success(`KYC marked ${vars.status}`);
+      if (detail && detail.id === vars.app.id) {
+        setDetail({ ...detail, metadata: nextMeta });
+      }
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+
+  useEffect(() => {
+    if (detail) setKycNotesDraft(extractKycReview(detail).notes);
+    else setKycNotesDraft("");
+  }, [detail]);
 
   const counts = useMemo(() => {
     const map: Record<string, number> = { all: data.length };
@@ -264,6 +344,8 @@ export function PartnerApplicationsPage() {
                     const role =
                       typeof l.metadata?.role === "string" ? (l.metadata.role as string) : "—";
                     const kycPath = extractKycPath(l);
+                    const kycReview = extractKycReview(l);
+
                     return (
                       <TableRow key={l.id}>
                         <TableCell>
@@ -302,12 +384,47 @@ export function PartnerApplicationsPage() {
                           </span>
                         </TableCell>
                         <TableCell>
-                          <KycDocumentPreview
-                            kycPath={kycPath}
-                            applicantName={l.full_name}
-                            variant="thumb"
-                          />
+                          <div className="flex flex-col gap-1.5">
+                            <KycDocumentPreview
+                              kycPath={kycPath}
+                              applicantName={l.full_name}
+                              variant="thumb"
+                            />
+                            <Select
+                              value={kycReview.status}
+                              onValueChange={(v) =>
+                                setKyc.mutate({
+                                  app: l,
+                                  status: v as KycStatus,
+                                  notes: kycReview.notes,
+                                })
+                              }
+                              disabled={setKyc.isPending}
+                            >
+                              <SelectTrigger
+                                className={`h-7 w-[120px] text-xs ${KYC_TONE[kycReview.status]}`}
+                              >
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {KYC_STATUSES.map((s) => (
+                                  <SelectItem key={s} value={s} className="text-xs capitalize">
+                                    {s}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            {kycReview.notes && (
+                              <div
+                                className="text-[10px] text-muted-foreground max-w-[160px] truncate"
+                                title={kycReview.notes}
+                              >
+                                📝 {kycReview.notes}
+                              </div>
+                            )}
+                          </div>
                         </TableCell>
+
                         <TableCell className="text-sm text-muted-foreground max-w-[180px] truncate">
                           {role}
                         </TableCell>
@@ -420,16 +537,63 @@ export function PartnerApplicationsPage() {
                   </div>
                 </div>
               </div>
-              <div>
-                <div className="mb-1.5 text-xs font-semibold text-muted-foreground">
-                  KYC Document
+              <div className="rounded-md border p-3 space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-xs font-semibold text-muted-foreground">KYC Document</div>
+                  {(() => {
+                    const r = extractKycReview(detail);
+                    return (
+                      <Badge className={KYC_TONE[r.status]}>
+                        KYC: {r.status}
+                        {r.reviewed_at && (
+                          <span className="ml-1 opacity-70">
+                            · {new Date(r.reviewed_at).toLocaleDateString("en-IN")}
+                          </span>
+                        )}
+                      </Badge>
+                    );
+                  })()}
                 </div>
                 <KycDocumentPreview
                   kycPath={extractKycPath(detail)}
                   applicantName={detail.full_name}
                   variant="inline"
                 />
+                <div className="space-y-2">
+                  <div className="text-xs font-semibold text-muted-foreground">
+                    Reviewer notes
+                  </div>
+                  <Textarea
+                    value={kycNotesDraft}
+                    onChange={(e) => setKycNotesDraft(e.target.value)}
+                    placeholder="Add reviewer notes (e.g. Aadhaar clearly visible, name matches)…"
+                    rows={3}
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    {KYC_STATUSES.map((s) => {
+                      const current = extractKycReview(detail).status === s;
+                      return (
+                        <Button
+                          key={s}
+                          size="sm"
+                          variant={s === "approved" ? "default" : s === "rejected" ? "destructive" : "outline"}
+                          disabled={setKyc.isPending}
+                          onClick={() =>
+                            setKyc.mutate({
+                              app: detail,
+                              status: s,
+                              notes: kycNotesDraft.trim(),
+                            })
+                          }
+                        >
+                          {current && "✓ "}Mark {s}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
+
               {detail.tagline && (
                 <div>
                   <div className="text-xs text-muted-foreground">Tagline</div>
