@@ -592,11 +592,7 @@ export function PartnerApplicationsPage() {
                           variant={s === "approved" ? "default" : s === "rejected" ? "destructive" : "outline"}
                           disabled={setKyc.isPending}
                           onClick={() =>
-                            setKyc.mutate({
-                              app: detail,
-                              status: s,
-                              notes: kycNotesDraft.trim(),
-                            })
+                            requestKycChange(detail, s, kycNotesDraft.trim())
                           }
                         >
                           {current && "✓ "}Mark {s}
