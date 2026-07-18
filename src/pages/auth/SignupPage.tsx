@@ -101,14 +101,22 @@ export default function SignupPage() {
   const validateRefFn = useServerFn(validateReferralCode);
   const [referrerName, setReferrerName] = useState<string | null>(null);
   const [refInvalid, setRefInvalid] = useState(false);
+  const [refChecking, setRefChecking] = useState(false);
+  const [refCheckFailed, setRefCheckFailed] = useState(false);
 
   useEffect(() => {
     if (!referredBy) {
       setReferrerName(null);
       setRefInvalid(false);
+      setRefChecking(false);
+      setRefCheckFailed(false);
       return;
     }
     let cancelled = false;
+    setRefChecking(true);
+    setRefCheckFailed(false);
+    setRefInvalid(false);
+    setReferrerName(null);
     void validateRefFn({ data: { code: referredBy } })
       .then((res) => {
         if (cancelled) return;
@@ -126,12 +134,25 @@ export default function SignupPage() {
         }
       })
       .catch(() => {
-        /* keep code, let backend trigger decide */
+        if (cancelled) return;
+        // Fail-closed: if we can't verify, do NOT credit anyone.
+        setReferrerName(null);
+        setRefInvalid(true);
+        setRefCheckFailed(true);
+      })
+      .finally(() => {
+        if (!cancelled) setRefChecking(false);
       });
     return () => {
       cancelled = true;
     };
   }, [referredBy, validateRefFn]);
+
+  // Only send referral to backend when we have CONFIRMED it's valid (name resolved).
+  const referralConfirmed = Boolean(
+    referredBy && !refInvalid && !refChecking && referrerName,
+  );
+
 
   useEffect(() => {
     if (!isInitialized || !user) return;
