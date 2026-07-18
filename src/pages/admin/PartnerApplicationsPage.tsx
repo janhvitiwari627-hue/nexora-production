@@ -337,6 +337,8 @@ export function PartnerApplicationsPage() {
                     const role =
                       typeof l.metadata?.role === "string" ? (l.metadata.role as string) : "—";
                     const kycPath = extractKycPath(l);
+                    const kycReview = extractKycReview(l);
+
                     return (
                       <TableRow key={l.id}>
                         <TableCell>
