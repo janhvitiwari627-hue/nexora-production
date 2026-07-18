@@ -400,23 +400,45 @@ export function PersonalInfoPanel() {
 
   // Store unfinished work locally instead of writing to the database on every
   // keystroke. The user can return to this device and continue where they left off.
+  const [autoSaveError, setAutoSaveError] = useState<string | null>(null);
+
+  function persistDraft(snapshot: string): boolean {
+    if (!draftKey || typeof window === "undefined") return false;
+    try {
+      window.localStorage.setItem(draftKey, snapshot);
+      setAutoSavedAt(Date.now());
+      setAutoSaveError(null);
+      return true;
+    } catch (err) {
+      const { message } = errorDetails(err);
+      const lower = message.toLowerCase();
+      const friendly =
+        lower.includes("quota") || lower.includes("exceeded")
+          ? "Your device storage is full, so we couldn't auto-save the draft. Your edits are still here — free up space and try again."
+          : "We couldn't auto-save your draft on this device. Your edits are still here — try again.";
+      setAutoSaveError(friendly);
+      return false;
+    }
+  }
+
   useEffect(() => {
     if (!draftKey || !profile) return;
     const snapshot = JSON.stringify(form);
     if (snapshot === lastSavedSnapshotRef.current) return;
     if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
     draftTimerRef.current = setTimeout(() => {
-      try {
-        window.localStorage.setItem(draftKey, snapshot);
-        setAutoSavedAt(Date.now());
-      } catch {
-        // Storage can be disabled or full; manual save still works.
-      }
+      persistDraft(snapshot);
     }, 600);
     return () => {
       if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [draftKey, form, profile]);
+
+  function retryAutoSave() {
+    persistDraft(JSON.stringify(form));
+  }
+
 
 
 
