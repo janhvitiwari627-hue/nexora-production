@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { PROFILE } from "./mockSettings";
@@ -45,7 +45,6 @@ export function PersonalInfoPanel() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [usernameTouched, setUsernameTouched] = useState(false);
-  const [sessionChecked, setSessionChecked] = useState(false);
 
   const [form, setForm] = useState({
     fullName: profile?.full_name || "",
@@ -59,23 +58,23 @@ export function PersonalInfoPanel() {
   });
   const [pincodeError, setPincodeError] = useState<string | null>(null);
 
-  // Fetch active Supabase session on mount and refresh profile from DB
+  // Track which user's profile we've hydrated the form from. We hydrate ONCE
+  // per user so that background profile refreshes (token refresh, auth events,
+  // realtime updates) never wipe the fields the user is currently editing.
+  const hydratedForUserRef = useRef<string | null>(profile ? profile.id : null);
+
+  // Ensure we have a session; hydrate profile in background only if missing.
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
         const { data, error } = await supabase.auth.getUser();
         if (cancelled) return;
-        if (error || !data.user) {
-          setSessionChecked(true);
-          return;
-        }
+        if (error || !data.user) return;
         if (!user) setUser(data.user);
-        await refreshProfile();
+        if (!profile) await refreshProfile();
       } catch (e) {
         console.warn("[PersonalInfoPanel] session hydration failed", e);
-      } finally {
-        if (!cancelled) setSessionChecked(true);
       }
     })();
     return () => {
@@ -85,9 +84,12 @@ export function PersonalInfoPanel() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Hydrate form when profile arrives / changes
+  // Hydrate form when profile first arrives for a user. Do NOT re-hydrate on
+  // subsequent profile updates — that would overwrite in-progress edits.
   useEffect(() => {
     if (!profile) return;
+    if (hydratedForUserRef.current === profile.id) return;
+    hydratedForUserRef.current = profile.id;
     setForm({
       fullName: profile.full_name || "",
       username: profile.username || "",
@@ -102,8 +104,6 @@ export function PersonalInfoPanel() {
     setUsernameTouched(!!profile.username);
   }, [profile]);
 
-  // Silence unused-var lint for the diagnostic flag while still exposing it for future UI states
-  void sessionChecked;
 
   const districts = useMemo(() => getDistricts(form.state), [form.state]);
   const blocks = useMemo(() => getBlocks(form.state, form.district), [form.state, form.district]);
