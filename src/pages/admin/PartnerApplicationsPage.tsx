@@ -126,6 +126,8 @@ export function PartnerApplicationsPage() {
   const [rejectOpen, setRejectOpen] = useState<PartnerApp | null>(null);
   const [kycNotesDraft, setKycNotesDraft] = useState("");
   const [kycConfirm, setKycConfirm] = useState<{ app: PartnerApp; status: KycStatus; notes: string } | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
+  const [rejectReasonError, setRejectReasonError] = useState<string | null>(null);
 
   const requestKycChange = (app: PartnerApp, next: KycStatus, notes: string) => {
     const current = extractKycReview(app).status;
