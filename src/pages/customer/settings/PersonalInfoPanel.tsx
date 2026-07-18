@@ -44,6 +44,7 @@ export function PersonalInfoPanel() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [autoSavedAt, setAutoSavedAt] = useState<number | null>(null);
   const [usernameTouched, setUsernameTouched] = useState(false);
 
   const [form, setForm] = useState({
@@ -62,6 +63,11 @@ export function PersonalInfoPanel() {
   // per user so that background profile refreshes (token refresh, auth events,
   // realtime updates) never wipe the fields the user is currently editing.
   const hydratedForUserRef = useRef<string | null>(profile ? profile.id : null);
+  const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastSavedSnapshotRef = useRef<string>("");
+  const savingRef = useRef(false);
+  const pendingAutoSaveRef = useRef(false);
+
 
   // Ensure we have a session; hydrate profile in background only if missing.
   useEffect(() => {
