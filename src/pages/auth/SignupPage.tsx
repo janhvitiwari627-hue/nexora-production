@@ -364,34 +364,53 @@ export default function SignupPage() {
               </Alert>
             )}
 
-            {referredBy && !refInvalid && (
+            {referredBy && refChecking && (
+              <Alert className="mb-4">
+                <AlertDescription className="text-sm flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Verifying referral code{" "}
+                  <strong className="font-mono">{referredBy}</strong>…
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {referralConfirmed && (
               <Alert className="mb-4 border-primary/20 bg-primary/5">
                 <AlertDescription className="text-sm">
-                  {referrerName ? (
-                    <>
+                  <span className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                    <span>
                       Invited by <strong>{referrerName}</strong> · code{" "}
                       <strong className="font-mono">{referredBy}</strong>
-                    </>
-                  ) : (
-                    <>
-                      Joining with referral code{" "}
-                      <strong className="font-mono">{referredBy}</strong>.
-                    </>
-                  )}
-                  <span className="block text-xs text-muted-foreground mt-0.5">
-                    You'll be credited to this referrer on signup.
+                    </span>
+                  </span>
+                  <span className="block text-xs text-muted-foreground mt-1">
+                    Credit will go to this referrer only.
                   </span>
                 </AlertDescription>
               </Alert>
             )}
+
             {referredBy && refInvalid && (
               <Alert variant="destructive" className="mb-4">
+                <AlertTriangle className="h-4 w-4" />
                 <AlertDescription className="text-sm">
-                  Referral code <strong className="font-mono">{referredBy}</strong> is invalid or
-                  expired. You can still sign up without it.
+                  <strong className="block mb-1">
+                    {refCheckFailed
+                      ? "Referral code could not be verified"
+                      : "Invalid or expired referral code"}
+                  </strong>
+                  <span className="block">
+                    Code <strong className="font-mono">{referredBy}</strong>{" "}
+                    {refCheckFailed
+                      ? "couldn't be checked right now. To protect the wrong account from getting credit, we won't apply any referral."
+                      : "doesn't match any active referrer. No referral credit will be applied."}
+                    {" "}You can continue signing up without a referral, or double-check the link with the person who shared it.
+                  </span>
                 </AlertDescription>
               </Alert>
             )}
+
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">
