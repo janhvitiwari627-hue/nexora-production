@@ -400,23 +400,45 @@ export function PersonalInfoPanel() {
 
   // Store unfinished work locally instead of writing to the database on every
   // keystroke. The user can return to this device and continue where they left off.
+  const [autoSaveError, setAutoSaveError] = useState<string | null>(null);
+
+  function persistDraft(snapshot: string): boolean {
+    if (!draftKey || typeof window === "undefined") return false;
+    try {
+      window.localStorage.setItem(draftKey, snapshot);
+      setAutoSavedAt(Date.now());
+      setAutoSaveError(null);
+      return true;
+    } catch (err) {
+      const { message } = errorDetails(err);
+      const lower = message.toLowerCase();
+      const friendly =
+        lower.includes("quota") || lower.includes("exceeded")
+          ? "Your device storage is full, so we couldn't auto-save the draft. Your edits are still here — free up space and try again."
+          : "We couldn't auto-save your draft on this device. Your edits are still here — try again.";
+      setAutoSaveError(friendly);
+      return false;
+    }
+  }
+
   useEffect(() => {
     if (!draftKey || !profile) return;
     const snapshot = JSON.stringify(form);
     if (snapshot === lastSavedSnapshotRef.current) return;
     if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
     draftTimerRef.current = setTimeout(() => {
-      try {
-        window.localStorage.setItem(draftKey, snapshot);
-        setAutoSavedAt(Date.now());
-      } catch {
-        // Storage can be disabled or full; manual save still works.
-      }
+      persistDraft(snapshot);
     }, 600);
     return () => {
       if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [draftKey, form, profile]);
+
+  function retryAutoSave() {
+    persistDraft(JSON.stringify(form));
+  }
+
 
 
 
@@ -557,17 +579,35 @@ export function PersonalInfoPanel() {
           {saveError}
         </p>
       )}
+      {autoSaveError && (
+        <div
+          role="alert"
+          className="border-destructive/40 bg-destructive/5 text-destructive mt-3 flex flex-wrap items-center justify-between gap-2 rounded-md border px-3 py-2 text-xs"
+        >
+          <span>{autoSaveError}</span>
+          <button
+            type="button"
+            onClick={retryAutoSave}
+            className="border-destructive/50 hover:bg-destructive/10 rounded-md border px-2 py-1 text-xs font-semibold"
+          >
+            Try again
+          </button>
+        </div>
+      )}
       <div className="text-muted-foreground mt-3 flex items-center gap-2 text-xs" aria-live="polite">
         {saving ? (
           <>
             <Loader2 className="h-3 w-3 animate-spin" /> Saving…
           </>
+        ) : autoSaveError ? (
+          <span>Auto-save paused · your edits are still here.</span>
         ) : autoSavedAt ? (
           <span>Draft saved on this device · {new Date(autoSavedAt).toLocaleTimeString()}</span>
         ) : (
           <span>Your unfinished form is saved on this device.</span>
         )}
       </div>
+
       <SaveBar onSave={handleSave} onCancel={handleCancel} saving={saving} />
 
     </PanelShell>
