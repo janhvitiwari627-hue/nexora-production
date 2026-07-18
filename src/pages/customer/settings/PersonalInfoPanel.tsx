@@ -37,6 +37,28 @@ function errorDetails(error: unknown) {
   };
 }
 
+type PersonalInfoForm = {
+  fullName: string;
+  username: string;
+  gender: string;
+  dob: string;
+  state: string;
+  district: string;
+  block: string;
+  pincode: string;
+};
+
+const EMPTY_FORM: PersonalInfoForm = {
+  fullName: "",
+  username: "",
+  gender: "prefer_not",
+  dob: "",
+  state: "",
+  district: "",
+  block: "",
+  pincode: "",
+};
+
 export function PersonalInfoPanel() {
   const { user, profile, refreshProfile, setUser, setProfile } = useAuthStore();
   const [avatar, setAvatar] = useState<string>(profile?.avatar_url || "");
@@ -47,7 +69,7 @@ export function PersonalInfoPanel() {
   const [autoSavedAt, setAutoSavedAt] = useState<number | null>(null);
   const [usernameTouched, setUsernameTouched] = useState(false);
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<PersonalInfoForm>({
     fullName: profile?.full_name || "",
     username: profile?.username || "",
     gender: (profile?.gender || "prefer_not") as string,
@@ -62,11 +84,10 @@ export function PersonalInfoPanel() {
   // Track which user's profile we've hydrated the form from. We hydrate ONCE
   // per user so that background profile refreshes (token refresh, auth events,
   // realtime updates) never wipe the fields the user is currently editing.
-  const hydratedForUserRef = useRef<string | null>(profile ? profile.id : null);
-  const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hydratedForUserRef = useRef<string | null>(null);
   const lastSavedSnapshotRef = useRef<string>("");
-  const savingRef = useRef(false);
-  const pendingAutoSaveRef = useRef(false);
+  const draftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const draftKey = user ? `personal-info-draft:${user.id}` : null;
 
 
   // Ensure we have a session; hydrate profile in background only if missing.
@@ -96,7 +117,7 @@ export function PersonalInfoPanel() {
     if (!profile) return;
     if (hydratedForUserRef.current === profile.id) return;
     hydratedForUserRef.current = profile.id;
-    const next = {
+    const next: PersonalInfoForm = {
       fullName: profile.full_name || "",
       username: profile.username || "",
       gender: (profile.gender || "prefer_not") as string,
@@ -106,7 +127,22 @@ export function PersonalInfoPanel() {
       block: profile.block || "",
       pincode: profile.pincode || "",
     };
-    setForm(next);
+    let restoredDraft: PersonalInfoForm | null = null;
+    if (typeof window !== "undefined") {
+      try {
+        const raw = window.localStorage.getItem(`personal-info-draft:${profile.id}`);
+        if (raw) {
+          const draft = JSON.parse(raw) as Partial<PersonalInfoForm>;
+          restoredDraft = { ...next };
+          for (const key of Object.keys(EMPTY_FORM) as (keyof PersonalInfoForm)[]) {
+            if (typeof draft[key] === "string") restoredDraft[key] = draft[key] as string;
+          }
+        }
+      } catch {
+        // Ignore a corrupt or unavailable local draft.
+      }
+    }
+    setForm(restoredDraft ?? next);
     lastSavedSnapshotRef.current = JSON.stringify(next);
     setAvatar(profile.avatar_url || "");
     setUsernameTouched(!!profile.username);
@@ -297,7 +333,7 @@ export function PersonalInfoPanel() {
     else setPincodeError(null);
   }
 
-  async function doSave(snapshot: typeof form, opts: { silent?: boolean } = {}) {
+  async function doSave(snapshot: PersonalInfoForm, opts: { silent?: boolean } = {}) {
     const { silent = false } = opts;
     const { data: authData, error: authError } = await supabase.auth.getUser();
     const activeUser = authData.user;
@@ -309,7 +345,6 @@ export function PersonalInfoPanel() {
       if (!silent) toast.error(pincodeError);
       return false;
     }
-    savingRef.current = true;
     setSaving(true);
     setSaveError(null);
     try {
@@ -339,7 +374,10 @@ export function PersonalInfoPanel() {
       }
       setProfile(savedProfile);
       lastSavedSnapshotRef.current = JSON.stringify(snapshot);
-      setAutoSavedAt(Date.now());
+      if (draftKey && typeof window !== "undefined") {
+        window.localStorage.removeItem(draftKey);
+      }
+      setAutoSavedAt(null);
       if (!silent) toast.success("Personal information saved");
       return true;
     } catch (err: unknown) {
@@ -352,7 +390,6 @@ export function PersonalInfoPanel() {
       if (!silent) toast.error(message);
       return false;
     } finally {
-      savingRef.current = false;
       setSaving(false);
     }
   }
@@ -361,71 +398,33 @@ export function PersonalInfoPanel() {
     await doSave(form);
   }
 
-  // Auto-save: debounce form changes and persist silently.
+  // Store unfinished work locally instead of writing to the database on every
+  // keystroke. The user can return to this device and continue where they left off.
   useEffect(() => {
-    if (!user || !profile) return;
-    if (hydratedForUserRef.current !== profile.id) return;
+    if (!draftKey || !profile) return;
     const snapshot = JSON.stringify(form);
     if (snapshot === lastSavedSnapshotRef.current) return;
-    if (form.pincode && pincodeError) return;
-    if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
-    autoSaveTimerRef.current = setTimeout(() => {
-      if (savingRef.current) {
-        pendingAutoSaveRef.current = true;
-        return;
+    if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+    draftTimerRef.current = setTimeout(() => {
+      try {
+        window.localStorage.setItem(draftKey, snapshot);
+        setAutoSavedAt(Date.now());
+      } catch {
+        // Storage can be disabled or full; manual save still works.
       }
-      void doSave(form, { silent: true });
-    }, 1200);
+    }, 600);
     return () => {
-      if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+      if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form, pincodeError, user, profile]);
-
-  // If a save was requested while another was in flight, run it after.
-  useEffect(() => {
-    if (!saving && pendingAutoSaveRef.current) {
-      pendingAutoSaveRef.current = false;
-      const snapshot = JSON.stringify(form);
-      if (snapshot !== lastSavedSnapshotRef.current) {
-        void doSave(form, { silent: true });
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [saving]);
-
-  // Best-effort flush on unmount / tab hide.
-  useEffect(() => {
-    const flush = () => {
-      if (autoSaveTimerRef.current) {
-        clearTimeout(autoSaveTimerRef.current);
-        autoSaveTimerRef.current = null;
-      }
-      const snapshot = JSON.stringify(form);
-      if (
-        user &&
-        profile &&
-        snapshot !== lastSavedSnapshotRef.current &&
-        !(form.pincode && pincodeError)
-      ) {
-        void doSave(form, { silent: true });
-      }
-    };
-    const onVis = () => {
-      if (document.visibilityState === "hidden") flush();
-    };
-    document.addEventListener("visibilitychange", onVis);
-    return () => {
-      document.removeEventListener("visibilitychange", onVis);
-      flush();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form, pincodeError, user, profile]);
+  }, [draftKey, form, profile]);
 
 
 
   function handleCancel() {
     if (!profile) return;
+    if (draftKey && typeof window !== "undefined") {
+      window.localStorage.removeItem(draftKey);
+    }
     setForm({
       fullName: profile.full_name || "",
       username: profile.username || "",
@@ -438,6 +437,7 @@ export function PersonalInfoPanel() {
     });
     setPincodeError(null);
     setSaveError(null);
+    setAutoSavedAt(null);
   }
 
   const initials = (form.fullName || PROFILE.fullName)
@@ -563,9 +563,9 @@ export function PersonalInfoPanel() {
             <Loader2 className="h-3 w-3 animate-spin" /> Saving…
           </>
         ) : autoSavedAt ? (
-          <span>Auto-saved · {new Date(autoSavedAt).toLocaleTimeString()}</span>
+          <span>Draft saved on this device · {new Date(autoSavedAt).toLocaleTimeString()}</span>
         ) : (
-          <span>Changes save automatically.</span>
+          <span>Your unfinished form is saved on this device.</span>
         )}
       </div>
       <SaveBar onSave={handleSave} onCancel={handleCancel} saving={saving} />
