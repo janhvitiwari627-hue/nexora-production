@@ -28,6 +28,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Search, Phone, MapPin, UserCheck, Mail, Loader2 } from "lucide-react";
@@ -115,6 +125,13 @@ export function PartnerApplicationsPage() {
   const [rejectReason, setRejectReason] = useState("");
   const [rejectOpen, setRejectOpen] = useState<PartnerApp | null>(null);
   const [kycNotesDraft, setKycNotesDraft] = useState("");
+  const [kycConfirm, setKycConfirm] = useState<{ app: PartnerApp; status: KycStatus; notes: string } | null>(null);
+
+  const requestKycChange = (app: PartnerApp, next: KycStatus, notes: string) => {
+    const current = extractKycReview(app).status;
+    if (current === next) return;
+    setKycConfirm({ app, status: next, notes });
+  };
 
 
   const { data = [], isLoading } = useQuery({
@@ -393,11 +410,7 @@ export function PartnerApplicationsPage() {
                             <Select
                               value={kycReview.status}
                               onValueChange={(v) =>
-                                setKyc.mutate({
-                                  app: l,
-                                  status: v as KycStatus,
-                                  notes: kycReview.notes,
-                                })
+                                requestKycChange(l, v as KycStatus, kycReview.notes)
                               }
                               disabled={setKyc.isPending}
                             >
@@ -579,11 +592,7 @@ export function PartnerApplicationsPage() {
                           variant={s === "approved" ? "default" : s === "rejected" ? "destructive" : "outline"}
                           disabled={setKyc.isPending}
                           onClick={() =>
-                            setKyc.mutate({
-                              app: detail,
-                              status: s,
-                              notes: kycNotesDraft.trim(),
-                            })
+                            requestKycChange(detail, s, kycNotesDraft.trim())
                           }
                         >
                           {current && "✓ "}Mark {s}
@@ -659,6 +668,56 @@ export function PartnerApplicationsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!kycConfirm} onOpenChange={(o) => !o && setKycConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {kycConfirm?.status === "approved"
+                ? "Approve KYC document?"
+                : kycConfirm?.status === "rejected"
+                ? "Reject KYC document?"
+                : "Mark KYC as pending?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {kycConfirm && (
+                <>
+                  You are about to mark <strong>{kycConfirm.app.full_name}</strong>'s KYC as{" "}
+                  <strong className="capitalize">{kycConfirm.status}</strong>. This will be recorded
+                  with your reviewer identity and timestamp. You can change it again later, but the
+                  applicant may be notified. Please confirm.
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={setKyc.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={setKyc.isPending}
+              className={
+                kycConfirm?.status === "rejected"
+                  ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  : undefined
+              }
+              onClick={(e) => {
+                e.preventDefault();
+                if (!kycConfirm) return;
+                setKyc.mutate(kycConfirm, {
+                  onSuccess: () => setKycConfirm(null),
+                });
+              }}
+            >
+              {setKyc.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving…
+                </>
+              ) : (
+                `Yes, mark ${kycConfirm?.status ?? ""}`
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
