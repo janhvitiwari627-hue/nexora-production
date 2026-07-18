@@ -31,6 +31,18 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Search, Phone, MapPin, UserCheck, Mail, Loader2 } from "lucide-react";
+import { KycDocumentPreview } from "@/components/admin/KycDocumentPreview";
+
+function extractKycPath(app: { metadata: Record<string, unknown> | null }): string | null {
+  const m = app.metadata;
+  if (!m || typeof m !== "object") return null;
+  const candidates = ["kyc_path", "kycPath", "kyc_document_path", "kyc"];
+  for (const key of candidates) {
+    const v = (m as Record<string, unknown>)[key];
+    if (typeof v === "string" && v.trim()) return v.trim();
+  }
+  return null;
+}
 
 const STATUSES = ["pending", "verified", "rejected", "suspended"] as const;
 type Status = (typeof STATUSES)[number];
