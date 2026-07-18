@@ -367,18 +367,27 @@ function PdfViewer({ url, applicantName, downloadUrl }: { url: string; applicant
           <ul className="space-y-2">
             {pages.map((n) => (
               <li key={n}>
-                <button
-                  type="button"
-                  onClick={() => setPage(n)}
-                  className={`block w-full overflow-hidden rounded border bg-white transition hover:border-primary ${
-                    n === page ? "border-primary ring-2 ring-primary/40" : "border-border"
-                  }`}
-                  aria-label={`Go to page ${n}`}
-                  aria-current={n === page ? "page" : undefined}
+                <ThumbButton
+                  active={n === page}
+                  onSelect={() => setPage(n)}
+                  ariaLabel={`Go to page ${n}${n === page ? " (current)" : ""}`}
                 >
-                  <PdfThumb doc={doc} pageNumber={n} />
-                  <span className="block py-1 text-center text-[10px] font-medium text-muted-foreground">{n}</span>
-                </button>
+                  <div className="relative">
+                    <PdfThumb doc={doc} pageNumber={n} />
+                    {n === page && (
+                      <span className="pointer-events-none absolute right-1 top-1 rounded bg-primary px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-primary-foreground shadow">
+                        Current
+                      </span>
+                    )}
+                  </div>
+                  <span
+                    className={`block py-1 text-center text-[10px] font-medium ${
+                      n === page ? "bg-primary text-primary-foreground" : "text-muted-foreground"
+                    }`}
+                  >
+                    Page {n}
+                  </span>
+                </ThumbButton>
               </li>
             ))}
           </ul>
