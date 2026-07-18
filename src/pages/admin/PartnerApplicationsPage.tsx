@@ -44,6 +44,41 @@ function extractKycPath(app: { metadata: Record<string, unknown> | null }): stri
   return null;
 }
 
+const KYC_STATUSES = ["pending", "approved", "rejected"] as const;
+type KycStatus = (typeof KYC_STATUSES)[number];
+
+type KycReview = {
+  status: KycStatus;
+  notes: string;
+  reviewed_at: string | null;
+  reviewed_by: string | null;
+};
+
+function extractKycReview(app: { metadata: Record<string, unknown> | null }): KycReview {
+  const m = app.metadata;
+  const fallback: KycReview = { status: "pending", notes: "", reviewed_at: null, reviewed_by: null };
+  if (!m || typeof m !== "object") return fallback;
+  const kyc = (m as Record<string, unknown>).kyc_review;
+  if (!kyc || typeof kyc !== "object") return fallback;
+  const k = kyc as Record<string, unknown>;
+  const status = typeof k.status === "string" && (KYC_STATUSES as readonly string[]).includes(k.status)
+    ? (k.status as KycStatus)
+    : "pending";
+  return {
+    status,
+    notes: typeof k.notes === "string" ? k.notes : "",
+    reviewed_at: typeof k.reviewed_at === "string" ? k.reviewed_at : null,
+    reviewed_by: typeof k.reviewed_by === "string" ? k.reviewed_by : null,
+  };
+}
+
+const KYC_TONE: Record<KycStatus, string> = {
+  pending: "bg-amber-100 text-amber-800 border-amber-200",
+  approved: "bg-emerald-100 text-emerald-700 border-emerald-200",
+  rejected: "bg-red-100 text-red-700 border-red-200",
+};
+
+
 const STATUSES = ["pending", "verified", "rejected", "suspended"] as const;
 type Status = (typeof STATUSES)[number];
 
