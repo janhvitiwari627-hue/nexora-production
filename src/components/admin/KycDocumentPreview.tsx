@@ -425,7 +425,7 @@ function ThumbButton({
   active: boolean;
   onSelect: () => void;
   ariaLabel: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   const ref = useRef<HTMLButtonElement>(null);
   useEffect(() => {
