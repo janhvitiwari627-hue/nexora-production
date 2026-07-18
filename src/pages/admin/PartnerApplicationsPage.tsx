@@ -31,6 +31,18 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Search, Phone, MapPin, UserCheck, Mail, Loader2 } from "lucide-react";
+import { KycDocumentPreview } from "@/components/admin/KycDocumentPreview";
+
+function extractKycPath(app: { metadata: Record<string, unknown> | null }): string | null {
+  const m = app.metadata;
+  if (!m || typeof m !== "object") return null;
+  const candidates = ["kyc_path", "kycPath", "kyc_document_path", "kyc"];
+  for (const key of candidates) {
+    const v = (m as Record<string, unknown>)[key];
+    if (typeof v === "string" && v.trim()) return v.trim();
+  }
+  return null;
+}
 
 const STATUSES = ["pending", "verified", "rejected", "suspended"] as const;
 type Status = (typeof STATUSES)[number];
@@ -240,6 +252,7 @@ export function PartnerApplicationsPage() {
                     <TableHead>Applicant</TableHead>
                     <TableHead>Contact</TableHead>
                     <TableHead>District</TableHead>
+                    <TableHead>KYC</TableHead>
                     <TableHead>Role</TableHead>
                     <TableHead>Applied</TableHead>
                     <TableHead>Status</TableHead>
@@ -250,6 +263,7 @@ export function PartnerApplicationsPage() {
                   {filtered.map((l) => {
                     const role =
                       typeof l.metadata?.role === "string" ? (l.metadata.role as string) : "—";
+                    const kycPath = extractKycPath(l);
                     return (
                       <TableRow key={l.id}>
                         <TableCell>
@@ -286,6 +300,13 @@ export function PartnerApplicationsPage() {
                             <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
                             {l.district}
                           </span>
+                        </TableCell>
+                        <TableCell>
+                          <KycDocumentPreview
+                            kycPath={kycPath}
+                            applicantName={l.full_name}
+                            variant="thumb"
+                          />
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground max-w-[180px] truncate">
                           {role}
@@ -367,7 +388,7 @@ export function PartnerApplicationsPage() {
 
       {/* Detail dialog */}
       <Dialog open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>{detail?.full_name}</DialogTitle>
             <DialogDescription>
@@ -398,6 +419,16 @@ export function PartnerApplicationsPage() {
                       : "—"}
                   </div>
                 </div>
+              </div>
+              <div>
+                <div className="mb-1.5 text-xs font-semibold text-muted-foreground">
+                  KYC Document
+                </div>
+                <KycDocumentPreview
+                  kycPath={extractKycPath(detail)}
+                  applicantName={detail.full_name}
+                  variant="inline"
+                />
               </div>
               {detail.tagline && (
                 <div>
