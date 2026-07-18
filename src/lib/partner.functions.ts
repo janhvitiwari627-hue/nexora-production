@@ -61,6 +61,8 @@ export type PartnerProfile = {
   success_story: string | null;
   photo_url: string | null;
   status: string;
+  metadata: Record<string, unknown> | null;
+  verified_at: string | null;
 };
 
 export const getPartnerProfile = createServerFn({ method: "GET" })
@@ -69,7 +71,7 @@ export const getPartnerProfile = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data } = await supabase
       .from("district_business_partners")
-      .select("id,full_name,mobile,email,district,state,pincode,tagline,success_story,photo_url,status")
+      .select("id,full_name,mobile,email,district,state,pincode,tagline,success_story,photo_url,status,metadata,verified_at")
       .eq("user_id", userId)
       .maybeSingle();
     return (data as PartnerProfile) ?? null;
