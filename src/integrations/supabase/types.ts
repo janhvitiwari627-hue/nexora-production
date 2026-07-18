@@ -47,6 +47,13 @@ export type Database = {
             foreignKeyName: "admin_roles_profile_id_fkey"
             columns: ["profile_id"]
             isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_roles_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -175,6 +182,74 @@ export type Database = {
         }
         Relationships: []
       }
+      booking_status_history: {
+        Row: {
+          booking_id: string
+          changed_by: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          metadata: Json
+          new_status: string
+          previous_status: string | null
+          reason: string | null
+          salon_id: string
+        }
+        Insert: {
+          booking_id: string
+          changed_by?: string | null
+          created_at?: string
+          customer_id: string
+          id?: string
+          metadata?: Json
+          new_status: string
+          previous_status?: string | null
+          reason?: string | null
+          salon_id: string
+        }
+        Update: {
+          booking_id?: string
+          changed_by?: string | null
+          created_at?: string
+          customer_id?: string
+          id?: string
+          metadata?: Json
+          new_status?: string
+          previous_status?: string | null
+          reason?: string | null
+          salon_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_status_history_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_status_history_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_status_history_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_status_history_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookings: {
         Row: {
           advance_amount: number | null
@@ -199,8 +274,10 @@ export type Database = {
           refund_status: string | null
           salon_id: string
           service_address: string | null
+          service_id: string | null
           service_mode: string
           service_name: string
+          staff_id: string | null
           status: string
           updated_at: string
           user_id: string
@@ -228,8 +305,10 @@ export type Database = {
           refund_status?: string | null
           salon_id: string
           service_address?: string | null
+          service_id?: string | null
           service_mode?: string
           service_name: string
+          staff_id?: string | null
           status?: string
           updated_at?: string
           user_id: string
@@ -257,8 +336,10 @@ export type Database = {
           refund_status?: string | null
           salon_id?: string
           service_address?: string | null
+          service_id?: string | null
           service_mode?: string
           service_name?: string
+          staff_id?: string | null
           status?: string
           updated_at?: string
           user_id?: string
@@ -269,6 +350,34 @@ export type Database = {
             columns: ["salon_id"]
             isOneToOne: false
             referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
             referencedColumns: ["id"]
           },
           {
@@ -576,6 +685,13 @@ export type Database = {
             foreignKeyName: "businesses_owner_id_fkey"
             columns: ["owner_id"]
             isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "businesses_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -584,6 +700,13 @@ export type Database = {
             columns: ["salon_id"]
             isOneToOne: false
             referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "businesses_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -677,135 +800,6 @@ export type Database = {
           video_url?: string | null
         }
         Relationships: []
-      }
-      chat_messages: {
-        Row: {
-          created_at: string
-          id: string
-          image_url: string | null
-          is_read: boolean | null
-          message_text: string | null
-          message_type: string | null
-          sender_id: string | null
-          sender_role: string
-          thread_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          image_url?: string | null
-          is_read?: boolean | null
-          message_text?: string | null
-          message_type?: string | null
-          sender_id?: string | null
-          sender_role: string
-          thread_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          image_url?: string | null
-          is_read?: boolean | null
-          message_text?: string | null
-          message_type?: string | null
-          sender_id?: string | null
-          sender_role?: string
-          thread_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "chat_messages_thread_id_fkey"
-            columns: ["thread_id"]
-            isOneToOne: false
-            referencedRelation: "chat_threads"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      chat_quick_replies: {
-        Row: {
-          created_at: string
-          id: string
-          is_active: boolean | null
-          is_default: boolean | null
-          reply_text: string
-          shop_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          is_active?: boolean | null
-          is_default?: boolean | null
-          reply_text: string
-          shop_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          is_active?: boolean | null
-          is_default?: boolean | null
-          reply_text?: string
-          shop_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "chat_quick_replies_shop_id_fkey"
-            columns: ["shop_id"]
-            isOneToOne: false
-            referencedRelation: "shops"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      chat_threads: {
-        Row: {
-          booking_id: string | null
-          created_at: string
-          customer_id: string | null
-          customer_unread_count: number | null
-          id: string
-          last_message: string | null
-          last_message_at: string | null
-          owner_id: string | null
-          owner_unread_count: number | null
-          shop_id: string
-          status: string | null
-        }
-        Insert: {
-          booking_id?: string | null
-          created_at?: string
-          customer_id?: string | null
-          customer_unread_count?: number | null
-          id?: string
-          last_message?: string | null
-          last_message_at?: string | null
-          owner_id?: string | null
-          owner_unread_count?: number | null
-          shop_id: string
-          status?: string | null
-        }
-        Update: {
-          booking_id?: string | null
-          created_at?: string
-          customer_id?: string | null
-          customer_unread_count?: number | null
-          id?: string
-          last_message?: string | null
-          last_message_at?: string | null
-          owner_id?: string | null
-          owner_unread_count?: number | null
-          shop_id?: string
-          status?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "chat_threads_shop_id_fkey"
-            columns: ["shop_id"]
-            isOneToOne: false
-            referencedRelation: "shops"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       customer_insights: {
         Row: {
@@ -1183,6 +1177,20 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "favorites_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "favorites_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -1190,6 +1198,75 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      growth_partner_applications: {
+        Row: {
+          beauty_industry_experience: string
+          city: string
+          created_at: string
+          current_work_type: string
+          district: string
+          email: string
+          full_name: string
+          id: string
+          kyc_path: string
+          mobile: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          reviewer_note: string | null
+          salons_in_network: number
+          state: string
+          status: string
+          terms_accepted_at: string
+          updated_at: string
+          user_id: string
+          whatsapp_number: string
+        }
+        Insert: {
+          beauty_industry_experience: string
+          city: string
+          created_at?: string
+          current_work_type: string
+          district: string
+          email: string
+          full_name: string
+          id?: string
+          kyc_path: string
+          mobile: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_note?: string | null
+          salons_in_network?: number
+          state: string
+          status?: string
+          terms_accepted_at?: string
+          updated_at?: string
+          user_id: string
+          whatsapp_number: string
+        }
+        Update: {
+          beauty_industry_experience?: string
+          city?: string
+          created_at?: string
+          current_work_type?: string
+          district?: string
+          email?: string
+          full_name?: string
+          id?: string
+          kyc_path?: string
+          mobile?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_note?: string | null
+          salons_in_network?: number
+          state?: string
+          status?: string
+          terms_accepted_at?: string
+          updated_at?: string
+          user_id?: string
+          whatsapp_number?: string
+        }
+        Relationships: []
       }
       job_applications: {
         Row: {
@@ -1408,6 +1485,13 @@ export type Database = {
             referencedRelation: "salons"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "jobs_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
         ]
       }
       location_history: {
@@ -1527,6 +1611,13 @@ export type Database = {
             referencedRelation: "salons"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "marketing_campaigns_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
         ]
       }
       media_library: {
@@ -1609,7 +1700,73 @@ export type Database = {
             foreignKeyName: "memberships_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "memberships_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_deliveries: {
+        Row: {
+          attempts: number
+          channel: string
+          delivered_at: string | null
+          id: string
+          last_error: string | null
+          metadata: Json
+          notification_id: string | null
+          provider: string | null
+          provider_message_id: string | null
+          queued_at: string
+          read_at: string | null
+          sent_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          channel: string
+          delivered_at?: string | null
+          id?: string
+          last_error?: string | null
+          metadata?: Json
+          notification_id?: string | null
+          provider?: string | null
+          provider_message_id?: string | null
+          queued_at?: string
+          read_at?: string | null
+          sent_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          channel?: string
+          delivered_at?: string | null
+          id?: string
+          last_error?: string | null
+          metadata?: Json
+          notification_id?: string | null
+          provider?: string | null
+          provider_message_id?: string | null
+          queued_at?: string
+          read_at?: string | null
+          sent_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_deliveries_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "notifications"
             referencedColumns: ["id"]
           },
         ]
@@ -1692,6 +1849,13 @@ export type Database = {
             foreignKeyName: "notifications_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1748,6 +1912,13 @@ export type Database = {
             referencedRelation: "salons"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "offers_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
         ]
       }
       owner_requests: {
@@ -1802,6 +1973,13 @@ export type Database = {
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "owner_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
             referencedColumns: ["id"]
           },
           {
@@ -2402,6 +2580,100 @@ export type Database = {
             referencedRelation: "salons"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "partner_shop_mapping_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_ledger: {
+        Row: {
+          amount: number
+          booking_id: string | null
+          currency: string
+          customer_id: string
+          event_type: string
+          gateway_reference: string | null
+          id: string
+          idempotency_key: string
+          metadata: Json
+          occurred_at: string
+          payment_id: string
+          recorded_at: string
+          salon_id: string
+          status: string
+        }
+        Insert: {
+          amount: number
+          booking_id?: string | null
+          currency?: string
+          customer_id: string
+          event_type: string
+          gateway_reference?: string | null
+          id?: string
+          idempotency_key: string
+          metadata?: Json
+          occurred_at?: string
+          payment_id: string
+          recorded_at?: string
+          salon_id: string
+          status: string
+        }
+        Update: {
+          amount?: number
+          booking_id?: string | null
+          currency?: string
+          customer_id?: string
+          event_type?: string
+          gateway_reference?: string | null
+          id?: string
+          idempotency_key?: string
+          metadata?: Json
+          occurred_at?: string
+          payment_id?: string
+          recorded_at?: string
+          salon_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_ledger_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_ledger_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_ledger_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_ledger_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_ledger_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
         ]
       }
       payments: {
@@ -2470,6 +2742,13 @@ export type Database = {
             foreignKeyName: "payments_booking_id_fkey"
             columns: ["booking_id"]
             isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
             referencedRelation: "bookings"
             referencedColumns: ["id"]
           },
@@ -2478,6 +2757,13 @@ export type Database = {
             columns: ["salon_id"]
             isOneToOne: false
             referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -2518,7 +2804,21 @@ export type Database = {
             foreignKeyName: "pending_payments_booking_id_fkey"
             columns: ["booking_id"]
             isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pending_payments_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
             referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pending_payments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
             referencedColumns: ["id"]
           },
           {
@@ -2687,6 +2987,13 @@ export type Database = {
           username?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "profiles_referred_by_user_id_fkey"
+            columns: ["referred_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "profiles_referred_by_user_id_fkey"
             columns: ["referred_by_user_id"]
@@ -2952,6 +3259,42 @@ export type Database = {
         }
         Relationships: []
       }
+      push_device_tokens: {
+        Row: {
+          created_at: string
+          device_name: string | null
+          id: string
+          is_active: boolean
+          last_seen_at: string
+          platform: string
+          token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_name?: string | null
+          id?: string
+          is_active?: boolean
+          last_seen_at?: string
+          platform: string
+          token: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          device_name?: string | null
+          id?: string
+          is_active?: boolean
+          last_seen_at?: string
+          platform?: string
+          token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       qr_payments: {
         Row: {
           amount: number | null
@@ -3001,6 +3344,116 @@ export type Database = {
             referencedRelation: "salons"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "qr_payments_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referral_attributions: {
+        Row: {
+          id: string
+          metadata: Json
+          qualified_at: string | null
+          referral_code: string
+          referred_user_id: string
+          referrer_name: string | null
+          referrer_user_id: string
+          rewarded_at: string | null
+          source: string
+          status: string
+          validated_at: string
+        }
+        Insert: {
+          id?: string
+          metadata?: Json
+          qualified_at?: string | null
+          referral_code: string
+          referred_user_id: string
+          referrer_name?: string | null
+          referrer_user_id: string
+          rewarded_at?: string | null
+          source?: string
+          status?: string
+          validated_at?: string
+        }
+        Update: {
+          id?: string
+          metadata?: Json
+          qualified_at?: string | null
+          referral_code?: string
+          referred_user_id?: string
+          referrer_name?: string | null
+          referrer_user_id?: string
+          rewarded_at?: string | null
+          source?: string
+          status?: string
+          validated_at?: string
+        }
+        Relationships: []
+      }
+      referral_transactions: {
+        Row: {
+          amount: number
+          attribution_id: string
+          beneficiary_user_id: string
+          booking_id: string | null
+          created_at: string
+          id: string
+          idempotency_key: string
+          metadata: Json
+          points: number
+          transaction_type: string
+        }
+        Insert: {
+          amount?: number
+          attribution_id: string
+          beneficiary_user_id: string
+          booking_id?: string | null
+          created_at?: string
+          id?: string
+          idempotency_key: string
+          metadata?: Json
+          points?: number
+          transaction_type: string
+        }
+        Update: {
+          amount?: number
+          attribution_id?: string
+          beneficiary_user_id?: string
+          booking_id?: string | null
+          created_at?: string
+          id?: string
+          idempotency_key?: string
+          metadata?: Json
+          points?: number
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_transactions_attribution_id_fkey"
+            columns: ["attribution_id"]
+            isOneToOne: false
+            referencedRelation: "referral_attributions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_transactions_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_transactions_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
         ]
       }
       referrals: {
@@ -3036,6 +3489,13 @@ export type Database = {
             foreignKeyName: "referrals_referred_user_id_fkey"
             columns: ["referred_user_id"]
             isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referred_user_id_fkey"
+            columns: ["referred_user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -3043,7 +3503,130 @@ export type Database = {
             foreignKeyName: "referrals_referrer_id_fkey"
             columns: ["referrer_id"]
             isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_replies: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          id: string
+          is_public: boolean
+          review_id: string
+          salon_id: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          review_id: string
+          salon_id: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          review_id?: string
+          salon_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_replies_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_replies_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_replies_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_reports: {
+        Row: {
+          created_at: string
+          details: string | null
+          id: string
+          reason: string
+          reporter_id: string
+          resolved_at: string | null
+          resolved_by: string | null
+          review_id: string
+          salon_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason: string
+          reporter_id: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          review_id: string
+          salon_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason?: string
+          reporter_id?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          review_id?: string
+          salon_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_reports_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_reports_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_reports_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -3091,10 +3674,98 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "reviews_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "reviews_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reward_transactions: {
+        Row: {
+          balance_after: number | null
+          booking_id: string | null
+          created_at: string
+          customer_id: string
+          entry_type: string
+          expires_at: string | null
+          id: string
+          idempotency_key: string
+          metadata: Json
+          payment_id: string | null
+          points: number
+          referral_attribution_id: string | null
+        }
+        Insert: {
+          balance_after?: number | null
+          booking_id?: string | null
+          created_at?: string
+          customer_id: string
+          entry_type: string
+          expires_at?: string | null
+          id?: string
+          idempotency_key: string
+          metadata?: Json
+          payment_id?: string | null
+          points: number
+          referral_attribution_id?: string | null
+        }
+        Update: {
+          balance_after?: number | null
+          booking_id?: string | null
+          created_at?: string
+          customer_id?: string
+          entry_type?: string
+          expires_at?: string | null
+          id?: string
+          idempotency_key?: string
+          metadata?: Json
+          payment_id?: string | null
+          points?: number
+          referral_attribution_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_transactions_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reward_transactions_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reward_transactions_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reward_transactions_referral_attribution_fkey"
+            columns: ["referral_attribution_id"]
+            isOneToOne: false
+            referencedRelation: "referral_attributions"
             referencedColumns: ["id"]
           },
         ]
@@ -3150,7 +3821,21 @@ export type Database = {
             foreignKeyName: "rewards_booking_id_fkey"
             columns: ["booking_id"]
             isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rewards_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
             referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rewards_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
             referencedColumns: ["id"]
           },
           {
@@ -3259,6 +3944,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "salon_owners_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "salon_owners_selected_template_id_fkey"
             columns: ["selected_template_id"]
             isOneToOne: false
@@ -3318,6 +4010,13 @@ export type Database = {
             referencedRelation: "salons"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "salon_rankings_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
         ]
       }
       salon_wallets: {
@@ -3371,6 +4070,13 @@ export type Database = {
             referencedRelation: "salons"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "salon_wallets_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
         ]
       }
       salons: {
@@ -3417,6 +4123,7 @@ export type Database = {
           rank_in_city: number | null
           rating: number
           reviews_count: number
+          search_vector: unknown
           selected_template_id: string | null
           selected_template_key: string | null
           seo_description: string | null
@@ -3476,6 +4183,7 @@ export type Database = {
           rank_in_city?: number | null
           rating?: number
           reviews_count?: number
+          search_vector?: unknown
           selected_template_id?: string | null
           selected_template_key?: string | null
           seo_description?: string | null
@@ -3535,6 +4243,7 @@ export type Database = {
           rank_in_city?: number | null
           rating?: number
           reviews_count?: number
+          search_vector?: unknown
           selected_template_id?: string | null
           selected_template_key?: string | null
           seo_description?: string | null
@@ -3557,6 +4266,35 @@ export type Database = {
             columns: ["selected_template_id"]
             isOneToOne: false
             referencedRelation: "website_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saved_jobs: {
+        Row: {
+          created_at: string
+          id: string
+          job_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          job_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          job_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_jobs_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
             referencedColumns: ["id"]
           },
         ]
@@ -3631,6 +4369,13 @@ export type Database = {
             columns: ["clicked_salon_id"]
             isOneToOne: false
             referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "search_history_clicked_salon_id_fkey"
+            columns: ["clicked_salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -3722,6 +4467,13 @@ export type Database = {
             referencedRelation: "salons"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "services_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
         ]
       }
       shop_members: {
@@ -3752,6 +4504,13 @@ export type Database = {
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
             referencedColumns: ["id"]
           },
           {
@@ -3801,6 +4560,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "shop_staff_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "shop_staff_profile_id_fkey"
             columns: ["profile_id"]
@@ -3926,6 +4692,129 @@ export type Database = {
             columns: ["salon_id"]
             isOneToOne: false
             referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_availability: {
+        Row: {
+          created_at: string
+          ends_at: string
+          id: string
+          is_available: boolean
+          salon_id: string
+          slot_minutes: number
+          staff_id: string
+          starts_at: string
+          updated_at: string
+          weekday: number
+        }
+        Insert: {
+          created_at?: string
+          ends_at: string
+          id?: string
+          is_available?: boolean
+          salon_id: string
+          slot_minutes?: number
+          staff_id: string
+          starts_at: string
+          updated_at?: string
+          weekday: number
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string
+          id?: string
+          is_available?: boolean
+          salon_id?: string
+          slot_minutes?: number
+          staff_id?: string
+          starts_at?: string
+          updated_at?: string
+          weekday?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_availability_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_availability_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_availability_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_time_off: {
+        Row: {
+          created_at: string
+          created_by: string
+          ends_at: string
+          id: string
+          reason: string | null
+          salon_id: string
+          staff_id: string
+          starts_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          ends_at: string
+          id?: string
+          reason?: string | null
+          salon_id: string
+          staff_id: string
+          starts_at: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          ends_at?: string
+          id?: string
+          reason?: string | null
+          salon_id?: string
+          staff_id?: string
+          starts_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_time_off_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_time_off_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_time_off_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
             referencedColumns: ["id"]
           },
         ]
@@ -4068,7 +4957,21 @@ export type Database = {
             foreignKeyName: "transactions_booking_id_fkey"
             columns: ["booking_id"]
             isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
             referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
             referencedColumns: ["id"]
           },
           {
@@ -4117,6 +5020,8 @@ export type Database = {
       }
       user_websites: {
         Row: {
+          business_category: string | null
+          business_category_id: string | null
           created_at: string
           draft_updated_at: string
           id: string
@@ -4131,6 +5036,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          business_category?: string | null
+          business_category_id?: string | null
           created_at?: string
           draft_updated_at?: string
           id?: string
@@ -4145,6 +5052,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          business_category?: string | null
+          business_category_id?: string | null
           created_at?: string
           draft_updated_at?: string
           id?: string
@@ -4160,10 +5069,24 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "user_websites_business_category_id_fkey"
+            columns: ["business_category_id"]
+            isOneToOne: false
+            referencedRelation: "website_template_categories"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "user_websites_salon_id_fkey"
             columns: ["salon_id"]
             isOneToOne: false
             referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_websites_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
           {
@@ -4207,6 +5130,170 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      wallet_ledger: {
+        Row: {
+          amount: number
+          balance_after: number | null
+          booking_id: string | null
+          created_at: string
+          description: string | null
+          entry_type: string
+          id: string
+          idempotency_key: string
+          metadata: Json
+          payment_id: string | null
+          salon_id: string
+          user_id: string | null
+          wallet_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after?: number | null
+          booking_id?: string | null
+          created_at?: string
+          description?: string | null
+          entry_type: string
+          id?: string
+          idempotency_key: string
+          metadata?: Json
+          payment_id?: string | null
+          salon_id: string
+          user_id?: string | null
+          wallet_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number | null
+          booking_id?: string | null
+          created_at?: string
+          description?: string | null
+          entry_type?: string
+          id?: string
+          idempotency_key?: string
+          metadata?: Json
+          payment_id?: string | null
+          salon_id?: string
+          user_id?: string | null
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_ledger_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wallet_ledger_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wallet_ledger_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wallet_ledger_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wallet_ledger_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wallet_ledger_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "salon_wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wallet_settlements: {
+        Row: {
+          amount: number
+          failure_reason: string | null
+          fee_amount: number
+          id: string
+          metadata: Json
+          net_amount: number | null
+          payout_reference: string | null
+          processed_at: string | null
+          processed_by: string | null
+          requested_at: string
+          requested_by: string
+          salon_id: string
+          status: string
+          wallet_id: string
+        }
+        Insert: {
+          amount: number
+          failure_reason?: string | null
+          fee_amount?: number
+          id?: string
+          metadata?: Json
+          net_amount?: number | null
+          payout_reference?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          requested_at?: string
+          requested_by: string
+          salon_id: string
+          status?: string
+          wallet_id: string
+        }
+        Update: {
+          amount?: number
+          failure_reason?: string | null
+          fee_amount?: number
+          id?: string
+          metadata?: Json
+          net_amount?: number | null
+          payout_reference?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          requested_at?: string
+          requested_by?: string
+          salon_id?: string
+          status?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_settlements_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wallet_settlements_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wallet_settlements_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "salon_wallets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       wallet_transactions: {
         Row: {
@@ -4254,6 +5341,20 @@ export type Database = {
             columns: ["salon_id"]
             isOneToOne: false
             referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wallet_transactions_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wallet_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
             referencedColumns: ["id"]
           },
           {
@@ -4357,71 +5458,127 @@ export type Database = {
           },
         ]
       }
+      website_template_categories: {
+        Row: {
+          created_at: string
+          icon: string | null
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       website_templates: {
         Row: {
           background_color: string | null
           card_color: string | null
           category: string
+          category_id: string | null
           created_at: string
           description: string | null
           hero_type: string | null
           id: string
           is_active: boolean
+          is_featured: boolean
+          preview_data: Json
           preview_image: string | null
           primary_color: string | null
           secondary_color: string | null
+          section_schema: Json
           sort_order: number
           template_config_json: Json
           template_key: string
           template_name: string
           template_slug: string
           text_color: string | null
+          theme_config: Json
           theme_type: string | null
+          thumbnail_url: string | null
           updated_at: string
         }
         Insert: {
           background_color?: string | null
           card_color?: string | null
           category: string
+          category_id?: string | null
           created_at?: string
           description?: string | null
           hero_type?: string | null
           id?: string
           is_active?: boolean
+          is_featured?: boolean
+          preview_data?: Json
           preview_image?: string | null
           primary_color?: string | null
           secondary_color?: string | null
+          section_schema?: Json
           sort_order?: number
           template_config_json?: Json
           template_key: string
           template_name: string
           template_slug: string
           text_color?: string | null
+          theme_config?: Json
           theme_type?: string | null
+          thumbnail_url?: string | null
           updated_at?: string
         }
         Update: {
           background_color?: string | null
           card_color?: string | null
           category?: string
+          category_id?: string | null
           created_at?: string
           description?: string | null
           hero_type?: string | null
           id?: string
           is_active?: boolean
+          is_featured?: boolean
+          preview_data?: Json
           preview_image?: string | null
           primary_color?: string | null
           secondary_color?: string | null
+          section_schema?: Json
           sort_order?: number
           template_config_json?: Json
           template_key?: string
           template_name?: string
           template_slug?: string
           text_color?: string | null
+          theme_config?: Json
           theme_type?: string | null
+          thumbnail_url?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "website_templates_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "website_template_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       website_theme: {
         Row: {
@@ -4550,10 +5707,133 @@ export type Database = {
             referencedRelation: "salons"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "withdrawals_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
         ]
       }
     }
     Views: {
+      appointments: {
+        Row: {
+          advance_amount: number | null
+          appointment_date: string | null
+          appointment_time: string | null
+          booking_reference: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          created_at: string | null
+          customer_id: string | null
+          deleted_at: string | null
+          home_service_charge: number | null
+          id: string | null
+          payment_deadline: string | null
+          payment_status: string | null
+          price: number | null
+          proposal_note: string | null
+          proposal_status: string | null
+          proposed_date: string | null
+          proposed_time: string | null
+          refund_status: string | null
+          service_address: string | null
+          service_mode: string | null
+          service_name: string | null
+          status: string | null
+          tenant_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          advance_amount?: number | null
+          appointment_date?: string | null
+          appointment_time?: string | null
+          booking_reference?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          deleted_at?: string | null
+          home_service_charge?: number | null
+          id?: string | null
+          payment_deadline?: string | null
+          payment_status?: string | null
+          price?: number | null
+          proposal_note?: string | null
+          proposal_status?: string | null
+          proposed_date?: string | null
+          proposed_time?: string | null
+          refund_status?: string | null
+          service_address?: string | null
+          service_mode?: string | null
+          service_name?: string | null
+          status?: string | null
+          tenant_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          advance_amount?: number | null
+          appointment_date?: string | null
+          appointment_time?: string | null
+          booking_reference?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          deleted_at?: string | null
+          home_service_charge?: number | null
+          id?: string | null
+          payment_deadline?: string | null
+          payment_status?: string | null
+          price?: number | null
+          proposal_note?: string | null
+          proposal_status?: string | null
+          proposed_date?: string | null
+          proposed_time?: string | null
+          refund_status?: string | null
+          service_address?: string | null
+          service_mode?: string | null
+          service_name?: string | null
+          status?: string | null
+          tenant_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_salon_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_salon_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_user_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_user_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brands_public: {
         Row: {
           category: string | null
@@ -4629,6 +5909,66 @@ export type Database = {
         }
         Relationships: []
       }
+      customers: {
+        Row: {
+          avatar_url: string | null
+          city: string | null
+          country: string | null
+          created_at: string | null
+          date_of_birth: string | null
+          district: string | null
+          email: string | null
+          full_name: string | null
+          gender: string | null
+          id: string | null
+          is_active: boolean | null
+          is_verified: boolean | null
+          mobile: string | null
+          pincode: string | null
+          state: string | null
+          updated_at: string | null
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          date_of_birth?: string | null
+          district?: string | null
+          email?: string | null
+          full_name?: string | null
+          gender?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          mobile?: string | null
+          pincode?: string | null
+          state?: string | null
+          updated_at?: string | null
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          date_of_birth?: string | null
+          district?: string | null
+          email?: string | null
+          full_name?: string | null
+          gender?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          mobile?: string | null
+          pincode?: string | null
+          state?: string | null
+          updated_at?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
       distributors_public: {
         Row: {
           brands_handled: string[] | null
@@ -4695,6 +6035,39 @@ export type Database = {
           status?: string | null
           website?: string | null
           years_in_business?: number | null
+        }
+        Relationships: []
+      }
+      media_files: {
+        Row: {
+          bucket_id: string | null
+          created_at: string | null
+          id: string | null
+          last_accessed_at: string | null
+          metadata: Json | null
+          object_path: string | null
+          tenant_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          bucket_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          last_accessed_at?: string | null
+          metadata?: Json | null
+          object_path?: string | null
+          tenant_id?: never
+          updated_at?: string | null
+        }
+        Update: {
+          bucket_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          last_accessed_at?: string | null
+          metadata?: Json | null
+          object_path?: string | null
+          tenant_id?: never
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -4807,10 +6180,300 @@ export type Database = {
           },
         ]
       }
+      tenant_websites: {
+        Row: {
+          about_us: string | null
+          address: string | null
+          amenities: string[] | null
+          brand_primary: string | null
+          brand_secondary: string | null
+          category: string | null
+          city: string | null
+          cover_image_url: string | null
+          created_at: string | null
+          description: string | null
+          discount: string | null
+          gallery_images: string[] | null
+          home_service_charge: number | null
+          home_service_radius_km: number | null
+          hours: Json | null
+          id: string | null
+          image_url: string | null
+          is_active: boolean | null
+          is_home_service: boolean | null
+          is_published: boolean | null
+          is_verified: boolean | null
+          latitude: number | null
+          location: string | null
+          logo_url: string | null
+          longitude: number | null
+          name: string | null
+          owner_profile_image_url: string | null
+          phone: string | null
+          pincode: string | null
+          price_range: string | null
+          rating: number | null
+          reviews_count: number | null
+          slug: string | null
+          tagline: string | null
+          template_id: string | null
+          template_key: string | null
+          tenant_id: string | null
+          theme: string | null
+          video_url: string | null
+          website_url: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          about_us?: string | null
+          address?: string | null
+          amenities?: string[] | null
+          brand_primary?: string | null
+          brand_secondary?: string | null
+          category?: string | null
+          city?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          discount?: string | null
+          gallery_images?: string[] | null
+          home_service_charge?: number | null
+          home_service_radius_km?: number | null
+          hours?: Json | null
+          id?: string | null
+          image_url?: string | null
+          is_active?: boolean | null
+          is_home_service?: boolean | null
+          is_published?: boolean | null
+          is_verified?: boolean | null
+          latitude?: number | null
+          location?: string | null
+          logo_url?: string | null
+          longitude?: number | null
+          name?: string | null
+          owner_profile_image_url?: string | null
+          phone?: string | null
+          pincode?: string | null
+          price_range?: string | null
+          rating?: number | null
+          reviews_count?: number | null
+          slug?: string | null
+          tagline?: string | null
+          template_id?: string | null
+          template_key?: string | null
+          tenant_id?: string | null
+          theme?: string | null
+          video_url?: string | null
+          website_url?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          about_us?: string | null
+          address?: string | null
+          amenities?: string[] | null
+          brand_primary?: string | null
+          brand_secondary?: string | null
+          category?: string | null
+          city?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          discount?: string | null
+          gallery_images?: string[] | null
+          home_service_charge?: number | null
+          home_service_radius_km?: number | null
+          hours?: Json | null
+          id?: string | null
+          image_url?: string | null
+          is_active?: boolean | null
+          is_home_service?: boolean | null
+          is_published?: boolean | null
+          is_verified?: boolean | null
+          latitude?: number | null
+          location?: string | null
+          logo_url?: string | null
+          longitude?: number | null
+          name?: string | null
+          owner_profile_image_url?: string | null
+          phone?: string | null
+          pincode?: string | null
+          price_range?: string | null
+          rating?: number | null
+          reviews_count?: number | null
+          slug?: string | null
+          tagline?: string | null
+          template_id?: string | null
+          template_key?: string | null
+          tenant_id?: string | null
+          theme?: string | null
+          video_url?: string | null
+          website_url?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      tenants: {
+        Row: {
+          about_us: string | null
+          address: string | null
+          amenities: string[] | null
+          brand_primary: string | null
+          brand_secondary: string | null
+          category: string | null
+          city: string | null
+          cover_image_url: string | null
+          created_at: string | null
+          deleted_at: string | null
+          description: string | null
+          district: string | null
+          gallery_images: string[] | null
+          home_service_charge: number | null
+          home_service_radius_km: number | null
+          hours: Json | null
+          id: string | null
+          image_url: string | null
+          is_active: boolean | null
+          is_home_service: boolean | null
+          is_verified: boolean | null
+          latitude: number | null
+          location: string | null
+          logo_url: string | null
+          longitude: number | null
+          name: string | null
+          pincode: string | null
+          public_phone: string | null
+          public_whatsapp: string | null
+          selected_template_id: string | null
+          selected_template_key: string | null
+          show_public_contact: boolean | null
+          slug: string | null
+          tagline: string | null
+          theme: string | null
+          updated_at: string | null
+          video_url: string | null
+          website_created: boolean | null
+          website_url: string | null
+        }
+        Insert: {
+          about_us?: string | null
+          address?: string | null
+          amenities?: string[] | null
+          brand_primary?: string | null
+          brand_secondary?: string | null
+          category?: string | null
+          city?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          district?: string | null
+          gallery_images?: string[] | null
+          home_service_charge?: number | null
+          home_service_radius_km?: number | null
+          hours?: Json | null
+          id?: string | null
+          image_url?: string | null
+          is_active?: boolean | null
+          is_home_service?: boolean | null
+          is_verified?: boolean | null
+          latitude?: number | null
+          location?: string | null
+          logo_url?: string | null
+          longitude?: number | null
+          name?: string | null
+          pincode?: string | null
+          public_phone?: string | null
+          public_whatsapp?: string | null
+          selected_template_id?: string | null
+          selected_template_key?: string | null
+          show_public_contact?: boolean | null
+          slug?: string | null
+          tagline?: string | null
+          theme?: string | null
+          updated_at?: string | null
+          video_url?: string | null
+          website_created?: boolean | null
+          website_url?: string | null
+        }
+        Update: {
+          about_us?: string | null
+          address?: string | null
+          amenities?: string[] | null
+          brand_primary?: string | null
+          brand_secondary?: string | null
+          category?: string | null
+          city?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          district?: string | null
+          gallery_images?: string[] | null
+          home_service_charge?: number | null
+          home_service_radius_km?: number | null
+          hours?: Json | null
+          id?: string | null
+          image_url?: string | null
+          is_active?: boolean | null
+          is_home_service?: boolean | null
+          is_verified?: boolean | null
+          latitude?: number | null
+          location?: string | null
+          logo_url?: string | null
+          longitude?: number | null
+          name?: string | null
+          pincode?: string | null
+          public_phone?: string | null
+          public_whatsapp?: string | null
+          selected_template_id?: string | null
+          selected_template_key?: string | null
+          show_public_contact?: boolean | null
+          slug?: string | null
+          tagline?: string | null
+          theme?: string | null
+          updated_at?: string | null
+          video_url?: string | null
+          website_created?: boolean | null
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "salons_selected_template_id_fkey"
+            columns: ["selected_template_id"]
+            isOneToOne: false
+            referencedRelation: "website_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       auto_release_escrow: { Args: never; Returns: number }
       complete_owner_salon_setup: { Args: { _salon_id: string }; Returns: Json }
+      create_public_appointment:
+        | {
+            Args: {
+              _appointment_date: string
+              _appointment_time: string
+              _customer_name: string
+              _mobile: string
+              _service_id: string
+              _tenant_id: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              _appointment_date: string
+              _appointment_time: string
+              _customer_name: string
+              _mobile: string
+              _service_id: string
+              _staff_id: string
+              _tenant_id: string
+            }
+            Returns: Json
+          }
       create_user_website_from_template: {
         Args: { _salon_id?: string; _template_id: string }
         Returns: string
@@ -4819,7 +6482,6 @@ export type Database = {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
       }
-      email_queue_dispatch: { Args: never; Returns: undefined }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
@@ -4937,8 +6599,10 @@ export type Database = {
           refund_status: string | null
           salon_id: string
           service_address: string | null
+          service_id: string | null
           service_mode: string
           service_name: string
+          staff_id: string | null
           status: string
           updated_at: string
           user_id: string
@@ -4951,6 +6615,24 @@ export type Database = {
         }
       }
       process_pending_settlements: { Args: never; Returns: number }
+      public_salons_search: {
+        Args: { _category?: string; _limit?: number; _q?: string }
+        Returns: {
+          area: string
+          category: string
+          city: string
+          cover_image: string
+          id: string
+          is_verified: boolean
+          name: string
+          price_level: string
+          rank: number
+          rating: number
+          review_count: number
+          slug: string
+          tagline: string
+        }[]
+      }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
@@ -5320,3 +7002,4 @@ export const Constants = {
     },
   },
 } as const
+

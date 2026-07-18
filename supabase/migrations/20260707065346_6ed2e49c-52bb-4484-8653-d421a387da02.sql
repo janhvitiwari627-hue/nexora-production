@@ -12,8 +12,16 @@ GRANT SELECT ON public.public_salon_cards TO anon, authenticated;
 -- legitimate reason to call. Triggers/cron/RLS still work because they run as
 -- table owner or as the authenticated user (which retains EXECUTE).
 REVOKE EXECUTE ON FUNCTION public.log_partner_financial_change() FROM anon, PUBLIC;
-REVOKE EXECUTE ON FUNCTION public.email_queue_wake() FROM anon, authenticated, PUBLIC;
-REVOKE EXECUTE ON FUNCTION public.email_queue_dispatch() FROM anon, authenticated, PUBLIC;
+DO $$
+BEGIN
+  IF to_regprocedure('public.email_queue_wake()') IS NOT NULL THEN
+    REVOKE EXECUTE ON FUNCTION public.email_queue_wake() FROM anon, authenticated, PUBLIC;
+  END IF;
+  IF to_regprocedure('public.email_queue_dispatch()') IS NOT NULL THEN
+    REVOKE EXECUTE ON FUNCTION public.email_queue_dispatch() FROM anon, authenticated, PUBLIC;
+  END IF;
+END
+$$;
 REVOKE EXECUTE ON FUNCTION public.is_super_admin() FROM anon, PUBLIC;
 REVOKE EXECUTE ON FUNCTION public.is_super_admin(uuid) FROM anon, PUBLIC;
 REVOKE EXECUTE ON FUNCTION public.is_shop_member(uuid, uuid) FROM anon, PUBLIC;

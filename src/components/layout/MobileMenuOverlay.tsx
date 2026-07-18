@@ -117,8 +117,14 @@ export function MobileMenuOverlay({
   };
 
 
+  const currentProfile = profile?.id === user?.id ? profile : null;
+  const metadataName =
+    typeof user?.user_metadata?.full_name === "string"
+      ? user.user_metadata.full_name.trim()
+      : "";
   const displayName =
-    profile?.full_name ||
+    metadataName ||
+    currentProfile?.full_name ||
     (user?.email ? user.email.split("@")[0] : "Account");
   const email = user?.email ?? "";
 

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { toast } from "sonner";
 import {
@@ -7,14 +7,10 @@ import {
   Download,
   Share2,
   Link as LinkIcon,
-  Users,
-  Trophy,
   Wallet,
-  Hourglass,
   MessageCircle,
   Sparkles,
   Gift,
-  Send,
   Mail,
   Twitter,
   Facebook,
@@ -26,13 +22,7 @@ import { PublicFooter } from "@/components/layout/PublicFooter";
 import { MyReferralsSection } from "@/components/referral/MyReferralsSection";
 import { useAuthStore } from "@/stores/authStore";
 import { buildReferralSignupUrl } from "@/lib/public-app-url";
-import {
-  mockReferralCode,
-  mockReferralLink,
-  mockReferralStats,
-  mockReferrals,
-  type ReferralStatus,
-} from "./referral/mockReferral";
+import type { ReferralStatus } from "./referral/mockReferral";
 
 const STATUS: Record<ReferralStatus, { label: string; classes: string }> = {
   joined: { label: "Joined", classes: "bg-sky-100 text-sky-700" },
@@ -42,15 +32,21 @@ const STATUS: Record<ReferralStatus, { label: string; classes: string }> = {
 };
 
 export function ReferralCenterPage() {
+  const user = useAuthStore((s) => s.user);
   const profile = useAuthStore((s) => s.profile);
-  const referralCode = profile?.referral_code ?? mockReferralCode;
-  const referralLink = profile?.referral_code
-    ? buildReferralSignupUrl(profile.referral_code)
-    : mockReferralLink;
+  const refreshProfile = useAuthStore((s) => s.refreshProfile);
+  const currentProfile = profile?.id === user?.id ? profile : null;
+  const referralCode = currentProfile?.referral_code?.trim() ?? "";
+  const referralLink = referralCode ? buildReferralSignupUrl(referralCode) : "";
   const qrRef = useRef<HTMLDivElement>(null);
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [showFallback, setShowFallback] = useState(false);
+
+  useEffect(() => {
+    if (!user || currentProfile) return;
+    void refreshProfile();
+  }, [currentProfile, refreshProfile, user]);
 
   const shareText = `Join me on Nexora and we both earn 100 points. Use code ${referralCode}: ${referralLink}`;
 
@@ -136,6 +132,23 @@ export function ReferralCenterPage() {
   const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
   const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(referralLink)}`;
   const emailUrl = `mailto:?subject=${encodeURIComponent("Join me on Nexora")}&body=${encodeURIComponent(shareText)}`;
+
+  if (!referralCode) {
+    return (
+      <div className="min-h-screen bg-background">
+        <PublicHeader />
+        <main className="mx-auto w-full max-w-6xl px-4 py-10">
+          <div className="rounded-2xl border bg-card p-6 text-center shadow-sm">
+            <h1 className="text-xl font-black">Loading your referral code…</h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              We are securely loading the referral code for your signed-in account.
+            </p>
+          </div>
+        </main>
+        <PublicFooter />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -312,34 +325,6 @@ export function ReferralCenterPage() {
           </div>
         </div>
 
-        {/* Stats */}
-        <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard
-            label="Total Invites"
-            value={mockReferralStats.totalInvites}
-            Icon={Send}
-            tint="bg-sky-100 text-sky-700"
-          />
-          <StatCard
-            label="Successful"
-            value={mockReferralStats.successful}
-            Icon={Users}
-            tint="bg-indigo-100 text-indigo-700"
-          />
-          <StatCard
-            label="Rewards Earned"
-            value={`₹${mockReferralStats.rewardsEarned}`}
-            Icon={Trophy}
-            tint="bg-emerald-100 text-emerald-700"
-          />
-          <StatCard
-            label="Pending Rewards"
-            value={`₹${mockReferralStats.pending}`}
-            Icon={Hourglass}
-            tint="bg-amber-100 text-amber-700"
-          />
-        </section>
-
         {/* How it works */}
         <section className="rounded-3xl border bg-gradient-to-br from-card to-muted/40 p-6 shadow-sm">
           <h2 className="text-lg font-bold">How it works</h2>
@@ -369,28 +354,6 @@ export function ReferralCenterPage() {
         <MyReferralsSection />
       </main>
       <PublicFooter />
-    </div>
-  );
-}
-
-function StatCard({
-  label,
-  value,
-  Icon,
-  tint,
-}: {
-  label: string;
-  value: string | number;
-  Icon: LucideIcon;
-  tint: string;
-}) {
-  return (
-    <div className="rounded-2xl border bg-card p-4 shadow-sm">
-      <div className={`grid h-9 w-9 place-items-center rounded-full ${tint}`}>
-        <Icon className="h-4 w-4" />
-      </div>
-      <p className="mt-3 text-2xl font-black">{value}</p>
-      <p className="text-xs font-semibold text-muted-foreground">{label}</p>
     </div>
   );
 }

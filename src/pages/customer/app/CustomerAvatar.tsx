@@ -13,6 +13,7 @@ export function CustomerAvatar({
 }: CustomerAvatarProps) {
   const user = useAuthStore((state) => state.user);
   const profile = useAuthStore((state) => state.profile);
+  const currentProfile = profile?.id === user?.id ? profile : null;
   const [imageFailed, setImageFailed] = useState(false);
 
   const metadataAvatar =
@@ -21,9 +22,13 @@ export function CustomerAvatar({
       : typeof user?.user_metadata?.picture === "string"
         ? user.user_metadata.picture
         : null;
-  const avatarUrl = profile?.avatar_url || metadataAvatar;
+  const avatarUrl = metadataAvatar || currentProfile?.avatar_url;
+  const metadataName =
+    typeof user?.user_metadata?.full_name === "string"
+      ? user.user_metadata.full_name.trim()
+      : "";
   const displayName =
-    profile?.full_name || user?.user_metadata?.full_name || user?.email?.split("@")[0] || "";
+    metadataName || currentProfile?.full_name || user?.email?.split("@")[0] || "";
   const initials =
     displayName
       .split(/\s+/)

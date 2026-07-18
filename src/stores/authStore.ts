@@ -140,6 +140,7 @@ export const useAuthStore = create<AuthStore>((set, get) => {
       });
       void ensureProfileExists(session.user)
         .then(({ profile, roles }) => {
+          if (get().user?.id !== session.user.id) return;
           set({ profile, roles, role: roles[0] ?? null, initError: null });
         })
         .catch((error) => {
@@ -173,7 +174,16 @@ export const useAuthStore = create<AuthStore>((set, get) => {
 
     setUser: (user) => set({ user }),
     setProfile: (profile) => set({ profile }),
-    setSession: (session) => set({ session, user: session?.user ?? null }),
+    setSession: (session) =>
+      set((state) => {
+        const nextUser = session?.user ?? null;
+        const accountChanged = state.user?.id !== nextUser?.id;
+        return {
+          session,
+          user: nextUser,
+          ...(accountChanged ? { profile: null, role: null, roles: [] } : {}),
+        };
+      }),
 
     signOut: async () => {
       try {
@@ -203,6 +213,7 @@ export const useAuthStore = create<AuthStore>((set, get) => {
       const { user } = get();
       if (!user) return;
       const { profile, roles } = await loadProfileAndRoles(user.id);
+      if (get().user?.id !== user.id) return;
       set({ profile, roles, role: roles[0] ?? null });
     },
 
@@ -244,7 +255,15 @@ export const useAuthStore = create<AuthStore>((set, get) => {
           event,
           nextSession ? "session exists" : "no session",
         );
-        set({ session: nextSession, user: nextSession?.user ?? null });
+        set((state) => {
+          const nextUser = nextSession?.user ?? null;
+          const accountChanged = state.user?.id !== nextUser?.id;
+          return {
+            session: nextSession,
+            user: nextUser,
+            ...(accountChanged ? { profile: null, role: null, roles: [] } : {}),
+          };
+        });
 
         if (event === "SIGNED_OUT" || !nextSession?.user) {
           set({ profile: null, role: null, roles: [] });
@@ -256,6 +275,7 @@ export const useAuthStore = create<AuthStore>((set, get) => {
           setTimeout(async () => {
             console.log("[Auth Store] Loading profile and roles for user:", userId);
             const { profile, roles } = await ensureProfileExists(nextSession.user);
+            if (get().user?.id !== userId) return;
             set({ profile, roles, role: roles[0] ?? null });
           }, 0);
 

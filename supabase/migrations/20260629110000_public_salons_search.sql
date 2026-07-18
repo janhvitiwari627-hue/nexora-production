@@ -86,7 +86,7 @@ CREATE OR REPLACE FUNCTION public.public_salons_search(
     s.tagline,
     s.category,
     s.city,
-    s.area,
+    s.location AS area,
     s.cover_image_url AS cover_image,
     s.rating,
     s.reviews_count AS review_count,

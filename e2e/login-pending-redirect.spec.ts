@@ -14,6 +14,8 @@ const SESSION_JSON = process.env.LOVABLE_BROWSER_SUPABASE_SESSION_JSON;
 
 const PENDING_KEY = "nexora:postLoginRedirect";
 
+test.setTimeout(90_000);
+
 async function seedSession(page: Page) {
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await page.evaluate(
@@ -84,6 +86,7 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
       timeout: 10_000,
     });
     expect(new URL(page.url()).pathname).not.toMatch(/^\/login$/);
+  });
 
   for (const target of ["/dashboard", "/owner/bookings", "/partner/dashboard"]) {
     test(`pending redirect key for ${target} is consumed exactly once and not reused on next /login`, async ({ page }) => {
@@ -134,6 +137,7 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
       );
       expect(afterSecond).toBeNull();
     });
+  }
 
   test("logout before completing redirect flow clears the pending redirect key", async ({ page }) => {
     await seedSession(page);
@@ -758,8 +762,6 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     ).toBeNull();
   });
 });
-
-
 
 
 

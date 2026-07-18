@@ -9,13 +9,20 @@ REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM anon, authenticated, PU
 -- P2: chat_quick_replies has RLS on but no policies (locked to everyone).
 -- Add explicit admin-only policies so the state is intentional and auditable.
 -- Owner/staff/shop-scoped policies will be added when the chat feature ships.
-REVOKE ALL ON public.chat_quick_replies FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.chat_quick_replies TO authenticated;
-GRANT ALL ON public.chat_quick_replies TO service_role;
-
-CREATE POLICY "Admins manage chat quick replies"
-  ON public.chat_quick_replies
-  FOR ALL
-  TO authenticated
-  USING (public.has_role(auth.uid(), 'admin'::public.app_role))
-  WITH CHECK (public.has_role(auth.uid(), 'admin'::public.app_role));
+DO $$
+BEGIN
+  IF to_regclass('public.chat_quick_replies') IS NOT NULL THEN
+    EXECUTE 'REVOKE ALL ON public.chat_quick_replies FROM anon';
+    EXECUTE 'GRANT SELECT, INSERT, UPDATE, DELETE ON public.chat_quick_replies TO authenticated';
+    EXECUTE 'GRANT ALL ON public.chat_quick_replies TO service_role';
+    EXECUTE $policy$
+      CREATE POLICY "Admins manage chat quick replies"
+        ON public.chat_quick_replies
+        FOR ALL
+        TO authenticated
+        USING (public.has_role(auth.uid(), 'admin'::public.app_role))
+        WITH CHECK (public.has_role(auth.uid(), 'admin'::public.app_role))
+    $policy$;
+  END IF;
+END
+$$;

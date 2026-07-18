@@ -288,7 +288,7 @@ export default function SignupPage() {
         }
         setSuccess("signed_in");
         const redirectTo = await resolvePostLoginRedirect(session.user.id);
-        setTimeout(() => navigate({ to: redirectTo, replace: true }), 600);
+        setTimeout(() => navigate({ to: redirectTo, replace: true }), 1500);
       }
     } catch (err) {
       setServerError(parseErr(err));
@@ -310,6 +310,20 @@ export default function SignupPage() {
               <CardTitle>Welcome to Nexora!</CardTitle>
               <CardDescription>Your account has been created. Redirecting…</CardDescription>
             </CardHeader>
+            {referralConfirmed ? (
+              <CardContent>
+                <div className="border-primary/20 bg-primary/5 rounded-xl border p-4 text-center">
+                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+                    Referral confirmed
+                  </p>
+                  <p className="text-heading mt-1 text-base font-bold">{referrerName}</p>
+                  <p className="text-muted-foreground mt-1 text-sm">
+                    Referrer code{" "}
+                    <strong className="text-foreground font-mono tracking-wider">{referredBy}</strong>
+                  </p>
+                </div>
+              </CardContent>
+            ) : null}
           </Card>
         </div>
       </div>

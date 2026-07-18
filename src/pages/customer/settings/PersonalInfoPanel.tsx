@@ -372,6 +372,11 @@ export function PersonalInfoPanel() {
       if (!savedProfile || savedProfile.id !== activeUser.id) {
         throw new Error("The profile update could not be verified. Please try again.");
       }
+      const normalizedFullName = snapshot.fullName.trim();
+      const { error: metadataError } = await supabase.auth.updateUser({
+        data: { full_name: normalizedFullName || null },
+      });
+      if (metadataError) throw metadataError;
       setProfile(savedProfile);
       lastSavedSnapshotRef.current = JSON.stringify(snapshot);
       if (draftKey && typeof window !== "undefined") {

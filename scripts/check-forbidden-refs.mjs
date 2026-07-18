@@ -12,6 +12,9 @@ const EXCLUDES = [
   "--glob=!**/.output/**",
   "--glob=!**/.vinxi/**",
   "--glob=!**/routeTree.gen.ts",
+  // Generated database declarations describe legacy server objects but are
+  // not executable application references.
+  "--glob=!src/integrations/supabase/types.ts",
   "--glob=!supabase/migrations/**",
   "--glob=!scripts/check-forbidden-refs.mjs",
 ];

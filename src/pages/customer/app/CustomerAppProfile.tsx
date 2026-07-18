@@ -38,20 +38,24 @@ export function CustomerAppProfile() {
     );
   }
 
-  const name = profile?.full_name || user.email?.split("@")[0] || "Nexora customer";
+  const currentProfile = profile?.id === user.id ? profile : null;
+  const metadataName =
+    typeof user.user_metadata?.full_name === "string" ? user.user_metadata.full_name.trim() : "";
+  const name =
+    metadataName || currentProfile?.full_name || user.email?.split("@")[0] || "Nexora customer";
   return (
     <main className="mx-auto max-w-2xl px-4 py-6 sm:py-10">
       <section className="flex items-center gap-4 rounded-3xl border bg-white p-6">
         <CustomerAvatar className="h-16 w-16 text-xl" iconClassName="h-8 w-8" />
         <div className="min-w-0">
           <h1 className="truncate text-2xl font-black">{name}</h1>
-          <p className="truncate text-sm text-slate-500">{user.email || profile?.mobile}</p>
+          <p className="truncate text-sm text-slate-500">{user.email || currentProfile?.mobile}</p>
           <p className="mt-1 truncate text-xs font-bold text-violet-700">
-            Nexora member{profile?.nexora_id ? ` · ID ${profile.nexora_id}` : ""}
+            Nexora member{currentProfile?.nexora_id ? ` · ID ${currentProfile.nexora_id}` : ""}
           </p>
           <p className="mt-1 text-xs capitalize text-slate-500">
-            {profile?.gender
-              ? `${profile.gender} recommendations`
+            {currentProfile?.gender
+              ? `${currentProfile.gender} recommendations`
               : "Add gender for personalised salons"}
           </p>
         </div>
@@ -61,7 +65,7 @@ export function CustomerAppProfile() {
         className="mt-3 flex items-center justify-center gap-2 rounded-2xl border bg-white px-4 py-3 text-sm font-bold text-violet-700"
       >
         <Camera className="h-4 w-4" />
-        {profile?.avatar_url ? "Change profile photo" : "Choose profile photo"}
+        {currentProfile?.avatar_url ? "Change profile photo" : "Choose profile photo"}
       </Link>
       <div className="mt-6 overflow-hidden rounded-2xl border bg-white">
         {LINKS.map((item) => (

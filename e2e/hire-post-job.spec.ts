@@ -377,6 +377,8 @@ test.describe("/hire/post-job", () => {
   });
 });
 
+});
+
 test.describe("/hire/post-job publish failure", () => {
   test.skip(
     !STORAGE_KEY || !SESSION_JSON,
@@ -581,7 +583,6 @@ test.describe("/hire/post-job publish validation", () => {
     expect(jobsPostCount).toBe(0);
   });
 });
-
 
 
 

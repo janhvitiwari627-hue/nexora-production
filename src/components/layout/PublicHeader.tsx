@@ -98,6 +98,7 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
   const [logoutOpen, setLogoutOpen] = useState(false);
   const user = useAuthStore((s) => s.user);
   const profile = useAuthStore((s) => s.profile);
+  const currentProfile = profile?.id === user?.id ? profile : null;
   const roles = useAuthStore((s) => s.roles);
   const primaryRole = pickPrimaryRole(roles);
   const dashHref = routeForRole(primaryRole);
@@ -141,12 +142,17 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
     navigate({ to: "/login", replace: true });
   };
 
-  const displayName = profile?.full_name || (user?.email ? user.email.split("@")[0] : "Account");
+  const metadataName =
+    typeof user?.user_metadata?.full_name === "string"
+      ? user.user_metadata.full_name.trim()
+      : "";
+  const displayName =
+    metadataName || currentProfile?.full_name || (user?.email ? user.email.split("@")[0] : "Account");
   const email = user?.email ?? "";
   const avatarUrl =
-    profile?.avatar_url ||
     (user?.user_metadata?.avatar_url as string | undefined) ||
     (user?.user_metadata?.picture as string | undefined) ||
+    currentProfile?.avatar_url ||
     "";
   const initials =
     displayName
@@ -268,7 +274,7 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
                     </span>
                   )}
                   <span className="truncate text-[11px] font-semibold text-primary">
-                    Nexora member{profile?.nexora_id ? ` · ID ${profile.nexora_id}` : ""}
+                    Nexora member{currentProfile?.nexora_id ? ` · ID ${currentProfile.nexora_id}` : ""}
                   </span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />

@@ -1,4 +1,4 @@
-export const PUBLIC_APP_ORIGIN = "https://nexora-final-last-app.lovable.app";
+export const PUBLIC_APP_ORIGIN = "https://meripahalfasthelp.online";
 
 type AppLocation = Pick<Location, "hostname" | "origin">;
 
@@ -11,17 +11,10 @@ export function resolvePublicAppOrigin(location?: AppLocation): string {
     return current.origin;
   }
 
-  const isTemporaryPreview =
-    hostname.startsWith("id-preview--") ||
-    hostname.startsWith("preview--") ||
-    hostname === "lovableproject.com" ||
-    hostname.endsWith(".lovableproject.com") ||
-    hostname === "lovableproject-dev.com" ||
-    hostname.endsWith(".lovableproject-dev.com") ||
-    hostname === "beta.lovable.dev" ||
-    hostname.endsWith(".beta.lovable.dev");
-
-  return isTemporaryPreview ? PUBLIC_APP_ORIGIN : current.origin;
+  // Referral links are public marketing links. Always send recipients to the
+  // canonical custom domain, even when the link is copied from a Lovable
+  // preview or the lovable.app deployment.
+  return PUBLIC_APP_ORIGIN;
 }
 
 export function buildReferralSignupUrl(code: string, location?: AppLocation): string {

@@ -33,3 +33,7 @@ dist-ssr
 
 # Local environment variables
 .env
+
+# Playwright generated artifacts
+playwright-report/
+test-results/
