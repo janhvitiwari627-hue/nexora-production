@@ -410,11 +410,7 @@ export function PartnerApplicationsPage() {
                             <Select
                               value={kycReview.status}
                               onValueChange={(v) =>
-                                setKyc.mutate({
-                                  app: l,
-                                  status: v as KycStatus,
-                                  notes: kycReview.notes,
-                                })
+                                requestKycChange(l, v as KycStatus, kycReview.notes)
                               }
                               disabled={setKyc.isPending}
                             >
