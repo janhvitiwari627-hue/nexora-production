@@ -377,12 +377,47 @@ export function PartnerApplicationsPage() {
                           </span>
                         </TableCell>
                         <TableCell>
-                          <KycDocumentPreview
-                            kycPath={kycPath}
-                            applicantName={l.full_name}
-                            variant="thumb"
-                          />
+                          <div className="flex flex-col gap-1.5">
+                            <KycDocumentPreview
+                              kycPath={kycPath}
+                              applicantName={l.full_name}
+                              variant="thumb"
+                            />
+                            <Select
+                              value={kycReview.status}
+                              onValueChange={(v) =>
+                                setKyc.mutate({
+                                  app: l,
+                                  status: v as KycStatus,
+                                  notes: kycReview.notes,
+                                })
+                              }
+                              disabled={setKyc.isPending}
+                            >
+                              <SelectTrigger
+                                className={`h-7 w-[120px] text-xs ${KYC_TONE[kycReview.status]}`}
+                              >
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {KYC_STATUSES.map((s) => (
+                                  <SelectItem key={s} value={s} className="text-xs capitalize">
+                                    {s}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            {kycReview.notes && (
+                              <div
+                                className="text-[10px] text-muted-foreground max-w-[160px] truncate"
+                                title={kycReview.notes}
+                              >
+                                📝 {kycReview.notes}
+                              </div>
+                            )}
+                          </div>
                         </TableCell>
+
                         <TableCell className="text-sm text-muted-foreground max-w-[180px] truncate">
                           {role}
                         </TableCell>
