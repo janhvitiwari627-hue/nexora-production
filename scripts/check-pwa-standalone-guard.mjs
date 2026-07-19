@@ -7,43 +7,76 @@
  * codebase, and it must NOT be recreated. Any reference is almost certainly
  * a stale import that will break the build.
  */
-import { spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const FILE = "src/lib/pwa-standalone-guard.ts";
 const TERM = "pwa-standalone-guard";
+const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const EXCLUDED_DIRECTORIES = new Set(["node_modules", "dist", ".output", ".vinxi"]);
 
 const errors = [];
 
-if (existsSync(FILE)) {
+if (existsSync(path.join(PROJECT_ROOT, FILE))) {
   errors.push(
     `${FILE} exists — this module was removed during the customer-app cleanup and must not be recreated.`,
   );
 }
 
-const INCLUDE_GLOBS = ["src", "app"].filter((d) => existsSync(d));
-const EXCLUDES = [
-  "--glob=!**/node_modules/**",
-  "--glob=!**/dist/**",
-  "--glob=!**/.output/**",
-  "--glob=!**/.vinxi/**",
-  "--glob=!**/routeTree.gen.ts",
-];
+const normalizePath = (filePath) => filePath.split(path.sep).join("/");
 
-if (INCLUDE_GLOBS.length > 0) {
-  const result = spawnSync(
-    "rg",
-    ["-n", "--no-heading", "-S", ...EXCLUDES, "--", TERM, ...INCLUDE_GLOBS],
-    { encoding: "utf8" },
-  );
-  if (result.status === 0 && result.stdout.trim()) {
-    errors.push(
-      `Found stale reference(s) to \`${TERM}\` in source (module was deleted):\n${result.stdout}`,
-    );
-  } else if (result.status !== 1) {
-    console.error(`[pwa-standalone-guard] scan error:`, result.stderr || result.error?.message);
-    process.exit(2);
+function isBinary(buffer) {
+  const sample = buffer.subarray(0, Math.min(buffer.length, 8_192));
+  if (sample.includes(0)) return true;
+
+  let suspiciousBytes = 0;
+  for (const byte of sample) {
+    if (byte < 32 && byte !== 9 && byte !== 10 && byte !== 13) suspiciousBytes += 1;
   }
+
+  return sample.length > 0 && suspiciousBytes / sample.length > 0.1;
+}
+
+function collectFiles(directory) {
+  const files = [];
+
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    if (entry.isDirectory() && EXCLUDED_DIRECTORIES.has(entry.name)) continue;
+    if (entry.isFile() && entry.name === "routeTree.gen.ts") continue;
+
+    const absolutePath = path.join(directory, entry.name);
+    if (entry.isDirectory()) files.push(...collectFiles(absolutePath));
+    else if (entry.isFile()) files.push(absolutePath);
+  }
+
+  return files;
+}
+
+try {
+  const roots = ["src", "app"]
+    .map((directory) => path.join(PROJECT_ROOT, directory))
+    .filter((directory) => existsSync(directory));
+
+  for (const absolutePath of roots.flatMap(collectFiles)) {
+    const buffer = readFileSync(absolutePath);
+    if (isBinary(buffer)) continue;
+
+    buffer
+      .toString("utf8")
+      .split(/\r?\n/)
+      .forEach((line, index) => {
+        if (!line.includes(TERM)) return;
+        const relativePath = normalizePath(path.relative(PROJECT_ROOT, absolutePath));
+        errors.push(`${relativePath}:${index + 1}: stale reference to \`${TERM}\``);
+      });
+  }
+} catch (error) {
+  console.error(
+    "[pwa-standalone-guard] scan error:",
+    error instanceof Error ? error.message : error,
+  );
+  process.exit(2);
 }
 
 if (errors.length) {
