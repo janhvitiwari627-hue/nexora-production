@@ -1,4 +1,12 @@
-import { AlertTriangle, RefreshCw, Home, Database, KeyRound, Wifi } from "lucide-react";
+import {
+  AlertTriangle,
+  RefreshCw,
+  Home,
+  Database,
+  KeyRound,
+  Wifi,
+  type LucideIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export type SupabaseErrorKind = "missing-env" | "auth" | "network" | "unknown";
@@ -7,29 +15,38 @@ export function detectSupabaseErrorKind(error: unknown): SupabaseErrorKind | nul
   const msg = error instanceof Error ? error.message : typeof error === "string" ? error : "";
   if (!msg) return null;
   const m = msg.toLowerCase();
-  if (m.includes("missing supabase environment") || m.includes("supabase_url") && m.includes("missing")) {
+  if (
+    m.includes("missing supabase environment") ||
+    (m.includes("supabase_url") && m.includes("missing"))
+  ) {
     return "missing-env";
   }
-  if (m.includes("connect supabase in lovable cloud")) return "missing-env";
-  if (m.includes("jwt") || m.includes("unauthorized") || m.includes("invalid api key") || m.includes("not authenticated")) {
+  if (
+    m.includes("jwt") ||
+    m.includes("unauthorized") ||
+    m.includes("invalid api key") ||
+    m.includes("not authenticated")
+  ) {
     return "auth";
   }
   if (m.includes("failed to fetch") || m.includes("network") || m.includes("networkerror")) {
     return "network";
   }
-  if (m.includes("supabase")) return "unknown";
   return null;
 }
 
-const COPY: Record<SupabaseErrorKind, { icon: any; title: string; body: string; steps: string[] }> = {
+const COPY: Record<
+  SupabaseErrorKind,
+  { icon: LucideIcon; title: string; body: string; steps: string[] }
+> = {
   "missing-env": {
     icon: Database,
-    title: "Backend isn't connected",
-    body: "The app can't reach the database because the Lovable Cloud connection isn't configured.",
+    title: "Backend configuration is unavailable",
+    body: "The app is missing its Supabase connection settings for this environment.",
     steps: [
-      "Open the Backend panel from the top of the editor.",
-      "Verify Lovable Cloud is enabled for this project.",
-      "Wait a few seconds after reconnecting, then reload this page.",
+      "Retry once in case the deployment has just finished.",
+      "Verify the Supabase environment variables are configured for this deployment.",
+      "Contact the site administrator if the problem continues.",
     ],
   },
   auth: {

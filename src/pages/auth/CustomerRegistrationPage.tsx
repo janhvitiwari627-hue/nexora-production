@@ -473,20 +473,21 @@ export default function CustomerRegistrationPage() {
     window.sessionStorage.setItem("nexora_pending_customer_gender", form.gender);
     setGoogleSubmitting(true);
     try {
-      console.log("[Register] Initiating Google OAuth...");
-      const { lovable } = await import("@/integrations/lovable/index");
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+      const { data: oauthData, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
       });
 
-      if (result.error) {
-        console.error("[Register] Google OAuth error:", result.error);
-        setServerError(parseErrorMessage(result.error));
+      if (error) {
+        console.error("[Register] Google OAuth error:", error.message);
+        setServerError(parseErrorMessage(error));
         return;
       }
 
-      if (result.redirected) {
-        console.log("[Register] Google OAuth initiated, redirecting...");
+      if (oauthData.url) {
+        window.location.assign(oauthData.url);
         return;
       }
 
