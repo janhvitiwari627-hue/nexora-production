@@ -9,13 +9,13 @@ const STATUS_STYLES: Record<
   ReferralAttribution["status"],
   { label: string; classes: string; Icon: typeof Clock }
 > = {
-  pending: {
-    label: "Pending",
-    classes: "bg-amber-100 text-amber-700",
-    Icon: Clock,
+  joined: {
+    label: "Joined",
+    classes: "bg-sky-100 text-sky-700",
+    Icon: UserPlus,
   },
-  converted: {
-    label: "Converted",
+  rewarded: {
+    label: "Rewarded",
     classes: "bg-emerald-100 text-emerald-700",
     Icon: CheckCircle2,
   },
@@ -34,8 +34,7 @@ export function MyReferralsSection() {
 
   const rows = data ?? [];
   const total = rows.length;
-  const converted = rows.filter((r) => r.status === "converted").length;
-  const pending = total - converted;
+  const rewarded = rows.filter((r) => r.status === "rewarded").length;
 
   return (
     <section className="overflow-hidden rounded-2xl border bg-card shadow-sm">
@@ -46,7 +45,7 @@ export function MyReferralsSection() {
             My referrals
           </h3>
           <p className="text-muted-foreground mt-0.5 text-xs">
-            Live attribution — {total} invited · {converted} converted · {pending} pending
+            Live attribution — {total} joined via your link · {rewarded} rewarded
           </p>
         </div>
         <button
@@ -83,7 +82,6 @@ export function MyReferralsSection() {
               <tr>
                 <th className="px-5 py-2.5 text-left">Friend</th>
                 <th className="px-5 py-2.5 text-left">Signed up</th>
-                <th className="px-5 py-2.5 text-right">Bookings</th>
                 <th className="px-5 py-2.5 text-right">Status</th>
               </tr>
             </thead>
@@ -100,7 +98,6 @@ export function MyReferralsSection() {
                         year: "numeric",
                       })}
                     </td>
-                    <td className="px-5 py-3 text-right font-semibold">{r.bookingsCount}</td>
                     <td className="px-5 py-3 text-right">
                       <span
                         className={cn(

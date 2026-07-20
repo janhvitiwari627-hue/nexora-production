@@ -1,4 +1,6 @@
 import { expect, test } from "@playwright/test";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import {
   buildReferralSignupUrl,
   PUBLIC_APP_ORIGIN,
@@ -35,4 +37,16 @@ test("local development keeps its local origin", () => {
   } as Location;
 
   expect(resolvePublicAppOrigin(localLocation)).toBe("http://localhost:3000");
+});
+
+test("referral activity uses the signed-in RLS client", () => {
+  const source = readFileSync(
+    fileURLToPath(new URL("../src/lib/referrals.functions.ts", import.meta.url)),
+    "utf8",
+  );
+
+  expect(source).toContain('context.supabase\n        .from("referral_attributions")');
+  expect(source).toContain('.from("referrals")');
+  expect(source).not.toContain("supabaseAdmin");
+  expect(source).not.toContain("SUPABASE_SERVICE_ROLE_KEY");
 });

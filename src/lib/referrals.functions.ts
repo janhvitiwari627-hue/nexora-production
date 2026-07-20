@@ -1,63 +1,69 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export type ReferralAttributionStatus = "pending" | "converted";
+export type ReferralAttributionStatus = "joined" | "rewarded";
 
 export interface ReferralAttribution {
   id: string;
   name: string;
   signedUpAt: string;
   status: ReferralAttributionStatus;
-  bookingsCount: number;
 }
 
 export const getMyReferrals = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<ReferralAttribution[]> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const [attributionsResult, legacyResult] = await Promise.all([
+      context.supabase
+        .from("referral_attributions")
+        .select("id, referred_user_id, validated_at, status")
+        .eq("referrer_user_id", context.userId)
+        .order("validated_at", { ascending: false })
+        .limit(200),
+      context.supabase
+        .from("referrals")
+        .select("id, referred_user_id, created_at, status")
+        .eq("referrer_id", context.userId)
+        .order("created_at", { ascending: false })
+        .limit(200),
+    ]);
 
-    const { data: referred, error: refErr } = await supabaseAdmin
-      .from("profiles")
-      .select("id, full_name, email, created_at")
-      .eq("referred_by_user_id", context.userId)
-      .order("created_at", { ascending: false })
-      .limit(200);
-
-    if (refErr) throw refErr;
-    const rows = referred ?? [];
-    if (rows.length === 0) return [];
-
-    const ids = rows.map((r) => r.id);
-    const { data: bookings } = await supabaseAdmin
-      .from("bookings")
-      .select("user_id, status")
-      .in("user_id", ids);
-
-    const counts = new Map<string, number>();
-    for (const b of bookings ?? []) {
-      if (!b.user_id) continue;
-      counts.set(b.user_id, (counts.get(b.user_id) ?? 0) + 1);
+    // Both tables are protected by RLS and expose only this signed-in user's
+    // referrals. The user's token removes the need for an admin secret here.
+    if (attributionsResult.error && legacyResult.error) {
+      console.error("[Referrals] Attribution query failed", {
+        attributionCode: attributionsResult.error.code,
+        legacyCode: legacyResult.error.code,
+      });
+      throw new Error("Could not load referral activity");
     }
 
-    const mask = (name: string | null, email: string | null): string => {
-      const n = (name ?? "").trim();
-      if (n) return n;
-      const e = (email ?? "").trim();
-      if (!e) return "New member";
-      const [local] = e.split("@");
-      if (!local) return "New member";
-      if (local.length <= 2) return `${local[0] ?? "•"}***`;
-      return `${local.slice(0, 2)}***`;
-    };
+    const rows = new Map<string, ReferralAttribution>();
 
-    return rows.map((r) => {
-      const bookingsCount = counts.get(r.id) ?? 0;
-      return {
-        id: r.id,
-        name: mask(r.full_name, r.email),
-        signedUpAt: r.created_at ?? new Date().toISOString(),
-        status: bookingsCount > 0 ? "converted" : "pending",
-        bookingsCount,
-      };
-    });
+    for (const row of attributionsResult.data ?? []) {
+      const key = row.referred_user_id || row.id;
+      rows.set(key, {
+        id: row.id,
+        name: "Nexora member",
+        signedUpAt: row.validated_at,
+        status: row.status === "rewarded" ? "rewarded" : "joined",
+      });
+    }
+
+    // Keep the original referrals table as a fallback for accounts created
+    // before referral_attributions was introduced.
+    for (const row of legacyResult.data ?? []) {
+      const key = row.referred_user_id || row.id;
+      if (rows.has(key)) continue;
+      rows.set(key, {
+        id: row.id,
+        name: "Nexora member",
+        signedUpAt: row.created_at,
+        status: row.status === "rewarded" ? "rewarded" : "joined",
+      });
+    }
+
+    return [...rows.values()]
+      .sort((a, b) => Date.parse(b.signedUpAt) - Date.parse(a.signedUpAt))
+      .slice(0, 200);
   });
