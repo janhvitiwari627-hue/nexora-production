@@ -122,19 +122,24 @@ const ReferralInput = z.object({
 export const validateReferralCode = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) => ReferralInput.parse(d))
   .handler(async ({ data }) => {
-    // Public read via service-role bypass would be ideal, but we use anon-safe RPC.
-    // Profiles allows public SELECT in this project, so this is fine.
-    const { createClient } = await import("@supabase/supabase-js");
-    const supabase = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_PUBLISHABLE_KEY!,
-      { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
-    );
-    const { data: row } = await supabase
+    // Signup happens before authentication, so perform this narrow lookup on the
+    // server instead of granting anonymous users access to the profiles table.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row, error } = await supabaseAdmin
       .from("profiles")
       .select("full_name")
       .eq("referral_code", data.code.toUpperCase())
+      .eq("is_active", true)
       .maybeSingle();
+
+    if (error) {
+      console.error("[referral] Failed to validate referral code", {
+        code: data.code.toUpperCase(),
+        error: error.message,
+      });
+      throw new Error("Unable to validate referral code");
+    }
+
     return { valid: !!row, referrerName: row?.full_name ?? null };
   });
 
