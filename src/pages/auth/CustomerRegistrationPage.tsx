@@ -36,7 +36,7 @@ import {
   PasswordStrengthIndicator,
   scorePassword,
 } from "@/components/auth/PasswordStrengthIndicator";
-import { validateReferralCode, registerMySalon } from "@/lib/owner.functions";
+import { registerMySalon } from "@/lib/owner.functions";
 import { registerDistrictPartner } from "@/lib/districtPartner.functions";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
@@ -200,7 +200,11 @@ export default function CustomerRegistrationPage() {
   });
 
   useEffect(() => {
-    if (search?.ref) setForm((f) => (f.referred_by ? f : { ...f, referred_by: search.ref! }));
+    if (search?.ref) {
+      setForm((f) =>
+        f.referred_by ? f : { ...f, referred_by: search.ref!.trim().slice(0, 20).toUpperCase() },
+      );
+    }
   }, [search?.ref]);
 
   useEffect(() => {
@@ -225,33 +229,9 @@ export default function CustomerRegistrationPage() {
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [showEligibility, setShowEligibility] = useState(false);
 
-  // Referral code live validation
-  const [refStatus, setRefStatus] = useState<"idle" | "checking" | "valid" | "invalid">("idle");
-  const [refName, setRefName] = useState<string | null>(null);
-  const validateRef = useServerFn(validateReferralCode);
-  useEffect(() => {
-    const code = form.referred_by.trim();
-    if (!code) {
-      setRefStatus("idle");
-      setRefName(null);
-      return;
-    }
-    if (code.length < 3) {
-      setRefStatus("idle");
-      return;
-    }
-    setRefStatus("checking");
-    const t = setTimeout(async () => {
-      try {
-        const r = await validateRef({ data: { code } });
-        setRefStatus(r.valid ? "valid" : "invalid");
-        setRefName(r.referrerName);
-      } catch {
-        setRefStatus("invalid");
-      }
-    }, 400);
-    return () => clearTimeout(t);
-  }, [form.referred_by, validateRef]);
+  const normalizedReferral = form.referred_by.trim().toUpperCase();
+  const referralPending = /^[A-Z0-9]{3,20}$/.test(normalizedReferral);
+  const referralMalformed = Boolean(normalizedReferral && !referralPending);
 
   const registerSalonFn = useServerFn(registerMySalon);
   const registerDbpFn = useServerFn(registerDistrictPartner);
@@ -323,8 +303,8 @@ export default function CustomerRegistrationPage() {
       setErrors((current) => ({ ...current, gender: "Please select Male or Female" }));
       return;
     }
-    if (form.referred_by && refStatus === "invalid") {
-      setErrors((e) => ({ ...e, referred_by: "Referral code not found" }));
+    if (referralMalformed) {
+      setErrors((e) => ({ ...e, referred_by: "Use only letters and numbers" }));
       return;
     }
 
@@ -359,7 +339,9 @@ export default function CustomerRegistrationPage() {
           data: {
             full_name: parsed.data.full_name,
             mobile: parsed.data.mobile,
-            referred_by: parsed.data.referred_by || null,
+            // The database signup trigger validates the active referrer and
+            // creates attribution atomically with the new profile.
+            referred_by: referralPending ? normalizedReferral : null,
             role: accountType,
             gender: accountType === "customer" ? form.gender : null,
             business_category: accountType === "owner" ? form.business_category : null,
@@ -1130,18 +1112,17 @@ export default function CustomerRegistrationPage() {
                   disabled={submitting}
                 />
                 <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                  {refStatus === "checking" && (
-                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                  )}
-                  {refStatus === "valid" && <BadgeCheck className="h-4 w-4 text-success" />}
-                  {refStatus === "invalid" && <XCircle className="h-4 w-4 text-destructive" />}
+                  {referralPending && <BadgeCheck className="h-4 w-4 text-success" />}
+                  {referralMalformed && <XCircle className="h-4 w-4 text-destructive" />}
                 </div>
               </div>
-              {refStatus === "valid" && refName && (
-                <p className="text-xs text-success">Referred by {refName}</p>
+              {referralPending && (
+                <p className="text-xs text-success">
+                  Code received. It will be securely verified when your account is created.
+                </p>
               )}
-              {refStatus === "invalid" && form.referred_by && (
-                <p className="text-xs text-destructive">Referral code not found</p>
+              {referralMalformed && (
+                <p className="text-xs text-destructive">Use only letters and numbers</p>
               )}
               {errors.referred_by && (
                 <p className="text-xs text-destructive">{errors.referred_by}</p>

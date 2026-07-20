@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import { Copy, Gift, Link2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/stores/authStore";
 import { buildReferralSignupUrl } from "@/lib/public-app-url";
-import { validateReferralCode } from "@/lib/owner.functions";
 
 type ReferrerDetails = {
   code: string;
@@ -18,7 +16,6 @@ export function ReferralPanel() {
   const [code, setCode] = useState<string | null>(null);
   const [referrer, setReferrer] = useState<ReferrerDetails | null>(null);
   const [loading, setLoading] = useState(true);
-  const validateReferrer = useServerFn(validateReferralCode);
 
   useEffect(() => {
     if (!user) {
@@ -34,20 +31,20 @@ export function ReferralPanel() {
     void (async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("referral_code, referred_by")
+        .select("referral_code")
         .eq("id", user.id)
         .maybeSingle();
       let confirmedReferrer: ReferrerDetails | null = null;
-      const referredBy = data?.referred_by?.trim();
-      if (referredBy) {
-        try {
-          const result = await validateReferrer({ data: { code: referredBy } });
-          if (result.valid && result.referrerName) {
-            confirmedReferrer = { code: referredBy.toUpperCase(), name: result.referrerName };
-          }
-        } catch {
-          // Keep the profile usable if referrer details cannot be refreshed.
-        }
+      const { data: attribution } = await supabase
+        .from("referral_attributions")
+        .select("referral_code, referrer_name")
+        .eq("referred_user_id", user.id)
+        .maybeSingle();
+      if (attribution?.referral_code && attribution.referrer_name) {
+        confirmedReferrer = {
+          code: attribution.referral_code.toUpperCase(),
+          name: attribution.referrer_name,
+        };
       }
       if (!cancelled) {
         setCode(data?.referral_code ?? null);
@@ -58,7 +55,7 @@ export function ReferralPanel() {
     return () => {
       cancelled = true;
     };
-  }, [user, validateReferrer]);
+  }, [user]);
 
   const link = code ? buildReferralSignupUrl(code) : "";
 
