@@ -1,4 +1,4 @@
-export const PUBLIC_APP_ORIGIN = "https://nexora-production.vercel.app";
+export const PUBLIC_APP_ORIGIN = "https://meripahalfasthelp.online";
 
 type AppLocation = Pick<Location, "hostname" | "origin">;
 

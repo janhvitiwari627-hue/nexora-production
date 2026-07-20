@@ -1,12 +1,15 @@
 project_id = "hbqcsjmdyoosmidkzcjj"
 
 [auth]
-site_url = "https://nexora-production.vercel.app"
+site_url = "https://meripahalfasthelp.online"
 enable_anonymous_sign_ins = true
 additional_redirect_urls = [
-  "https://nexora-production.vercel.app/auth/callback",
-  "https://nexora-production.vercel.app/auth/callback?next=/reset-password",
-  "https://nexora-production.vercel.app/reset-password",
+  "https://meripahalfasthelp.online/auth/callback",
+  "https://meripahalfasthelp.online/auth/callback?next=/reset-password",
+  "https://meripahalfasthelp.online/reset-password",
+  "https://www.meripahalfasthelp.online/auth/callback",
+  "https://www.meripahalfasthelp.online/auth/callback?next=/reset-password",
+  "https://www.meripahalfasthelp.online/reset-password",
 ]
 
 [auth.email.template.recovery]
