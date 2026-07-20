@@ -13,7 +13,18 @@ test("referral links never expose a temporary Lovable preview host", () => {
 
   expect(resolvePublicAppOrigin(previewLocation)).toBe(PUBLIC_APP_ORIGIN);
   expect(buildReferralSignupUrl("NX 100", previewLocation)).toBe(
-    `${PUBLIC_APP_ORIGIN}/signup?ref=NX%20100`,
+    "https://nexora-production.vercel.app/signup?ref=NX%20100",
+  );
+});
+
+test("production referral links keep the signed-in user's code on Nexora", () => {
+  const productionLocation = {
+    hostname: "nexora-production.vercel.app",
+    origin: "https://nexora-production.vercel.app",
+  } as Location;
+
+  expect(buildReferralSignupUrl("NXKISH01", productionLocation)).toBe(
+    "https://nexora-production.vercel.app/signup?ref=NXKISH01",
   );
 });
 
