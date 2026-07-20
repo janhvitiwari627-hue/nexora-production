@@ -1,23 +1,38 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 
-const ownerFunctions = readFileSync(
-  new URL("../src/lib/owner.functions.ts", import.meta.url),
+const signupPage = readFileSync(
+  new URL("../src/pages/auth/SignupPage.tsx", import.meta.url),
+  "utf8",
+);
+const customerRegistrationPage = readFileSync(
+  new URL("../src/pages/auth/CustomerRegistrationPage.tsx", import.meta.url),
+  "utf8",
+);
+const referralPanel = readFileSync(
+  new URL("../src/pages/customer/settings/ReferralPanel.tsx", import.meta.url),
   "utf8",
 );
 
-const referralValidator = ownerFunctions.slice(
-  ownerFunctions.indexOf("export const validateReferralCode"),
-  ownerFunctions.indexOf("// ---------- Salon owner self-registration"),
-);
-
-test("referral validation stays server-side and accepts only active referrers", () => {
-  expect(referralValidator).toContain('await import("@/integrations/supabase/client.server")');
-  expect(referralValidator).toContain("supabaseAdmin");
-  expect(referralValidator).toContain('.eq("is_active", true)');
+test("signup sends well-formed referral codes to the authoritative database trigger", () => {
+  expect(signupPage).toContain("const referralPending = /^[A-Z0-9]{3,20}$/.test(referredBy)");
+  expect(signupPage).toContain("referred_by: referralPending ? referredBy : null");
+  expect(signupPage).toContain("Credit goes only");
+  expect(signupPage).toContain("matching active referrer");
 });
 
-test("referral validation never exposes profiles through the public key", () => {
-  expect(referralValidator).not.toContain("SUPABASE_PUBLISHABLE_KEY");
-  expect(referralValidator).not.toContain('from("@supabase/supabase-js")');
+test("signup never performs a pre-auth profiles lookup", () => {
+  expect(signupPage).not.toContain("validateReferralCode");
+  expect(signupPage).not.toContain("SUPABASE_SERVICE_ROLE_KEY");
+  expect(signupPage).not.toContain('.from("profiles")');
+  expect(customerRegistrationPage).not.toContain("validateReferralCode");
+  expect(customerRegistrationPage).toContain(
+    "referred_by: referralPending ? normalizedReferral : null",
+  );
+});
+
+test("customer settings reads the immutable referral attribution", () => {
+  expect(referralPanel).not.toContain("validateReferralCode");
+  expect(referralPanel).toContain('.from("referral_attributions")');
+  expect(referralPanel).toContain('.eq("referred_user_id", user.id)');
 });

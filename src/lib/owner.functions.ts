@@ -115,34 +115,6 @@ export const getMyOwnerApprovalStatus = createServerFn({ method: "GET" })
     };
   });
 
-// ---------- Referral code validation (used during signup) ----------
-const ReferralInput = z.object({
-  code: z.string().trim().min(3).max(20),
-});
-export const validateReferralCode = createServerFn({ method: "GET" })
-  .inputValidator((d: unknown) => ReferralInput.parse(d))
-  .handler(async ({ data }) => {
-    // Signup happens before authentication, so perform this narrow lookup on the
-    // server instead of granting anonymous users access to the profiles table.
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: row, error } = await supabaseAdmin
-      .from("profiles")
-      .select("full_name")
-      .eq("referral_code", data.code.toUpperCase())
-      .eq("is_active", true)
-      .maybeSingle();
-
-    if (error) {
-      console.error("[referral] Failed to validate referral code", {
-        code: data.code.toUpperCase(),
-        error: error.message,
-      });
-      throw new Error("Unable to validate referral code");
-    }
-
-    return { valid: !!row, referrerName: row?.full_name ?? null };
-  });
-
 // ---------- Salon owner self-registration ----------
 const RegisterSalonInput = z.object({
   name: z.string().trim().min(2).max(120),

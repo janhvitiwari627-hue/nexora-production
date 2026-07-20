@@ -17,7 +17,6 @@ import {
 import { useAuthStore } from "@/stores/authStore";
 import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
 import { requestPasswordReset } from "@/lib/password-reset";
-import { validateReferralCode } from "@/lib/owner.functions";
 
 const normalizeEmail = (value: string) => value.trim().toLowerCase();
 
@@ -67,7 +66,7 @@ export default function SignupPage() {
     confirm_password: "",
     gender: "" as "" | "male" | "female",
   });
-  const urlRef = (search?.ref ?? "").trim().slice(0, 20);
+  const urlRef = (search?.ref ?? "").trim().slice(0, 20).toUpperCase();
   const referredBy = useMemo(() => {
     if (typeof window === "undefined") return urlRef;
     const KEY = "nexora_pending_ref";
@@ -80,7 +79,7 @@ export default function SignupPage() {
       return urlRef;
     }
     try {
-      return (window.sessionStorage.getItem(KEY) ?? "").slice(0, 20);
+      return (window.sessionStorage.getItem(KEY) ?? "").slice(0, 20).toUpperCase();
     } catch {
       return "";
     }
@@ -97,58 +96,8 @@ export default function SignupPage() {
 
   const pwStrength = useMemo(() => scorePassword(form.password), [form.password]);
   const checkEmailRoleFn = useServerFn(getEmailRole);
-  const validateRefFn = useServerFn(validateReferralCode);
-  const [referrerName, setReferrerName] = useState<string | null>(null);
-  const [refInvalid, setRefInvalid] = useState(false);
-  const [refChecking, setRefChecking] = useState(false);
-  const [refCheckFailed, setRefCheckFailed] = useState(false);
-
-  useEffect(() => {
-    if (!referredBy) {
-      setReferrerName(null);
-      setRefInvalid(false);
-      setRefChecking(false);
-      setRefCheckFailed(false);
-      return;
-    }
-    let cancelled = false;
-    setRefChecking(true);
-    setRefCheckFailed(false);
-    setRefInvalid(false);
-    setReferrerName(null);
-    void validateRefFn({ data: { code: referredBy } })
-      .then((res) => {
-        if (cancelled) return;
-        if (res.valid) {
-          setReferrerName(res.referrerName ?? null);
-          setRefInvalid(false);
-        } else {
-          setReferrerName(null);
-          setRefInvalid(true);
-          try {
-            window.sessionStorage.removeItem("nexora_pending_ref");
-          } catch {
-            /* ignore */
-          }
-        }
-      })
-      .catch(() => {
-        if (cancelled) return;
-        // Fail-closed: if we can't verify, do NOT credit anyone.
-        setReferrerName(null);
-        setRefInvalid(true);
-        setRefCheckFailed(true);
-      })
-      .finally(() => {
-        if (!cancelled) setRefChecking(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [referredBy, validateRefFn]);
-
-  // Only send referral to backend when we have CONFIRMED it's valid (name resolved).
-  const referralConfirmed = Boolean(referredBy && !refInvalid && !refChecking && referrerName);
+  const referralPending = /^[A-Z0-9]{3,20}$/.test(referredBy);
+  const referralMalformed = Boolean(referredBy && !referralPending);
 
   useEffect(() => {
     if (!isInitialized || !user) return;
@@ -239,7 +188,9 @@ export default function SignupPage() {
           data: {
             full_name: parsed.data.full_name,
             mobile: parsed.data.mobile,
-            referred_by: referralConfirmed ? referredBy : null,
+            // The signup trigger validates this against the authoritative active
+            // profile and stores attribution only when it finds a real match.
+            referred_by: referralPending ? referredBy : null,
             gender: parsed.data.gender,
             // Force customer role — trigger ignores unknown/disallowed roles
             role: "customer",
@@ -305,13 +256,12 @@ export default function SignupPage() {
               <CardTitle>Welcome to Nexora!</CardTitle>
               <CardDescription>Your account has been created. Redirecting…</CardDescription>
             </CardHeader>
-            {referralConfirmed ? (
+            {referralPending ? (
               <CardContent>
                 <div className="border-primary/20 bg-primary/5 rounded-xl border p-4 text-center">
                   <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                    Referral confirmed
+                    Referral submitted
                   </p>
-                  <p className="text-heading mt-1 text-base font-bold">{referrerName}</p>
                   <p className="text-muted-foreground mt-1 text-sm">
                     Referrer code{" "}
                     <strong className="text-foreground font-mono tracking-wider">
@@ -374,48 +324,32 @@ export default function SignupPage() {
               </Alert>
             )}
 
-            {referredBy && refChecking && (
-              <Alert className="mb-4">
-                <AlertDescription className="text-sm flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Verifying referral code <strong className="font-mono">{referredBy}</strong>…
-                </AlertDescription>
-              </Alert>
-            )}
-
-            {referralConfirmed && (
+            {referralPending && (
               <Alert className="mb-4 border-primary/20 bg-primary/5">
                 <AlertDescription className="text-sm">
                   <span className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-primary" />
                     <span>
-                      Invited by <strong>{referrerName}</strong> · code{" "}
-                      <strong className="font-mono">{referredBy}</strong>
+                      Referral code <strong className="font-mono">{referredBy}</strong> received
                     </span>
                   </span>
                   <span className="block text-xs text-muted-foreground mt-1">
-                    Credit will go to this referrer only.
+                    Nexora will securely verify it when your account is created. Credit goes only to
+                    the matching active referrer.
                   </span>
                 </AlertDescription>
               </Alert>
             )}
 
-            {referredBy && refInvalid && (
+            {referralMalformed && (
               <Alert variant="destructive" className="mb-4">
                 <AlertTriangle className="h-4 w-4" />
                 <AlertDescription className="text-sm">
-                  <strong className="block mb-1">
-                    {refCheckFailed
-                      ? "Referral code could not be verified"
-                      : "Invalid or expired referral code"}
-                  </strong>
+                  <strong className="block mb-1">Invalid referral link format</strong>
                   <span className="block">
-                    Code <strong className="font-mono">{referredBy}</strong>{" "}
-                    {refCheckFailed
-                      ? "couldn't be checked right now. To protect the wrong account from getting credit, we won't apply any referral."
-                      : "doesn't match any active referrer. No referral credit will be applied."}{" "}
-                    You can continue signing up without a referral, or double-check the link with
-                    the person who shared it.
+                    Code <strong className="font-mono">{referredBy}</strong> contains unsupported
+                    characters. You can continue signing up without a referral, or ask the person
+                    who shared it for a fresh link.
                   </span>
                 </AlertDescription>
               </Alert>
