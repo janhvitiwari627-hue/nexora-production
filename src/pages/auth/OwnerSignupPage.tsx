@@ -21,7 +21,6 @@ import {
   PasswordStrengthIndicator,
   scorePassword,
 } from "@/components/auth/PasswordStrengthIndicator";
-import { BackButton } from "@/components/shared/BackButton";
 
 const CATEGORIES = [
   "Hire Cute Shop",
@@ -240,7 +239,6 @@ export default function OwnerSignupPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12">
         <div className="w-full max-w-md">
-          <BackButton className="mb-3" />
           <Card className="w-full">
             <CardHeader className="text-center">
               <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
@@ -272,7 +270,6 @@ export default function OwnerSignupPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-xl">
-        <BackButton className="mb-3" />
         <Card className="w-full">
           <CardHeader>
             <div className="flex items-center gap-2">
