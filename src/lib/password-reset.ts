@@ -1,11 +1,16 @@
-import { supabase } from "@/integrations/supabase/client";
-
-/** Requests a reset link through the project's standard Supabase Auth flow. */
+/** Requests a reset link through the server so email URLs always use Nexora's production host. */
 export async function requestPasswordReset(email: string) {
-  const redirectTo = `${window.location.origin}/auth/callback?next=/reset-password`;
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo,
+  const response = await fetch("/api/public/auth/forgot-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
   });
+  const result = (await response.json().catch(() => null)) as {
+    ok?: boolean;
+    message?: string;
+  } | null;
 
-  if (error) throw error;
+  if (!response.ok || result?.ok === false) {
+    throw new Error(result?.message || "Password reset email is temporarily unavailable.");
+  }
 }
