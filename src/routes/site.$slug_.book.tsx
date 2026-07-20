@@ -29,7 +29,9 @@ const TIMES = [
 ] as const;
 
 export const Route = createFileRoute("/site/$slug_/book")({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { service?: string; booking?: "on" | "off" } => ({
     service: typeof search.service === "string" ? search.service : undefined,
     booking:
       search.booking === "on" || search.booking === "off"
@@ -135,7 +137,7 @@ function PublishedBookingPageInner({ slug }: { slug: string }) {
           remaining,
         });
         await navigate({
-          to: "/site/$slug_/booking-success",
+          to: "/site/$slug/booking-success",
           params: { slug },
           search: { booking: receipt.id },
         });
@@ -172,7 +174,7 @@ function PublishedBookingPageInner({ slug }: { slug: string }) {
         }
       }
       await navigate({
-        to: "/site/$slug_/booking-success",
+        to: "/site/$slug/booking-success",
         params: { slug },
         search: { booking: appointment.id },
       });
@@ -208,7 +210,7 @@ function PublishedBookingPageInner({ slug }: { slug: string }) {
               {services.length === 0 ? (
                 <div className="rounded-xl border bg-white p-5 text-sm text-slate-600">
                   No active services are available.{" "}
-                  <Link to="/site/$slug_/services" params={{ slug }} className="text-violet-700">
+                  <Link to="/site/$slug/services" params={{ slug }} className="text-violet-700">
                     View services
                   </Link>
                 </div>

@@ -8,7 +8,7 @@ import type { Staff } from "@/components/shared/StaffCard";
 export const Route = createFileRoute("/book/$slug")({
   beforeLoad: ({ params }) => {
     throw redirect({
-      to: "/site/$slug_/book",
+      to: "/site/$slug/book",
       params: { slug: params.slug },
       search: { service: undefined },
     });

@@ -233,8 +233,8 @@ function PodiumCard({ s }: { s: ScoredShop }) {
   const RankIcon = style.icon;
   return (
     <Link
-      to="/site/$slug"
-      params={{ slug: s.slug }}
+      to="/site/$businessSlug"
+      params={{ businessSlug: s.slug }}
       className={`group relative flex flex-col overflow-hidden rounded-2xl bg-white ${style.ring} ${style.glow} transition-transform hover:-translate-y-0.5`}
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
@@ -296,8 +296,8 @@ function PodiumCard({ s }: { s: ScoredShop }) {
 function CompactCard({ s }: { s: ScoredShop }) {
   return (
     <Link
-      to="/site/$slug"
-      params={{ slug: s.slug }}
+      to="/site/$businessSlug"
+      params={{ businessSlug: s.slug }}
       className="group relative flex w-[260px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">

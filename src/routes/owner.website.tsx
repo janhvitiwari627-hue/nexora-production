@@ -4,7 +4,7 @@ import { requireRole } from "@/lib/route-guards";
 
 export const Route = createFileRoute("/owner/website")({
   beforeLoad: ({ location }) => requireRole(["owner", "shop_owner", "admin"], location.pathname),
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): { live?: 1 } => ({
     live: search.live === "1" || search.live === 1 || search.live === true ? 1 : undefined,
   }),
   head: () => ({

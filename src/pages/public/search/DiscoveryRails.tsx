@@ -146,8 +146,8 @@ function Rail({
 function MiniCard({ shop }: { shop: Shop }) {
   return (
     <Link
-      to="/site/$slug"
-      params={{ slug: shop.slug }}
+      to="/site/$businessSlug"
+      params={{ businessSlug: shop.slug }}
       className="group w-[240px] shrink-0 snap-start overflow-hidden rounded-[var(--radius-card)] border border-border bg-card shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:shadow-lg"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">

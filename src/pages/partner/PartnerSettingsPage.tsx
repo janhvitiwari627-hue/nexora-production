@@ -137,7 +137,7 @@ export function PartnerSettingsPage() {
     try {
       await supabase.auth.signOut();
       toast.success("Signed out");
-      navigate({ to: "/auth" });
+      navigate({ to: "/login" });
     } catch (e) {
       toast.error("Sign out failed");
       setSigningOut(false);

@@ -67,7 +67,7 @@ function PublishedServicesPageInner({ slug }: { slug: string }) {
                   </span>
                 </div>
                 <Link
-                  to="/site/$slug_/book"
+                  to="/site/$slug/book"
                   params={{ slug }}
                   search={{ service: service.id }}
                   className="mt-5 inline-flex w-full justify-center rounded-xl bg-violet-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-violet-800"

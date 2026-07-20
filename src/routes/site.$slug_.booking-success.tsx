@@ -48,6 +48,10 @@ function BookingSuccessPage() {
   if (!slug || slug === "undefined" || slug === "null") {
     return <SalonNotFound />;
   }
+  return <BookingSuccessPageInner slug={slug} />;
+}
+
+function BookingSuccessPageInner({ slug }: { slug: string }) {
   const { booking } = Route.useSearch();
   const isMock = isMockBookingId(booking);
   const receipt = useQuery({
@@ -106,7 +110,7 @@ function BookingSuccessPage() {
             Open this page on the same device used to create the appointment.
           </p>
           <Link
-            to="/site/$slug_/book"
+            to="/site/$slug/book"
             params={{ slug }}
             search={{ service: undefined }}
             className="mt-5 inline-flex rounded-xl bg-violet-700 px-5 py-2.5 text-sm font-semibold text-white"

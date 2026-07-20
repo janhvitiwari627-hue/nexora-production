@@ -12,8 +12,8 @@ const ALLOWED_STATUSES = [
 ] as const;
 
 export type ApplicationsSearch = {
-  status: (typeof ALLOWED_STATUSES)[number];
-  q: string;
+  status?: (typeof ALLOWED_STATUSES)[number];
+  q?: string;
 };
 
 export const Route = createFileRoute("/jobs/applications")({

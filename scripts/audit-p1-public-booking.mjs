@@ -74,10 +74,10 @@ requireText(
   /\.from\("bookings"\)/,
   "customer dashboard must query bookings through the active browser session",
 );
-requireText("oldBook", /to:\s*"\/site\/\$slug_\/book"/, "legacy booking route must redirect");
+requireText("oldBook", /to:\s*"\/site\/\$slug\/book"/, "legacy booking route must redirect");
 requireText(
   "oldSalonBook",
-  /to:\s*"\/site\/\$slug_\/book"/,
+  /to:\s*"\/site\/\$slug\/book"/,
   "legacy salon booking route must redirect",
 );
 

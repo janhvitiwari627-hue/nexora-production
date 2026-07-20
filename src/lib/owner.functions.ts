@@ -531,7 +531,8 @@ export const getOwnerSalonFull = createServerFn({ method: "GET" })
       .eq("id", data.salon_id)
       .single();
     if (error) throw new Error(error.message);
-    return row;
+    const { search_vector: _searchVector, ...serializableRow } = row;
+    return serializableRow;
   });
 
 const blankStringToNull = (value: unknown) => {
@@ -637,7 +638,8 @@ export const updateOwnerSalon = createServerFn({ method: "POST" })
       .select()
       .single();
     if (error) throw new Error(error.message);
-    return row;
+    const { search_vector: _searchVector, ...serializableRow } = row;
+    return serializableRow;
   });
 
 export const markSalonSetupComplete = createServerFn({ method: "POST" })

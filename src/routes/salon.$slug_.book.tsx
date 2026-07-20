@@ -12,7 +12,7 @@ import { Calendar, Clock, Sparkles } from "lucide-react";
 export const Route = createFileRoute("/salon/$slug_/book")({
   beforeLoad: ({ params }) => {
     throw redirect({
-      to: "/site/$slug_/book",
+      to: "/site/$slug/book",
       params: { slug: params.slug },
       search: { service: undefined },
     });

@@ -16,13 +16,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install ripgrep
-        run: sudo apt-get update && sudo apt-get install -y ripgrep
-
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version: 1.3.14
 
       - name: Cache Bun install
         uses: actions/cache@v4
@@ -48,7 +45,7 @@ jobs:
         if: always()
         run: |
           mkdir -p build-logs
-          bunx tsgo --noEmit --pretty false 2>&1 | tee build-logs/typecheck.log || true
+          bunx tsc --noEmit --pretty false 2>&1 | tee build-logs/typecheck.log || true
           {
             echo "## Environment"
             echo "node: $(node -v 2>/dev/null || echo n/a)"
