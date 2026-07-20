@@ -28,3 +28,7 @@ export function buildPasswordRecoveryUrl(tokenHash: string): string {
   url.searchParams.set("next", "/reset-password");
   return url.toString();
 }
+
+export function buildPasswordResetRedirectUrl(): string {
+  return `${PUBLIC_APP_ORIGIN}/auth/callback?next=/reset-password`;
+}

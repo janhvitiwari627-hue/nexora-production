@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
-import { buildPasswordRecoveryUrl } from "../src/lib/public-app-url";
+import { buildPasswordRecoveryUrl, buildPasswordResetRedirectUrl } from "../src/lib/public-app-url";
 
 test("password recovery emails point to the Nexora callback with a recovery token", () => {
   expect(buildPasswordRecoveryUrl("token with spaces")).toBe(
@@ -8,12 +8,16 @@ test("password recovery emails point to the Nexora callback with a recovery toke
   );
 });
 
-test("forgot-password requests never derive email links from the browser origin", () => {
+test("forgot-password uses Supabase Auth without depending on the custom email service", () => {
   const source = readFileSync("src/lib/password-reset.ts", "utf8");
 
-  expect(source).toContain("/api/public/auth/forgot-password");
+  expect(source).toContain("resetPasswordForEmail");
+  expect(source).toContain("buildPasswordResetRedirectUrl()");
+  expect(source).not.toContain("/api/public/auth/forgot-password");
   expect(source).not.toContain("window.location.origin");
-  expect(source).not.toContain("resetPasswordForEmail");
+  expect(buildPasswordResetRedirectUrl()).toBe(
+    "https://nexora-production.vercel.app/auth/callback?next=/reset-password",
+  );
 });
 
 test("Supabase auth configuration uses the production Nexora host", () => {
