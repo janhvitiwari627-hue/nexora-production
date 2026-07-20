@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { sendLovableEmail } from "@lovable.dev/email-js";
 import { z } from "zod";
+import { buildPasswordRecoveryUrl } from "@/lib/public-app-url";
 
 const bodySchema = z.object({
   email: z.string().trim().toLowerCase().email().max(255),
-  redirectTo: z.string().url().max(500).optional(),
 });
 
 const GENERIC_OK = {
@@ -16,9 +16,6 @@ const DELIVERY_UNAVAILABLE = {
   ok: false,
   message: "Password reset email is temporarily unavailable. Please try again shortly.",
 };
-
-const PRODUCTION_ORIGIN = "https://meripahalfasthelp.online";
-const RESET_REDIRECT_TO = `${PRODUCTION_ORIGIN}/auth/callback?next=/reset-password`;
 
 function resetEmailHtml(actionLink: string) {
   return `<!doctype html>
@@ -84,20 +81,18 @@ export const Route = createFileRoute("/api/public/auth/forgot-password")({
           const { data, error } = await supabaseAdmin.auth.admin.generateLink({
             type: "recovery",
             email,
-            options: {
-              redirectTo: RESET_REDIRECT_TO,
-            },
           });
           if (error) {
             console.error("[forgot-password] recovery link status", error.status ?? "failed");
             return Response.json(DELIVERY_UNAVAILABLE, { status: 503 });
           }
 
-          const actionLink = data.properties?.action_link;
-          if (!actionLink) {
+          const tokenHash = data.properties?.hashed_token;
+          if (!tokenHash) {
             console.error("[forgot-password] recovery link missing");
             return Response.json(DELIVERY_UNAVAILABLE, { status: 503 });
           }
+          const actionLink = buildPasswordRecoveryUrl(tokenHash);
 
           await sendLovableEmail(
             {

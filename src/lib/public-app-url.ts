@@ -20,3 +20,11 @@ export function resolvePublicAppOrigin(location?: AppLocation): string {
 export function buildReferralSignupUrl(code: string, location?: AppLocation): string {
   return `${resolvePublicAppOrigin(location)}/signup?ref=${encodeURIComponent(code.trim())}`;
 }
+
+export function buildPasswordRecoveryUrl(tokenHash: string): string {
+  const url = new URL("/auth/callback", PUBLIC_APP_ORIGIN);
+  url.searchParams.set("token_hash", tokenHash);
+  url.searchParams.set("type", "recovery");
+  url.searchParams.set("next", "/reset-password");
+  return url.toString();
+}
