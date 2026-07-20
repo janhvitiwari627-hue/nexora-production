@@ -37,21 +37,14 @@ async function seedSession(page: Page) {
 }
 
 async function expectRoleLanding(page: Page, from: string) {
-  await page.waitForFunction(
-    (p) => !window.location.pathname.startsWith(p),
-    from,
-    { timeout: 10_000 },
-  );
+  await page.waitForFunction((p) => !window.location.pathname.startsWith(p), from, {
+    timeout: 10_000,
+  });
   const landed = new URL(page.url()).pathname;
   expect(landed.startsWith(from)).toBe(false);
-  expect(
-    ROLE_TARGETS.some((t) => landed === t || landed.startsWith(t + "/")),
-  ).toBe(true);
+  expect(ROLE_TARGETS.some((t) => landed === t || landed.startsWith(t + "/"))).toBe(true);
   expect(await page.locator('input[type="password"]').count()).toBe(0);
-  const pending = await page.evaluate(
-    (k) => window.sessionStorage.getItem(k),
-    PENDING_KEY,
-  );
+  const pending = await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
   expect(pending).toBeNull();
   return landed;
 }

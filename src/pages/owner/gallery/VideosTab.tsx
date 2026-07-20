@@ -59,7 +59,8 @@ export function VideosTab({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <span>
-            <span className="font-semibold text-heading">{videos.length}</span> of {MAX_VIDEOS} videos added
+            <span className="font-semibold text-heading">{videos.length}</span> of {MAX_VIDEOS}{" "}
+            videos added
           </span>
           <TooltipProvider>
             <Tooltip>
@@ -175,9 +176,7 @@ function AddVideoModal({
             onChange={(e) => setUrl(e.target.value)}
             placeholder="https://www.youtube.com/watch?v=..."
           />
-          {url && !ytId && (
-            <p className="text-xs text-red-600">Invalid YouTube URL.</p>
-          )}
+          {url && !ytId && <p className="text-xs text-red-600">Invalid YouTube URL.</p>}
         </div>
         {ytId && (
           <div className="rounded-xl overflow-hidden border border-border">

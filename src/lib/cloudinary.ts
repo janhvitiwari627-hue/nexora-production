@@ -23,7 +23,10 @@ export class CloudinaryUploadError extends Error {
   statusText?: string;
   code?: string;
   rawResponse?: string;
-  constructor(message: string, init: { status?: number; statusText?: string; code?: string; rawResponse?: string } = {}) {
+  constructor(
+    message: string,
+    init: { status?: number; statusText?: string; code?: string; rawResponse?: string } = {},
+  ) {
     super(message);
     this.name = "CloudinaryUploadError";
     this.status = init.status;
@@ -32,7 +35,6 @@ export class CloudinaryUploadError extends Error {
     this.rawResponse = init.rawResponse;
   }
 }
-
 
 export function isCloudinaryConfigured(): boolean {
   return Boolean(CLOUD_NAME && UPLOAD_PRESET);
@@ -72,33 +74,45 @@ export async function uploadToCloudinary(
         try {
           resolve(JSON.parse(xhr.responseText) as CloudinaryUploadResult);
         } catch {
-          reject(new CloudinaryUploadError("Invalid response from Cloudinary", {
-            status: xhr.status,
-            statusText: xhr.statusText,
-            code: "INVALID_RESPONSE",
-            rawResponse: xhr.responseText,
-          }));
+          reject(
+            new CloudinaryUploadError("Invalid response from Cloudinary", {
+              status: xhr.status,
+              statusText: xhr.statusText,
+              code: "INVALID_RESPONSE",
+              rawResponse: xhr.responseText,
+            }),
+          );
         }
       } else {
         let msg = `Upload failed (${xhr.status})`;
         let code: string | undefined;
         try {
-          const j = JSON.parse(xhr.responseText) as { error?: { message?: string; http_code?: number; name?: string } };
+          const j = JSON.parse(xhr.responseText) as {
+            error?: { message?: string; http_code?: number; name?: string };
+          };
           if (j?.error?.message) msg = j.error.message;
           if (j?.error?.name) code = j.error.name;
-        } catch { /* noop */ }
-        reject(new CloudinaryUploadError(msg, {
-          status: xhr.status,
-          statusText: xhr.statusText,
-          code,
-          rawResponse: xhr.responseText,
-        }));
+        } catch {
+          /* noop */
+        }
+        reject(
+          new CloudinaryUploadError(msg, {
+            status: xhr.status,
+            statusText: xhr.statusText,
+            code,
+            rawResponse: xhr.responseText,
+          }),
+        );
       }
     };
-    xhr.onerror = () => reject(new CloudinaryUploadError("Network error during upload", { code: "NETWORK_ERROR" }));
+    xhr.onerror = () =>
+      reject(new CloudinaryUploadError("Network error during upload", { code: "NETWORK_ERROR" }));
     xhr.onabort = () => reject(new CloudinaryUploadError("Upload cancelled", { code: "ABORTED" }));
     if (opts.signal) {
-      if (opts.signal.aborted) { xhr.abort(); return; }
+      if (opts.signal.aborted) {
+        xhr.abort();
+        return;
+      }
       opts.signal.addEventListener("abort", () => xhr.abort());
     }
     xhr.send(fd);

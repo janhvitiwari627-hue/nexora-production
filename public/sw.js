@@ -18,14 +18,10 @@ self.addEventListener("activate", (event) => {
     (async () => {
       try {
         const cacheNames = await caches.keys();
-        await Promise.allSettled(
-          cacheNames.filter(isNexoraAppCache).map((n) => caches.delete(n)),
-        );
+        await Promise.allSettled(cacheNames.filter(isNexoraAppCache).map((n) => caches.delete(n)));
         await self.clients.claim();
         const windowClients = await self.clients.matchAll({ type: "window" });
-        await Promise.allSettled(
-          windowClients.map((client) => client.navigate(client.url)),
-        );
+        await Promise.allSettled(windowClients.map((client) => client.navigate(client.url)));
       } finally {
         await self.registration.unregister();
       }

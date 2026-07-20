@@ -13,14 +13,7 @@ interface Props {
   onReset: () => void;
 }
 
-export function FilterBottomSheet({
-  open,
-  onClose,
-  draft,
-  onChange,
-  onApply,
-  onReset,
-}: Props) {
+export function FilterBottomSheet({ open, onClose, draft, onChange, onApply, onReset }: Props) {
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;

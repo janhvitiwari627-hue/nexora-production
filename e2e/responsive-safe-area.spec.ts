@@ -62,10 +62,7 @@ test.describe("safe-area + keyboard-open regression", () => {
         `PublicHeader inner row must include safe-area-inset horizontal padding on ${emu.name}`,
       );
       // The safe-area horizontal padding lives on the header's inner grid row.
-      const innerRowClass = await header
-        .locator("> div")
-        .first()
-        .getAttribute("class");
+      const innerRowClass = await header.locator("> div").first().getAttribute("class");
       expect(innerRowClass ?? "").toMatch(/safe-area-inset-left/);
 
       await testInfo.attach(`${emu.name}-01-idle.png`, {
@@ -81,7 +78,9 @@ test.describe("safe-area + keyboard-open regression", () => {
 
       // 3) Focus the smart-search input if it exists on this page.
       const searchInput = page
-        .locator('input[placeholder*="haircut" i], input[placeholder*="near" i], input[placeholder*="salon" i]')
+        .locator(
+          'input[placeholder*="haircut" i], input[placeholder*="near" i], input[placeholder*="salon" i]',
+        )
         .first();
       const hasSearch = (await searchInput.count()) > 0;
 
@@ -91,8 +90,8 @@ test.describe("safe-area + keyboard-open regression", () => {
         await page.waitForTimeout(200);
 
         // font-size >= 16px prevents iOS auto-zoom on focus.
-        const fontSize = await searchInput.evaluate(
-          (el) => parseFloat(getComputedStyle(el as HTMLElement).fontSize),
+        const fontSize = await searchInput.evaluate((el) =>
+          parseFloat(getComputedStyle(el as HTMLElement).fontSize),
         );
         expect(
           fontSize,
@@ -192,9 +191,7 @@ test.describe("safe-area + keyboard-open regression", () => {
  * indistinguishable from plain px-3 / px-4.
  */
 test.describe("safe-area insets applied when non-zero", () => {
-  test("iPhone-13 with forced 44px top / 34px bottom insets", async ({
-    browser,
-  }, testInfo) => {
+  test("iPhone-13 with forced 44px top / 34px bottom insets", async ({ browser }, testInfo) => {
     const context = await browser.newContext({ ...devices["iPhone 13"] });
     const page = await context.newPage();
 
@@ -220,8 +217,8 @@ test.describe("safe-area insets applied when non-zero", () => {
     await page.waitForTimeout(300);
 
     const header = page.getByTestId("public-header");
-    const paddingTop = await header.evaluate(
-      (el) => parseFloat(getComputedStyle(el as HTMLElement).paddingTop),
+    const paddingTop = await header.evaluate((el) =>
+      parseFloat(getComputedStyle(el as HTMLElement).paddingTop),
     );
     expect(
       paddingTop,

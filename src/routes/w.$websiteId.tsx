@@ -2,7 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getPublishedWebsite, type WebsiteSection, type WebsiteTheme } from "@/lib/website-editor.functions";
+import {
+  getPublishedWebsite,
+  type WebsiteSection,
+  type WebsiteTheme,
+} from "@/lib/website-editor.functions";
 
 export const Route = createFileRoute("/w/$websiteId")({
   head: ({ params }) => ({
@@ -44,9 +48,14 @@ function PublicWebsitePage() {
     };
   }, [isPreview]);
 
-  const bundle: Bundle | null = preview ?? (q.data
-    ? { sections: q.data.sections as WebsiteSection[], theme: q.data.theme as WebsiteTheme | null }
-    : null);
+  const bundle: Bundle | null =
+    preview ??
+    (q.data
+      ? {
+          sections: q.data.sections as WebsiteSection[],
+          theme: q.data.theme as WebsiteTheme | null,
+        }
+      : null);
 
   const theme = bundle?.theme;
   const headingFont = theme?.heading_font || "Inter";
@@ -80,28 +89,36 @@ function PublicWebsitePage() {
       <div className="flex min-h-screen items-center justify-center p-8 text-center">
         <div>
           <h1 className="text-2xl font-semibold">This website isn’t published yet</h1>
-          <p className="mt-2 text-muted-foreground">The owner is still building it. Check back soon!</p>
+          <p className="mt-2 text-muted-foreground">
+            The owner is still building it. Check back soon!
+          </p>
         </div>
       </div>
     );
   }
 
-  const extras = ((theme as unknown as { extras?: Record<string, unknown> } | null)?.extras) ?? {};
+  const extras = (theme as unknown as { extras?: Record<string, unknown> } | null)?.extras ?? {};
   const headerBg = (extras.header_bg as string) || "#FFFFFF";
   const headerText = (extras.header_text as string) || "#111827";
   const linkColor = (extras.link_color as string) || "#4F46E5";
   const linkStyle = (extras.link_style as string) || "hover-underline";
 
   const linkClass =
-    linkStyle === "underline" ? "underline" : linkStyle === "none" ? "no-underline" : "hover:underline";
+    linkStyle === "underline"
+      ? "underline"
+      : linkStyle === "none"
+        ? "no-underline"
+        : "hover:underline";
 
   const bgBase = theme?.background_color ?? "#FFFFFF";
   const bgStyle = (extras.bg_style as string) || "solid";
   const bgFrom = (extras.bg_gradient_from as string) || bgBase;
   const bgTo = (extras.bg_gradient_to as string) || "#F1F5F9";
-  const bgAngle = typeof extras.bg_gradient_angle === "number" ? (extras.bg_gradient_angle as number) : 135;
+  const bgAngle =
+    typeof extras.bg_gradient_angle === "number" ? (extras.bg_gradient_angle as number) : 135;
   const bgPatternColor = (extras.bg_pattern_color as string) || "#E5E7EB";
-  const bgPatternSize = typeof extras.bg_pattern_size === "number" ? (extras.bg_pattern_size as number) : 24;
+  const bgPatternSize =
+    typeof extras.bg_pattern_size === "number" ? (extras.bg_pattern_size as number) : 24;
 
   const bgStyleProps: React.CSSProperties = (() => {
     switch (bgStyle) {
@@ -151,10 +168,16 @@ function PublicWebsitePage() {
     .sort((a, b) => a.sort_order - b.sort_order);
 
   // Header nav from saved extras, with a fallback derived from visible sections
-  const savedNav = Array.isArray(extras.nav_links) ? (extras.nav_links as { id?: string; label: string; url: string }[]) : null;
+  const savedNav = Array.isArray(extras.nav_links)
+    ? (extras.nav_links as { id?: string; label: string; url: string }[])
+    : null;
   const fallbackNav = sections
     .filter((s) => ["about", "services", "gallery", "contact"].includes(s.section_type))
-    .map((s) => ({ id: s.section_type, label: s.section_type.replace("_", " "), url: `#${s.section_type}` }));
+    .map((s) => ({
+      id: s.section_type,
+      label: s.section_type.replace("_", " "),
+      url: `#${s.section_type}`,
+    }));
   const navItems = (savedNav && savedNav.length ? savedNav : fallbackNav).map((n, i) => ({
     id: n.id ?? `n${i}`,
     label: n.label,
@@ -164,7 +187,6 @@ function PublicWebsitePage() {
 
   return (
     <div style={{ ...styleVars, ...bgStyleProps, color: "var(--w-text)", minHeight: "100vh" }}>
-
       <header
         className="sticky top-0 z-10 flex items-center justify-between border-b px-6 py-3"
         style={{ background: "var(--w-header-bg)", color: "var(--w-header-text)" }}
@@ -174,12 +196,7 @@ function PublicWebsitePage() {
         </div>
         <nav className="flex flex-wrap gap-4 text-sm">
           {navItems.map((n) => (
-            <a
-              key={n.id}
-              href={n.url}
-              className={linkClass}
-              style={{ color: "var(--w-link)" }}
-            >
+            <a key={n.id} href={n.url} className={linkClass} style={{ color: "var(--w-link)" }}>
               {n.label}
             </a>
           ))}
@@ -242,7 +259,10 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
         >
           {c.imageUrl && <div className="absolute inset-0 bg-black/50" />}
           <div className="relative max-w-3xl">
-            <h1 className="text-4xl font-bold leading-tight md:text-6xl" style={{ fontFamily: "var(--w-heading-font)" }}>
+            <h1
+              className="text-4xl font-bold leading-tight md:text-6xl"
+              style={{ fontFamily: "var(--w-heading-font)" }}
+            >
               {c.heading || "Welcome"}
             </h1>
             {c.subheading && <p className="mt-4 text-lg opacity-90 md:text-xl">{c.subheading}</p>}
@@ -250,7 +270,11 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
               <a
                 href={c.buttonLink || "#"}
                 className="mt-8 inline-block px-8 py-3 font-medium shadow-lg transition hover:opacity-90"
-                style={{ background: "var(--w-secondary)", color: "#000", borderRadius: "var(--w-btn-radius)" }}
+                style={{
+                  background: "var(--w-secondary)",
+                  color: "#000",
+                  borderRadius: "var(--w-btn-radius)",
+                }}
               >
                 {c.buttonText}
               </a>
@@ -280,13 +304,26 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
                 <div
                   key={i}
                   className="rounded-lg border p-6 shadow-sm transition hover:shadow-md"
-                  style={{ borderColor: "var(--w-primary)", borderOpacity: 0.15 } as React.CSSProperties}
+                  style={
+                    { borderColor: "var(--w-primary)", borderOpacity: 0.15 } as React.CSSProperties
+                  }
                 >
                   {it.image && (
-                    <img src={String(it.image)} alt={String(it.name ?? "")} className="mb-4 h-40 w-full rounded-md object-cover" />
+                    <img
+                      src={String(it.image)}
+                      alt={String(it.name ?? "")}
+                      className="mb-4 h-40 w-full rounded-md object-cover"
+                    />
                   )}
-                  <h3 className="text-lg font-semibold" style={{ fontFamily: "var(--w-heading-font)" }}>{String(it.name ?? "Service")}</h3>
-                  {it.description && <p className="mt-2 text-sm opacity-80">{String(it.description)}</p>}
+                  <h3
+                    className="text-lg font-semibold"
+                    style={{ fontFamily: "var(--w-heading-font)" }}
+                  >
+                    {String(it.name ?? "Service")}
+                  </h3>
+                  {it.description && (
+                    <p className="mt-2 text-sm opacity-80">{String(it.description)}</p>
+                  )}
                   <div className="mt-4 flex items-center justify-between text-sm">
                     {it.duration && <span className="opacity-70">{String(it.duration)}</span>}
                     {it.price && (
@@ -325,7 +362,10 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
                     <tr key={i} className="border-t">
                       <td className="px-4 py-3">{String(it.name ?? "-")}</td>
                       <td className="px-4 py-3 opacity-70">{String(it.duration ?? "-")}</td>
-                      <td className="px-4 py-3 text-right font-semibold" style={{ color: "var(--w-accent)" }}>
+                      <td
+                        className="px-4 py-3 text-right font-semibold"
+                        style={{ color: "var(--w-accent)" }}
+                      >
                         {it.price ? `₹${String(it.price)}` : "-"}
                       </td>
                     </tr>
@@ -343,7 +383,9 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
       const items = asArray(raw.items);
       return (
         <section className="mx-auto max-w-6xl px-6 py-20">
-          <SectionHeading>{c.heading || (section.section_type === "packages" ? "Packages" : "Membership")}</SectionHeading>
+          <SectionHeading>
+            {c.heading || (section.section_type === "packages" ? "Packages" : "Membership")}
+          </SectionHeading>
           {items.length === 0 ? (
             <p className="text-center text-sm opacity-60">Nothing here yet.</p>
           ) : (
@@ -354,7 +396,10 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
                   className="flex flex-col rounded-xl border-2 p-6 text-center shadow-sm"
                   style={{ borderColor: "var(--w-secondary)" }}
                 >
-                  <h3 className="text-xl font-semibold" style={{ fontFamily: "var(--w-heading-font)" }}>
+                  <h3
+                    className="text-xl font-semibold"
+                    style={{ fontFamily: "var(--w-heading-font)" }}
+                  >
                     {String(it.name ?? "Plan")}
                   </h3>
                   {it.price && (
@@ -389,9 +434,13 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
                   <div
                     key={i}
                     className="rounded-lg p-6 text-white shadow-md"
-                    style={{ background: `linear-gradient(135deg, var(--w-primary), var(--w-secondary))` }}
+                    style={{
+                      background: `linear-gradient(135deg, var(--w-primary), var(--w-secondary))`,
+                    }}
                   >
-                    <div className="text-xs font-semibold uppercase tracking-wider opacity-80">Offer</div>
+                    <div className="text-xs font-semibold uppercase tracking-wider opacity-80">
+                      Offer
+                    </div>
                     <h3 className="mt-1 text-xl font-bold">{title}</h3>
                     {desc && <p className="mt-2 text-sm opacity-90">{desc}</p>}
                     {discount && (
@@ -407,7 +456,6 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
         </section>
       );
     }
-
 
     case "staff": {
       const items = asArray(raw.items);
@@ -425,7 +473,12 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
                     alt={String(it.name ?? "")}
                     className="mx-auto h-32 w-32 rounded-full object-cover shadow-md"
                   />
-                  <h3 className="mt-3 font-semibold" style={{ fontFamily: "var(--w-heading-font)" }}>{String(it.name ?? "")}</h3>
+                  <h3
+                    className="mt-3 font-semibold"
+                    style={{ fontFamily: "var(--w-heading-font)" }}
+                  >
+                    {String(it.name ?? "")}
+                  </h3>
                   {it.role && <p className="text-sm opacity-70">{String(it.role)}</p>}
                 </div>
               ))}
@@ -449,7 +502,8 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
       if (tiles.length === 0 && Array.isArray(raw.images)) {
         tiles = (raw.images as unknown[])
           .map((x) => {
-            const url = typeof x === "string" ? x : String((x as Item)?.url ?? (x as Item)?.image ?? "");
+            const url =
+              typeof x === "string" ? x : String((x as Item)?.url ?? (x as Item)?.image ?? "");
             return { url, objectPosition: "center", shape: "auto" };
           })
           .filter((t) => t.url);
@@ -457,7 +511,9 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
 
       const gridAspect = String(raw.gridAspect ?? "square");
       const gridColumns = Math.max(2, Math.min(6, Number(raw.gridColumns ?? 4)));
-      const imageFit = (String(raw.imageFit ?? "cover") === "contain" ? "contain" : "cover") as "cover" | "contain";
+      const imageFit = (String(raw.imageFit ?? "cover") === "contain" ? "contain" : "cover") as
+        | "cover"
+        | "contain";
       const gridGap = Math.max(0, Math.min(48, Number(raw.gridGap ?? 12)));
 
       const ratioMap: Record<string, string> = {
@@ -532,9 +588,13 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
                 const date = p.date ? String(p.date) : "";
                 return (
                   <article key={i} className="rounded-lg border overflow-hidden shadow-sm">
-                    {p.image && <img src={String(p.image)} alt={title} className="h-44 w-full object-cover" />}
+                    {p.image && (
+                      <img src={String(p.image)} alt={title} className="h-44 w-full object-cover" />
+                    )}
                     <div className="p-5">
-                      <h3 className="font-semibold" style={{ fontFamily: "var(--w-heading-font)" }}>{title}</h3>
+                      <h3 className="font-semibold" style={{ fontFamily: "var(--w-heading-font)" }}>
+                        {title}
+                      </h3>
                       {date && <p className="mt-1 text-xs opacity-60">{date}</p>}
                       {excerpt && <p className="mt-2 text-sm opacity-80">{excerpt}</p>}
                     </div>
@@ -544,7 +604,6 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
             </div>
           )}
         </section>
-
       );
     }
 
@@ -553,9 +612,35 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
         <section className="mx-auto max-w-3xl px-6 py-20">
           <SectionHeading>{c.heading || "Contact Us"}</SectionHeading>
           <div className="grid gap-3 text-center">
-            {c.phone && <p>📞 <a href={`tel:${c.phone}`} className="hover:underline">{c.phone}</a></p>}
-            {c.whatsapp && <p>💬 <a href={`https://wa.me/${c.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="hover:underline">WhatsApp: {c.whatsapp}</a></p>}
-            {c.email && <p>✉️ <a href={`mailto:${c.email}`} className="hover:underline">{c.email}</a></p>}
+            {c.phone && (
+              <p>
+                📞{" "}
+                <a href={`tel:${c.phone}`} className="hover:underline">
+                  {c.phone}
+                </a>
+              </p>
+            )}
+            {c.whatsapp && (
+              <p>
+                💬{" "}
+                <a
+                  href={`https://wa.me/${c.whatsapp.replace(/\D/g, "")}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:underline"
+                >
+                  WhatsApp: {c.whatsapp}
+                </a>
+              </p>
+            )}
+            {c.email && (
+              <p>
+                ✉️{" "}
+                <a href={`mailto:${c.email}`} className="hover:underline">
+                  {c.email}
+                </a>
+              </p>
+            )}
             {c.address && <p>📍 {c.address}</p>}
           </div>
           {c.mapEmbed && (
@@ -573,9 +658,10 @@ function SectionRenderer({ section }: { section: WebsiteSection }) {
       return (
         <section className="mx-auto max-w-4xl px-6 py-16">
           <SectionHeading>{c.heading || section.section_type}</SectionHeading>
-          {c.body && <p className="whitespace-pre-wrap text-center leading-relaxed opacity-90">{c.body}</p>}
+          {c.body && (
+            <p className="whitespace-pre-wrap text-center leading-relaxed opacity-90">{c.body}</p>
+          )}
         </section>
       );
   }
 }
-

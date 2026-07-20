@@ -1,7 +1,12 @@
 import type { ReactNode } from "react";
 import { CalendarX, Heart, Inbox, MessageSquareOff, SearchX } from "lucide-react";
 
-export type EmptyIllustration = "no-results" | "no-bookings" | "no-reviews" | "no-favorites" | "generic";
+export type EmptyIllustration =
+  | "no-results"
+  | "no-bookings"
+  | "no-reviews"
+  | "no-favorites"
+  | "generic";
 
 const ILLOS: Record<EmptyIllustration, ReactNode> = {
   "no-results": <SearchX className="h-12 w-12" />,

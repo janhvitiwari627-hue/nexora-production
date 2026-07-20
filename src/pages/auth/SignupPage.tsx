@@ -149,10 +149,7 @@ export default function SignupPage() {
   }, [referredBy, validateRefFn]);
 
   // Only send referral to backend when we have CONFIRMED it's valid (name resolved).
-  const referralConfirmed = Boolean(
-    referredBy && !refInvalid && !refChecking && referrerName,
-  );
-
+  const referralConfirmed = Boolean(referredBy && !refInvalid && !refChecking && referrerName);
 
   useEffect(() => {
     if (!isInitialized || !user) return;
@@ -319,7 +316,9 @@ export default function SignupPage() {
                   <p className="text-heading mt-1 text-base font-bold">{referrerName}</p>
                   <p className="text-muted-foreground mt-1 text-sm">
                     Referrer code{" "}
-                    <strong className="text-foreground font-mono tracking-wider">{referredBy}</strong>
+                    <strong className="text-foreground font-mono tracking-wider">
+                      {referredBy}
+                    </strong>
                   </p>
                 </div>
               </CardContent>
@@ -382,8 +381,7 @@ export default function SignupPage() {
               <Alert className="mb-4">
                 <AlertDescription className="text-sm flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Verifying referral code{" "}
-                  <strong className="font-mono">{referredBy}</strong>…
+                  Verifying referral code <strong className="font-mono">{referredBy}</strong>…
                 </AlertDescription>
               </Alert>
             )}
@@ -418,13 +416,13 @@ export default function SignupPage() {
                     Code <strong className="font-mono">{referredBy}</strong>{" "}
                     {refCheckFailed
                       ? "couldn't be checked right now. To protect the wrong account from getting credit, we won't apply any referral."
-                      : "doesn't match any active referrer. No referral credit will be applied."}
-                    {" "}You can continue signing up without a referral, or double-check the link with the person who shared it.
+                      : "doesn't match any active referrer. No referral credit will be applied."}{" "}
+                    You can continue signing up without a referral, or double-check the link with
+                    the person who shared it.
                   </span>
                 </AlertDescription>
               </Alert>
             )}
-
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">

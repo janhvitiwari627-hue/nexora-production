@@ -31,9 +31,7 @@ export function OfflineBanner({ message, hint, forceShow, className }: Props) {
     >
       <WifiOff className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
       <div className="min-w-0">
-        <div className="font-semibold">
-          {message ?? "You're offline"}
-        </div>
+        <div className="font-semibold">{message ?? "You're offline"}</div>
         <div className="text-xs opacity-90">
           {hint ??
             "You can keep browsing your saved booking, but confirming and payment need internet."}

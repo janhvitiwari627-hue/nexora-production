@@ -21,8 +21,9 @@ export function ServiceManagementCard({
   onEdit: (s: OwnerService) => void;
   onDelete: (id: string) => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id: service.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: service.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -52,7 +53,11 @@ export function ServiceManagementCard({
 
       <div className="bg-primary/10 text-primary hidden h-12 w-12 shrink-0 place-items-center rounded-lg sm:grid">
         <span className="text-xs font-semibold uppercase">
-          {service.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
+          {service.name
+            .split(" ")
+            .map((w) => w[0])
+            .slice(0, 2)
+            .join("")}
         </span>
       </div>
 
@@ -70,7 +75,9 @@ export function ServiceManagementCard({
           <span className="inline-flex items-center gap-1">
             <Clock className="h-3 w-3" /> {service.durationMin} min
           </span>
-          <span className="capitalize">For: {service.gender === "all" ? "All" : service.gender}</span>
+          <span className="capitalize">
+            For: {service.gender === "all" ? "All" : service.gender}
+          </span>
         </div>
       </div>
 
@@ -78,7 +85,9 @@ export function ServiceManagementCard({
         {hasOffer ? (
           <>
             <div className="text-heading font-bold">₹{service.offerPrice!.toLocaleString()}</div>
-            <div className="text-muted-foreground text-xs line-through">₹{service.price.toLocaleString()}</div>
+            <div className="text-muted-foreground text-xs line-through">
+              ₹{service.price.toLocaleString()}
+            </div>
           </>
         ) : (
           <div className="text-heading font-bold">₹{service.price.toLocaleString()}</div>

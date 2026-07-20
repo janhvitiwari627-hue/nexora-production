@@ -8,8 +8,8 @@ export function RewardBalanceHero() {
       {/* Particles */}
       <div className="pointer-events-none absolute inset-0">
         {Array.from({ length: 18 }).map((_, i) => {
-          const left = ((i * 53) % 100);
-          const top = ((i * 37) % 100);
+          const left = (i * 53) % 100;
+          const top = (i * 37) % 100;
           const dur = 4 + ((i * 7) % 5);
           const delay = (i * 0.3) % 4;
           const size = 4 + ((i * 3) % 6);

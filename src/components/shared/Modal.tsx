@@ -76,7 +76,9 @@ export function Modal({
                 <h2 className="text-heading text-lg font-bold">{title}</h2>
               </header>
             )}
-            <div className={cn("overflow-y-auto", size === "fullscreen" ? "h-full" : "max-h-[80vh]")}>
+            <div
+              className={cn("overflow-y-auto", size === "fullscreen" ? "h-full" : "max-h-[80vh]")}
+            >
               {children}
             </div>
           </motion.div>

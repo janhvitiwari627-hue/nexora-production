@@ -96,11 +96,7 @@ export function AuditLogPage() {
     if (!node) return;
     const io = new IntersectionObserver(
       (entries) => {
-        if (
-          entries[0]?.isIntersecting &&
-          q.hasNextPage &&
-          !q.isFetchingNextPage
-        ) {
+        if (entries[0]?.isIntersecting && q.hasNextPage && !q.isFetchingNextPage) {
           void q.fetchNextPage();
         }
       },
@@ -115,8 +111,8 @@ export function AuditLogPage() {
       <header>
         <h1 className="text-2xl font-bold">Admin Audit Log</h1>
         <p className="text-muted-foreground text-sm">
-          Every approve, reject, refund and adjust action — with the required reason
-          and operator identity.
+          Every approve, reject, refund and adjust action — with the required reason and operator
+          identity.
         </p>
       </header>
 
@@ -155,9 +151,7 @@ export function AuditLogPage() {
               {(q.error as Error).message}
             </div>
           ) : filtered.length === 0 ? (
-            <div className="text-muted-foreground p-10 text-center text-sm">
-              No audit entries
-            </div>
+            <div className="text-muted-foreground p-10 text-center text-sm">No audit entries</div>
           ) : (
             <>
               <Table>
@@ -174,8 +168,7 @@ export function AuditLogPage() {
                 <TableBody>
                   {filtered.map((r) => {
                     const meta = (r.metadata ?? {}) as Record<string, unknown>;
-                    const reason =
-                      typeof meta.reason === "string" ? meta.reason : null;
+                    const reason = typeof meta.reason === "string" ? meta.reason : null;
                     return (
                       <TableRow key={r.id}>
                         <TableCell className="text-muted-foreground text-xs whitespace-nowrap">

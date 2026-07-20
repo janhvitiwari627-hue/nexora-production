@@ -36,8 +36,8 @@ export function MyApplicationsWidget() {
     let alive = true;
     listMyApplications(user.id)
       .then((rows) => alive && setApps(rows))
-      .catch((e) =>
-        alive && setError(e instanceof Error ? e.message : "Failed to load applications"),
+      .catch(
+        (e) => alive && setError(e instanceof Error ? e.message : "Failed to load applications"),
       );
     return () => {
       alive = false;

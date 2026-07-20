@@ -27,8 +27,14 @@ export const seoDescriptionSchema = z.string().trim().max(MAX_SEO_DESCRIPTION);
 
 export const bankAccountSchema = z.object({
   account_holder: z.string().trim().min(2).max(100),
-  account_number: z.string().trim().regex(/^\d{9,18}$/, "Account number must be 9-18 digits"),
-  ifsc: z.string().trim().regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC code"),
+  account_number: z
+    .string()
+    .trim()
+    .regex(/^\d{9,18}$/, "Account number must be 9-18 digits"),
+  ifsc: z
+    .string()
+    .trim()
+    .regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC code"),
   bank_name: z.string().trim().min(2).max(100),
 });
 
@@ -36,7 +42,10 @@ export const withdrawalRequestSchema = z.object({
   amount: z
     .number()
     .min(MIN_WITHDRAWAL_AMOUNT, `Minimum withdrawal is ₹${MIN_WITHDRAWAL_AMOUNT}`)
-    .max(DAILY_WITHDRAWAL_LIMIT, `Daily limit is ₹${DAILY_WITHDRAWAL_LIMIT.toLocaleString("en-IN")}`),
+    .max(
+      DAILY_WITHDRAWAL_LIMIT,
+      `Daily limit is ₹${DAILY_WITHDRAWAL_LIMIT.toLocaleString("en-IN")}`,
+    ),
   bank_account_details: bankAccountSchema,
 });
 

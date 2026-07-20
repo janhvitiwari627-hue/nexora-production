@@ -24,15 +24,10 @@ export function CancelledBookingCard({ booking }: { booking: CancelledBooking })
             <div className="min-w-0">
               <h3 className="truncate text-sm font-bold sm:text-base">{booking.shopName}</h3>
               <p className="truncate text-sm text-muted-foreground">{booking.service}</p>
-              <p className="text-xs text-muted-foreground">
-                {formatBookingDate(booking.dateISO)}
-              </p>
+              <p className="text-xs text-muted-foreground">{formatBookingDate(booking.dateISO)}</p>
             </div>
             <span
-              className={cn(
-                "shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold",
-                r.classes,
-              )}
+              className={cn("shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold", r.classes)}
             >
               {r.label}
               {booking.refundAmount ? ` · ₹${booking.refundAmount}` : ""}

@@ -125,7 +125,7 @@ function BookingSuccessPageInner({ slug }: { slug: string }) {
   const salonFromDb = salonQuery.data?.salon;
   const salon = mockReceipt
     ? { name: mockReceipt.salon_name, address: null, location: null, phone: null, whatsapp: null }
-    : salonFromDb ?? null;
+    : (salonFromDb ?? null);
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-10">
@@ -249,7 +249,6 @@ function BookingSuccessPageInner({ slug }: { slug: string }) {
             </button>
           );
         })()}
-
 
         <div className="mt-4 flex flex-col gap-3 sm:flex-row">
           <Link

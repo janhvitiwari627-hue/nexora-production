@@ -12,8 +12,8 @@ This project runs an automated, repository-wide scan to prevent legacy or unauth
 
 The current forbidden pattern is:
 
-| Pattern | Why it is forbidden | Use instead |
-| --- | --- | --- |
+| Pattern                | Why it is forbidden                                                                                                                  | Use instead    |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | -------------- |
 | `public_salons_search` | The legacy Supabase RPC `public.public_salons_search` no longer exists in the schema and callers now fail with a schema-cache error. | `shops_search` |
 
 Additional patterns can be added to the `FORBIDDEN` array in `scripts/check-forbidden-refs.mjs`.

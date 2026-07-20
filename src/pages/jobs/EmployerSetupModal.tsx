@@ -10,7 +10,15 @@ type Props = {
   redirectTo?: string;
 };
 
-const BUSINESS_TYPES = ["Salon", "Spa", "Barbershop", "Nail Studio", "Makeup Studio", "Academy", "Other"];
+const BUSINESS_TYPES = [
+  "Salon",
+  "Spa",
+  "Barbershop",
+  "Nail Studio",
+  "Makeup Studio",
+  "Academy",
+  "Other",
+];
 
 export function EmployerSetupModal({ open, onClose, redirectTo = "/hire/post-job" }: Props) {
   const { user } = useAuthStore();

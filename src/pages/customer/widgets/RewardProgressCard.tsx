@@ -15,12 +15,8 @@ export function RewardProgressCard() {
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             Reward Points
           </p>
-          <p className="mt-1 text-3xl font-black sm:text-4xl">
-            {points.toLocaleString()}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Available to redeem
-          </p>
+          <p className="mt-1 text-3xl font-black sm:text-4xl">{points.toLocaleString()}</p>
+          <p className="mt-1 text-xs text-muted-foreground">Available to redeem</p>
         </div>
         <div className="relative h-32 w-32 shrink-0">
           <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">

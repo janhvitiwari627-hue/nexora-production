@@ -110,7 +110,9 @@ export const cancelBooking = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { data: b, error: fetchErr } = await supabase
       .from("bookings")
-      .select("id, user_id, status, payment_status, booking_date, booking_time, price, advance_amount")
+      .select(
+        "id, user_id, status, payment_status, booking_date, booking_time, price, advance_amount",
+      )
       .eq("id", data.id)
       .maybeSingle();
     if (fetchErr) throw new Error(fetchErr.message);
@@ -123,7 +125,8 @@ export const cancelBooking = createServerFn({ method: "POST" })
     const hoursToSlot = (slotAt.getTime() - Date.now()) / 3_600_000;
     const wasPaid = b.payment_status === "paid";
     let refund_status: string | null = null;
-    if (wasPaid) refund_status = hoursToSlot >= 24 ? "full_refund_pending" : "partial_refund_pending";
+    if (wasPaid)
+      refund_status = hoursToSlot >= 24 ? "full_refund_pending" : "partial_refund_pending";
 
     const { data: row, error } = await supabase
       .from("bookings")

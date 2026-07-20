@@ -31,10 +31,12 @@ export const logAnalyticsEvent = createServerFn({ method: "POST" })
 export const getMyEventStats = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    z.object({
-      event_name: z.string().min(1).max(80),
-      days: z.number().int().min(1).max(90).optional().default(7),
-    }).parse(d),
+    z
+      .object({
+        event_name: z.string().min(1).max(80),
+        days: z.number().int().min(1).max(90).optional().default(7),
+      })
+      .parse(d),
   )
   .handler(async ({ data, context }) => {
     const since = new Date();
@@ -60,4 +62,3 @@ export const getMyEventStats = createServerFn({ method: "GET" })
     }
     return { total: rows?.length ?? 0, daily: buckets };
   });
-

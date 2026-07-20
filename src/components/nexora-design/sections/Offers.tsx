@@ -56,9 +56,7 @@ export default function Offers() {
                     </span>
                   </div>
                   <h3 className="text-2xl font-bold">{offer.title}</h3>
-                  <p className="mt-2 max-w-md text-indigo-100">
-                    {offer.description}
-                  </p>
+                  <p className="mt-2 max-w-md text-indigo-100">{offer.description}</p>
                   <a
                     href="#"
                     className="mt-6 inline-flex w-max items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-slate-900 transition-transform hover:scale-105 active:scale-95"

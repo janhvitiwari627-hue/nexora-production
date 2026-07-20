@@ -40,10 +40,7 @@ export function StarRating({
               aria-label={`${idx} star${idx > 1 ? "s" : ""}`}
             >
               <Star className="text-muted-foreground/40" style={{ width: size, height: size }} />
-              <span
-                className="absolute inset-0 overflow-hidden"
-                style={{ width: `${fillPct}%` }}
-              >
+              <span className="absolute inset-0 overflow-hidden" style={{ width: `${fillPct}%` }}>
                 <Star className="fill-warning text-warning" style={{ width: size, height: size }} />
               </span>
             </button>

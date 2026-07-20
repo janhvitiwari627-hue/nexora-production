@@ -1,7 +1,18 @@
 import { createFileRoute, Outlet, redirect, Link, useRouterState } from "@tanstack/react-router";
 import {
-  Sparkles, LayoutDashboard, Users, Building2, Briefcase, CreditCard,
-  Megaphone, Gift, Star, Trophy, Settings, UserPlus, BarChart3,
+  Sparkles,
+  LayoutDashboard,
+  Users,
+  Building2,
+  Briefcase,
+  CreditCard,
+  Megaphone,
+  Gift,
+  Star,
+  Trophy,
+  Settings,
+  UserPlus,
+  BarChart3,
 } from "lucide-react";
 import { BackButton } from "@/components/shared/BackButton";
 import { supabase } from "@/integrations/supabase/client";

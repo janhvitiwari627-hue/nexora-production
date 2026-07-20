@@ -21,10 +21,7 @@ import { PartnerPageShell } from "./PartnerAppLayout";
 import { PartnerOnboardingChecklist } from "./PartnerOnboardingChecklist";
 import { getPartnerOverview } from "@/lib/partner.functions";
 
-const inr = (n: number) =>
-  new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(n);
-
-
+const inr = (n: number) => new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(n);
 
 type Kpi = {
   icon: ComponentType<{ className?: string }>;
@@ -35,18 +32,60 @@ type Kpi = {
 };
 
 const KPIS: Kpi[] = [
-  { icon: Store, label: "Total Shops Onboarded", value: "128", delta: "+6 this week", tone: "indigo" },
+  {
+    icon: Store,
+    label: "Total Shops Onboarded",
+    value: "128",
+    delta: "+6 this week",
+    tone: "indigo",
+  },
   { icon: BadgeCheck, label: "Verified Shops", value: "104", delta: "+4", tone: "green" },
   { icon: Zap, label: "Active Shops", value: "92", delta: "+3", tone: "green" },
   { icon: Clock, label: "Pending Shops", value: "24", delta: "In review", tone: "amber" },
-  { icon: IndianRupee, label: "Today's Nexora Collection", value: "₹18,420", delta: "+12%", tone: "indigo" },
-  { icon: IndianRupee, label: "Today's Partner Commission", value: "₹1,842", delta: "+12%", tone: "green" },
-  { icon: LineChart, label: "This Week Commission", value: "₹12,480", delta: "6 days", tone: "sky" },
+  {
+    icon: IndianRupee,
+    label: "Today's Nexora Collection",
+    value: "₹18,420",
+    delta: "+12%",
+    tone: "indigo",
+  },
+  {
+    icon: IndianRupee,
+    label: "Today's Partner Commission",
+    value: "₹1,842",
+    delta: "+12%",
+    tone: "green",
+  },
+  {
+    icon: LineChart,
+    label: "This Week Commission",
+    value: "₹12,480",
+    delta: "6 days",
+    tone: "sky",
+  },
   { icon: Wallet, label: "Pending Balance", value: "₹4,220", delta: "Clearing", tone: "amber" },
-  { icon: Wallet, label: "Available Balance", value: "₹8,260", delta: "Withdrawable", tone: "green" },
-  { icon: CalendarClock, label: "Next Auto Payout", value: "Fri, 07 Jul", delta: "Auto", tone: "indigo" },
+  {
+    icon: Wallet,
+    label: "Available Balance",
+    value: "₹8,260",
+    delta: "Withdrawable",
+    tone: "green",
+  },
+  {
+    icon: CalendarClock,
+    label: "Next Auto Payout",
+    value: "Fri, 07 Jul",
+    delta: "Auto",
+    tone: "indigo",
+  },
   { icon: Trophy, label: "Lifetime Earnings", value: "₹2,84,700", delta: "All-time", tone: "sky" },
-  { icon: BadgeCheck, label: "Milestone Progress", value: "92 / 100", delta: "Tablet reward", tone: "amber" },
+  {
+    icon: BadgeCheck,
+    label: "Milestone Progress",
+    value: "92 / 100",
+    delta: "Tablet reward",
+    tone: "amber",
+  },
 ];
 
 const TONE: Record<NonNullable<Kpi["tone"]>, { chip: string; icon: string; delta: string }> = {
@@ -119,7 +158,6 @@ export function PartnerDashboardPage() {
       {/* Overview cards — live partner metrics */}
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map((o, i) => (
-
           <motion.div
             key={o.label}
             initial={{ opacity: 0, y: 10 }}
@@ -143,10 +181,8 @@ export function PartnerDashboardPage() {
         ))}
       </div>
 
-
       {/* KPI Grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-
         {KPIS.map((s, i) => {
           const t = TONE[s.tone ?? "indigo"];
           return (
@@ -162,7 +198,9 @@ export function PartnerDashboardPage() {
                   <s.icon className="h-4 w-4" />
                 </div>
                 {s.delta && (
-                  <span className={`inline-flex items-center gap-0.5 text-[11px] font-bold ${t.delta}`}>
+                  <span
+                    className={`inline-flex items-center gap-0.5 text-[11px] font-bold ${t.delta}`}
+                  >
                     <TrendingUp className="h-3 w-3" /> {s.delta}
                   </span>
                 )}
@@ -202,17 +240,15 @@ export function PartnerDashboardPage() {
                   m.done
                     ? "border-[#16A34A]/30 bg-[#DCFCE7]"
                     : m.current
-                    ? "border-[#4F46E5]/40 bg-[#EEF2FF]"
-                    : "border-slate-200 bg-slate-50"
+                      ? "border-[#4F46E5]/40 bg-[#EEF2FF]"
+                      : "border-slate-200 bg-slate-50"
                 }`}
               >
                 <div className="text-lg font-black text-[#0B1330]">{m.count}</div>
                 <div className="mt-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
                   {m.reward}
                 </div>
-                {m.done && (
-                  <CheckCircle2 className="mx-auto mt-1.5 h-3.5 w-3.5 text-[#16A34A]" />
-                )}
+                {m.done && <CheckCircle2 className="mx-auto mt-1.5 h-3.5 w-3.5 text-[#16A34A]" />}
               </div>
             ))}
           </div>
@@ -224,7 +260,10 @@ export function PartnerDashboardPage() {
               <h3 className="text-base font-bold text-[#0B1330]">Onboarding trend</h3>
               <p className="text-xs text-slate-500">Last 7 days</p>
             </div>
-            <a href="/partner/shops" className="inline-flex items-center gap-1 text-xs font-bold text-[#4F46E5]">
+            <a
+              href="/partner/shops"
+              className="inline-flex items-center gap-1 text-xs font-bold text-[#4F46E5]"
+            >
               View all <ArrowUpRight className="h-3 w-3" />
             </a>
           </div>

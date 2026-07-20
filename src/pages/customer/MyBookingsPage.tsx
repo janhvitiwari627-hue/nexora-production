@@ -52,36 +52,28 @@ export function MyBookingsPage() {
   const upcoming = useMemo(
     () =>
       mockUpcoming.filter(
-        (b) =>
-          withinRange(b.dateISO, range) &&
-          matchesQuery(query, b.shopName, b.service, b.id),
+        (b) => withinRange(b.dateISO, range) && matchesQuery(query, b.shopName, b.service, b.id),
       ),
     [range, query],
   );
   const completed = useMemo(
     () =>
       mockCompleted.filter(
-        (b) =>
-          withinRange(b.dateISO, range) &&
-          matchesQuery(query, b.shopName, b.service, b.id),
+        (b) => withinRange(b.dateISO, range) && matchesQuery(query, b.shopName, b.service, b.id),
       ),
     [range, query],
   );
   const cancelled = useMemo(
     () =>
       mockCancelled.filter(
-        (b) =>
-          withinRange(b.dateISO, range) &&
-          matchesQuery(query, b.shopName, b.service, b.id),
+        (b) => withinRange(b.dateISO, range) && matchesQuery(query, b.shopName, b.service, b.id),
       ),
     [range, query],
   );
   const rescheduled = useMemo(
     () =>
       mockRescheduled.filter(
-        (b) =>
-          withinRange(b.dateISO, range) &&
-          matchesQuery(query, b.shopName, b.service, b.id),
+        (b) => withinRange(b.dateISO, range) && matchesQuery(query, b.shopName, b.service, b.id),
       ),
     [range, query],
   );
@@ -133,9 +125,7 @@ export function MyBookingsPage() {
           {tab === "upcoming" && !upcoming.length && <BookingsEmptyState tab="upcoming" />}
           {tab === "completed" && !completed.length && <BookingsEmptyState tab="completed" />}
           {tab === "cancelled" && !cancelled.length && <BookingsEmptyState tab="cancelled" />}
-          {tab === "rescheduled" && !rescheduled.length && (
-            <BookingsEmptyState tab="rescheduled" />
-          )}
+          {tab === "rescheduled" && !rescheduled.length && <BookingsEmptyState tab="rescheduled" />}
         </div>
       </main>
       <PublicFooter />

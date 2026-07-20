@@ -26,15 +26,11 @@ export function CouponCodeDisplay({ code, disabled }: Props) {
       onClick={onCopy}
       disabled={disabled}
       className={`group flex items-center justify-between gap-3 w-full rounded-lg border border-dashed border-border bg-muted/40 px-3 py-2 text-left transition ${
-        disabled
-          ? "opacity-60 cursor-not-allowed"
-          : "hover:bg-muted hover:border-primary"
+        disabled ? "opacity-60 cursor-not-allowed" : "hover:bg-muted hover:border-primary"
       }`}
       aria-label={`Copy coupon code ${code}`}
     >
-      <span className="font-mono text-sm tracking-widest text-foreground">
-        {code}
-      </span>
+      <span className="font-mono text-sm tracking-widest text-foreground">{code}</span>
       <span className="flex items-center gap-1 text-xs font-medium text-primary">
         {copied ? (
           <>

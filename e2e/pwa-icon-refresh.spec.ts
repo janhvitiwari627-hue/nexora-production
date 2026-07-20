@@ -41,10 +41,7 @@ test.describe("PWA icons refresh across deploys", () => {
   test("manifest lists content-addressed icons and revalidates", async ({ page, request }) => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
 
-    const manifestHref = await page
-      .locator("link[rel='manifest']")
-      .first()
-      .getAttribute("href");
+    const manifestHref = await page.locator("link[rel='manifest']").first().getAttribute("href");
     expect(manifestHref, "<link rel='manifest'> must exist").toBeTruthy();
 
     const manifestUrl = new URL(manifestHref!, page.url()).toString();
@@ -54,7 +51,10 @@ test.describe("PWA icons refresh across deploys", () => {
     // Manifest itself must revalidate so new icon URLs propagate on next visit.
     const cc = (manifestResp.headers()["cache-control"] ?? "").toLowerCase();
     expect(
-      cc.includes("no-cache") || cc.includes("no-store") || cc.includes("must-revalidate") || cc.includes("max-age=0"),
+      cc.includes("no-cache") ||
+        cc.includes("no-store") ||
+        cc.includes("must-revalidate") ||
+        cc.includes("max-age=0"),
       `manifest cache-control should revalidate; got: "${cc}"`,
     ).toBe(true);
 
@@ -109,10 +109,7 @@ test.describe("PWA icons refresh across deploys", () => {
     // that might rewrite headers).
     expect(swInfo.supported).toBe(true);
 
-    const iconHref = await page
-      .locator("link[rel='icon']")
-      .first()
-      .getAttribute("href");
+    const iconHref = await page.locator("link[rel='icon']").first().getAttribute("href");
     expect(iconHref).toBeTruthy();
 
     for (let i = 0; i < 2; i++) {
@@ -130,10 +127,7 @@ test.describe("PWA icons refresh across deploys", () => {
     // cannot silently keep serving the old icon after a logo change.
     await page.goto("/", { waitUntil: "domcontentloaded" });
 
-    const currentHref = await page
-      .locator("link[rel='icon']")
-      .first()
-      .getAttribute("href");
+    const currentHref = await page.locator("link[rel='icon']").first().getAttribute("href");
     expect(currentHref).toMatch(CDN_ICON_RE);
 
     const fakeStaleHref = currentHref!.replace(

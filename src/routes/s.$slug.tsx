@@ -6,11 +6,24 @@ export const Route = createFileRoute("/s/$slug")({
   loader: ({ context, params }) =>
     context.queryClient.ensureQueryData(salonBySlugQueryOptions(params.slug)),
   head: ({ loaderData }) => {
-    const salon = (loaderData as { salon: { name: string; description?: string | null; location?: string | null; image_url?: string | null } } | undefined)?.salon;
+    const salon = (
+      loaderData as
+        | {
+            salon: {
+              name: string;
+              description?: string | null;
+              location?: string | null;
+              image_url?: string | null;
+            };
+          }
+        | undefined
+    )?.salon;
     const title = salon ? `${salon.name} — Book on Nexora` : "Salon — Nexora";
     const desc =
       salon?.description ??
-      (salon ? `Book ${salon.name}${salon.location ? ` in ${salon.location}` : ""}. 25% advance, rest at the salon.` : "Discover and book salons near you on Nexora.");
+      (salon
+        ? `Book ${salon.name}${salon.location ? ` in ${salon.location}` : ""}. 25% advance, rest at the salon.`
+        : "Discover and book salons near you on Nexora.");
     return {
       meta: [
         { title },

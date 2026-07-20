@@ -5,7 +5,9 @@ import type { StaffMember } from "./mockStaff";
 import { cn } from "@/lib/utils";
 
 export function StaffDetailModal({
-  staff, onClose, onEdit,
+  staff,
+  onClose,
+  onEdit,
 }: {
   staff: StaffMember | null;
   onClose: () => void;
@@ -17,11 +19,17 @@ export function StaffDetailModal({
       <div className="space-y-6 p-6">
         <header className="flex flex-wrap items-center gap-4">
           <div className="relative">
-            <img src={staff.photo} alt={staff.name} className="border-border h-24 w-24 rounded-2xl border object-cover" />
-            <span className={cn(
-              "border-card absolute -right-1 -bottom-1 h-5 w-5 rounded-full border-2",
-              staff.available ? "bg-success" : "bg-danger",
-            )} />
+            <img
+              src={staff.photo}
+              alt={staff.name}
+              className="border-border h-24 w-24 rounded-2xl border object-cover"
+            />
+            <span
+              className={cn(
+                "border-card absolute -right-1 -bottom-1 h-5 w-5 rounded-full border-2",
+                staff.available ? "bg-success" : "bg-danger",
+              )}
+            />
           </div>
           <div className="flex-1">
             <div className="text-heading text-xl font-bold">{staff.name}</div>
@@ -36,12 +44,22 @@ export function StaffDetailModal({
           </div>
           <div className="flex gap-2">
             {staff.instagram && (
-              <a href={staff.instagram} target="_blank" rel="noreferrer" className="border-border hover:bg-muted/40 inline-flex h-9 w-9 items-center justify-center rounded-full border">
+              <a
+                href={staff.instagram}
+                target="_blank"
+                rel="noreferrer"
+                className="border-border hover:bg-muted/40 inline-flex h-9 w-9 items-center justify-center rounded-full border"
+              >
                 <Instagram className="h-4 w-4" />
               </a>
             )}
             {staff.whatsapp && (
-              <a href={`https://wa.me/${staff.whatsapp}`} target="_blank" rel="noreferrer" className="text-success border-success/30 hover:bg-success/10 inline-flex h-9 w-9 items-center justify-center rounded-full border">
+              <a
+                href={`https://wa.me/${staff.whatsapp}`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-success border-success/30 hover:bg-success/10 inline-flex h-9 w-9 items-center justify-center rounded-full border"
+              >
                 <MessageCircle className="h-4 w-4" />
               </a>
             )}
@@ -50,9 +68,21 @@ export function StaffDetailModal({
 
         {/* Metrics */}
         <div className="grid grid-cols-3 gap-3">
-          <Metric icon={<Calendar className="h-4 w-4" />} label="Bookings (mo)" value={staff.bookingsThisMonth.toString()} />
-          <Metric icon={<IndianRupee className="h-4 w-4" />} label="Revenue (mo)" value={`₹${(staff.revenueThisMonth / 1000).toFixed(0)}K`} />
-          <Metric icon={<Star className="h-4 w-4" />} label="Rating" value={staff.rating.toFixed(1)} />
+          <Metric
+            icon={<Calendar className="h-4 w-4" />}
+            label="Bookings (mo)"
+            value={staff.bookingsThisMonth.toString()}
+          />
+          <Metric
+            icon={<IndianRupee className="h-4 w-4" />}
+            label="Revenue (mo)"
+            value={`₹${(staff.revenueThisMonth / 1000).toFixed(0)}K`}
+          />
+          <Metric
+            icon={<Star className="h-4 w-4" />}
+            label="Rating"
+            value={staff.rating.toFixed(1)}
+          />
         </div>
 
         {/* Specializations + languages */}
@@ -81,15 +111,29 @@ export function StaffDetailModal({
           <Section title="Portfolio">
             <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
               {staff.portfolio.map((src, i) => (
-                <img key={i} src={src} alt="" className="border-border aspect-square w-full rounded-lg border object-cover" />
+                <img
+                  key={i}
+                  src={src}
+                  alt=""
+                  className="border-border aspect-square w-full rounded-lg border object-cover"
+                />
               ))}
             </div>
           </Section>
         )}
 
         <div className="flex justify-end gap-2 border-t pt-4">
-          <Button variant="outline" onClick={onClose}>Close</Button>
-          <Button onClick={() => { onEdit(staff); onClose(); }}>Edit profile</Button>
+          <Button variant="outline" onClick={onClose}>
+            Close
+          </Button>
+          <Button
+            onClick={() => {
+              onEdit(staff);
+              onClose();
+            }}
+          >
+            Edit profile
+          </Button>
         </div>
       </div>
     </Modal>
@@ -110,7 +154,9 @@ function ChipList({ items }: { items: string[] }) {
   return (
     <div className="flex flex-wrap gap-1.5">
       {items.map((s) => (
-        <span key={s} className="bg-muted text-body rounded-full px-2.5 py-0.5 text-xs">{s}</span>
+        <span key={s} className="bg-muted text-body rounded-full px-2.5 py-0.5 text-xs">
+          {s}
+        </span>
       ))}
     </div>
   );

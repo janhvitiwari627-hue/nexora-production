@@ -31,9 +31,7 @@ async function signOutViaHeader(page: Page) {
   await page.getByRole("menuitem", { name: /Logout/ }).click();
 
   // Wait for the anonymous state to appear as proof the sign-out landed.
-  await expect(
-    page.getByRole("link", { name: "Login" }).first(),
-  ).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByRole("link", { name: "Login" }).first()).toBeVisible({ timeout: 10_000 });
 }
 
 test.describe("After logout, /login and /signup render forms (no auto-redirect)", () => {
@@ -42,7 +40,9 @@ test.describe("After logout, /login and /signup render forms (no auto-redirect)"
     "Supabase session env vars not present; skipping logout redirect test.",
   );
 
-  test("visiting /login after logout stays on /login and shows a sign-in form", async ({ page }) => {
+  test("visiting /login after logout stays on /login and shows a sign-in form", async ({
+    page,
+  }) => {
     await seedSession(page);
     await page.goto("/", { waitUntil: "networkidle" });
     await signOutViaHeader(page);
@@ -56,7 +56,9 @@ test.describe("After logout, /login and /signup render forms (no auto-redirect)"
     await expect(page.locator('input[type="password"]').first()).toBeVisible();
   });
 
-  test("visiting /signup after logout stays on /signup and shows a sign-up form", async ({ page }) => {
+  test("visiting /signup after logout stays on /signup and shows a sign-up form", async ({
+    page,
+  }) => {
     await seedSession(page);
     await page.goto("/", { waitUntil: "networkidle" });
     await signOutViaHeader(page);
@@ -68,7 +70,9 @@ test.describe("After logout, /login and /signup render forms (no auto-redirect)"
     await expect(page.locator('input[type="password"]').first()).toBeVisible();
   });
 
-  test("repeat visits to /login and /signup after logout never redirect to a role dashboard", async ({ page }) => {
+  test("repeat visits to /login and /signup after logout never redirect to a role dashboard", async ({
+    page,
+  }) => {
     await seedSession(page);
     await page.goto("/", { waitUntil: "networkidle" });
     await signOutViaHeader(page);

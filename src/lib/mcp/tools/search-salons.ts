@@ -8,9 +8,24 @@ export default defineTool({
   description:
     "Search Nexora's public directory of salons, spas, and barbershops. Filters by optional query text (matched against name), category, and city/location. Returns up to 20 results.",
   inputSchema: {
-    query: z.string().trim().max(200).optional().describe("Free-text search matched against salon name."),
-    category: z.string().trim().max(100).optional().describe("Category filter, e.g. 'Hair Salon', 'Spa', 'Barber Shop'."),
-    location: z.string().trim().max(200).optional().describe("City or area name to filter by (matched against location field)."),
+    query: z
+      .string()
+      .trim()
+      .max(200)
+      .optional()
+      .describe("Free-text search matched against salon name."),
+    category: z
+      .string()
+      .trim()
+      .max(100)
+      .optional()
+      .describe("Category filter, e.g. 'Hair Salon', 'Spa', 'Barber Shop'."),
+    location: z
+      .string()
+      .trim()
+      .max(200)
+      .optional()
+      .describe("City or area name to filter by (matched against location field)."),
     limit: z.number().int().min(1).max(20).optional().describe("Max results (default 10)."),
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
@@ -26,7 +41,9 @@ export default defineTool({
 
     let q = supabase
       .from("public_salon_cards")
-      .select("id, slug, name, category, rating, reviews_count, location, address, price_range, is_verified")
+      .select(
+        "id, slug, name, category, rating, reviews_count, location, address, price_range, is_verified",
+      )
       .eq("website_created", true)
       .limit(limit ?? 10);
 

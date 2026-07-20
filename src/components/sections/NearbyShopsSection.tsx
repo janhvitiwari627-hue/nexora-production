@@ -78,7 +78,9 @@ export function NearbyShopsSection() {
       {/* Radius selector */}
       {location ? (
         <div className="mb-5 flex flex-wrap items-center gap-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Radius:</span>
+          <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            Radius:
+          </span>
           {RADII.map((r) => (
             <button
               key={r}

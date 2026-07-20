@@ -5,7 +5,10 @@ export const Route = createFileRoute("/owner/analytics")({
   head: () => ({
     meta: [
       { title: "Analytics — Nexora Owner" },
-      { name: "description", content: "Revenue, bookings, customers, staff and service performance analytics." },
+      {
+        name: "description",
+        content: "Revenue, bookings, customers, staff and service performance analytics.",
+      },
     ],
   }),
   component: OwnerAnalyticsPage,

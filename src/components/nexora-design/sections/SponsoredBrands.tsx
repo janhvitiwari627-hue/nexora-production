@@ -1,5 +1,15 @@
 import { useRef, useState } from "react";
-import { ArrowRight, ChevronLeft, ChevronRight, X, Globe, Mail, Phone, MapPin, ExternalLink } from "lucide-react";
+import {
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  X,
+  Globe,
+  Mail,
+  Phone,
+  MapPin,
+  ExternalLink,
+} from "lucide-react";
 import FadeIn from "../FadeIn";
 
 type Brand = {
@@ -24,8 +34,10 @@ const BRANDS: Brand[] = [
     category: "Hair Care",
     city: "New York",
     description: "Salon-grade hair repair and styling formulas trusted by stylists worldwide.",
-    story: "LuxeLocks Pro is built on twenty years of trichology research, formulated to give professional stylists tools that protect hair while delivering runway-grade finishes.",
-    banner: "https://images.pexels.com/photos/3993449/pexels-photo-3993449.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=700&w=900",
+    story:
+      "LuxeLocks Pro is built on twenty years of trichology research, formulated to give professional stylists tools that protect hair while delivering runway-grade finishes.",
+    banner:
+      "https://images.pexels.com/photos/3993449/pexels-photo-3993449.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=700&w=900",
     products: [
       { name: "Bond Repair Serum", note: "Part of the LuxeLocks professional line." },
       { name: "Volume Mousse", note: "Part of the LuxeLocks professional line." },
@@ -33,7 +45,11 @@ const BRANDS: Brand[] = [
       { name: "Salon Backbar", note: "Part of the LuxeLocks professional line." },
     ],
     salons: ["The Glam House", "Royal Wellness Spa"],
-    contact: { website: "example.com/luxelocks", email: "hello@luxelocks.com", phone: "+1 212 555 0102" },
+    contact: {
+      website: "example.com/luxelocks",
+      email: "hello@luxelocks.com",
+      phone: "+1 212 555 0102",
+    },
   },
   {
     id: "dermaelite",
@@ -42,8 +58,10 @@ const BRANDS: Brand[] = [
     category: "Skin Care",
     city: "Los Angeles",
     description: "Dermatologist-developed skin science for radiant, healthy complexions.",
-    story: "DermaElite combines clinical actives with sensorial rituals, created for modern spas and skin clinics. Through our partnership with Nexora SalonOS, DermaElite is featured in premium salons across Los Angeles and beyond.",
-    banner: "https://images.pexels.com/photos/3993454/pexels-photo-3993454.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=700&w=900",
+    story:
+      "DermaElite combines clinical actives with sensorial rituals, created for modern spas and skin clinics. Through our partnership with Nexora SalonOS, DermaElite is featured in premium salons across Los Angeles and beyond.",
+    banner:
+      "https://images.pexels.com/photos/3993454/pexels-photo-3993454.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=700&w=900",
     products: [
       { name: "Signature Formula", note: "Part of the DermaElite professional line." },
       { name: "Professional Kit", note: "Part of the DermaElite professional line." },
@@ -51,7 +69,11 @@ const BRANDS: Brand[] = [
       { name: "Salon Backbar", note: "Part of the DermaElite professional line." },
     ],
     salons: ["Glow Derma Bar", "Skin Sanctuary"],
-    contact: { website: "example.com/dermaelite", email: "hello@dermaelite.com", phone: "+1 310 555 0123" },
+    contact: {
+      website: "example.com/dermaelite",
+      email: "hello@dermaelite.com",
+      phone: "+1 310 555 0123",
+    },
   },
   {
     id: "stylecraft",
@@ -60,8 +82,10 @@ const BRANDS: Brand[] = [
     category: "Professional Salon Products",
     city: "Chicago",
     description: "Precision tools and ergonomic equipment designed for busy salons.",
-    story: "StyleCraft engineers premium scissors, brushes and clippers built to last through thousands of services, with weight balance designed alongside working stylists.",
-    banner: "https://images.pexels.com/photos/3993459/pexels-photo-3993459.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=700&w=900",
+    story:
+      "StyleCraft engineers premium scissors, brushes and clippers built to last through thousands of services, with weight balance designed alongside working stylists.",
+    banner:
+      "https://images.pexels.com/photos/3993459/pexels-photo-3993459.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=700&w=900",
     products: [
       { name: "Precision Shears", note: "Part of the StyleCraft professional line." },
       { name: "Pro Blow Brush Set", note: "Part of the StyleCraft professional line." },
@@ -69,7 +93,11 @@ const BRANDS: Brand[] = [
       { name: "Salon Trolley", note: "Part of the StyleCraft professional line." },
     ],
     salons: ["Ink Culture Studio", "Urban Fade Co."],
-    contact: { website: "example.com/stylecraft", email: "hello@stylecraft.com", phone: "+1 312 555 0144" },
+    contact: {
+      website: "example.com/stylecraft",
+      email: "hello@stylecraft.com",
+      phone: "+1 312 555 0144",
+    },
   },
   {
     id: "serenespa",
@@ -78,8 +106,10 @@ const BRANDS: Brand[] = [
     category: "Spa Products",
     city: "Miami",
     description: "Botanical oils and wellness rituals that turn treatments into escapes.",
-    story: "SereneSpa Organics blends Ayurvedic tradition with modern aromatherapy, crafted in small batches for premium spas worldwide.",
-    banner: "https://images.pexels.com/photos/3865711/pexels-photo-3865711.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=700&w=900",
+    story:
+      "SereneSpa Organics blends Ayurvedic tradition with modern aromatherapy, crafted in small batches for premium spas worldwide.",
+    banner:
+      "https://images.pexels.com/photos/3865711/pexels-photo-3865711.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=700&w=900",
     products: [
       { name: "Calming Body Oil", note: "Part of the SereneSpa professional line." },
       { name: "Ritual Candle Set", note: "Part of the SereneSpa professional line." },
@@ -87,7 +117,11 @@ const BRANDS: Brand[] = [
       { name: "Aromatherapy Mist", note: "Part of the SereneSpa professional line." },
     ],
     salons: ["Royal Wellness Spa", "Lotus Retreat"],
-    contact: { website: "example.com/serenespa", email: "hello@serenespa.com", phone: "+1 305 555 0188" },
+    contact: {
+      website: "example.com/serenespa",
+      email: "hello@serenespa.com",
+      phone: "+1 305 555 0188",
+    },
   },
   {
     id: "colorpop",
@@ -96,8 +130,10 @@ const BRANDS: Brand[] = [
     category: "Nail Art Products",
     city: "Austin",
     description: "Long-wear gel systems and nail art kits made for studio creativity.",
-    story: "ColorPop Nails launched from an indie nail studio in Austin and is now stocked by hundreds of pro nail artists across the country.",
-    banner: "https://images.pexels.com/photos/3997989/pexels-photo-3997989.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=700&w=900",
+    story:
+      "ColorPop Nails launched from an indie nail studio in Austin and is now stocked by hundreds of pro nail artists across the country.",
+    banner:
+      "https://images.pexels.com/photos/3997989/pexels-photo-3997989.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=700&w=900",
     products: [
       { name: "Gel Color Library", note: "Part of the ColorPop professional line." },
       { name: "Nail Art Kit", note: "Part of the ColorPop professional line." },
@@ -105,7 +141,11 @@ const BRANDS: Brand[] = [
       { name: "Care Treatment", note: "Part of the ColorPop professional line." },
     ],
     salons: ["Nailed It Studio", "Polish Lab"],
-    contact: { website: "example.com/colorpop", email: "hello@colorpop.com", phone: "+1 512 555 0177" },
+    contact: {
+      website: "example.com/colorpop",
+      email: "hello@colorpop.com",
+      phone: "+1 512 555 0177",
+    },
   },
   {
     id: "nexora-collective",
@@ -114,8 +154,10 @@ const BRANDS: Brand[] = [
     category: "Beauty Brand Story",
     city: "Jaipur",
     description: "A curated collective of independent beauty brands powered by Nexora SalonOS.",
-    story: "The Nexora Collective showcases independent makers and master stylists building the next chapter of premium beauty in India.",
-    banner: "https://images.pexels.com/photos/3997387/pexels-photo-3997387.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=700&w=900",
+    story:
+      "The Nexora Collective showcases independent makers and master stylists building the next chapter of premium beauty in India.",
+    banner:
+      "https://images.pexels.com/photos/3997387/pexels-photo-3997387.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=700&w=900",
     products: [
       { name: "Capsule Collection", note: "Part of the Nexora Collective line." },
       { name: "Studio Edition", note: "Part of the Nexora Collective line." },
@@ -123,7 +165,11 @@ const BRANDS: Brand[] = [
       { name: "Pro Backbar", note: "Part of the Nexora Collective line." },
     ],
     salons: ["The Glam House", "Lotus Retreat"],
-    contact: { website: "example.com/nexora-collective", email: "hello@nexora.com", phone: "+91 99999 00000" },
+    contact: {
+      website: "example.com/nexora-collective",
+      email: "hello@nexora.com",
+      phone: "+91 99999 00000",
+    },
   },
 ];
 
@@ -134,7 +180,10 @@ export default function SponsoredBrands() {
   const scroll = (dir: "l" | "r") => {
     const el = scrollerRef.current;
     if (!el) return;
-    el.scrollBy({ left: dir === "l" ? -el.clientWidth * 0.8 : el.clientWidth * 0.8, behavior: "smooth" });
+    el.scrollBy({
+      left: dir === "l" ? -el.clientWidth * 0.8 : el.clientWidth * 0.8,
+      behavior: "smooth",
+    });
   };
 
   return (
@@ -145,7 +194,8 @@ export default function SponsoredBrands() {
             Trusted Beauty Industry Partners
           </h2>
           <p className="mt-3 max-w-2xl text-slate-500">
-            Discover leading beauty and personal care brands trusted by salons, spas and beauty professionals.
+            Discover leading beauty and personal care brands trusted by salons, spas and beauty
+            professionals.
           </p>
         </FadeIn>
 
@@ -307,7 +357,10 @@ function BrandModal({ brand, onClose }: { brand: Brand | null; onClose: () => vo
             {tab === "salons" && (
               <div className="space-y-2">
                 {brand.salons.map((s) => (
-                  <div key={s} className="flex items-center gap-2 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                  <div
+                    key={s}
+                    className="flex items-center gap-2 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-700"
+                  >
                     <MapPin className="h-4 w-4 text-slate-400" /> {s}
                   </div>
                 ))}
@@ -316,9 +369,15 @@ function BrandModal({ brand, onClose }: { brand: Brand | null; onClose: () => vo
 
             {tab === "contact" && (
               <div className="space-y-3">
-                <div className="flex items-center gap-2 text-slate-700"><Globe className="h-4 w-4 text-slate-400" /> {brand.contact.website}</div>
-                <div className="flex items-center gap-2 text-slate-700"><Mail className="h-4 w-4 text-slate-400" /> {brand.contact.email}</div>
-                <div className="flex items-center gap-2 text-slate-700"><Phone className="h-4 w-4 text-slate-400" /> {brand.contact.phone}</div>
+                <div className="flex items-center gap-2 text-slate-700">
+                  <Globe className="h-4 w-4 text-slate-400" /> {brand.contact.website}
+                </div>
+                <div className="flex items-center gap-2 text-slate-700">
+                  <Mail className="h-4 w-4 text-slate-400" /> {brand.contact.email}
+                </div>
+                <div className="flex items-center gap-2 text-slate-700">
+                  <Phone className="h-4 w-4 text-slate-400" /> {brand.contact.phone}
+                </div>
               </div>
             )}
           </div>

@@ -1,25 +1,33 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Briefcase, Building2, LayoutDashboard, LogOut, Sparkles, TrendingUp, User, X } from "lucide-react";
+import {
+  ArrowRight,
+  Briefcase,
+  Building2,
+  LayoutDashboard,
+  LogOut,
+  Sparkles,
+  TrendingUp,
+  User,
+  X,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthStore } from "@/stores/authStore";
 
-
 const NAV = [
   { label: "Explore", to: "/search", icon: Sparkles, desc: "Salons, spas & barbers near you" },
   { label: "Job Portal", to: "/jobs", icon: Briefcase, desc: "Find your next role in beauty" },
-  { label: "Final Website Editor", to: "/owner/website", icon: Building2, desc: "Edit theme, content and publish in one place" },
+  {
+    label: "Final Website Editor",
+    to: "/owner/website",
+    icon: Building2,
+    desc: "Edit theme, content and publish in one place",
+  },
 ] as const;
 
-export function MobileMenuOverlay({
-  open,
-  onClose,
-}: {
-  open: boolean;
-  onClose: () => void;
-}) {
+export function MobileMenuOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [mounted, setMounted] = useState(false);
   const user = useAuthStore((s) => s.user);
   const profile = useAuthStore((s) => s.profile);
@@ -116,12 +124,9 @@ export function MobileMenuOverlay({
     navigate({ to: "/", replace: true });
   };
 
-
   const currentProfile = profile?.id === user?.id ? profile : null;
   const metadataName =
-    typeof user?.user_metadata?.full_name === "string"
-      ? user.user_metadata.full_name.trim()
-      : "";
+    typeof user?.user_metadata?.full_name === "string" ? user.user_metadata.full_name.trim() : "";
   const displayName =
     metadataName ||
     currentProfile?.full_name ||
@@ -156,9 +161,7 @@ export function MobileMenuOverlay({
             aria-label="Main menu"
             tabIndex={-1}
           >
-
             <div className="border-border flex items-center justify-between border-b px-4 py-4 sm:px-5">
-
               <div className="flex items-center gap-2">
                 <div className="bg-gradient-cta grid h-9 w-9 place-items-center rounded-xl text-primary-foreground shadow-[var(--shadow-glow)]">
                   <Sparkles className="h-4 w-4" />
@@ -175,7 +178,6 @@ export function MobileMenuOverlay({
               >
                 <X className="h-5 w-5" />
               </button>
-
             </div>
 
             <nav className="flex-1 overflow-y-auto px-3 py-4">
@@ -191,12 +193,8 @@ export function MobileMenuOverlay({
                         <item.icon className="h-5 w-5" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="text-heading truncate text-sm font-bold">
-                          {item.label}
-                        </div>
-                        <div className="text-muted-foreground truncate text-xs">
-                          {item.desc}
-                        </div>
+                        <div className="text-heading truncate text-sm font-bold">{item.label}</div>
+                        <div className="text-muted-foreground truncate text-xs">{item.desc}</div>
                       </div>
                       <ArrowRight className="text-muted-foreground h-4 w-4 transition group-hover:translate-x-0.5 group-hover:text-primary" />
                     </Link>
@@ -236,7 +234,11 @@ export function MobileMenuOverlay({
                       Profile
                     </Link>
                   </Button>
-                  <Button variant="outline" className="h-11 justify-start font-semibold text-destructive hover:text-destructive" onClick={handleLogout}>
+                  <Button
+                    variant="outline"
+                    className="h-11 justify-start font-semibold text-destructive hover:text-destructive"
+                    onClick={handleLogout}
+                  >
                     <LogOut className="mr-2 h-4 w-4" />
                     Logout
                   </Button>
@@ -244,10 +246,17 @@ export function MobileMenuOverlay({
               ) : (
                 <>
                   <Button variant="outline" className="h-11 font-semibold" asChild>
-                    <Link to="/login" onClick={onClose}>Login</Link>
+                    <Link to="/login" onClick={onClose}>
+                      Login
+                    </Link>
                   </Button>
-                  <Button className="bg-gradient-cta text-primary-foreground h-11 font-semibold shadow-[var(--shadow-glow)]" asChild>
-                    <Link to="/register" onClick={onClose}>Register →</Link>
+                  <Button
+                    className="bg-gradient-cta text-primary-foreground h-11 font-semibold shadow-[var(--shadow-glow)]"
+                    asChild
+                  >
+                    <Link to="/register" onClick={onClose}>
+                      Register →
+                    </Link>
                   </Button>
                   <p className="text-muted-foreground mt-1 text-center text-[11px]">
                     Join 50k+ members getting their best looks on Nexora.

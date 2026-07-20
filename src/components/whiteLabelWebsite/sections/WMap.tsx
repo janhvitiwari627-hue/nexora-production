@@ -6,7 +6,10 @@ export function WMap({ shop, template }: { shop: ShopData; template: TemplateCon
   const bbox = `${lng - 0.01}%2C${lat - 0.01}%2C${lng + 0.01}%2C${lat + 0.01}`;
   return (
     <section className="px-6 pb-16 md:px-12">
-      <div className="mx-auto max-w-5xl overflow-hidden shadow-lg" style={{ borderRadius: template.radius }}>
+      <div
+        className="mx-auto max-w-5xl overflow-hidden shadow-lg"
+        style={{ borderRadius: template.radius }}
+      >
         <iframe
           title={`Map of ${shop.name}`}
           className="h-72 w-full md:h-96"

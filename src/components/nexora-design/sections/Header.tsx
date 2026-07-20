@@ -1,15 +1,6 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import {
-  Menu,
-  X,
-  Search,
-  Bell,
-  Sparkles,
-  ChevronDown,
-  LayoutDashboard,
-  Globe,
-} from "lucide-react";
+import { Menu, X, Search, Bell, Sparkles, ChevronDown, LayoutDashboard, Globe } from "lucide-react";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -43,9 +34,7 @@ export default function Header() {
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-200">
             <Sparkles className="h-5 w-5" />
           </div>
-          <span className="text-xl font-bold tracking-tight text-slate-900">
-            Nexora
-          </span>
+          <span className="text-xl font-bold tracking-tight text-slate-900">Nexora</span>
         </a>
 
         {/* Desktop Nav */}
@@ -99,12 +88,8 @@ export default function Header() {
                         <item.icon className="h-4 w-4" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold text-slate-900">
-                          {item.label}
-                        </p>
-                        <p className="mt-0.5 text-xs text-slate-500">
-                          {item.description}
-                        </p>
+                        <p className="text-sm font-semibold text-slate-900">{item.label}</p>
+                        <p className="mt-0.5 text-xs text-slate-500">{item.description}</p>
                       </div>
                     </Link>
                   ))}

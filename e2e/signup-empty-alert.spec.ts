@@ -12,7 +12,11 @@ import { test, expect, type Page } from "@playwright/test";
 
 test.setTimeout(60_000);
 
-async function gotoForm(page: Page, path: string, anchorLabel: RegExp = /Full name|Owner full name/) {
+async function gotoForm(
+  page: Page,
+  path: string,
+  anchorLabel: RegExp = /Full name|Owner full name/,
+) {
   await page.goto(path, { waitUntil: "domcontentloaded", timeout: 90_000 });
   await page.waitForTimeout(8000);
   await expect(page.getByLabel(anchorLabel).first()).toBeVisible({ timeout: 60_000 });
@@ -22,7 +26,8 @@ async function gotoForm(page: Page, path: string, anchorLabel: RegExp = /Full na
 // that lives ABOVE the form. The shadcn <Alert> wraps an info banner with
 // `role="alert"` as well (referral code, password reset confirmations),
 // so we narrow by `variant="destructive"` via class selector.
-const destructiveAlertSelector = '[role="alert"].border-destructive\\/50, [role="alert"].text-destructive, [role="alert"][class*="destructive"]';
+const destructiveAlertSelector =
+  '[role="alert"].border-destructive\\/50, [role="alert"].text-destructive, [role="alert"][class*="destructive"]';
 
 async function expectNoEmptyDestructiveAlert(page: Page) {
   const alerts = page.locator(destructiveAlertSelector);
@@ -96,12 +101,12 @@ test.describe("/owner-signup — current business registration validation", () =
     await expectNoEmptyDestructiveAlert(page);
     await expect(page).toHaveURL(/\/owner\/register-business$/);
   });
-
 });
 
-
 test.describe("/register — empty-alert regression guard for mismatched passwords", () => {
-  test("mismatched passwords on customer tab shows friendly error, no empty alert", async ({ page }) => {
+  test("mismatched passwords on customer tab shows friendly error, no empty alert", async ({
+    page,
+  }) => {
     await page.goto("/register", { waitUntil: "domcontentloaded", timeout: 90_000 });
     await page.waitForTimeout(8000);
     await expect(page.getByLabel("Email")).toBeVisible({ timeout: 60_000 });
@@ -111,7 +116,6 @@ test.describe("/register — empty-alert regression guard for mismatched passwor
     await page.getByLabel("Mobile").fill("9876543210");
     await page.locator("#password").fill("StrongP@ss123");
     await page.locator("#confirm_password").fill("DifferentP@ss123");
-
 
     await page.getByRole("button", { name: "Create account" }).click();
 

@@ -100,9 +100,7 @@ export function SponsoredBrandsSection() {
 
             <div className="p-5">
               <h3 className="text-lg font-bold text-heading">{b.name}</h3>
-              <p className="mt-1.5 line-clamp-2 text-sm text-muted-foreground">
-                {b.description}
-              </p>
+              <p className="mt-1.5 line-clamp-2 text-sm text-muted-foreground">{b.description}</p>
               <button
                 type="button"
                 className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-primary transition hover:gap-2"

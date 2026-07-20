@@ -5,8 +5,16 @@ import { Award, Cake, Gift, PartyPopper, Sparkles } from "lucide-react";
 
 export function WLoyalty({ shop, template }: { shop: ShopData; template: TemplateConfig }) {
   const items = [
-    { icon: Sparkles, title: "Reward Points", body: `Earn ${shop.loyalty.pointsPerVisit} points every visit.` },
-    { icon: Gift, title: "Referral Rewards", body: `Get ${shop.loyalty.referralPoints} points for every friend you refer.` },
+    {
+      icon: Sparkles,
+      title: "Reward Points",
+      body: `Earn ${shop.loyalty.pointsPerVisit} points every visit.`,
+    },
+    {
+      icon: Gift,
+      title: "Referral Rewards",
+      body: `Get ${shop.loyalty.referralPoints} points for every friend you refer.`,
+    },
     { icon: Cake, title: "Birthday Reward", body: shop.loyalty.birthdayReward },
     { icon: PartyPopper, title: "Festival Reward", body: shop.loyalty.festivalReward },
   ];
@@ -16,7 +24,11 @@ export function WLoyalty({ shop, template }: { shop: ShopData; template: Templat
       <p className="text-muted-foreground mt-2 text-center text-sm">Stay loyal. Get rewarded.</p>
       <div className="mx-auto mt-8 grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {items.map((it) => (
-          <div key={it.title} className="border bg-white p-5 text-center shadow-sm" style={{ borderRadius: template.radius }}>
+          <div
+            key={it.title}
+            className="border bg-white p-5 text-center shadow-sm"
+            style={{ borderRadius: template.radius }}
+          >
             <div
               className="mx-auto grid h-12 w-12 place-items-center text-white"
               style={{ backgroundColor: template.colors.primary, borderRadius: template.radius }}

@@ -23,7 +23,6 @@ export function ContactInfoPanel() {
   const emailVerified = !!user?.email_confirmed_at;
   const phoneVerified = !!profile?.mobile;
 
-
   function saveAddress(a: Address) {
     setAddresses((prev) => {
       const exists = prev.some((x) => x.id === a.id);
@@ -54,7 +53,9 @@ export function ContactInfoPanel() {
 
       <div className="mt-8">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-heading text-sm font-black uppercase tracking-wide">Saved addresses</h3>
+          <h3 className="text-heading text-sm font-black uppercase tracking-wide">
+            Saved addresses
+          </h3>
           <button
             onClick={() => setAddingAddr(true)}
             className="text-primary hover:bg-primary/10 inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-bold"
@@ -70,7 +71,9 @@ export function ContactInfoPanel() {
                   <div className="flex items-center gap-2">
                     <span className="text-heading text-sm font-bold">{a.label}</span>
                     {a.isDefault && (
-                      <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px] font-bold uppercase">Default</span>
+                      <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px] font-bold uppercase">
+                        Default
+                      </span>
                     )}
                   </div>
                   <p className="text-muted-foreground mt-1 text-sm">
@@ -105,7 +108,10 @@ export function ContactInfoPanel() {
           currentValue={email}
           type="email"
           onClose={() => setEmailModal(false)}
-          onConfirm={(v) => { setEmail(v); setEmailModal(false); }}
+          onConfirm={(v) => {
+            setEmail(v);
+            setEmailModal(false);
+          }}
         />
       )}
       {phoneModal && (
@@ -122,7 +128,10 @@ export function ContactInfoPanel() {
       {(editAddr || addingAddr) && (
         <AddressModal
           initial={editAddr ?? undefined}
-          onClose={() => { setEditAddr(null); setAddingAddr(false); }}
+          onClose={() => {
+            setEditAddr(null);
+            setAddingAddr(false);
+          }}
           onSave={saveAddress}
         />
       )}
@@ -131,8 +140,18 @@ export function ContactInfoPanel() {
 }
 
 function ContactRow({
-  icon: Icon, label, value, verified, onChange,
-}: { icon: typeof Mail; label: string; value: string; verified: boolean; onChange: () => void }) {
+  icon: Icon,
+  label,
+  value,
+  verified,
+  onChange,
+}: {
+  icon: typeof Mail;
+  label: string;
+  value: string;
+  verified: boolean;
+  onChange: () => void;
+}) {
   return (
     <div className="border-border bg-background flex items-center justify-between gap-3 rounded-xl border p-4">
       <div className="flex items-center gap-3">
@@ -151,7 +170,10 @@ function ContactRow({
           </div>
         </div>
       </div>
-      <button onClick={onChange} className="text-primary hover:bg-primary/10 rounded-md px-3 py-1 text-xs font-bold">
+      <button
+        onClick={onChange}
+        className="text-primary hover:bg-primary/10 rounded-md px-3 py-1 text-xs font-bold"
+      >
         Change
       </button>
     </div>
@@ -159,10 +181,19 @@ function ContactRow({
 }
 
 function OtpFlowModal({
-  title, fieldLabel, currentValue, type, onClose, onConfirm,
+  title,
+  fieldLabel,
+  currentValue,
+  type,
+  onClose,
+  onConfirm,
 }: {
-  title: string; fieldLabel: string; currentValue: string; type: "email" | "tel";
-  onClose: () => void; onConfirm: (v: string) => void;
+  title: string;
+  fieldLabel: string;
+  currentValue: string;
+  type: "email" | "tel";
+  onClose: () => void;
+  onConfirm: (v: string) => void;
 }) {
   const [step, setStep] = useState<1 | 2>(1);
   const [val, setVal] = useState("");
@@ -172,9 +203,16 @@ function OtpFlowModal({
     <ModalShell title={title} onClose={onClose}>
       {step === 1 ? (
         <>
-          <p className="text-muted-foreground text-xs">Current: <span className="font-semibold">{currentValue}</span></p>
+          <p className="text-muted-foreground text-xs">
+            Current: <span className="font-semibold">{currentValue}</span>
+          </p>
           <Field label={fieldLabel}>
-            <input type={type} value={val} onChange={(e) => setVal(e.target.value)} className={inputCls} />
+            <input
+              type={type}
+              value={val}
+              onChange={(e) => setVal(e.target.value)}
+              className={inputCls}
+            />
           </Field>
           <button
             disabled={!val}
@@ -186,7 +224,9 @@ function OtpFlowModal({
         </>
       ) : (
         <>
-          <p className="text-muted-foreground text-xs">We sent a 6-digit code to <span className="font-semibold">{val}</span></p>
+          <p className="text-muted-foreground text-xs">
+            We sent a 6-digit code to <span className="font-semibold">{val}</span>
+          </p>
           <Field label="Enter OTP">
             <input
               value={otp}
@@ -209,22 +249,71 @@ function OtpFlowModal({
 }
 
 function AddressModal({
-  initial, onClose, onSave,
-}: { initial?: Address; onClose: () => void; onSave: (a: Address) => void }) {
+  initial,
+  onClose,
+  onSave,
+}: {
+  initial?: Address;
+  onClose: () => void;
+  onSave: (a: Address) => void;
+}) {
   const [a, setA] = useState<Address>(
-    initial ?? { id: `a${Date.now()}`, label: "Home", line1: "", city: "", state: "", pincode: "", isDefault: false },
+    initial ?? {
+      id: `a${Date.now()}`,
+      label: "Home",
+      line1: "",
+      city: "",
+      state: "",
+      pincode: "",
+      isDefault: false,
+    },
   );
   return (
     <ModalShell title={initial ? "Edit address" : "Add address"} onClose={onClose}>
-      <Field label="Label"><input value={a.label} onChange={(e) => setA({ ...a, label: e.target.value })} className={inputCls} /></Field>
-      <Field label="Address line"><input value={a.line1} onChange={(e) => setA({ ...a, line1: e.target.value })} className={inputCls} /></Field>
+      <Field label="Label">
+        <input
+          value={a.label}
+          onChange={(e) => setA({ ...a, label: e.target.value })}
+          className={inputCls}
+        />
+      </Field>
+      <Field label="Address line">
+        <input
+          value={a.line1}
+          onChange={(e) => setA({ ...a, line1: e.target.value })}
+          className={inputCls}
+        />
+      </Field>
       <div className="grid grid-cols-2 gap-3">
-        <Field label="City"><input value={a.city} onChange={(e) => setA({ ...a, city: e.target.value })} className={inputCls} /></Field>
-        <Field label="Pincode"><input value={a.pincode} onChange={(e) => setA({ ...a, pincode: e.target.value })} className={inputCls} /></Field>
+        <Field label="City">
+          <input
+            value={a.city}
+            onChange={(e) => setA({ ...a, city: e.target.value })}
+            className={inputCls}
+          />
+        </Field>
+        <Field label="Pincode">
+          <input
+            value={a.pincode}
+            onChange={(e) => setA({ ...a, pincode: e.target.value })}
+            className={inputCls}
+          />
+        </Field>
       </div>
-      <Field label="State"><input value={a.state} onChange={(e) => setA({ ...a, state: e.target.value })} className={inputCls} /></Field>
+      <Field label="State">
+        <input
+          value={a.state}
+          onChange={(e) => setA({ ...a, state: e.target.value })}
+          className={inputCls}
+        />
+      </Field>
       <label className="flex items-center gap-2 text-xs">
-        <input type="checkbox" checked={a.isDefault} onChange={(e) => setA({ ...a, isDefault: e.target.checked })} className="accent-primary" />
+        <input
+          type="checkbox"
+          checked={a.isDefault}
+          onChange={(e) => setA({ ...a, isDefault: e.target.checked })}
+          className="accent-primary"
+        />
         Set as default address
       </label>
       <button
@@ -237,7 +326,15 @@ function AddressModal({
   );
 }
 
-export function ModalShell({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
+export function ModalShell({
+  title,
+  onClose,
+  children,
+}: {
+  title: string;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
   return (
     <div
       role="dialog"
@@ -246,10 +343,19 @@ export function ModalShell({ title, onClose, children }: { title: string; onClos
       className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4"
       onClick={onClose}
     >
-      <div className="bg-card border-border w-full max-w-md rounded-2xl border p-5 shadow-2xl space-y-3" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="bg-card border-border w-full max-w-md rounded-2xl border p-5 shadow-2xl space-y-3"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between">
           <h3 className="text-heading text-base font-black">{title}</h3>
-          <button onClick={onClose} aria-label="Close dialog" className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>
+          <button
+            onClick={onClose}
+            aria-label="Close dialog"
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
 
         {children}

@@ -219,9 +219,7 @@ export function EmployerJobApplicationsPage() {
                 <Briefcase className="h-8 w-8 text-primary" />
               </div>
               <h2 className="text-lg font-semibold text-heading">
-                {apps.length === 0
-                  ? "No applications yet"
-                  : "No applications match this filter"}
+                {apps.length === 0 ? "No applications yet" : "No applications match this filter"}
               </h2>
               <p className="text-sm text-muted-foreground">
                 {apps.length === 0
@@ -325,11 +323,7 @@ export function EmployerJobApplicationsPage() {
                         )}
                         {waPhone && (
                           <Button asChild size="sm" variant="outline">
-                            <a
-                              href={`https://wa.me/${waPhone}`}
-                              target="_blank"
-                              rel="noreferrer"
-                            >
+                            <a href={`https://wa.me/${waPhone}`} target="_blank" rel="noreferrer">
                               <MessageCircle className="mr-1.5 h-4 w-4" /> WhatsApp
                             </a>
                           </Button>

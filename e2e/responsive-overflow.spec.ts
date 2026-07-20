@@ -170,9 +170,7 @@ test.describe("responsive overflow — emulated devices", () => {
 
         await context.close();
 
-        expect(dims.scrollWidth).toBeLessThanOrEqual(
-          dims.clientWidth + OVERFLOW_TOLERANCE_PX,
-        );
+        expect(dims.scrollWidth).toBeLessThanOrEqual(dims.clientWidth + OVERFLOW_TOLERANCE_PX);
       });
     }
   }

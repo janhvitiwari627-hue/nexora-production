@@ -6,11 +6,9 @@ import type { Database } from "@/integrations/supabase/types";
 
 // -------- Public read client (anon, no session) --------
 function publicClient() {
-  return createClient<Database>(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_PUBLISHABLE_KEY!,
-    { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
-  );
+  return createClient<Database>(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+  });
 }
 
 function slugify(input: string) {
@@ -101,7 +99,7 @@ export const verifyDistrictPartner = createServerFn({ method: "POST" })
       tier?: "welcome" | "recognition" | "growth_builder" | "platinum" | "leadership_circle";
     } = {
       status,
-      rejection_reason: data.action === "reject" ? data.reason ?? null : null,
+      rejection_reason: data.action === "reject" ? (data.reason ?? null) : null,
     };
     if (data.action === "verify") {
       patch.verified_at = new Date().toISOString();
@@ -167,9 +165,9 @@ export const addPartnerShop = createServerFn({ method: "POST" })
 export const activatePartnerShop = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z.object({ shop_id: z.string().uuid(), revenue_generated: z.number().min(0).optional() }).parse(
-      input,
-    ),
+    z
+      .object({ shop_id: z.string().uuid(), revenue_generated: z.number().min(0).optional() })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase } = context;
@@ -339,9 +337,7 @@ export const getPartnerLeaderboard = createServerFn({ method: "GET" })
     const sb = publicClient();
     let q = sb
       .from("partner_leaderboard_public")
-      .select(
-        "id, partner_id, period, rank, active_shops, score, district, state, scope",
-      )
+      .select("id, partner_id, period, rank, active_shops, score, district, state, scope")
       .eq("period", data.period)
       .order("rank", { ascending: true })
       .limit(data.limit);

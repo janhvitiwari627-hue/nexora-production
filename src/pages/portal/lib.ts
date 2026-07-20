@@ -88,13 +88,17 @@ export type BrandProduct = {
 };
 
 export function slugify(s: string) {
-  return s
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .slice(0, 60) + "-" + Math.random().toString(36).slice(2, 6);
+  return (
+    s
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .slice(0, 60) +
+    "-" +
+    Math.random().toString(36).slice(2, 6)
+  );
 }
 
 export async function listBrands() {
@@ -139,14 +143,27 @@ export async function getMyBrand(userId: string) {
 }
 
 export async function getMyDistributor(userId: string) {
-  const { data } = await supabase.from("distributors").select("*").eq("user_id", userId).maybeSingle();
+  const { data } = await supabase
+    .from("distributors")
+    .select("*")
+    .eq("user_id", userId)
+    .maybeSingle();
   return data as Distributor | null;
 }
 
 export async function getMyLeads(userId: string) {
-  const { data: brand } = await supabase.from("brands").select("id").eq("user_id", userId).maybeSingle();
-  const { data: dist } = await supabase.from("distributors").select("id").eq("user_id", userId).maybeSingle();
-  const brandId = brand?.id; const distId = dist?.id;
+  const { data: brand } = await supabase
+    .from("brands")
+    .select("id")
+    .eq("user_id", userId)
+    .maybeSingle();
+  const { data: dist } = await supabase
+    .from("distributors")
+    .select("id")
+    .eq("user_id", userId)
+    .maybeSingle();
+  const brandId = brand?.id;
+  const distId = dist?.id;
   if (!brandId && !distId) return [];
   const filters: string[] = [];
   if (brandId) filters.push(`brand_id.eq.${brandId}`);

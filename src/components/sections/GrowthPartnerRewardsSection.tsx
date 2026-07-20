@@ -120,7 +120,8 @@ export default function GrowthPartnerRewardsSection() {
         </h2>
 
         <p className="mx-auto mt-4 max-w-xl text-center text-[13px] leading-relaxed text-slate-500 sm:mt-5 sm:text-[15px]">
-          Sirf active revenue-generating shops count hoti hain. Kisi bhi card par tap karke full reward breakdown dekhein.
+          Sirf active revenue-generating shops count hoti hain. Kisi bhi card par tap karke full
+          reward breakdown dekhein.
         </p>
 
         <div className="mt-8 grid grid-cols-2 gap-3 sm:mt-14 sm:grid-cols-3 sm:gap-5 lg:grid-cols-5">
@@ -146,7 +147,9 @@ export default function GrowthPartnerRewardsSection() {
               </div>
 
               <div className="mt-4 border-t border-white/70 pt-3 sm:mt-6 sm:pt-4">
-                <h3 className="text-[13px] font-bold leading-tight text-[#0B1330] sm:text-sm">{m.title}</h3>
+                <h3 className="text-[13px] font-bold leading-tight text-[#0B1330] sm:text-sm">
+                  {m.title}
+                </h3>
                 <p className="mt-1 text-[11px] leading-snug text-slate-600 sm:text-[12px]">
                   {m.subtitle}
                 </p>

@@ -2,12 +2,35 @@ import { Gift, Users, BadgePercent } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { mockWallet, type WalletBucket } from "./mockWallet";
 
-const TABS: { id: WalletBucket; label: string; balance: number; Icon: typeof Gift; tint: string }[] =
-  [
-    { id: "reward", label: "Reward Credits", balance: mockWallet.reward, Icon: Gift, tint: "from-fuchsia-500 to-indigo-500" },
-    { id: "referral", label: "Referral Credits", balance: mockWallet.referral, Icon: Users, tint: "from-sky-500 to-cyan-500" },
-    { id: "cashback", label: "Cashback Credits", balance: mockWallet.cashback, Icon: BadgePercent, tint: "from-emerald-500 to-teal-500" },
-  ];
+const TABS: {
+  id: WalletBucket;
+  label: string;
+  balance: number;
+  Icon: typeof Gift;
+  tint: string;
+}[] = [
+  {
+    id: "reward",
+    label: "Reward Credits",
+    balance: mockWallet.reward,
+    Icon: Gift,
+    tint: "from-fuchsia-500 to-indigo-500",
+  },
+  {
+    id: "referral",
+    label: "Referral Credits",
+    balance: mockWallet.referral,
+    Icon: Users,
+    tint: "from-sky-500 to-cyan-500",
+  },
+  {
+    id: "cashback",
+    label: "Cashback Credits",
+    balance: mockWallet.cashback,
+    Icon: BadgePercent,
+    tint: "from-emerald-500 to-teal-500",
+  },
+];
 
 export function BalanceTabs({
   active,
@@ -28,7 +51,9 @@ export function BalanceTabs({
               onClick={() => onChange(isActive ? "all" : t.id)}
               className={cn(
                 "group relative overflow-hidden rounded-2xl border bg-card p-4 text-left transition",
-                isActive ? "border-primary shadow-[var(--shadow-glow)]" : "hover:border-primary/40 hover:shadow-md",
+                isActive
+                  ? "border-primary shadow-[var(--shadow-glow)]"
+                  : "hover:border-primary/40 hover:shadow-md",
               )}
             >
               <div

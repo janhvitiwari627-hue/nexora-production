@@ -38,16 +38,28 @@ export function ConnectedAccountsPanel() {
       ),
     );
     const acct = accounts.find((a) => a.id === id);
-    toast.success(acct?.connected ? `${acct.name} disconnected` : `${acct?.name ?? "Account"} connected`);
+    toast.success(
+      acct?.connected ? `${acct.name} disconnected` : `${acct?.name ?? "Account"} connected`,
+    );
   }
 
   return (
-    <PanelShell title="Connected accounts" subtitle="Sign in faster and share to your social profiles.">
+    <PanelShell
+      title="Connected accounts"
+      subtitle="Sign in faster and share to your social profiles."
+    >
       <div className="space-y-3">
         {accounts.map((a) => (
-          <div key={a.id} className="border-border bg-background flex items-center justify-between gap-3 rounded-xl border p-4">
+          <div
+            key={a.id}
+            className="border-border bg-background flex items-center justify-between gap-3 rounded-xl border p-4"
+          >
             <div className="flex items-center gap-3">
-              <div className={`grid h-10 w-10 place-items-center rounded-xl text-lg font-black ${TINT[a.id] || "bg-muted text-foreground"}`}>{ICONS[a.id] || a.name[0]}</div>
+              <div
+                className={`grid h-10 w-10 place-items-center rounded-xl text-lg font-black ${TINT[a.id] || "bg-muted text-foreground"}`}
+              >
+                {ICONS[a.id] || a.name[0]}
+              </div>
               <div>
                 <p className="text-heading text-sm font-bold">{a.name}</p>
                 <p className="text-muted-foreground text-xs">

@@ -24,7 +24,10 @@ export function BookingDetailModal({
             </div>
             <div>
               <div className="text-heading text-lg font-bold">{booking.customer}</div>
-              <a href={`tel:${booking.mobile}`} className="text-muted-foreground hover:text-primary inline-flex items-center gap-1 text-sm">
+              <a
+                href={`tel:${booking.mobile}`}
+                className="text-muted-foreground hover:text-primary inline-flex items-center gap-1 text-sm"
+              >
                 <Phone className="h-3.5 w-3.5" /> {booking.mobile}
               </a>
             </div>
@@ -41,7 +44,10 @@ export function BookingDetailModal({
           <Detail label="Booking ID" value={booking.id} />
           <Detail label="Advance Paid" value={`₹${booking.advance.toLocaleString()}`} />
           <Detail label="Total" value={`₹${booking.total.toLocaleString()}`} />
-          <Detail label="Balance" value={`₹${(booking.total - booking.advance).toLocaleString()}`} />
+          <Detail
+            label="Balance"
+            value={`₹${(booking.total - booking.advance).toLocaleString()}`}
+          />
         </div>
 
         {booking.notes && (
@@ -61,7 +67,9 @@ export function BookingDetailModal({
                 <MessageCircle className="h-4 w-4" /> WhatsApp
               </Button>
             </a>
-            <Button variant="outline" onClick={onClose}>Close</Button>
+            <Button variant="outline" onClick={onClose}>
+              Close
+            </Button>
           </div>
         </div>
       </div>

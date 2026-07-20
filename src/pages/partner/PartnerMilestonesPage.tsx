@@ -35,7 +35,8 @@ const STATUS_TONE: Record<RewardStatus, string> = {
 };
 
 const ACTIVE_SHOPS = 92;
-const NEXT_MILESTONE = MILESTONES.find((m) => m.status === "In Progress" || m.status === "Eligible") ?? MILESTONES[0];
+const NEXT_MILESTONE =
+  MILESTONES.find((m) => m.status === "In Progress" || m.status === "Eligible") ?? MILESTONES[0];
 const PROGRESS = Math.min(100, Math.round((ACTIVE_SHOPS / NEXT_MILESTONE.count) * 100));
 
 export function PartnerMilestonesPage() {
@@ -52,7 +53,10 @@ export function PartnerMilestonesPage() {
             <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/70">
               Current Active Shops
             </div>
-            <div className="mt-2 text-6xl font-black tracking-tight" style={{ letterSpacing: "-0.02em" }}>
+            <div
+              className="mt-2 text-6xl font-black tracking-tight"
+              style={{ letterSpacing: "-0.02em" }}
+            >
               {ACTIVE_SHOPS}
             </div>
             <div className="mt-2 text-sm text-white/70">
@@ -113,10 +117,15 @@ export function PartnerMilestonesPage() {
                   {m.status}
                 </span>
               </div>
-              <div className="mt-5 text-3xl font-black tracking-tight text-[#0B1330]" style={{ letterSpacing: "-0.02em" }}>
+              <div
+                className="mt-5 text-3xl font-black tracking-tight text-[#0B1330]"
+                style={{ letterSpacing: "-0.02em" }}
+              >
                 {m.count}
               </div>
-              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Active Shops</div>
+              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                Active Shops
+              </div>
               <div className="mt-3 text-sm font-bold text-[#0B1330]">{m.reward}</div>
 
               {m.status === "Delivered" && (

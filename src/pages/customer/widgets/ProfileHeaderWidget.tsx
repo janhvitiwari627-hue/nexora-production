@@ -55,9 +55,7 @@ export function ProfileHeaderWidget() {
         <p className="text-sm text-muted-foreground" suppressHydrationWarning>
           {greeting ?? "Welcome"},
         </p>
-        <h1 className="truncate text-xl font-bold sm:text-2xl">
-          {displayName}
-        </h1>
+        <h1 className="truncate text-xl font-bold sm:text-2xl">{displayName}</h1>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <span
             className={`inline-flex items-center gap-1 rounded-full bg-gradient-to-r ${tierGradient[mockUser.tier]} px-3 py-1 text-xs font-semibold text-white shadow-sm`}

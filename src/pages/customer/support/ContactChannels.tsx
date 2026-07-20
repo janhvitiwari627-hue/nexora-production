@@ -55,9 +55,7 @@ export function ContactChannels() {
             <Phone className="h-4 w-4" />
             +91 80000 12345
           </a>
-          <p className="text-muted-foreground mt-1 text-center text-xs">
-            Mon–Sat, 9 AM – 9 PM IST
-          </p>
+          <p className="text-muted-foreground mt-1 text-center text-xs">Mon–Sat, 9 AM – 9 PM IST</p>
         </div>
       </section>
     </div>

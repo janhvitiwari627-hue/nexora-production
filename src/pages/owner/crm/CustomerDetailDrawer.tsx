@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react";
 import { Cake, Check, Gift, MessageCircle, Phone, Tag as TagIcon } from "lucide-react";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
@@ -71,12 +66,22 @@ export function CustomerDetailDrawer({
                   </span>
                 )}
               </div>
-              <a href={`tel:${customer.mobile}`} className="text-muted-foreground hover:text-primary inline-flex items-center gap-1 text-sm">
+              <a
+                href={`tel:${customer.mobile}`}
+                className="text-muted-foreground hover:text-primary inline-flex items-center gap-1 text-sm"
+              >
                 <Phone className="h-3.5 w-3.5" /> {customer.mobile}
               </a>
               <div className="mt-2 flex flex-wrap gap-1">
                 {customer.tags.map((t) => (
-                  <span key={t} className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase", TAG_META[t].bg, TAG_META[t].text)}>
+                  <span
+                    key={t}
+                    className={cn(
+                      "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase",
+                      TAG_META[t].bg,
+                      TAG_META[t].text,
+                    )}
+                  >
                     {TAG_META[t].label}
                   </span>
                 ))}
@@ -116,7 +121,9 @@ export function CustomerDetailDrawer({
                     onClick={() => toggleTag(t)}
                     className={cn(
                       "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs transition",
-                      active ? "border-primary bg-primary text-primary-foreground" : "border-border text-body hover:bg-muted/40",
+                      active
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border text-body hover:bg-muted/40",
                     )}
                   >
                     {active && <Check className="h-3 w-3" />} {TAG_META[t].label}
@@ -131,10 +138,12 @@ export function CustomerDetailDrawer({
             <ol className="border-border relative space-y-4 border-l pl-4">
               {customer.visits.map((v) => (
                 <li key={v.id} className="relative">
-                  <span className={cn(
-                    "border-card absolute -left-[21px] top-1 h-3 w-3 rounded-full border-2",
-                    v.status === "completed" ? "bg-success" : "bg-danger",
-                  )} />
+                  <span
+                    className={cn(
+                      "border-card absolute -left-[21px] top-1 h-3 w-3 rounded-full border-2",
+                      v.status === "completed" ? "bg-success" : "bg-danger",
+                    )}
+                  />
                   <div className="text-heading text-sm font-medium">{v.service}</div>
                   <div className="text-muted-foreground text-xs">
                     {v.date} · {v.staff} · ₹{v.amount.toLocaleString()} · {v.status}
@@ -158,7 +167,9 @@ export function CustomerDetailDrawer({
           </Section>
 
           <div className="flex justify-end">
-            <Button size="sm" onClick={saveNotesAndTags}>Save notes & tags</Button>
+            <Button size="sm" onClick={saveNotesAndTags}>
+              Save notes & tags
+            </Button>
           </div>
 
           {/* WhatsApp composer */}

@@ -67,7 +67,9 @@ async function fillForm(
 }
 
 test.describe("/register — empty fields (browser-native validation)", () => {
-  test("blocks submit when every field is empty; never renders {} in the error box", async ({ page }) => {
+  test("blocks submit when every field is empty; never renders {} in the error box", async ({
+    page,
+  }) => {
     await goToRegister(page);
     await page.getByRole("button", { name: "Create account" }).click();
 
@@ -78,7 +80,9 @@ test.describe("/register — empty fields (browser-native validation)", () => {
     await expect(page.getByRole("alert")).toHaveCount(0);
   });
 
-  test("blocks submit when only password is missing; never renders {} in the error box", async ({ page }) => {
+  test("blocks submit when only password is missing; never renders {} in the error box", async ({
+    page,
+  }) => {
     await goToRegister(page);
     await fillForm(page, {
       full_name: "Test User",
@@ -108,7 +112,9 @@ test.describe("/register — empty fields (browser-native validation)", () => {
 test.describe("/register — friendly-message mapping (live Supabase)", () => {
   test.skip(!LIVE_EMAIL, "SUPABASE_E2E_EMAIL not set; skipping live existing-email test.");
 
-  test("existing email shows the friendly 'already registered' message, not raw JSON", async ({ page }) => {
+  test("existing email shows the friendly 'already registered' message, not raw JSON", async ({
+    page,
+  }) => {
     await goToRegister(page);
     await fillForm(page, {
       full_name: "Existing User",
@@ -128,7 +134,9 @@ test.describe("/register — friendly-message mapping (live Supabase)", () => {
     expect(text).not.toMatch(/^\s*\{[\s\S]*\}\s*$/);
   });
 
-  test("weak / wrong password shows a friendly password message, not raw error", async ({ page }) => {
+  test("weak / wrong password shows a friendly password message, not raw error", async ({
+    page,
+  }) => {
     await goToRegister(page);
     const uniqueEmail = `weakpw-${Date.now()}-${Math.random().toString(36).slice(2)}@example.com`;
     await fillForm(page, {

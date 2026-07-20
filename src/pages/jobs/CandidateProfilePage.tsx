@@ -61,7 +61,11 @@ export function CandidateProfilePage() {
     if (anyErr?.name === "AbortError" || lower.includes("timeout") || lower.includes("timed out")) {
       return "The upload timed out. Please check your connection and try again.";
     }
-    if (lower.includes("network") || lower.includes("failed to fetch") || lower.includes("load failed")) {
+    if (
+      lower.includes("network") ||
+      lower.includes("failed to fetch") ||
+      lower.includes("load failed")
+    ) {
       return "Network error while uploading. Please try again.";
     }
     if (status === 401 || lower.includes("unauthorized") || lower.includes("jwt")) {
@@ -79,16 +83,23 @@ export function CandidateProfilePage() {
     if (status === 429 || lower.includes("rate")) {
       return "Too many uploads in a short time. Please wait a moment and retry.";
     }
-    if (lower.includes("could not decode") || lower.includes("invalid image") || lower.includes("decode")) {
+    if (
+      lower.includes("could not decode") ||
+      lower.includes("invalid image") ||
+      lower.includes("decode")
+    ) {
       return "We couldn't read this image file. It may be corrupted — please try a different one.";
     }
     if (status >= 500) {
       return "The server had a problem saving your photo. Please try again shortly.";
     }
     switch (stage) {
-      case "upload":  return "We couldn't upload your photo. Please try again.";
-      case "sign":    return "Uploaded, but we couldn't generate a preview link. Please retry.";
-      case "profile": return "Photo uploaded, but saving it to your profile failed. Please retry.";
+      case "upload":
+        return "We couldn't upload your photo. Please try again.";
+      case "sign":
+        return "Uploaded, but we couldn't generate a preview link. Please retry.";
+      case "profile":
+        return "Photo uploaded, but saving it to your profile failed. Please retry.";
     }
   }
 
@@ -269,7 +280,7 @@ export function CandidateProfilePage() {
 
   function computeCompletion() {
     let filled = 0;
-    let total = 6;
+    const total = 6;
     if (personal.name.trim()) filled++;
     if (personal.email.trim()) filled++;
     if (personal.phone.trim()) filled++;
@@ -419,7 +430,6 @@ export function CandidateProfilePage() {
       </>
     );
   }
-
 
   return (
     <>
@@ -676,7 +686,11 @@ export function CandidateProfilePage() {
                 <label className="bg-muted/30 hover:bg-muted grid cursor-pointer place-items-center rounded-xl border-2 border-dashed py-10 text-center">
                   <Upload className="text-muted-foreground mb-2 h-8 w-8" />
                   <div className="font-medium">
-                    {uploadingResume ? "Uploading resume…" : resume ? "Resume uploaded" : "Upload PDF resume"}
+                    {uploadingResume
+                      ? "Uploading resume…"
+                      : resume
+                        ? "Resume uploaded"
+                        : "Upload PDF resume"}
                   </div>
                   <input
                     hidden
@@ -698,14 +712,37 @@ export function CandidateProfilePage() {
                 <div className="rounded-lg border bg-muted/30 p-4 text-sm">
                   <div className="text-heading mb-2 font-semibold">Review your details</div>
                   <ul className="text-muted-foreground space-y-1">
-                    <li><span className="font-medium text-foreground">Name:</span> {personal.name || "—"}</li>
-                    <li><span className="font-medium text-foreground">Email:</span> {personal.email || "—"}</li>
-                    <li><span className="font-medium text-foreground">Phone:</span> {personal.phone || "—"}</li>
-                    <li><span className="font-medium text-foreground">City:</span> {personal.city || "—"}</li>
-                    <li><span className="font-medium text-foreground">Skills:</span> {skills.join(", ") || "—"}</li>
-                    <li><span className="font-medium text-foreground">Experience:</span> {experience.filter((e) => e.company || e.role).length} entries</li>
-                    <li><span className="font-medium text-foreground">Education:</span> {education.filter((e) => e.school).length} entries</li>
-                    <li><span className="font-medium text-foreground">Resume:</span> {resume || "—"}</li>
+                    <li>
+                      <span className="font-medium text-foreground">Name:</span>{" "}
+                      {personal.name || "—"}
+                    </li>
+                    <li>
+                      <span className="font-medium text-foreground">Email:</span>{" "}
+                      {personal.email || "—"}
+                    </li>
+                    <li>
+                      <span className="font-medium text-foreground">Phone:</span>{" "}
+                      {personal.phone || "—"}
+                    </li>
+                    <li>
+                      <span className="font-medium text-foreground">City:</span>{" "}
+                      {personal.city || "—"}
+                    </li>
+                    <li>
+                      <span className="font-medium text-foreground">Skills:</span>{" "}
+                      {skills.join(", ") || "—"}
+                    </li>
+                    <li>
+                      <span className="font-medium text-foreground">Experience:</span>{" "}
+                      {experience.filter((e) => e.company || e.role).length} entries
+                    </li>
+                    <li>
+                      <span className="font-medium text-foreground">Education:</span>{" "}
+                      {education.filter((e) => e.school).length} entries
+                    </li>
+                    <li>
+                      <span className="font-medium text-foreground">Resume:</span> {resume || "—"}
+                    </li>
                   </ul>
                 </div>
                 <p className="text-muted-foreground text-xs">
@@ -714,7 +751,12 @@ export function CandidateProfilePage() {
                 {submitError && (
                   <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">
                     <span>{submitError}</span>
-                    <Button size="sm" variant="outline" onClick={handleSubmitProfile} disabled={submitting}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleSubmitProfile}
+                      disabled={submitting}
+                    >
                       <RefreshCw className="mr-1 h-3.5 w-3.5" /> Retry
                     </Button>
                   </div>
@@ -742,7 +784,6 @@ export function CandidateProfilePage() {
                 </Button>
               )}
             </div>
-
           </CardContent>
         </Card>
       </div>

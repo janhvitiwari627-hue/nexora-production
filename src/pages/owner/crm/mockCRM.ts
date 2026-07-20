@@ -52,7 +52,15 @@ const daysAgo = (n: number) => {
 };
 
 function makeVisits(seed: number, count: number, lastDaysAgo: number): CustomerVisit[] {
-  const services = ["Haircut & Style", "Hair Color", "Facial Glow", "Manicure", "Beard Trim", "Hair Spa", "Pedicure"];
+  const services = [
+    "Haircut & Style",
+    "Hair Color",
+    "Facial Glow",
+    "Manicure",
+    "Beard Trim",
+    "Hair Spa",
+    "Pedicure",
+  ];
   const staff = ["Anjali Rao", "Rohit Sen", "Meera Iyer", "Karan Bhatt"];
   return Array.from({ length: count }, (_, i) => ({
     id: `v${seed}-${i}`,
@@ -111,7 +119,10 @@ export const crmCustomers: CRMCustomer[] = NAMES.map(([name, mobile, email], i) 
     name,
     mobile,
     email,
-    avatar: name.split(" ").map((s) => s[0]).join(""),
+    avatar: name
+      .split(" ")
+      .map((s) => s[0])
+      .join(""),
     lastVisit: daysAgo(lastDays),
     totalVisits: visits,
     lifetimeSpend: spend,

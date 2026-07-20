@@ -1,10 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { getSalonBySlug } from "./salons.functions";
-import {
-  expandMockBusiness,
-  getMockBusinessBySlug,
-  type MockBusiness,
-} from "./mock-businesses";
+import { expandMockBusiness, getMockBusinessBySlug, type MockBusiness } from "./mock-businesses";
 import type { ShopData } from "@/components/whiteLabelWebsite/types";
 
 /**

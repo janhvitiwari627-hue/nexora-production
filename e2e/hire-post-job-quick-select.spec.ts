@@ -39,15 +39,15 @@ async function readDraft(page: Page): Promise<Draft | null> {
   }, DRAFT_KEY);
 }
 
-async function waitForForm(
-  page: Page,
-  predicate: (form: Record<string, any>) => boolean,
-) {
+async function waitForForm(page: Page, predicate: (form: Record<string, any>) => boolean) {
   await expect
-    .poll(async () => {
-      const d = await readDraft(page);
-      return d?.form ? predicate(d.form) : false;
-    }, { timeout: 5_000 })
+    .poll(
+      async () => {
+        const d = await readDraft(page);
+        return d?.form ? predicate(d.form) : false;
+      },
+      { timeout: 5_000 },
+    )
     .toBe(true);
 }
 
@@ -81,7 +81,10 @@ async function fillStep1(page: Page) {
   // Template buttons don't carry aria-pressed, so click without pickChip's assertion.
   await page.getByRole("button", { name: "Hair salon role", exact: true }).click();
   await expect(page.getByRole("textbox", { name: "Description" })).not.toHaveValue("");
-  await page.getByRole("button", { name: /^Continue$/ }).first().click();
+  await page
+    .getByRole("button", { name: /^Continue$/ })
+    .first()
+    .click();
   await expect(page.getByRole("heading", { name: "Location & schedule" })).toBeVisible({
     timeout: 10_000,
   });
@@ -94,7 +97,10 @@ async function fillStep2(page: Page) {
   await pickChip(page, "Mon–Sat");
   await pickChip(page, "10 AM – 7 PM");
   await pickChip(page, "Within 7 days");
-  await page.getByRole("button", { name: /^Continue$/ }).first().click();
+  await page
+    .getByRole("button", { name: /^Continue$/ })
+    .first()
+    .click();
   await expect(page.getByRole("heading", { name: "Salary & benefits" })).toBeVisible({
     timeout: 10_000,
   });
@@ -106,7 +112,10 @@ async function fillStep3(page: Page) {
   // Benefit bundle expands into multiple benefits, plus one direct benefit chip.
   await pickChip(page, "Basic benefits");
   await pickChip(page, "Paid leave");
-  await page.getByRole("button", { name: /^Continue$/ }).first().click();
+  await page
+    .getByRole("button", { name: /^Continue$/ })
+    .first()
+    .click();
   await expect(page.getByRole("heading", { name: "Requirements" })).toBeVisible({
     timeout: 10_000,
   });
@@ -119,7 +128,10 @@ async function fillStep4(page: Page) {
   await pickChip(page, "English");
   await pickChip(page, "Portfolio required");
   await pickChip(page, "How many years of experience do you have?");
-  await page.getByRole("button", { name: /^Continue$/ }).first().click();
+  await page
+    .getByRole("button", { name: /^Continue$/ })
+    .first()
+    .click();
   await expect(page.getByRole("heading", { name: "Review & publish" })).toBeVisible({
     timeout: 10_000,
   });
@@ -149,9 +161,15 @@ test.describe("/hire/post-job quick-select chips", () => {
     await waitForForm(page, (f) => f.experience_level === "1–2 years");
 
     await page.getByRole("button", { name: "Hair salon role", exact: true }).click();
-    await waitForForm(page, (f) => typeof f.description === "string" && (f.description as string).length > 20);
+    await waitForForm(
+      page,
+      (f) => typeof f.description === "string" && (f.description as string).length > 20,
+    );
 
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+    await page
+      .getByRole("button", { name: /^Continue$/ })
+      .first()
+      .click();
     await expect(page.getByRole("heading", { name: "Location & schedule" })).toBeVisible({
       timeout: 10_000,
     });
@@ -172,16 +190,16 @@ test.describe("/hire/post-job quick-select chips", () => {
     await pickChip(page, "10 AM – 7 PM");
     await waitForForm(
       page,
-      (f) =>
-        f.hours_preset === "10 AM – 7 PM" &&
-        f.start_time === "10 AM" &&
-        f.end_time === "7 PM",
+      (f) => f.hours_preset === "10 AM – 7 PM" && f.start_time === "10 AM" && f.end_time === "7 PM",
     );
 
     await pickChip(page, "Within 7 days");
     await waitForForm(page, (f) => f.joining_availability === "Within 7 days");
 
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+    await page
+      .getByRole("button", { name: /^Continue$/ })
+      .first()
+      .click();
     await expect(page.getByRole("heading", { name: "Salary & benefits" })).toBeVisible({
       timeout: 10_000,
     });
@@ -204,16 +222,17 @@ test.describe("/hire/post-job quick-select chips", () => {
     await waitForForm(page, (f) => {
       const b = (f.benefits as string[]) ?? [];
       return (
-        b.includes("Weekly off") &&
-        b.includes("Training provided") &&
-        b.includes("Incentives")
+        b.includes("Weekly off") && b.includes("Training provided") && b.includes("Incentives")
       );
     });
 
     await pickChip(page, "Paid leave");
     await waitForForm(page, (f) => ((f.benefits as string[]) ?? []).includes("Paid leave"));
 
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+    await page
+      .getByRole("button", { name: /^Continue$/ })
+      .first()
+      .click();
     await expect(page.getByRole("heading", { name: "Requirements" })).toBeVisible({
       timeout: 10_000,
     });
@@ -285,9 +304,7 @@ test.describe("/hire/post-job quick-select chips", () => {
     expect(after?.form.benefits as string[]).toEqual(
       expect.arrayContaining(["Weekly off", "Training provided", "Incentives", "Paid leave"]),
     );
-    expect(after?.form.languages as string[]).toEqual(
-      expect.arrayContaining(["Hindi", "English"]),
-    );
+    expect(after?.form.languages as string[]).toEqual(expect.arrayContaining(["Hindi", "English"]));
     expect(after?.form.screening_questions as Array<{ q: string }>).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ q: "How many years of experience do you have?" }),
@@ -296,7 +313,10 @@ test.describe("/hire/post-job quick-select chips", () => {
 
     // Chips on the visible Review step's live preview / earlier steps should
     // still be marked pressed when the user navigates back.
-    await page.getByRole("button", { name: /^Back$/ }).first().click(); // → Requirements
+    await page
+      .getByRole("button", { name: /^Back$/ })
+      .first()
+      .click(); // → Requirements
     await expect(
       page.getByRole("button", { name: "Portfolio required", exact: true }),
     ).toHaveAttribute("aria-pressed", "true");
@@ -333,10 +353,11 @@ test.describe("/hire/post-job quick-select chips", () => {
     await fillStep3(page);
     await fillStep4(page);
 
-    await page.getByRole("button", { name: /^Publish job$/ }).first().click();
-    await expect
-      .poll(() => capturedBody, { timeout: 15_000 })
-      .not.toBeNull();
+    await page
+      .getByRole("button", { name: /^Publish job$/ })
+      .first()
+      .click();
+    await expect.poll(() => capturedBody, { timeout: 15_000 }).not.toBeNull();
 
     const body = capturedBody! as Record<string, any>;
     expect(body).toMatchObject({

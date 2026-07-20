@@ -89,7 +89,6 @@ export const verifyPayment = createServerFn({ method: "POST" })
       .single();
     if (error) throw new Error(error.message);
 
-
     if (success && payment.customer_id) {
       const cashback = Math.round(Number(payment.amount) * 0.02 * 100) / 100;
       await supabase.from("rewards_ledger").insert({
@@ -138,8 +137,7 @@ export const scanQRPayment = createServerFn({ method: "POST" })
       .single();
     if (qrErr || !qr) throw new Error("Invalid QR code");
     if (qr.status === "PAID") throw new Error("QR already used");
-    if (qr.expires_at && new Date(qr.expires_at) < new Date())
-      throw new Error("QR expired");
+    if (qr.expires_at && new Date(qr.expires_at) < new Date()) throw new Error("QR expired");
 
     // Create payment + mark as SUCCESS (mock)
     const orderId = randomId("order");

@@ -93,7 +93,9 @@ export const getPartnerProfile = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data } = await supabase
       .from("district_business_partners")
-      .select("id,full_name,mobile,email,district,state,pincode,tagline,success_story,photo_url,status,metadata,verified_at")
+      .select(
+        "id,full_name,mobile,email,district,state,pincode,tagline,success_story,photo_url,status,metadata,verified_at",
+      )
       .eq("user_id", userId)
       .maybeSingle();
     return (data as PartnerProfile) ?? null;
@@ -103,7 +105,12 @@ const profileUpdateSchema = z.object({
   mobile: z.string().trim().min(10).max(20).optional().nullable(),
   email: z.string().trim().email().max(255).optional().nullable(),
   state: z.string().trim().min(2).max(80).optional().nullable(),
-  pincode: z.string().trim().regex(/^\d{4,10}$/).optional().nullable(),
+  pincode: z
+    .string()
+    .trim()
+    .regex(/^\d{4,10}$/)
+    .optional()
+    .nullable(),
   tagline: z.string().trim().max(140).optional().nullable(),
   success_story: z.string().trim().max(2000).optional().nullable(),
   photo_url: z.string().trim().url().max(500).optional().nullable(),
@@ -114,11 +121,15 @@ export const updatePartnerProfile = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => profileUpdateSchema.parse(data))
   .handler(async ({ context, data }): Promise<PartnerProfile> => {
     const { supabase, userId } = context;
-    const patch: Partial<Record<
-      "mobile" | "email" | "state" | "pincode" | "tagline" | "success_story" | "photo_url",
-      string | null
-    >> = {};
-    for (const [k, v] of Object.entries(data) as Array<[keyof typeof patch, string | null | undefined]>) {
+    const patch: Partial<
+      Record<
+        "mobile" | "email" | "state" | "pincode" | "tagline" | "success_story" | "photo_url",
+        string | null
+      >
+    > = {};
+    for (const [k, v] of Object.entries(data) as Array<
+      [keyof typeof patch, string | null | undefined]
+    >) {
       if (v === undefined) continue;
       patch[k] = v === "" ? null : v;
     }
@@ -126,7 +137,9 @@ export const updatePartnerProfile = createServerFn({ method: "POST" })
       .from("district_business_partners")
       .update(patch)
       .eq("user_id", userId)
-      .select("id,full_name,mobile,email,district,state,pincode,tagline,success_story,photo_url,status,metadata,verified_at")
+      .select(
+        "id,full_name,mobile,email,district,state,pincode,tagline,success_story,photo_url,status,metadata,verified_at",
+      )
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!row) throw new Error("Partner profile not found");
@@ -164,7 +177,9 @@ export const updatePartnerMetadata = createServerFn({ method: "POST" })
       .from("district_business_partners")
       .update({ metadata: nextMeta })
       .eq("user_id", userId)
-      .select("id,full_name,mobile,email,district,state,pincode,tagline,success_story,photo_url,status,metadata,verified_at")
+      .select(
+        "id,full_name,mobile,email,district,state,pincode,tagline,success_story,photo_url,status,metadata,verified_at",
+      )
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!row) throw new Error("Partner profile not found");

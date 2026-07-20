@@ -38,7 +38,9 @@ export function ReferralWelcomePopup() {
     new URLSearchParams(window.location.search).get("preview") === "1";
   const isWorkspaceRoute =
     isWebsitePreview ||
-    pathname.startsWith("/owner") || pathname.startsWith("/app/owner") || pathname.startsWith("/admin");
+    pathname.startsWith("/owner") ||
+    pathname.startsWith("/app/owner") ||
+    pathname.startsWith("/admin");
 
   const code = profile?.referral_code ?? null;
   const link = code ? buildReferralSignupUrl(code) : "";

@@ -78,13 +78,15 @@ test.describe("/hire/post-job", () => {
     await continueBtn.click();
 
     // Next step should render its own heading and the progress label update.
-    await expect(
-      page.getByRole("heading", { name: "Location & schedule" }),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("heading", { name: "Location & schedule" })).toBeVisible({
+      timeout: 10_000,
+    });
     await expect(page.getByText(/Step 2 of 5/)).toBeVisible();
   });
 
-  test("Continue from Location & schedule advances to the Salary & benefits step", async ({ page }) => {
+  test("Continue from Location & schedule advances to the Salary & benefits step", async ({
+    page,
+  }) => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
     await page.evaluate(() => {
       window.localStorage.removeItem("nexora:postJobWizard:v1");
@@ -98,12 +100,15 @@ test.describe("/hire/post-job", () => {
     await page
       .getByRole("textbox", { name: "Description" })
       .fill("Own the chair, deliver amazing cuts, and mentor junior stylists.");
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+    await page
+      .getByRole("button", { name: /^Continue$/ })
+      .first()
+      .click();
 
     // Step 2: Location & schedule
-    await expect(
-      page.getByRole("heading", { name: "Location & schedule" }),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("heading", { name: "Location & schedule" })).toBeVisible({
+      timeout: 10_000,
+    });
     await page.getByRole("textbox", { name: "City" }).fill("Mumbai");
 
     const continueBtn = page.getByRole("button", { name: /^Continue$/ }).first();
@@ -111,9 +116,9 @@ test.describe("/hire/post-job", () => {
     await continueBtn.click();
 
     // Step 3: Salary & benefits should render.
-    await expect(
-      page.getByRole("heading", { name: "Salary & benefits" }),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("heading", { name: "Salary & benefits" })).toBeVisible({
+      timeout: 10_000,
+    });
     await expect(page.getByText(/Step 3 of 5/)).toBeVisible();
   });
 
@@ -131,28 +136,34 @@ test.describe("/hire/post-job", () => {
     await page
       .getByRole("textbox", { name: "Description" })
       .fill("Own the chair, deliver amazing cuts, and mentor junior stylists.");
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+    await page
+      .getByRole("button", { name: /^Continue$/ })
+      .first()
+      .click();
 
     // Step 2: Location & schedule
-    await expect(
-      page.getByRole("heading", { name: "Location & schedule" }),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("heading", { name: "Location & schedule" })).toBeVisible({
+      timeout: 10_000,
+    });
     await page.getByRole("textbox", { name: "City" }).fill("Mumbai");
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+    await page
+      .getByRole("button", { name: /^Continue$/ })
+      .first()
+      .click();
 
     // Step 3: Salary & benefits — no required fields, just Continue.
-    await expect(
-      page.getByRole("heading", { name: "Salary & benefits" }),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("heading", { name: "Salary & benefits" })).toBeVisible({
+      timeout: 10_000,
+    });
 
     const continueBtn = page.getByRole("button", { name: /^Continue$/ }).first();
     await expect(continueBtn).toBeEnabled();
     await continueBtn.click();
 
     // Step 4: Requirements should render.
-    await expect(
-      page.getByRole("heading", { name: "Requirements" }),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("heading", { name: "Requirements" })).toBeVisible({
+      timeout: 10_000,
+    });
     await expect(page.getByText(/Step 4 of 5/)).toBeVisible();
   });
 
@@ -170,38 +181,49 @@ test.describe("/hire/post-job", () => {
     await page
       .getByRole("textbox", { name: "Description" })
       .fill("Own the chair, deliver amazing cuts, and mentor junior stylists.");
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+    await page
+      .getByRole("button", { name: /^Continue$/ })
+      .first()
+      .click();
 
     // Step 2: Location & schedule
-    await expect(
-      page.getByRole("heading", { name: "Location & schedule" }),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("heading", { name: "Location & schedule" })).toBeVisible({
+      timeout: 10_000,
+    });
     await page.getByRole("textbox", { name: "City" }).fill("Mumbai");
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+    await page
+      .getByRole("button", { name: /^Continue$/ })
+      .first()
+      .click();
 
     // Step 3: Salary & benefits
-    await expect(
-      page.getByRole("heading", { name: "Salary & benefits" }),
-    ).toBeVisible({ timeout: 10_000 });
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+    await expect(page.getByRole("heading", { name: "Salary & benefits" })).toBeVisible({
+      timeout: 10_000,
+    });
+    await page
+      .getByRole("button", { name: /^Continue$/ })
+      .first()
+      .click();
 
     // Step 4: Requirements — no required fields, just Continue.
-    await expect(
-      page.getByRole("heading", { name: "Requirements" }),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("heading", { name: "Requirements" })).toBeVisible({
+      timeout: 10_000,
+    });
 
     const continueBtn = page.getByRole("button", { name: /^Continue$/ }).first();
     await expect(continueBtn).toBeEnabled();
     await continueBtn.click();
 
     // Step 5: Review & publish should render.
-    await expect(
-      page.getByRole("heading", { name: "Review & publish" }),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("heading", { name: "Review & publish" })).toBeVisible({
+      timeout: 10_000,
+    });
     await expect(page.getByText(/Step 5 of 5/)).toBeVisible();
   });
 
-  test("Full wizard walk-through renders the Review & publish confirmation page", async ({ page }) => {
+  test("Full wizard walk-through renders the Review & publish confirmation page", async ({
+    page,
+  }) => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
     await page.evaluate(() => {
       window.localStorage.removeItem("nexora:postJobWizard:v1");
@@ -215,51 +237,59 @@ test.describe("/hire/post-job", () => {
     await page
       .getByRole("textbox", { name: "Description" })
       .fill("Own the chair, deliver amazing cuts, and mentor junior stylists.");
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+    await page
+      .getByRole("button", { name: /^Continue$/ })
+      .first()
+      .click();
 
     // Step 2: Location & schedule
-    await expect(
-      page.getByRole("heading", { name: "Location & schedule" }),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("heading", { name: "Location & schedule" })).toBeVisible({
+      timeout: 10_000,
+    });
     await page.getByRole("textbox", { name: "City" }).fill("Mumbai");
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+    await page
+      .getByRole("button", { name: /^Continue$/ })
+      .first()
+      .click();
 
     // Step 3: Salary & benefits
-    await expect(
-      page.getByRole("heading", { name: "Salary & benefits" }),
-    ).toBeVisible({ timeout: 10_000 });
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+    await expect(page.getByRole("heading", { name: "Salary & benefits" })).toBeVisible({
+      timeout: 10_000,
+    });
+    await page
+      .getByRole("button", { name: /^Continue$/ })
+      .first()
+      .click();
 
     // Step 4: Requirements
-    await expect(
-      page.getByRole("heading", { name: "Requirements" }),
-    ).toBeVisible({ timeout: 10_000 });
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+    await expect(page.getByRole("heading", { name: "Requirements" })).toBeVisible({
+      timeout: 10_000,
+    });
+    await page
+      .getByRole("button", { name: /^Continue$/ })
+      .first()
+      .click();
 
     // Step 5: Review & publish — final confirmation page.
-    await expect(
-      page.getByRole("heading", { name: "Review & publish" }),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("heading", { name: "Review & publish" })).toBeVisible({
+      timeout: 10_000,
+    });
     await expect(page.getByText(/Step 5 of 5/)).toBeVisible();
 
     // Review guidance copy is present.
-    await expect(
-      page.getByText(/Please review the details below/i),
-    ).toBeVisible();
+    await expect(page.getByText(/Please review the details below/i)).toBeVisible();
 
     // Publish CTA replaces Continue on the final step (desktop + mobile bars).
-    await expect(
-      page.getByRole("button", { name: /^Publish job$/ }),
-    ).toBeVisible();
+    await expect(page.getByRole("button", { name: /^Publish job$/ })).toBeVisible();
     await expect(page.getByRole("button", { name: /^Continue$/ })).toHaveCount(0);
 
     // Live preview reflects data entered in earlier steps.
-    await expect(
-      page.getByRole("heading", { name: "Senior Hair Stylist" }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Senior Hair Stylist" })).toBeVisible();
   });
 
-  test("Publishing the job creates the listing and opens the job detail page with the entered title", async ({ page }) => {
+  test("Publishing the job creates the listing and opens the job detail page with the entered title", async ({
+    page,
+  }) => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
     await page.evaluate(() => {
       window.localStorage.removeItem("nexora:postJobWizard:v1");
@@ -275,108 +305,135 @@ test.describe("/hire/post-job", () => {
     await page
       .getByRole("textbox", { name: "Description" })
       .fill("Own the chair, deliver amazing cuts, and mentor junior stylists.");
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+    await page
+      .getByRole("button", { name: /^Continue$/ })
+      .first()
+      .click();
 
     // Step 2
-    await expect(
-      page.getByRole("heading", { name: "Location & schedule" }),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("heading", { name: "Location & schedule" })).toBeVisible({
+      timeout: 10_000,
+    });
     await page.getByRole("textbox", { name: "City" }).fill("Mumbai");
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+    await page
+      .getByRole("button", { name: /^Continue$/ })
+      .first()
+      .click();
 
     // Step 3
-    await expect(
-      page.getByRole("heading", { name: "Salary & benefits" }),
-    ).toBeVisible({ timeout: 10_000 });
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+    await expect(page.getByRole("heading", { name: "Salary & benefits" })).toBeVisible({
+      timeout: 10_000,
+    });
+    await page
+      .getByRole("button", { name: /^Continue$/ })
+      .first()
+      .click();
 
     // Step 4
-    await expect(
-      page.getByRole("heading", { name: "Requirements" }),
-    ).toBeVisible({ timeout: 10_000 });
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+    await expect(page.getByRole("heading", { name: "Requirements" })).toBeVisible({
+      timeout: 10_000,
+    });
+    await page
+      .getByRole("button", { name: /^Continue$/ })
+      .first()
+      .click();
 
     // Step 5 — publish.
-    await expect(
-      page.getByRole("heading", { name: "Review & publish" }),
-    ).toBeVisible({ timeout: 10_000 });
-    await page.getByRole("button", { name: /^Publish job$/ }).first().click();
+    await expect(page.getByRole("heading", { name: "Review & publish" })).toBeVisible({
+      timeout: 10_000,
+    });
+    await page
+      .getByRole("button", { name: /^Publish job$/ })
+      .first()
+      .click();
 
     // Navigation lands on /jobs/<uuid> and the detail page renders the entered title.
     await page.waitForURL(
       /\/jobs\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
       { timeout: 15_000 },
     );
-    await expect(
-      page.getByRole("heading", { name: jobTitle }),
-    ).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole("heading", { name: jobTitle })).toBeVisible({ timeout: 15_000 });
 
-  test("Publishing the job shows title, location, and price range on the detail page", async ({ page }) => {
-    await page.goto("/", { waitUntil: "domcontentloaded" });
-    await page.evaluate(() => {
-      window.localStorage.removeItem("nexora:postJobWizard:v1");
+    test("Publishing the job shows title, location, and price range on the detail page", async ({
+      page,
+    }) => {
+      await page.goto("/", { waitUntil: "domcontentloaded" });
+      await page.evaluate(() => {
+        window.localStorage.removeItem("nexora:postJobWizard:v1");
+      });
+
+      await seedSession(page);
+      await page.goto("/hire/post-job", { waitUntil: "networkidle" });
+
+      const jobTitle = `Senior Hair Stylist ${Date.now()}`;
+      const city = "Mumbai";
+      const area = "Bandra West";
+
+      // Step 1: Job details
+      await page.getByRole("textbox", { name: "Job title" }).fill(jobTitle);
+      await page
+        .getByRole("textbox", { name: "Description" })
+        .fill("Own the chair, deliver amazing cuts, and mentor junior stylists.");
+      await page
+        .getByRole("button", { name: /^Continue$/ })
+        .first()
+        .click();
+
+      // Step 2: Location & schedule
+      await expect(page.getByRole("heading", { name: "Location & schedule" })).toBeVisible({
+        timeout: 10_000,
+      });
+      await page.getByRole("textbox", { name: "City" }).fill(city);
+      await page.getByRole("textbox", { name: "Area / locality" }).fill(area);
+      await page
+        .getByRole("button", { name: /^Continue$/ })
+        .first()
+        .click();
+
+      // Step 3: Salary & benefits — fill min/max so the detail page renders a range.
+      await expect(page.getByRole("heading", { name: "Salary & benefits" })).toBeVisible({
+        timeout: 10_000,
+      });
+      await page.getByRole("spinbutton", { name: "Min" }).fill("30000");
+      await page.getByRole("spinbutton", { name: "Max" }).fill("50000");
+      await page
+        .getByRole("button", { name: /^Continue$/ })
+        .first()
+        .click();
+
+      // Step 4: Requirements
+      await expect(page.getByRole("heading", { name: "Requirements" })).toBeVisible({
+        timeout: 10_000,
+      });
+      await page
+        .getByRole("button", { name: /^Continue$/ })
+        .first()
+        .click();
+
+      // Step 5: Publish
+      await expect(page.getByRole("heading", { name: "Review & publish" })).toBeVisible({
+        timeout: 10_000,
+      });
+      await page
+        .getByRole("button", { name: /^Publish job$/ })
+        .first()
+        .click();
+
+      await page.waitForURL(
+        /\/jobs\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+        { timeout: 15_000 },
+      );
+
+      // Title renders on the detail page.
+      await expect(page.getByRole("heading", { name: jobTitle })).toBeVisible({ timeout: 15_000 });
+
+      // Location badge renders "{area}, {city}".
+      await expect(page.getByText(`${area}, ${city}`)).toBeVisible();
+
+      // Price range — fmtSalary renders "₹30k–50k/mo" (en dash separator).
+      await expect(page.getByText("₹30k–50k/mo")).toBeVisible();
     });
-
-    await seedSession(page);
-    await page.goto("/hire/post-job", { waitUntil: "networkidle" });
-
-    const jobTitle = `Senior Hair Stylist ${Date.now()}`;
-    const city = "Mumbai";
-    const area = "Bandra West";
-
-    // Step 1: Job details
-    await page.getByRole("textbox", { name: "Job title" }).fill(jobTitle);
-    await page
-      .getByRole("textbox", { name: "Description" })
-      .fill("Own the chair, deliver amazing cuts, and mentor junior stylists.");
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
-
-    // Step 2: Location & schedule
-    await expect(
-      page.getByRole("heading", { name: "Location & schedule" }),
-    ).toBeVisible({ timeout: 10_000 });
-    await page.getByRole("textbox", { name: "City" }).fill(city);
-    await page.getByRole("textbox", { name: "Area / locality" }).fill(area);
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
-
-    // Step 3: Salary & benefits — fill min/max so the detail page renders a range.
-    await expect(
-      page.getByRole("heading", { name: "Salary & benefits" }),
-    ).toBeVisible({ timeout: 10_000 });
-    await page.getByRole("spinbutton", { name: "Min" }).fill("30000");
-    await page.getByRole("spinbutton", { name: "Max" }).fill("50000");
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
-
-    // Step 4: Requirements
-    await expect(
-      page.getByRole("heading", { name: "Requirements" }),
-    ).toBeVisible({ timeout: 10_000 });
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
-
-    // Step 5: Publish
-    await expect(
-      page.getByRole("heading", { name: "Review & publish" }),
-    ).toBeVisible({ timeout: 10_000 });
-    await page.getByRole("button", { name: /^Publish job$/ }).first().click();
-
-    await page.waitForURL(
-      /\/jobs\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
-      { timeout: 15_000 },
-    );
-
-    // Title renders on the detail page.
-    await expect(
-      page.getByRole("heading", { name: jobTitle }),
-    ).toBeVisible({ timeout: 15_000 });
-
-    // Location badge renders "{area}, {city}".
-    await expect(page.getByText(`${area}, ${city}`)).toBeVisible();
-
-    // Price range — fmtSalary renders "₹30k–50k/mo" (en dash separator).
-    await expect(page.getByText("₹30k–50k/mo")).toBeVisible();
   });
-});
-
 });
 
 test.describe("/hire/post-job publish failure", () => {
@@ -385,7 +442,9 @@ test.describe("/hire/post-job publish failure", () => {
     "Supabase session env vars not present; skipping authenticated post-job checks.",
   );
 
-  test("failing publish shows error alert with retry, and retry recovers or re-shows the error", async ({ page }) => {
+  test("failing publish shows error alert with retry, and retry recovers or re-shows the error", async ({
+    page,
+  }) => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
     await page.evaluate(() => {
       window.localStorage.removeItem("nexora:postJobWizard:v1");
@@ -427,32 +486,47 @@ test.describe("/hire/post-job publish failure", () => {
     await page
       .getByRole("textbox", { name: "Description" })
       .fill("Own the chair, deliver amazing cuts, and mentor junior stylists.");
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+    await page
+      .getByRole("button", { name: /^Continue$/ })
+      .first()
+      .click();
 
     // Step 2
-    await expect(
-      page.getByRole("heading", { name: "Location & schedule" }),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("heading", { name: "Location & schedule" })).toBeVisible({
+      timeout: 10_000,
+    });
     await page.getByRole("textbox", { name: "City" }).fill("Mumbai");
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+    await page
+      .getByRole("button", { name: /^Continue$/ })
+      .first()
+      .click();
 
     // Step 3
-    await expect(
-      page.getByRole("heading", { name: "Salary & benefits" }),
-    ).toBeVisible({ timeout: 10_000 });
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+    await expect(page.getByRole("heading", { name: "Salary & benefits" })).toBeVisible({
+      timeout: 10_000,
+    });
+    await page
+      .getByRole("button", { name: /^Continue$/ })
+      .first()
+      .click();
 
     // Step 4
-    await expect(
-      page.getByRole("heading", { name: "Requirements" }),
-    ).toBeVisible({ timeout: 10_000 });
-    await page.getByRole("button", { name: /^Continue$/ }).first().click();
+    await expect(page.getByRole("heading", { name: "Requirements" })).toBeVisible({
+      timeout: 10_000,
+    });
+    await page
+      .getByRole("button", { name: /^Continue$/ })
+      .first()
+      .click();
 
     // Step 5 — publish (will fail due to intercept).
-    await expect(
-      page.getByRole("heading", { name: "Review & publish" }),
-    ).toBeVisible({ timeout: 10_000 });
-    await page.getByRole("button", { name: /^Publish job$/ }).first().click();
+    await expect(page.getByRole("heading", { name: "Review & publish" })).toBeVisible({
+      timeout: 10_000,
+    });
+    await page
+      .getByRole("button", { name: /^Publish job$/ })
+      .first()
+      .click();
 
     // Error alert renders with the failure title and retry button.
     const alert = page.getByRole("alert");
@@ -476,9 +550,7 @@ test.describe("/hire/post-job publish failure", () => {
       .catch(() => false);
 
     if (navigated) {
-      await expect(
-        page.getByRole("heading", { name: jobTitle }),
-      ).toBeVisible({ timeout: 15_000 });
+      await expect(page.getByRole("heading", { name: jobTitle })).toBeVisible({ timeout: 15_000 });
     } else {
       // Retry did not recover — alert must still be shown to the user.
       await expect(page.getByRole("alert")).toBeVisible();
@@ -495,7 +567,9 @@ test.describe("/hire/post-job publish validation", () => {
     "Supabase session env vars not present; skipping authenticated post-job checks.",
   );
 
-  test("invalid draft blocks POST /rest/v1/jobs and scrolls to + highlights the first invalid step", async ({ page }) => {
+  test("invalid draft blocks POST /rest/v1/jobs and scrolls to + highlights the first invalid step", async ({
+    page,
+  }) => {
     // Track any POST to the jobs REST endpoint — if validation works, this
     // must stay at 0 for the whole test.
     let jobsPostCount = 0;
@@ -545,18 +619,21 @@ test.describe("/hire/post-job publish validation", () => {
     await page.goto("/hire/post-job", { waitUntil: "networkidle" });
 
     // We should land on Step 5 (Review & publish) thanks to the restored draft.
-    await expect(
-      page.getByRole("heading", { name: "Review & publish" }),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("heading", { name: "Review & publish" })).toBeVisible({
+      timeout: 10_000,
+    });
 
     // Click Publish — validation should block the network call and jump to
     // the first invalid step (Salary & benefits, index 2).
-    await page.getByRole("button", { name: /^Publish job$/ }).first().click();
+    await page
+      .getByRole("button", { name: /^Publish job$/ })
+      .first()
+      .click();
 
     // Wizard should have jumped back to Step 3 (Salary & benefits).
-    await expect(
-      page.getByRole("heading", { name: "Salary & benefits" }),
-    ).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByRole("heading", { name: "Salary & benefits" })).toBeVisible({
+      timeout: 5_000,
+    });
     await expect(page.getByText(/Step 3 of 5/)).toBeVisible();
 
     // The step card is highlighted (data attribute + destructive ring class).
@@ -564,9 +641,7 @@ test.describe("/hire/post-job publish validation", () => {
     await expect(card).toHaveAttribute("data-invalid-step", "true");
 
     // Field-level error is surfaced on the invalid salary max input.
-    await expect(
-      page.getByText(/Enter a maximum, or clear the minimum/i),
-    ).toBeVisible();
+    await expect(page.getByText(/Enter a maximum, or clear the minimum/i)).toBeVisible();
 
     // Card should be scrolled into view — its top should be near/within the viewport.
     const inView = await card.evaluate((el) => {
@@ -583,8 +658,3 @@ test.describe("/hire/post-job publish validation", () => {
     expect(jobsPostCount).toBe(0);
   });
 });
-
-
-
-
-

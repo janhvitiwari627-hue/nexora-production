@@ -123,7 +123,10 @@ export function PartnerPageShell({
           <Icon className="h-5 w-5" />
         </div>
         <div className="min-w-0">
-          <h1 className="truncate text-2xl font-black tracking-tight text-[#0B1330] md:text-3xl" style={{ letterSpacing: "-0.02em" }}>
+          <h1
+            className="truncate text-2xl font-black tracking-tight text-[#0B1330] md:text-3xl"
+            style={{ letterSpacing: "-0.02em" }}
+          >
             {title}
           </h1>
           <p className="mt-1 text-sm text-slate-600">{subtitle}</p>

@@ -35,30 +35,25 @@ async function isPartnerSession(page: Page): Promise<boolean> {
     const mod = await import("/src/integrations/supabase/client.ts").catch(
       () => null as unknown as { supabase: unknown } | null,
     );
-    const supabase = (mod as { supabase: {
-      auth: { getUser: () => Promise<{ data: { user: { id: string } | null } }> };
-      from: (t: string) => {
-        select: (c: string) => {
-          eq: (col: string, val: string) => Promise<{ data: Array<{ role: string }> | null }>;
+    const supabase = (
+      mod as {
+        supabase: {
+          auth: { getUser: () => Promise<{ data: { user: { id: string } | null } }> };
+          from: (t: string) => {
+            select: (c: string) => {
+              eq: (col: string, val: string) => Promise<{ data: Array<{ role: string }> | null }>;
+            };
+          };
         };
-      };
-    } } | null)?.supabase;
+      } | null
+    )?.supabase;
     if (!supabase) return false;
     const { data } = await supabase.auth.getUser();
     if (!data.user) return false;
-    const res = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", data.user.id);
+    const res = await supabase.from("user_roles").select("role").eq("user_id", data.user.id);
     const roles = (res.data ?? []).map((r) => r.role);
     // Exclude admins/owners so this stays partner-scoped.
-    const elevated = [
-      "admin",
-      "super_admin",
-      "owner",
-      "shop_owner",
-      "shop_manager",
-    ];
+    const elevated = ["admin", "super_admin", "owner", "shop_owner", "shop_manager"];
     if (roles.some((r) => elevated.includes(r))) return false;
     return roles.includes("growth_partner") || roles.includes("district_partner");
   });
@@ -80,7 +75,9 @@ test.describe("Partner cannot open owner/admin profile edit routes", () => {
   });
 
   for (const route of FORBIDDEN_ROUTES) {
-    test(`direct navigation to ${route} is blocked for a partner and never lands on /dashboard/settings`, async ({ page }) => {
+    test(`direct navigation to ${route} is blocked for a partner and never lands on /dashboard/settings`, async ({
+      page,
+    }) => {
       // Track every URL the browser visits so we can assert
       // /dashboard/settings was NEVER reached — not even for a frame.
       const visited: string[] = [];
@@ -93,11 +90,9 @@ test.describe("Partner cannot open owner/admin profile edit routes", () => {
       await page.goto(route);
 
       // The guard must redirect off the forbidden URL.
-      await page.waitForFunction(
-        (r) => !window.location.pathname.startsWith(r),
-        route,
-        { timeout: 10_000 },
-      );
+      await page.waitForFunction((r) => !window.location.pathname.startsWith(r), route, {
+        timeout: 10_000,
+      });
 
       // Give trailing redirects a beat to settle.
       await page.waitForTimeout(500);
@@ -116,9 +111,7 @@ test.describe("Partner cannot open owner/admin profile edit routes", () => {
       ).toBe(false);
 
       // Landing must be partner-appropriate.
-      expect(
-        ALLOWED_LANDINGS.some((t) => landed === t || landed.startsWith(t + "/")),
-      ).toBe(true);
+      expect(ALLOWED_LANDINGS.some((t) => landed === t || landed.startsWith(t + "/"))).toBe(true);
     });
   }
 });

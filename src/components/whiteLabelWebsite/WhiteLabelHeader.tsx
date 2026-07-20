@@ -24,16 +24,16 @@ export function WhiteLabelHeader({ shop, template }: { shop: ShopData; template:
   const headerBg = isDark
     ? "rgba(11,11,11,0.92)"
     : variant === "elegant"
-    ? "rgba(255,255,255,0.9)"
-    : variant === "bold"
-    ? "#ffffff"
-    : "rgba(255,255,255,0.7)";
+      ? "rgba(255,255,255,0.9)"
+      : variant === "bold"
+        ? "#ffffff"
+        : "rgba(255,255,255,0.7)";
   const headerClass =
     variant === "elegant"
       ? `border-b backdrop-blur ${isDark ? "border-amber-500/30" : "border-amber-200/40"}`
       : variant === "bold"
-      ? "border-b-2"
-      : "backdrop-blur-lg";
+        ? "border-b-2"
+        : "backdrop-blur-lg";
 
   return (
     <header
@@ -65,13 +65,24 @@ export function WhiteLabelHeader({ shop, template }: { shop: ShopData; template:
               {shop.name[0]}
             </span>
           )}
-          <span className={variant === "elegant" ? "text-xl tracking-wide" : "text-base font-extrabold uppercase tracking-wide"}>
+          <span
+            className={
+              variant === "elegant"
+                ? "text-xl tracking-wide"
+                : "text-base font-extrabold uppercase tracking-wide"
+            }
+          >
             {shop.name}
           </span>
         </Link>
         <nav className="hidden items-center gap-5 text-sm md:flex">
           {LINKS.map((l) => (
-            <a key={l.href} href={l.href} className="hover:underline" style={{ color: template.colors.text }}>
+            <a
+              key={l.href}
+              href={l.href}
+              className="hover:underline"
+              style={{ color: template.colors.text }}
+            >
               {l.label}
             </a>
           ))}
@@ -80,10 +91,20 @@ export function WhiteLabelHeader({ shop, template }: { shop: ShopData; template:
           <Button
             size="sm"
             className="hidden md:inline-flex"
-            style={{ backgroundColor: template.colors.primary, color: "white", borderRadius: template.radius }}
+            style={{
+              backgroundColor: template.colors.primary,
+              color: "white",
+              borderRadius: template.radius,
+            }}
             asChild
           >
-            <Link to="/site/$slug/book" params={{ slug: shop.slug }} search={{ service: undefined }}>Book Now</Link>
+            <Link
+              to="/site/$slug/book"
+              params={{ slug: shop.slug }}
+              search={{ service: undefined }}
+            >
+              Book Now
+            </Link>
           </Button>
           <button
             type="button"
@@ -96,7 +117,10 @@ export function WhiteLabelHeader({ shop, template }: { shop: ShopData; template:
         </div>
       </div>
       {open && (
-        <div className="border-t md:hidden" style={{ backgroundColor: headerBg, color: template.colors.text }}>
+        <div
+          className="border-t md:hidden"
+          style={{ backgroundColor: headerBg, color: template.colors.text }}
+        >
           <nav className="grid gap-1 px-6 py-3">
             {LINKS.map((l) => (
               <a
@@ -110,10 +134,21 @@ export function WhiteLabelHeader({ shop, template }: { shop: ShopData; template:
             ))}
             <Button
               className="mt-2"
-              style={{ backgroundColor: template.colors.primary, color: "white", borderRadius: template.radius }}
+              style={{
+                backgroundColor: template.colors.primary,
+                color: "white",
+                borderRadius: template.radius,
+              }}
               asChild
             >
-              <Link to="/site/$slug/book" params={{ slug: shop.slug }} search={{ service: undefined }} onClick={() => setOpen(false)}>Book Now</Link>
+              <Link
+                to="/site/$slug/book"
+                params={{ slug: shop.slug }}
+                search={{ service: undefined }}
+                onClick={() => setOpen(false)}
+              >
+                Book Now
+              </Link>
             </Button>
           </nav>
         </div>

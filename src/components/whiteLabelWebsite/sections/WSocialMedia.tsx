@@ -1,9 +1,7 @@
 import type { ShopData } from "../types";
 import type { TemplateConfig } from "../templates";
 import { SectionTitle } from "./WServices";
-import {
-  Facebook, Instagram, Linkedin, MessageCircle, Send, Twitter, Youtube,
-} from "lucide-react";
+import { Facebook, Instagram, Linkedin, MessageCircle, Send, Twitter, Youtube } from "lucide-react";
 
 const PLATFORMS = [
   { key: "instagram", label: "Instagram", icon: Instagram, color: "#E4405F" },
@@ -24,7 +22,9 @@ export function WSocialMedia({ shop, template }: { shop: ShopData; template: Tem
   return (
     <section id="social" className="bg-muted/30 px-6 py-16 md:px-12">
       <SectionTitle font={template.headingFont}>Follow & Connect</SectionTitle>
-      <p className="text-muted-foreground mt-2 text-center text-sm">Daily inspiration on every channel.</p>
+      <p className="text-muted-foreground mt-2 text-center text-sm">
+        Daily inspiration on every channel.
+      </p>
       <div className="mx-auto mt-8 grid max-w-4xl grid-cols-3 gap-3 sm:grid-cols-5 md:grid-cols-9">
         {active.map((p) => (
           <a

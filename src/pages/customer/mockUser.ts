@@ -45,8 +45,7 @@ export const mockUpcomingBooking: UpcomingBooking | null = {
   id: "BK-23984",
   shopName: "Glow & Co. Salon",
   shopSlug: "glow-and-co-salon",
-  shopCover:
-    "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80",
+  shopCover: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80",
   service: "Haircut + Hair Spa",
   staff: "Priya M.",
   dateISO: "2026-06-21T15:30:00+05:30",

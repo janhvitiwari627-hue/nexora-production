@@ -25,7 +25,11 @@ const DESKTOP_UA =
 async function suppressBeforeInstallPrompt(context: import("@playwright/test").BrowserContext) {
   await context.addInitScript(() => {
     const origAdd = window.addEventListener.bind(window);
-    window.addEventListener = ((type: string, listener: EventListenerOrEventListenerObject, opts?: boolean | AddEventListenerOptions) => {
+    window.addEventListener = ((
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      opts?: boolean | AddEventListenerOptions,
+    ) => {
       if (type === "beforeinstallprompt" || type === "appinstalled") return;
       return origAdd(type, listener, opts);
     }) as typeof window.addEventListener;
@@ -114,7 +118,7 @@ test.describe("CustomerAppPage platform-aware install fallback", () => {
     for (const ua of [IOS_UA, ANDROID_UA, DESKTOP_UA]) {
       const context = await browser.newContext({ userAgent: ua });
       await suppressBeforeInstallPrompt(context);
-    const page = await context.newPage();
+      const page = await context.newPage();
       await page.goto("/customer-app");
       await expect(page.getByRole("button", { name: /Get it on Google Play/i })).toBeDisabled();
       await expect(page.getByRole("button", { name: /Download on the App Store/i })).toBeDisabled();
@@ -122,7 +126,9 @@ test.describe("CustomerAppPage platform-aware install fallback", () => {
     }
   });
 
-  test("Native prompt: dispatches beforeinstallprompt and calls prompt() on click", async ({ browser }) => {
+  test("Native prompt: dispatches beforeinstallprompt and calls prompt() on click", async ({
+    browser,
+  }) => {
     const context = await browser.newContext({
       ...devices["Pixel 7"],
       userAgent: ANDROID_UA,
@@ -164,7 +170,9 @@ test.describe("CustomerAppPage platform-aware install fallback", () => {
 
     // The native prompt path was taken.
     await expect
-      .poll(() => page.evaluate(() => (window as unknown as { __promptCalls: number }).__promptCalls))
+      .poll(() =>
+        page.evaluate(() => (window as unknown as { __promptCalls: number }).__promptCalls),
+      )
       .toBe(1);
     await expect
       .poll(() =>

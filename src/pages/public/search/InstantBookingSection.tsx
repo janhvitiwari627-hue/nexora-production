@@ -16,9 +16,7 @@ export function InstantBookingSection({ shops }: { shops: Shop[] }) {
         </span>
         <div>
           <h3 className="text-base font-black text-heading">Book within 2 hours</h3>
-          <p className="text-xs text-muted-foreground">
-            Live availability — grab the next slot.
-          </p>
+          <p className="text-xs text-muted-foreground">Live availability — grab the next slot.</p>
         </div>
       </div>
 
@@ -30,11 +28,7 @@ export function InstantBookingSection({ shops }: { shops: Shop[] }) {
           >
             <div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-lg bg-muted">
               {s.cover_image && (
-                <img
-                  src={s.cover_image}
-                  alt={s.name}
-                  className="h-full w-full object-cover"
-                />
+                <img src={s.cover_image} alt={s.name} className="h-full w-full object-cover" />
               )}
             </div>
             <div className="min-w-0 flex-1">

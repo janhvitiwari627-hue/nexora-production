@@ -81,7 +81,11 @@ export function PartnerSettingsPage() {
   const saveProfile = useServerFn(updatePartnerProfile);
   const saveMetadata = useServerFn(updatePartnerMetadata);
 
-  const { data: profile, isLoading, error } = useQuery({
+  const {
+    data: profile,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["partner", "profile"],
     queryFn: () => fetchProfile({}),
     staleTime: 30_000,
@@ -170,7 +174,8 @@ export function PartnerSettingsPage() {
         </div>
       ) : error || !profile ? (
         <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-800">
-          Partner profile nahi mila. Pehle Growth Partner application submit karo, phir yahan wapas aao.
+          Partner profile nahi mila. Pehle Growth Partner application submit karo, phir yahan wapas
+          aao.
         </div>
       ) : (
         <div className="space-y-6">
@@ -260,7 +265,10 @@ export function PartnerSettingsPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {NOTIF_ROWS.map((row) => {
-                    const pref: PartnerNotificationPref = { ...DEFAULT_PREF, ...(meta[row.key] ?? {}) };
+                    const pref: PartnerNotificationPref = {
+                      ...DEFAULT_PREF,
+                      ...(meta[row.key] ?? {}),
+                    };
                     const set = (channel: keyof PartnerNotificationPref) =>
                       metaMutation.mutate({
                         [row.key]: { ...pref, [channel]: !pref[channel] },
@@ -412,7 +420,11 @@ export function PartnerSettingsPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setEditOpen(false)} disabled={profileMutation.isPending}>
+            <Button
+              variant="ghost"
+              onClick={() => setEditOpen(false)}
+              disabled={profileMutation.isPending}
+            >
               Cancel
             </Button>
             <Button
@@ -446,7 +458,9 @@ function StatusBanner({ status, verifiedAt }: { status: string; verifiedAt: stri
           <div>
             <div className="text-sm font-bold text-emerald-900">Partner approved</div>
             <div className="text-xs text-emerald-700/80">
-              {verifiedAt ? `Verified ${fmtDate(verifiedAt)}` : "Aap ab leads generate kar sakte ho."}
+              {verifiedAt
+                ? `Verified ${fmtDate(verifiedAt)}`
+                : "Aap ab leads generate kar sakte ho."}
             </div>
           </div>
         </div>
@@ -481,10 +495,25 @@ function KycCard({ kyc, docUrl }: { kyc?: PartnerMetadata["kyc_review"]; docUrl?
   const status = kyc?.status ?? "pending";
   const tone =
     status === "approved"
-      ? { bg: "bg-emerald-50", border: "border-emerald-200", chip: "bg-emerald-100 text-emerald-700", label: "Verified" }
+      ? {
+          bg: "bg-emerald-50",
+          border: "border-emerald-200",
+          chip: "bg-emerald-100 text-emerald-700",
+          label: "Verified",
+        }
       : status === "rejected"
-      ? { bg: "bg-red-50", border: "border-red-200", chip: "bg-red-100 text-red-700", label: "Rejected" }
-      : { bg: "bg-amber-50", border: "border-amber-200", chip: "bg-amber-100 text-amber-800", label: "Under review" };
+        ? {
+            bg: "bg-red-50",
+            border: "border-red-200",
+            chip: "bg-red-100 text-red-700",
+            label: "Rejected",
+          }
+        : {
+            bg: "bg-amber-50",
+            border: "border-amber-200",
+            chip: "bg-amber-100 text-amber-800",
+            label: "Under review",
+          };
 
   return (
     <div className={`space-y-3 rounded-xl border ${tone.border} ${tone.bg} p-5`}>
@@ -500,7 +529,9 @@ function KycCard({ kyc, docUrl }: { kyc?: PartnerMetadata["kyc_review"]; docUrl?
             </div>
           </div>
         </div>
-        <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${tone.chip}`}>
+        <span
+          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${tone.chip}`}
+        >
           <CheckCircle2 className="h-3 w-3" /> {tone.label}
         </span>
       </div>
@@ -613,7 +644,11 @@ function Toggle({
 
 function fmtDate(s: string) {
   try {
-    return new Date(s).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+    return new Date(s).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
   } catch {
     return s;
   }

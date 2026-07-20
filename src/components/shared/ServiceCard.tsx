@@ -45,9 +45,7 @@ export function ServiceCard({
             )}
           </div>
           {service.description && (
-            <p className="text-muted-foreground mt-1 line-clamp-2 text-xs">
-              {service.description}
-            </p>
+            <p className="text-muted-foreground mt-1 line-clamp-2 text-xs">{service.description}</p>
           )}
           <span className="bg-muted text-heading mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold">
             <Clock className="h-3 w-3" /> {service.duration_minutes} min

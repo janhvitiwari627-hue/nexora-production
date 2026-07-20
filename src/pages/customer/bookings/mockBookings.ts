@@ -159,13 +159,15 @@ export const mockRescheduled: UpcomingBooking[] = [
 ];
 
 export function formatBookingDate(iso: string) {
-  return new Date(iso).toLocaleString("en-IN", {
-    weekday: "short",
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  }).replace(",", " ·");
+  return new Date(iso)
+    .toLocaleString("en-IN", {
+      weekday: "short",
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    })
+    .replace(",", " ·");
 }

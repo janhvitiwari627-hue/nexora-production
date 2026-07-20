@@ -89,7 +89,11 @@ function relative(iso: string) {
   return `${months}mo ago`;
 }
 
-function fmtSalary(min: number | null | undefined, max: number | null | undefined, period: string | null | undefined) {
+function fmtSalary(
+  min: number | null | undefined,
+  max: number | null | undefined,
+  period: string | null | undefined,
+) {
   if (!min && !max) return null;
   const p = period === "hourly" ? "/hr" : period === "yearly" ? "/yr" : "/mo";
   const f = (v: number) => (v >= 1000 ? `${Math.round(v / 1000)}k` : `${v}`);
@@ -134,11 +138,17 @@ export function MyApplicationsPage() {
 
   async function handleWithdraw(app: JobApplication) {
     if (!user) return;
-    if (typeof window !== "undefined" && !window.confirm("Withdraw this application? This cannot be undone.")) return;
+    if (
+      typeof window !== "undefined" &&
+      !window.confirm("Withdraw this application? This cannot be undone.")
+    )
+      return;
     setWithdrawingId(app.id);
     try {
       await withdrawApplication(app.id, user.id);
-      setApps((prev) => prev?.map((a) => (a.id === app.id ? { ...a, status: "withdrawn" } : a)) ?? prev);
+      setApps(
+        (prev) => prev?.map((a) => (a.id === app.id ? { ...a, status: "withdrawn" } : a)) ?? prev,
+      );
       toast.success("Application withdrawn");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not withdraw application");
@@ -364,7 +374,8 @@ export function MyApplicationsPage() {
             <CardContent className="flex flex-wrap items-center justify-between gap-3 p-6 text-sm">
               <span className="text-rose-600">
                 {error}
-                {retryAttempt > 0 && ` (after ${retryAttempt} ${retryAttempt === 1 ? "retry" : "retries"})`}
+                {retryAttempt > 0 &&
+                  ` (after ${retryAttempt} ${retryAttempt === 1 ? "retry" : "retries"})`}
               </span>
               <Button size="sm" variant="outline" onClick={() => setRefreshTick((t) => t + 1)}>
                 <RefreshCw className="mr-2 h-4 w-4" /> Try again

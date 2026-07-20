@@ -13,10 +13,10 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Nexora — Book salons, spas & barbers in Jaipur" },
       {
         property: "og:description",
-        content: "Discover top-rated salons, spas and barbershops in Jaipur. Instant booking, member rewards, and exclusive offers on Nexora SalonOS.",
+        content:
+          "Discover top-rated salons, spas and barbershops in Jaipur. Instant booking, member rewards, and exclusive offers on Nexora SalonOS.",
       },
     ],
   }),
   component: HomePage,
 });
-

@@ -6,8 +6,18 @@ import { mockUpcomingBooking } from "../mockUser";
 function formatDate(iso: string) {
   const d = new Date(iso);
   const opts = { timeZone: "Asia/Kolkata" } as const;
-  const date = d.toLocaleDateString("en-IN", { ...opts, weekday: "short", day: "numeric", month: "short" });
-  const time = d.toLocaleTimeString("en-IN", { ...opts, hour: "2-digit", minute: "2-digit", hour12: true });
+  const date = d.toLocaleDateString("en-IN", {
+    ...opts,
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  });
+  const time = d.toLocaleTimeString("en-IN", {
+    ...opts,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
   return `${date} · ${time}`;
 }
 

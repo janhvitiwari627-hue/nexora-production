@@ -23,10 +23,7 @@ export function DiscoveryRails({ shops, onApplyFilters, onSelectCategory }: Prop
   const nearby = useMemo(
     () =>
       [...shops]
-        .sort(
-          (a, b) =>
-            (a.distance_km ?? 99) - (b.distance_km ?? 99) || b.rating - a.rating,
-        )
+        .sort((a, b) => (a.distance_km ?? 99) - (b.distance_km ?? 99) || b.rating - a.rating)
         .slice(0, 10),
     [shops],
   );
@@ -62,9 +59,7 @@ export function DiscoveryRails({ shops, onApplyFilters, onSelectCategory }: Prop
         title="Nearby Discovery"
         subtitle="Closest beauty spots to you"
         items={nearby}
-        onSeeAll={() =>
-          onApplyFilters({ ...DEFAULT_FILTERS, maxDistance: 5 })
-        }
+        onSeeAll={() => onApplyFilters({ ...DEFAULT_FILTERS, maxDistance: 5 })}
         keyName="nearby"
       />
       <Rail
@@ -72,23 +67,16 @@ export function DiscoveryRails({ shops, onApplyFilters, onSelectCategory }: Prop
         title="Trending Now"
         subtitle="Most booked this week"
         items={trending}
-        onSeeAll={() =>
-          onApplyFilters({ ...DEFAULT_FILTERS, mostPopular: true })
-        }
+        onSeeAll={() => onApplyFilters({ ...DEFAULT_FILTERS, mostPopular: true })}
         keyName="trending"
       />
-      <CategoryRail
-        categories={categories}
-        onPick={onSelectCategory}
-      />
+      <CategoryRail categories={categories} onPick={onSelectCategory} />
       <Rail
         icon={<BadgeCheck className="h-4 w-4" />}
         title="Verified Discovery"
         subtitle="Hand-picked & verified salons"
         items={verified}
-        onSeeAll={() =>
-          onApplyFilters({ ...DEFAULT_FILTERS, verifiedOnly: true })
-        }
+        onSeeAll={() => onApplyFilters({ ...DEFAULT_FILTERS, verifiedOnly: true })}
         keyName="verified"
       />
     </section>
@@ -210,9 +198,7 @@ function CategoryRail({
             </span>
             Browse by Category
           </h2>
-          <p className="text-xs text-muted-foreground">
-            Jump straight into what you want today
-          </p>
+          <p className="text-xs text-muted-foreground">Jump straight into what you want today</p>
         </div>
       </div>
       <div className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -223,10 +209,7 @@ function CategoryRail({
             onClick={() => onPick(cat)}
             className="shrink-0 snap-start rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold text-heading shadow-sm transition hover:border-primary hover:bg-primary/5"
           >
-            {cat}{" "}
-            <span className="ml-1 text-xs font-normal text-muted-foreground">
-              ({count})
-            </span>
+            {cat} <span className="ml-1 text-xs font-normal text-muted-foreground">({count})</span>
           </button>
         ))}
       </div>

@@ -34,10 +34,7 @@ export async function listAllPendingPayments(): Promise<PendingPayment[]> {
   return data ?? [];
 }
 
-export async function setPaymentStatus(
-  id: string,
-  status: "approved" | "rejected",
-): Promise<void> {
+export async function setPaymentStatus(id: string, status: "approved" | "rejected"): Promise<void> {
   const { error } = await supabase.from("pending_payments").update({ status }).eq("id", id);
   if (error) throw error;
 }

@@ -89,7 +89,6 @@ export function PersonalInfoPanel() {
   const draftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const draftKey = user ? `personal-info-draft:${user.id}` : null;
 
-
   // Ensure we have a session; hydrate profile in background only if missing.
   useEffect(() => {
     let cancelled = false;
@@ -147,8 +146,6 @@ export function PersonalInfoPanel() {
     setAvatar(profile.avatar_url || "");
     setUsernameTouched(!!profile.username);
   }, [profile]);
-
-
 
   const districts = useMemo(() => getDistricts(form.state), [form.state]);
   const blocks = useMemo(() => getBlocks(form.state, form.district), [form.state, form.district]);
@@ -444,9 +441,6 @@ export function PersonalInfoPanel() {
     persistDraft(JSON.stringify(form));
   }
 
-
-
-
   function handleCancel() {
     if (!profile) return;
     if (draftKey && typeof window !== "undefined") {
@@ -599,7 +593,10 @@ export function PersonalInfoPanel() {
           </button>
         </div>
       )}
-      <div className="text-muted-foreground mt-3 flex items-center gap-2 text-xs" aria-live="polite">
+      <div
+        className="text-muted-foreground mt-3 flex items-center gap-2 text-xs"
+        aria-live="polite"
+      >
         {saving ? (
           <>
             <Loader2 className="h-3 w-3 animate-spin" /> Saving…
@@ -614,7 +611,6 @@ export function PersonalInfoPanel() {
       </div>
 
       <SaveBar onSave={handleSave} onCancel={handleCancel} saving={saving} />
-
     </PanelShell>
   );
 }

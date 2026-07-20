@@ -14,10 +14,10 @@ export const Route = createFileRoute("/api/public/hooks/process-settlements")({
     handlers: {
       POST: async ({ request }) => {
         if (V1_LOCKED) {
-          return new Response(
-            JSON.stringify({ error: "Disabled in V1" }),
-            { status: 503, headers: { "Content-Type": "application/json" } },
-          );
+          return new Response(JSON.stringify({ error: "Disabled in V1" }), {
+            status: 503,
+            headers: { "Content-Type": "application/json" },
+          });
         }
         const provided = request.headers.get("x-cron-secret") ?? "";
         const expected = process.env.CRON_WEBHOOK_SECRET ?? "";
@@ -26,15 +26,9 @@ export const Route = createFileRoute("/api/public/hooks/process-settlements")({
         if (!expected || a.length !== b.length || !timingSafeEqual(a, b)) {
           return new Response("Unauthorized", { status: 401 });
         }
-        const { supabaseAdmin } = await import(
-          "@/integrations/supabase/client.server"
-        );
-        const { data: released, error: e1 } = await supabaseAdmin.rpc(
-          "auto_release_escrow",
-        );
-        const { data: settled, error: e2 } = await supabaseAdmin.rpc(
-          "process_pending_settlements",
-        );
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: released, error: e1 } = await supabaseAdmin.rpc("auto_release_escrow");
+        const { data: settled, error: e2 } = await supabaseAdmin.rpc("process_pending_settlements");
         return Response.json({
           ok: !e1 && !e2,
           released,

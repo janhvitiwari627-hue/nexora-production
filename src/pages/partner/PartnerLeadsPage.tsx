@@ -16,7 +16,7 @@ const LEAD_STATUSES = [
   "Lost",
   "Rejected",
 ] as const;
-type LeadStatus = typeof LEAD_STATUSES[number];
+type LeadStatus = (typeof LEAD_STATUSES)[number];
 
 type Lead = {
   name: string;
@@ -29,16 +29,96 @@ type Lead = {
 };
 
 const LEADS: Lead[] = [
-  { name: "Ramesh Kumar", shop: "Style Hub", mobile: "98765 12345", area: "Malviya Nagar", status: "New", addedOn: "Today", note: "Referred by Glow Studio" },
-  { name: "Anjali Mehta", shop: "Rose Beauty", mobile: "97845 67890", area: "Vaishali", status: "Contacted", addedOn: "Today", note: "Callback tomorrow" },
-  { name: "Suresh Rao", shop: "Sharp Cuts", mobile: "99887 22110", area: "Sitapura", status: "Interested", addedOn: "Yesterday", note: "Wants pricing details" },
-  { name: "Kavita Joshi", shop: "Luxe Nails", mobile: "98123 88997", area: "C-Scheme", status: "Demo Given", addedOn: "2d ago", note: "Loved dashboard" },
-  { name: "Manoj Sharma", shop: "Trim & Trend", mobile: "97001 45566", area: "Mansarovar", status: "Documents Pending", addedOn: "3d ago", note: "Aadhaar pending" },
-  { name: "Pooja Iyer", shop: "Glamour Point", mobile: "98555 78912", area: "Jagatpura", status: "Registered", addedOn: "4d ago", note: "KYC in review" },
-  { name: "Deepak Yadav", shop: "Modern Look", mobile: "97878 33221", area: "Jhotwara", status: "Verified", addedOn: "5d ago", note: "Website in build" },
-  { name: "Sonia Kapoor", shop: "Aura Salon", mobile: "98765 99887", area: "Tonk Road", status: "Website Published", addedOn: "6d ago", note: "QR next" },
-  { name: "Vinay Gupta", shop: "Fresh Snip", mobile: "97445 66778", area: "Raja Park", status: "Active", addedOn: "1w ago", note: "First collection ₹450" },
-  { name: "Rina Das", shop: "Blush Zone", mobile: "98999 11223", area: "Ajmer Road", status: "Lost", addedOn: "2w ago", note: "Went with competitor" },
+  {
+    name: "Ramesh Kumar",
+    shop: "Style Hub",
+    mobile: "98765 12345",
+    area: "Malviya Nagar",
+    status: "New",
+    addedOn: "Today",
+    note: "Referred by Glow Studio",
+  },
+  {
+    name: "Anjali Mehta",
+    shop: "Rose Beauty",
+    mobile: "97845 67890",
+    area: "Vaishali",
+    status: "Contacted",
+    addedOn: "Today",
+    note: "Callback tomorrow",
+  },
+  {
+    name: "Suresh Rao",
+    shop: "Sharp Cuts",
+    mobile: "99887 22110",
+    area: "Sitapura",
+    status: "Interested",
+    addedOn: "Yesterday",
+    note: "Wants pricing details",
+  },
+  {
+    name: "Kavita Joshi",
+    shop: "Luxe Nails",
+    mobile: "98123 88997",
+    area: "C-Scheme",
+    status: "Demo Given",
+    addedOn: "2d ago",
+    note: "Loved dashboard",
+  },
+  {
+    name: "Manoj Sharma",
+    shop: "Trim & Trend",
+    mobile: "97001 45566",
+    area: "Mansarovar",
+    status: "Documents Pending",
+    addedOn: "3d ago",
+    note: "Aadhaar pending",
+  },
+  {
+    name: "Pooja Iyer",
+    shop: "Glamour Point",
+    mobile: "98555 78912",
+    area: "Jagatpura",
+    status: "Registered",
+    addedOn: "4d ago",
+    note: "KYC in review",
+  },
+  {
+    name: "Deepak Yadav",
+    shop: "Modern Look",
+    mobile: "97878 33221",
+    area: "Jhotwara",
+    status: "Verified",
+    addedOn: "5d ago",
+    note: "Website in build",
+  },
+  {
+    name: "Sonia Kapoor",
+    shop: "Aura Salon",
+    mobile: "98765 99887",
+    area: "Tonk Road",
+    status: "Website Published",
+    addedOn: "6d ago",
+    note: "QR next",
+  },
+  {
+    name: "Vinay Gupta",
+    shop: "Fresh Snip",
+    mobile: "97445 66778",
+    area: "Raja Park",
+    status: "Active",
+    addedOn: "1w ago",
+    note: "First collection ₹450",
+  },
+  {
+    name: "Rina Das",
+    shop: "Blush Zone",
+    mobile: "98999 11223",
+    area: "Ajmer Road",
+    status: "Lost",
+    addedOn: "2w ago",
+    note: "Went with competitor",
+  },
 ];
 
 const STATUS_TONE: Record<LeadStatus, string> = {
@@ -59,10 +139,13 @@ export function PartnerLeadsPage() {
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<LeadStatus | "All">("All");
 
-  const counts = LEAD_STATUSES.reduce((acc, s) => {
-    acc[s] = LEADS.filter((l) => l.status === s).length;
-    return acc;
-  }, {} as Record<LeadStatus, number>);
+  const counts = LEAD_STATUSES.reduce(
+    (acc, s) => {
+      acc[s] = LEADS.filter((l) => l.status === s).length;
+      return acc;
+    },
+    {} as Record<LeadStatus, number>,
+  );
 
   const filtered = LEADS.filter(
     (l) =>
@@ -136,7 +219,9 @@ export function PartnerLeadsPage() {
                   {l.name} · {l.area}
                 </div>
               </div>
-              <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${STATUS_TONE[l.status]}`}>
+              <span
+                className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${STATUS_TONE[l.status]}`}
+              >
                 {l.status}
               </span>
             </div>

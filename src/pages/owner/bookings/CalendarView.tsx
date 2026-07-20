@@ -78,7 +78,8 @@ export function CalendarView({
           {HOURS.map((h) => (
             <div key={h} className="contents">
               <div className="border-border text-muted-foreground border-b p-1 text-right text-[10px]">
-                {h > 12 ? h - 12 : h}{h >= 12 ? "PM" : "AM"}
+                {h > 12 ? h - 12 : h}
+                {h >= 12 ? "PM" : "AM"}
               </div>
               {days.map((d) => {
                 const key = fmtDateKey(d);

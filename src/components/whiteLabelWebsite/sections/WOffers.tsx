@@ -14,7 +14,10 @@ export function WOffers({ shop, template }: { shop: ShopData; template: Template
             className="relative overflow-hidden border-2 border-dashed p-6"
             style={{ borderRadius: template.radius, borderColor: template.colors.primary }}
           >
-            <div className="absolute right-0 top-0 px-4 py-2 text-sm font-bold text-white" style={{ backgroundColor: template.colors.primary }}>
+            <div
+              className="absolute right-0 top-0 px-4 py-2 text-sm font-bold text-white"
+              style={{ backgroundColor: template.colors.primary }}
+            >
               {o.discount} OFF
             </div>
             <h3 className="text-xl font-bold">{o.title}</h3>

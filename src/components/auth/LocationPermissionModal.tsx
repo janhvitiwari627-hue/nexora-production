@@ -105,8 +105,8 @@ export function LocationPermissionModal() {
           </div>
           <DialogTitle className="text-center">Find salons near you</DialogTitle>
           <DialogDescription className="text-center">
-            Share your location so we can show salons and offers in your area. We only use
-            it to personalize results — never shared with third parties.
+            Share your location so we can show salons and offers in your area. We only use it to
+            personalize results — never shared with third parties.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-center">
@@ -115,7 +115,11 @@ export function LocationPermissionModal() {
             Not now
           </Button>
           <Button onClick={handleAllow} disabled={busy}>
-            {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <MapPin className="mr-2 h-4 w-4" />}
+            {busy ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <MapPin className="mr-2 h-4 w-4" />
+            )}
             Share location
           </Button>
         </DialogFooter>

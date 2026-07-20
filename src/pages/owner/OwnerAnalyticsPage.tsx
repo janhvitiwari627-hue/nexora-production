@@ -2,15 +2,38 @@ import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
-  ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-  BarChart, Bar, AreaChart, Area, Legend,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  BarChart,
+  Bar,
+  AreaChart,
+  Area,
+  Legend,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import {
-  TrendingUp, TrendingDown, Sparkles, Loader2, IndianRupee, CalendarCheck, Users, Repeat,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import {
+  TrendingUp,
+  TrendingDown,
+  Sparkles,
+  Loader2,
+  IndianRupee,
+  CalendarCheck,
+  Users,
+  Repeat,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getMyOwnedSalons } from "@/lib/owner.functions";
@@ -71,10 +94,16 @@ export function OwnerAnalyticsPage() {
         <div className="flex items-center gap-2">
           {salons.length > 1 ? (
             <Select value={activeSalonId ?? undefined} onValueChange={(v) => setSalonId(v)}>
-              <SelectTrigger className="w-56"><SelectValue placeholder="Choose salon" /></SelectTrigger>
+              <SelectTrigger className="w-56">
+                <SelectValue placeholder="Choose salon" />
+              </SelectTrigger>
               <SelectContent>
                 {salons.map((s) =>
-                  s.salon ? <SelectItem key={s.salon.id} value={s.salon.id}>{s.salon.name}</SelectItem> : null,
+                  s.salon ? (
+                    <SelectItem key={s.salon.id} value={s.salon.id}>
+                      {s.salon.name}
+                    </SelectItem>
+                  ) : null,
                 )}
               </SelectContent>
             </Select>
@@ -101,13 +130,17 @@ export function OwnerAnalyticsPage() {
           <Loader2 className="h-5 w-5 animate-spin" />
         </div>
       ) : salons.length === 0 ? (
-        <Card><CardContent className="p-6 text-sm text-muted-foreground">
-          No approved salons linked to your account yet.
-        </CardContent></Card>
+        <Card>
+          <CardContent className="p-6 text-sm text-muted-foreground">
+            No approved salons linked to your account yet.
+          </CardContent>
+        </Card>
       ) : analyticsQuery.isError ? (
-        <Card><CardContent className="p-6 text-sm text-rose-600">
-          {(analyticsQuery.error as Error).message}
-        </CardContent></Card>
+        <Card>
+          <CardContent className="p-6 text-sm text-rose-600">
+            {(analyticsQuery.error as Error).message}
+          </CardContent>
+        </Card>
       ) : !a ? (
         <div className="grid h-40 place-items-center text-muted-foreground">
           <Loader2 className="h-5 w-5 animate-spin" />
@@ -158,7 +191,9 @@ export function OwnerAnalyticsPage() {
 
           {/* Revenue */}
           <Card>
-            <CardHeader><CardTitle className="text-base">Revenue trend</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle className="text-base">Revenue trend</CardTitle>
+            </CardHeader>
             <CardContent className="h-72">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={a.revenueTrend}>
@@ -166,7 +201,13 @@ export function OwnerAnalyticsPage() {
                   <XAxis dataKey="label" fontSize={11} />
                   <YAxis fontSize={11} />
                   <Tooltip formatter={(v: number) => formatINR(v)} />
-                  <Line type="monotone" dataKey="revenue" stroke="hsl(243, 75%, 59%)" strokeWidth={2} dot={false} />
+                  <Line
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="hsl(243, 75%, 59%)"
+                    strokeWidth={2}
+                    dot={false}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </CardContent>
@@ -174,7 +215,9 @@ export function OwnerAnalyticsPage() {
 
           {/* Bookings */}
           <Card>
-            <CardHeader><CardTitle className="text-base">Bookings per day</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle className="text-base">Bookings per day</CardTitle>
+            </CardHeader>
             <CardContent className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={a.bookingsTrend}>
@@ -190,7 +233,9 @@ export function OwnerAnalyticsPage() {
 
           {/* Customers */}
           <Card>
-            <CardHeader><CardTitle className="text-base">New vs returning customers</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle className="text-base">New vs returning customers</CardTitle>
+            </CardHeader>
             <CardContent className="h-72">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={a.customerTrend}>
@@ -209,8 +254,18 @@ export function OwnerAnalyticsPage() {
                   <YAxis fontSize={11} />
                   <Tooltip />
                   <Legend wrapperStyle={{ fontSize: 11 }} />
-                  <Area type="monotone" dataKey="new" stroke="hsl(243, 75%, 59%)" fill="url(#newG)" />
-                  <Area type="monotone" dataKey="returning" stroke="hsl(280, 70%, 60%)" fill="url(#retG)" />
+                  <Area
+                    type="monotone"
+                    dataKey="new"
+                    stroke="hsl(243, 75%, 59%)"
+                    fill="url(#newG)"
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="returning"
+                    stroke="hsl(280, 70%, 60%)"
+                    fill="url(#retG)"
+                  />
                 </AreaChart>
               </ResponsiveContainer>
             </CardContent>
@@ -218,19 +273,27 @@ export function OwnerAnalyticsPage() {
 
           {/* Top services */}
           <Card>
-            <CardHeader><CardTitle className="text-base">Top services by revenue</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle className="text-base">Top services by revenue</CardTitle>
+            </CardHeader>
             <CardContent>
               {a.topServices.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No completed bookings in this window.</p>
+                <p className="text-sm text-muted-foreground">
+                  No completed bookings in this window.
+                </p>
               ) : (
                 <div className="divide-y">
                   {a.topServices.map((s) => (
                     <div key={s.name} className="flex items-center justify-between py-2.5">
                       <div className="min-w-0">
                         <p className="truncate font-medium text-heading">{s.name}</p>
-                        <p className="text-xs text-muted-foreground">{s.bookings} booking{s.bookings === 1 ? "" : "s"}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {s.bookings} booking{s.bookings === 1 ? "" : "s"}
+                        </p>
                       </div>
-                      <span className="font-mono text-sm font-semibold">{formatINR(s.revenue)}</span>
+                      <span className="font-mono text-sm font-semibold">
+                        {formatINR(s.revenue)}
+                      </span>
                     </div>
                   ))}
                 </div>

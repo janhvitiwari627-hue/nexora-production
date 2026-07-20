@@ -33,10 +33,7 @@ export function selectedServices(b: BookingState): Service[] {
 }
 
 export function subtotal(b: BookingState): number {
-  return selectedServices(b).reduce(
-    (sum, s) => sum + (s.offer_price ?? s.price),
-    0,
-  );
+  return selectedServices(b).reduce((sum, s) => sum + (s.offer_price ?? s.price), 0);
 }
 
 export function totalDuration(b: BookingState): number {
@@ -55,10 +52,7 @@ export function rewardsDiscount(b: BookingState): number {
 }
 
 export function grandTotal(b: BookingState): number {
-  return Math.max(
-    0,
-    subtotal(b) + PLATFORM_FEE - couponDiscount(b) - rewardsDiscount(b),
-  );
+  return Math.max(0, subtotal(b) + PLATFORM_FEE - couponDiscount(b) - rewardsDiscount(b));
 }
 
 export function advancePayable(b: BookingState): number {

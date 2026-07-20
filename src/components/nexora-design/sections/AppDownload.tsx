@@ -42,14 +42,22 @@ function PhoneScreen({ variant }: { variant: "home" | "booking" | "rewards" }) {
           )}
           {variant === "booking" && (
             <>
-              <div className="h-32 rounded-xl bg-cover bg-center" style={{ backgroundImage: `url(https://images.pexels.com/photos/7195801/pexels-photo-7195801.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=300&w=400)` }} />
+              <div
+                className="h-32 rounded-xl bg-cover bg-center"
+                style={{
+                  backgroundImage: `url(https://images.pexels.com/photos/7195801/pexels-photo-7195801.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=300&w=400)`,
+                }}
+              />
               <div className="space-y-2">
                 <div className="h-4 w-3/4 rounded bg-slate-200" />
                 <div className="h-4 w-1/2 rounded bg-slate-200" />
               </div>
               <div className="grid grid-cols-4 gap-2">
                 {[10, 11, 12, 1].map((t) => (
-                  <div key={t} className="flex h-10 flex-col items-center justify-center rounded-lg bg-white text-[10px] font-semibold text-slate-700 shadow-sm">
+                  <div
+                    key={t}
+                    className="flex h-10 flex-col items-center justify-center rounded-lg bg-white text-[10px] font-semibold text-slate-700 shadow-sm"
+                  >
                     {t}:00
                   </div>
                 ))}
@@ -90,8 +98,8 @@ export default function AppDownload() {
                 Your beauty routine, in your pocket.
               </h2>
               <p className="mt-5 text-lg text-slate-500">
-                Book appointments, manage memberships, and unlock exclusive
-                rewards — all in one beautifully simple app.
+                Book appointments, manage memberships, and unlock exclusive rewards — all in one
+                beautifully simple app.
               </p>
 
               <div className="mt-8 space-y-4">

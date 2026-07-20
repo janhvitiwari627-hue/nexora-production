@@ -31,9 +31,7 @@ export type QueueTask<TPayload = unknown, TResult = unknown> = {
   result?: TResult;
 };
 
-type Runner<TPayload = unknown, TResult = unknown> = (
-  payload: TPayload,
-) => Promise<TResult>;
+type Runner<TPayload = unknown, TResult = unknown> = (payload: TPayload) => Promise<TResult>;
 
 const runners = new Map<string, Runner>();
 const listeners = new Set<() => void>();
@@ -60,8 +58,7 @@ function readAll(): QueueTask[] {
     const now = Date.now();
     const kept = parsed.filter(
       (t) =>
-        t.status !== "succeeded" ||
-        (t.completedAt ? now - t.completedAt < SUCCESS_TTL_MS : false),
+        t.status !== "succeeded" || (t.completedAt ? now - t.completedAt < SUCCESS_TTL_MS : false),
     );
     if (kept.length !== parsed.length) {
       try {
@@ -154,10 +151,13 @@ function backoff(attempts: number): number {
 
 export function scheduleFlush(delayMs = 0) {
   if (scheduled) clearTimeout(scheduled);
-  scheduled = setTimeout(() => {
-    scheduled = null;
-    void flush();
-  }, Math.max(0, delayMs));
+  scheduled = setTimeout(
+    () => {
+      scheduled = null;
+      void flush();
+    },
+    Math.max(0, delayMs),
+  );
 }
 
 export async function flush(): Promise<void> {
@@ -178,9 +178,7 @@ export async function flush(): Promise<void> {
 
       const runner = runners.get(next.type)!;
       // Mark running
-      writeAll(
-        readAll().map((t) => (t.id === next.id ? { ...t, status: "running" } : t)),
-      );
+      writeAll(readAll().map((t) => (t.id === next.id ? { ...t, status: "running" } : t)));
 
       try {
         const result = await runner(next.payload);

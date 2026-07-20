@@ -10,14 +10,22 @@ import { cn } from "@/lib/utils";
  * only — it never blocks signup, and any network failure is treated as
  * "unknown" so the UI degrades gracefully.
  */
-export function scorePassword(pw: string): { score: 0 | 1 | 2 | 3 | 4; label: string; tips: string[] } {
+export function scorePassword(pw: string): {
+  score: 0 | 1 | 2 | 3 | 4;
+  label: string;
+  tips: string[];
+} {
   let score = 0;
   const tips: string[] = [];
-  if (pw.length >= 8) score++; else tips.push("Use at least 8 characters");
+  if (pw.length >= 8) score++;
+  else tips.push("Use at least 8 characters");
   if (pw.length >= 12) score++;
-  if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++; else tips.push("Mix upper- and lower-case letters");
-  if (/\d/.test(pw)) score++; else tips.push("Include a number");
-  if (/[^A-Za-z0-9]/.test(pw)) score++; else tips.push("Add a symbol (!@#$…)");
+  if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+  else tips.push("Mix upper- and lower-case letters");
+  if (/\d/.test(pw)) score++;
+  else tips.push("Include a number");
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  else tips.push("Add a symbol (!@#$…)");
   // Common-password penalty (prefix match)
   if (/^(password|qwerty|123456|111111|abc123)/i.test(pw)) score = Math.min(score, 1);
   const finalScore = Math.min(4, score) as 0 | 1 | 2 | 3 | 4;
@@ -98,7 +106,8 @@ export function PasswordStrengthIndicator({ password }: { password: string }) {
   const label = cappedByPwned ? "Good" : local.label;
   const tips = [...local.tips];
   if (pwned === true) tips.push("Found in known data breaches — choose a different password");
-  if (pwned === null && score >= 2) tips.push("Breach check unavailable — pick a unique password to be safe");
+  if (pwned === null && score >= 2)
+    tips.push("Breach check unavailable — pick a unique password to be safe");
 
   return (
     <div className="space-y-1.5" aria-live="polite">

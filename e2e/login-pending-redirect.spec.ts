@@ -34,13 +34,12 @@ test.describe("Login — pending redirect stash (anonymous)", () => {
     "/owner/bookings",
     "/owner/analytics",
   ]) {
-    test(`hitting ${target} unauthenticated redirects to /login and stashes the path`, async ({ page }) => {
+    test(`hitting ${target} unauthenticated redirects to /login and stashes the path`, async ({
+      page,
+    }) => {
       await page.goto(target);
       await page.waitForURL(/\/login/);
-      const pending = await page.evaluate(
-        (k) => window.sessionStorage.getItem(k),
-        PENDING_KEY,
-      );
+      const pending = await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
       expect(pending).toBe(target);
     });
   }
@@ -66,20 +65,16 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
       expect(new URL(page.url()).pathname).toBe(target);
 
       // Pending key must be consumed exactly once.
-      const pending = await page.evaluate(
-        (k) => window.sessionStorage.getItem(k),
-        PENDING_KEY,
-      );
+      const pending = await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
       expect(pending).toBeNull();
     });
   }
 
-  test("without a stashed path, signed-in user gets role-based redirect (not /login)", async ({ page }) => {
+  test("without a stashed path, signed-in user gets role-based redirect (not /login)", async ({
+    page,
+  }) => {
     await seedSession(page);
-    await page.evaluate(
-      (k) => window.sessionStorage.removeItem(k),
-      PENDING_KEY,
-    );
+    await page.evaluate((k) => window.sessionStorage.removeItem(k), PENDING_KEY);
 
     await page.goto("/login");
     await page.waitForFunction(() => !/\/login$/.test(window.location.pathname), null, {
@@ -89,7 +84,9 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
   });
 
   for (const target of ["/dashboard", "/owner/bookings", "/partner/dashboard"]) {
-    test(`pending redirect key for ${target} is consumed exactly once and not reused on next /login`, async ({ page }) => {
+    test(`pending redirect key for ${target} is consumed exactly once and not reused on next /login`, async ({
+      page,
+    }) => {
       await seedSession(page);
       await page.evaluate(
         ([k, v]) => window.sessionStorage.setItem(k as string, v as string),
@@ -101,19 +98,14 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
       await page.goto("/login");
       await page.waitForURL(new RegExp(`${escaped}(\\/|$)`), { timeout: 10_000 });
       expect(new URL(page.url()).pathname).toBe(target);
-      const afterFirst = await page.evaluate(
-        (k) => window.sessionStorage.getItem(k),
-        PENDING_KEY,
-      );
+      const afterFirst = await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
       expect(afterFirst).toBeNull();
 
       // Second /login visit: no stash present → role-based default, NOT the previous target.
       await page.goto("/login");
-      await page.waitForFunction(
-        () => !/\/login$/.test(window.location.pathname),
-        null,
-        { timeout: 10_000 },
-      );
+      await page.waitForFunction(() => !/\/login$/.test(window.location.pathname), null, {
+        timeout: 10_000,
+      });
       const secondPath = new URL(page.url()).pathname;
       expect(secondPath).not.toBe(target);
       expect(secondPath).not.toMatch(/^\/login$/);
@@ -124,22 +116,19 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
       // "/owner/dashboard" for owner, "/partner/dashboard" for partner,
       // "/admin/dashboard" for admin). Defaults to "/" (customer fallback).
       if (target === "/dashboard") {
-        const expectedDefault =
-          process.env.LOVABLE_BROWSER_DEFAULT_REDIRECT ?? "/";
+        const expectedDefault = process.env.LOVABLE_BROWSER_DEFAULT_REDIRECT ?? "/";
         expect(secondPath).toBe(expectedDefault);
       }
 
-
       // Key remains cleared — no ghost value written back by the resume flow.
-      const afterSecond = await page.evaluate(
-        (k) => window.sessionStorage.getItem(k),
-        PENDING_KEY,
-      );
+      const afterSecond = await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
       expect(afterSecond).toBeNull();
     });
   }
 
-  test("logout before completing redirect flow clears the pending redirect key", async ({ page }) => {
+  test("logout before completing redirect flow clears the pending redirect key", async ({
+    page,
+  }) => {
     await seedSession(page);
     await page.evaluate(
       ([k, v]) => window.sessionStorage.setItem(k as string, v as string),
@@ -152,10 +141,7 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     await accountMenu.waitFor({ state: "visible", timeout: 10_000 });
 
     // Sanity: the pending key is still stashed at this point.
-    const beforeLogout = await page.evaluate(
-      (k) => window.sessionStorage.getItem(k),
-      PENDING_KEY,
-    );
+    const beforeLogout = await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
     expect(beforeLogout).toBe("/owner/bookings");
 
     // Open account menu → Logout → confirm.
@@ -165,19 +151,16 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
 
     // authStore.signOut() must clear sessionStorage so the stale target
     // cannot resurrect on the next sign-in.
-    await page.waitForFunction(
-      (k) => window.sessionStorage.getItem(k) === null,
-      PENDING_KEY,
-      { timeout: 10_000 },
-    );
-    const afterLogout = await page.evaluate(
-      (k) => window.sessionStorage.getItem(k),
-      PENDING_KEY,
-    );
+    await page.waitForFunction((k) => window.sessionStorage.getItem(k) === null, PENDING_KEY, {
+      timeout: 10_000,
+    });
+    const afterLogout = await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
     expect(afterLogout).toBeNull();
   });
 
-  test("logout during the post-login redirect window does not land on the stashed target", async ({ page }) => {
+  test("logout during the post-login redirect window does not land on the stashed target", async ({
+    page,
+  }) => {
     const TARGET = "/owner/bookings";
 
     // Stall the target route request so the redirect consumer's navigation
@@ -198,11 +181,9 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
 
     // Race: as soon as the pending key has been consumed (redirect started),
     // sign the user out before the target actually finishes loading.
-    await page.waitForFunction(
-      (k) => window.sessionStorage.getItem(k) === null,
-      PENDING_KEY,
-      { timeout: 10_000 },
-    );
+    await page.waitForFunction((k) => window.sessionStorage.getItem(k) === null, PENDING_KEY, {
+      timeout: 10_000,
+    });
     await page.evaluate(async () => {
       // Mirror authStore.signOut(): clear supabase session + wipe sessionStorage.
       const mod = await import("/src/integrations/supabase/client.ts");
@@ -214,23 +195,20 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
 
     // The auth-state-change listener redirects signed-out users away from
     // protected routes. Final URL must NOT be the stashed target.
-    await page.waitForFunction(
-      (t) => !window.location.pathname.startsWith(t),
-      TARGET,
-      { timeout: 10_000 },
-    );
+    await page.waitForFunction((t) => !window.location.pathname.startsWith(t), TARGET, {
+      timeout: 10_000,
+    });
     const finalPath = new URL(page.url()).pathname;
     expect(finalPath.startsWith(TARGET)).toBe(false);
 
     // And the pending key must stay cleared — no ghost value to resurrect.
-    const pending = await page.evaluate(
-      (k) => window.sessionStorage.getItem(k),
-      PENDING_KEY,
-    );
+    const pending = await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
     expect(pending).toBeNull();
   });
 
-  test("after key is consumed, /login honors the new role-based default when the signed-in role changes", async ({ page }) => {
+  test("after key is consumed, /login honors the new role-based default when the signed-in role changes", async ({
+    page,
+  }) => {
     // Requires TWO seeded sessions with distinct role-based defaults.
     // Session A: LOVABLE_BROWSER_SUPABASE_SESSION_JSON + LOVABLE_BROWSER_DEFAULT_REDIRECT (fallback "/")
     // Session B: LOVABLE_BROWSER_SUPABASE_SESSION_JSON_B + LOVABLE_BROWSER_DEFAULT_REDIRECT_B (required)
@@ -253,10 +231,7 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     await page.goto("/login");
     await page.waitForURL(/\/dashboard(\/|$)/, { timeout: 10_000 });
     expect(new URL(page.url()).pathname).toBe("/dashboard");
-    const afterFirst = await page.evaluate(
-      (k) => window.sessionStorage.getItem(k),
-      PENDING_KEY,
-    );
+    const afterFirst = await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
     expect(afterFirst).toBeNull();
 
     // Swap the signed-in identity to role B: clear A's session, seed B.
@@ -276,24 +251,21 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
 
     // Second /login visit as role B: no stash → role B's default, not A's.
     await page.goto("/login");
-    await page.waitForFunction(
-      () => !/\/login$/.test(window.location.pathname),
-      null,
-      { timeout: 10_000 },
-    );
+    await page.waitForFunction(() => !/\/login$/.test(window.location.pathname), null, {
+      timeout: 10_000,
+    });
     const secondPath = new URL(page.url()).pathname;
     expect(secondPath).toBe(DEFAULT_B);
     expect(secondPath).not.toBe(DEFAULT_A);
 
     // And the pending key must remain cleared.
-    const pending = await page.evaluate(
-      (k) => window.sessionStorage.getItem(k),
-      PENDING_KEY,
-    );
+    const pending = await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
     expect(pending).toBeNull();
   });
 
-  test("pending redirect key consumed in tab A is not reused when login completes in tab B", async ({ browser }) => {
+  test("pending redirect key consumed in tab A is not reused when login completes in tab B", async ({
+    browser,
+  }) => {
     const TARGET = "/owner/bookings";
 
     // Shared storage state across tabs (same origin, same context).
@@ -330,10 +302,7 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     const escaped = TARGET.replace(/\//g, "\\/");
     await tabA.waitForURL(new RegExp(`${escaped}(\\/|$)`), { timeout: 10_000 });
     expect(new URL(tabA.url()).pathname).toBe(TARGET);
-    const afterA = await tabA.evaluate(
-      (k) => window.sessionStorage.getItem(k),
-      PENDING_KEY,
-    );
+    const afterA = await tabA.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
     expect(afterA).toBeNull();
 
     // Tab B now completes /login. Its own sessionStorage still holds the stale
@@ -341,37 +310,28 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     // resurrect the key, and tab B must fall through to the role-based default.
     // To simulate a well-behaved cross-tab flow, clear tab B's stash to mirror
     // the shared-intent semantics (the "intent" was already fulfilled in tab A).
-    await tabB.evaluate(
-      (k) => window.sessionStorage.removeItem(k),
-      PENDING_KEY,
-    );
+    await tabB.evaluate((k) => window.sessionStorage.removeItem(k), PENDING_KEY);
 
     await tabB.goto("/login");
-    await tabB.waitForFunction(
-      () => !/\/login$/.test(window.location.pathname),
-      null,
-      { timeout: 10_000 },
-    );
+    await tabB.waitForFunction(() => !/\/login$/.test(window.location.pathname), null, {
+      timeout: 10_000,
+    });
     const tabBPath = new URL(tabB.url()).pathname;
     expect(tabBPath).not.toBe(TARGET);
     expect(tabBPath).not.toMatch(/^\/login$/);
 
     // Neither tab should have the pending key set anymore.
-    const pendingA = await tabA.evaluate(
-      (k) => window.sessionStorage.getItem(k),
-      PENDING_KEY,
-    );
-    const pendingB = await tabB.evaluate(
-      (k) => window.sessionStorage.getItem(k),
-      PENDING_KEY,
-    );
+    const pendingA = await tabA.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
+    const pendingB = await tabB.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
     expect(pendingA).toBeNull();
     expect(pendingB).toBeNull();
 
     await context.close();
   });
 
-  test("logout then immediate re-login as a different role carries no cross-session pending redirect", async ({ page }) => {
+  test("logout then immediate re-login as a different role carries no cross-session pending redirect", async ({
+    page,
+  }) => {
     // Requires two seeded sessions with distinct role-based defaults.
     const SESSION_B = process.env.LOVABLE_BROWSER_SUPABASE_SESSION_JSON_B;
     const DEFAULT_B = process.env.LOVABLE_BROWSER_DEFAULT_REDIRECT_B;
@@ -397,21 +357,16 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     await accountMenu.waitFor({ state: "visible", timeout: 10_000 });
 
     // Sanity: stash present before logout.
-    const beforeLogout = await page.evaluate(
-      (k) => window.sessionStorage.getItem(k),
-      PENDING_KEY,
-    );
+    const beforeLogout = await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
     expect(beforeLogout).toBe(TARGET_A);
 
     // Logout via the UI — authStore.signOut() must wipe sessionStorage.
     await accountMenu.click();
     await page.getByRole("menuitem", { name: /logout/i }).click();
     await page.getByRole("button", { name: "Logout" }).click();
-    await page.waitForFunction(
-      (k) => window.sessionStorage.getItem(k) === null,
-      PENDING_KEY,
-      { timeout: 10_000 },
-    );
+    await page.waitForFunction((k) => window.sessionStorage.getItem(k) === null, PENDING_KEY, {
+      timeout: 10_000,
+    });
 
     // --- Immediate re-login as role B (different identity). ---
     // Clear any residual browser storage, then seed session B.
@@ -432,25 +387,22 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     // Visit /login as role B. With no pending key, it must land on role B's
     // default — never on role A's stashed target, never on role A's default.
     await page.goto("/login");
-    await page.waitForFunction(
-      () => !/\/login$/.test(window.location.pathname),
-      null,
-      { timeout: 10_000 },
-    );
+    await page.waitForFunction(() => !/\/login$/.test(window.location.pathname), null, {
+      timeout: 10_000,
+    });
     const landed = new URL(page.url()).pathname;
     expect(landed).toBe(DEFAULT_B);
     expect(landed).not.toBe(TARGET_A);
     expect(landed).not.toBe(DEFAULT_A);
 
     // And the pending key must remain cleared across the session swap.
-    const pending = await page.evaluate(
-      (k) => window.sessionStorage.getItem(k),
-      PENDING_KEY,
-    );
+    const pending = await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
     expect(pending).toBeNull();
   });
 
-  test("refreshing tab B after tab A consumes the key does not reuse the stale pending redirect", async ({ browser }) => {
+  test("refreshing tab B after tab A consumes the key does not reuse the stale pending redirect", async ({
+    browser,
+  }) => {
     const TARGET = "/owner/bookings";
 
     // Shared context — both tabs share localStorage (the Supabase session).
@@ -486,10 +438,7 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     const escaped = TARGET.replace(/\//g, "\\/");
     await tabA.waitForURL(new RegExp(`${escaped}(\\/|$)`), { timeout: 10_000 });
     expect(new URL(tabA.url()).pathname).toBe(TARGET);
-    const afterA = await tabA.evaluate(
-      (k) => window.sessionStorage.getItem(k),
-      PENDING_KEY,
-    );
+    const afterA = await tabA.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
     expect(afterA).toBeNull();
 
     // Now REFRESH tab B. Its sessionStorage still holds the stale target
@@ -499,47 +448,35 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     // (via BroadcastChannel / storage event) by clearing tab B's stash
     // before the reload — production code should do this on the tab-A
     // consume path. Then reload tab B and hit /login.
-    await tabB.evaluate(
-      (k) => window.sessionStorage.removeItem(k),
-      PENDING_KEY,
-    );
+    await tabB.evaluate((k) => window.sessionStorage.removeItem(k), PENDING_KEY);
     await tabB.reload({ waitUntil: "domcontentloaded" });
 
     // Sanity: after reload, no pending key resurrected.
-    const afterReload = await tabB.evaluate(
-      (k) => window.sessionStorage.getItem(k),
-      PENDING_KEY,
-    );
+    const afterReload = await tabB.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
     expect(afterReload).toBeNull();
 
     // Tab B visits /login — must fall through to the role-based default,
     // never to the stale TARGET consumed by tab A.
     await tabB.goto("/login");
-    await tabB.waitForFunction(
-      () => !/\/login$/.test(window.location.pathname),
-      null,
-      { timeout: 10_000 },
-    );
+    await tabB.waitForFunction(() => !/\/login$/.test(window.location.pathname), null, {
+      timeout: 10_000,
+    });
     const tabBPath = new URL(tabB.url()).pathname;
     expect(tabBPath).not.toBe(TARGET);
     expect(tabBPath).not.toMatch(/^\/login$/);
 
     // Pending key must still be null in both tabs.
-    const pendingA = await tabA.evaluate(
-      (k) => window.sessionStorage.getItem(k),
-      PENDING_KEY,
-    );
-    const pendingB = await tabB.evaluate(
-      (k) => window.sessionStorage.getItem(k),
-      PENDING_KEY,
-    );
+    const pendingA = await tabA.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
+    const pendingB = await tabB.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
     expect(pendingA).toBeNull();
     expect(pendingB).toBeNull();
 
     await context.close();
   });
 
-  test("browser Back after consuming the pending key does not reuse the stale target", async ({ page }) => {
+  test("browser Back after consuming the pending key does not reuse the stale target", async ({
+    page,
+  }) => {
     const TARGET = "/owner/bookings";
 
     await seedSession(page);
@@ -554,21 +491,16 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     const escaped = TARGET.replace(/\//g, "\\/");
     await page.waitForURL(new RegExp(`${escaped}(\\/|$)`), { timeout: 10_000 });
     expect(new URL(page.url()).pathname).toBe(TARGET);
-    const afterConsume = await page.evaluate(
-      (k) => window.sessionStorage.getItem(k),
-      PENDING_KEY,
-    );
+    const afterConsume = await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
     expect(afterConsume).toBeNull();
 
     // Press browser Back — previous entry is /login. If the consumer
     // resurrects the stale key, it would bounce us back to TARGET.
     // Correct behavior: /login falls through to the role-based default.
     await page.goBack();
-    await page.waitForFunction(
-      () => !/\/login$/.test(window.location.pathname),
-      null,
-      { timeout: 10_000 },
-    );
+    await page.waitForFunction(() => !/\/login$/.test(window.location.pathname), null, {
+      timeout: 10_000,
+    });
     const landed = new URL(page.url()).pathname;
     expect(landed).not.toBe(TARGET);
     expect(landed).not.toMatch(/^\/login$/);
@@ -581,15 +513,14 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
 
     // Back once more — no resurrection on subsequent navigations either.
     await page.goBack().catch(() => {});
-    const pendingFinal = await page.evaluate(
-      (k) => window.sessionStorage.getItem(k),
-      PENDING_KEY,
-    );
+    const pendingFinal = await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
     expect(pendingFinal).toBeNull();
     expect(new URL(page.url()).pathname).not.toBe(TARGET);
   });
 
-  test("browser Forward after consuming the pending key does not reuse the stale target", async ({ page }) => {
+  test("browser Forward after consuming the pending key does not reuse the stale target", async ({
+    page,
+  }) => {
     const TARGET = "/owner/bookings";
 
     await seedSession(page);
@@ -605,19 +536,14 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     const escaped = TARGET.replace(/\//g, "\\/");
     await page.waitForURL(new RegExp(`${escaped}(\\/|$)`), { timeout: 10_000 });
     expect(new URL(page.url()).pathname).toBe(TARGET);
-    const afterConsume = await page.evaluate(
-      (k) => window.sessionStorage.getItem(k),
-      PENDING_KEY,
-    );
+    const afterConsume = await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
     expect(afterConsume).toBeNull();
 
     // Go Back — should land on the role-based default (not /login, not TARGET).
     await page.goBack();
-    await page.waitForFunction(
-      () => !/\/login$/.test(window.location.pathname),
-      null,
-      { timeout: 10_000 },
-    );
+    await page.waitForFunction(() => !/\/login$/.test(window.location.pathname), null, {
+      timeout: 10_000,
+    });
     const backLanded = new URL(page.url()).pathname;
     expect(backLanded).not.toBe(TARGET);
     expect(backLanded).not.toMatch(/^\/login$/);
@@ -639,15 +565,14 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     // Forward once more (may be a no-op if history is exhausted). Either way,
     // the pending key must stay cleared and we must not be stuck on /login.
     await page.goForward().catch(() => {});
-    const pendingFinal = await page.evaluate(
-      (k) => window.sessionStorage.getItem(k),
-      PENDING_KEY,
-    );
+    const pendingFinal = await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
     expect(pendingFinal).toBeNull();
     expect(new URL(page.url()).pathname).not.toMatch(/^\/login$/);
   });
 
-  test("direct navigation to the stashed target after consume does not restore a stale pending redirect", async ({ page }) => {
+  test("direct navigation to the stashed target after consume does not restore a stale pending redirect", async ({
+    page,
+  }) => {
     const TARGET = "/owner/bookings";
 
     await seedSession(page);
@@ -661,10 +586,7 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     const escaped = TARGET.replace(/\//g, "\\/");
     await page.waitForURL(new RegExp(`${escaped}(\\/|$)`), { timeout: 10_000 });
     expect(new URL(page.url()).pathname).toBe(TARGET);
-    const afterConsume = await page.evaluate(
-      (k) => window.sessionStorage.getItem(k),
-      PENDING_KEY,
-    );
+    const afterConsume = await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
     expect(afterConsume).toBeNull();
 
     // Navigate somewhere else so the next direct hit to TARGET is a fresh nav.
@@ -692,23 +614,20 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     // Now visit /login again: with no stash, it must fall through to the
     // role-based default — NOT resurrect the previously-consumed TARGET.
     await page.goto("/login");
-    await page.waitForFunction(
-      () => !/\/login$/.test(window.location.pathname),
-      null,
-      { timeout: 10_000 },
-    );
+    await page.waitForFunction(() => !/\/login$/.test(window.location.pathname), null, {
+      timeout: 10_000,
+    });
     const landed = new URL(page.url()).pathname;
     expect(landed).not.toBe(TARGET);
     expect(landed).not.toMatch(/^\/login$/);
 
-    const pendingFinal = await page.evaluate(
-      (k) => window.sessionStorage.getItem(k),
-      PENDING_KEY,
-    );
+    const pendingFinal = await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
     expect(pendingFinal).toBeNull();
   });
 
-  test("typing the stashed target URL after consume, reloading, then hitting /login falls through to the role-based default", async ({ page }) => {
+  test("typing the stashed target URL after consume, reloading, then hitting /login falls through to the role-based default", async ({
+    page,
+  }) => {
     const TARGET = "/owner/bookings";
     const DEFAULT_A = process.env.LOVABLE_BROWSER_DEFAULT_REDIRECT ?? "/";
 
@@ -723,52 +642,32 @@ test.describe("Login — resume pending redirect (authenticated)", () => {
     const escaped = TARGET.replace(/\//g, "\\/");
     await page.waitForURL(new RegExp(`${escaped}(\\/|$)`), { timeout: 10_000 });
     expect(new URL(page.url()).pathname).toBe(TARGET);
-    expect(
-      await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY),
-    ).toBeNull();
+    expect(await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY)).toBeNull();
 
     // Simulate the user typing the same URL into the address bar. In
     // Playwright, page.goto() is the address-bar equivalent — it performs a
     // fresh navigation, not a client-side router push.
     await page.goto(TARGET, { waitUntil: "domcontentloaded" });
     expect(new URL(page.url()).pathname).toBe(TARGET);
-    expect(
-      await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY),
-    ).toBeNull();
+    expect(await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY)).toBeNull();
 
     // Reload the page — sessionStorage survives reloads, so any stale key
     // written by the guard would still be present. It must NOT be.
     await page.reload({ waitUntil: "domcontentloaded" });
     expect(new URL(page.url()).pathname).toBe(TARGET);
-    expect(
-      await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY),
-    ).toBeNull();
+    expect(await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY)).toBeNull();
 
     // Finally, visit /login. With no stash, the app must fall through to the
     // role-based default — never resurrect the previously-consumed TARGET.
     await page.goto("/login");
-    await page.waitForFunction(
-      () => !/\/login$/.test(window.location.pathname),
-      null,
-      { timeout: 10_000 },
-    );
+    await page.waitForFunction(() => !/\/login$/.test(window.location.pathname), null, {
+      timeout: 10_000,
+    });
     const landed = new URL(page.url()).pathname;
     expect(landed).toBe(DEFAULT_A);
     expect(landed).not.toBe(TARGET);
     expect(landed).not.toMatch(/^\/login$/);
 
-    expect(
-      await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY),
-    ).toBeNull();
+    expect(await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY)).toBeNull();
   });
 });
-
-
-
-
-
-
-
-
-
-

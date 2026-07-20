@@ -34,7 +34,14 @@ export type MockShop = {
   gallery_photos: string[];
   gallery_videos: { id: string; thumb: string; youtubeId: string; title: string }[];
   reviews: Review[];
-  offers: { id: string; code: string; title: string; description: string; expiry: string; discount: string }[];
+  offers: {
+    id: string;
+    code: string;
+    title: string;
+    description: string;
+    expiry: string;
+    discount: string;
+  }[];
 };
 
 const PHOTOS = [
@@ -76,33 +83,98 @@ export const MOCK_SHOP: MockShop = {
     { title: "Top 10 Salons Rajasthan", year: 2022 },
   ],
   policies: [
-    { title: "Cancellation", body: "Free cancellation up to 4 hours before your slot. Within 4 hours, 50% of service price is charged." },
-    { title: "Refund", body: "Prepaid amounts are refunded to the original payment method within 5–7 business days." },
-    { title: "Hygiene", body: "All tools are sterilised between clients. Single-use blades and disposable towels are used as standard." },
-    { title: "Children", body: "Children under 10 must be accompanied by an adult. Kids' chair available on request." },
+    {
+      title: "Cancellation",
+      body: "Free cancellation up to 4 hours before your slot. Within 4 hours, 50% of service price is charged.",
+    },
+    {
+      title: "Refund",
+      body: "Prepaid amounts are refunded to the original payment method within 5–7 business days.",
+    },
+    {
+      title: "Hygiene",
+      body: "All tools are sterilised between clients. Single-use blades and disposable towels are used as standard.",
+    },
+    {
+      title: "Children",
+      body: "Children under 10 must be accompanied by an adult. Kids' chair available on request.",
+    },
   ],
   faqs: [
-    { q: "Do you accept walk-ins?", a: "Yes, but we strongly recommend booking ahead — weekend slots fill quickly." },
-    { q: "Do you offer home service?", a: "Yes, select services are available at home within Jaipur for an additional travel fee." },
-    { q: "Which brands do you use?", a: "We exclusively use L'Oréal Professionnel, Wella, Olaplex, and Schwarzkopf." },
-    { q: "Is parking available?", a: "Yes, complimentary valet parking is offered to all clients." },
-    { q: "Are stylists trained for curly hair?", a: "Absolutely — three of our senior stylists specialise in textured and curly hair." },
+    {
+      q: "Do you accept walk-ins?",
+      a: "Yes, but we strongly recommend booking ahead — weekend slots fill quickly.",
+    },
+    {
+      q: "Do you offer home service?",
+      a: "Yes, select services are available at home within Jaipur for an additional travel fee.",
+    },
+    {
+      q: "Which brands do you use?",
+      a: "We exclusively use L'Oréal Professionnel, Wella, Olaplex, and Schwarzkopf.",
+    },
+    {
+      q: "Is parking available?",
+      a: "Yes, complimentary valet parking is offered to all clients.",
+    },
+    {
+      q: "Are stylists trained for curly hair?",
+      a: "Absolutely — three of our senior stylists specialise in textured and curly hair.",
+    },
   ],
   service_categories: [
     {
       name: "Hair",
       items: [
-        { id: "s1", name: "Haircut & Style — Women", duration_minutes: 60, price: 1200, offer_price: 999, description: "Consult, shampoo, precision cut & blow-dry" },
-        { id: "s2", name: "Haircut — Men", duration_minutes: 30, price: 600, offer_price: null, description: "Scissor cut with beard trim" },
-        { id: "s3", name: "Global Hair Colour", duration_minutes: 120, price: 4500, offer_price: 3999 },
-        { id: "s4", name: "Keratin Smoothening", duration_minutes: 180, price: 8000, offer_price: null },
+        {
+          id: "s1",
+          name: "Haircut & Style — Women",
+          duration_minutes: 60,
+          price: 1200,
+          offer_price: 999,
+          description: "Consult, shampoo, precision cut & blow-dry",
+        },
+        {
+          id: "s2",
+          name: "Haircut — Men",
+          duration_minutes: 30,
+          price: 600,
+          offer_price: null,
+          description: "Scissor cut with beard trim",
+        },
+        {
+          id: "s3",
+          name: "Global Hair Colour",
+          duration_minutes: 120,
+          price: 4500,
+          offer_price: 3999,
+        },
+        {
+          id: "s4",
+          name: "Keratin Smoothening",
+          duration_minutes: 180,
+          price: 8000,
+          offer_price: null,
+        },
       ],
     },
     {
       name: "Skin & Facial",
       items: [
-        { id: "s5", name: "Hydra Glow Facial", duration_minutes: 75, price: 2500, offer_price: 1999 },
-        { id: "s6", name: "Anti-Ageing Facial", duration_minutes: 90, price: 3500, offer_price: null },
+        {
+          id: "s5",
+          name: "Hydra Glow Facial",
+          duration_minutes: 75,
+          price: 2500,
+          offer_price: 1999,
+        },
+        {
+          id: "s6",
+          name: "Anti-Ageing Facial",
+          duration_minutes: 90,
+          price: 3500,
+          offer_price: null,
+        },
         { id: "s7", name: "Express Clean-up", duration_minutes: 30, price: 800, offer_price: null },
       ],
     },
@@ -110,14 +182,32 @@ export const MOCK_SHOP: MockShop = {
       name: "Nails",
       items: [
         { id: "s8", name: "Gel Manicure", duration_minutes: 45, price: 1200, offer_price: null },
-        { id: "s9", name: "Nail Art (per finger)", duration_minutes: 15, price: 150, offer_price: null },
+        {
+          id: "s9",
+          name: "Nail Art (per finger)",
+          duration_minutes: 15,
+          price: 150,
+          offer_price: null,
+        },
       ],
     },
     {
       name: "Spa & Massage",
       items: [
-        { id: "s10", name: "Aromatherapy Massage", duration_minutes: 60, price: 2200, offer_price: 1899 },
-        { id: "s11", name: "Head & Shoulder Spa", duration_minutes: 30, price: 800, offer_price: null },
+        {
+          id: "s10",
+          name: "Aromatherapy Massage",
+          duration_minutes: 60,
+          price: 2200,
+          offer_price: 1899,
+        },
+        {
+          id: "s11",
+          name: "Head & Shoulder Spa",
+          duration_minutes: 30,
+          price: 800,
+          offer_price: null,
+        },
       ],
     },
   ],
@@ -179,9 +269,24 @@ export const MOCK_SHOP: MockShop = {
     "https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=1200&q=80",
   ],
   gallery_videos: [
-    { id: "v1", thumb: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg", youtubeId: "dQw4w9WgXcQ", title: "Bridal transformation reel" },
-    { id: "v2", thumb: "https://img.youtube.com/vi/ScMzIvxBSi4/hqdefault.jpg", youtubeId: "ScMzIvxBSi4", title: "Behind the scenes" },
-    { id: "v3", thumb: "https://img.youtube.com/vi/aqz-KE-bpKQ/hqdefault.jpg", youtubeId: "aqz-KE-bpKQ", title: "Hair colour masterclass" },
+    {
+      id: "v1",
+      thumb: "https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+      youtubeId: "dQw4w9WgXcQ",
+      title: "Bridal transformation reel",
+    },
+    {
+      id: "v2",
+      thumb: "https://img.youtube.com/vi/ScMzIvxBSi4/hqdefault.jpg",
+      youtubeId: "ScMzIvxBSi4",
+      title: "Behind the scenes",
+    },
+    {
+      id: "v3",
+      thumb: "https://img.youtube.com/vi/aqz-KE-bpKQ/hqdefault.jpg",
+      youtubeId: "aqz-KE-bpKQ",
+      title: "Hair colour masterclass",
+    },
   ],
   reviews: [
     {
@@ -193,7 +298,11 @@ export const MOCK_SHOP: MockShop = {
       text: "Aanya gave me the most beautiful balayage I've ever had. The salon is spotless and everyone made me feel like a VIP from the moment I walked in. Will definitely be back!",
       photos: [PHOTOS[1], PHOTOS[2]],
       helpful_count: 24,
-      owner_reply: { author: "Owner", date: "1 day ago", text: "Thank you Meera! Aanya will be thrilled. See you soon ❤️" },
+      owner_reply: {
+        author: "Owner",
+        date: "1 day ago",
+        text: "Thank you Meera! Aanya will be thrilled. See you soon ❤️",
+      },
     },
     {
       id: "r2",
@@ -219,8 +328,29 @@ export const MOCK_SHOP: MockShop = {
     },
   ],
   offers: [
-    { id: "o1", code: "FIRST20", title: "20% off your first visit", description: "Valid on all hair services for new customers", expiry: "31 Dec 2026", discount: "20%" },
-    { id: "o2", code: "GLOW999", title: "Hydra Facial @ ₹999", description: "Limited slots every Tuesday & Wednesday", expiry: "15 Jul 2026", discount: "₹1000 off" },
-    { id: "o3", code: "BRIDE25", title: "Bridal package — 25% off", description: "Book hair + makeup + skin together", expiry: "30 Sep 2026", discount: "25%" },
+    {
+      id: "o1",
+      code: "FIRST20",
+      title: "20% off your first visit",
+      description: "Valid on all hair services for new customers",
+      expiry: "31 Dec 2026",
+      discount: "20%",
+    },
+    {
+      id: "o2",
+      code: "GLOW999",
+      title: "Hydra Facial @ ₹999",
+      description: "Limited slots every Tuesday & Wednesday",
+      expiry: "15 Jul 2026",
+      discount: "₹1000 off",
+    },
+    {
+      id: "o3",
+      code: "BRIDE25",
+      title: "Bridal package — 25% off",
+      description: "Book hair + makeup + skin together",
+      expiry: "30 Sep 2026",
+      discount: "25%",
+    },
   ],
 };

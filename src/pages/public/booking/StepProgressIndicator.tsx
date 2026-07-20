@@ -25,8 +25,7 @@ export function StepProgressIndicator({ active }: { active: BookingStepIndex }) 
                 className={cn(
                   "relative grid h-9 w-9 place-items-center rounded-full text-sm font-bold transition",
                   isComplete && "bg-primary text-primary-foreground",
-                  isActive &&
-                    "bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]",
+                  isActive && "bg-gradient-cta text-primary-foreground shadow-[var(--shadow-glow)]",
                   !isComplete && !isActive && "bg-muted text-muted-foreground",
                 )}
               >

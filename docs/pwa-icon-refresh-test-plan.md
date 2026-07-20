@@ -21,11 +21,11 @@ without any manual cache clear.
 
 Run all with `bunx playwright test` (dev server on `:8080`).
 
-| Test file | What it proves |
-| --- | --- |
-| `e2e/pwa-icon-refresh.spec.ts` | Favicon `<link>`s and every manifest icon use content-addressed CDN URLs, resolve 200, are `immutable`; manifest itself revalidates; SW does not rewrite icon headers; a tampered UUID does not resolve. |
+| Test file                       | What it proves                                                                                                                                                                                                        |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `e2e/pwa-icon-refresh.spec.ts`  | Favicon `<link>`s and every manifest icon use content-addressed CDN URLs, resolve 200, are `immutable`; manifest itself revalidates; SW does not rewrite icon headers; a tampered UUID does not resolve.              |
 | `e2e/pwa-icon-redeploy.spec.ts` | Simulates a redeploy by intercepting `/manifest.webmanifest` and rewriting every icon UUID. Confirms the browser re-fetches the manifest, receives the new UUIDs, and never surfaces the old UUID after the "deploy". |
-| `e2e/pwa-published.spec.ts` | Sanity: production build serves the manifest + kill-switch SW. |
+| `e2e/pwa-published.spec.ts`     | Sanity: production build serves the manifest + kill-switch SW.                                                                                                                                                        |
 
 ## Manual smoke test (post-deploy)
 

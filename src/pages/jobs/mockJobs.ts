@@ -1,5 +1,12 @@
 export type JobType = "Full-time" | "Part-time" | "Contract" | "Freelance";
-export type JobCategory = "Stylist" | "Barber" | "Beautician" | "Spa Therapist" | "Nail Artist" | "Manager" | "Receptionist";
+export type JobCategory =
+  | "Stylist"
+  | "Barber"
+  | "Beautician"
+  | "Spa Therapist"
+  | "Nail Artist"
+  | "Manager"
+  | "Receptionist";
 
 export interface Job {
   id: string;
@@ -21,7 +28,15 @@ export interface Job {
 }
 
 export const MOCK_JOBS: Job[] = Array.from({ length: 12 }).map((_, i) => {
-  const cats: JobCategory[] = ["Stylist", "Barber", "Beautician", "Spa Therapist", "Nail Artist", "Manager", "Receptionist"];
+  const cats: JobCategory[] = [
+    "Stylist",
+    "Barber",
+    "Beautician",
+    "Spa Therapist",
+    "Nail Artist",
+    "Manager",
+    "Receptionist",
+  ];
   const cat = cats[i % cats.length];
   const types: JobType[] = ["Full-time", "Part-time", "Contract", "Freelance"];
   return {
@@ -36,8 +51,13 @@ export const MOCK_JOBS: Job[] = Array.from({ length: 12 }).map((_, i) => {
     experience: `${1 + (i % 5)}–${3 + (i % 5)} yrs`,
     postedDays: (i % 7) + 1,
     applicants: 4 + i * 3,
-    description: "We're looking for passionate professionals to join our growing team in a fast-paced, premium salon environment.",
-    responsibilities: ["Deliver excellent client service", "Maintain hygiene & safety standards", "Drive upsells & retention"],
+    description:
+      "We're looking for passionate professionals to join our growing team in a fast-paced, premium salon environment.",
+    responsibilities: [
+      "Deliver excellent client service",
+      "Maintain hygiene & safety standards",
+      "Drive upsells & retention",
+    ],
     requirements: ["Relevant certification", "Customer-first mindset", "Team player"],
     benefits: ["Health insurance", "Performance bonus", "Paid training", "Staff discounts"],
   };
@@ -55,7 +75,8 @@ export interface Applicant {
 
 export const MOCK_APPLICANTS: Applicant[] = Array.from({ length: 14 }).map((_, i) => ({
   id: `app-${i + 1}`,
-  name: ["Aarav M.", "Priya S.", "Rohan I.", "Sneha R.", "Kabir D.", "Anaya P."][i % 6] + ` ${i + 1}`,
+  name:
+    ["Aarav M.", "Priya S.", "Rohan I.", "Sneha R.", "Kabir D.", "Anaya P."][i % 6] + ` ${i + 1}`,
   city: ["Mumbai", "Delhi", "Bangalore"][i % 3],
   experience: `${1 + (i % 6)} yrs`,
   stage: (["Applied", "Screening", "Interview", "Offer", "Hired", "Rejected"] as const)[i % 6],

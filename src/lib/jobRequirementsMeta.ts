@@ -20,7 +20,10 @@ export function stripRequirementsMeta(raw: string | null | undefined): string {
   if (!raw) return "";
   const keys = Object.values(REQ_META_KEYS).join("|");
   const re = new RegExp(`^\\s*(?:${keys}):\\s*.+$`, "gmi");
-  return raw.replace(re, "").replace(/\n{3,}/g, "\n\n").trim();
+  return raw
+    .replace(re, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }
 
 export function parseRequirementsMeta(raw: string | null | undefined): {
@@ -36,16 +39,21 @@ export function parseRequirementsMeta(raw: string | null | undefined): {
     screening: [] as ScreeningQuestion[],
   };
   if (!raw) return out;
-  const certM = raw.match(/^\s*Certification:\s*(.+)$/mi);
+  const certM = raw.match(/^\s*Certification:\s*(.+)$/im);
   if (certM) out.certification = certM[1].trim();
-  const langM = raw.match(/^\s*Languages:\s*(.+)$/mi);
-  if (langM) out.languages = langM[1].split(",").map((s) => s.trim()).filter(Boolean);
-  const portM = raw.match(/^\s*Portfolio:\s*(.+)$/mi);
+  const langM = raw.match(/^\s*Languages:\s*(.+)$/im);
+  if (langM)
+    out.languages = langM[1]
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  const portM = raw.match(/^\s*Portfolio:\s*(.+)$/im);
   if (portM) {
     const val = portM[1].trim();
-    if ((PORTFOLIO_OPTIONS as readonly string[]).includes(val)) out.portfolio = val as PortfolioOption;
+    if ((PORTFOLIO_OPTIONS as readonly string[]).includes(val))
+      out.portfolio = val as PortfolioOption;
   }
-  const screenM = raw.match(/^\s*Screening:\s*(.+)$/mi);
+  const screenM = raw.match(/^\s*Screening:\s*(.+)$/im);
   if (screenM) {
     try {
       const parsed = JSON.parse(screenM[1].trim());
@@ -54,7 +62,9 @@ export function parseRequirementsMeta(raw: string | null | undefined): {
           .filter((x) => x && typeof x.q === "string" && typeof x.t === "string")
           .map((x) => ({
             q: String(x.q),
-            t: (["short", "long", "yesno", "number"].includes(x.t) ? x.t : "short") as ScreeningQuestionType,
+            t: (["short", "long", "yesno", "number"].includes(x.t)
+              ? x.t
+              : "short") as ScreeningQuestionType,
           }));
       }
     } catch {}

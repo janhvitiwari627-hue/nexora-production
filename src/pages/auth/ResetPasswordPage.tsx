@@ -59,7 +59,11 @@ export default function ResetPasswordPage() {
           const { data, error } = await supabase.auth.getSession();
           if (error) {
             const lower = error.message.toLowerCase();
-            if (lower.includes("refresh token") || lower.includes("invalid") || lower.includes("expired")) {
+            if (
+              lower.includes("refresh token") ||
+              lower.includes("invalid") ||
+              lower.includes("expired")
+            ) {
               await supabase.auth.signOut({ scope: "local" }).catch(() => {});
               break;
             }
@@ -104,7 +108,11 @@ export default function ResetPasswordPage() {
       const { error: err } = await supabase.auth.updateUser({ password });
       if (err) {
         const lower = err.message.toLowerCase();
-        if (lower.includes("refresh token") || lower.includes("token") || lower.includes("session")) {
+        if (
+          lower.includes("refresh token") ||
+          lower.includes("token") ||
+          lower.includes("session")
+        ) {
           setHasRecovery(false);
           setError(null);
         } else {
@@ -133,9 +141,7 @@ export default function ResetPasswordPage() {
           {hasRecovery === false ? (
             <div className="space-y-3">
               <Alert variant="destructive">
-                <AlertDescription>
-                  {RECOVERY_ERROR_MESSAGE}
-                </AlertDescription>
+                <AlertDescription>{RECOVERY_ERROR_MESSAGE}</AlertDescription>
               </Alert>
               <Button className="w-full" onClick={() => navigate({ to: "/forgot-password" })}>
                 Request New Link
@@ -144,7 +150,9 @@ export default function ResetPasswordPage() {
           ) : done ? (
             <Alert>
               <CheckCircle2 className="h-4 w-4" />
-              <AlertDescription>Password updated successfully. Redirecting to sign in…</AlertDescription>
+              <AlertDescription>
+                Password updated successfully. Redirecting to sign in…
+              </AlertDescription>
             </Alert>
           ) : hasRecovery === null ? (
             <div className="flex flex-col items-center py-8 text-center text-muted-foreground">

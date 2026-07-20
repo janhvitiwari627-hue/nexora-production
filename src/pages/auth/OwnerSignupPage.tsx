@@ -17,7 +17,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PasswordStrengthIndicator, scorePassword } from "@/components/auth/PasswordStrengthIndicator";
+import {
+  PasswordStrengthIndicator,
+  scorePassword,
+} from "@/components/auth/PasswordStrengthIndicator";
 import { BackButton } from "@/components/shared/BackButton";
 
 const CATEGORIES = [
@@ -33,31 +36,33 @@ const CATEGORIES = [
   "Other",
 ];
 
-const schema = z.object({
-  full_name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
-  email: z.string().trim().email("Invalid email").max(255),
-  mobile: z
-    .string()
-    .trim()
-    .min(1, "Mobile number is required")
-    .transform((v) => v.replace(/[\s-]/g, ""))
-    .pipe(z.string().regex(/^(\+91)?[6-9]\d{9}$/, "Enter a valid 10-digit mobile number")),
-  password: z.string().min(8, "Password must be at least 8 characters").max(72),
-  confirm_password: z.string().min(1, "Confirm your password"),
-  business_name: z.string().trim().min(2, "Business name is required").max(120),
-  business_category: z.string().min(1, "Select a category"),
-  city: z.string().trim().min(2, "City is required").max(80),
-  area: z.string().trim().min(2, "Area is required").max(120),
-  whatsapp: z
-    .string()
-    .trim()
-    .min(1, "WhatsApp number is required")
-    .transform((v) => v.replace(/[\s-]/g, ""))
-    .pipe(z.string().regex(/^(\+91)?[6-9]\d{9}$/, "Enter a valid 10-digit WhatsApp number")),
-}).refine((d) => d.password === d.confirm_password, {
-  path: ["confirm_password"],
-  message: "Passwords do not match",
-});
+const schema = z
+  .object({
+    full_name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
+    email: z.string().trim().email("Invalid email").max(255),
+    mobile: z
+      .string()
+      .trim()
+      .min(1, "Mobile number is required")
+      .transform((v) => v.replace(/[\s-]/g, ""))
+      .pipe(z.string().regex(/^(\+91)?[6-9]\d{9}$/, "Enter a valid 10-digit mobile number")),
+    password: z.string().min(8, "Password must be at least 8 characters").max(72),
+    confirm_password: z.string().min(1, "Confirm your password"),
+    business_name: z.string().trim().min(2, "Business name is required").max(120),
+    business_category: z.string().min(1, "Select a category"),
+    city: z.string().trim().min(2, "City is required").max(80),
+    area: z.string().trim().min(2, "Area is required").max(120),
+    whatsapp: z
+      .string()
+      .trim()
+      .min(1, "WhatsApp number is required")
+      .transform((v) => v.replace(/[\s-]/g, ""))
+      .pipe(z.string().regex(/^(\+91)?[6-9]\d{9}$/, "Enter a valid 10-digit WhatsApp number")),
+  })
+  .refine((d) => d.password === d.confirm_password, {
+    path: ["confirm_password"],
+    message: "Passwords do not match",
+  });
 
 function parseErr(error: unknown): string {
   if (!error) return "Something went wrong. Please try again.";
@@ -161,12 +166,12 @@ export default function OwnerSignupPage() {
         },
       });
 
-
       if (error) {
         const raw = parseErr(error);
         let msg = raw;
         if (/already registered|already exists/i.test(raw)) {
-          msg = "Email already registered. Please sign in and contact support to request owner access.";
+          msg =
+            "Email already registered. Please sign in and contact support to request owner access.";
         } else if (/weak password|pwned|breach/i.test(raw)) {
           msg = "Password is too weak or commonly used. Choose a stronger one.";
         } else if (/rate limit|too many/i.test(raw)) {
@@ -231,7 +236,6 @@ export default function OwnerSignupPage() {
     }
   };
 
-
   if (success) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12">
@@ -251,7 +255,11 @@ export default function OwnerSignupPage() {
               <Button className="w-full" onClick={() => navigate({ to: "/" })}>
                 Back to home
               </Button>
-              <Button variant="outline" className="w-full" onClick={() => navigate({ to: "/login" })}>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => navigate({ to: "/login" })}
+              >
                 Go to Sign in
               </Button>
             </CardContent>
@@ -276,143 +284,195 @@ export default function OwnerSignupPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-          {typeof serverError === "string" && serverError.trim().length > 0 && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertDescription>{serverError.trim()}</AlertDescription>
-            </Alert>
-          )}
+            {typeof serverError === "string" && serverError.trim().length > 0 && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertDescription>{serverError.trim()}</AlertDescription>
+              </Alert>
+            )}
 
-          {referredBy && (
-            <Alert className="mb-4 border-primary/20 bg-primary/5">
-              <AlertDescription className="text-sm">
-                Joining with referral code <strong className="font-mono">{referredBy}</strong>.
-                <span className="block text-xs text-muted-foreground mt-0.5">Referral rewards will be activated soon.</span>
-              </AlertDescription>
-            </Alert>
-          )}
+            {referredBy && (
+              <Alert className="mb-4 border-primary/20 bg-primary/5">
+                <AlertDescription className="text-sm">
+                  Joining with referral code <strong className="font-mono">{referredBy}</strong>.
+                  <span className="block text-xs text-muted-foreground mt-0.5">
+                    Referral rewards will be activated soon.
+                  </span>
+                </AlertDescription>
+              </Alert>
+            )}
 
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="full_name">Owner full name</Label>
-              <Input id="full_name" value={form.full_name} onChange={update("full_name")} disabled={submitting} />
-              {errors.full_name && <p className="text-xs text-destructive">{errors.full_name}</p>}
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" autoComplete="email" value={form.email} onChange={update("email")} disabled={submitting} />
-              {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="mobile">Phone</Label>
-              <Input id="mobile" type="tel" autoComplete="tel" placeholder="+91 9876543210" value={form.mobile} onChange={update("mobile")} disabled={submitting} />
-              {errors.mobile && <p className="text-xs text-destructive">{errors.mobile}</p>}
-            </div>
-
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label htmlFor="full_name">Owner full name</Label>
                 <Input
-                  id="password"
-                  type={showPw ? "text" : "password"}
-                  autoComplete="new-password"
-                  value={form.password}
-                  onChange={update("password")}
+                  id="full_name"
+                  value={form.full_name}
+                  onChange={update("full_name")}
                   disabled={submitting}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPw((s) => !s)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
-                  tabIndex={-1}
-                >
-                  {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
+                {errors.full_name && <p className="text-xs text-destructive">{errors.full_name}</p>}
               </div>
-              {form.password && <PasswordStrengthIndicator password={form.password} />}
-              {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
-            </div>
 
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="confirm_password">Confirm password</Label>
-              <Input
-                id="confirm_password"
-                type={showPw ? "text" : "password"}
-                autoComplete="new-password"
-                value={form.confirm_password}
-                onChange={update("confirm_password")}
-                disabled={submitting}
-              />
-              {errors.confirm_password && <p className="text-xs text-destructive">{errors.confirm_password}</p>}
-            </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  value={form.email}
+                  onChange={update("email")}
+                  disabled={submitting}
+                />
+                {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+              </div>
 
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="business_name">Business name</Label>
-              <Input id="business_name" value={form.business_name} onChange={update("business_name")} disabled={submitting} />
-              {errors.business_name && <p className="text-xs text-destructive">{errors.business_name}</p>}
-            </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="mobile">Phone</Label>
+                <Input
+                  id="mobile"
+                  type="tel"
+                  autoComplete="tel"
+                  placeholder="+91 9876543210"
+                  value={form.mobile}
+                  onChange={update("mobile")}
+                  disabled={submitting}
+                />
+                {errors.mobile && <p className="text-xs text-destructive">{errors.mobile}</p>}
+              </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="business_category">Business category</Label>
-              <Select
-                value={form.business_category}
-                onValueChange={(v) => {
-                  setForm((f) => ({ ...f, business_category: v }));
-                  if (errors.business_category) setErrors((p) => ({ ...p, business_category: "" }));
-                }}
-                disabled={submitting}
-              >
-                <SelectTrigger id="business_category">
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {CATEGORIES.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.business_category && <p className="text-xs text-destructive">{errors.business_category}</p>}
-            </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPw ? "text" : "password"}
+                    autoComplete="new-password"
+                    value={form.password}
+                    onChange={update("password")}
+                    disabled={submitting}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPw((s) => !s)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    tabIndex={-1}
+                  >
+                    {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                {form.password && <PasswordStrengthIndicator password={form.password} />}
+                {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
+              </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="whatsapp">WhatsApp number</Label>
-              <Input id="whatsapp" type="tel" placeholder="+91 9876543210" value={form.whatsapp} onChange={update("whatsapp")} disabled={submitting} />
-              {errors.whatsapp && <p className="text-xs text-destructive">{errors.whatsapp}</p>}
-            </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label htmlFor="confirm_password">Confirm password</Label>
+                <Input
+                  id="confirm_password"
+                  type={showPw ? "text" : "password"}
+                  autoComplete="new-password"
+                  value={form.confirm_password}
+                  onChange={update("confirm_password")}
+                  disabled={submitting}
+                />
+                {errors.confirm_password && (
+                  <p className="text-xs text-destructive">{errors.confirm_password}</p>
+                )}
+              </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="city">City</Label>
-              <Input id="city" value={form.city} onChange={update("city")} disabled={submitting} />
-              {errors.city && <p className="text-xs text-destructive">{errors.city}</p>}
-            </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label htmlFor="business_name">Business name</Label>
+                <Input
+                  id="business_name"
+                  value={form.business_name}
+                  onChange={update("business_name")}
+                  disabled={submitting}
+                />
+                {errors.business_name && (
+                  <p className="text-xs text-destructive">{errors.business_name}</p>
+                )}
+              </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="area">Area / Locality</Label>
-              <Input id="area" value={form.area} onChange={update("area")} disabled={submitting} />
-              {errors.area && <p className="text-xs text-destructive">{errors.area}</p>}
-            </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="business_category">Business category</Label>
+                <Select
+                  value={form.business_category}
+                  onValueChange={(v) => {
+                    setForm((f) => ({ ...f, business_category: v }));
+                    if (errors.business_category)
+                      setErrors((p) => ({ ...p, business_category: "" }));
+                  }}
+                  disabled={submitting}
+                >
+                  <SelectTrigger id="business_category">
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CATEGORIES.map((c) => (
+                      <SelectItem key={c} value={c}>
+                        {c}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.business_category && (
+                  <p className="text-xs text-destructive">{errors.business_category}</p>
+                )}
+              </div>
 
-            <div className="sm:col-span-2">
-              <Button type="submit" className="w-full" disabled={submitting}>
-                {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Submit owner request
-              </Button>
-              <p className="mt-3 text-center text-xs text-muted-foreground">
-                Owner access activates only after admin verification. Until then your account works as a customer.
-              </p>
-              <p className="mt-3 text-center text-sm text-muted-foreground">
-                Already have an account?{" "}
-                <Link to="/login" className="text-primary font-medium hover:underline">
-                  Sign in
-                </Link>
-              </p>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+              <div className="space-y-1.5">
+                <Label htmlFor="whatsapp">WhatsApp number</Label>
+                <Input
+                  id="whatsapp"
+                  type="tel"
+                  placeholder="+91 9876543210"
+                  value={form.whatsapp}
+                  onChange={update("whatsapp")}
+                  disabled={submitting}
+                />
+                {errors.whatsapp && <p className="text-xs text-destructive">{errors.whatsapp}</p>}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="city">City</Label>
+                <Input
+                  id="city"
+                  value={form.city}
+                  onChange={update("city")}
+                  disabled={submitting}
+                />
+                {errors.city && <p className="text-xs text-destructive">{errors.city}</p>}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="area">Area / Locality</Label>
+                <Input
+                  id="area"
+                  value={form.area}
+                  onChange={update("area")}
+                  disabled={submitting}
+                />
+                {errors.area && <p className="text-xs text-destructive">{errors.area}</p>}
+              </div>
+
+              <div className="sm:col-span-2">
+                <Button type="submit" className="w-full" disabled={submitting}>
+                  {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Submit owner request
+                </Button>
+                <p className="mt-3 text-center text-xs text-muted-foreground">
+                  Owner access activates only after admin verification. Until then your account
+                  works as a customer.
+                </p>
+                <p className="mt-3 text-center text-sm text-muted-foreground">
+                  Already have an account?{" "}
+                  <Link to="/login" className="text-primary font-medium hover:underline">
+                    Sign in
+                  </Link>
+                </p>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

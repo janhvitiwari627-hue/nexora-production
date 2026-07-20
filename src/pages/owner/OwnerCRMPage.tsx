@@ -67,7 +67,8 @@ export function OwnerCRMPage() {
   const toggleOne = (id: string, checked: boolean) => {
     setSelected((prev) => {
       const n = new Set(prev);
-      if (checked) n.add(id); else n.delete(id);
+      if (checked) n.add(id);
+      else n.delete(id);
       return n;
     });
   };
@@ -82,14 +83,19 @@ export function OwnerCRMPage() {
 
   const bulkAddTag = (tag: CustomerTag) => {
     setCustomers((prev) =>
-      prev.map((c) => (selected.has(c.id) && !c.tags.includes(tag) ? { ...c, tags: [...c.tags, tag] } : c)),
+      prev.map((c) =>
+        selected.has(c.id) && !c.tags.includes(tag) ? { ...c, tags: [...c.tags, tag] } : c,
+      ),
     );
   };
 
   const allFilteredSelected = filtered.length > 0 && filtered.every((c) => selected.has(c.id));
 
   const counts = useMemo(() => {
-    const c: Record<string, number> = { all: customers.length, lost_60: customers.filter(isLostCustomer).length };
+    const c: Record<string, number> = {
+      all: customers.length,
+      lost_60: customers.filter(isLostCustomer).length,
+    };
     for (const x of customers) for (const t of x.tags) c[t] = (c[t] || 0) + 1;
     return c;
   }, [customers]);
@@ -100,7 +106,8 @@ export function OwnerCRMPage() {
         <header>
           <h1 className="text-heading text-2xl font-bold">Customer CRM</h1>
           <p className="text-muted-foreground text-sm">
-            {customers.length} customers · {counts.lost_60 ?? 0} at risk · {customers.filter(isBirthdayThisMonth).length} birthdays this month
+            {customers.length} customers · {counts.lost_60 ?? 0} at risk ·{" "}
+            {customers.filter(isBirthdayThisMonth).length} birthdays this month
           </p>
         </header>
 
@@ -120,10 +127,12 @@ export function OwnerCRMPage() {
                 )}
               >
                 {f.label}
-                <span className={cn(
-                  "rounded-full px-1.5 py-0.5 text-[10px]",
-                  active ? "bg-primary-foreground/20" : "bg-muted text-muted-foreground",
-                )}>
+                <span
+                  className={cn(
+                    "rounded-full px-1.5 py-0.5 text-[10px]",
+                    active ? "bg-primary-foreground/20" : "bg-muted text-muted-foreground",
+                  )}
+                >
                   {counts[f.key] ?? 0}
                 </span>
               </button>
@@ -142,9 +151,7 @@ export function OwnerCRMPage() {
               className="pl-9"
             />
           </div>
-          <span className="text-muted-foreground text-xs">
-            {selected.size} selected
-          </span>
+          <span className="text-muted-foreground text-xs">{selected.size} selected</span>
           <Button
             size="sm"
             variant="outline"
@@ -153,11 +160,7 @@ export function OwnerCRMPage() {
           >
             <TagIcon className="h-4 w-4" /> Tag as VIP
           </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            disabled={selected.size === 0}
-          >
+          <Button size="sm" variant="outline" disabled={selected.size === 0}>
             <Megaphone className="h-4 w-4" /> Create Campaign
           </Button>
           <Button
@@ -209,25 +212,43 @@ export function OwnerCRMPage() {
                       <div>
                         <div className="text-heading inline-flex items-center gap-1.5 font-medium">
                           {c.name}
-                          {isBirthdayThisMonth(c) && <Cake className="text-warning h-3.5 w-3.5" aria-label="Birthday this month" />}
+                          {isBirthdayThisMonth(c) && (
+                            <Cake
+                              className="text-warning h-3.5 w-3.5"
+                              aria-label="Birthday this month"
+                            />
+                          )}
                         </div>
                         {c.email && <div className="text-muted-foreground text-xs">{c.email}</div>}
                       </div>
                     </div>
                   </TableCell>
                   <TableCell className="text-sm">
-                    <a href={`tel:${c.mobile}`} className="hover:text-primary">{c.mobile}</a>
+                    <a href={`tel:${c.mobile}`} className="hover:text-primary">
+                      {c.mobile}
+                    </a>
                   </TableCell>
                   <TableCell className="text-sm">
                     {c.lastVisit}
-                    <div className="text-muted-foreground text-xs">{daysSince(c.lastVisit)}d ago</div>
+                    <div className="text-muted-foreground text-xs">
+                      {daysSince(c.lastVisit)}d ago
+                    </div>
                   </TableCell>
                   <TableCell className="text-sm">{c.totalVisits}</TableCell>
-                  <TableCell className="text-sm font-semibold">₹{c.lifetimeSpend.toLocaleString()}</TableCell>
+                  <TableCell className="text-sm font-semibold">
+                    ₹{c.lifetimeSpend.toLocaleString()}
+                  </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
                       {c.tags.map((t) => (
-                        <span key={t} className={cn("rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase", TAG_META[t].bg, TAG_META[t].text)}>
+                        <span
+                          key={t}
+                          className={cn(
+                            "rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase",
+                            TAG_META[t].bg,
+                            TAG_META[t].text,
+                          )}
+                        >
                           {TAG_META[t].label}
                         </span>
                       ))}
@@ -244,7 +265,12 @@ export function OwnerCRMPage() {
                       >
                         <MessageCircle className="h-4 w-4" />
                       </a>
-                      <Button size="icon" variant="ghost" onClick={() => setActive(c)} aria-label="View">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => setActive(c)}
+                        aria-label="View"
+                      >
                         <Eye className="h-4 w-4" />
                       </Button>
                     </div>
@@ -273,7 +299,8 @@ export function OwnerCRMPage() {
       >
         <div className="space-y-4 p-6">
           <p className="text-muted-foreground text-sm">
-            Your message will be sent to {selected.size} selected customers via WhatsApp Business API.
+            Your message will be sent to {selected.size} selected customers via WhatsApp Business
+            API.
           </p>
           <WhatsAppComposer onSend={() => setBroadcastOpen(false)} />
         </div>

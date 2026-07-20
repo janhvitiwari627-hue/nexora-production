@@ -1,5 +1,17 @@
 import { motion } from "framer-motion";
-import { ArrowDownToLine, Building2, CalendarClock, CheckCircle2, Clock, CircleDollarSign, Download, Info, Landmark, ShieldAlert, Wallet } from "lucide-react";
+import {
+  ArrowDownToLine,
+  Building2,
+  CalendarClock,
+  CheckCircle2,
+  Clock,
+  CircleDollarSign,
+  Download,
+  Info,
+  Landmark,
+  ShieldAlert,
+  Wallet,
+} from "lucide-react";
 import { PartnerPageShell } from "./PartnerAppLayout";
 
 const HISTORY = [
@@ -13,7 +25,10 @@ const RULES = [
   { icon: CircleDollarSign, text: "Commission daily calculate hoti hai." },
   { icon: CalendarClock, text: "Eligible balance har 7 days me auto payout hoti hai." },
   { icon: Wallet, text: "Available balance ka withdrawal request kabhi bhi kar sakte ho." },
-  { icon: ShieldAlert, text: "Fraud / refund / suspicious transactions payout se pehle hold hoti hain." },
+  {
+    icon: ShieldAlert,
+    text: "Fraud / refund / suspicious transactions payout se pehle hold hoti hain.",
+  },
 ];
 
 export function PartnerPayoutPage() {
@@ -37,7 +52,10 @@ export function PartnerPayoutPage() {
           <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white/70">
             <CalendarClock className="h-3.5 w-3.5" /> Next Auto Payout
           </div>
-          <div className="mt-3 text-4xl font-black tracking-tight" style={{ letterSpacing: "-0.02em" }}>
+          <div
+            className="mt-3 text-4xl font-black tracking-tight"
+            style={{ letterSpacing: "-0.02em" }}
+          >
             Fri, 07 Jul 2026
           </div>
           <div className="mt-2 text-sm text-white/70">Cycle: Mon 01 Jul → Sun 07 Jul</div>
@@ -74,11 +92,16 @@ export function PartnerPayoutPage() {
       <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
         <div className="flex items-center gap-2">
           <Info className="h-4 w-4 text-[#4F46E5]" />
-          <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#4F46E5]">Payout Rules</span>
+          <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#4F46E5]">
+            Payout Rules
+          </span>
         </div>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {RULES.map((r) => (
-            <div key={r.text} className="flex items-start gap-3 rounded-xl bg-[#FAFBFF] p-4 ring-1 ring-slate-200/70">
+            <div
+              key={r.text}
+              className="flex items-start gap-3 rounded-xl bg-[#FAFBFF] p-4 ring-1 ring-slate-200/70"
+            >
               <r.icon className="mt-0.5 h-4 w-4 shrink-0 text-[#4F46E5]" />
               <span className="text-sm font-medium text-slate-700">{r.text}</span>
             </div>
@@ -153,7 +176,9 @@ function BalanceCard({
       <div className={`grid h-9 w-9 place-items-center rounded-xl ${t.chip} ${t.icon}`}>
         <Icon className="h-4 w-4" />
       </div>
-      <div className="mt-4 text-[11px] font-semibold uppercase tracking-wider text-slate-400">{label}</div>
+      <div className="mt-4 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+        {label}
+      </div>
       <div className="mt-1 text-2xl font-black text-[#0B1330]">{value}</div>
     </div>
   );

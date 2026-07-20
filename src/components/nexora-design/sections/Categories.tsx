@@ -5,42 +5,50 @@ const categories = [
   {
     title: "Salon",
     icon: Scissors,
-    image: "https://images.pexels.com/photos/7195801/pexels-photo-7195801.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=600",
+    image:
+      "https://images.pexels.com/photos/7195801/pexels-photo-7195801.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=600",
   },
   {
     title: "Beauty Parlour",
     icon: Sparkles,
-    image: "https://images.pexels.com/photos/7195812/pexels-photo-7195812.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=600",
+    image:
+      "https://images.pexels.com/photos/7195812/pexels-photo-7195812.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=600",
   },
   {
     title: "Spa",
     icon: Droplets,
-    image: "https://images.pexels.com/photos/7031713/pexels-photo-7031713.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=600",
+    image:
+      "https://images.pexels.com/photos/7031713/pexels-photo-7031713.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=600",
   },
   {
     title: "Tattoo Studio",
     icon: PenTool,
-    image: "https://images.pexels.com/photos/28991529/pexels-photo-28991529.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=600",
+    image:
+      "https://images.pexels.com/photos/28991529/pexels-photo-28991529.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=600",
   },
   {
     title: "Massage Center",
     icon: Heart,
-    image: "https://images.pexels.com/photos/9146378/pexels-photo-9146378.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=600",
+    image:
+      "https://images.pexels.com/photos/9146378/pexels-photo-9146378.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=600",
   },
   {
     title: "Nail Art Studio",
     icon: Palette,
-    image: "https://images.pexels.com/photos/7755218/pexels-photo-7755218.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=600",
+    image:
+      "https://images.pexels.com/photos/7755218/pexels-photo-7755218.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=600",
   },
   {
     title: "Makeup Artist",
     icon: Gem,
-    image: "https://images.pexels.com/photos/7234531/pexels-photo-7234531.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=600",
+    image:
+      "https://images.pexels.com/photos/7234531/pexels-photo-7234531.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=600",
   },
   {
     title: "Bridal Services",
     icon: Crown,
-    image: "https://images.pexels.com/photos/20695691/pexels-photo-20695691.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=600",
+    image:
+      "https://images.pexels.com/photos/20695691/pexels-photo-20695691.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=600",
   },
 ];
 

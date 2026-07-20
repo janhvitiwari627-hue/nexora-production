@@ -7,7 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Bookmark,
   Briefcase,
@@ -28,10 +34,18 @@ import { applyToJob, isRealJobId, listPublishedJobs, type JobRow } from "@/lib/j
 import { useAuthStore } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
 
-const CATEGORIES: JobCategory[] = ["Stylist", "Barber", "Beautician", "Spa Therapist", "Nail Artist", "Manager", "Receptionist"];
+const CATEGORIES: JobCategory[] = [
+  "Stylist",
+  "Barber",
+  "Beautician",
+  "Spa Therapist",
+  "Nail Artist",
+  "Manager",
+  "Receptionist",
+];
 const TYPES: JobType[] = ["Full-time", "Part-time", "Contract", "Freelance"];
 const EXPERIENCE_LEVELS = ["Any", "Fresher", "1-3 years", "3-5 years", "5+ years"] as const;
-type ExpLevel = typeof EXPERIENCE_LEVELS[number];
+type ExpLevel = (typeof EXPERIENCE_LEVELS)[number];
 
 type UnifiedJob = Job & { isReal: boolean; salaryMin: number; salaryMax: number };
 
@@ -138,28 +152,38 @@ export function JobSearchPage() {
     let alive = true;
     (async () => {
       const [apps, cand] = await Promise.all([
-        (supabase as never as {
-          from: (n: string) => {
-            select: (c: string) => {
-              eq: (c: string, v: string) => {
-                neq: (c: string, v: string) => Promise<{ data: { job_id: string }[] | null }>;
+        (
+          supabase as never as {
+            from: (n: string) => {
+              select: (c: string) => {
+                eq: (
+                  c: string,
+                  v: string,
+                ) => {
+                  neq: (c: string, v: string) => Promise<{ data: { job_id: string }[] | null }>;
+                };
               };
             };
-          };
-        })
+          }
+        )
           .from("job_applications")
           .select("job_id")
           .eq("applicant_id", user.id)
           .neq("status", "withdrawn"),
-        (supabase as never as {
-          from: (n: string) => {
-            select: (c: string) => {
-              eq: (c: string, v: string) => {
-                maybeSingle: () => Promise<{ data: { is_submitted: boolean } | null }>;
+        (
+          supabase as never as {
+            from: (n: string) => {
+              select: (c: string) => {
+                eq: (
+                  c: string,
+                  v: string,
+                ) => {
+                  maybeSingle: () => Promise<{ data: { is_submitted: boolean } | null }>;
+                };
               };
             };
-          };
-        })
+          }
+        )
           .from("candidate_profiles")
           .select("is_submitted")
           .eq("user_id", user.id)
@@ -185,8 +209,22 @@ export function JobSearchPage() {
   const filtered = useMemo(() => {
     const myCity = (profile?.city ?? "").toLowerCase();
     let r = allJobs.filter((j) => {
-      if (q && !(j.title.toLowerCase().includes(q.toLowerCase()) || j.business.toLowerCase().includes(q.toLowerCase()))) return false;
-      if (loc && !(j.city.toLowerCase().includes(loc.toLowerCase()) || j.area.toLowerCase().includes(loc.toLowerCase()))) return false;
+      if (
+        q &&
+        !(
+          j.title.toLowerCase().includes(q.toLowerCase()) ||
+          j.business.toLowerCase().includes(q.toLowerCase())
+        )
+      )
+        return false;
+      if (
+        loc &&
+        !(
+          j.city.toLowerCase().includes(loc.toLowerCase()) ||
+          j.area.toLowerCase().includes(loc.toLowerCase())
+        )
+      )
+        return false;
       if (cat !== "all" && j.category !== cat) return false;
       if (types.length > 0 && !types.includes(j.type)) return false;
       if (minSalary > 0 && j.salaryMax < minSalary) return false;
@@ -257,7 +295,14 @@ export function JobSearchPage() {
   }
 
   const hasActiveFilters =
-    !!q || !!loc || cat !== "all" || types.length > 0 || minSalary > 0 || exp !== "Any" || nearbyOnly || latestOnly;
+    !!q ||
+    !!loc ||
+    cat !== "all" ||
+    types.length > 0 ||
+    minSalary > 0 ||
+    exp !== "Any" ||
+    nearbyOnly ||
+    latestOnly;
 
   return (
     <>
@@ -266,27 +311,52 @@ export function JobSearchPage() {
         <header className="space-y-3">
           <BackButton />
           <h1 className="text-heading text-3xl font-bold">Find Your Next Job</h1>
-          <p className="text-muted-foreground">Discover opportunities at top salons, spas & studios</p>
+          <p className="text-muted-foreground">
+            Discover opportunities at top salons, spas & studios
+          </p>
         </header>
 
         <Card>
           <CardContent className="grid gap-3 p-4 md:grid-cols-[1.5fr_1fr_auto]">
             <div className="relative">
               <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
-              <Input className="pl-9" placeholder="Job title, skills, or company" value={q} onChange={(e) => setQ(e.target.value)} />
+              <Input
+                className="pl-9"
+                placeholder="Job title, skills, or company"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+              />
             </div>
             <div className="relative">
               <MapPin className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
-              <Input className="pl-9" placeholder="City or area" value={loc} onChange={(e) => setLoc(e.target.value)} />
+              <Input
+                className="pl-9"
+                placeholder="City or area"
+                value={loc}
+                onChange={(e) => setLoc(e.target.value)}
+              />
             </div>
             <Button>Search</Button>
           </CardContent>
         </Card>
 
         <div className="flex flex-wrap items-center gap-2">
-          <Button size="sm" variant={cat === "all" ? "default" : "outline"} onClick={() => setCat("all")}>All</Button>
+          <Button
+            size="sm"
+            variant={cat === "all" ? "default" : "outline"}
+            onClick={() => setCat("all")}
+          >
+            All
+          </Button>
           {CATEGORIES.map((c) => (
-            <Button key={c} size="sm" variant={cat === c ? "default" : "outline"} onClick={() => setCat(c)}>{c}</Button>
+            <Button
+              key={c}
+              size="sm"
+              variant={cat === c ? "default" : "outline"}
+              onClick={() => setCat(c)}
+            >
+              {c}
+            </Button>
           ))}
           <Button
             size="sm"
@@ -315,22 +385,30 @@ export function JobSearchPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs uppercase tracking-wider text-muted-foreground">Job Type</Label>
+                  <Label className="text-xs uppercase tracking-wider text-muted-foreground">
+                    Job Type
+                  </Label>
                   {TYPES.map((t) => (
                     <div key={t} className="flex items-center gap-2">
                       <Checkbox
                         id={t}
                         checked={types.includes(t)}
-                        onCheckedChange={(v) => setTypes((p) => (v ? [...p, t] : p.filter((x) => x !== t)))}
+                        onCheckedChange={(v) =>
+                          setTypes((p) => (v ? [...p, t] : p.filter((x) => x !== t)))
+                        }
                       />
-                      <Label htmlFor={t} className="cursor-pointer text-sm">{t}</Label>
+                      <Label htmlFor={t} className="cursor-pointer text-sm">
+                        {t}
+                      </Label>
                     </div>
                   ))}
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label className="text-xs uppercase tracking-wider text-muted-foreground">Min. Salary</Label>
+                    <Label className="text-xs uppercase tracking-wider text-muted-foreground">
+                      Min. Salary
+                    </Label>
                     <span className="text-xs font-semibold">
                       {minSalary > 0 ? `₹${Math.round(minSalary / 1000)}k/mo` : "Any"}
                     </span>
@@ -345,12 +423,18 @@ export function JobSearchPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs uppercase tracking-wider text-muted-foreground">Experience</Label>
+                  <Label className="text-xs uppercase tracking-wider text-muted-foreground">
+                    Experience
+                  </Label>
                   <Select value={exp} onValueChange={(v) => setExp(v as ExpLevel)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
                       {EXPERIENCE_LEVELS.map((l) => (
-                        <SelectItem key={l} value={l}>{l}</SelectItem>
+                        <SelectItem key={l} value={l}>
+                          {l}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -385,7 +469,9 @@ export function JobSearchPage() {
                 {loading ? "Loading jobs…" : `${filtered.length} jobs found`}
               </p>
               <Select value={sort} onValueChange={(v) => setSort(v as typeof sort)}>
-                <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="recent">Most Recent</SelectItem>
                   <SelectItem value="salary">Salary (High)</SelectItem>
@@ -411,7 +497,13 @@ export function JobSearchPage() {
                     <CardContent className="space-y-3 p-5">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <Link to="/jobs/$jobId" params={{ jobId: j.id }} className="text-lg font-semibold hover:underline">{j.title}</Link>
+                          <Link
+                            to="/jobs/$jobId"
+                            params={{ jobId: j.id }}
+                            className="text-lg font-semibold hover:underline"
+                          >
+                            {j.title}
+                          </Link>
                           <p className="text-sm text-muted-foreground">{j.business}</p>
                         </div>
                         <Button
@@ -427,14 +519,30 @@ export function JobSearchPage() {
                             })
                           }
                         >
-                          <Bookmark className={`h-4 w-4 ${saved.has(j.id) ? "fill-primary text-primary" : ""}`} />
+                          <Bookmark
+                            className={`h-4 w-4 ${saved.has(j.id) ? "fill-primary text-primary" : ""}`}
+                          />
                         </Button>
                       </div>
                       <div className="flex flex-wrap gap-2 text-xs">
-                        <Badge variant="secondary"><Briefcase className="mr-1 h-3 w-3" />{j.type}</Badge>
-                        <Badge variant="outline"><MapPin className="mr-1 h-3 w-3" />{j.area ? `${j.area}, ` : ""}{j.city}</Badge>
+                        <Badge variant="secondary">
+                          <Briefcase className="mr-1 h-3 w-3" />
+                          {j.type}
+                        </Badge>
+                        <Badge variant="outline">
+                          <MapPin className="mr-1 h-3 w-3" />
+                          {j.area ? `${j.area}, ` : ""}
+                          {j.city}
+                        </Badge>
                         <Badge variant="outline">{j.experience}</Badge>
-                        {j.isReal && <Badge className="bg-primary/10 text-primary border-primary/20" variant="outline">New</Badge>}
+                        {j.isReal && (
+                          <Badge
+                            className="bg-primary/10 text-primary border-primary/20"
+                            variant="outline"
+                          >
+                            New
+                          </Badge>
+                        )}
                       </div>
                       <div className="flex items-center justify-between text-sm">
                         <span className="inline-flex items-center gap-1 font-semibold text-primary">
@@ -480,7 +588,9 @@ export function JobSearchPage() {
               <CheckCircle2 className="text-primary h-9 w-9" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-heading text-xl font-bold">Application submitted successfully.</h3>
+              <h3 className="text-heading text-xl font-bold">
+                Application submitted successfully.
+              </h3>
             </div>
             <div className="w-full space-y-1 rounded-lg bg-muted/40 p-3 text-left text-sm">
               <div className="flex justify-between gap-3">
@@ -493,7 +603,15 @@ export function JobSearchPage() {
               </div>
               <div className="flex justify-between gap-3">
                 <span className="text-muted-foreground">Applied</span>
-                <span className="font-medium">{new Date(success.appliedAt).toLocaleString(undefined, { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
+                <span className="font-medium">
+                  {new Date(success.appliedAt).toLocaleString(undefined, {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
               </div>
               <div className="flex justify-between gap-3">
                 <span className="text-muted-foreground">Status</span>

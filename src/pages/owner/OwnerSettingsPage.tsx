@@ -132,9 +132,7 @@ export function OwnerSettingsPage() {
           for (const k of Object.keys(EMPTY) as (keyof Form)[]) {
             if (typeof parsed[k] === "string") merged[k] = parsed[k] as string;
           }
-          const differs = (Object.keys(EMPTY) as (keyof Form)[]).some(
-            (k) => merged[k] !== next[k],
-          );
+          const differs = (Object.keys(EMPTY) as (keyof Form)[]).some((k) => merged[k] !== next[k]);
           if (differs) restored = merged;
         }
       } catch {
@@ -186,7 +184,6 @@ export function OwnerSettingsPage() {
     toast.success("Draft discarded.");
   };
 
-
   // Intercept ALL in-app router navigation (Link, useNavigate, router.navigate,
   // browser back/forward). This covers header/sidebar/breadcrumbs uniformly
   // as long as they use TanStack Router.
@@ -205,16 +202,18 @@ export function OwnerSettingsPage() {
     const onClick = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0) return;
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-      const anchor = (e.target as HTMLElement | null)?.closest?.("a[href]") as
-        | HTMLAnchorElement
-        | null;
+      const anchor = (e.target as HTMLElement | null)?.closest?.(
+        "a[href]",
+      ) as HTMLAnchorElement | null;
       if (!anchor) return;
       const href = anchor.getAttribute("href");
-      if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:")) return;
+      if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:"))
+        return;
       if (anchor.target && anchor.target !== "" && anchor.target !== "_self") return;
       const url = new URL(anchor.href, window.location.href);
       if (url.origin !== window.location.origin) return;
-      if (url.pathname === window.location.pathname && url.search === window.location.search) return;
+      if (url.pathname === window.location.pathname && url.search === window.location.search)
+        return;
       e.preventDefault();
       e.stopPropagation();
       setPendingHref(url.pathname + url.search + url.hash);
@@ -222,7 +221,6 @@ export function OwnerSettingsPage() {
     document.addEventListener("click", onClick, true);
     return () => document.removeEventListener("click", onClick, true);
   }, [isDirty, uploading]);
-
 
   const set = <K extends keyof Form>(k: K, v: Form[K]) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -346,7 +344,6 @@ export function OwnerSettingsPage() {
           </Button>
         </div>
       )}
-
 
       <Card>
         <CardHeader>
@@ -476,7 +473,9 @@ export function OwnerSettingsPage() {
 
       <div className="sticky bottom-0 flex flex-wrap items-center justify-end gap-2 border-t bg-background/95 py-3 backdrop-blur">
         {isDirty ? (
-          <span className="mr-auto text-xs text-muted-foreground">Unsaved changes · autosaved as draft</span>
+          <span className="mr-auto text-xs text-muted-foreground">
+            Unsaved changes · autosaved as draft
+          </span>
         ) : (
           <span className="mr-auto text-xs text-muted-foreground">
             Next: template, colors, banner & live preview →

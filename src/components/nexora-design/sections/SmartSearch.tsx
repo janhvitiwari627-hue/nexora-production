@@ -20,7 +20,7 @@ export default function SmartSearch() {
 
   const toggleFilter = (label: string) => {
     setActiveFilters((prev) =>
-      prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label]
+      prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label],
     );
   };
 

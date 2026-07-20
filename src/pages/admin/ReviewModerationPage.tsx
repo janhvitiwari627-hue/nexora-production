@@ -26,7 +26,9 @@ export function ReviewModerationPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("reviews")
-        .select("id,rating,comment,created_at,user_id,salon_id,profiles(full_name,avatar_url),salons(name)")
+        .select(
+          "id,rating,comment,created_at,user_id,salon_id,profiles(full_name,avatar_url),salons(name)",
+        )
         .order("created_at", { ascending: false })
         .limit(500);
       if (error) throw error;
@@ -54,12 +56,19 @@ export function ReviewModerationPage() {
     <div className="mx-auto max-w-7xl space-y-6 p-6">
       <header>
         <h1 className="text-2xl font-bold">Review Moderation</h1>
-        <p className="text-muted-foreground text-sm">All customer reviews across the platform ({reviews.length} total).</p>
+        <p className="text-muted-foreground text-sm">
+          All customer reviews across the platform ({reviews.length} total).
+        </p>
       </header>
 
       <div className="flex flex-wrap gap-2">
         {[0, 1, 2, 3, 4, 5].map((r) => (
-          <Button key={r} size="sm" variant={minRating === r ? "default" : "outline"} onClick={() => setMinRating(r)}>
+          <Button
+            key={r}
+            size="sm"
+            variant={minRating === r ? "default" : "outline"}
+            onClick={() => setMinRating(r)}
+          >
             {r === 0 ? "All ratings" : `${r}★ +`}
           </Button>
         ))}
@@ -78,13 +87,19 @@ export function ReviewModerationPage() {
               <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex flex-1 items-start gap-3">
                   <Avatar className="h-10 w-10">
-                    <AvatarFallback>{(r.profiles?.full_name ?? "?").slice(0, 2).toUpperCase()}</AvatarFallback>
+                    <AvatarFallback>
+                      {(r.profiles?.full_name ?? "?").slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-medium">{r.profiles?.full_name ?? "Anonymous"}</span>
-                      <span className="text-muted-foreground text-xs">on {r.salons?.name ?? "unknown shop"}</span>
-                      <span className="text-muted-foreground text-xs">· {new Date(r.created_at).toLocaleDateString()}</span>
+                      <span className="text-muted-foreground text-xs">
+                        on {r.salons?.name ?? "unknown shop"}
+                      </span>
+                      <span className="text-muted-foreground text-xs">
+                        · {new Date(r.created_at).toLocaleDateString()}
+                      </span>
                     </div>
                     <div className="flex items-center gap-0.5">
                       {Array.from({ length: 5 }).map((_, i) => (
@@ -94,7 +109,11 @@ export function ReviewModerationPage() {
                         />
                       ))}
                     </div>
-                    <p className="text-sm">{r.comment ?? <span className="text-muted-foreground italic">(no comment)</span>}</p>
+                    <p className="text-sm">
+                      {r.comment ?? (
+                        <span className="text-muted-foreground italic">(no comment)</span>
+                      )}
+                    </p>
                   </div>
                 </div>
                 <div className="flex gap-2">

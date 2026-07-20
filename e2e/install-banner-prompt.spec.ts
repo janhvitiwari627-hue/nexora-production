@@ -32,7 +32,6 @@ test.describe("InstallBanner — prompt available state", () => {
       // the "persists across reload" test is asserting on. Playwright gives
       // each test a fresh browser context, so storage is already empty.
 
-
       const w = window as unknown as {
         __bipListeners?: number;
         __fireBeforeInstallPrompt?: (outcome?: "accepted" | "dismissed") => void;
@@ -44,7 +43,11 @@ test.describe("InstallBanner — prompt available state", () => {
       // Instrument addEventListener so tests can wait for the production
       // capture listener to be wired before dispatching the synthetic event.
       const origAdd = window.addEventListener.bind(window);
-      window.addEventListener = ((type: string, listener: EventListenerOrEventListenerObject, opts?: boolean | AddEventListenerOptions) => {
+      window.addEventListener = ((
+        type: string,
+        listener: EventListenerOrEventListenerObject,
+        opts?: boolean | AddEventListenerOptions,
+      ) => {
         if (type === "beforeinstallprompt") {
           w.__bipListeners = (w.__bipListeners ?? 0) + 1;
         }
@@ -92,14 +95,18 @@ test.describe("InstallBanner — prompt available state", () => {
     ).toHaveCount(0);
   });
 
-  test("clicking Install invokes prompt() and flips to installed state on accept", async ({ page }) => {
+  test("clicking Install invokes prompt() and flips to installed state on accept", async ({
+    page,
+  }) => {
     await page.goto("/download-app");
     await waitForInstallPromptListener(page);
 
     await page.evaluate(() => {
-      (window as unknown as {
-        __fireBeforeInstallPrompt: (o: "accepted" | "dismissed") => void;
-      }).__fireBeforeInstallPrompt("accepted");
+      (
+        window as unknown as {
+          __fireBeforeInstallPrompt: (o: "accepted" | "dismissed") => void;
+        }
+      ).__fireBeforeInstallPrompt("accepted");
     });
 
     await expect(page.getByRole("button", { name: "Install", exact: true })).toBeVisible();
@@ -150,7 +157,12 @@ test.describe("InstallBanner — standalone & appinstalled", () => {
       colorScheme: "light",
     });
     const page = await context.newPage();
-    await page.emulateMedia({ media: "screen", colorScheme: "light", reducedMotion: null, forcedColors: null });
+    await page.emulateMedia({
+      media: "screen",
+      colorScheme: "light",
+      reducedMotion: null,
+      forcedColors: null,
+    });
     // Playwright doesn't expose display-mode emulation directly; patch the
     // matchMedia call to report standalone before any app code runs.
     await context.addInitScript(() => {
@@ -180,12 +192,19 @@ test.describe("InstallBanner — standalone & appinstalled", () => {
     await context.close();
   });
 
-  test("beforeinstallprompt listener is wired via dynamic import from __root", async ({ page, context }) => {
+  test("beforeinstallprompt listener is wired via dynamic import from __root", async ({
+    page,
+    context,
+  }) => {
     await context.addInitScript(() => {
       const w = window as unknown as { __bipListeners?: number };
       w.__bipListeners = 0;
       const origAdd = window.addEventListener.bind(window);
-      window.addEventListener = ((type: string, listener: EventListenerOrEventListenerObject, opts?: boolean | AddEventListenerOptions) => {
+      window.addEventListener = ((
+        type: string,
+        listener: EventListenerOrEventListenerObject,
+        opts?: boolean | AddEventListenerOptions,
+      ) => {
         if (type === "beforeinstallprompt") {
           w.__bipListeners = (w.__bipListeners ?? 0) + 1;
         }
@@ -208,12 +227,19 @@ test.describe("InstallBanner — standalone & appinstalled", () => {
     expect(count).toBeGreaterThanOrEqual(1);
   });
 
-  test("appinstalled event transitions to installed state and persists across reload", async ({ page, context }) => {
+  test("appinstalled event transitions to installed state and persists across reload", async ({
+    page,
+    context,
+  }) => {
     await context.addInitScript(() => {
       const w = window as unknown as { __appInstalledListeners?: number };
       w.__appInstalledListeners = 0;
       const origAdd = window.addEventListener.bind(window);
-      window.addEventListener = ((type: string, listener: EventListenerOrEventListenerObject, opts?: boolean | AddEventListenerOptions) => {
+      window.addEventListener = ((
+        type: string,
+        listener: EventListenerOrEventListenerObject,
+        opts?: boolean | AddEventListenerOptions,
+      ) => {
         if (type === "appinstalled") {
           w.__appInstalledListeners = (w.__appInstalledListeners ?? 0) + 1;
         }
@@ -230,7 +256,8 @@ test.describe("InstallBanner — standalone & appinstalled", () => {
 
     // Wait for InstallBanner's useEffect to attach its appinstalled listener.
     await page.waitForFunction(
-      () => (window as unknown as { __appInstalledListeners?: number }).__appInstalledListeners! >= 1,
+      () =>
+        (window as unknown as { __appInstalledListeners?: number }).__appInstalledListeners! >= 1,
       { timeout: 10_000 },
     );
 

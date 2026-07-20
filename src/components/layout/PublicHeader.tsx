@@ -143,11 +143,11 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
   };
 
   const metadataName =
-    typeof user?.user_metadata?.full_name === "string"
-      ? user.user_metadata.full_name.trim()
-      : "";
+    typeof user?.user_metadata?.full_name === "string" ? user.user_metadata.full_name.trim() : "";
   const displayName =
-    metadataName || currentProfile?.full_name || (user?.email ? user.email.split("@")[0] : "Account");
+    metadataName ||
+    currentProfile?.full_name ||
+    (user?.email ? user.email.split("@")[0] : "Account");
   const email = user?.email ?? "";
   const avatarUrl =
     (user?.user_metadata?.avatar_url as string | undefined) ||
@@ -173,7 +173,6 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
       }`}
     >
       <div className="mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-2 py-3 sm:gap-4 px-[max(env(safe-area-inset-left),0.75rem)] pr-[max(env(safe-area-inset-right),0.75rem)] sm:px-[max(env(safe-area-inset-left),1rem)] sm:pr-[max(env(safe-area-inset-right),1rem)] md:px-6">
-
         {/* Back + Logo */}
         <div className="flex min-w-0 items-center gap-2">
           {showBackButton && <BackButton size="icon" className="shrink-0" aria-label="Go back" />}
@@ -186,10 +185,8 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
             <span className="text-gradient-brand hidden text-lg font-extrabold tracking-tight sm:inline sm:text-xl">
               Nexora
             </span>
-
           </Link>
         </div>
-
 
         {/* Center nav */}
         <nav className="hidden items-center justify-center gap-1 md:flex">
@@ -274,7 +271,8 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
                     </span>
                   )}
                   <span className="truncate text-[11px] font-semibold text-primary">
-                    Nexora member{currentProfile?.nexora_id ? ` · ID ${currentProfile.nexora_id}` : ""}
+                    Nexora member
+                    {currentProfile?.nexora_id ? ` · ID ${currentProfile.nexora_id}` : ""}
                   </span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -348,7 +346,6 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
 
         {/* Mobile */}
         <div className="flex items-center gap-0.5 md:hidden">
-          
           <Button
             variant="ghost"
             size="icon"
@@ -402,8 +399,6 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
       <div className="mx-auto flex max-w-7xl items-center gap-2 pb-2 px-[max(env(safe-area-inset-left),0.75rem)] pr-[max(env(safe-area-inset-right),0.75rem)] md:hidden">
         <LocationChip className="inline-flex min-w-0 max-w-full" />
       </div>
-
-
 
       <MobileMenuOverlay open={menuOpen} onClose={() => setMenuOpen(false)} />
 

@@ -1,14 +1,5 @@
 import { motion } from "framer-motion";
-import {
-  Scissors,
-  Sparkles,
-  Droplets,
-  Palette,
-  Hand,
-  Brush,
-  Heart,
-  Flower2,
-} from "lucide-react";
+import { Scissors, Sparkles, Droplets, Palette, Hand, Brush, Heart, Flower2 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 const CATEGORIES = [

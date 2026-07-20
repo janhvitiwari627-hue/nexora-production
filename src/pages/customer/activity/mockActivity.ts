@@ -94,9 +94,27 @@ const img = (seed: string) =>
   `https://images.unsplash.com/photo-${seed}?auto=format&fit=crop&w=160&h=160&q=70`;
 
 export const TOP_SHOPS: TopShop[] = [
-  { id: "s1", name: "Glow Studio", thumbnail: img("1560066984-138dadb4c035"), visits: 12, spend: 14400 },
-  { id: "s2", name: "Urban Spa", thumbnail: img("1544161515-4ab6ce6db874"), visits: 8, spend: 9800 },
-  { id: "s3", name: "The Barber Co.", thumbnail: img("1503951914875-452162b0f3f1"), visits: 6, spend: 4200 },
+  {
+    id: "s1",
+    name: "Glow Studio",
+    thumbnail: img("1560066984-138dadb4c035"),
+    visits: 12,
+    spend: 14400,
+  },
+  {
+    id: "s2",
+    name: "Urban Spa",
+    thumbnail: img("1544161515-4ab6ce6db874"),
+    visits: 8,
+    spend: 9800,
+  },
+  {
+    id: "s3",
+    name: "The Barber Co.",
+    thumbnail: img("1503951914875-452162b0f3f1"),
+    visits: 6,
+    spend: 4200,
+  },
 ];
 
 export const SERVICE_PREFS: ServicePref[] = [

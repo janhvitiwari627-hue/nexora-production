@@ -30,7 +30,6 @@ import {
   type PaymentMethod,
 } from "./state";
 
-
 export function Step4Payment({
   booking,
   setCoupon,
@@ -53,7 +52,6 @@ export function Step4Payment({
   const items = selectedServices(booking);
   const online = useOnlineStatus();
 
-
   const handleApply = () => {
     const code = booking.coupon.trim().toUpperCase();
     if (!code) return setCouponError("Enter a coupon code");
@@ -74,7 +72,8 @@ export function Step4Payment({
           <div>
             <h2 className="text-heading text-2xl font-black md:text-3xl">Review & pay</h2>
             <p className="text-muted-foreground mt-1 text-sm">
-              Pay {Math.round((advance / Math.max(1, total)) * 100)}% advance to confirm. Rest at the salon.
+              Pay {Math.round((advance / Math.max(1, total)) * 100)}% advance to confirm. Rest at
+              the salon.
             </p>
           </div>
           <PaymentCountdown deadline={deadline} />
@@ -89,7 +88,7 @@ export function Step4Payment({
               label="Stylist"
               value={
                 booking.selectedStaffId
-                  ? booking.staff.find((s) => s.id === booking.selectedStaffId)?.name ?? ""
+                  ? (booking.staff.find((s) => s.id === booking.selectedStaffId)?.name ?? "")
                   : "Any available"
               }
             />
@@ -119,7 +118,9 @@ export function Step4Payment({
           {booking.couponApplied ? (
             <div className="bg-success/10 text-success flex items-center justify-between rounded-[var(--radius-button)] px-3 py-2.5 text-sm font-semibold">
               <span className="inline-flex items-center gap-2">
-                <Check className="h-4 w-4" />{booking.couponApplied.code} applied · {Math.round(booking.couponApplied.discount * 100)}% off
+                <Check className="h-4 w-4" />
+                {booking.couponApplied.code} applied ·{" "}
+                {Math.round(booking.couponApplied.discount * 100)}% off
               </span>
               <button
                 type="button"
@@ -240,8 +241,8 @@ export function Step4Payment({
         </section>
 
         <p className="text-muted-foreground text-xs">
-          By proceeding you agree to free cancellation up to 4 hours before your slot. Within 4 hours,
-          the 25% advance is non-refundable.
+          By proceeding you agree to free cancellation up to 4 hours before your slot. Within 4
+          hours, the 25% advance is non-refundable.
         </p>
       </div>
 
@@ -258,20 +259,12 @@ export function Step4Payment({
           />
         )}
         {rewardsDiscount(booking) > 0 && (
-          <Row
-            label="Rewards"
-            value={`− ${formatINR(rewardsDiscount(booking))}`}
-            tone="success"
-          />
+          <Row label="Rewards" value={`− ${formatINR(rewardsDiscount(booking))}`} tone="success" />
         )}
         <div className="border-border my-3 border-t" />
         <Row label="Total" value={formatINR(total)} bold />
         <Row label="Pay now (25% advance)" value={formatINR(advance)} bold tone="primary" />
-        <Row
-          label="Pay at salon"
-          value={formatINR(total - advance)}
-          muted
-        />
+        <Row label="Pay at salon" value={formatINR(total - advance)} muted />
 
         <OfflineBanner
           className="mt-5"
@@ -297,7 +290,6 @@ export function Step4Payment({
             : `Save booking (${formatINR(advance)} — sync when online)`}
         </motion.button>
         <p className="text-muted-foreground mt-3 inline-flex items-center gap-1.5 text-[11px]">
-
           <ShieldCheck className="text-success h-3.5 w-3.5" /> 256-bit secure payment
         </p>
       </aside>
@@ -413,7 +405,8 @@ function QrPaymentModal({
 
         <h3 className="text-heading text-lg font-black">Scan & Pay</h3>
         <p className="text-muted-foreground mt-1 text-xs">
-          Scan the QR with any UPI app, pay {formatINR(amount)}, then upload screenshot & transaction ID.
+          Scan the QR with any UPI app, pay {formatINR(amount)}, then upload screenshot &
+          transaction ID.
         </p>
 
         <OfflineBanner
@@ -495,7 +488,6 @@ function QrPaymentModal({
     </motion.div>
   );
 }
-
 
 function Detail({ label, value }: { label: string; value: string }) {
   return (

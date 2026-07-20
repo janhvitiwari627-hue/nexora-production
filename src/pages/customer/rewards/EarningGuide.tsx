@@ -33,9 +33,7 @@ export function EarningGuide() {
         <span className="flex items-center gap-2 text-base font-bold">
           <Sparkles className="h-4 w-4 text-primary" /> How to earn more points
         </span>
-        <ChevronDown
-          className={cn("h-5 w-5 transition-transform", open && "rotate-180")}
-        />
+        <ChevronDown className={cn("h-5 w-5 transition-transform", open && "rotate-180")} />
       </button>
       {open && (
         <div className="grid gap-3 px-5 pb-5 md:grid-cols-2">

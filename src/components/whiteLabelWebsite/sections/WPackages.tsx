@@ -8,7 +8,9 @@ export function WPackages({ shop, template }: { shop: ShopData; template: Templa
   return (
     <section id="packages" className="px-6 py-16 md:px-12">
       <SectionTitle font={template.headingFont}>Curated Packages</SectionTitle>
-      <p className="text-muted-foreground mt-2 text-center text-sm">Bundle and save on signature experiences.</p>
+      <p className="text-muted-foreground mt-2 text-center text-sm">
+        Bundle and save on signature experiences.
+      </p>
       <div className="mx-auto mt-8 grid max-w-6xl gap-5 md:grid-cols-3">
         {shop.packages.map((p) => (
           <article
@@ -17,19 +19,38 @@ export function WPackages({ shop, template }: { shop: ShopData; template: Templa
             style={{ borderRadius: template.radius }}
           >
             {p.originalPrice && (
-              <span className="absolute right-4 top-4 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase text-white" style={{ backgroundColor: template.colors.primary }}>
+              <span
+                className="absolute right-4 top-4 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase text-white"
+                style={{ backgroundColor: template.colors.primary }}
+              >
                 Save ₹{p.originalPrice - p.price}
               </span>
             )}
-            <h3 className="text-xl font-bold" style={{ fontFamily: template.headingFont }}>{p.name}</h3>
+            <h3 className="text-xl font-bold" style={{ fontFamily: template.headingFont }}>
+              {p.name}
+            </h3>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-3xl font-bold" style={{ color: template.colors.primary }}>₹{p.price}</span>
-              {p.originalPrice && <span className="text-muted-foreground text-sm line-through">₹{p.originalPrice}</span>}
+              <span className="text-3xl font-bold" style={{ color: template.colors.primary }}>
+                ₹{p.price}
+              </span>
+              {p.originalPrice && (
+                <span className="text-muted-foreground text-sm line-through">
+                  ₹{p.originalPrice}
+                </span>
+              )}
             </div>
-            <p className="text-muted-foreground mt-1 text-xs uppercase tracking-wider">{p.duration}</p>
+            <p className="text-muted-foreground mt-1 text-xs uppercase tracking-wider">
+              {p.duration}
+            </p>
             <ul className="mt-4 flex-1 space-y-2 text-sm">
               {p.services.map((s) => (
-                <li key={s} className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0" style={{ color: template.colors.primary }} /> {s}</li>
+                <li key={s} className="flex items-start gap-2">
+                  <Check
+                    className="mt-0.5 h-4 w-4 shrink-0"
+                    style={{ color: template.colors.primary }}
+                  />{" "}
+                  {s}
+                </li>
               ))}
             </ul>
             <div className="mt-5 flex items-center gap-2">

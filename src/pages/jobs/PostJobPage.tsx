@@ -1,6 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { AlertTriangle, ArrowLeft, ArrowRight, Briefcase, Check, CheckCircle2, IndianRupee, MapPin, RefreshCw, Save, Sparkles } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  ArrowRight,
+  Briefcase,
+  Check,
+  CheckCircle2,
+  IndianRupee,
+  MapPin,
+  RefreshCw,
+  Save,
+  Sparkles,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useAuthStore } from "@/stores/authStore";
 import {
@@ -24,12 +36,7 @@ import {
   type ScreeningQuestionType,
 } from "@/lib/jobRequirementsMeta";
 
-const WORK_LOCATIONS = [
-  "At salon / studio",
-  "At client location",
-  "Hybrid",
-  "Remote consultation",
-];
+const WORK_LOCATIONS = ["At salon / studio", "At client location", "Hybrid", "Remote consultation"];
 const LEGACY_WORK_LOCATION_MAP: Record<string, string> = {
   Onsite: "At salon / studio",
   Remote: "Remote consultation",
@@ -467,13 +474,7 @@ const SKILL_SUGGESTIONS: Record<string, string[]> = {
     "MS Office",
     "Salon software",
   ],
-  "Salon Assistant": [
-    "Shampooing",
-    "Tool prep",
-    "Hygiene",
-    "Client comfort",
-    "Product handling",
-  ],
+  "Salon Assistant": ["Shampooing", "Tool prep", "Hygiene", "Client comfort", "Product handling"],
   "Hair Colourist": [
     "Global colour",
     "Highlights",
@@ -490,13 +491,7 @@ const SKILL_SUGGESTIONS: Record<string, string[]> = {
     "Hair styling",
     "Trials",
   ],
-  Freelancer: [
-    "Client handling",
-    "Portfolio",
-    "Travel-ready",
-    "Own kit",
-    "Time management",
-  ],
+  Freelancer: ["Client handling", "Portfolio", "Travel-ready", "Own kit", "Time management"],
   Other: ["Customer service", "Hygiene", "Teamwork", "Punctuality"],
 };
 
@@ -540,26 +535,21 @@ export const SUGGESTED_SCREENING_QUESTIONS: ScreeningQuestion[] = [
 export { parseRequirementsMeta, stripRequirementsMeta, PORTFOLIO_OPTIONS };
 export type { PortfolioOption };
 
-
-
 // Ready-made job description starters shown under the Description field.
 // Templates change with Beauty Category; a generic set is used when no
 // category is selected.
 const GENERAL_DESCRIPTION_TEMPLATES: { label: string; body: string }[] = [
   {
     label: "Standard role",
-    body:
-      "We are hiring a passionate beauty professional to join our team. You will deliver high-quality services, build long-term client relationships, and help our salon grow. Prior experience preferred; freshers with the right attitude are welcome.",
+    body: "We are hiring a passionate beauty professional to join our team. You will deliver high-quality services, build long-term client relationships, and help our salon grow. Prior experience preferred; freshers with the right attitude are welcome.",
   },
   {
     label: "Freshers welcome",
-    body:
-      "We're looking for enthusiastic beginners eager to build a career in the beauty industry. On-the-job training, mentorship, and a friendly team environment provided. Bring a positive attitude and a willingness to learn.",
+    body: "We're looking for enthusiastic beginners eager to build a career in the beauty industry. On-the-job training, mentorship, and a friendly team environment provided. Bring a positive attitude and a willingness to learn.",
   },
   {
     label: "Experienced professional",
-    body:
-      "Seeking an experienced beauty professional with a strong client base and proven skills. You'll handle premium clients, mentor junior staff, and contribute to service quality and salon reputation. Attractive incentives and growth path.",
+    body: "Seeking an experienced beauty professional with a strong client base and proven skills. You'll handle premium clients, mentor junior staff, and contribute to service quality and salon reputation. Attractive incentives and growth path.",
   },
 ];
 
@@ -567,155 +557,131 @@ const DESCRIPTION_TEMPLATES: Record<string, { label: string; body: string }[]> =
   "Hair Stylist": [
     {
       label: "Senior stylist",
-      body:
-        "We are hiring a Senior Hair Stylist to deliver premium cuts, colours, styling, and hair treatments. You will manage regular clients, guide juniors, and maintain high service standards. 3+ years of salon experience preferred.",
+      body: "We are hiring a Senior Hair Stylist to deliver premium cuts, colours, styling, and hair treatments. You will manage regular clients, guide juniors, and maintain high service standards. 3+ years of salon experience preferred.",
     },
     {
       label: "Junior stylist",
-      body:
-        "Looking for a Junior Hair Stylist to assist senior stylists, perform basic cuts, blow-dries, and shampoo services, and learn advanced techniques on the job. Freshers from reputed academies are welcome.",
+      body: "Looking for a Junior Hair Stylist to assist senior stylists, perform basic cuts, blow-dries, and shampoo services, and learn advanced techniques on the job. Freshers from reputed academies are welcome.",
     },
     {
       label: "Bridal specialist",
-      body:
-        "Hiring a Bridal Hair Specialist for pre-wedding trials and wedding-day styling. You should be skilled in traditional and contemporary bridal looks, hair extensions, and long-lasting hold techniques.",
+      body: "Hiring a Bridal Hair Specialist for pre-wedding trials and wedding-day styling. You should be skilled in traditional and contemporary bridal looks, hair extensions, and long-lasting hold techniques.",
     },
   ],
   Barber: [
     {
       label: "Senior barber",
-      body:
-        "We're hiring a Senior Barber skilled in classic and modern men's cuts, fades, beard shaping, and hot-towel shaves. You'll handle premium clients and maintain grooming standards across the salon.",
+      body: "We're hiring a Senior Barber skilled in classic and modern men's cuts, fades, beard shaping, and hot-towel shaves. You'll handle premium clients and maintain grooming standards across the salon.",
     },
     {
       label: "Beard specialist",
-      body:
-        "Looking for a Beard Grooming Specialist experienced in beard trims, shaping, hot-towel shaves, and beard colour. Attention to detail and hygiene are essential.",
+      body: "Looking for a Beard Grooming Specialist experienced in beard trims, shaping, hot-towel shaves, and beard colour. Attention to detail and hygiene are essential.",
     },
   ],
   "Makeup Artist": [
     {
       label: "Bridal MUA",
-      body:
-        "Hiring a Bridal Makeup Artist experienced in HD, airbrush, and traditional bridal looks. You'll handle trials, wedding-day services, and destination assignments. Portfolio required.",
+      body: "Hiring a Bridal Makeup Artist experienced in HD, airbrush, and traditional bridal looks. You'll handle trials, wedding-day services, and destination assignments. Portfolio required.",
     },
     {
       label: "Party & studio MUA",
-      body:
-        "We're hiring a Makeup Artist for party, engagement, and studio shoots. Skills in HD makeup, contouring, and eye looks are essential. Prior salon or freelance experience preferred.",
+      body: "We're hiring a Makeup Artist for party, engagement, and studio shoots. Skills in HD makeup, contouring, and eye looks are essential. Prior salon or freelance experience preferred.",
     },
   ],
   "Nail Artist": [
     {
       label: "Nail technician",
-      body:
-        "Hiring a Nail Technician skilled in manicures, pedicures, gel, acrylic extensions, and nail art. You should follow strict hygiene protocols and stay updated with current nail trends.",
+      body: "Hiring a Nail Technician skilled in manicures, pedicures, gel, acrylic extensions, and nail art. You should follow strict hygiene protocols and stay updated with current nail trends.",
     },
     {
       label: "Nail art specialist",
-      body:
-        "Looking for a Nail Art Specialist with expertise in freehand art, stamping, chrome, and 3D designs. Ideal for premium clients and social-media-friendly work.",
+      body: "Looking for a Nail Art Specialist with expertise in freehand art, stamping, chrome, and 3D designs. Ideal for premium clients and social-media-friendly work.",
     },
   ],
   "Beauty Therapist": [
     {
       label: "Facial & waxing",
-      body:
-        "Hiring a Beauty Therapist for facials, clean-ups, waxing, threading, and body polishing. Certification from a recognised institute preferred; strong client-handling skills essential.",
+      body: "Hiring a Beauty Therapist for facials, clean-ups, waxing, threading, and body polishing. Certification from a recognised institute preferred; strong client-handling skills essential.",
     },
     {
       label: "Advanced therapist",
-      body:
-        "Looking for a Senior Beauty Therapist with expertise in advanced facials, skin analysis, and product recommendation. You'll handle premium clients and mentor junior therapists.",
+      body: "Looking for a Senior Beauty Therapist with expertise in advanced facials, skin analysis, and product recommendation. You'll handle premium clients and mentor junior therapists.",
     },
   ],
   "Spa Therapist": [
     {
       label: "Wellness therapist",
-      body:
-        "Hiring a Spa Therapist skilled in relaxation massages, body scrubs, wraps, and aromatherapy. Certification and a calm, professional demeanour are essential.",
+      body: "Hiring a Spa Therapist skilled in relaxation massages, body scrubs, wraps, and aromatherapy. Certification and a calm, professional demeanour are essential.",
     },
     {
       label: "Ayurvedic therapist",
-      body:
-        "Looking for an Ayurvedic Spa Therapist trained in Abhyanga, Shirodhara, and traditional oil therapies. Prior wellness centre experience preferred.",
+      body: "Looking for an Ayurvedic Spa Therapist trained in Abhyanga, Shirodhara, and traditional oil therapies. Prior wellness centre experience preferred.",
     },
   ],
   "Massage Therapist": [
     {
       label: "Body massage",
-      body:
-        "Hiring a Body Massage Therapist experienced in Swedish, deep-tissue, and relaxation techniques. Formal training and a customer-first attitude are required.",
+      body: "Hiring a Body Massage Therapist experienced in Swedish, deep-tissue, and relaxation techniques. Formal training and a customer-first attitude are required.",
     },
   ],
   "Skin Therapist": [
     {
       label: "Skin care specialist",
-      body:
-        "Hiring a Skin Therapist for advanced facials, chemical peels, and clinical skin routines. Familiarity with skin analysis tools and consultation-based selling is a plus.",
+      body: "Hiring a Skin Therapist for advanced facials, chemical peels, and clinical skin routines. Familiarity with skin analysis tools and consultation-based selling is a plus.",
     },
   ],
   "Eyelash / Brow Artist": [
     {
       label: "Lash & brow",
-      body:
-        "Looking for a Lash & Brow Artist skilled in extensions, lash lift, brow lamination, tinting, and microblading. Steady hands and portfolio required.",
+      body: "Looking for a Lash & Brow Artist skilled in extensions, lash lift, brow lamination, tinting, and microblading. Steady hands and portfolio required.",
     },
   ],
   "Tattoo Artist": [
     {
       label: "Tattoo artist",
-      body:
-        "Hiring a Tattoo Artist with a strong portfolio in line work, shading, and colour realism. Hygiene, safety compliance, and client consultation skills are essential.",
+      body: "Hiring a Tattoo Artist with a strong portfolio in line work, shading, and colour realism. Hygiene, safety compliance, and client consultation skills are essential.",
     },
   ],
   "Salon Manager": [
     {
       label: "Salon manager",
-      body:
-        "Hiring a Salon Manager to lead daily operations, staff scheduling, client retention, and revenue growth. 3+ years of salon operations experience preferred.",
+      body: "Hiring a Salon Manager to lead daily operations, staff scheduling, client retention, and revenue growth. 3+ years of salon operations experience preferred.",
     },
   ],
   Receptionist: [
     {
       label: "Front desk",
-      body:
-        "Hiring a Salon Receptionist to manage appointments, greet clients, handle billing, and coordinate with staff. Good communication and basic computer skills required.",
+      body: "Hiring a Salon Receptionist to manage appointments, greet clients, handle billing, and coordinate with staff. Good communication and basic computer skills required.",
     },
   ],
   "Salon Assistant": [
     {
       label: "Salon assistant",
-      body:
-        "Looking for a Salon Assistant to support stylists and therapists, maintain hygiene, prepare tools, and assist with client comfort. Freshers welcome.",
+      body: "Looking for a Salon Assistant to support stylists and therapists, maintain hygiene, prepare tools, and assist with client comfort. Freshers welcome.",
     },
   ],
   "Hair Colourist": [
     {
       label: "Hair colourist",
-      body:
-        "Hiring a Hair Colourist skilled in global colour, highlights, balayage, and colour correction. Knowledge of premium colour brands and consultation skills essential.",
+      body: "Hiring a Hair Colourist skilled in global colour, highlights, balayage, and colour correction. Knowledge of premium colour brands and consultation skills essential.",
     },
   ],
   "Bridal Makeup Artist": [
     {
       label: "Bridal artist",
-      body:
-        "Hiring a Bridal Makeup Artist for HD, airbrush, and traditional bridal looks. Weekend availability and portfolio required.",
+      body: "Hiring a Bridal Makeup Artist for HD, airbrush, and traditional bridal looks. Weekend availability and portfolio required.",
     },
   ],
   Freelancer: [
     {
       label: "Freelance role",
-      body:
-        "We're onboarding freelance beauty professionals for on-demand bookings. Flexible schedule, per-service payouts, and platform support. Portfolio and hygiene compliance required.",
+      body: "We're onboarding freelance beauty professionals for on-demand bookings. Flexible schedule, per-service payouts, and platform support. Portfolio and hygiene compliance required.",
     },
   ],
   Other: [
     {
       label: "Custom role",
-      body:
-        "Describe the role, key responsibilities, required experience, working hours, and any preferred skills or certifications.",
+      body: "Describe the role, key responsibilities, required experience, working hours, and any preferred skills or certifications.",
     },
   ],
 };
@@ -744,7 +710,6 @@ type UiOnlyFields = {
   languages?: string[];
   portfolio_option?: PortfolioOption | "";
   screening_questions?: ScreeningQuestion[];
-
 };
 
 type Form = Required<
@@ -790,12 +755,17 @@ const EMPTY: Form = {
   languages: [],
   portfolio_option: "",
   screening_questions: [],
-
 };
 
 const DRAFT_STORAGE_KEY = "nexora:postJobWizard:v1";
 
-type PersistedDraft = { step: number; form: Form; jobId?: string; skillsInput: string; userId?: string };
+type PersistedDraft = {
+  step: number;
+  form: Form;
+  jobId?: string;
+  skillsInput: string;
+  userId?: string;
+};
 
 function loadDraft(): PersistedDraft | null {
   if (typeof window === "undefined") return null;
@@ -823,7 +793,9 @@ export function PostJobPage() {
   const [jobId, setJobId] = useState<string | undefined>(editJobId ?? initialDraft?.jobId);
   const [saving, setSaving] = useState<"draft" | "publish" | null>(null);
   const [skillsInput, setSkillsInput] = useState(initialDraft?.skillsInput ?? "");
-  const [draftRestored, setDraftRestored] = useState<boolean>(!!initialDraft && (initialDraft.step > 0 || initialDraft.form.title.length > 0));
+  const [draftRestored, setDraftRestored] = useState<boolean>(
+    !!initialDraft && (initialDraft.step > 0 || initialDraft.form.title.length > 0),
+  );
   const [publishError, setPublishError] = useState<string | null>(null);
   const [attempted, setAttempted] = useState<Set<number>>(new Set());
   const [highlightInvalid, setHighlightInvalid] = useState(false);
@@ -867,7 +839,9 @@ export function PostJobPage() {
       })
       .catch(() => {})
       .finally(() => setLoadingProfile(false));
-    getMyShopId(user.id).then((sid) => setShopId(sid)).catch(() => {});
+    getMyShopId(user.id)
+      .then((sid) => setShopId(sid))
+      .catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitialized, user]);
 
@@ -905,7 +879,8 @@ export function PostJobPage() {
           openings: job.openings ?? 1,
           job_role: job.job_role ?? "",
           work_location:
-            (job.work_location && (LEGACY_WORK_LOCATION_MAP[job.work_location] ?? job.work_location)) ||
+            (job.work_location &&
+              (LEGACY_WORK_LOCATION_MAP[job.work_location] ?? job.work_location)) ||
             WORK_LOCATIONS[0],
           contact_person: job.contact_person ?? "",
           contact_mobile: job.contact_mobile ?? "",
@@ -914,7 +889,9 @@ export function PostJobPage() {
           shop_id: job.shop_id ?? null,
           business_type: (job as any).business_type ?? "",
           days_preset: "",
-          custom_days: Array.isArray((job as any).working_days) ? ((job as any).working_days as string[]) : [],
+          custom_days: Array.isArray((job as any).working_days)
+            ? ((job as any).working_days as string[])
+            : [],
           hours_preset: "",
           start_time: (job as any).start_time ?? "",
           end_time: (job as any).end_time ?? "",
@@ -924,23 +901,33 @@ export function PostJobPage() {
           salary_range_preset: "",
           ...(() => {
             const m = parseRequirementsMeta(job.requirements);
-            const langs = Array.isArray((job as any).language_preferences) && ((job as any).language_preferences as string[]).length > 0
-              ? ((job as any).language_preferences as string[])
-              : m.languages;
-            const cert = ((job as any).certification_requirement as string | null) || m.certification;
+            const langs =
+              Array.isArray((job as any).language_preferences) &&
+              ((job as any).language_preferences as string[]).length > 0
+                ? ((job as any).language_preferences as string[])
+                : m.languages;
+            const cert =
+              ((job as any).certification_requirement as string | null) || m.certification;
             const pType = (job as any).portfolio_type as string | null;
             const pRequired = (job as any).portfolio_required as boolean | null;
             const rPreferred = (job as any).resume_preferred as boolean | null;
             const portfolio_option: PortfolioOption | "" =
-              pType === "instagram_required" ? "Instagram profile required" :
-              pType === "portfolio_required" ? "Portfolio required" :
-              pType === "none" ? "No portfolio needed" :
-              rPreferred ? "Resume preferred" :
-              pRequired ? "Portfolio required" :
-              m.portfolio;
-            const screening = Array.isArray((job as any).screening_questions) && ((job as any).screening_questions as any[]).length > 0
-              ? ((job as any).screening_questions as ScreeningQuestion[])
-              : m.screening;
+              pType === "instagram_required"
+                ? "Instagram profile required"
+                : pType === "portfolio_required"
+                  ? "Portfolio required"
+                  : pType === "none"
+                    ? "No portfolio needed"
+                    : rPreferred
+                      ? "Resume preferred"
+                      : pRequired
+                        ? "Portfolio required"
+                        : m.portfolio;
+            const screening =
+              Array.isArray((job as any).screening_questions) &&
+              ((job as any).screening_questions as any[]).length > 0
+                ? ((job as any).screening_questions as ScreeningQuestion[])
+                : m.screening;
             return {
               certification: cert,
               languages: langs,
@@ -963,8 +950,6 @@ export function PostJobPage() {
     };
   }, [editJobId, user, navigate]);
 
-
-
   const update = (patch: Partial<Form>) => setForm((f) => ({ ...f, ...patch }));
 
   const errors = useMemo(() => validateForm(form), [form]);
@@ -972,13 +957,12 @@ export function PostJobPage() {
     setAttempted((prev) => (prev.has(i) ? prev : new Set(prev).add(i)));
 
   const stepInvalid = (i: number) => {
-    if (i === 0) return !!(errors.title || errors.category || errors.description || errors.openings);
+    if (i === 0)
+      return !!(errors.title || errors.category || errors.description || errors.openings);
     if (i === 1) return !!(errors.city || errors.contact_mobile);
     if (i === 2) return !!(errors.salary_min || errors.salary_max);
     return false;
   };
-
-  
 
   function tryContinue() {
     if (stepInvalid(step)) {
@@ -992,7 +976,6 @@ export function PostJobPage() {
     for (let i = 0; i <= 3; i++) if (stepInvalid(i)) return i;
     return null;
   }
-
 
   async function persist(publish: boolean) {
     if (!user || !profile) {
@@ -1040,8 +1023,20 @@ export function PostJobPage() {
         screening_questions: _sq,
         ...dbForm
       } = form;
-      void _bt; void _dp; void _cd; void _hp; void _st; void _et; void _fs;
-      void _ja; void _sty; void _srp; void _cert; void _lng; void _po; void _sq;
+      void _bt;
+      void _dp;
+      void _cd;
+      void _hp;
+      void _st;
+      void _et;
+      void _fs;
+      void _ja;
+      void _sty;
+      void _srp;
+      void _cert;
+      void _lng;
+      void _po;
+      void _sq;
 
       // Encode meta into requirements text so job detail + apply form can read
       // them without a schema change. Human-readable "Key: value" lines.
@@ -1060,16 +1055,23 @@ export function PostJobPage() {
       const portfolio_required =
         portfolioOpt === "Portfolio required" || portfolioOpt === "Instagram profile required";
       const portfolio_type =
-        portfolioOpt === "Instagram profile required" ? "instagram_required" :
-        portfolioOpt === "Portfolio required" ? "portfolio_required" :
-        portfolioOpt === "No portfolio needed" ? "none" :
-        portfolioOpt === "Resume preferred" ? "resume_preferred" : null;
+        portfolioOpt === "Instagram profile required"
+          ? "instagram_required"
+          : portfolioOpt === "Portfolio required"
+            ? "portfolio_required"
+            : portfolioOpt === "No portfolio needed"
+              ? "none"
+              : portfolioOpt === "Resume preferred"
+                ? "resume_preferred"
+                : null;
       const resume_preferred = portfolioOpt === "Resume preferred";
 
       const working_days =
-        (form.custom_days && form.custom_days.length > 0)
+        form.custom_days && form.custom_days.length > 0
           ? form.custom_days
-          : (form.days_preset ? [form.days_preset] : []);
+          : form.days_preset
+            ? [form.days_preset]
+            : [];
 
       const cleaned: JobDraftInput = {
         ...dbForm,
@@ -1115,7 +1117,9 @@ export function PostJobPage() {
       setJobId(row.id);
       createdJobId = row.id;
       if (publish) {
-        try { localStorage.removeItem(DRAFT_STORAGE_KEY); } catch {}
+        try {
+          localStorage.removeItem(DRAFT_STORAGE_KEY);
+        } catch {}
         toast.success("Job posted successfully.", {
           description: `${row.title} is now live. Share it with candidates or view applications.`,
         });
@@ -1157,7 +1161,6 @@ export function PostJobPage() {
     await persist(true);
   }
 
-
   if (!isInitialized || loadingProfile) {
     return (
       <div className="min-h-screen bg-background p-8 text-center text-sm text-muted-foreground">
@@ -1175,15 +1178,22 @@ export function PostJobPage() {
             <div className="bg-gradient-cta grid h-8 w-8 place-items-center rounded-lg text-primary-foreground shadow-[var(--shadow-glow)]">
               <Sparkles className="h-4 w-4" />
             </div>
-            <span className="text-gradient-brand text-lg font-extrabold tracking-tight">Nexora</span>
+            <span className="text-gradient-brand text-lg font-extrabold tracking-tight">
+              Nexora
+            </span>
           </Link>
           <div className="ml-auto text-xs text-muted-foreground">
-            Posting as <span className="font-semibold text-heading">{profile?.business_name ?? "—"}</span>
+            Posting as{" "}
+            <span className="font-semibold text-heading">{profile?.business_name ?? "—"}</span>
           </div>
         </div>
       </div>
 
-      <EmployerSetupModal open={showSetup} onClose={() => setShowSetup(false)} redirectTo="/hire/post-job" />
+      <EmployerSetupModal
+        open={showSetup}
+        onClose={() => setShowSetup(false)}
+        redirectTo="/hire/post-job"
+      />
 
       {publishedJob ? (
         <div className="mx-auto max-w-3xl px-4 pb-24 pt-10 md:px-6">
@@ -1203,218 +1213,215 @@ export function PostJobPage() {
               setSkillsInput("");
               setAttempted(new Set());
               setStep(0);
-              try { localStorage.removeItem(DRAFT_STORAGE_KEY); } catch {}
+              try {
+                localStorage.removeItem(DRAFT_STORAGE_KEY);
+              } catch {}
             }}
           />
         </div>
       ) : (
-      <div className="mx-auto max-w-7xl px-4 pb-32 pt-8 md:px-6">
-        {draftRestored && (
-          <div className="mb-4 flex items-center justify-between gap-3 rounded-[var(--radius-card)] border border-primary/30 bg-primary/5 px-4 py-3 text-sm">
-            <span className="text-heading">
-              Welcome back — we restored your draft at <strong>{STEPS[step].label}</strong>.
-            </span>
-            <button
-              type="button"
-              onClick={() => {
-                try { localStorage.removeItem(DRAFT_STORAGE_KEY); } catch {}
-                setForm(EMPTY);
-                setStep(0);
-                setJobId(undefined);
-                setSkillsInput("");
-                setDraftRestored(false);
-              }}
-              className="rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold hover:bg-muted"
-            >
-              Start over
-            </button>
-          </div>
-        )}
-        {/* Progress */}
-        <div className="mb-6">
-
-
-          <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground">
-            <span>
-              Step {step + 1} of {STEPS.length} · <span className="text-heading">{STEPS[step].label}</span>
-            </span>
-            <span>{Math.round(((step + 1) / STEPS.length) * 100)}%</span>
-          </div>
-          <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted">
-            <div
-              className="bg-gradient-cta h-full transition-all"
-              style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
-            />
-          </div>
-          <div className="mt-4 hidden gap-2 md:flex">
-            {STEPS.map((s, i) => (
-              <button
-                key={s.key}
-                onClick={() => i <= step && setStep(i)}
-                className={cn(
-                  "flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold",
-                  i === step
-                    ? "bg-gradient-cta text-primary-foreground"
-                    : i < step
-                    ? "bg-primary/10 text-heading"
-                    : "bg-card text-muted-foreground",
-                )}
-              >
-                {i < step ? <Check className="h-3.5 w-3.5" /> : <span>{i + 1}</span>}
-                {s.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <div
-              ref={stepCardRef}
-              data-testid="wizard-step-card"
-              data-invalid-step={highlightInvalid ? "true" : "false"}
-              className={cn(
-                "rounded-[var(--radius-card)] border border-border bg-card p-6 shadow-[var(--shadow-card)] transition-shadow",
-                highlightInvalid && "ring-2 ring-destructive ring-offset-2 border-destructive",
-              )}
-            >
-              {step === 0 && (
-                <DetailsStep
-                  form={form}
-                  update={update}
-                  errors={attempted.has(0) ? errors : {}}
-                />
-              )}
-              {step === 1 && (
-                <LocationStep
-                  form={form}
-                  update={update}
-                  errors={attempted.has(1) ? errors : {}}
-                />
-              )}
-              {step === 2 && (
-                <SalaryStep
-                  form={form}
-                  update={update}
-                  errors={attempted.has(2) ? errors : {}}
-                />
-              )}
-
-              {step === 3 && (
-                <RequirementsStep
-                  form={form}
-                  update={update}
-                  skillsInput={skillsInput}
-                  setSkillsInput={setSkillsInput}
-                />
-              )}
-              {step === 4 && (
-                <ReviewStep
-                  form={form}
-                  profile={profile}
-                  publishError={publishError}
-                  onRetry={retryPublish}
-                  onDismissError={() => setPublishError(null)}
-                  retrying={saving === "publish"}
-                  hasSavedJob={!!jobId}
-                />
-              )}
-            </div>
-
-            {/* Desktop action row */}
-            <div className="mt-4 hidden items-center justify-between md:flex">
+        <div className="mx-auto max-w-7xl px-4 pb-32 pt-8 md:px-6">
+          {draftRestored && (
+            <div className="mb-4 flex items-center justify-between gap-3 rounded-[var(--radius-card)] border border-primary/30 bg-primary/5 px-4 py-3 text-sm">
+              <span className="text-heading">
+                Welcome back — we restored your draft at <strong>{STEPS[step].label}</strong>.
+              </span>
               <button
                 type="button"
-                onClick={() => setStep((s) => Math.max(0, s - 1))}
-                disabled={step === 0}
-                className="inline-flex items-center gap-1 rounded-[var(--radius-button)] border border-border bg-card px-4 py-2.5 text-sm font-semibold disabled:opacity-40"
+                onClick={() => {
+                  try {
+                    localStorage.removeItem(DRAFT_STORAGE_KEY);
+                  } catch {}
+                  setForm(EMPTY);
+                  setStep(0);
+                  setJobId(undefined);
+                  setSkillsInput("");
+                  setDraftRestored(false);
+                }}
+                className="rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold hover:bg-muted"
               >
-                <ArrowLeft className="h-4 w-4" /> Back
+                Start over
               </button>
-              <div className="flex items-center gap-2">
+            </div>
+          )}
+          {/* Progress */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground">
+              <span>
+                Step {step + 1} of {STEPS.length} ·{" "}
+                <span className="text-heading">{STEPS[step].label}</span>
+              </span>
+              <span>{Math.round(((step + 1) / STEPS.length) * 100)}%</span>
+            </div>
+            <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted">
+              <div
+                className="bg-gradient-cta h-full transition-all"
+                style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
+              />
+            </div>
+            <div className="mt-4 hidden gap-2 md:flex">
+              {STEPS.map((s, i) => (
                 <button
-                  type="button"
-                  onClick={() => persist(false)}
-                  disabled={saving !== null}
-                  className="inline-flex items-center gap-1 rounded-[var(--radius-button)] border border-border bg-card px-4 py-2.5 text-sm font-semibold disabled:opacity-60"
+                  key={s.key}
+                  onClick={() => i <= step && setStep(i)}
+                  className={cn(
+                    "flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold",
+                    i === step
+                      ? "bg-gradient-cta text-primary-foreground"
+                      : i < step
+                        ? "bg-primary/10 text-heading"
+                        : "bg-card text-muted-foreground",
+                  )}
                 >
-                  <Save className="h-4 w-4" /> {saving === "draft" ? "Saving…" : "Save draft"}
+                  {i < step ? <Check className="h-3.5 w-3.5" /> : <span>{i + 1}</span>}
+                  {s.label}
                 </button>
-                {step < STEPS.length - 1 ? (
-                  <button
-                    type="button"
-                    onClick={tryContinue}
-                    className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-1 rounded-[var(--radius-button)] px-5 py-2.5 text-sm font-bold shadow-[var(--shadow-glow)]"
-                  >
-                    Continue <ArrowRight className="h-4 w-4" />
-                  </button>
-
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => persist(true)}
-                    disabled={saving !== null}
-                    className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-1 rounded-[var(--radius-button)] px-5 py-2.5 text-sm font-bold shadow-[var(--shadow-glow)] disabled:opacity-60"
-                  >
-                    {saving === "publish" ? "Publishing…" : "Publish job"}
-                  </button>
-                )}
-              </div>
+              ))}
             </div>
           </div>
 
-          {/* Live preview */}
-          <aside className="hidden lg:block">
-            <div className="sticky top-24">
-              <p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Live preview
-              </p>
-              <LivePreview form={form} profile={profile} />
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-2">
+              <div
+                ref={stepCardRef}
+                data-testid="wizard-step-card"
+                data-invalid-step={highlightInvalid ? "true" : "false"}
+                className={cn(
+                  "rounded-[var(--radius-card)] border border-border bg-card p-6 shadow-[var(--shadow-card)] transition-shadow",
+                  highlightInvalid && "ring-2 ring-destructive ring-offset-2 border-destructive",
+                )}
+              >
+                {step === 0 && (
+                  <DetailsStep
+                    form={form}
+                    update={update}
+                    errors={attempted.has(0) ? errors : {}}
+                  />
+                )}
+                {step === 1 && (
+                  <LocationStep
+                    form={form}
+                    update={update}
+                    errors={attempted.has(1) ? errors : {}}
+                  />
+                )}
+                {step === 2 && (
+                  <SalaryStep form={form} update={update} errors={attempted.has(2) ? errors : {}} />
+                )}
+
+                {step === 3 && (
+                  <RequirementsStep
+                    form={form}
+                    update={update}
+                    skillsInput={skillsInput}
+                    setSkillsInput={setSkillsInput}
+                  />
+                )}
+                {step === 4 && (
+                  <ReviewStep
+                    form={form}
+                    profile={profile}
+                    publishError={publishError}
+                    onRetry={retryPublish}
+                    onDismissError={() => setPublishError(null)}
+                    retrying={saving === "publish"}
+                    hasSavedJob={!!jobId}
+                  />
+                )}
+              </div>
+
+              {/* Desktop action row */}
+              <div className="mt-4 hidden items-center justify-between md:flex">
+                <button
+                  type="button"
+                  onClick={() => setStep((s) => Math.max(0, s - 1))}
+                  disabled={step === 0}
+                  className="inline-flex items-center gap-1 rounded-[var(--radius-button)] border border-border bg-card px-4 py-2.5 text-sm font-semibold disabled:opacity-40"
+                >
+                  <ArrowLeft className="h-4 w-4" /> Back
+                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => persist(false)}
+                    disabled={saving !== null}
+                    className="inline-flex items-center gap-1 rounded-[var(--radius-button)] border border-border bg-card px-4 py-2.5 text-sm font-semibold disabled:opacity-60"
+                  >
+                    <Save className="h-4 w-4" /> {saving === "draft" ? "Saving…" : "Save draft"}
+                  </button>
+                  {step < STEPS.length - 1 ? (
+                    <button
+                      type="button"
+                      onClick={tryContinue}
+                      className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-1 rounded-[var(--radius-button)] px-5 py-2.5 text-sm font-bold shadow-[var(--shadow-glow)]"
+                    >
+                      Continue <ArrowRight className="h-4 w-4" />
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => persist(true)}
+                      disabled={saving !== null}
+                      className="bg-gradient-cta text-primary-foreground inline-flex items-center gap-1 rounded-[var(--radius-button)] px-5 py-2.5 text-sm font-bold shadow-[var(--shadow-glow)] disabled:opacity-60"
+                    >
+                      {saving === "publish" ? "Publishing…" : "Publish job"}
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
-          </aside>
+
+            {/* Live preview */}
+            <aside className="hidden lg:block">
+              <div className="sticky top-24">
+                <p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  Live preview
+                </p>
+                <LivePreview form={form} profile={profile} />
+              </div>
+            </aside>
+          </div>
         </div>
-      </div>
       )}
 
       {/* Mobile sticky bottom action */}
       {!publishedJob && (
-      <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-2 border-t border-border bg-card/95 p-3 shadow-2xl backdrop-blur md:hidden">
-        <button
-          type="button"
-          onClick={() => setStep((s) => Math.max(0, s - 1))}
-          disabled={step === 0}
-          className="rounded-[var(--radius-button)] border border-border px-3 py-2.5 text-xs font-semibold disabled:opacity-40"
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => persist(false)}
-          disabled={saving !== null}
-          className="rounded-[var(--radius-button)] border border-border px-3 py-2.5 text-xs font-semibold disabled:opacity-60"
-        >
-          Draft
-        </button>
-        {step < STEPS.length - 1 ? (
+        <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-2 border-t border-border bg-card/95 p-3 shadow-2xl backdrop-blur md:hidden">
           <button
             type="button"
-            onClick={tryContinue}
-            className="bg-gradient-cta text-primary-foreground flex-1 rounded-[var(--radius-button)] px-4 py-2.5 text-sm font-bold"
+            onClick={() => setStep((s) => Math.max(0, s - 1))}
+            disabled={step === 0}
+            className="rounded-[var(--radius-button)] border border-border px-3 py-2.5 text-xs font-semibold disabled:opacity-40"
           >
-            Continue
+            <ArrowLeft className="h-4 w-4" />
           </button>
-
-        ) : (
           <button
             type="button"
-            onClick={() => persist(true)}
+            onClick={() => persist(false)}
             disabled={saving !== null}
-            className="bg-gradient-cta text-primary-foreground flex-1 rounded-[var(--radius-button)] px-4 py-2.5 text-sm font-bold disabled:opacity-60"
+            className="rounded-[var(--radius-button)] border border-border px-3 py-2.5 text-xs font-semibold disabled:opacity-60"
           >
-            {saving === "publish" ? "Publishing…" : "Publish"}
+            Draft
           </button>
-        )}
-      </div>
+          {step < STEPS.length - 1 ? (
+            <button
+              type="button"
+              onClick={tryContinue}
+              className="bg-gradient-cta text-primary-foreground flex-1 rounded-[var(--radius-button)] px-4 py-2.5 text-sm font-bold"
+            >
+              Continue
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => persist(true)}
+              disabled={saving !== null}
+              className="bg-gradient-cta text-primary-foreground flex-1 rounded-[var(--radius-button)] px-4 py-2.5 text-sm font-bold disabled:opacity-60"
+            >
+              {saving === "publish" ? "Publishing…" : "Publish"}
+            </button>
+          )}
+        </div>
       )}
     </div>
   );
@@ -1440,8 +1447,7 @@ function validateForm(form: Form): FormErrors {
   else if (title.length < 3) errs.title = "Job title must be at least 3 characters.";
   else if (title.length > 80) errs.title = "Job title must be 80 characters or fewer.";
 
-  if (!form.category || !form.category.trim())
-    errs.category = "Please pick a beauty category.";
+  if (!form.category || !form.category.trim()) errs.category = "Please pick a beauty category.";
 
   const desc = form.description.trim();
   if (desc.length === 0) errs.description = "Description is required.";
@@ -1461,7 +1467,6 @@ function validateForm(form: Form): FormErrors {
   const mobile = (form.contact_mobile ?? "").replace(/\D/g, "");
   if (mobile.length === 0) errs.contact_mobile = "Contact mobile is required.";
   else if (mobile.length < 10) errs.contact_mobile = "Enter a valid 10-digit mobile.";
-
 
   const min = form.salary_min;
   const max = form.salary_max;
@@ -1511,33 +1516,27 @@ const inputErrCls =
 const QUICK_START_TEMPLATES: { label: string; body: string }[] = [
   {
     label: "Hair salon role",
-    body:
-      "We are looking for a skilled [Specific Job Role] to join our salon team. The candidate should be confident in haircutting, styling, client consultation and maintaining a professional salon experience.",
+    body: "We are looking for a skilled [Specific Job Role] to join our salon team. The candidate should be confident in haircutting, styling, client consultation and maintaining a professional salon experience.",
   },
   {
     label: "Beauty parlour role",
-    body:
-      "We are looking for a professional [Specific Job Role] who is experienced in beauty services, client consultation, hygiene and customer satisfaction.",
+    body: "We are looking for a professional [Specific Job Role] who is experienced in beauty services, client consultation, hygiene and customer satisfaction.",
   },
   {
     label: "Spa role",
-    body:
-      "We are looking for a skilled [Specific Job Role] who can deliver quality spa and wellness services while maintaining a premium client experience.",
+    body: "We are looking for a skilled [Specific Job Role] who can deliver quality spa and wellness services while maintaining a premium client experience.",
   },
   {
     label: "Nail studio role",
-    body:
-      "We are looking for a creative [Specific Job Role] who is skilled in nail extensions, nail art, hygiene and client consultation.",
+    body: "We are looking for a creative [Specific Job Role] who is skilled in nail extensions, nail art, hygiene and client consultation.",
   },
   {
     label: "Bridal service role",
-    body:
-      "We are looking for a talented [Specific Job Role] with strong knowledge of bridal, party or professional makeup services and client handling.",
+    body: "We are looking for a talented [Specific Job Role] with strong knowledge of bridal, party or professional makeup services and client handling.",
   },
   {
     label: "Freelancer role",
-    body:
-      "We are looking for a passionate freelance [Specific Job Role] who can deliver quality services on-demand while managing bookings, hygiene and client satisfaction.",
+    body: "We are looking for a passionate freelance [Specific Job Role] who can deliver quality services on-demand while managing bookings, hygiene and client satisfaction.",
   },
   { label: "Write my own", body: "" },
 ];
@@ -1551,7 +1550,6 @@ function DetailsStep({
   update: (p: Partial<Form>) => void;
   errors: FormErrors;
 }) {
-
   const GENERAL_ROLES = [
     "Senior Beauty Professional",
     "Junior Beauty Professional",
@@ -1562,20 +1560,19 @@ function DetailsStep({
     "Other",
   ];
   const roleOptions = form.category
-    ? ROLE_SUGGESTIONS[form.category] ?? GENERAL_ROLES
+    ? (ROLE_SUGGESTIONS[form.category] ?? GENERAL_ROLES)
     : GENERAL_ROLES;
   const selectedRole = (form.job_role ?? "").trim();
   const titleValue = form.title.trim();
   const titleMatchesRole = selectedRole.length > 0 && titleValue === selectedRole;
-  const [pendingTemplate, setPendingTemplate] = useState<{ label: string; body: string } | null>(null);
+  const [pendingTemplate, setPendingTemplate] = useState<{ label: string; body: string } | null>(
+    null,
+  );
   const [activeQuickTemplate, setActiveQuickTemplate] = useState<string | null>(null);
 
   function fillQuickTemplate(t: { label: string; body: string }) {
     const roleForTemplate =
-      (form.specific_role ?? "").trim() ||
-      selectedRole ||
-      form.category ||
-      "beauty professional";
+      (form.specific_role ?? "").trim() || selectedRole || form.category || "beauty professional";
     const filled = t.body.replace(/\[Specific Job Role\]/g, roleForTemplate);
     update({ description: filled });
     setActiveQuickTemplate(t.label);
@@ -1594,7 +1591,6 @@ function DetailsStep({
     }
   }
 
-
   function pickRole(role: string) {
     const next = selectedRole === role ? "" : role;
     const patch: Partial<Form> = { job_role: next };
@@ -1611,7 +1607,11 @@ function DetailsStep({
   return (
     <div className="space-y-4">
       <h2 className="text-heading text-xl font-bold">Job details</h2>
-      <Field label="Job title" error={errors.title} hint={`${form.title.trim().length}/80 characters`}>
+      <Field
+        label="Job title"
+        error={errors.title}
+        hint={`${form.title.trim().length}/80 characters`}
+      >
         <input
           className={errors.title ? inputErrCls : inputCls}
           placeholder="Example: Senior Hair Stylist"
@@ -1678,10 +1678,7 @@ function DetailsStep({
           <p className="text-muted-foreground mt-2 text-xs">Selected: {form.category}</p>
         )}
       </Field>
-      <Field
-        label="Specific job role"
-        hint="Choose a suggested role or type your own."
-      >
+      <Field label="Specific job role" hint="Choose a suggested role or type your own.">
         <input
           className={inputCls}
           placeholder="Example: Bridal Hair Specialist"
@@ -1773,9 +1770,7 @@ function DetailsStep({
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() =>
-              update({ openings: Math.max(1, (Number(form.openings) || 1) - 1) })
-            }
+            onClick={() => update({ openings: Math.max(1, (Number(form.openings) || 1) - 1) })}
             aria-label="Decrease openings"
             className="h-10 w-10 rounded-lg border border-border bg-background text-lg font-bold text-heading hover:bg-muted disabled:opacity-40"
             disabled={(Number(form.openings) || 1) <= 1}
@@ -1807,9 +1802,7 @@ function DetailsStep({
           />
           <button
             type="button"
-            onClick={() =>
-              update({ openings: Math.min(50, (Number(form.openings) || 1) + 1) })
-            }
+            onClick={() => update({ openings: Math.min(50, (Number(form.openings) || 1) + 1) })}
             aria-label="Increase openings"
             className="h-10 w-10 rounded-lg border border-border bg-background text-lg font-bold text-heading hover:bg-muted disabled:opacity-40"
             disabled={(Number(form.openings) || 1) >= 50}
@@ -1920,13 +1913,9 @@ function DetailsStep({
             salary,
           };
           const substitute = (body: string) =>
-            body.replace(/\{(\w+)\}/g, (m, k: string) =>
-              values[k] ? values[k] : m,
-            );
+            body.replace(/\{(\w+)\}/g, (m, k: string) => (values[k] ? values[k] : m));
           const extractTokens = (body: string) =>
-            Array.from(
-              new Set(Array.from(body.matchAll(/\{(\w+)\}/g)).map((x) => x[1])),
-            );
+            Array.from(new Set(Array.from(body.matchAll(/\{(\w+)\}/g)).map((x) => x[1])));
 
           const insert = (body: string) => {
             const filled = substitute(body);
@@ -1980,13 +1969,13 @@ function DetailsStep({
                 })}
               </div>
               <p className="text-muted-foreground mt-1.5 text-[11px]">
-                Chips show the variables each template uses. Filled variables (highlighted) are replaced with your form values on insert; empty ones stay as{" "}
+                Chips show the variables each template uses. Filled variables (highlighted) are
+                replaced with your form values on insert; empty ones stay as{" "}
                 <code>{"{placeholder}"}</code> so you can edit later.
               </p>
             </div>
           );
         })()}
-
       </Field>
     </div>
   );
@@ -2402,7 +2391,6 @@ function SalaryStep({
       )}
 
       <div className="grid gap-4 md:grid-cols-3">
-
         <Field label="Min" error={errors.salary_min}>
           <input
             type="number"
@@ -2480,9 +2468,7 @@ function SalaryStep({
                   key={b}
                   onClick={() =>
                     update({
-                      benefits: on
-                        ? form.benefits.filter((x) => x !== b)
-                        : [...form.benefits, b],
+                      benefits: on ? form.benefits.filter((x) => x !== b) : [...form.benefits, b],
                     })
                   }
                   aria-pressed={on}
@@ -2500,7 +2486,6 @@ function SalaryStep({
           </div>
         </div>
       </div>
-
     </div>
   );
 }
@@ -2861,7 +2846,6 @@ function ScreeningQuestionsField({
   );
 }
 
-
 function ReviewStep({
   form,
   profile,
@@ -2931,11 +2915,15 @@ function LivePreview({ form, profile }: { form: Form; profile: EmployerProfile |
   };
   const periodLabel = (() => {
     switch (form.salary_period) {
-      case "hourly": return "/hr";
-      case "daily": return "/day";
-      case "yearly": return "/yr";
+      case "hourly":
+        return "/hr";
+      case "daily":
+        return "/day";
+      case "yearly":
+        return "/yr";
       case "monthly":
-      default: return "/mo";
+      default:
+        return "/mo";
     }
   })();
   const salary = (() => {
@@ -2956,8 +2944,8 @@ function LivePreview({ form, profile }: { form: Form; profile: EmployerProfile |
   const hoursText = form.flexible_schedule
     ? "Flexible hours"
     : form.start_time && form.end_time
-    ? `${form.start_time} – ${form.end_time}`
-    : "";
+      ? `${form.start_time} – ${form.end_time}`
+      : "";
   return (
     <article className="rounded-[var(--radius-card)] border border-border bg-card p-5 shadow-[var(--shadow-card)]">
       <div className="mb-3 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-primary">
@@ -2970,7 +2958,9 @@ function LivePreview({ form, profile }: { form: Form; profile: EmployerProfile |
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <h3 className="text-heading text-lg font-bold">{form.title || "Your job title"}</h3>
-          <p className="text-muted-foreground truncate text-sm">{profile?.business_name ?? "Your business"}</p>
+          <p className="text-muted-foreground truncate text-sm">
+            {profile?.business_name ?? "Your business"}
+          </p>
         </div>
         {form.category && (
           <span className="bg-primary/10 text-heading shrink-0 rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wider">
@@ -3007,15 +2997,22 @@ function LivePreview({ form, profile }: { form: Form; profile: EmployerProfile |
 
       {form.skills.length > 0 && (
         <div className="mt-3">
-          <div className="text-muted-foreground mb-1 text-[10px] font-bold uppercase tracking-wider">Skills</div>
+          <div className="text-muted-foreground mb-1 text-[10px] font-bold uppercase tracking-wider">
+            Skills
+          </div>
           <div className="flex flex-wrap gap-1.5">
             {form.skills.slice(0, 10).map((s) => (
-              <span key={s} className="bg-muted text-heading rounded-full px-2 py-0.5 text-[11px] font-semibold">
+              <span
+                key={s}
+                className="bg-muted text-heading rounded-full px-2 py-0.5 text-[11px] font-semibold"
+              >
                 {s}
               </span>
             ))}
             {form.skills.length > 10 && (
-              <span className="text-muted-foreground text-[11px] font-semibold">+{form.skills.length - 10} more</span>
+              <span className="text-muted-foreground text-[11px] font-semibold">
+                +{form.skills.length - 10} more
+              </span>
             )}
           </div>
         </div>
@@ -3023,7 +3020,9 @@ function LivePreview({ form, profile }: { form: Form; profile: EmployerProfile |
 
       {form.benefits.length > 0 && (
         <div className="mt-3">
-          <div className="text-muted-foreground mb-1 text-[10px] font-bold uppercase tracking-wider">Benefits</div>
+          <div className="text-muted-foreground mb-1 text-[10px] font-bold uppercase tracking-wider">
+            Benefits
+          </div>
           <ul className="grid grid-cols-1 gap-1">
             {form.benefits.slice(0, 8).map((b) => (
               <li key={b} className="text-heading flex items-center gap-1.5 text-xs">
@@ -3031,19 +3030,28 @@ function LivePreview({ form, profile }: { form: Form; profile: EmployerProfile |
               </li>
             ))}
             {form.benefits.length > 8 && (
-              <li className="text-muted-foreground text-[11px] font-semibold">+{form.benefits.length - 8} more</li>
+              <li className="text-muted-foreground text-[11px] font-semibold">
+                +{form.benefits.length - 8} more
+              </li>
             )}
           </ul>
         </div>
       )}
 
-      {(reqLines.length > 0 || meta.certification || meta.languages.length > 0 || meta.portfolio) && (
+      {(reqLines.length > 0 ||
+        meta.certification ||
+        meta.languages.length > 0 ||
+        meta.portfolio) && (
         <div className="mt-3">
-          <div className="text-muted-foreground mb-1 text-[10px] font-bold uppercase tracking-wider">Requirements</div>
+          <div className="text-muted-foreground mb-1 text-[10px] font-bold uppercase tracking-wider">
+            Requirements
+          </div>
           {reqLines.length > 0 && (
             <ul className="space-y-0.5">
               {reqLines.map((l, i) => (
-                <li key={i} className="text-heading text-xs">• {l}</li>
+                <li key={i} className="text-heading text-xs">
+                  • {l}
+                </li>
               ))}
             </ul>
           )}
@@ -3054,7 +3062,10 @@ function LivePreview({ form, profile }: { form: Form; profile: EmployerProfile |
               </span>
             )}
             {meta.languages.map((l) => (
-              <span key={l} className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold text-heading">
+              <span
+                key={l}
+                className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold text-heading"
+              >
                 {l}
               </span>
             ))}

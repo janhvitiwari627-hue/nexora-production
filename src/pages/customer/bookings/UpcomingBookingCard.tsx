@@ -26,10 +26,7 @@ export function UpcomingBookingCard({ booking }: { booking: UpcomingBooking }) {
               <p className="text-xs text-muted-foreground">with {booking.staff}</p>
             </div>
             <span
-              className={cn(
-                "shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold",
-                s.classes,
-              )}
+              className={cn("shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold", s.classes)}
             >
               {s.label}
             </span>

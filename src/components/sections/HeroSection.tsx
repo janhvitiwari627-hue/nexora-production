@@ -53,7 +53,6 @@ export function HeroSection() {
             India's Beauty Industry Operating System — find, book and save in seconds.
           </motion.p>
 
-
           <motion.div
             variants={item}
             className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row"
@@ -131,13 +130,10 @@ function HeroBackground() {
       <div
         className="absolute inset-0 opacity-[0.35]"
         style={{
-          backgroundImage:
-            "radial-gradient(rgba(10,37,64,0.08) 1px, transparent 1px)",
+          backgroundImage: "radial-gradient(rgba(10,37,64,0.08) 1px, transparent 1px)",
           backgroundSize: "28px 28px",
-          maskImage:
-            "radial-gradient(ellipse at center, black 40%, transparent 75%)",
-          WebkitMaskImage:
-            "radial-gradient(ellipse at center, black 40%, transparent 75%)",
+          maskImage: "radial-gradient(ellipse at center, black 40%, transparent 75%)",
+          WebkitMaskImage: "radial-gradient(ellipse at center, black 40%, transparent 75%)",
         }}
       />
 
@@ -208,4 +204,3 @@ function HeroBackground() {
     </div>
   );
 }
-

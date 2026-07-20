@@ -9,7 +9,11 @@ export function WAwards({ shop, template }: { shop: ShopData; template: Template
       <SectionTitle font={template.font}>Awards & Recognition</SectionTitle>
       <div className="mt-8 flex flex-wrap justify-center gap-4">
         {shop.awards.map((a, i) => (
-          <div key={i} className="flex items-center gap-3 border bg-white px-5 py-3 shadow-sm" style={{ borderRadius: template.radius }}>
+          <div
+            key={i}
+            className="flex items-center gap-3 border bg-white px-5 py-3 shadow-sm"
+            style={{ borderRadius: template.radius }}
+          >
             <Award className="h-6 w-6" style={{ color: template.colors.secondary }} />
             <div>
               <div className="font-semibold">{a.title}</div>

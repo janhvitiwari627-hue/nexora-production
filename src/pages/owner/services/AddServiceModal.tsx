@@ -73,10 +73,14 @@ export function AddServiceModal({
               value={form.categoryId}
               onValueChange={(v) => setForm({ ...form, categoryId: v })}
             >
-              <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
               <SelectContent>
                 {categories.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -125,7 +129,9 @@ export function AddServiceModal({
                 value={form.durationMin}
                 onChange={(e) => setForm({ ...form, durationMin: Number(e.target.value) })}
               />
-              <span className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-xs">min</span>
+              <span className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-xs">
+                min
+              </span>
             </div>
           </Field>
           <Field label="Regular price (₹)">
@@ -142,7 +148,10 @@ export function AddServiceModal({
               min={0}
               value={form.offerPrice ?? ""}
               onChange={(e) =>
-                setForm({ ...form, offerPrice: e.target.value ? Number(e.target.value) : undefined })
+                setForm({
+                  ...form,
+                  offerPrice: e.target.value ? Number(e.target.value) : undefined,
+                })
               }
               placeholder="Optional"
             />
@@ -178,7 +187,9 @@ export function AddServiceModal({
         </Field>
 
         <div className="flex justify-end gap-2 border-t pt-4">
-          <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
           <Button type="submit">{initial ? "Save changes" : "Add service"}</Button>
         </div>
       </form>
@@ -198,7 +209,9 @@ function Field({
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
-        <Label className="text-heading text-xs font-semibold uppercase tracking-wide">{label}</Label>
+        <Label className="text-heading text-xs font-semibold uppercase tracking-wide">
+          {label}
+        </Label>
         {action}
       </div>
       {children}

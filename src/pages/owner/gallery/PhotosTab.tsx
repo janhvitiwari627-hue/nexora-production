@@ -8,12 +8,7 @@ import {
   useSensors,
   type DragEndEvent,
 } from "@dnd-kit/core";
-import {
-  SortableContext,
-  arrayMove,
-  rectSortingStrategy,
-  useSortable,
-} from "@dnd-kit/sortable";
+import { SortableContext, arrayMove, rectSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -107,7 +102,8 @@ export function PhotosTab({
 
       <div className="flex items-center justify-between text-sm">
         <span className="text-muted-foreground">
-          <span className="font-semibold text-heading">{photos.length}</span> of {MAX_PHOTOS} photos uploaded
+          <span className="font-semibold text-heading">{photos.length}</span> of {MAX_PHOTOS} photos
+          uploaded
         </span>
         <span className="text-muted-foreground">5MB limit per photo</span>
       </div>

@@ -51,12 +51,7 @@ export function ShopProfilePage() {
         verified={shop.is_verified}
       />
 
-      <QuickActionBar
-        phone={shop.phone}
-        whatsapp={shop.whatsapp}
-        lat={shop.lat}
-        lng={shop.lng}
-      />
+      <QuickActionBar phone={shop.phone} whatsapp={shop.whatsapp} lat={shop.lat} lng={shop.lng} />
 
       <TabNav active={active} onChange={switchTab} />
 

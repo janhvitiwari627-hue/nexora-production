@@ -149,7 +149,6 @@ export function OwnerWebsitePage() {
     }
   }, [routeSearch, salon]);
 
-
   useEffect(() => {
     if (salon && !form) {
       const templateDefaults = getTemplate(salon.selected_template_key);
@@ -329,7 +328,14 @@ export function OwnerWebsitePage() {
   const addService = () => {
     setServices((prev) => [
       ...(prev ?? []),
-      { name: "New Service", price: 500, duration_minutes: 30, description: "", image_url: "", category: "" },
+      {
+        name: "New Service",
+        price: 500,
+        duration_minutes: 30,
+        description: "",
+        image_url: "",
+        category: "",
+      },
     ]);
   };
   const updateService = (idx: number, patch: Partial<ServiceDraft>) => {
@@ -440,7 +446,10 @@ export function OwnerWebsitePage() {
     }
   };
 
-  const uploadFile = async (file: File, folder: "cover" | "owner" | "gallery" | "video" | "services" | "staff") => {
+  const uploadFile = async (
+    file: File,
+    folder: "cover" | "owner" | "gallery" | "video" | "services" | "staff",
+  ) => {
     if (!activeSalonId) return null;
     const isVideo = folder === "video";
     const maxBytes = isVideo ? 10 * 1024 * 1024 : 2 * 1024 * 1024;
@@ -579,7 +588,6 @@ export function OwnerWebsitePage() {
             Save Changes
           </Button>
         </div>
-
       </div>
 
       {/* Status card */}
@@ -730,7 +738,8 @@ export function OwnerWebsitePage() {
               <Scissors className="h-4 w-4" /> Our Services / Rate Card
             </CardTitle>
             <p className="text-muted-foreground text-xs mt-1">
-              Add ya edit karein — image URL paste karke turant live preview me dikhega. Save karke customers ko live karo.
+              Add ya edit karein — image URL paste karke turant live preview me dikhega. Save karke
+              customers ko live karo.
             </p>
           </div>
           <div className="flex gap-2">
@@ -738,7 +747,11 @@ export function OwnerWebsitePage() {
               <Plus className="h-4 w-4" /> Add Service
             </Button>
             <Button size="sm" onClick={saveServices} disabled={savingServices || !services}>
-              {savingServices ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              {savingServices ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
               Save Services
             </Button>
           </div>
@@ -750,7 +763,10 @@ export function OwnerWebsitePage() {
             </div>
           )}
           {services?.map((s, idx) => (
-            <div key={s.id ?? `new-${idx}`} className="grid gap-2 rounded-lg border p-3 sm:grid-cols-[80px_minmax(0,1fr)_auto]">
+            <div
+              key={s.id ?? `new-${idx}`}
+              className="grid gap-2 rounded-lg border p-3 sm:grid-cols-[80px_minmax(0,1fr)_auto]"
+            >
               <div className="flex flex-col items-center gap-1.5">
                 <div className="h-20 w-20 shrink-0 overflow-hidden rounded-md border bg-muted grid place-items-center relative">
                   {s.image_url ? (
@@ -837,7 +853,8 @@ export function OwnerWebsitePage() {
             </div>
           ))}
           <p className="text-xs text-muted-foreground">
-            Tip: Thumbnail par "Upload" click karke apne phone/computer se image chunein (max 2MB). Ya optional URL field me public image link paste karein.
+            Tip: Thumbnail par "Upload" click karke apne phone/computer se image chunein (max 2MB).
+            Ya optional URL field me public image link paste karein.
           </p>
         </CardContent>
       </Card>
@@ -850,7 +867,8 @@ export function OwnerWebsitePage() {
               <Users className="h-4 w-4" /> Meet the Team
             </CardTitle>
             <p className="text-muted-foreground text-xs mt-1">
-              Team members add karein — photo upload karke turant live preview me dikhega. Save karke customers ke liye publish karo.
+              Team members add karein — photo upload karke turant live preview me dikhega. Save
+              karke customers ke liye publish karo.
             </p>
           </div>
           <div className="flex gap-2">
@@ -858,7 +876,11 @@ export function OwnerWebsitePage() {
               <Plus className="h-4 w-4" /> Add Member
             </Button>
             <Button size="sm" onClick={saveStaff} disabled={savingStaff || !staff}>
-              {savingStaff ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              {savingStaff ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
               Save Team
             </Button>
           </div>
@@ -958,8 +980,6 @@ export function OwnerWebsitePage() {
           </p>
         </CardContent>
       </Card>
-
-
 
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Brand customizer */}
@@ -1418,7 +1438,8 @@ export function OwnerWebsitePage() {
               </div>
             </div>
             <p className="text-muted-foreground mt-1 text-xs">
-              Aap jo bhi color, banner, logo ya text change karenge, wo yahan turant dikhega. Save Changes ke baad customers ko bhi dikhega.
+              Aap jo bhi color, banner, logo ya text change karenge, wo yahan turant dikhega. Save
+              Changes ke baad customers ko bhi dikhega.
             </p>
           </DialogHeader>
           <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden bg-muted/40 lg:grid-cols-[340px_minmax(0,1fr)]">
@@ -1441,11 +1462,18 @@ export function OwnerWebsitePage() {
                         >
                           <span
                             className="h-8 w-8 shrink-0 rounded-full border"
-                            style={{ backgroundColor: template.colors.primary, borderColor: template.colors.secondary }}
+                            style={{
+                              backgroundColor: template.colors.primary,
+                              borderColor: template.colors.secondary,
+                            }}
                           />
                           <span className="min-w-0">
-                            <span className="block truncate text-sm font-semibold">{template.name}</span>
-                            <span className="text-muted-foreground block truncate text-[11px]">{template.themeType}</span>
+                            <span className="block truncate text-sm font-semibold">
+                              {template.name}
+                            </span>
+                            <span className="text-muted-foreground block truncate text-[11px]">
+                              {template.themeType}
+                            </span>
                           </span>
                         </button>
                       );
@@ -1496,7 +1524,11 @@ export function OwnerWebsitePage() {
                     Banner Image
                     <span className="hover:bg-muted/50 mt-1 flex h-24 cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-dashed">
                       {form.cover_image_url ? (
-                        <img src={form.cover_image_url} alt="Website banner" className="h-full w-full object-cover" />
+                        <img
+                          src={form.cover_image_url}
+                          alt="Website banner"
+                          className="h-full w-full object-cover"
+                        />
                       ) : (
                         <span className="text-muted-foreground text-xs">Upload banner</span>
                       )}
@@ -1515,7 +1547,11 @@ export function OwnerWebsitePage() {
                     Logo / Owner Photo
                     <span className="hover:bg-muted/50 mt-1 flex h-24 cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-dashed">
                       {form.owner_profile_image_url ? (
-                        <img src={form.owner_profile_image_url} alt="Website logo" className="h-full w-full object-cover" />
+                        <img
+                          src={form.owner_profile_image_url}
+                          alt="Website logo"
+                          className="h-full w-full object-cover"
+                        />
                       ) : (
                         <span className="text-muted-foreground text-xs">Upload logo</span>
                       )}
@@ -1532,7 +1568,11 @@ export function OwnerWebsitePage() {
                   </label>
                 </div>
                 <Button onClick={handleSave} disabled={mutate.isPending} className="w-full">
-                  {mutate.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                  {mutate.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Save className="h-4 w-4" />
+                  )}
                   Save Website
                 </Button>
               </div>
@@ -1646,4 +1686,3 @@ function SectionEditLink({
   }
   return <div className={className}>{inner}</div>;
 }
-

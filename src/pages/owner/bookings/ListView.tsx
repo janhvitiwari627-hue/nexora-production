@@ -64,12 +64,22 @@ export function ListView({
                 aria-label="Select all"
               />
             </TableHead>
-            <TableHead><SortBtn k="customer" label="Customer" /></TableHead>
+            <TableHead>
+              <SortBtn k="customer" label="Customer" />
+            </TableHead>
             <TableHead>Service</TableHead>
-            <TableHead><SortBtn k="staff" label="Staff" /></TableHead>
-            <TableHead><SortBtn k="date" label="Date / Time" /></TableHead>
-            <TableHead><SortBtn k="total" label="Total" /></TableHead>
-            <TableHead><SortBtn k="status" label="Status" /></TableHead>
+            <TableHead>
+              <SortBtn k="staff" label="Staff" />
+            </TableHead>
+            <TableHead>
+              <SortBtn k="date" label="Date / Time" />
+            </TableHead>
+            <TableHead>
+              <SortBtn k="total" label="Total" />
+            </TableHead>
+            <TableHead>
+              <SortBtn k="status" label="Status" />
+            </TableHead>
             <TableHead></TableHead>
           </TableRow>
         </TableHeader>
@@ -85,13 +95,20 @@ export function ListView({
               </TableCell>
               <TableCell>
                 <div className="text-heading font-medium">{b.customer}</div>
-                <div className="text-muted-foreground text-xs">{b.id} · {b.mobile}</div>
+                <div className="text-muted-foreground text-xs">
+                  {b.id} · {b.mobile}
+                </div>
               </TableCell>
               <TableCell className="text-sm">{b.service}</TableCell>
               <TableCell className="text-sm">{b.staff}</TableCell>
-              <TableCell className="text-sm">{b.date}<div className="text-muted-foreground text-xs">{b.time}</div></TableCell>
+              <TableCell className="text-sm">
+                {b.date}
+                <div className="text-muted-foreground text-xs">{b.time}</div>
+              </TableCell>
               <TableCell className="text-sm">₹{b.total.toLocaleString()}</TableCell>
-              <TableCell><StatusBadge status={b.status} /></TableCell>
+              <TableCell>
+                <StatusBadge status={b.status} />
+              </TableCell>
               <TableCell>
                 <Button size="sm" variant="ghost" onClick={() => onView(b)}>
                   <Eye className="h-4 w-4" />

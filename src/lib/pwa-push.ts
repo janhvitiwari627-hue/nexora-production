@@ -16,7 +16,9 @@ export async function requestPushPermission(): Promise<NotificationPermission | 
     const permission = await Notification.requestPermission();
     localStorage.setItem(KEY, permission);
     if (permission === "granted") {
-      toast.success("Notifications enabled", { description: "We'll remind you of upcoming appointments." });
+      toast.success("Notifications enabled", {
+        description: "We'll remind you of upcoming appointments.",
+      });
     }
     return permission;
   } catch {

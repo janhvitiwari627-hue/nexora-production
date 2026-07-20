@@ -47,10 +47,7 @@ export function resolveBookingAvailability(
   return readStorage(slugKey(slug)) ?? readStorage(GLOBAL_KEY) ?? "on";
 }
 
-export function isBookingMockDisabled(
-  slug: string,
-  searchOverride?: BookingMockState,
-): boolean {
+export function isBookingMockDisabled(slug: string, searchOverride?: BookingMockState): boolean {
   return resolveBookingAvailability(slug, searchOverride) === "off";
 }
 

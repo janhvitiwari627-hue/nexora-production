@@ -33,12 +33,38 @@ export interface StaffMember {
   availability: Availability;
 }
 
-export const DESIGNATIONS = ["Senior Stylist", "Stylist", "Junior Stylist", "Therapist", "Makeup Artist", "Nail Artist"];
-export const SPECIALIZATIONS = [
-  "Hair Color", "Balayage", "Keratin", "Bridal Makeup", "HD Makeup", "Facials",
-  "Acne Care", "Manicure", "Pedicure", "Threading", "Beard Styling", "Massage Therapy",
+export const DESIGNATIONS = [
+  "Senior Stylist",
+  "Stylist",
+  "Junior Stylist",
+  "Therapist",
+  "Makeup Artist",
+  "Nail Artist",
 ];
-export const LANGUAGES = ["English", "Hindi", "Marathi", "Tamil", "Telugu", "Bengali", "Punjabi", "Kannada"];
+export const SPECIALIZATIONS = [
+  "Hair Color",
+  "Balayage",
+  "Keratin",
+  "Bridal Makeup",
+  "HD Makeup",
+  "Facials",
+  "Acne Care",
+  "Manicure",
+  "Pedicure",
+  "Threading",
+  "Beard Styling",
+  "Massage Therapy",
+];
+export const LANGUAGES = [
+  "English",
+  "Hindi",
+  "Marathi",
+  "Tamil",
+  "Telugu",
+  "Bengali",
+  "Punjabi",
+  "Kannada",
+];
 
 export const ALL_SERVICES = [
   { id: "s1", name: "Haircut & Style" },
@@ -55,7 +81,10 @@ export const ALL_SERVICES = [
 ];
 
 const PORT = (n: number) =>
-  Array.from({ length: n }, (_, i) => `https://picsum.photos/seed/staff${Math.floor(Math.random() * 9999)}-${i}/400/400`);
+  Array.from(
+    { length: n },
+    (_, i) => `https://picsum.photos/seed/staff${Math.floor(Math.random() * 9999)}-${i}/400/400`,
+  );
 
 export const initialStaff: StaffMember[] = [
   {

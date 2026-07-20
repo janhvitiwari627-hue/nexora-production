@@ -67,7 +67,9 @@ async function expectNoMarketingLayout(page: import("@playwright/test").Page) {
 }
 
 test.describe("PWA standalone mode: customer app layout isolation", () => {
-  test("standalone-mode public URL redirects into /customer/* and shows no marketing layout", async ({ browser }) => {
+  test("standalone-mode public URL redirects into /customer/* and shows no marketing layout", async ({
+    browser,
+  }) => {
     const context = await browser.newContext();
     await installStandaloneFake(context);
     const page = await context.newPage();
@@ -78,7 +80,9 @@ test.describe("PWA standalone mode: customer app layout isolation", () => {
     await page.waitForURL(/\/customer\//, { timeout: 10_000 });
 
     expect(page.url()).toMatch(/\/customer\//);
-    expect(page.url()).not.toMatch(/\/(explore|for-owners|admin|about|create-shop-website|partner-growth|distributor|job-portal)(\/|$|\?)/);
+    expect(page.url()).not.toMatch(
+      /\/(explore|for-owners|admin|about|create-shop-website|partner-growth|distributor|job-portal)(\/|$|\?)/,
+    );
     await expectNoMarketingLayout(page);
 
     await context.close();
@@ -106,7 +110,9 @@ test.describe("PWA standalone mode: customer app layout isolation", () => {
   // Rule 3 + 4: launching the installed app (start_url = /customer/home)
   // must land inside /customer/* with no marketing chrome, even when the
   // browser initially navigates to the /customer-app install landing page.
-  test("standalone: /customer-app redirects into /customer/* (no install landing)", async ({ browser }) => {
+  test("standalone: /customer-app redirects into /customer/* (no install landing)", async ({
+    browser,
+  }) => {
     const context = await browser.newContext();
     await installStandaloneFake(context);
     const page = await context.newPage();
@@ -132,7 +138,9 @@ test.describe("PWA standalone mode: customer app layout isolation", () => {
   ];
 
   for (const route of ["/customer/home", "/customer/at-salon", "/customer/profile"]) {
-    test(`standalone: ${route} contains no owner/partner/distributor nav links`, async ({ browser }) => {
+    test(`standalone: ${route} contains no owner/partner/distributor nav links`, async ({
+      browser,
+    }) => {
       const context = await browser.newContext();
       await installStandaloneFake(context);
       const page = await context.newPage();
@@ -153,7 +161,9 @@ test.describe("PWA standalone mode: customer app layout isolation", () => {
 
   // Rule 7: "Continue in Browser" (rendered in InstallBanner on public
   // pages) must route to /customer/home, never to the website home.
-  test("non-standalone: InstallBanner 'Continue in Browser' targets /customer/home", async ({ browser }) => {
+  test("non-standalone: InstallBanner 'Continue in Browser' targets /customer/home", async ({
+    browser,
+  }) => {
     const context = await browser.newContext();
     // NOTE: no standalone fake — this checks the browser-mode banner.
     const page = await context.newPage();

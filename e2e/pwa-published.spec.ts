@@ -10,8 +10,7 @@ import { test, expect, devices } from "@playwright/test";
  * they hit whatever HTML + manifest the CDN is currently serving.
  */
 
-const PUBLISHED_URL =
-  process.env.PLAYWRIGHT_PUBLISHED_URL ?? "https://radiant-hub-os.lovable.app";
+const PUBLISHED_URL = process.env.PLAYWRIGHT_PUBLISHED_URL ?? "https://radiant-hub-os.lovable.app";
 
 const IOS_UA =
   "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1";
@@ -34,7 +33,9 @@ type Manifest = {
 };
 
 test.describe("Published PWA manifest", () => {
-  test("serves manifest with correct start_url, theme, background, and icons", async ({ request }) => {
+  test("serves manifest with correct start_url, theme, background, and icons", async ({
+    request,
+  }) => {
     const res = await request.get(`${PUBLISHED_URL}/manifest.webmanifest`);
     expect(res.status(), "manifest.webmanifest must be 200").toBe(200);
 
@@ -44,7 +45,9 @@ test.describe("Published PWA manifest", () => {
 
     const manifest = (await res.json()) as Manifest;
 
-    expect(manifest.start_url, "start_url must launch the customer app home").toBe(EXPECTED_START_URL);
+    expect(manifest.start_url, "start_url must launch the customer app home").toBe(
+      EXPECTED_START_URL,
+    );
     expect(manifest.display, "display must be standalone for installability").toBe("standalone");
     expect(manifest.theme_color?.toLowerCase()).toBe(EXPECTED_THEME_COLOR);
     expect(manifest.background_color?.toLowerCase()).toBe(EXPECTED_BACKGROUND_COLOR);
@@ -70,7 +73,9 @@ test.describe("Published PWA manifest", () => {
 });
 
 test.describe("Published /customer-app install CTA visibility", () => {
-  test("Android (Chrome UA): shows install-eligible CTA and Android manual steps hint", async ({ browser }) => {
+  test("Android (Chrome UA): shows install-eligible CTA and Android manual steps hint", async ({
+    browser,
+  }) => {
     const context = await browser.newContext({
       ...devices["Pixel 7"],
       userAgent: ANDROID_UA,
@@ -107,13 +112,17 @@ test.describe("Published /customer-app install CTA visibility", () => {
     const nativeBtn = page.locator("main").getByRole("button", { name: /^Install Nexora App$/i });
     await expect(nativeBtn).toBeVisible();
     await nativeBtn.click();
-    const fired = await page.evaluate(() => (window as unknown as { __promptFired?: boolean }).__promptFired);
+    const fired = await page.evaluate(
+      () => (window as unknown as { __promptFired?: boolean }).__promptFired,
+    );
     expect(fired, "clicking Install Nexora App must invoke deferred.prompt()").toBe(true);
 
     await context.close();
   });
 
-  test("iOS (Safari UA): shows iOS install-steps CTA and Add to Home Screen guidance", async ({ browser }) => {
+  test("iOS (Safari UA): shows iOS install-steps CTA and Add to Home Screen guidance", async ({
+    browser,
+  }) => {
     const context = await browser.newContext({
       ...devices["iPhone 13"],
       userAgent: IOS_UA,
@@ -122,9 +131,7 @@ test.describe("Published /customer-app install CTA visibility", () => {
     await page.goto(`${PUBLISHED_URL}/customer-app`, { waitUntil: "domcontentloaded" });
     await page.waitForLoadState("networkidle");
 
-    const iosBtn = page
-      .locator("main")
-      .getByRole("button", { name: /Show iOS Install Steps/i });
+    const iosBtn = page.locator("main").getByRole("button", { name: /Show iOS Install Steps/i });
     await expect(iosBtn).toBeVisible();
 
     await expect(page.locator("main")).toContainText(/On iPhone\/iPad:/i);
@@ -137,7 +144,9 @@ test.describe("Published /customer-app install CTA visibility", () => {
     await context.close();
   });
 
-  test("Installed state (localStorage flag): CTA hides and 'App installed' pill shows", async ({ browser }) => {
+  test("Installed state (localStorage flag): CTA hides and 'App installed' pill shows", async ({
+    browser,
+  }) => {
     const context = await browser.newContext({
       ...devices["Pixel 7"],
       userAgent: ANDROID_UA,
@@ -157,7 +166,9 @@ test.describe("Published /customer-app install CTA visibility", () => {
     await page.waitForLoadState("networkidle");
 
     await expect(
-      page.locator("main").getByRole("button", { name: /Install Nexora App|Show Android Install Steps|Show iOS Install Steps/i })
+      page.locator("main").getByRole("button", {
+        name: /Install Nexora App|Show Android Install Steps|Show iOS Install Steps/i,
+      }),
     ).toHaveCount(0);
     await expect(page.locator("main")).toContainText(/App installed/i);
 

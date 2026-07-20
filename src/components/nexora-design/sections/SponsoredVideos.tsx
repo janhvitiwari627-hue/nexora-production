@@ -20,9 +20,11 @@ const VIDEOS: SponsoredVideo[] = [
     brand: "LuxeLocks Pro",
     initials: "LP",
     title: "The Art of Salon Blowouts",
-    description: "Watch master stylists create volume, shine and movement using LuxeLocks Pro formulas.",
+    description:
+      "Watch master stylists create volume, shine and movement using LuxeLocks Pro formulas.",
     duration: "0:30",
-    thumbnail: "https://images.pexels.com/photos/3993449/pexels-photo-3993449.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=900",
+    thumbnail:
+      "https://images.pexels.com/photos/3993449/pexels-photo-3993449.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=900",
     youtubeId: "GIQn0quNk68",
     stats: { views: "84.5K", ctr: "4.64%", avgWatch: "18s", completion: "62%" },
   },
@@ -33,7 +35,8 @@ const VIDEOS: SponsoredVideo[] = [
     title: "Morning Skin Ritual",
     description: "A 60-second routine designed by dermatologists for radiant skin.",
     duration: "0:15",
-    thumbnail: "https://images.pexels.com/photos/3997385/pexels-photo-3997385.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=900",
+    thumbnail:
+      "https://images.pexels.com/photos/3997385/pexels-photo-3997385.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=900",
     youtubeId: "uelHwf8o7_U",
     stats: { views: "62.1K", ctr: "3.92%", avgWatch: "11s", completion: "71%" },
   },
@@ -44,7 +47,8 @@ const VIDEOS: SponsoredVideo[] = [
     title: "Tools That Transform",
     description: "Inside the workshop where StyleCraft's precision shears are made.",
     duration: "0:45",
-    thumbnail: "https://images.pexels.com/photos/3993459/pexels-photo-3993459.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=900",
+    thumbnail:
+      "https://images.pexels.com/photos/3993459/pexels-photo-3993459.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=900",
     youtubeId: "vS0Hku4SkQ8",
     stats: { views: "41.8K", ctr: "5.10%", avgWatch: "27s", completion: "58%" },
   },
@@ -55,7 +59,8 @@ const VIDEOS: SponsoredVideo[] = [
     title: "Spa at Home Experience",
     description: "Recreate a five-star spa ritual with botanical oils from SereneSpa.",
     duration: "0:30",
-    thumbnail: "https://images.pexels.com/photos/3865711/pexels-photo-3865711.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=900",
+    thumbnail:
+      "https://images.pexels.com/photos/3865711/pexels-photo-3865711.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=900",
     youtubeId: "0E00Zuayv9Q",
     stats: { views: "53.2K", ctr: "4.21%", avgWatch: "19s", completion: "65%" },
   },
@@ -66,7 +71,8 @@ const VIDEOS: SponsoredVideo[] = [
     title: "Nail Art Masterclass",
     description: "Learn signature nail art looks from ColorPop's lead artist.",
     duration: "1:00",
-    thumbnail: "https://images.pexels.com/photos/3997989/pexels-photo-3997989.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=900",
+    thumbnail:
+      "https://images.pexels.com/photos/3997989/pexels-photo-3997989.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=900",
     youtubeId: "OPf0YbXqDm0",
     stats: { views: "29.4K", ctr: "6.02%", avgWatch: "33s", completion: "54%" },
   },
@@ -77,7 +83,8 @@ const VIDEOS: SponsoredVideo[] = [
     title: "Beauty Brand Story",
     description: "Meet the independent makers powering the next chapter of premium beauty.",
     duration: "0:30",
-    thumbnail: "https://images.pexels.com/photos/3997387/pexels-photo-3997387.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=900",
+    thumbnail:
+      "https://images.pexels.com/photos/3997387/pexels-photo-3997387.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=900",
     youtubeId: "fLexgOxsZu0",
     stats: { views: "37.6K", ctr: "4.85%", avgWatch: "21s", completion: "60%" },
   },
@@ -90,7 +97,10 @@ export default function SponsoredVideos() {
   const scroll = (dir: "l" | "r") => {
     const el = scrollerRef.current;
     if (!el) return;
-    el.scrollBy({ left: dir === "l" ? -el.clientWidth * 0.8 : el.clientWidth * 0.8, behavior: "smooth" });
+    el.scrollBy({
+      left: dir === "l" ? -el.clientWidth * 0.8 : el.clientWidth * 0.8,
+      behavior: "smooth",
+    });
   };
 
   return (
@@ -306,7 +316,9 @@ function VideoViewer({
                   </span>
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-[11px] font-semibold text-indigo-600">{v.brand}</div>
+                  <div className="truncate text-[11px] font-semibold text-indigo-600">
+                    {v.brand}
+                  </div>
                   <div className="line-clamp-2 text-sm font-medium text-slate-800 group-hover:text-slate-900">
                     {v.title}
                   </div>

@@ -24,11 +24,8 @@ export function CustomerAvatar({
         : null;
   const avatarUrl = metadataAvatar || currentProfile?.avatar_url;
   const metadataName =
-    typeof user?.user_metadata?.full_name === "string"
-      ? user.user_metadata.full_name.trim()
-      : "";
-  const displayName =
-    metadataName || currentProfile?.full_name || user?.email?.split("@")[0] || "";
+    typeof user?.user_metadata?.full_name === "string" ? user.user_metadata.full_name.trim() : "";
+  const displayName = metadataName || currentProfile?.full_name || user?.email?.split("@")[0] || "";
   const initials =
     displayName
       .split(/\s+/)

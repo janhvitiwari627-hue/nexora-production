@@ -16,7 +16,14 @@ const PLACEHOLDERS = [
 ];
 
 const TRENDING_CHIPS = [
-  "Salon", "Haircut", "Spa", "Bridal Makeup", "Nail Art", "Tattoo", "Massage", "Beard",
+  "Salon",
+  "Haircut",
+  "Spa",
+  "Bridal Makeup",
+  "Nail Art",
+  "Tattoo",
+  "Massage",
+  "Beard",
 ];
 
 type SpeechRecognitionLike = {
@@ -83,12 +90,15 @@ export function SmartSearchCard() {
       const parsed = await parse({ data: { query: term } });
       if (parsed.nearMe && !location) requestGps();
       toast.success("AI: " + parsed.intent, {
-        description: [
-          parsed.category && `Category: ${parsed.category}`,
-          parsed.maxBudget && `Budget: ≤ ₹${parsed.maxBudget}`,
-          parsed.minRating && `Rating: ≥ ${parsed.minRating}★`,
-          parsed.area && `Area: ${parsed.area}`,
-        ].filter(Boolean).join(" · ") || undefined,
+        description:
+          [
+            parsed.category && `Category: ${parsed.category}`,
+            parsed.maxBudget && `Budget: ≤ ₹${parsed.maxBudget}`,
+            parsed.minRating && `Rating: ≥ ${parsed.minRating}★`,
+            parsed.area && `Area: ${parsed.area}`,
+          ]
+            .filter(Boolean)
+            .join(" · ") || undefined,
       });
       submit(parsed.service || term, parsed.category ?? undefined);
     } catch (e) {
@@ -127,7 +137,10 @@ export function SmartSearchCard() {
   };
 
   return (
-    <div ref={wrapRef} className="relative mx-auto w-full max-w-[1400px] px-[max(env(safe-area-inset-left),0.75rem)] pr-[max(env(safe-area-inset-right),0.75rem)] sm:w-[95%] sm:px-0">
+    <div
+      ref={wrapRef}
+      className="relative mx-auto w-full max-w-[1400px] px-[max(env(safe-area-inset-left),0.75rem)] pr-[max(env(safe-area-inset-right),0.75rem)] sm:w-[95%] sm:px-0"
+    >
       <div className="rounded-[24px] border border-[#E6EBF1] bg-white p-3 shadow-[0_10px_40px_-12px_rgba(50,50,93,0.12),0_4px_10px_-4px_rgba(10,37,64,0.06)] md:p-4">
         <div className="flex flex-col gap-2 md:flex-row md:items-stretch">
           {/* Service */}
@@ -148,7 +161,9 @@ export function SmartSearchCard() {
               onClick={toggleVoice}
               aria-label={listening ? "Stop voice search" : "Voice search"}
               className={`grid h-9 w-9 shrink-0 place-items-center rounded-full transition ${
-                listening ? "bg-red-500 text-white animate-pulse" : "bg-white text-[#635BFF] hover:bg-[#635BFF]/10"
+                listening
+                  ? "bg-red-500 text-white animate-pulse"
+                  : "bg-white text-[#635BFF] hover:bg-[#635BFF]/10"
               }`}
             >
               <Mic className="h-4 w-4" />
@@ -161,14 +176,17 @@ export function SmartSearchCard() {
               title="AI smart search"
               className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#635BFF] to-[#9F7AFF] text-white transition hover:scale-110 disabled:opacity-60"
             >
-              {aiBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              {aiBusy ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4" />
+              )}
             </button>
           </div>
 
           {/* Location */}
           <button
             className="flex flex-1 min-w-0 items-center gap-3 rounded-[16px] bg-[#F6F9FC] px-3 py-3 text-left sm:px-4"
-
             type="button"
             onClick={() => !location && requestGps()}
           >
@@ -185,7 +203,9 @@ export function SmartSearchCard() {
                 Location
               </div>
               <div className="truncate text-sm font-semibold text-[#0A2540]">
-                {location ? `${location.lat.toFixed(2)}, ${location.lng.toFixed(2)}` : "Auto Detect"}
+                {location
+                  ? `${location.lat.toFixed(2)}, ${location.lng.toFixed(2)}`
+                  : "Auto Detect"}
               </div>
             </div>
           </button>
@@ -197,7 +217,6 @@ export function SmartSearchCard() {
           >
             Find Services
           </button>
-
         </div>
 
         {/* Trending chips */}

@@ -145,7 +145,11 @@ export async function saveJob(params: {
   if (publish) payload.published_at = new Date().toISOString();
 
   if (jobId) {
-    const { data, error } = await table("jobs").update(payload).eq("id", jobId).select("*").single();
+    const { data, error } = await table("jobs")
+      .update(payload)
+      .eq("id", jobId)
+      .select("*")
+      .single();
     if (error) throw error;
     return data as JobRow;
   }
@@ -192,10 +196,7 @@ export async function saveJobForLater(jobId: string, userId: string): Promise<vo
 }
 
 export async function removeSavedJob(jobId: string, userId: string): Promise<void> {
-  const { error } = await table("saved_jobs")
-    .delete()
-    .eq("job_id", jobId)
-    .eq("user_id", userId);
+  const { error } = await table("saved_jobs").delete().eq("job_id", jobId).eq("user_id", userId);
   if (error) throw error;
 }
 
@@ -254,14 +255,18 @@ export async function listMyApplications(
     .order("created_at", { ascending: false });
   const { data, error } = await (options?.signal
     ? // supabase-js exposes abortSignal on the builder
-      (query as unknown as { abortSignal: (s: AbortSignal) => typeof query })
-        .abortSignal(options.signal)
+      (query as unknown as { abortSignal: (s: AbortSignal) => typeof query }).abortSignal(
+        options.signal,
+      )
     : query);
   if (error) throw error;
   return (data ?? []) as JobApplication[];
 }
 
-export async function withdrawApplication(applicationId: string, applicantId: string): Promise<void> {
+export async function withdrawApplication(
+  applicationId: string,
+  applicantId: string,
+): Promise<void> {
   const { error } = await table("job_applications")
     .update({ status: "withdrawn" })
     .eq("id", applicationId)
@@ -283,9 +288,7 @@ export async function listMyJobPosts(userId: string): Promise<MyJobPost[]> {
   const rows = (jobs ?? []) as JobRow[];
   if (rows.length === 0) return [];
   const ids = rows.map((j) => j.id);
-  const { data: apps } = await table("job_applications")
-    .select("job_id,status")
-    .in("job_id", ids);
+  const { data: apps } = await table("job_applications").select("job_id,status").in("job_id", ids);
   const counts = new Map<string, { total: number; fresh: number }>();
   for (const a of (apps ?? []) as { job_id: string; status: string }[]) {
     const c = counts.get(a.job_id) ?? { total: 0, fresh: 0 };
@@ -356,9 +359,7 @@ export async function updateApplicationStatus(
   applicationId: string,
   status: "submitted" | "reviewed" | "shortlisted" | "rejected" | "hired",
 ): Promise<void> {
-  const { error } = await table("job_applications")
-    .update({ status })
-    .eq("id", applicationId);
+  const { error } = await table("job_applications").update({ status }).eq("id", applicationId);
   if (error) throw error;
 }
 
@@ -369,9 +370,6 @@ export async function setJobStatus(
 ): Promise<void> {
   const patch: any = { status };
   if (status === "published") patch.published_at = new Date().toISOString();
-  const { error } = await table("jobs")
-    .update(patch)
-    .eq("id", jobId)
-    .eq("posted_by", userId);
+  const { error } = await table("jobs").update(patch).eq("id", jobId).eq("posted_by", userId);
   if (error) throw error;
 }

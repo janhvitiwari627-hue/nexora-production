@@ -68,8 +68,7 @@ export async function getPublicAppointmentReceipt(bookingId: string) {
   const { data: session } = await supabase.auth.getSession();
   if (!session.session) return null;
 
-  const { data, error } = await (supabase
-    .from("bookings") as any)
+  const { data, error } = await (supabase.from("bookings") as any)
     .select(
       "id, booking_reference, salon_id, service_id, service_name, staff_id, booking_date, booking_time, price, advance_amount, status, payment_status, salons(name, slug), staff(name)",
     )

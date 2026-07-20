@@ -58,10 +58,9 @@ for (const vp of VIEWPORTS) {
         await expect(page.locator("body")).toBeVisible();
 
         const hrefs = await collectBookNowHrefs(page);
-        expect(
-          hrefs.length,
-          `expected at least one Book Now link on ${vp.name}`,
-        ).toBeGreaterThan(0);
+        expect(hrefs.length, `expected at least one Book Now link on ${vp.name}`).toBeGreaterThan(
+          0,
+        );
 
         for (const href of hrefs) {
           expect(href, `bad Book Now href on ${vp.name}: ${href}`).toMatch(

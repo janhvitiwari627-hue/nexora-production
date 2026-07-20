@@ -218,7 +218,10 @@ export function JoinPartnerDialog({ trigger }: Props) {
   };
 
   const renderStatusCard = (app: NonNullable<ExistingApp>) => {
-    const map: Record<DbpStatus, { icon: typeof CheckCircle2; tone: string; label: string; desc: string }> = {
+    const map: Record<
+      DbpStatus,
+      { icon: typeof CheckCircle2; tone: string; label: string; desc: string }
+    > = {
       pending: {
         icon: Clock,
         tone: "text-amber-600 bg-amber-50 border-amber-200",
@@ -386,10 +389,7 @@ export function JoinPartnerDialog({ trigger }: Props) {
               </div>
               <div>
                 <Label htmlFor="jp-role">Your role *</Label>
-                <Select
-                  value={form.role}
-                  onValueChange={(v) => setForm({ ...form, role: v })}
-                >
+                <Select value={form.role} onValueChange={(v) => setForm({ ...form, role: v })}>
                   <SelectTrigger id="jp-role">
                     <SelectValue placeholder="Select your role" />
                   </SelectTrigger>

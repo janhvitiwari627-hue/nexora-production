@@ -8,7 +8,12 @@ interface FadeInProps {
   direction?: "up" | "down" | "left" | "right";
 }
 
-export default function FadeIn({ children, delay = 0, className = "", direction = "up" }: FadeInProps) {
+export default function FadeIn({
+  children,
+  delay = 0,
+  className = "",
+  direction = "up",
+}: FadeInProps) {
   const directionOffset = {
     up: { y: 28 },
     down: { y: -28 },

@@ -16,9 +16,7 @@ type Detail = { id: string; phase: Phase };
 
 export function emitBookingRefresh(id: string, phase: Phase) {
   if (typeof window === "undefined") return;
-  window.dispatchEvent(
-    new CustomEvent<Detail>(EVENT_NAME, { detail: { id, phase } }),
-  );
+  window.dispatchEvent(new CustomEvent<Detail>(EVENT_NAME, { detail: { id, phase } }));
 }
 
 /** Fires start → auto-end after `minMs` OR when caller calls the returned fn. */

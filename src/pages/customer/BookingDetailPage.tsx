@@ -35,7 +35,8 @@ export function BookingDetailPage({ booking = mockBookingDetail }: { booking?: B
   const qrWrapRef = useRef<HTMLDivElement>(null);
   const isRefreshing = useBookingRefreshing(booking.id);
 
-  const total = booking.payment.servicePrice + booking.payment.platformFee - booking.payment.discount;
+  const total =
+    booking.payment.servicePrice + booking.payment.platformFee - booking.payment.discount;
   const remaining = Math.max(0, total - booking.payment.advancePaid);
 
   const copyId = () => {
@@ -105,7 +106,11 @@ export function BookingDetailPage({ booking = mockBookingDetail }: { booking?: B
                 aria-label="Copy booking ID"
                 className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition hover:text-heading"
               >
-                {copied ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4" />}
+                {copied ? (
+                  <Check className="h-4 w-4 text-emerald-600" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
               </button>
             </div>
           </div>
@@ -176,11 +181,7 @@ export function BookingDetailPage({ booking = mockBookingDetail }: { booking?: B
                     </span>
                   }
                 />
-                <Detail
-                  label="When"
-                  value={formatBookingDate(booking.service.dateISO)}
-                  span={2}
-                />
+                <Detail label="When" value={formatBookingDate(booking.service.dateISO)} span={2} />
                 <Detail label="Total" value={`₹${total}`} />
                 <Detail label="Advance Paid" value={`₹${booking.payment.advancePaid}`} />
                 <Detail
@@ -231,13 +232,8 @@ export function BookingDetailPage({ booking = mockBookingDetail }: { booking?: B
           <aside className="space-y-6">
             <div className="rounded-2xl border bg-card p-5 text-center shadow-sm">
               <h3 className="text-sm font-bold">Show this at the shop</h3>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Scan for instant check-in
-              </p>
-              <div
-                ref={qrWrapRef}
-                className="mx-auto mt-4 w-fit rounded-2xl border bg-white p-4"
-              >
+              <p className="mt-1 text-xs text-muted-foreground">Scan for instant check-in</p>
+              <div ref={qrWrapRef} className="mx-auto mt-4 w-fit rounded-2xl border bg-white p-4">
                 <QRCodeCanvas
                   value={`nexora:booking:${booking.id}`}
                   size={180}
@@ -282,15 +278,7 @@ export function BookingDetailPage({ booking = mockBookingDetail }: { booking?: B
   );
 }
 
-function Detail({
-  label,
-  value,
-  span,
-}: {
-  label: string;
-  value: React.ReactNode;
-  span?: number;
-}) {
+function Detail({ label, value, span }: { label: string; value: React.ReactNode; span?: number }) {
   return (
     <div className={span === 2 ? "col-span-2" : undefined}>
       <dt className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
@@ -314,9 +302,7 @@ function Line({
 }) {
   return (
     <li className="flex items-center justify-between">
-      <span className={cn("text-muted-foreground", bold && "font-bold text-heading")}>
-        {label}
-      </span>
+      <span className={cn("text-muted-foreground", bold && "font-bold text-heading")}>{label}</span>
       <span className={cn(bold ? "font-black text-heading" : "font-semibold", valueClass)}>
         {value}
       </span>
@@ -345,7 +331,9 @@ function ActionBtn({
         "inline-flex w-full items-center justify-center gap-1.5 rounded-full px-3 py-2.5 text-xs font-bold transition disabled:opacity-50",
         primary && "bg-primary text-primary-foreground hover:opacity-90",
         tone === "danger" && "border border-rose-200 text-rose-600 hover:bg-rose-50",
-        !primary && !tone && "border border-border text-heading hover:border-primary/40 hover:bg-primary/5",
+        !primary &&
+          !tone &&
+          "border border-border text-heading hover:border-primary/40 hover:bg-primary/5",
       )}
     >
       <Icon className="h-3.5 w-3.5" /> {label}

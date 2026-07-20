@@ -18,11 +18,36 @@ export const MAX_PHOTOS = 10;
 export const MAX_VIDEOS = 10;
 
 export const initialPhotos: GalleryPhoto[] = [
-  { id: "p1", url: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600", category: "Interior", isCover: true },
-  { id: "p2", url: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600", category: "Hair", isCover: false },
-  { id: "p3", url: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600", category: "Nails", isCover: false },
-  { id: "p4", url: "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=600", category: "Makeup", isCover: false },
-  { id: "p5", url: "https://images.unsplash.com/photo-1633681926022-84c23e8cb2d6?w=600", category: "Team", isCover: false },
+  {
+    id: "p1",
+    url: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600",
+    category: "Interior",
+    isCover: true,
+  },
+  {
+    id: "p2",
+    url: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600",
+    category: "Hair",
+    isCover: false,
+  },
+  {
+    id: "p3",
+    url: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600",
+    category: "Nails",
+    isCover: false,
+  },
+  {
+    id: "p4",
+    url: "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=600",
+    category: "Makeup",
+    isCover: false,
+  },
+  {
+    id: "p5",
+    url: "https://images.unsplash.com/photo-1633681926022-84c23e8cb2d6?w=600",
+    category: "Team",
+    isCover: false,
+  },
 ];
 
 export const initialVideos: GalleryVideo[] = [
@@ -35,9 +60,7 @@ export const initialVideos: GalleryVideo[] = [
 ];
 
 export function extractYouTubeId(url: string): string | null {
-  const patterns = [
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]{11})/,
-  ];
+  const patterns = [/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]{11})/];
   for (const p of patterns) {
     const m = url.match(p);
     if (m) return m[1];

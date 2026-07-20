@@ -65,10 +65,7 @@ function scoreShops(shops: Enriched[]): ScoredShop[] {
     const qrPaymentsWeek = Math.round(
       bookingsWeek * (0.6 + ((s.popularityScore ?? 50) / 100) * 0.8),
     );
-    const reviewsWeek = Math.max(
-      1,
-      Math.round((s.verifiedReviews ?? s.review_count ?? 10) * 0.08),
-    );
+    const reviewsWeek = Math.max(1, Math.round((s.verifiedReviews ?? s.review_count ?? 10) * 0.08));
     return { ...s, qrPaymentsWeek, bookingsWeek, reviewsWeek };
   });
 
@@ -159,9 +156,24 @@ export function TrendingThisWeek({ shops }: { shops: Enriched[] }) {
 
       {/* Live counters */}
       <div className="mt-5 grid grid-cols-3 gap-2 sm:gap-4">
-        <Counter icon={<CalendarCheck className="h-4 w-4" />} label="Bookings" value={cBookings} tone="indigo" />
-        <Counter icon={<QrCode className="h-4 w-4" />} label="QR Payments" value={cQR} tone="emerald" />
-        <Counter icon={<MessageSquare className="h-4 w-4" />} label="New Reviews" value={cReviews} tone="rose" />
+        <Counter
+          icon={<CalendarCheck className="h-4 w-4" />}
+          label="Bookings"
+          value={cBookings}
+          tone="indigo"
+        />
+        <Counter
+          icon={<QrCode className="h-4 w-4" />}
+          label="QR Payments"
+          value={cQR}
+          tone="emerald"
+        />
+        <Counter
+          icon={<MessageSquare className="h-4 w-4" />}
+          label="New Reviews"
+          value={cReviews}
+          tone="rose"
+        />
       </div>
 
       {/* Top 3 podium — desktop grid, mobile stacked */}
@@ -175,9 +187,7 @@ export function TrendingThisWeek({ shops }: { shops: Enriched[] }) {
       {rest.length > 0 && (
         <div className="mt-6">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-slate-700">
-              Rank 4 – {3 + rest.length}
-            </h3>
+            <h3 className="text-sm font-semibold text-slate-700">Rank 4 – {3 + rest.length}</h3>
             <Link
               to="/search"
               search={{ sort: "popular" }}
@@ -251,7 +261,9 @@ function PodiumCard({ s }: { s: ScoredShop }) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/0 to-black/0" />
 
         {/* Rank badge */}
-        <div className={`absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold shadow-sm ${style.badge}`}>
+        <div
+          className={`absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold shadow-sm ${style.badge}`}
+        >
           <RankIcon className="h-3.5 w-3.5" />#{s.rank} · {style.label}
         </div>
         {s.is_verified && (
@@ -280,9 +292,7 @@ function PodiumCard({ s }: { s: ScoredShop }) {
 
       <div className="flex items-center justify-between gap-3 px-4 py-3">
         <div className="text-[11px] text-slate-600">
-          <span className="font-semibold text-slate-900 tabular-nums">
-            {s.bookingsWeek}
-          </span>{" "}
+          <span className="font-semibold text-slate-900 tabular-nums">{s.bookingsWeek}</span>{" "}
           bookings this week
         </div>
         <span className="inline-flex items-center rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white transition group-hover:bg-indigo-600">
@@ -339,9 +349,7 @@ function CompactCard({ s }: { s: ScoredShop }) {
         </div>
         <div className="mt-1 flex items-center justify-between">
           <div className="text-[11px] text-slate-500">
-            <span className="font-semibold tabular-nums text-slate-800">
-              {s.bookingsWeek}
-            </span>{" "}
+            <span className="font-semibold tabular-nums text-slate-800">{s.bookingsWeek}</span>{" "}
             bookings
           </div>
           <span className="rounded-full bg-slate-900 px-2.5 py-1 text-[11px] font-semibold text-white transition group-hover:bg-indigo-600">

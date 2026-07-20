@@ -22,9 +22,7 @@ function sanitizeNext(next: string | null): string | null {
 const RECOVERY_ERROR_MESSAGE =
   "Reset link expired or already used. Please request a new password reset link.";
 
-type CallbackResult =
-  | { ok: true; redirectTo: string }
-  | { ok: false; message: string };
+type CallbackResult = { ok: true; redirectTo: string } | { ok: false; message: string };
 
 type AuthCallbackWindow = Window & {
   __nxAuthCallbackPromise?: Promise<CallbackResult>;
@@ -46,12 +44,12 @@ function isRecoveryCallback(url: URL, next: string | null, hash: URLSearchParams
 function hasCallbackPayload(url: URL, hash: URLSearchParams) {
   return Boolean(
     url.searchParams.get("code") ||
-      url.searchParams.get("token_hash") ||
-      url.searchParams.get("error") ||
-      url.searchParams.get("error_description") ||
-      hash.get("access_token") ||
-      hash.get("error") ||
-      hash.get("error_description"),
+    url.searchParams.get("token_hash") ||
+    url.searchParams.get("error") ||
+    url.searchParams.get("error_description") ||
+    hash.get("access_token") ||
+    hash.get("error") ||
+    hash.get("error_description"),
   );
 }
 
@@ -92,7 +90,11 @@ async function waitForSession(): Promise<Session | null> {
       const { data, error } = await supabase.auth.getSession();
       if (error) {
         const lower = error.message.toLowerCase();
-        if (lower.includes("refresh token") || lower.includes("invalid") || lower.includes("expired")) {
+        if (
+          lower.includes("refresh token") ||
+          lower.includes("invalid") ||
+          lower.includes("expired")
+        ) {
           await supabase.auth.signOut({ scope: "local" }).catch(() => {});
           return null;
         }
@@ -191,7 +193,10 @@ function AuthCallbackPage() {
         const url = new URL(window.location.href);
         const hash = getHashParams(url);
         const key = callbackKey(url);
-        if (!win.__nxAuthCallbackPromise || (hasCallbackPayload(url, hash) && win.__nxAuthCallbackKey !== key)) {
+        if (
+          !win.__nxAuthCallbackPromise ||
+          (hasCallbackPayload(url, hash) && win.__nxAuthCallbackKey !== key)
+        ) {
           win.__nxAuthCallbackKey = key;
           win.__nxAuthCallbackPromise = resolveCallbackResult();
         }
@@ -233,9 +238,7 @@ function AuthCallbackPage() {
             <Button variant="outline" onClick={() => navigate({ to: "/login" })}>
               Back to login
             </Button>
-            <Button onClick={() => navigate({ to: "/forgot-password" })}>
-              Request New Link
-            </Button>
+            <Button onClick={() => navigate({ to: "/forgot-password" })}>Request New Link</Button>
           </div>
         </CardContent>
       </Card>

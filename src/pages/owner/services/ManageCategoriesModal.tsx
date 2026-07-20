@@ -24,22 +24,26 @@ export function ManageCategoriesModal({
   const add = () => {
     const name = newName.trim();
     if (!name) return;
-    onChange([
-      ...categories,
-      { id: `c${Date.now()}`, name },
-    ]);
+    onChange([...categories, { id: `c${Date.now()}`, name }]);
     setNewName("");
   };
 
   const saveRename = () => {
     if (!editing) return;
-    onChange(categories.map((c) => (c.id === editing.id ? { ...c, name: editing.name.trim() || c.name } : c)));
+    onChange(
+      categories.map((c) =>
+        c.id === editing.id ? { ...c, name: editing.name.trim() || c.name } : c,
+      ),
+    );
     setEditing(null);
   };
 
   const remove = (id: string) => {
     if (countFor(id) > 0) {
-      if (!confirm("This category has services. Delete anyway? Services will become uncategorized.")) return;
+      if (
+        !confirm("This category has services. Delete anyway? Services will become uncategorized.")
+      )
+        return;
     }
     onChange(categories.filter((c) => c.id !== id));
   };
@@ -74,8 +78,15 @@ export function ManageCategoriesModal({
                       onChange={(e) => setEditing({ id: c.id, name: e.target.value })}
                       autoFocus
                     />
-                    <Button size="sm" onClick={saveRename}>Save</Button>
-                    <Button size="icon" variant="ghost" aria-label="Cancel edit" onClick={() => setEditing(null)}>
+                    <Button size="sm" onClick={saveRename}>
+                      Save
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      aria-label="Cancel edit"
+                      onClick={() => setEditing(null)}
+                    >
                       <X className="h-4 w-4" />
                     </Button>
                   </>
@@ -85,7 +96,12 @@ export function ManageCategoriesModal({
                       <div className="text-heading font-medium">{c.name}</div>
                       <div className="text-muted-foreground text-xs">{countFor(c.id)} services</div>
                     </div>
-                    <Button size="icon" variant="ghost" aria-label="Rename category" onClick={() => setEditing({ id: c.id, name: c.name })}>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      aria-label="Rename category"
+                      onClick={() => setEditing({ id: c.id, name: c.name })}
+                    >
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <Button
@@ -97,7 +113,6 @@ export function ManageCategoriesModal({
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
-
                   </>
                 )}
               </li>
@@ -106,7 +121,9 @@ export function ManageCategoriesModal({
         </ul>
 
         <div className="flex justify-end border-t pt-4">
-          <Button variant="outline" onClick={onClose}>Done</Button>
+          <Button variant="outline" onClick={onClose}>
+            Done
+          </Button>
         </div>
       </div>
     </Modal>

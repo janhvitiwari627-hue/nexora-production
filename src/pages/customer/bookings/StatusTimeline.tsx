@@ -1,4 +1,12 @@
-import { Check, Clock, type LucideIcon, CalendarCheck, Scissors, Sparkles, FileCheck } from "lucide-react";
+import {
+  Check,
+  Clock,
+  type LucideIcon,
+  CalendarCheck,
+  Scissors,
+  Sparkles,
+  FileCheck,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { TimelineStatus } from "./mockBookingDetail";
 

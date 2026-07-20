@@ -53,9 +53,7 @@ export function RecommendedSection() {
           <h2 className="text-3xl font-black tracking-tight text-heading md:text-4xl">
             Picked for you
           </h2>
-          <p className="mt-2 text-muted-foreground">
-            Based on your location and preferences.
-          </p>
+          <p className="mt-2 text-muted-foreground">Based on your location and preferences.</p>
         </div>
         <Link
           to="/search"

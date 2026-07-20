@@ -191,8 +191,8 @@ function PublishedBookingPageInner({ slug }: { slug: string }) {
         {isMock && (
           <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
             <strong className="font-semibold">Demo booking:</strong> this salon site is a template
-            preview. Your appointment stays on this device for demo purposes and no email or
-            payment is sent.
+            preview. Your appointment stays on this device for demo purposes and no email or payment
+            is sent.
           </div>
         )}
         <div className="grid gap-8 lg:grid-cols-[1fr_320px]">

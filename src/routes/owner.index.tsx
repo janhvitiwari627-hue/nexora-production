@@ -6,7 +6,10 @@ export const Route = createFileRoute("/owner/")({
   head: () => ({
     meta: [
       { title: "Owner Dashboard — Nexora" },
-      { name: "description", content: "Run your salon: bookings, revenue, staff and reviews at a glance." },
+      {
+        name: "description",
+        content: "Run your salon: bookings, revenue, staff and reviews at a glance.",
+      },
     ],
   }),
   component: OwnerDashboardPage,

@@ -20,8 +20,7 @@ export function MembershipHistorySection() {
             <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", TIER_DOT[h.tier])} />
             <div className="min-w-0 flex-1">
               <p className="text-sm font-bold">
-                {h.tier}{" "}
-                <span className="font-normal text-muted-foreground">· {h.period}</span>
+                {h.tier} <span className="font-normal text-muted-foreground">· {h.period}</span>
               </p>
               <p className="text-[11px] text-muted-foreground">
                 Paid ₹{h.amountPaid.toLocaleString("en-IN")} · Saved ₹

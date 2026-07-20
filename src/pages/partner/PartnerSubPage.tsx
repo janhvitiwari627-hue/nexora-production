@@ -1,8 +1,21 @@
-import { GraduationCap, IndianRupee, Settings, Store, Trophy, UserPlus, Wallet } from "lucide-react";
+import {
+  GraduationCap,
+  IndianRupee,
+  Settings,
+  Store,
+  Trophy,
+  UserPlus,
+  Wallet,
+} from "lucide-react";
 import type { ComponentType } from "react";
 import { ComingSoonCard, PartnerPageShell } from "./PartnerAppLayout";
 
-type Meta = { title: string; subtitle: string; icon: ComponentType<{ className?: string }>; note: string };
+type Meta = {
+  title: string;
+  subtitle: string;
+  icon: ComponentType<{ className?: string }>;
+  note: string;
+};
 
 export const PARTNER_SUBPAGES = {
   leads: {

@@ -34,12 +34,32 @@ type Row = {
 };
 
 const TYPE_META: Record<NotificationType, { label: string; icon: typeof Bell; tint: string }> = {
-  booking: { label: "Bookings", icon: Calendar, tint: "bg-indigo-500/15 text-indigo-600 dark:text-indigo-300" },
-  reward: { label: "Rewards", icon: Sparkles, tint: "bg-amber-500/15 text-amber-600 dark:text-amber-300" },
-  wallet: { label: "Wallet", icon: Wallet, tint: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300" },
+  booking: {
+    label: "Bookings",
+    icon: Calendar,
+    tint: "bg-indigo-500/15 text-indigo-600 dark:text-indigo-300",
+  },
+  reward: {
+    label: "Rewards",
+    icon: Sparkles,
+    tint: "bg-amber-500/15 text-amber-600 dark:text-amber-300",
+  },
+  wallet: {
+    label: "Wallet",
+    icon: Wallet,
+    tint: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300",
+  },
   offer: { label: "Offers", icon: Ticket, tint: "bg-pink-500/15 text-pink-600 dark:text-pink-300" },
-  referral: { label: "Referrals", icon: Users, tint: "bg-violet-500/15 text-violet-600 dark:text-violet-300" },
-  system: { label: "System", icon: Settings, tint: "bg-slate-500/15 text-slate-600 dark:text-slate-300" },
+  referral: {
+    label: "Referrals",
+    icon: Users,
+    tint: "bg-violet-500/15 text-violet-600 dark:text-violet-300",
+  },
+  system: {
+    label: "System",
+    icon: Settings,
+    tint: "bg-slate-500/15 text-slate-600 dark:text-slate-300",
+  },
 };
 const FILTERS: Array<{ key: "all" | NotificationType; label: string }> = [
   { key: "all", label: "All" },
@@ -61,7 +81,7 @@ function timeAgo(iso: string) {
 }
 
 const resolveType = (t: string | null | undefined): NotificationType =>
-  (t && (t in TYPE_META) ? t : "system") as NotificationType;
+  (t && t in TYPE_META ? t : "system") as NotificationType;
 
 export function NotificationsPage() {
   const { user } = useAuthStore();

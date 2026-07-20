@@ -64,8 +64,8 @@ export default function Membership() {
               Beauty, elevated.
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-500">
-              Unlock rewards, priority bookings and exclusive perks across every
-              partner salon in India.
+              Unlock rewards, priority bookings and exclusive perks across every partner salon in
+              India.
             </p>
           </div>
         </FadeIn>
@@ -85,16 +85,10 @@ export default function Membership() {
                   <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/70 text-slate-900 shadow-sm backdrop-blur-sm">
                     <plan.icon className="h-6 w-6" />
                   </div>
-                  <h3 className="text-2xl font-bold text-slate-900">
-                    {plan.name}
-                  </h3>
+                  <h3 className="text-2xl font-bold text-slate-900">{plan.name}</h3>
                   <div className="mt-2 flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-slate-900">
-                      {plan.price}
-                    </span>
-                    <span className="text-sm font-medium text-slate-600">
-                      {plan.period}
-                    </span>
+                    <span className="text-4xl font-extrabold text-slate-900">{plan.price}</span>
+                    <span className="text-sm font-medium text-slate-600">{plan.period}</span>
                   </div>
                   <ul className="mt-6 flex-1 space-y-3">
                     {plan.benefits.map((benefit) => (

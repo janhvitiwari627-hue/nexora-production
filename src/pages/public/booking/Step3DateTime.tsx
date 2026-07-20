@@ -173,7 +173,8 @@ export function Step3DateTime({
                         !isSelected &&
                           !isBooked &&
                           "border-success/30 bg-success/10 text-success hover:bg-success/20",
-                        isBooked && "bg-muted text-muted-foreground/60 cursor-not-allowed line-through",
+                        isBooked &&
+                          "bg-muted text-muted-foreground/60 cursor-not-allowed line-through",
                       )}
                     >
                       {slot}
@@ -183,7 +184,8 @@ export function Step3DateTime({
               </div>
               {conflictSlot && (
                 <div className="bg-danger/10 text-danger mt-4 flex items-center gap-2 rounded-[var(--radius-button)] px-3 py-2 text-xs font-semibold">
-                  <AlertTriangle className="h-4 w-4" /> This slot was just booked. Please pick another.
+                  <AlertTriangle className="h-4 w-4" /> This slot was just booked. Please pick
+                  another.
                 </div>
               )}
             </>

@@ -30,38 +30,44 @@ async function isOwnerSession(page: Page): Promise<boolean> {
     const mod = await import("/src/integrations/supabase/client.ts").catch(
       () => null as unknown as { supabase: unknown } | null,
     );
-    const supabase = (mod as { supabase: {
-      auth: { getUser: () => Promise<{ data: { user: { id: string } | null } }> };
-      from: (t: string) => {
-        select: (c: string) => {
-          eq: (col: string, val: string) => {
-            eq?: (col: string, val: unknown) => Promise<{ data: unknown[] | null }>;
-          } & Promise<{ data: Array<{ role: string }> | null }>;
+    const supabase = (
+      mod as {
+        supabase: {
+          auth: { getUser: () => Promise<{ data: { user: { id: string } | null } }> };
+          from: (t: string) => {
+            select: (c: string) => {
+              eq: (
+                col: string,
+                val: string,
+              ) => {
+                eq?: (col: string, val: unknown) => Promise<{ data: unknown[] | null }>;
+              } & Promise<{ data: Array<{ role: string }> | null }>;
+            };
+          };
         };
-      };
-    } } | null)?.supabase;
+      } | null
+    )?.supabase;
     if (!supabase) return false;
     const { data } = await supabase.auth.getUser();
     if (!data.user) return false;
-    const roleRes = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", data.user.id);
+    const roleRes = await supabase.from("user_roles").select("role").eq("user_id", data.user.id);
     const roles = (roleRes.data ?? []).map((r) => r.role);
     const hasOwnerRole =
-      roles.includes("owner") ||
-      roles.includes("shop_owner") ||
-      roles.includes("shop_manager");
+      roles.includes("owner") || roles.includes("shop_owner") || roles.includes("shop_manager");
     if (hasOwnerRole) return true;
     // Fallback: approved salon_owners link also grants owner access via requireRole.
-    const linkRes = await (supabase
-      .from("salon_owners") as unknown as {
+    const linkRes = await (
+      supabase.from("salon_owners") as unknown as {
         select: (c: string) => {
-          eq: (col: string, val: string) => {
+          eq: (
+            col: string,
+            val: string,
+          ) => {
             eq: (col: string, val: boolean) => Promise<{ data: unknown[] | null }>;
           };
         };
-      })
+      }
+    )
       .select("id")
       .eq("user_id", data.user.id)
       .eq("is_approved", true);
@@ -84,7 +90,9 @@ test.describe("Owner cannot open /partner/profile", () => {
     );
   });
 
-  test("direct navigation to /partner/profile is blocked and never lands on /dashboard/settings", async ({ page }) => {
+  test("direct navigation to /partner/profile is blocked and never lands on /dashboard/settings", async ({
+    page,
+  }) => {
     // Track every URL the browser visits during this navigation so we can
     // assert /dashboard/settings was NEVER reached — not even for a frame.
     const visited: string[] = [];
@@ -120,8 +128,6 @@ test.describe("Owner cannot open /partner/profile", () => {
     ).toBe(false);
 
     // Landing is an owner-appropriate destination.
-    expect(
-      ALLOWED_LANDINGS.some((t) => landed === t || landed.startsWith(t + "/")),
-    ).toBe(true);
+    expect(ALLOWED_LANDINGS.some((t) => landed === t || landed.startsWith(t + "/"))).toBe(true);
   });
 });

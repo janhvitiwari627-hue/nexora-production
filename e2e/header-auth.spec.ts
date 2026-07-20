@@ -65,8 +65,7 @@ test.describe("PublicHeader — authenticated", () => {
           const t = (el.textContent ?? "").trim();
           if (t === "Login" || t === "Register") seen.add(t);
         }
-        (window as unknown as { __authFlashes: string[] }).__authFlashes =
-          Array.from(seen);
+        (window as unknown as { __authFlashes: string[] }).__authFlashes = Array.from(seen);
       };
       const mo = new MutationObserver(check);
       const start = () => {

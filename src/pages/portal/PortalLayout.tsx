@@ -1,6 +1,20 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { Building2, LayoutDashboard, Megaphone, Package, Sparkles, Star, Store, Tag, Target, Truck, Users, HelpCircle, Phone } from "lucide-react";
+import {
+  Building2,
+  LayoutDashboard,
+  Megaphone,
+  Package,
+  Sparkles,
+  Star,
+  Store,
+  Tag,
+  Target,
+  Truck,
+  Users,
+  HelpCircle,
+  Phone,
+} from "lucide-react";
 import { PublicHeader } from "@/components/layout/PublicHeader";
 import { PublicFooter } from "@/components/layout/PublicFooter";
 import { BackButton } from "@/components/shared/BackButton";
@@ -40,15 +54,23 @@ export function PortalLayout({ children }: { children: ReactNode }) {
           ))}
         </div>
       </div>
-      <main className="mx-auto max-w-7xl px-4 py-10 md:px-6 md:py-14">
-        {children}
-      </main>
+      <main className="mx-auto max-w-7xl px-4 py-10 md:px-6 md:py-14">{children}</main>
       <PublicFooter />
     </div>
   );
 }
 
-export function PortalHeading({ eyebrow, title, description, action }: { eyebrow?: string; title: string; description?: string; action?: React.ReactNode }) {
+export function PortalHeading({
+  eyebrow,
+  title,
+  description,
+  action,
+}: {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  action?: React.ReactNode;
+}) {
   return (
     <header className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       <div>
@@ -65,7 +87,17 @@ export function PortalHeading({ eyebrow, title, description, action }: { eyebrow
   );
 }
 
-export function EmptyHint({ icon: Icon = HelpCircle, title, body, action }: { icon?: React.ComponentType<{ className?: string }>; title: string; body?: string; action?: React.ReactNode }) {
+export function EmptyHint({
+  icon: Icon = HelpCircle,
+  title,
+  body,
+  action,
+}: {
+  icon?: React.ComponentType<{ className?: string }>;
+  title: string;
+  body?: string;
+  action?: React.ReactNode;
+}) {
   return (
     <div className="rounded-[var(--radius-card-lg)] border border-dashed border-border/70 bg-card/60 p-10 text-center">
       <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-muted">

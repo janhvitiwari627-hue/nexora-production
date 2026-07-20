@@ -3,10 +3,30 @@ import { Link } from "@tanstack/react-router";
 import { CalendarPlus, QrCode, Gift, UserPlus, Crown } from "lucide-react";
 
 const actions = [
-  { label: "Book Service", icon: CalendarPlus, to: "/search", color: "from-indigo-500 to-violet-500" },
-  { label: "Scan QR", icon: QrCode, to: "/dashboard/qr-history", color: "from-sky-500 to-cyan-500" },
-  { label: "Redeem Rewards", icon: Gift, to: "/dashboard/rewards", color: "from-amber-500 to-orange-500" },
-  { label: "Invite Friends", icon: UserPlus, to: "/dashboard/referrals", color: "from-rose-500 to-pink-500" },
+  {
+    label: "Book Service",
+    icon: CalendarPlus,
+    to: "/search",
+    color: "from-indigo-500 to-violet-500",
+  },
+  {
+    label: "Scan QR",
+    icon: QrCode,
+    to: "/dashboard/qr-history",
+    color: "from-sky-500 to-cyan-500",
+  },
+  {
+    label: "Redeem Rewards",
+    icon: Gift,
+    to: "/dashboard/rewards",
+    color: "from-amber-500 to-orange-500",
+  },
+  {
+    label: "Invite Friends",
+    icon: UserPlus,
+    to: "/dashboard/referrals",
+    color: "from-rose-500 to-pink-500",
+  },
   { label: "Membership", icon: Crown, to: "/membership", color: "from-fuchsia-500 to-purple-500" },
 ] as const;
 

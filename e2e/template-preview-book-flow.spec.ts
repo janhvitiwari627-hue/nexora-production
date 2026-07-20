@@ -39,12 +39,17 @@ for (const key of TEMPLATE_KEYS) {
     // We must be on the booking form for THIS slug — never redirected home.
     await expect(page).toHaveURL(new RegExp(`/site/${slug}/book`));
     const heading = page.getByRole("heading", { level: 1, name: /^Book at /i });
-    await expect(heading, "booking form heading should render (not the disabled fallback)").toBeVisible();
+    await expect(
+      heading,
+      "booking form heading should render (not the disabled fallback)",
+    ).toBeVisible();
 
     // Capture the service that got auto-selected via the first radio.
     // The first service card's <span class="font-semibold"> holds its name.
     const firstServiceLabel = page.locator('label:has(input[name="service"])').first();
-    const serviceName = (await firstServiceLabel.locator("span.font-semibold").first().innerText()).trim();
+    const serviceName = (
+      await firstServiceLabel.locator("span.font-semibold").first().innerText()
+    ).trim();
     expect(serviceName.length).toBeGreaterThan(0);
 
     // Pick a time slot (the first available one).

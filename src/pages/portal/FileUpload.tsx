@@ -22,7 +22,13 @@ async function upload(file: File, userId: string, folder: string): Promise<strin
 }
 
 export function SingleFileUpload({
-  label, value, onChange, userId, folder, accept = "image/*", preview = true,
+  label,
+  value,
+  onChange,
+  userId,
+  folder,
+  accept = "image/*",
+  preview = true,
 }: {
   label: string;
   value: string;
@@ -38,8 +44,14 @@ export function SingleFileUpload({
   const onPick = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
-    if (!userId) { toast.error("Please sign in first"); return; }
-    if (f.size > 5 * 1024 * 1024) { toast.error("File must be under 5 MB"); return; }
+    if (!userId) {
+      toast.error("Please sign in first");
+      return;
+    }
+    if (f.size > 5 * 1024 * 1024) {
+      toast.error("File must be under 5 MB");
+      return;
+    }
     setBusy(true);
     try {
       const url = await upload(f, userId, folder);
@@ -60,14 +72,27 @@ export function SingleFileUpload({
         {preview && value ? (
           <div className="relative h-16 w-16 overflow-hidden rounded-lg border border-border/60 bg-muted">
             <img src={value} alt="" className="h-full w-full object-cover" />
-            <button type="button" onClick={() => onChange("")}
-              className="absolute right-0 top-0 grid h-5 w-5 place-items-center rounded-bl bg-black/60 text-white">
+            <button
+              type="button"
+              onClick={() => onChange("")}
+              className="absolute right-0 top-0 grid h-5 w-5 place-items-center rounded-bl bg-black/60 text-white"
+            >
               <X className="h-3 w-3" />
             </button>
           </div>
         ) : null}
-        <Button type="button" variant="outline" size="sm" onClick={() => ref.current?.click()} disabled={busy}>
-          {busy ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Upload className="mr-1 h-4 w-4" />}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => ref.current?.click()}
+          disabled={busy}
+        >
+          {busy ? (
+            <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+          ) : (
+            <Upload className="mr-1 h-4 w-4" />
+          )}
           {value ? "Replace" : "Upload"}
         </Button>
         <input ref={ref} type="file" className="hidden" accept={accept} onChange={onPick} />
@@ -77,7 +102,13 @@ export function SingleFileUpload({
 }
 
 export function MultiFileUpload({
-  label, values, onChange, userId, folder, accept = "image/*,application/pdf", max = 10,
+  label,
+  values,
+  onChange,
+  userId,
+  folder,
+  accept = "image/*,application/pdf",
+  max = 10,
 }: {
   label: string;
   values: string[];
@@ -93,13 +124,22 @@ export function MultiFileUpload({
   const onPick = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
     if (!files.length) return;
-    if (!userId) { toast.error("Please sign in first"); return; }
-    if (values.length + files.length > max) { toast.error(`Max ${max} files`); return; }
+    if (!userId) {
+      toast.error("Please sign in first");
+      return;
+    }
+    if (values.length + files.length > max) {
+      toast.error(`Max ${max} files`);
+      return;
+    }
     setBusy(true);
     try {
       const next = [...values];
       for (const f of files) {
-        if (f.size > 10 * 1024 * 1024) { toast.error(`${f.name} > 10 MB`); continue; }
+        if (f.size > 10 * 1024 * 1024) {
+          toast.error(`${f.name} > 10 MB`);
+          continue;
+        }
         next.push(await upload(f, userId, folder));
       }
       onChange(next);
@@ -119,7 +159,10 @@ export function MultiFileUpload({
         {values.map((u, i) => {
           const isImg = /\.(png|jpe?g|webp|gif|avif)(\?|$)/i.test(u);
           return (
-            <div key={i} className="relative h-16 w-16 overflow-hidden rounded-lg border border-border/60 bg-muted">
+            <div
+              key={i}
+              className="relative h-16 w-16 overflow-hidden rounded-lg border border-border/60 bg-muted"
+            >
               {isImg ? (
                 <img src={u} alt="" className="h-full w-full object-cover" />
               ) : (
@@ -127,18 +170,32 @@ export function MultiFileUpload({
                   <FileText className="h-6 w-6" />
                 </div>
               )}
-              <button type="button" onClick={() => onChange(values.filter((_, j) => j !== i))}
-                className="absolute right-0 top-0 grid h-5 w-5 place-items-center rounded-bl bg-black/60 text-white">
+              <button
+                type="button"
+                onClick={() => onChange(values.filter((_, j) => j !== i))}
+                className="absolute right-0 top-0 grid h-5 w-5 place-items-center rounded-bl bg-black/60 text-white"
+              >
                 <X className="h-3 w-3" />
               </button>
             </div>
           );
         })}
-        <button type="button" disabled={busy} onClick={() => ref.current?.click()}
-          className="grid h-16 w-16 place-items-center rounded-lg border border-dashed border-border/60 text-muted-foreground hover:bg-muted">
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => ref.current?.click()}
+          className="grid h-16 w-16 place-items-center rounded-lg border border-dashed border-border/60 text-muted-foreground hover:bg-muted"
+        >
           {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <ImageIcon className="h-5 w-5" />}
         </button>
-        <input ref={ref} type="file" multiple className="hidden" accept={accept} onChange={onPick} />
+        <input
+          ref={ref}
+          type="file"
+          multiple
+          className="hidden"
+          accept={accept}
+          onChange={onPick}
+        />
       </div>
     </div>
   );

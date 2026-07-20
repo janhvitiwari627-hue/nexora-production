@@ -56,7 +56,10 @@ export const getOwnerAnalytics = createServerFn({ method: "POST" })
     const all = rows ?? [];
 
     // Seed buckets so the chart has every day
-    const buckets = new Map<string, { revenue: number; bookings: number; new: number; returning: number }>();
+    const buckets = new Map<
+      string,
+      { revenue: number; bookings: number; new: number; returning: number }
+    >();
     for (let i = 0; i < data.days; i++) {
       const d = new Date(from);
       d.setDate(from.getDate() + i);
@@ -111,8 +114,14 @@ export const getOwnerAnalytics = createServerFn({ method: "POST" })
     const repeatRate = totalCustomers > 0 ? repeatCustomers / totalCustomers : 0;
 
     const sortedKeys = [...buckets.keys()].sort();
-    const revenueTrend = sortedKeys.map((k) => ({ label: k.slice(5), revenue: buckets.get(k)!.revenue }));
-    const bookingsTrend = sortedKeys.map((k) => ({ label: k.slice(5), bookings: buckets.get(k)!.bookings }));
+    const revenueTrend = sortedKeys.map((k) => ({
+      label: k.slice(5),
+      revenue: buckets.get(k)!.revenue,
+    }));
+    const bookingsTrend = sortedKeys.map((k) => ({
+      label: k.slice(5),
+      bookings: buckets.get(k)!.bookings,
+    }));
     const customerTrend = sortedKeys.map((k) => ({
       label: k.slice(5),
       new: buckets.get(k)!.new,
@@ -153,11 +162,10 @@ export const getOwnerAnalytics = createServerFn({ method: "POST" })
           windowDays: data.days,
           ...kpis,
           topServices: topServices.slice(0, 3).map((s) => s.name),
-          peakDay:
-            bookingsTrend.reduce(
-              (best, cur) => (cur.bookings > best.bookings ? cur : best),
-              bookingsTrend[0] ?? { label: "—", bookings: 0 },
-            ).label,
+          peakDay: bookingsTrend.reduce(
+            (best, cur) => (cur.bookings > best.bookings ? cur : best),
+            bookingsTrend[0] ?? { label: "—", bookings: 0 },
+          ).label,
         };
         const { text } = await generateText({
           model,

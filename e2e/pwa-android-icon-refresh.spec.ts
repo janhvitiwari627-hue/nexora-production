@@ -31,8 +31,7 @@ import { expect, test, devices } from "@playwright/test";
 const ANDROID_UA =
   "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36";
 const UUID_RE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/g;
-const CDN_ICON_RE =
-  /\/__l5e\/assets-v1\/[0-9a-f-]{36}\/[^/]+\.(?:jpe?g|png|svg|webp)$/i;
+const CDN_ICON_RE = /\/__l5e\/assets-v1\/[0-9a-f-]{36}\/[^/]+\.(?:jpe?g|png|svg|webp)$/i;
 const NEW_UUID = "11111111-2222-3333-4444-555555555555";
 
 test.describe("Android emulated PWA icon refresh", () => {
@@ -48,10 +47,7 @@ test.describe("Android emulated PWA icon refresh", () => {
     // --- Pre-deploy visit ---------------------------------------------------
     await page.goto("/", { waitUntil: "domcontentloaded" });
 
-    const manifestHref = await page
-      .locator("link[rel='manifest']")
-      .first()
-      .getAttribute("href");
+    const manifestHref = await page.locator("link[rel='manifest']").first().getAttribute("href");
     expect(manifestHref, "Android install requires <link rel='manifest'>").toBeTruthy();
     const manifestUrl = new URL(manifestHref!, page.url()).toString();
 

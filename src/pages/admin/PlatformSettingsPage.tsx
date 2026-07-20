@@ -7,9 +7,27 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { AlertTriangle, Megaphone, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -19,9 +37,24 @@ type Category = { id: string; name: string; slug: string };
 type Tpl = { id: string; key: string; label: string; body: string };
 
 const initialTiers: Tier[] = [
-  { id: "t1", name: "Silver", price: 499, benefits: "5% off all bookings\nPriority support\nMonthly free service" },
-  { id: "t2", name: "Gold", price: 999, benefits: "10% off all bookings\nFree home service x2\nBirthday voucher" },
-  { id: "t3", name: "Platinum", price: 1999, benefits: "15% off all bookings\nDedicated concierge\nUnlimited cancellations" },
+  {
+    id: "t1",
+    name: "Silver",
+    price: 499,
+    benefits: "5% off all bookings\nPriority support\nMonthly free service",
+  },
+  {
+    id: "t2",
+    name: "Gold",
+    price: 999,
+    benefits: "10% off all bookings\nFree home service x2\nBirthday voucher",
+  },
+  {
+    id: "t3",
+    name: "Platinum",
+    price: 1999,
+    benefits: "15% off all bookings\nDedicated concierge\nUnlimited cancellations",
+  },
 ];
 
 const initialCities: City[] = [
@@ -41,11 +74,36 @@ const initialCategories: Category[] = [
 ];
 
 const initialTemplates: Tpl[] = [
-  { id: "wa1", key: "booking_confirm", label: "Booking Confirmation", body: "Hi {name}, your booking at {shop} on {date} is confirmed. Ref #{id}." },
-  { id: "wa2", key: "reminder", label: "Booking Reminder", body: "Hi {name}, friendly reminder for your {service} appointment tomorrow at {time}." },
-  { id: "wa3", key: "review_request", label: "Review Request", body: "Hi {name}, how was your visit to {shop}? Tap to leave a review: {link}" },
-  { id: "wa4", key: "birthday", label: "Birthday Wish", body: "Happy birthday {name}! 🎂 Enjoy 20% off your next booking with code BDAY20." },
-  { id: "wa5", key: "reactivation", label: "Reactivation", body: "Hi {name}, we miss you! Here's ₹100 wallet credit on your next booking." },
+  {
+    id: "wa1",
+    key: "booking_confirm",
+    label: "Booking Confirmation",
+    body: "Hi {name}, your booking at {shop} on {date} is confirmed. Ref #{id}.",
+  },
+  {
+    id: "wa2",
+    key: "reminder",
+    label: "Booking Reminder",
+    body: "Hi {name}, friendly reminder for your {service} appointment tomorrow at {time}.",
+  },
+  {
+    id: "wa3",
+    key: "review_request",
+    label: "Review Request",
+    body: "Hi {name}, how was your visit to {shop}? Tap to leave a review: {link}",
+  },
+  {
+    id: "wa4",
+    key: "birthday",
+    label: "Birthday Wish",
+    body: "Happy birthday {name}! 🎂 Enjoy 20% off your next booking with code BDAY20.",
+  },
+  {
+    id: "wa5",
+    key: "reactivation",
+    label: "Reactivation",
+    body: "Hi {name}, we miss you! Here's ₹100 wallet credit on your next booking.",
+  },
 ];
 
 export function PlatformSettingsPage() {
@@ -72,7 +130,9 @@ export function PlatformSettingsPage() {
 
   const [templates, setTemplates] = useState(initialTemplates);
 
-  const [announcement, setAnnouncement] = useState("📢 Platform-wide festive offer: Earn 2x reward points until June 30!");
+  const [announcement, setAnnouncement] = useState(
+    "📢 Platform-wide festive offer: Earn 2x reward points until June 30!",
+  );
   const [announcementActive, setAnnouncementActive] = useState(true);
 
   const [maintenance, setMaintenance] = useState(false);
@@ -88,7 +148,8 @@ export function PlatformSettingsPage() {
 
       {maintenance && (
         <div className="border-destructive bg-destructive/10 text-destructive flex items-center gap-2 rounded-lg border p-3 text-sm">
-          <AlertTriangle className="h-4 w-4" /> Maintenance mode is currently <strong>ON</strong>. Public site shows a maintenance page.
+          <AlertTriangle className="h-4 w-4" /> Maintenance mode is currently <strong>ON</strong>.
+          Public site shows a maintenance page.
         </div>
       )}
 
@@ -107,12 +168,19 @@ export function PlatformSettingsPage() {
 
         <TabsContent value="commission">
           <Card>
-            <CardHeader><CardTitle>Commission Rate</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle>Commission Rate</CardTitle>
+            </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-3">
                 <Label>Mode</Label>
-                <Select value={commissionMode} onValueChange={v => setCommissionMode(v as typeof commissionMode)}>
-                  <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
+                <Select
+                  value={commissionMode}
+                  onValueChange={(v) => setCommissionMode(v as typeof commissionMode)}
+                >
+                  <SelectTrigger className="w-48">
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="global">Global</SelectItem>
                     <SelectItem value="perBusiness">Per Business</SelectItem>
@@ -122,81 +190,203 @@ export function PlatformSettingsPage() {
               {commissionMode === "global" ? (
                 <div className="max-w-sm">
                   <Label>Global Commission (%)</Label>
-                  <Input type="number" min={0} max={50} value={globalCommission} onChange={e => setGlobalCommission(Number(e.target.value))} />
+                  <Input
+                    type="number"
+                    min={0}
+                    max={50}
+                    value={globalCommission}
+                    onChange={(e) => setGlobalCommission(Number(e.target.value))}
+                  />
                 </div>
               ) : (
                 <Table>
-                  <TableHeader><TableRow><TableHead>Business</TableHead><TableHead>Rate (%)</TableHead></TableRow></TableHeader>
-                  <TableBody>{perBusiness.map(b => (
-                    <TableRow key={b.id}>
-                      <TableCell>{b.name}</TableCell>
-                      <TableCell><Input type="number" className="h-8 w-24" value={b.rate} onChange={e => setPerBusiness(p => p.map(x => x.id === b.id ? { ...x, rate: Number(e.target.value) } : x))} /></TableCell>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Business</TableHead>
+                      <TableHead>Rate (%)</TableHead>
                     </TableRow>
-                  ))}</TableBody>
+                  </TableHeader>
+                  <TableBody>
+                    {perBusiness.map((b) => (
+                      <TableRow key={b.id}>
+                        <TableCell>{b.name}</TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            className="h-8 w-24"
+                            value={b.rate}
+                            onChange={(e) =>
+                              setPerBusiness((p) =>
+                                p.map((x) =>
+                                  x.id === b.id ? { ...x, rate: Number(e.target.value) } : x,
+                                ),
+                              )
+                            }
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
                 </Table>
               )}
-              <div className="flex justify-end"><Button onClick={() => save("Commission")}>Save</Button></div>
+              <div className="flex justify-end">
+                <Button onClick={() => save("Commission")}>Save</Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
         <TabsContent value="rewards" className="space-y-4">
           <Card>
-            <CardHeader><CardTitle>Reward Rules</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle>Reward Rules</CardTitle>
+            </CardHeader>
             <CardContent className="grid gap-4 md:grid-cols-2">
-              <div><Label>Points per ₹100 spent</Label><Input type="number" value={rewards.perRupee} onChange={e => setRewards({ ...rewards, perRupee: Number(e.target.value) })} /></div>
-              <div><Label>Signup bonus (pts)</Label><Input type="number" value={rewards.signup} onChange={e => setRewards({ ...rewards, signup: Number(e.target.value) })} /></div>
-              <div><Label>Review reward (pts)</Label><Input type="number" value={rewards.review} onChange={e => setRewards({ ...rewards, review: Number(e.target.value) })} /></div>
-              <div><Label>Points expiry (days)</Label><Input type="number" value={rewards.expiryDays} onChange={e => setRewards({ ...rewards, expiryDays: Number(e.target.value) })} /></div>
-              <div className="md:col-span-2 flex justify-end"><Button onClick={() => save("Reward rules")}>Save</Button></div>
+              <div>
+                <Label>Points per ₹100 spent</Label>
+                <Input
+                  type="number"
+                  value={rewards.perRupee}
+                  onChange={(e) => setRewards({ ...rewards, perRupee: Number(e.target.value) })}
+                />
+              </div>
+              <div>
+                <Label>Signup bonus (pts)</Label>
+                <Input
+                  type="number"
+                  value={rewards.signup}
+                  onChange={(e) => setRewards({ ...rewards, signup: Number(e.target.value) })}
+                />
+              </div>
+              <div>
+                <Label>Review reward (pts)</Label>
+                <Input
+                  type="number"
+                  value={rewards.review}
+                  onChange={(e) => setRewards({ ...rewards, review: Number(e.target.value) })}
+                />
+              </div>
+              <div>
+                <Label>Points expiry (days)</Label>
+                <Input
+                  type="number"
+                  value={rewards.expiryDays}
+                  onChange={(e) => setRewards({ ...rewards, expiryDays: Number(e.target.value) })}
+                />
+              </div>
+              <div className="md:col-span-2 flex justify-end">
+                <Button onClick={() => save("Reward rules")}>Save</Button>
+              </div>
             </CardContent>
           </Card>
           <Card>
-            <CardHeader><CardTitle>Referral Rewards</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle>Referral Rewards</CardTitle>
+            </CardHeader>
             <CardContent className="grid gap-4 md:grid-cols-2">
-              <div><Label>Referrer reward (₹)</Label><Input type="number" value={referral.referrer} onChange={e => setReferral({ ...referral, referrer: Number(e.target.value) })} /></div>
-              <div><Label>Referee reward (₹)</Label><Input type="number" value={referral.referee} onChange={e => setReferral({ ...referral, referee: Number(e.target.value) })} /></div>
-              <div className="md:col-span-2 flex justify-end"><Button onClick={() => save("Referral rewards")}>Save</Button></div>
+              <div>
+                <Label>Referrer reward (₹)</Label>
+                <Input
+                  type="number"
+                  value={referral.referrer}
+                  onChange={(e) => setReferral({ ...referral, referrer: Number(e.target.value) })}
+                />
+              </div>
+              <div>
+                <Label>Referee reward (₹)</Label>
+                <Input
+                  type="number"
+                  value={referral.referee}
+                  onChange={(e) => setReferral({ ...referral, referee: Number(e.target.value) })}
+                />
+              </div>
+              <div className="md:col-span-2 flex justify-end">
+                <Button onClick={() => save("Referral rewards")}>Save</Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
         <TabsContent value="membership">
           <Card>
-            <CardHeader><CardTitle>Membership Plans</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle>Membership Plans</CardTitle>
+            </CardHeader>
             <CardContent className="space-y-4">
               <Accordion type="single" collapsible defaultValue="t1">
-                {tiers.map(t => (
+                {tiers.map((t) => (
                   <AccordionItem key={t.id} value={t.id}>
                     <AccordionTrigger>
-                      <span className="flex items-center gap-2">{t.name}<Badge variant="outline">₹{t.price}/mo</Badge></span>
+                      <span className="flex items-center gap-2">
+                        {t.name}
+                        <Badge variant="outline">₹{t.price}/mo</Badge>
+                      </span>
                     </AccordionTrigger>
                     <AccordionContent className="space-y-3">
                       <div className="grid gap-3 md:grid-cols-2">
-                        <div><Label>Tier Name</Label><Input value={t.name} onChange={e => setTiers(p => p.map(x => x.id === t.id ? { ...x, name: e.target.value } : x))} /></div>
-                        <div><Label>Price (₹/month)</Label><Input type="number" value={t.price} onChange={e => setTiers(p => p.map(x => x.id === t.id ? { ...x, price: Number(e.target.value) } : x))} /></div>
+                        <div>
+                          <Label>Tier Name</Label>
+                          <Input
+                            value={t.name}
+                            onChange={(e) =>
+                              setTiers((p) =>
+                                p.map((x) => (x.id === t.id ? { ...x, name: e.target.value } : x)),
+                              )
+                            }
+                          />
+                        </div>
+                        <div>
+                          <Label>Price (₹/month)</Label>
+                          <Input
+                            type="number"
+                            value={t.price}
+                            onChange={(e) =>
+                              setTiers((p) =>
+                                p.map((x) =>
+                                  x.id === t.id ? { ...x, price: Number(e.target.value) } : x,
+                                ),
+                              )
+                            }
+                          />
+                        </div>
                       </div>
                       <div>
                         <Label>Benefits (one per line)</Label>
-                        <Textarea rows={5} value={t.benefits} onChange={e => setTiers(p => p.map(x => x.id === t.id ? { ...x, benefits: e.target.value } : x))} />
+                        <Textarea
+                          rows={5}
+                          value={t.benefits}
+                          onChange={(e) =>
+                            setTiers((p) =>
+                              p.map((x) =>
+                                x.id === t.id ? { ...x, benefits: e.target.value } : x,
+                              ),
+                            )
+                          }
+                        />
                       </div>
                     </AccordionContent>
                   </AccordionItem>
                 ))}
               </Accordion>
-              <div className="flex justify-end"><Button onClick={() => save("Membership plans")}>Save</Button></div>
+              <div className="flex justify-end">
+                <Button onClick={() => save("Membership plans")}>Save</Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
         <TabsContent value="settlement">
           <Card>
-            <CardHeader><CardTitle>Settlement Window</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle>Settlement Window</CardTitle>
+            </CardHeader>
             <CardContent className="grid gap-4 md:grid-cols-2">
               <div>
                 <Label>Cycle</Label>
                 <Select value={settlementCycle} onValueChange={setSettlementCycle}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="daily">Daily (T+1)</SelectItem>
                     <SelectItem value="weekly">Weekly</SelectItem>
@@ -206,37 +396,91 @@ export function PlatformSettingsPage() {
               </div>
               <div>
                 <Label>Settlement Time</Label>
-                <Input type="time" value={settlementTime} onChange={e => setSettlementTime(e.target.value)} />
+                <Input
+                  type="time"
+                  value={settlementTime}
+                  onChange={(e) => setSettlementTime(e.target.value)}
+                />
               </div>
-              <div className="md:col-span-2 flex justify-end"><Button onClick={() => save("Settlement window")}>Save</Button></div>
+              <div className="md:col-span-2 flex justify-end">
+                <Button onClick={() => save("Settlement window")}>Save</Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
         <TabsContent value="cities">
           <Card>
-            <CardHeader><CardTitle>City Management</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle>City Management</CardTitle>
+            </CardHeader>
             <CardContent className="space-y-3">
               <div className="grid gap-2 md:grid-cols-[2fr_1fr_auto]">
-                <Input placeholder="City name" value={newCity.name} onChange={e => setNewCity({ ...newCity, name: e.target.value })} />
-                <Input placeholder="State code (e.g. MH)" value={newCity.state} onChange={e => setNewCity({ ...newCity, state: e.target.value })} />
-                <Button onClick={() => {
-                  if (!newCity.name.trim()) return;
-                  setCities(p => [...p, { id: `c${Date.now()}`, name: newCity.name.trim(), state: newCity.state.trim().toUpperCase(), active: true }]);
-                  setNewCity({ name: "", state: "" });
-                  toast.success("City added");
-                }}><Plus className="h-4 w-4" /> Add</Button>
+                <Input
+                  placeholder="City name"
+                  value={newCity.name}
+                  onChange={(e) => setNewCity({ ...newCity, name: e.target.value })}
+                />
+                <Input
+                  placeholder="State code (e.g. MH)"
+                  value={newCity.state}
+                  onChange={(e) => setNewCity({ ...newCity, state: e.target.value })}
+                />
+                <Button
+                  onClick={() => {
+                    if (!newCity.name.trim()) return;
+                    setCities((p) => [
+                      ...p,
+                      {
+                        id: `c${Date.now()}`,
+                        name: newCity.name.trim(),
+                        state: newCity.state.trim().toUpperCase(),
+                        active: true,
+                      },
+                    ]);
+                    setNewCity({ name: "", state: "" });
+                    toast.success("City added");
+                  }}
+                >
+                  <Plus className="h-4 w-4" /> Add
+                </Button>
               </div>
               <Table>
-                <TableHeader><TableRow><TableHead>City</TableHead><TableHead>State</TableHead><TableHead>Active</TableHead><TableHead className="text-right">Action</TableHead></TableRow></TableHeader>
-                <TableBody>{cities.map(c => (
-                  <TableRow key={c.id}>
-                    <TableCell>{c.name}</TableCell>
-                    <TableCell>{c.state}</TableCell>
-                    <TableCell><Switch checked={c.active} onCheckedChange={() => setCities(p => p.map(x => x.id === c.id ? { ...x, active: !x.active } : x))} /></TableCell>
-                    <TableCell className="text-right"><Button size="sm" variant="ghost" onClick={() => setCities(p => p.filter(x => x.id !== c.id))}><Trash2 className="text-destructive h-4 w-4" /></Button></TableCell>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>City</TableHead>
+                    <TableHead>State</TableHead>
+                    <TableHead>Active</TableHead>
+                    <TableHead className="text-right">Action</TableHead>
                   </TableRow>
-                ))}</TableBody>
+                </TableHeader>
+                <TableBody>
+                  {cities.map((c) => (
+                    <TableRow key={c.id}>
+                      <TableCell>{c.name}</TableCell>
+                      <TableCell>{c.state}</TableCell>
+                      <TableCell>
+                        <Switch
+                          checked={c.active}
+                          onCheckedChange={() =>
+                            setCities((p) =>
+                              p.map((x) => (x.id === c.id ? { ...x, active: !x.active } : x)),
+                            )
+                          }
+                        />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setCities((p) => p.filter((x) => x.id !== c.id))}
+                        >
+                          <Trash2 className="text-destructive h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
               </Table>
             </CardContent>
           </Card>
@@ -244,29 +488,78 @@ export function PlatformSettingsPage() {
 
         <TabsContent value="categories">
           <Card>
-            <CardHeader><CardTitle>Category Management</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle>Category Management</CardTitle>
+            </CardHeader>
             <CardContent className="space-y-3">
               <div className="grid gap-2 md:grid-cols-[2fr_2fr_auto]">
-                <Input placeholder="Category name" value={newCategory.name} onChange={e => setNewCategory({ ...newCategory, name: e.target.value })} />
-                <Input placeholder="Slug (e.g. nail-art)" value={newCategory.slug} onChange={e => setNewCategory({ ...newCategory, slug: e.target.value })} />
-                <Button onClick={() => {
-                  if (!newCategory.name.trim()) return;
-                  setCategories(p => [...p, { id: `k${Date.now()}`, name: newCategory.name.trim(), slug: newCategory.slug.trim() || newCategory.name.toLowerCase().replace(/\s+/g, "-") }]);
-                  setNewCategory({ name: "", slug: "" });
-                  toast.success("Category added");
-                }}><Plus className="h-4 w-4" /> Add</Button>
+                <Input
+                  placeholder="Category name"
+                  value={newCategory.name}
+                  onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
+                />
+                <Input
+                  placeholder="Slug (e.g. nail-art)"
+                  value={newCategory.slug}
+                  onChange={(e) => setNewCategory({ ...newCategory, slug: e.target.value })}
+                />
+                <Button
+                  onClick={() => {
+                    if (!newCategory.name.trim()) return;
+                    setCategories((p) => [
+                      ...p,
+                      {
+                        id: `k${Date.now()}`,
+                        name: newCategory.name.trim(),
+                        slug:
+                          newCategory.slug.trim() ||
+                          newCategory.name.toLowerCase().replace(/\s+/g, "-"),
+                      },
+                    ]);
+                    setNewCategory({ name: "", slug: "" });
+                    toast.success("Category added");
+                  }}
+                >
+                  <Plus className="h-4 w-4" /> Add
+                </Button>
               </div>
               <Table>
-                <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Slug</TableHead><TableHead className="text-right">Action</TableHead></TableRow></TableHeader>
-                <TableBody>{categories.map(c => (
-                  <TableRow key={c.id}>
-                    <TableCell>
-                      <Input value={c.name} className="h-8" onChange={e => setCategories(p => p.map(x => x.id === c.id ? { ...x, name: e.target.value } : x))} />
-                    </TableCell>
-                    <TableCell className="text-muted-foreground font-mono text-xs">{c.slug}</TableCell>
-                    <TableCell className="text-right"><Button size="sm" variant="ghost" onClick={() => setCategories(p => p.filter(x => x.id !== c.id))}><Trash2 className="text-destructive h-4 w-4" /></Button></TableCell>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Slug</TableHead>
+                    <TableHead className="text-right">Action</TableHead>
                   </TableRow>
-                ))}</TableBody>
+                </TableHeader>
+                <TableBody>
+                  {categories.map((c) => (
+                    <TableRow key={c.id}>
+                      <TableCell>
+                        <Input
+                          value={c.name}
+                          className="h-8"
+                          onChange={(e) =>
+                            setCategories((p) =>
+                              p.map((x) => (x.id === c.id ? { ...x, name: e.target.value } : x)),
+                            )
+                          }
+                        />
+                      </TableCell>
+                      <TableCell className="text-muted-foreground font-mono text-xs">
+                        {c.slug}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setCategories((p) => p.filter((x) => x.id !== c.id))}
+                        >
+                          <Trash2 className="text-destructive h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
               </Table>
             </CardContent>
           </Card>
@@ -274,27 +567,48 @@ export function PlatformSettingsPage() {
 
         <TabsContent value="whatsapp">
           <Card>
-            <CardHeader><CardTitle>WhatsApp Notification Templates</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle>WhatsApp Notification Templates</CardTitle>
+            </CardHeader>
             <CardContent>
               <Accordion type="single" collapsible defaultValue="wa1">
-                {templates.map(t => (
+                {templates.map((t) => (
                   <AccordionItem key={t.id} value={t.id}>
-                    <AccordionTrigger>{t.label}<span className="text-muted-foreground ml-2 font-mono text-xs">{t.key}</span></AccordionTrigger>
+                    <AccordionTrigger>
+                      {t.label}
+                      <span className="text-muted-foreground ml-2 font-mono text-xs">{t.key}</span>
+                    </AccordionTrigger>
                     <AccordionContent className="space-y-2">
-                      <Textarea rows={4} value={t.body} onChange={e => setTemplates(p => p.map(x => x.id === t.id ? { ...x, body: e.target.value } : x))} />
-                      <div className="text-muted-foreground text-xs">Variables: {"{name} {shop} {service} {date} {time} {id} {link}"}</div>
+                      <Textarea
+                        rows={4}
+                        value={t.body}
+                        onChange={(e) =>
+                          setTemplates((p) =>
+                            p.map((x) => (x.id === t.id ? { ...x, body: e.target.value } : x)),
+                          )
+                        }
+                      />
+                      <div className="text-muted-foreground text-xs">
+                        Variables: {"{name} {shop} {service} {date} {time} {id} {link}"}
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
                 ))}
               </Accordion>
-              <div className="mt-3 flex justify-end"><Button onClick={() => save("Templates")}>Save Templates</Button></div>
+              <div className="mt-3 flex justify-end">
+                <Button onClick={() => save("Templates")}>Save Templates</Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
         <TabsContent value="announce">
           <Card>
-            <CardHeader><CardTitle className="flex items-center gap-2"><Megaphone className="h-5 w-5" /> System Announcement</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Megaphone className="h-5 w-5" /> System Announcement
+              </CardTitle>
+            </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
                 <Label>Show on public site</Label>
@@ -302,27 +616,43 @@ export function PlatformSettingsPage() {
               </div>
               <div>
                 <Label>Message (Markdown supported)</Label>
-                <Textarea rows={6} value={announcement} onChange={e => setAnnouncement(e.target.value)} />
+                <Textarea
+                  rows={6}
+                  value={announcement}
+                  onChange={(e) => setAnnouncement(e.target.value)}
+                />
               </div>
               <div className="bg-muted/40 rounded-lg border p-3">
                 <div className="text-muted-foreground mb-1 text-xs">Preview</div>
                 <div className="whitespace-pre-wrap text-sm">{announcement}</div>
               </div>
-              <div className="flex justify-end"><Button onClick={() => save("Announcement")}>Publish</Button></div>
+              <div className="flex justify-end">
+                <Button onClick={() => save("Announcement")}>Publish</Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
         <TabsContent value="system">
           <Card>
-            <CardHeader><CardTitle>System</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle>System</CardTitle>
+            </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between rounded-lg border p-4">
                 <div>
                   <div className="font-semibold">Maintenance Mode</div>
-                  <p className="text-muted-foreground text-sm">Show maintenance page to all non-admin users.</p>
+                  <p className="text-muted-foreground text-sm">
+                    Show maintenance page to all non-admin users.
+                  </p>
                 </div>
-                <Switch checked={maintenance} onCheckedChange={v => { setMaintenance(v); toast.success(`Maintenance ${v ? "enabled" : "disabled"}`); }} />
+                <Switch
+                  checked={maintenance}
+                  onCheckedChange={(v) => {
+                    setMaintenance(v);
+                    toast.success(`Maintenance ${v ? "enabled" : "disabled"}`);
+                  }}
+                />
               </div>
             </CardContent>
           </Card>

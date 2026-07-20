@@ -14,11 +14,7 @@ import { test, expect, type Page } from "@playwright/test";
 const STORAGE_KEY = process.env.LOVABLE_BROWSER_SUPABASE_STORAGE_KEY;
 const SESSION_JSON = process.env.LOVABLE_BROWSER_SUPABASE_SESSION_JSON;
 
-const PROTECTED_PROFILE_ROUTES = [
-  "/owner/profile",
-  "/partner/profile",
-  "/admin/profile",
-] as const;
+const PROTECTED_PROFILE_ROUTES = ["/owner/profile", "/partner/profile", "/admin/profile"] as const;
 
 // `requireRole` sends a customer to `/` when the guard fails, or `/login`
 // if the session has lapsed. Any customer-appropriate landing is fine so
@@ -46,24 +42,28 @@ async function isCustomerSession(page: Page): Promise<boolean> {
     const mod = await import("/src/integrations/supabase/client.ts").catch(
       () => null as unknown as { supabase: unknown } | null,
     );
-    const supabase = (mod as { supabase: {
-      auth: { getUser: () => Promise<{ data: { user: { id: string } | null } }> };
-      from: (t: string) => {
-        select: (c: string) => {
-          eq: (col: string, val: string) => {
-            eq?: (col: string, val: unknown) => Promise<{ data: unknown[] | null }>;
-          } & Promise<{ data: Array<{ role: string }> | null }>;
+    const supabase = (
+      mod as {
+        supabase: {
+          auth: { getUser: () => Promise<{ data: { user: { id: string } | null } }> };
+          from: (t: string) => {
+            select: (c: string) => {
+              eq: (
+                col: string,
+                val: string,
+              ) => {
+                eq?: (col: string, val: unknown) => Promise<{ data: unknown[] | null }>;
+              } & Promise<{ data: Array<{ role: string }> | null }>;
+            };
+          };
         };
-      };
-    } } | null)?.supabase;
+      } | null
+    )?.supabase;
     if (!supabase) return false;
     const { data } = await supabase.auth.getUser();
     if (!data.user) return false;
 
-    const roleRes = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", data.user.id);
+    const roleRes = await supabase.from("user_roles").select("role").eq("user_id", data.user.id);
     const roles = (roleRes.data ?? []).map((r) => r.role);
     const elevated = [
       "admin",
@@ -76,14 +76,18 @@ async function isCustomerSession(page: Page): Promise<boolean> {
     ];
     if (roles.some((r) => elevated.includes(r))) return false;
 
-    const linkRes = await (supabase
-      .from("salon_owners") as unknown as {
+    const linkRes = await (
+      supabase.from("salon_owners") as unknown as {
         select: (c: string) => {
-          eq: (col: string, val: string) => {
+          eq: (
+            col: string,
+            val: string,
+          ) => {
             eq: (col: string, val: boolean) => Promise<{ data: unknown[] | null }>;
           };
         };
-      })
+      }
+    )
       .select("id")
       .eq("user_id", data.user.id)
       .eq("is_approved", true);
@@ -123,11 +127,9 @@ test.describe("Customer cannot open role-specific profile edit routes", () => {
 
       // The guard should redirect somewhere else. Wait until we're off
       // the protected profile URL.
-      await page.waitForFunction(
-        (r) => !window.location.pathname.startsWith(r),
-        route,
-        { timeout: 10_000 },
-      );
+      await page.waitForFunction((r) => !window.location.pathname.startsWith(r), route, {
+        timeout: 10_000,
+      });
 
       // Give any trailing redirects a beat to settle.
       await page.waitForTimeout(300);
@@ -147,9 +149,7 @@ test.describe("Customer cannot open role-specific profile edit routes", () => {
       ).toBe(false);
 
       // Must land on a customer-appropriate destination.
-      expect(
-        ALLOWED_LANDINGS.some((t) => landed === t || landed.startsWith(t + "/")),
-      ).toBe(true);
+      expect(ALLOWED_LANDINGS.some((t) => landed === t || landed.startsWith(t + "/"))).toBe(true);
     });
   }
 });

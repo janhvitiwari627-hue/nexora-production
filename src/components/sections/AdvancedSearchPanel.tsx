@@ -3,14 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Clock, Sparkles, TrendingUp, X } from "lucide-react";
 
 const TRENDING = ["Balayage", "Keratin", "Bridal Makeup", "Beard Trim", "Manicure", "Facial"];
-const POPULAR = [
-  "Haircut",
-  "Spa",
-  "Nails",
-  "Makeup",
-  "Massage",
-  "Tattoo",
-];
+const POPULAR = ["Haircut", "Spa", "Nails", "Makeup", "Massage", "Tattoo"];
 
 interface Props {
   open: boolean;
@@ -62,7 +55,6 @@ export function AdvancedSearchPanel({
         >
           <div className="mt-3 rounded-[24px] border border-border bg-card p-4 shadow-[var(--shadow-float)] sm:p-5 md:p-6">
             <div className="grid gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-4">
-
               <Section title="Trending" icon={<TrendingUp className="h-4 w-4 text-primary" />}>
                 <div className="flex flex-wrap gap-2">
                   {TRENDING.map((t) => (
@@ -118,12 +110,11 @@ export function AdvancedSearchPanel({
                 )}
               </Section>
 
-              <Section
-                title="AI Suggestions"
-                icon={<Sparkles className="h-4 w-4 text-primary" />}
-              >
+              <Section title="AI Suggestions" icon={<Sparkles className="h-4 w-4 text-primary" />}>
                 {query.trim().length === 0 ? (
-                  <p className="text-sm font-medium text-body">Start typing for smart suggestions.</p>
+                  <p className="text-sm font-medium text-body">
+                    Start typing for smart suggestions.
+                  </p>
                 ) : (
                   <div className="space-y-2">
                     {[

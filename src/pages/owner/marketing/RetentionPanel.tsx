@@ -48,13 +48,16 @@ export function RetentionPanel({ salonId }: { salonId: string }) {
   const toggle = (id: string) =>
     setSelected((s) => {
       const next = new Set(s);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
 
   const toggleAll = () => {
     if (!data?.length) return;
-    setSelected(selected.size === data.length ? new Set() : new Set(data.map((c) => c.customer_id)));
+    setSelected(
+      selected.size === data.length ? new Set() : new Set(data.map((c) => c.customer_id)),
+    );
   };
 
   const riskBadge = (score: number) => {
@@ -87,7 +90,9 @@ export function RetentionPanel({ salonId }: { salonId: string }) {
 
         {isLoading ? (
           <div className="space-y-2">
-            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-16 w-full" />)}
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-16 w-full" />
+            ))}
           </div>
         ) : !data?.length ? (
           <div className="text-center py-8 text-sm text-muted-foreground">
@@ -96,10 +101,7 @@ export function RetentionPanel({ salonId }: { salonId: string }) {
         ) : (
           <>
             <div className="flex items-center gap-2 px-2 py-1 border-b text-xs text-muted-foreground">
-              <Checkbox
-                checked={selected.size === data.length}
-                onCheckedChange={toggleAll}
-              />
+              <Checkbox checked={selected.size === data.length} onCheckedChange={toggleAll} />
               Select all ({data.length})
             </div>
             <div className="space-y-2 max-h-96 overflow-y-auto">
@@ -118,8 +120,8 @@ export function RetentionPanel({ salonId }: { salonId: string }) {
                       {riskBadge(Number(c.churn_risk_score))}
                     </div>
                     <div className="text-xs text-muted-foreground truncate">
-                      LTV ₹{Number(c.lifetime_value).toLocaleString()} ·{" "}
-                      Last visit {c.last_booking_date || "—"}
+                      LTV ₹{Number(c.lifetime_value).toLocaleString()} · Last visit{" "}
+                      {c.last_booking_date || "—"}
                       {c.preferred_services?.[0] && ` · Likes ${c.preferred_services[0]}`}
                     </div>
                   </div>

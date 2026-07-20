@@ -140,11 +140,8 @@ export function BookingConfirmationScreen({
 
       <QueuedBookingsList className="mt-6" />
 
-
       <div className="border-border bg-card mt-8 rounded-[var(--radius-card-lg)] border p-6 shadow-[var(--shadow-card)]">
-        <div className="text-muted-foreground text-[11px] uppercase tracking-wider">
-          Booking ID
-        </div>
+        <div className="text-muted-foreground text-[11px] uppercase tracking-wider">Booking ID</div>
         <div className="mt-1 flex items-center gap-2">
           <span className="text-heading font-mono text-2xl font-black tracking-wide">
             {bookingId}
@@ -176,7 +173,7 @@ export function BookingConfirmationScreen({
               k="Stylist"
               v={
                 booking.selectedStaffId
-                  ? booking.staff.find((s) => s.id === booking.selectedStaffId)?.name ?? "Any"
+                  ? (booking.staff.find((s) => s.id === booking.selectedStaffId)?.name ?? "Any")
                   : "Any available"
               }
             />

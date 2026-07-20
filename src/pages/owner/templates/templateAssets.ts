@@ -14,7 +14,17 @@ export const TEMPLATE_ASSETS: Record<string, TemplateAsset> = {
     preview: royalLuxeDesktop,
     bestFor: ["Luxury Salon", "Premium Spa", "High-End Beauty Parlour"],
     tags: ["Luxury", "Premium", "Spa", "Mobile Ready"],
-    features: ["Hero", "Services", "Staff", "Gallery", "Reviews", "Offers", "Booking", "WhatsApp", "Google Maps"],
+    features: [
+      "Hero",
+      "Services",
+      "Staff",
+      "Gallery",
+      "Reviews",
+      "Offers",
+      "Booking",
+      "WhatsApp",
+      "Google Maps",
+    ],
   },
   "modern-salon": {
     preview: urbanProDesktop,

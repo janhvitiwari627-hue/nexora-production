@@ -33,7 +33,9 @@ for (const key of TEMPLATE_KEYS) {
     }
   });
 
-  test(`template-preview/${key}: clicking Book Now stays on /site/<slug>/book (no home redirect)`, async ({ page }) => {
+  test(`template-preview/${key}: clicking Book Now stays on /site/<slug>/book (no home redirect)`, async ({
+    page,
+  }) => {
     await page.goto(`/template-preview/${key}`);
     await page.waitForLoadState("domcontentloaded");
 

@@ -18,7 +18,11 @@ export function WAbout({ shop, template }: { shop: ShopData; template: TemplateC
           <SectionTitle font={template.headingFont}>About {shop.name}</SectionTitle>
           <p className="text-muted-foreground leading-relaxed">{shop.about}</p>
           <div className="flex flex-wrap gap-3 text-sm">
-            <Stat label="Years" value={`${new Date().getFullYear() - 2015}+`} color={template.colors.primary} />
+            <Stat
+              label="Years"
+              value={`${new Date().getFullYear() - 2015}+`}
+              color={template.colors.primary}
+            />
             <Stat label="Reviews" value={`${shop.reviewCount}+`} color={template.colors.primary} />
             <Stat label="Rating" value={`${shop.rating}★`} color={template.colors.primary} />
           </div>
@@ -32,7 +36,9 @@ export function WAbout({ shop, template }: { shop: ShopData; template: TemplateC
 function Stat({ label, value, color }: { label: string; value: string; color: string }) {
   return (
     <div className="rounded-lg border bg-white px-4 py-2 shadow-sm">
-      <div className="text-lg font-bold" style={{ color }}>{value}</div>
+      <div className="text-lg font-bold" style={{ color }}>
+        {value}
+      </div>
       <div className="text-muted-foreground text-xs uppercase tracking-wider">{label}</div>
     </div>
   );

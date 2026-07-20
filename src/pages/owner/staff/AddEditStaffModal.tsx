@@ -6,12 +6,25 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  ALL_SERVICES, DAYS, DESIGNATIONS, LANGUAGES, SLOTS, SPECIALIZATIONS,
-  emptyAvailability, type Availability, type Day, type DaySlot, type StaffMember,
+  ALL_SERVICES,
+  DAYS,
+  DESIGNATIONS,
+  LANGUAGES,
+  SLOTS,
+  SPECIALIZATIONS,
+  emptyAvailability,
+  type Availability,
+  type Day,
+  type DaySlot,
+  type StaffMember,
 } from "./mockStaff";
 import { cn } from "@/lib/utils";
 
@@ -37,7 +50,10 @@ function emptyStaff(): StaffMember {
 }
 
 export function AddEditStaffModal({
-  open, onClose, onSave, initial,
+  open,
+  onClose,
+  onSave,
+  initial,
 }: {
   open: boolean;
   onClose: () => void;
@@ -53,14 +69,18 @@ export function AddEditStaffModal({
   const toggleChip = (key: "specializations" | "languages" | "assignedServiceIds", val: string) => {
     setForm((f) => {
       const set = new Set(f[key]);
-      if (set.has(val)) set.delete(val); else set.add(val);
+      if (set.has(val)) set.delete(val);
+      else set.add(val);
       return { ...f, [key]: Array.from(set) };
     });
   };
 
   const toggleSlot = (day: Day, slot: DaySlot) => {
     setForm((f) => {
-      const a: Availability = { ...f.availability, [day]: { ...f.availability[day], [slot]: !f.availability[day][slot] } };
+      const a: Availability = {
+        ...f.availability,
+        [day]: { ...f.availability[day], [slot]: !f.availability[day][slot] },
+      };
       return { ...f, availability: a };
     });
   };
@@ -99,32 +119,57 @@ export function AddEditStaffModal({
 
           <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
             <Field label="Full name">
-              <Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+              <Input
+                required
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+              />
             </Field>
             <Field label="Designation">
-              <Select value={form.designation} onValueChange={(v) => setForm({ ...form, designation: v })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={form.designation}
+                onValueChange={(v) => setForm({ ...form, designation: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
-                  {DESIGNATIONS.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                  {DESIGNATIONS.map((d) => (
+                    <SelectItem key={d} value={d}>
+                      {d}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </Field>
             <Field label="Experience (years)">
               <Input
-                type="number" min={0}
+                type="number"
+                min={0}
                 value={form.experienceYears}
                 onChange={(e) => setForm({ ...form, experienceYears: Number(e.target.value) })}
               />
             </Field>
             <Field label="Instagram URL">
-              <Input value={form.instagram ?? ""} onChange={(e) => setForm({ ...form, instagram: e.target.value })} placeholder="https://instagram.com/…" />
+              <Input
+                value={form.instagram ?? ""}
+                onChange={(e) => setForm({ ...form, instagram: e.target.value })}
+                placeholder="https://instagram.com/…"
+              />
             </Field>
             <Field label="WhatsApp">
-              <Input value={form.whatsapp ?? ""} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} placeholder="9198XXXXXXXX" />
+              <Input
+                value={form.whatsapp ?? ""}
+                onChange={(e) => setForm({ ...form, whatsapp: e.target.value })}
+                placeholder="9198XXXXXXXX"
+              />
             </Field>
             <Field label="Available now">
               <div className="flex h-9 items-center">
-                <Switch checked={form.available} onCheckedChange={(c) => setForm({ ...form, available: c })} />
+                <Switch
+                  checked={form.available}
+                  onCheckedChange={(c) => setForm({ ...form, available: c })}
+                />
                 <span className="text-muted-foreground ml-2 text-xs">
                   {form.available ? "Marked available" : "Off duty"}
                 </span>
@@ -149,7 +194,9 @@ export function AddEditStaffModal({
         <ChipGroup
           label="Assigned services"
           options={ALL_SERVICES.map((s) => s.name)}
-          selected={ALL_SERVICES.filter((s) => form.assignedServiceIds.includes(s.id)).map((s) => s.name)}
+          selected={ALL_SERVICES.filter((s) => form.assignedServiceIds.includes(s.id)).map(
+            (s) => s.name,
+          )}
           onToggle={(name) => {
             const svc = ALL_SERVICES.find((s) => s.name === name);
             if (svc) toggleChip("assignedServiceIds", svc.id);
@@ -158,16 +205,25 @@ export function AddEditStaffModal({
 
         {/* Availability grid */}
         <div className="space-y-2">
-          <Label className="text-heading text-xs font-semibold uppercase tracking-wide">Weekly availability</Label>
+          <Label className="text-heading text-xs font-semibold uppercase tracking-wide">
+            Weekly availability
+          </Label>
           <div className="border-border overflow-hidden rounded-lg border">
             <div className="grid grid-cols-[80px_repeat(7,1fr)] text-center text-xs">
               <div className="bg-muted/60 border-border border-b p-2 font-semibold" />
               {DAYS.map((d) => (
-                <div key={d} className="bg-muted/60 border-border border-b border-l p-2 font-semibold">{d}</div>
+                <div
+                  key={d}
+                  className="bg-muted/60 border-border border-b border-l p-2 font-semibold"
+                >
+                  {d}
+                </div>
               ))}
               {SLOTS.map((slot) => (
                 <div key={slot} className="contents">
-                  <div className="bg-muted/30 border-border border-b p-2 text-left text-[11px] font-semibold uppercase">{slot}</div>
+                  <div className="bg-muted/30 border-border border-b p-2 text-left text-[11px] font-semibold uppercase">
+                    {slot}
+                  </div>
                   {DAYS.map((d) => {
                     const checked = form.availability[d][slot];
                     return (
@@ -181,7 +237,11 @@ export function AddEditStaffModal({
                         )}
                         aria-pressed={checked}
                       >
-                        <Checkbox checked={checked} aria-label={`${d} ${slot}`} className="pointer-events-none" />
+                        <Checkbox
+                          checked={checked}
+                          aria-label={`${d} ${slot}`}
+                          className="pointer-events-none"
+                        />
                       </button>
                     );
                   })}
@@ -192,7 +252,9 @@ export function AddEditStaffModal({
         </div>
 
         <div className="flex justify-end gap-2 border-t pt-4">
-          <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
           <Button type="submit">{initial ? "Save changes" : "Add staff"}</Button>
         </div>
       </form>
@@ -210,7 +272,10 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 function ChipGroup({
-  label, options, selected, onToggle,
+  label,
+  options,
+  selected,
+  onToggle,
 }: {
   label: string;
   options: string[];

@@ -27,8 +27,8 @@ export default function Hero() {
               </span>
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-slate-600 sm:text-xl">
-              Discover trusted professionals, manage appointments, and grow your
-              business — all on India's Beauty Industry Operating System.
+              Discover trusted professionals, manage appointments, and grow your business — all on
+              India's Beauty Industry Operating System.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <a

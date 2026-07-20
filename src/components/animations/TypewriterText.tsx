@@ -42,9 +42,7 @@ export function TypewriterText({
     const t = setTimeout(
       () => {
         setText((prev) =>
-          deleting
-            ? current.slice(0, prev.length - 1)
-            : current.slice(0, prev.length + 1),
+          deleting ? current.slice(0, prev.length - 1) : current.slice(0, prev.length + 1),
         );
       },
       deleting ? deleteSpeed : typeSpeed,
@@ -58,8 +56,7 @@ export function TypewriterText({
       <span
         aria-hidden
         className={
-          cursorClassName ??
-          "ml-0.5 inline-block w-[2px] animate-pulse bg-current align-middle"
+          cursorClassName ?? "ml-0.5 inline-block w-[2px] animate-pulse bg-current align-middle"
         }
         style={{ height: "0.9em" }}
       />

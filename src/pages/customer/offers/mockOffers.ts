@@ -1,9 +1,4 @@
-export type OfferCategory =
-  | "available"
-  | "membership"
-  | "festival"
-  | "partner"
-  | "expired";
+export type OfferCategory = "available" | "membership" | "festival" | "partner" | "expired";
 
 export interface Coupon {
   id: string;
@@ -20,8 +15,7 @@ export interface Coupon {
   termsUrl?: string;
 }
 
-const inDays = (n: number) =>
-  new Date(Date.now() + n * 86400000).toISOString();
+const inDays = (n: number) => new Date(Date.now() + n * 86400000).toISOString();
 
 export const COUPONS: Coupon[] = [
   {

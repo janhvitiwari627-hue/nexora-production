@@ -27,7 +27,11 @@ export function ReviewCard({ review }: { review: Review }) {
       <header className="flex items-start gap-3">
         <div className="bg-muted h-10 w-10 shrink-0 overflow-hidden rounded-full">
           {review.author_avatar ? (
-            <img src={review.author_avatar} alt={review.author_name} className="h-full w-full object-cover" />
+            <img
+              src={review.author_avatar}
+              alt={review.author_name}
+              className="h-full w-full object-cover"
+            />
           ) : (
             <div className="bg-gradient-cta text-primary-foreground grid h-full w-full place-items-center text-sm font-bold">
               {review.author_name.charAt(0)}
@@ -65,7 +69,11 @@ export function ReviewCard({ review }: { review: Review }) {
               onClick={() => setLightboxIndex(i)}
               className="h-20 w-20 shrink-0 overflow-hidden rounded-lg"
             >
-              <img src={src} alt={`Review photo ${i + 1}`} className="h-full w-full object-cover transition hover:scale-105" />
+              <img
+                src={src}
+                alt={`Review photo ${i + 1}`}
+                className="h-full w-full object-cover transition hover:scale-105"
+              />
             </button>
           ))}
         </div>
@@ -74,7 +82,10 @@ export function ReviewCard({ review }: { review: Review }) {
       {review.owner_reply && (
         <div className="bg-muted mt-4 rounded-lg p-3">
           <p className="text-heading text-xs font-semibold">
-            {review.owner_reply.author} <span className="text-muted-foreground font-normal">· Owner · {review.owner_reply.date}</span>
+            {review.owner_reply.author}{" "}
+            <span className="text-muted-foreground font-normal">
+              · Owner · {review.owner_reply.date}
+            </span>
           </p>
           <p className="text-body mt-1 text-sm">{review.owner_reply.text}</p>
         </div>
@@ -86,7 +97,9 @@ export function ReviewCard({ review }: { review: Review }) {
           onClick={() => setHelpful((v) => !v)}
           className={cn(
             "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition",
-            helpful ? "border-primary text-primary bg-primary/5" : "border-border text-muted-foreground hover:border-primary/40",
+            helpful
+              ? "border-primary text-primary bg-primary/5"
+              : "border-border text-muted-foreground hover:border-primary/40",
           )}
         >
           <ThumbsUp className="h-3.5 w-3.5" />

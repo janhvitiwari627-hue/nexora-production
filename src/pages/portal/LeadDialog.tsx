@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -65,30 +72,59 @@ export function LeadDialog({ trigger, target }: Props) {
         <div className="grid gap-3">
           <div>
             <Label htmlFor="ld-name">Your name *</Label>
-            <Input id="ld-name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            <Input
+              id="ld-name"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+            />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label htmlFor="ld-email">Email</Label>
-              <Input id="ld-email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+              <Input
+                id="ld-email"
+                type="email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+              />
             </div>
             <div>
               <Label htmlFor="ld-phone">Phone</Label>
-              <Input id="ld-phone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+              <Input
+                id="ld-phone"
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              />
             </div>
           </div>
           <div>
             <Label htmlFor="ld-city">City</Label>
-            <Input id="ld-city" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
+            <Input
+              id="ld-city"
+              value={form.city}
+              onChange={(e) => setForm({ ...form, city: e.target.value })}
+            />
           </div>
           <div>
             <Label htmlFor="ld-msg">Message *</Label>
-            <Textarea id="ld-msg" rows={4} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="Tell them about your business and what you're looking for…" />
+            <Textarea
+              id="ld-msg"
+              rows={4}
+              value={form.message}
+              onChange={(e) => setForm({ ...form, message: e.target.value })}
+              placeholder="Tell them about your business and what you're looking for…"
+            />
           </div>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
-          <Button onClick={submit} disabled={loading} className="bg-gradient-cta text-primary-foreground">
+          <Button variant="ghost" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            onClick={submit}
+            disabled={loading}
+            className="bg-gradient-cta text-primary-foreground"
+          >
             {loading ? "Sending…" : "Send inquiry"}
           </Button>
         </DialogFooter>

@@ -14,10 +14,7 @@ export function FilterPills({
 }) {
   return (
     <div
-      className={cn(
-        "scrollbar-hide -mx-2 flex items-center gap-2 overflow-x-auto px-2",
-        className,
-      )}
+      className={cn("scrollbar-hide -mx-2 flex items-center gap-2 overflow-x-auto px-2", className)}
       style={{ scrollbarWidth: "none" }}
     >
       {options.map((opt) => {

@@ -137,9 +137,7 @@ export function MembershipSection() {
           className="flex w-full items-center justify-center gap-1.5 border-t border-border bg-muted/30 py-3 text-sm font-bold text-primary transition hover:bg-muted/60"
         >
           {expanded ? "Show Less" : "Compare All Benefits"}
-          <ChevronDown
-            className={cn("h-4 w-4 transition-transform", expanded && "rotate-180")}
-          />
+          <ChevronDown className={cn("h-4 w-4 transition-transform", expanded && "rotate-180")} />
         </button>
       </div>
     </section>

@@ -1,15 +1,6 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import {
-  Heart,
-  HeartOff,
-  Phone,
-  MapPin,
-  Star,
-  Tag,
-  Sparkles,
-  Calendar,
-} from "lucide-react";
+import { Heart, HeartOff, Phone, MapPin, Star, Tag, Sparkles, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { FavoriteShop } from "./mockFavorites";
 

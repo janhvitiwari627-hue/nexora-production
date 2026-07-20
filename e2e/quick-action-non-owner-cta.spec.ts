@@ -14,8 +14,7 @@ import { test, expect, type Page } from "@playwright/test";
  */
 
 const STORAGE_KEY = process.env.LOVABLE_BROWSER_SUPABASE_STORAGE_KEY;
-const SESSION_JSON_NON_OWNER =
-  process.env.LOVABLE_BROWSER_SUPABASE_SESSION_JSON_NON_OWNER;
+const SESSION_JSON_NON_OWNER = process.env.LOVABLE_BROWSER_SUPABASE_SESSION_JSON_NON_OWNER;
 const PENDING_KEY = "nexora:postLoginRedirect";
 
 const QUICK_ACTIONS: { label: string; target: string }[] = [
@@ -87,7 +86,7 @@ test.describe("Owner quick actions — non-owner CTA + role-complete resume", ()
       await page.getByRole("button", { name: action.label }).click();
 
       // 2. Toast should surface with the "Become an owner" action button.
-      const toast = page.locator('[data-sonner-toast]', {
+      const toast = page.locator("[data-sonner-toast]", {
         hasText: /owner access required/i,
       });
       await expect(toast).toBeVisible({ timeout: 5_000 });
@@ -116,10 +115,7 @@ test.describe("Owner quick actions — non-owner CTA + role-complete resume", ()
 
       // 6. The non-owner branch never stashes a post-login redirect — the user
       //    was already signed in, only the role was missing.
-      const pending = await page.evaluate(
-        (k) => window.sessionStorage.getItem(k),
-        PENDING_KEY,
-      );
+      const pending = await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
       expect(pending).toBeNull();
     });
   }
@@ -135,7 +131,7 @@ test.describe("Owner quick actions — non-owner CTA + role-complete resume", ()
     await page.waitForURL(/\/owner\/services(\/|$|\?)/, { timeout: 10_000 });
 
     // No "Owner access required" toast should have appeared.
-    const denialToast = page.locator('[data-sonner-toast]', {
+    const denialToast = page.locator("[data-sonner-toast]", {
       hasText: /owner access required/i,
     });
     await expect(denialToast).toHaveCount(0);

@@ -26,21 +26,22 @@ async function isPartnerSession(page: Page): Promise<boolean> {
     const mod = await import("/src/integrations/supabase/client.ts").catch(
       () => null as unknown as { supabase: unknown } | null,
     );
-    const supabase = (mod as { supabase: {
-      auth: { getUser: () => Promise<{ data: { user: { id: string } | null } }> };
-      from: (t: string) => {
-        select: (c: string) => {
-          eq: (col: string, val: string) => Promise<{ data: Array<{ role: string }> | null }>;
+    const supabase = (
+      mod as {
+        supabase: {
+          auth: { getUser: () => Promise<{ data: { user: { id: string } | null } }> };
+          from: (t: string) => {
+            select: (c: string) => {
+              eq: (col: string, val: string) => Promise<{ data: Array<{ role: string }> | null }>;
+            };
+          };
         };
-      };
-    } } | null)?.supabase;
+      } | null
+    )?.supabase;
     if (!supabase) return false;
     const { data } = await supabase.auth.getUser();
     if (!data.user) return false;
-    const res = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", data.user.id);
+    const res = await supabase.from("user_roles").select("role").eq("user_id", data.user.id);
     const roles = (res.data ?? []).map((r) => r.role);
     return roles.includes("growth_partner") || roles.includes("district_partner");
   });
@@ -61,7 +62,9 @@ test.describe("Partner reaches profile-edit form via /partner/profile", () => {
     );
   });
 
-  test("/partner/profile forwards to /dashboard/settings and the edit form loads", async ({ page }) => {
+  test("/partner/profile forwards to /dashboard/settings and the edit form loads", async ({
+    page,
+  }) => {
     await page.goto("/partner/profile");
 
     // Land on the shared edit surface.

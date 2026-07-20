@@ -67,15 +67,15 @@ export function FavoriteShopsPage() {
             <div className="text-sm">
               <p className="font-bold">AI-curated for you</p>
               <p className="text-xs text-muted-foreground">
-                Recommendations are based on your booking history, favourites and shops loved
-                by members in your tier and area.
+                Recommendations are based on your booking history, favourites and shops loved by
+                members in your tier and area.
               </p>
             </div>
           </div>
         )}
 
-        {tab === "saved" && (
-          mockSaved.length ? (
+        {tab === "saved" &&
+          (mockSaved.length ? (
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {mockSaved.map((s) => (
                 <FavoriteShopCard key={s.id} shop={s} saved />
@@ -87,11 +87,10 @@ export function FavoriteShopsPage() {
               subtitle="Tap the heart icon on any shop to save it for quick rebooking."
               cta="Discover Shops"
             />
-          )
-        )}
+          ))}
 
-        {tab === "visited" && (
-          mockVisited.length ? (
+        {tab === "visited" &&
+          (mockVisited.length ? (
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {mockVisited.map((s) => (
                 <FavoriteShopCard key={s.id} shop={s} visitedISO={s.lastVisitedISO} />
@@ -103,20 +102,13 @@ export function FavoriteShopsPage() {
               subtitle="Once you book and complete a service, it will appear here."
               cta="Book Something"
             />
-          )
-        )}
+          ))}
 
-        {tab === "recommended" && (
-          mockRecommended.length ? (
+        {tab === "recommended" &&
+          (mockRecommended.length ? (
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {mockRecommended.map((s) => (
-                <FavoriteShopCard
-                  key={s.id}
-                  shop={s}
-                  saved={false}
-                  showAiBadge
-                  reason={s.reason}
-                />
+                <FavoriteShopCard key={s.id} shop={s} saved={false} showAiBadge reason={s.reason} />
               ))}
             </div>
           ) : (
@@ -125,23 +117,14 @@ export function FavoriteShopsPage() {
               subtitle="Complete a few bookings and we'll surface tailored recommendations."
               cta="Explore Shops"
             />
-          )
-        )}
+          ))}
       </main>
       <PublicFooter />
     </div>
   );
 }
 
-function Empty({
-  title,
-  subtitle,
-  cta,
-}: {
-  title: string;
-  subtitle: string;
-  cta: string;
-}) {
+function Empty({ title, subtitle, cta }: { title: string; subtitle: string; cta: string }) {
   return (
     <div className="grid place-items-center rounded-3xl border border-dashed bg-card/60 px-6 py-16 text-center">
       <Heart className="h-10 w-10 text-rose-400" />

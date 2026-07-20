@@ -24,7 +24,9 @@ export function NotificationsPanel() {
             <tr className="text-muted-foreground border-border border-b text-xs uppercase tracking-wide">
               <th className="py-3 pr-3 text-left font-bold">Notification type</th>
               {NOTIF_CHANNELS.map((c) => (
-                <th key={c} className="py-3 px-2 text-center font-bold">{c}</th>
+                <th key={c} className="py-3 px-2 text-center font-bold">
+                  {c}
+                </th>
               ))}
             </tr>
           </thead>

@@ -4,12 +4,19 @@ import { Modal } from "@/components/shared/Modal";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import type { StaffMember } from "./mockStaff";
 
 export function DeleteStaffModal({
-  staff, others, onClose, onConfirm,
+  staff,
+  others,
+  onClose,
+  onConfirm,
 }: {
   staff: StaffMember | null;
   others: StaffMember[];
@@ -27,7 +34,8 @@ export function DeleteStaffModal({
         <div className="bg-danger/10 text-danger flex gap-3 rounded-lg p-3 text-sm">
           <AlertTriangle className="h-5 w-5 shrink-0" />
           <p>
-            You're about to permanently delete <strong>{staff.name}</strong>. This action cannot be undone.
+            You're about to permanently delete <strong>{staff.name}</strong>. This action cannot be
+            undone.
           </p>
         </div>
 
@@ -41,7 +49,9 @@ export function DeleteStaffModal({
             </SelectTrigger>
             <SelectContent>
               {others.map((s) => (
-                <SelectItem key={s.id} value={s.id}>{s.name} · {s.designation}</SelectItem>
+                <SelectItem key={s.id} value={s.id}>
+                  {s.name} · {s.designation}
+                </SelectItem>
               ))}
               <SelectItem value="__none__">Don't reassign (cancel bookings)</SelectItem>
             </SelectContent>
@@ -52,7 +62,9 @@ export function DeleteStaffModal({
         </div>
 
         <div className="flex justify-end gap-2 border-t pt-4">
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
           <Button
             disabled={!reassign}
             className="bg-danger hover:bg-danger/90 text-white"

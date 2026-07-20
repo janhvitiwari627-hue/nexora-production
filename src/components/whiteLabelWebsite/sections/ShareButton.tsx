@@ -7,7 +7,13 @@ export function ShareButton({
   url,
   label = "Share",
   className,
-}: { title: string; text?: string; url?: string; label?: string; className?: string }) {
+}: {
+  title: string;
+  text?: string;
+  url?: string;
+  label?: string;
+  className?: string;
+}) {
   const handleShare = async () => {
     const shareUrl = url ?? (typeof window !== "undefined" ? window.location.href : "");
     try {

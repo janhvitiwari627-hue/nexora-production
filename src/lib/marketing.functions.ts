@@ -89,7 +89,6 @@ export const sendRetentionCampaign = createServerFn({ method: "POST" })
       .single();
     if (campErr) throw new Error(campErr.message);
 
-
     // Drop in-app notifications so customers see the offer immediately
     if (messages.length) {
       await context.supabase.from("notifications").insert(

@@ -34,9 +34,7 @@ function writeStored(loc: UserLocation | null) {
  */
 export function useUserLocation() {
   const [location, setLocation] = useState<UserLocation | null>(null);
-  const [status, setStatus] = useState<"idle" | "loading" | "granted" | "denied" | "error">(
-    "idle",
-  );
+  const [status, setStatus] = useState<"idle" | "loading" | "granted" | "denied" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -71,15 +69,12 @@ export function useUserLocation() {
     );
   }, []);
 
-  const setManual = useCallback(
-    (input: { lat: number; lng: number; label?: string }) => {
-      const next: UserLocation = { ...input, source: "manual", updatedAt: Date.now() };
-      writeStored(next);
-      setLocation(next);
-      setStatus("granted");
-    },
-    [],
-  );
+  const setManual = useCallback((input: { lat: number; lng: number; label?: string }) => {
+    const next: UserLocation = { ...input, source: "manual", updatedAt: Date.now() };
+    writeStored(next);
+    setLocation(next);
+    setStatus("granted");
+  }, []);
 
   const clear = useCallback(() => {
     writeStored(null);

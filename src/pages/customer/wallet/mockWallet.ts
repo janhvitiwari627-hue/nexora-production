@@ -30,14 +30,70 @@ export const mockWallet = {
 const d = (n: number) => new Date(Date.now() - n * 86400000).toISOString();
 
 export const mockTxns: WalletTxn[] = [
-  { id: "T1", dateISO: d(0), bucket: "reward", type: "credit", amount: 120, description: "Booking reward — Glow & Co." },
-  { id: "T2", dateISO: d(2), bucket: "referral", type: "credit", amount: 100, description: "Referral bonus — Riya joined" },
-  { id: "T3", dateISO: d(3), bucket: "cashback", type: "credit", amount: 80, description: "Weekend cashback — Serene Spa" },
-  { id: "T4", dateISO: d(5), bucket: "reward", type: "debit", amount: 200, description: "Redeemed on booking BK-23984" },
-  { id: "T5", dateISO: d(8), bucket: "cashback", type: "refund", amount: 499, description: "Refund — Aromatherapy cancelled" },
-  { id: "T6", dateISO: d(14), bucket: "referral", type: "credit", amount: 100, description: "Referral bonus — Ankit joined" },
-  { id: "T7", dateISO: d(22), bucket: "reward", type: "credit", amount: 50, description: "Review bonus — The Nail Bar" },
-  { id: "T8", dateISO: d(40), bucket: "reward", type: "debit", amount: 150, description: "Discount applied — BK-23720" },
+  {
+    id: "T1",
+    dateISO: d(0),
+    bucket: "reward",
+    type: "credit",
+    amount: 120,
+    description: "Booking reward — Glow & Co.",
+  },
+  {
+    id: "T2",
+    dateISO: d(2),
+    bucket: "referral",
+    type: "credit",
+    amount: 100,
+    description: "Referral bonus — Riya joined",
+  },
+  {
+    id: "T3",
+    dateISO: d(3),
+    bucket: "cashback",
+    type: "credit",
+    amount: 80,
+    description: "Weekend cashback — Serene Spa",
+  },
+  {
+    id: "T4",
+    dateISO: d(5),
+    bucket: "reward",
+    type: "debit",
+    amount: 200,
+    description: "Redeemed on booking BK-23984",
+  },
+  {
+    id: "T5",
+    dateISO: d(8),
+    bucket: "cashback",
+    type: "refund",
+    amount: 499,
+    description: "Refund — Aromatherapy cancelled",
+  },
+  {
+    id: "T6",
+    dateISO: d(14),
+    bucket: "referral",
+    type: "credit",
+    amount: 100,
+    description: "Referral bonus — Ankit joined",
+  },
+  {
+    id: "T7",
+    dateISO: d(22),
+    bucket: "reward",
+    type: "credit",
+    amount: 50,
+    description: "Review bonus — The Nail Bar",
+  },
+  {
+    id: "T8",
+    dateISO: d(40),
+    bucket: "reward",
+    type: "debit",
+    amount: 150,
+    description: "Discount applied — BK-23720",
+  },
 ];
 
 export const mockRefunds: RefundItem[] = [

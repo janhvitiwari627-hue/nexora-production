@@ -38,7 +38,9 @@ async function loadPdfjs() {
   if (!pdfjsPromise) {
     pdfjsPromise = (async () => {
       const pdfjs = await import("pdfjs-dist");
-      const worker = (await import("pdfjs-dist/build/pdf.worker.min.mjs?url" as string)) as { default: string };
+      const worker = (await import("pdfjs-dist/build/pdf.worker.min.mjs?url" as string)) as {
+        default: string;
+      };
       pdfjs.GlobalWorkerOptions.workerSrc = worker.default;
       return pdfjs;
     })();
@@ -112,7 +114,12 @@ export function KycDocumentPreview({ kycPath, applicantName, variant = "thumb" }
         ) : error ? (
           <FileText className="h-4 w-4 text-red-500" />
         ) : img && url ? (
-          <img src={url} alt={`KYC preview for ${applicantName}`} className="h-full w-full object-cover" loading="lazy" />
+          <img
+            src={url}
+            alt={`KYC preview for ${applicantName}`}
+            className="h-full w-full object-cover"
+            loading="lazy"
+          />
         ) : pdf ? (
           <FileText className="h-5 w-5 text-primary" />
         ) : (
@@ -139,7 +146,11 @@ export function KycDocumentPreview({ kycPath, applicantName, variant = "thumb" }
             {error}
           </div>
         ) : img && url ? (
-          <img src={url} alt={`KYC document for ${applicantName}`} className="max-h-48 w-full rounded object-contain" />
+          <img
+            src={url}
+            alt={`KYC document for ${applicantName}`}
+            className="max-h-48 w-full rounded object-contain"
+          />
         ) : (
           <div className="flex h-40 w-full flex-col items-center justify-center gap-2 text-primary">
             <FileText className="h-8 w-8" />
@@ -215,14 +226,31 @@ function ImageViewer({
   return (
     <div className="flex flex-col">
       <div className="flex items-center justify-end gap-1 border-b bg-muted/40 px-3 py-2">
-        <Button size="icon" variant="outline" onClick={() => setZoom((z) => Math.max(0.25, +(z - 0.25).toFixed(2)))} aria-label="Zoom out">
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={() => setZoom((z) => Math.max(0.25, +(z - 0.25).toFixed(2)))}
+          aria-label="Zoom out"
+        >
           <ZoomOut className="h-4 w-4" />
         </Button>
-        <span className="min-w-[3rem] text-center text-xs tabular-nums text-muted-foreground">{Math.round(zoom * 100)}%</span>
-        <Button size="icon" variant="outline" onClick={() => setZoom((z) => Math.min(5, +(z + 0.25).toFixed(2)))} aria-label="Zoom in">
+        <span className="min-w-[3rem] text-center text-xs tabular-nums text-muted-foreground">
+          {Math.round(zoom * 100)}%
+        </span>
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={() => setZoom((z) => Math.min(5, +(z + 0.25).toFixed(2)))}
+          aria-label="Zoom in"
+        >
           <ZoomIn className="h-4 w-4" />
         </Button>
-        <Button size="icon" variant="outline" onClick={() => setRotate((r) => (r + 90) % 360)} aria-label="Rotate 90°">
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={() => setRotate((r) => (r + 90) % 360)}
+          aria-label="Rotate 90°"
+        >
           <RotateCw className="h-4 w-4" />
         </Button>
         <Button size="icon" variant="outline" asChild aria-label="Download">
@@ -235,7 +263,11 @@ function ImageViewer({
         <img
           src={url}
           alt={`KYC document for ${applicantName}`}
-          style={{ transform: `scale(${zoom}) rotate(${rotate}deg)`, transformOrigin: "center center", transition: "transform 120ms ease" }}
+          style={{
+            transform: `scale(${zoom}) rotate(${rotate}deg)`,
+            transformOrigin: "center center",
+            transition: "transform 120ms ease",
+          }}
           className="max-h-none select-none"
           draggable={false}
         />
@@ -247,7 +279,15 @@ function ImageViewer({
 /* -------- PDF viewer with thumbnails, page nav, rotate, fit-to-width -------- */
 type PdfDoc = { numPages: number; getPage: (n: number) => Promise<any> };
 
-function PdfViewer({ url, applicantName, downloadUrl }: { url: string; applicantName: string; downloadUrl: string }) {
+function PdfViewer({
+  url,
+  applicantName,
+  downloadUrl,
+}: {
+  url: string;
+  applicantName: string;
+  downloadUrl: string;
+}) {
   const [doc, setDoc] = useState<PdfDoc | null>(null);
   const [loadErr, setLoadErr] = useState<string | null>(null);
   const [page, setPage] = useState(1);
@@ -312,7 +352,13 @@ function PdfViewer({ url, applicantName, downloadUrl }: { url: string; applicant
     <div className="flex h-[80vh] flex-col">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-1 border-b bg-muted/40 px-3 py-2">
-        <Button size="icon" variant="outline" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} aria-label="Previous page">
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={() => setPage((p) => Math.max(1, p - 1))}
+          disabled={page <= 1}
+          aria-label="Previous page"
+        >
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <div
@@ -323,7 +369,13 @@ function PdfViewer({ url, applicantName, downloadUrl }: { url: string; applicant
           Page <span className="text-sm">{page}</span>
           <span className="text-primary/60">/ {numPages || "…"}</span>
         </div>
-        <Button size="icon" variant="outline" onClick={() => setPage((p) => Math.min(numPages, p + 1))} disabled={page >= numPages} aria-label="Next page">
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={() => setPage((p) => Math.min(numPages, p + 1))}
+          disabled={page >= numPages}
+          aria-label="Next page"
+        >
           <ChevronRight className="h-4 w-4" />
         </Button>
         <div className="mx-2 h-5 w-px bg-border" />
@@ -335,14 +387,37 @@ function PdfViewer({ url, applicantName, downloadUrl }: { url: string; applicant
         >
           <MoveHorizontal className="mr-1 h-4 w-4" /> Fit width
         </Button>
-        <Button size="icon" variant="outline" onClick={() => { setFitWidth(false); setZoom((z) => Math.max(0.25, +(z - 0.25).toFixed(2))); }} aria-label="Zoom out">
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={() => {
+            setFitWidth(false);
+            setZoom((z) => Math.max(0.25, +(z - 0.25).toFixed(2)));
+          }}
+          aria-label="Zoom out"
+        >
           <ZoomOut className="h-4 w-4" />
         </Button>
-        <span className="min-w-[3rem] text-center text-xs tabular-nums text-muted-foreground">{fitWidth ? "Fit" : `${Math.round(zoom * 100)}%`}</span>
-        <Button size="icon" variant="outline" onClick={() => { setFitWidth(false); setZoom((z) => Math.min(5, +(z + 0.25).toFixed(2))); }} aria-label="Zoom in">
+        <span className="min-w-[3rem] text-center text-xs tabular-nums text-muted-foreground">
+          {fitWidth ? "Fit" : `${Math.round(zoom * 100)}%`}
+        </span>
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={() => {
+            setFitWidth(false);
+            setZoom((z) => Math.min(5, +(z + 0.25).toFixed(2)));
+          }}
+          aria-label="Zoom in"
+        >
           <ZoomIn className="h-4 w-4" />
         </Button>
-        <Button size="icon" variant="outline" onClick={() => setRotate((r) => (r + 90) % 360)} aria-label="Rotate 90°">
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={() => setRotate((r) => (r + 90) % 360)}
+          aria-label="Rotate 90°"
+        >
           <RotateCw className="h-4 w-4" />
         </Button>
         <div className="ml-auto">

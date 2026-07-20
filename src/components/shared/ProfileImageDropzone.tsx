@@ -37,12 +37,14 @@ async function processImage(file: File): Promise<File> {
   bitmap.close?.();
 
   const shouldCompress = file.size > COMPRESS_THRESHOLD;
-  const type = shouldCompress ? "image/jpeg" : file.type === "image/png" ? "image/png" : "image/jpeg";
+  const type = shouldCompress
+    ? "image/jpeg"
+    : file.type === "image/png"
+      ? "image/png"
+      : "image/jpeg";
   const quality = shouldCompress ? 0.82 : 0.92;
 
-  const blob: Blob | null = await new Promise((resolve) =>
-    canvas.toBlob(resolve, type, quality),
-  );
+  const blob: Blob | null = await new Promise((resolve) => canvas.toBlob(resolve, type, quality));
   if (!blob) return file;
   const ext = type === "image/png" ? "png" : "jpg";
   return new File([blob], `avatar-${Date.now()}.${ext}`, { type });

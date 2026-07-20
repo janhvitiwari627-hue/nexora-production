@@ -19,10 +19,7 @@ export function Lightbox({
     () => setIndex((i) => (i - 1 + images.length) % images.length),
     [images.length],
   );
-  const next = useCallback(
-    () => setIndex((i) => (i + 1) % images.length),
-    [images.length],
-  );
+  const next = useCallback(() => setIndex((i) => (i + 1) % images.length), [images.length]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -131,7 +128,9 @@ export function Lightbox({
                 onClick={() => setIndex(i)}
                 className={cn(
                   "h-16 w-16 shrink-0 overflow-hidden rounded-md border-2 transition",
-                  i === index ? "border-primary" : "border-transparent opacity-60 hover:opacity-100",
+                  i === index
+                    ? "border-primary"
+                    : "border-transparent opacity-60 hover:opacity-100",
                 )}
               >
                 <img src={thumb} alt="" className="h-full w-full object-cover" />

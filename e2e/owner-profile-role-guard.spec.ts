@@ -33,40 +33,46 @@ async function isOwnerSession(page: Page): Promise<boolean> {
     const mod = await import("/src/integrations/supabase/client.ts").catch(
       () => null as unknown as { supabase: unknown } | null,
     );
-    const supabase = (mod as { supabase: {
-      auth: { getUser: () => Promise<{ data: { user: { id: string } | null } }> };
-      from: (t: string) => {
-        select: (c: string) => {
-          eq: (col: string, val: string) => {
-            eq?: (col: string, val: unknown) => Promise<{ data: unknown[] | null }>;
-          } & Promise<{ data: Array<{ role: string }> | null }>;
+    const supabase = (
+      mod as {
+        supabase: {
+          auth: { getUser: () => Promise<{ data: { user: { id: string } | null } }> };
+          from: (t: string) => {
+            select: (c: string) => {
+              eq: (
+                col: string,
+                val: string,
+              ) => {
+                eq?: (col: string, val: unknown) => Promise<{ data: unknown[] | null }>;
+              } & Promise<{ data: Array<{ role: string }> | null }>;
+            };
+          };
         };
-      };
-    } } | null)?.supabase;
+      } | null
+    )?.supabase;
     if (!supabase) return false;
     const { data } = await supabase.auth.getUser();
     if (!data.user) return false;
-    const roleRes = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", data.user.id);
+    const roleRes = await supabase.from("user_roles").select("role").eq("user_id", data.user.id);
     const roles = (roleRes.data ?? []).map((r) => r.role);
     // Exclude admins/partners so this stays owner-scoped.
     const elevated = ["admin", "super_admin", "growth_partner", "district_partner"];
     if (roles.some((r) => elevated.includes(r))) return false;
     const hasOwnerRole =
-      roles.includes("owner") ||
-      roles.includes("shop_owner") ||
-      roles.includes("shop_manager");
+      roles.includes("owner") || roles.includes("shop_owner") || roles.includes("shop_manager");
     if (hasOwnerRole) return true;
-    const linkRes = await (supabase
-      .from("salon_owners") as unknown as {
+    const linkRes = await (
+      supabase.from("salon_owners") as unknown as {
         select: (c: string) => {
-          eq: (col: string, val: string) => {
+          eq: (
+            col: string,
+            val: string,
+          ) => {
             eq: (col: string, val: boolean) => Promise<{ data: unknown[] | null }>;
           };
         };
-      })
+      }
+    )
       .select("id")
       .eq("user_id", data.user.id)
       .eq("is_approved", true);
@@ -103,11 +109,9 @@ test.describe("Owner cannot open partner/admin profile edit routes", () => {
       await page.goto(route);
 
       // The guard must redirect off the forbidden URL.
-      await page.waitForFunction(
-        (r) => !window.location.pathname.startsWith(r),
-        route,
-        { timeout: 10_000 },
-      );
+      await page.waitForFunction((r) => !window.location.pathname.startsWith(r), route, {
+        timeout: 10_000,
+      });
 
       // Give trailing redirects a beat to settle.
       await page.waitForTimeout(500);

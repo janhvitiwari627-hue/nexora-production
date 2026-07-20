@@ -80,7 +80,11 @@ export function AdminLoginPage() {
               disabled={loading}
               className="w-full bg-gradient-to-r from-indigo-500 to-pink-500 hover:opacity-90"
             >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lock className="h-4 w-4" />}
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Lock className="h-4 w-4" />
+              )}
               Sign In Securely
             </Button>
           </form>

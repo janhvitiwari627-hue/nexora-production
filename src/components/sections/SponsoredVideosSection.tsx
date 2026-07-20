@@ -12,12 +12,48 @@ type VideoItem = {
 };
 
 const VIDEOS: VideoItem[] = [
-  { id: "v1", youtubeId: "GIQn0quNk68", title: "Bridal Glow Routine", brand: "Lakmé", brandColor: "#FF4F8B" },
-  { id: "v2", youtubeId: "uelHwf8o7_U", title: "The Perfect Fade", brand: "Wahl", brandColor: "#111" },
-  { id: "v3", youtubeId: "vS0Hku4SkQ8", title: "Salon Color Mastery", brand: "L'Oréal", brandColor: "#0A2540" },
-  { id: "v4", youtubeId: "0E00Zuayv9Q", title: "Spa Day Rituals", brand: "Forest Essentials", brandColor: "#22D3A0" },
-  { id: "v5", youtubeId: "OPf0YbXqDm0", title: "Nail Art Trends 2026", brand: "OPI", brandColor: "#635BFF" },
-  { id: "v6", youtubeId: "fLexgOxsZu0", title: "Bond Repair, Explained", brand: "Olaplex", brandColor: "#FFB36B" },
+  {
+    id: "v1",
+    youtubeId: "GIQn0quNk68",
+    title: "Bridal Glow Routine",
+    brand: "Lakmé",
+    brandColor: "#FF4F8B",
+  },
+  {
+    id: "v2",
+    youtubeId: "uelHwf8o7_U",
+    title: "The Perfect Fade",
+    brand: "Wahl",
+    brandColor: "#111",
+  },
+  {
+    id: "v3",
+    youtubeId: "vS0Hku4SkQ8",
+    title: "Salon Color Mastery",
+    brand: "L'Oréal",
+    brandColor: "#0A2540",
+  },
+  {
+    id: "v4",
+    youtubeId: "0E00Zuayv9Q",
+    title: "Spa Day Rituals",
+    brand: "Forest Essentials",
+    brandColor: "#22D3A0",
+  },
+  {
+    id: "v5",
+    youtubeId: "OPf0YbXqDm0",
+    title: "Nail Art Trends 2026",
+    brand: "OPI",
+    brandColor: "#635BFF",
+  },
+  {
+    id: "v6",
+    youtubeId: "fLexgOxsZu0",
+    title: "Bond Repair, Explained",
+    brand: "Olaplex",
+    brandColor: "#FFB36B",
+  },
 ];
 
 export function SponsoredVideosSection() {
@@ -31,9 +67,7 @@ export function SponsoredVideosSection() {
             <span className="mb-2 inline-block rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white/70">
               Sponsored
             </span>
-            <h2 className="text-3xl font-black tracking-tight md:text-4xl">
-              Watch & Get Inspired
-            </h2>
+            <h2 className="text-3xl font-black tracking-tight md:text-4xl">Watch & Get Inspired</h2>
             <p className="mt-2 text-sm text-white/70">
               Style stories, tutorials and salon-grade tips from our partner brands.
             </p>

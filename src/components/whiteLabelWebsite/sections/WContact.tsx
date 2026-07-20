@@ -17,8 +17,19 @@ export function WContact({ shop, template }: { shop: ShopData; template: Templat
   const actions = [
     { icon: Phone, label: "Call", href: `tel:${phoneDigits}`, color: template.colors.primary },
     { icon: MessageCircle, label: "WhatsApp", href: `https://wa.me/${waDigits}`, color: "#25D366" },
-    { icon: Navigation, label: "Directions", href: directionsUrl, color: template.colors.secondary },
-    { icon: Mail, label: "Email", href: `mailto:${shop.email ?? ""}`, color: template.colors.secondary, disabled: !shop.email },
+    {
+      icon: Navigation,
+      label: "Directions",
+      href: directionsUrl,
+      color: template.colors.secondary,
+    },
+    {
+      icon: Mail,
+      label: "Email",
+      href: `mailto:${shop.email ?? ""}`,
+      color: template.colors.secondary,
+      disabled: !shop.email,
+    },
   ];
 
   return (
@@ -37,7 +48,10 @@ export function WContact({ shop, template }: { shop: ShopData; template: Templat
                 className={`group flex flex-col items-center gap-1 rounded-xl border bg-white p-3 text-center shadow-sm transition ${a.disabled ? "pointer-events-none opacity-50" : "hover:-translate-y-0.5 hover:shadow-md"}`}
                 style={{ borderRadius: template.radius }}
               >
-                <span className="grid h-9 w-9 place-items-center rounded-full text-white" style={{ backgroundColor: a.color }}>
+                <span
+                  className="grid h-9 w-9 place-items-center rounded-full text-white"
+                  style={{ backgroundColor: a.color }}
+                >
                   <a.icon className="h-4 w-4" />
                 </span>
                 <span className="text-[11px] font-medium">{a.label}</span>
@@ -46,7 +60,9 @@ export function WContact({ shop, template }: { shop: ShopData; template: Templat
           </div>
           <Info icon={<MapPin className="h-5 w-5" />} label="Visit Us" value={shop.address} />
           <Info icon={<Phone className="h-5 w-5" />} label="Call" value={shop.phone} />
-          {shop.email && <Info icon={<Mail className="h-5 w-5" />} label="Email" value={shop.email} />}
+          {shop.email && (
+            <Info icon={<Mail className="h-5 w-5" />} label="Email" value={shop.email} />
+          )}
         </div>
         <form
           className="space-y-3"
@@ -56,10 +72,34 @@ export function WContact({ shop, template }: { shop: ShopData; template: Templat
             setForm({ name: "", email: "", message: "" });
           }}
         >
-          <Input placeholder="Your name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required maxLength={100} />
-          <Input type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required maxLength={255} />
-          <Textarea placeholder="Message" rows={4} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} required maxLength={1000} />
-          <Button type="submit" className="w-full" style={{ backgroundColor: template.colors.primary, borderRadius: template.radius }}>
+          <Input
+            placeholder="Your name"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            required
+            maxLength={100}
+          />
+          <Input
+            type="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            required
+            maxLength={255}
+          />
+          <Textarea
+            placeholder="Message"
+            rows={4}
+            value={form.message}
+            onChange={(e) => setForm({ ...form, message: e.target.value })}
+            required
+            maxLength={1000}
+          />
+          <Button
+            type="submit"
+            className="w-full"
+            style={{ backgroundColor: template.colors.primary, borderRadius: template.radius }}
+          >
             Send Message
           </Button>
         </form>

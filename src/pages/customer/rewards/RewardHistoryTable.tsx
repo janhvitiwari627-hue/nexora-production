@@ -44,9 +44,7 @@ export function RewardHistoryTable() {
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold">{r.shopName}</p>
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  {formatDate(r.dateISO)}
-                </p>
+                <p className="mt-0.5 text-xs text-muted-foreground">{formatDate(r.dateISO)}</p>
               </div>
               <span
                 className={cn(

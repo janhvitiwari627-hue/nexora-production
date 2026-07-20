@@ -1,10 +1,4 @@
-export type NotificationType =
-  | "booking"
-  | "reward"
-  | "wallet"
-  | "offer"
-  | "referral"
-  | "system";
+export type NotificationType = "booking" | "reward" | "wallet" | "offer" | "referral" | "system";
 
 export interface AppNotification {
   id: string;
@@ -16,8 +10,7 @@ export interface AppNotification {
   href?: string;
 }
 
-const ago = (mins: number) =>
-  new Date(Date.now() - mins * 60_000).toISOString();
+const ago = (mins: number) => new Date(Date.now() - mins * 60_000).toISOString();
 
 export const NOTIFICATIONS: AppNotification[] = [
   {

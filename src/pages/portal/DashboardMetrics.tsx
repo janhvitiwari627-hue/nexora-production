@@ -114,7 +114,10 @@ export function BrandDashboardMetrics({ brand, leads }: { brand: Brand; leads: L
   useEffect(() => {
     (async () => {
       const [{ count: p }, { count: d }] = await Promise.all([
-        supabase.from("brand_products").select("*", { count: "exact", head: true }).eq("brand_id", brand.id),
+        supabase
+          .from("brand_products")
+          .select("*", { count: "exact", head: true })
+          .eq("brand_id", brand.id),
         (supabase as any)
           .from("brand_distributor_connections")
           .select("*", { count: "exact", head: true })
@@ -137,12 +140,19 @@ export function BrandDashboardMetrics({ brand, leads }: { brand: Brand; leads: L
       <div className="mb-4 flex items-center gap-2">
         <TrendingUp className="h-5 w-5 text-primary" />
         <h3 className="font-bold text-heading">Brand performance</h3>
-        {brand.is_sponsored && <Badge className="bg-primary text-primary-foreground">Sponsored</Badge>}
+        {brand.is_sponsored && (
+          <Badge className="bg-primary text-primary-foreground">Sponsored</Badge>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <MetricCard icon={Package} label="Products" value={productCount} />
-        <MetricCard icon={Target} label="Leads" value={leads.length} hint={`${activeLeads} active`} />
+        <MetricCard
+          icon={Target}
+          label="Leads"
+          value={leads.length}
+          hint={`${activeLeads} active`}
+        />
         <MetricCard icon={Truck} label="Distributors" value={distributorCount} hint="Accepted" />
         <MetricCard icon={Eye} label="Views" value={views.toLocaleString()} />
         <MetricCard icon={MousePointerClick} label="Clicks" value={clicks.toLocaleString()} />
@@ -161,7 +171,13 @@ export function BrandDashboardMetrics({ brand, leads }: { brand: Brand; leads: L
                 <XAxis dataKey="date" fontSize={11} />
                 <YAxis fontSize={11} allowDecimals={false} />
                 <Tooltip />
-                <Line type="monotone" dataKey="leads" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
+                <Line
+                  type="monotone"
+                  dataKey="leads"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={2}
+                  dot={false}
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -207,8 +223,10 @@ export function DistributorDashboardMetrics({
   const activeLeads = leads.filter((l) => l.status !== "closed" && l.status !== "rejected").length;
   const trend = useMemo(() => buildTrend(leads), [leads]);
   const sources = useMemo(() => buildSources(leads), [leads]);
-  const territories = (distributor.coverage_districts?.length || 0) + (distributor.coverage_states?.length || 0);
-  const productsListed = (distributor.categories?.length || 0) + (distributor.brands_handled?.length || 0);
+  const territories =
+    (distributor.coverage_districts?.length || 0) + (distributor.coverage_states?.length || 0);
+  const productsListed =
+    (distributor.categories?.length || 0) + (distributor.brands_handled?.length || 0);
   const views = leads.length * 22 + territories * 12;
   const clicks = Math.floor(views * 0.2);
   const perf = Math.min(100, leads.length * 8 + brandsConnected * 5 + territories * 2);
@@ -241,7 +259,13 @@ export function DistributorDashboardMetrics({
                 <XAxis dataKey="date" fontSize={11} />
                 <YAxis fontSize={11} allowDecimals={false} />
                 <Tooltip />
-                <Line type="monotone" dataKey="leads" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
+                <Line
+                  type="monotone"
+                  dataKey="leads"
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={2}
+                  dot={false}
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>

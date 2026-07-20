@@ -62,9 +62,10 @@ export function JobsAppShell() {
       >
         <ul className="mx-auto grid w-full max-w-xl grid-cols-5">
           {NAV.map((item) => {
-            const active = "exact" in item && item.exact
-              ? pathname === item.to || pathname === `${item.to}/`
-              : pathname.startsWith(item.to);
+            const active =
+              "exact" in item && item.exact
+                ? pathname === item.to || pathname === `${item.to}/`
+                : pathname.startsWith(item.to);
             return (
               <li key={item.to}>
                 <Link

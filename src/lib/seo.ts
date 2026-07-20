@@ -173,10 +173,7 @@ export interface ServiceInput {
   image?: string;
 }
 
-export function generateServiceSchema(
-  service: ServiceInput,
-  shop: { name: string; slug: string },
-) {
+export function generateServiceSchema(service: ServiceInput, shop: { name: string; slug: string }) {
   const schema: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Service",

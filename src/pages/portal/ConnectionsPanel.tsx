@@ -3,7 +3,14 @@ import { Handshake, Plus, Check, X, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
@@ -63,7 +70,13 @@ export function ConnectionsPanel({ brand, distributor }: Props) {
   const onRespond = async (id: string, status: "accepted" | "rejected" | "cancelled") => {
     try {
       await respondConnection(id, status);
-      toast.success(status === "accepted" ? "Connection accepted" : status === "rejected" ? "Request declined" : "Request cancelled");
+      toast.success(
+        status === "accepted"
+          ? "Connection accepted"
+          : status === "rejected"
+            ? "Request declined"
+            : "Request cancelled",
+      );
       refresh();
     } catch (e: any) {
       toast.error(e.message);
@@ -114,18 +127,26 @@ export function ConnectionsPanel({ brand, distributor }: Props) {
           <ColumnCard title="Incoming" icon={<Clock className="h-4 w-4" />} items={incoming}>
             {(c) => (
               <div className="flex gap-2">
-                <Button size="sm" className="bg-gradient-cta text-primary-foreground" onClick={() => onRespond(c.id, "accepted")}>
-                  <Check className="mr-1 h-3 w-3" />Accept
+                <Button
+                  size="sm"
+                  className="bg-gradient-cta text-primary-foreground"
+                  onClick={() => onRespond(c.id, "accepted")}
+                >
+                  <Check className="mr-1 h-3 w-3" />
+                  Accept
                 </Button>
                 <Button size="sm" variant="outline" onClick={() => onRespond(c.id, "rejected")}>
-                  <X className="mr-1 h-3 w-3" />Decline
+                  <X className="mr-1 h-3 w-3" />
+                  Decline
                 </Button>
               </div>
             )}
           </ColumnCard>
           <ColumnCard title="Sent" icon={<Clock className="h-4 w-4" />} items={outgoing}>
             {(c) => (
-              <Button size="sm" variant="ghost" onClick={() => onRespond(c.id, "cancelled")}>Cancel</Button>
+              <Button size="sm" variant="ghost" onClick={() => onRespond(c.id, "cancelled")}>
+                Cancel
+              </Button>
             )}
           </ColumnCard>
           <ColumnCard title="Partners" icon={<Check className="h-4 w-4" />} items={accepted}>
@@ -161,7 +182,9 @@ function ColumnCard({
           {items.map((c) => (
             <li key={c.id} className="rounded-lg border border-border/60 p-3">
               <p className="text-sm font-semibold text-heading">{c.brand?.name ?? "Brand"}</p>
-              <p className="text-xs text-muted-foreground">↔ {c.distributor?.company_name ?? "Distributor"}</p>
+              <p className="text-xs text-muted-foreground">
+                ↔ {c.distributor?.company_name ?? "Distributor"}
+              </p>
               {c.message && <p className="mt-1 line-clamp-2 text-xs text-body">"{c.message}"</p>}
               <div className="mt-2">{children(c)}</div>
             </li>
@@ -195,7 +218,12 @@ function InviteDialog({
     (async () => {
       if (from === "brand") {
         const rows = await listDistributorsLite();
-        setOptions(rows.map((r: any) => ({ id: r.id, label: `${r.company_name}${r.state ? ` — ${r.state}` : ""}` })));
+        setOptions(
+          rows.map((r: any) => ({
+            id: r.id,
+            label: `${r.company_name}${r.state ? ` — ${r.state}` : ""}`,
+          })),
+        );
       } else {
         const rows = await listBrandsLite();
         setOptions(rows.map((r: any) => ({ id: r.id, label: r.name })));
@@ -204,7 +232,10 @@ function InviteDialog({
   }, [open, from]);
 
   const submit = async () => {
-    if (!targetId) { toast.error("Select a partner"); return; }
+    if (!targetId) {
+      toast.error("Select a partner");
+      return;
+    }
     setSubmitting(true);
     try {
       await createConnection({
@@ -216,7 +247,9 @@ function InviteDialog({
       });
       toast.success("Request sent");
       setOpen(false);
-      setTargetId(""); setMessage(""); setTerritoryNotes("");
+      setTargetId("");
+      setMessage("");
+      setTerritoryNotes("");
       onCreated();
     } catch (e: any) {
       toast.error(e.message);
@@ -228,10 +261,15 @@ function InviteDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline"><Plus className="mr-1 h-3 w-3" />{title}</Button>
+        <Button size="sm" variant="outline">
+          <Plus className="mr-1 h-3 w-3" />
+          {title}
+        </Button>
       </DialogTrigger>
       <DialogContent>
-        <DialogHeader><DialogTitle>{title}</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+        </DialogHeader>
         <div className="space-y-3">
           <div>
             <Label>{from === "brand" ? "Distributor" : "Brand"}</Label>
@@ -241,21 +279,41 @@ function InviteDialog({
               className="h-10 w-full rounded-[var(--radius-button)] border border-border/60 bg-card px-3 text-sm"
             >
               <option value="">Select…</option>
-              {options.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
+              {options.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.label}
+                </option>
+              ))}
             </select>
           </div>
           <div>
             <Label>Message</Label>
-            <Textarea rows={3} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Introduce yourself and the partnership opportunity" />
+            <Textarea
+              rows={3}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Introduce yourself and the partnership opportunity"
+            />
           </div>
           <div>
             <Label>Territory notes</Label>
-            <Textarea rows={2} value={territoryNotes} onChange={(e) => setTerritoryNotes(e.target.value)} placeholder="States / districts covered, exclusivity, etc." />
+            <Textarea
+              rows={2}
+              value={territoryNotes}
+              onChange={(e) => setTerritoryNotes(e.target.value)}
+              placeholder="States / districts covered, exclusivity, etc."
+            />
           </div>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
-          <Button onClick={submit} disabled={submitting} className="bg-gradient-cta text-primary-foreground">
+          <Button variant="ghost" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            onClick={submit}
+            disabled={submitting}
+            className="bg-gradient-cta text-primary-foreground"
+          >
             {submitting ? "Sending…" : "Send request"}
           </Button>
         </DialogFooter>

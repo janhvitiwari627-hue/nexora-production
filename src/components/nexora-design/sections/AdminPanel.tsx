@@ -46,8 +46,8 @@ export default function AdminPanel() {
               Built to scale India's beauty economy.
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-500">
-              One powerful back office to manage listings, payments, ads and growth
-              across every city.
+              One powerful back office to manage listings, payments, ads and growth across every
+              city.
             </p>
           </div>
         </FadeIn>
@@ -123,9 +123,7 @@ export default function AdminPanel() {
                       >
                         <stat.icon className="h-5 w-5" />
                       </div>
-                      <p className="mt-4 text-2xl font-bold text-slate-900">
-                        {stat.value}
-                      </p>
+                      <p className="mt-4 text-2xl font-bold text-slate-900">{stat.value}</p>
                       <p className="text-sm font-medium text-slate-500">{stat.label}</p>
                     </div>
                   ))}
@@ -155,16 +153,14 @@ export default function AdminPanel() {
                   <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                     <h4 className="font-bold text-slate-900">Quick Actions</h4>
                     <div className="mt-4 grid grid-cols-2 gap-3">
-                      {["Approve Shops", "Run Payouts", "Push Ads", "Export Data"].map(
-                        (action) => (
-                          <button
-                            key={action}
-                            className="rounded-xl border border-slate-200 bg-slate-50 py-3 text-xs font-bold text-slate-700 transition-colors hover:border-indigo-300 hover:text-indigo-700"
-                          >
-                            {action}
-                          </button>
-                        )
-                      )}
+                      {["Approve Shops", "Run Payouts", "Push Ads", "Export Data"].map((action) => (
+                        <button
+                          key={action}
+                          className="rounded-xl border border-slate-200 bg-slate-50 py-3 text-xs font-bold text-slate-700 transition-colors hover:border-indigo-300 hover:text-indigo-700"
+                        >
+                          {action}
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </div>

@@ -10,25 +10,50 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  Accordion, AccordionContent, AccordionItem, AccordionTrigger,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
-  CalendarDays, Copy, Edit2, Megaphone, Plus, Sparkles, Trash2, TrendingUp, Wand2, Loader2,
+  CalendarDays,
+  Copy,
+  Edit2,
+  Megaphone,
+  Plus,
+  Sparkles,
+  Trash2,
+  TrendingUp,
+  Wand2,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useOwnerContext } from "@/hooks/use-owner-context";
 import { generateMarketingCopy } from "@/lib/owner.functions";
 import {
-  INITIAL_OFFERS, INITIAL_CAMPAIGNS, INITIAL_AUTOMATIONS, AI_SUGGESTIONS,
-  type Offer, type Campaign,
+  INITIAL_OFFERS,
+  INITIAL_CAMPAIGNS,
+  INITIAL_AUTOMATIONS,
+  AI_SUGGESTIONS,
+  type Offer,
+  type Campaign,
 } from "./marketing/mockMarketing";
 import { RetentionPanel } from "./marketing/RetentionPanel";
-
 
 export function OwnerMarketingPage() {
   return (
@@ -48,10 +73,18 @@ export function OwnerMarketingPage() {
           <TabsTrigger value="ai">AI Marketing</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="offers"><OffersTab /></TabsContent>
-        <TabsContent value="campaigns"><CampaignsTab /></TabsContent>
-        <TabsContent value="automations"><AutomationsTab /></TabsContent>
-        <TabsContent value="ai"><AITab /></TabsContent>
+        <TabsContent value="offers">
+          <OffersTab />
+        </TabsContent>
+        <TabsContent value="campaigns">
+          <CampaignsTab />
+        </TabsContent>
+        <TabsContent value="automations">
+          <AutomationsTab />
+        </TabsContent>
+        <TabsContent value="ai">
+          <AITab />
+        </TabsContent>
       </Tabs>
     </div>
   );
@@ -63,7 +96,7 @@ function OffersTab() {
   const [open, setOpen] = useState(false);
 
   const toggle = (id: string) =>
-    setOffers(offers.map((o) => o.id === id ? { ...o, active: !o.active } : o));
+    setOffers(offers.map((o) => (o.id === id ? { ...o, active: !o.active } : o)));
   const remove = (id: string) => {
     setOffers(offers.filter((o) => o.id !== id));
     toast.success("Offer deleted");
@@ -72,8 +105,12 @@ function OffersTab() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">{offers.filter((o) => o.active).length} active offers</div>
-        <Button onClick={() => setOpen(true)}><Plus className="h-4 w-4" /> Create Offer</Button>
+        <div className="text-sm text-muted-foreground">
+          {offers.filter((o) => o.active).length} active offers
+        </div>
+        <Button onClick={() => setOpen(true)}>
+          <Plus className="h-4 w-4" /> Create Offer
+        </Button>
       </div>
 
       <div className="grid gap-3 md:grid-cols-2">
@@ -88,15 +125,27 @@ function OffersTab() {
                 <Switch checked={o.active} onCheckedChange={() => toggle(o.id)} />
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="font-mono">{o.code}</Badge>
-                <Badge>{o.discountType === "percent" ? `${o.discountValue}% off` : `₹${o.discountValue} off`}</Badge>
+                <Badge variant="secondary" className="font-mono">
+                  {o.code}
+                </Badge>
+                <Badge>
+                  {o.discountType === "percent"
+                    ? `${o.discountValue}% off`
+                    : `₹${o.discountValue} off`}
+                </Badge>
               </div>
               <div className="text-xs text-muted-foreground flex items-center gap-3 flex-wrap">
-                <span className="flex items-center gap-1"><CalendarDays className="h-3 w-3" /> {o.validFrom} → {o.validTo}</span>
-                <span>{o.used}/{o.usageLimit} used</span>
+                <span className="flex items-center gap-1">
+                  <CalendarDays className="h-3 w-3" /> {o.validFrom} → {o.validTo}
+                </span>
+                <span>
+                  {o.used}/{o.usageLimit} used
+                </span>
               </div>
               <div className="flex gap-2 pt-1">
-                <Button variant="outline" size="sm" className="flex-1"><Edit2 className="h-3.5 w-3.5" /> Edit</Button>
+                <Button variant="outline" size="sm" className="flex-1">
+                  <Edit2 className="h-3.5 w-3.5" /> Edit
+                </Button>
                 <Button variant="outline" size="sm" onClick={() => remove(o.id)}>
                   <Trash2 className="h-3.5 w-3.5 text-destructive" />
                 </Button>
@@ -106,14 +155,26 @@ function OffersTab() {
         ))}
       </div>
 
-      <CreateOfferModal open={open} onClose={() => setOpen(false)}
-        onCreate={(o) => { setOffers([o, ...offers]); toast.success("Offer created"); }} />
+      <CreateOfferModal
+        open={open}
+        onClose={() => setOpen(false)}
+        onCreate={(o) => {
+          setOffers([o, ...offers]);
+          toast.success("Offer created");
+        }}
+      />
     </div>
   );
 }
 
-function CreateOfferModal({ open, onClose, onCreate }: {
-  open: boolean; onClose: () => void; onCreate: (o: Offer) => void;
+function CreateOfferModal({
+  open,
+  onClose,
+  onCreate,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onCreate: (o: Offer) => void;
 }) {
   const [title, setTitle] = useState("");
   const [service, setService] = useState("Hair Spa");
@@ -122,14 +183,26 @@ function CreateOfferModal({ open, onClose, onCreate }: {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [limit, setLimit] = useState(100);
-  const code = (title || "OFFER").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8) +
-    Math.floor(Math.random() * 90 + 10);
+  const code =
+    (title || "OFFER")
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, "")
+      .slice(0, 8) + Math.floor(Math.random() * 90 + 10);
 
   const submit = () => {
     if (!title) return toast.error("Add a title");
     onCreate({
-      id: `o${Date.now()}`, title, service, discountType, discountValue,
-      validFrom: from, validTo: to, usageLimit: limit, used: 0, code, active: true,
+      id: `o${Date.now()}`,
+      title,
+      service,
+      discountType,
+      discountValue,
+      validFrom: from,
+      validTo: to,
+      usageLimit: limit,
+      used: 0,
+      code,
+      active: true,
     });
     onClose();
     setTitle("");
@@ -138,25 +211,49 @@ function CreateOfferModal({ open, onClose, onCreate }: {
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-lg">
-        <DialogHeader><DialogTitle>Create Offer</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>Create Offer</DialogTitle>
+        </DialogHeader>
         <div className="space-y-4">
           <div>
             <Label>Offer Title</Label>
-            <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Flat 20% on Hair Spa" className="mt-1" />
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Flat 20% on Hair Spa"
+              className="mt-1"
+            />
           </div>
           <div>
             <Label>Applicable Service</Label>
             <Select value={service} onValueChange={setService}>
-              <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="mt-1">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
-                {["Hair Spa", "Haircut", "Bridal Makeup", "Manicure", "Pedicure", "Massage", "All Services"]
-                  .map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                {[
+                  "Hair Spa",
+                  "Haircut",
+                  "Bridal Makeup",
+                  "Manicure",
+                  "Pedicure",
+                  "Massage",
+                  "All Services",
+                ].map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {s}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
           <div>
             <Label>Discount Type</Label>
-            <RadioGroup value={discountType} onValueChange={(v) => setDiscountType(v as "percent" | "fixed")} className="flex gap-4 mt-2">
+            <RadioGroup
+              value={discountType}
+              onValueChange={(v) => setDiscountType(v as "percent" | "fixed")}
+              className="flex gap-4 mt-2"
+            >
               <label className="flex items-center gap-2 text-sm">
                 <RadioGroupItem value="percent" /> Percentage
               </label>
@@ -168,21 +265,41 @@ function CreateOfferModal({ open, onClose, onCreate }: {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label>{discountType === "percent" ? "Discount %" : "Discount ₹"}</Label>
-              <Input type="number" value={discountValue} onChange={(e) => setDiscountValue(+e.target.value)} className="mt-1" />
+              <Input
+                type="number"
+                value={discountValue}
+                onChange={(e) => setDiscountValue(+e.target.value)}
+                className="mt-1"
+              />
             </div>
             <div>
               <Label>Usage Limit</Label>
-              <Input type="number" value={limit} onChange={(e) => setLimit(+e.target.value)} className="mt-1" />
+              <Input
+                type="number"
+                value={limit}
+                onChange={(e) => setLimit(+e.target.value)}
+                className="mt-1"
+              />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label>Valid From</Label>
-              <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="mt-1" />
+              <Input
+                type="date"
+                value={from}
+                onChange={(e) => setFrom(e.target.value)}
+                className="mt-1"
+              />
             </div>
             <div>
               <Label>Valid To</Label>
-              <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="mt-1" />
+              <Input
+                type="date"
+                value={to}
+                onChange={(e) => setTo(e.target.value)}
+                className="mt-1"
+              />
             </div>
           </div>
           <div className="rounded-md bg-muted p-3 text-sm">
@@ -190,7 +307,9 @@ function CreateOfferModal({ open, onClose, onCreate }: {
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
           <Button onClick={submit}>Create Offer</Button>
         </DialogFooter>
       </DialogContent>
@@ -213,7 +332,9 @@ function CampaignsTab() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground">{campaigns.length} campaigns</div>
-        <Button onClick={() => setOpen(true)}><Plus className="h-4 w-4" /> Create Campaign</Button>
+        <Button onClick={() => setOpen(true)}>
+          <Plus className="h-4 w-4" /> Create Campaign
+        </Button>
       </div>
 
       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
@@ -235,14 +356,26 @@ function CampaignsTab() {
         ))}
       </div>
 
-      <CreateCampaignModal open={open} onClose={() => setOpen(false)}
-        onCreate={(c) => { setCampaigns([c, ...campaigns]); toast.success("Campaign created"); }} />
+      <CreateCampaignModal
+        open={open}
+        onClose={() => setOpen(false)}
+        onCreate={(c) => {
+          setCampaigns([c, ...campaigns]);
+          toast.success("Campaign created");
+        }}
+      />
     </div>
   );
 }
 
-function CreateCampaignModal({ open, onClose, onCreate }: {
-  open: boolean; onClose: () => void; onCreate: (c: Campaign) => void;
+function CreateCampaignModal({
+  open,
+  onClose,
+  onCreate,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onCreate: (c: Campaign) => void;
 }) {
   const [name, setName] = useState("");
   const [type, setType] = useState<Campaign["type"]>("Birthday");
@@ -253,8 +386,10 @@ function CreateCampaignModal({ open, onClose, onCreate }: {
   const aiWrite = () => {
     const templates: Record<Campaign["type"], string> = {
       Birthday: "🎂 Happy Birthday {name}! Celebrate with 25% off any service this month.",
-      Festival: "✨ Festive greetings, {name}! Book before {date} and enjoy 20% off + complimentary service.",
-      Reactivation: "We miss you, {name} ❤️ Come back this month for 30% off your favourite treatment.",
+      Festival:
+        "✨ Festive greetings, {name}! Book before {date} and enjoy 20% off + complimentary service.",
+      Reactivation:
+        "We miss you, {name} ❤️ Come back this month for 30% off your favourite treatment.",
       Custom: "",
     };
     setMessage(templates[type]);
@@ -264,19 +399,27 @@ function CreateCampaignModal({ open, onClose, onCreate }: {
   const submit = () => {
     if (!name || !message) return toast.error("Fill all fields");
     onCreate({
-      id: `c${Date.now()}`, name, type,
+      id: `c${Date.now()}`,
+      name,
+      type,
       status: schedule ? "scheduled" : "active",
-      audience, reach: Math.floor(Math.random() * 400 + 50),
-      scheduledAt: schedule || undefined, sentAt: schedule ? undefined : "just now",
+      audience,
+      reach: Math.floor(Math.random() * 400 + 50),
+      scheduledAt: schedule || undefined,
+      sentAt: schedule ? undefined : "just now",
     });
     onClose();
-    setName(""); setMessage(""); setSchedule("");
+    setName("");
+    setMessage("");
+    setSchedule("");
   };
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-lg">
-        <DialogHeader><DialogTitle>Create Campaign</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>Create Campaign</DialogTitle>
+        </DialogHeader>
         <div className="space-y-4">
           <div>
             <Label>Campaign Name</Label>
@@ -285,10 +428,14 @@ function CreateCampaignModal({ open, onClose, onCreate }: {
           <div>
             <Label>Type</Label>
             <Select value={type} onValueChange={(v) => setType(v as Campaign["type"])}>
-              <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="mt-1">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 {["Birthday", "Festival", "Reactivation", "Custom"].map((t) => (
-                  <SelectItem key={t} value={t}>{t}</SelectItem>
+                  <SelectItem key={t} value={t}>
+                    {t}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -296,10 +443,22 @@ function CreateCampaignModal({ open, onClose, onCreate }: {
           <div>
             <Label>Audience Segment</Label>
             <Select value={audience} onValueChange={setAudience}>
-              <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="mt-1">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
-                {["All customers", "VIP", "Regulars", "New customers", "Lost (60+ days)", "Birthday this month"]
-                  .map((a) => <SelectItem key={a} value={a}>{a}</SelectItem>)}
+                {[
+                  "All customers",
+                  "VIP",
+                  "Regulars",
+                  "New customers",
+                  "Lost (60+ days)",
+                  "Birthday this month",
+                ].map((a) => (
+                  <SelectItem key={a} value={a}>
+                    {a}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -314,11 +473,18 @@ function CreateCampaignModal({ open, onClose, onCreate }: {
           </div>
           <div>
             <Label>Schedule (optional)</Label>
-            <Input type="datetime-local" value={schedule} onChange={(e) => setSchedule(e.target.value)} className="mt-1" />
+            <Input
+              type="datetime-local"
+              value={schedule}
+              onChange={(e) => setSchedule(e.target.value)}
+              className="mt-1"
+            />
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
           <Button onClick={submit}>{schedule ? "Schedule" : "Send Now"}</Button>
         </DialogFooter>
       </DialogContent>
@@ -344,7 +510,7 @@ function AutomationsTab() {
                 <Switch
                   checked={a.enabled}
                   onCheckedChange={(v) =>
-                    setItems(items.map((x) => x.id === a.id ? { ...x, enabled: v } : x))
+                    setItems(items.map((x) => (x.id === a.id ? { ...x, enabled: v } : x)))
                   }
                 />
               </div>
@@ -356,11 +522,14 @@ function AutomationsTab() {
                   defaultValue={a.template}
                   rows={3}
                   onChange={(e) =>
-                    setItems(items.map((x) => x.id === a.id ? { ...x, template: e.target.value } : x))
+                    setItems(
+                      items.map((x) => (x.id === a.id ? { ...x, template: e.target.value } : x)),
+                    )
                   }
                 />
                 <div className="text-xs text-muted-foreground mt-1.5">
-                  Variables: <code>{`{name}`}</code>, <code>{`{service}`}</code>, <code>{`{date}`}</code>, <code>{`{time}`}</code>
+                  Variables: <code>{`{name}`}</code>, <code>{`{service}`}</code>,{" "}
+                  <code>{`{date}`}</code>, <code>{`{time}`}</code>
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -377,15 +546,22 @@ type AICopy = { sms: string; whatsapp: string; email_subject: string; email_body
 function AITab() {
   const { activeSalonId } = useOwnerContext();
   const generateFn = useServerFn(generateMarketingCopy);
-  const [goal, setGoal] = useState<"winback" | "promo" | "review_request" | "festival" | "new_service">("winback");
+  const [goal, setGoal] = useState<
+    "winback" | "promo" | "review_request" | "festival" | "new_service"
+  >("winback");
   const [tone, setTone] = useState<"friendly" | "premium" | "playful" | "urgent">("friendly");
   const [extra, setExtra] = useState("");
   const [copy, setCopy] = useState<AICopy | null>(null);
 
   const gen = useMutation({
     mutationFn: () =>
-      generateFn({ data: { salon_id: activeSalonId!, goal, tone, extra: extra || undefined } }) as Promise<AICopy>,
-    onSuccess: (r) => { setCopy(r); toast.success("Copy generated"); },
+      generateFn({
+        data: { salon_id: activeSalonId!, goal, tone, extra: extra || undefined },
+      }) as Promise<AICopy>,
+    onSuccess: (r) => {
+      setCopy(r);
+      toast.success("Copy generated");
+    },
     onError: (e: Error) => toast.error(e.message || "AI generation failed"),
   });
 
@@ -398,7 +574,6 @@ function AITab() {
     <div className="space-y-4">
       {activeSalonId && <RetentionPanel salonId={activeSalonId} />}
       <Card className="bg-gradient-to-br from-primary/5 to-pink-500/5 border-primary/20">
-
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" /> AI Campaign Generator
@@ -409,7 +584,9 @@ function AITab() {
             <div>
               <Label>Campaign goal</Label>
               <Select value={goal} onValueChange={(v) => setGoal(v as typeof goal)}>
-                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="winback">Win back lapsed customers</SelectItem>
                   <SelectItem value="promo">Promotional offer</SelectItem>
@@ -422,7 +599,9 @@ function AITab() {
             <div>
               <Label>Tone</Label>
               <Select value={tone} onValueChange={(v) => setTone(v as typeof tone)}>
-                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="friendly">Friendly</SelectItem>
                   <SelectItem value="premium">Premium</SelectItem>
@@ -437,14 +616,23 @@ function AITab() {
                 disabled={!activeSalonId || gen.isPending}
                 onClick={() => gen.mutate()}
               >
-                {gen.isPending ? <><Loader2 className="h-4 w-4 animate-spin" /> Generating…</> : <><Wand2 className="h-4 w-4" /> Generate copy</>}
+                {gen.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" /> Generating…
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="h-4 w-4" /> Generate copy
+                  </>
+                )}
               </Button>
             </div>
           </div>
           <div>
             <Label>Extra details (optional)</Label>
             <Textarea
-              rows={2} maxLength={500}
+              rows={2}
+              maxLength={500}
               placeholder="e.g. 25% off, Diwali week, mention Bridal Makeup specialist"
               value={extra}
               onChange={(e) => setExtra(e.target.value)}
@@ -452,15 +640,33 @@ function AITab() {
             />
           </div>
           {!activeSalonId && (
-            <p className="text-xs text-muted-foreground">Connect a salon during onboarding to enable AI generation.</p>
+            <p className="text-xs text-muted-foreground">
+              Connect a salon during onboarding to enable AI generation.
+            </p>
           )}
 
           {copy && (
             <div className="grid gap-3 md:grid-cols-2">
-              <CopyBlock label="SMS" text={copy.sms} onCopy={() => copyToClipboard(copy.sms, "SMS")} />
-              <CopyBlock label="WhatsApp" text={copy.whatsapp} onCopy={() => copyToClipboard(copy.whatsapp, "WhatsApp")} />
-              <CopyBlock label="Email subject" text={copy.email_subject} onCopy={() => copyToClipboard(copy.email_subject, "Subject")} />
-              <CopyBlock label="Email body" text={copy.email_body} onCopy={() => copyToClipboard(copy.email_body, "Email body")} />
+              <CopyBlock
+                label="SMS"
+                text={copy.sms}
+                onCopy={() => copyToClipboard(copy.sms, "SMS")}
+              />
+              <CopyBlock
+                label="WhatsApp"
+                text={copy.whatsapp}
+                onCopy={() => copyToClipboard(copy.whatsapp, "WhatsApp")}
+              />
+              <CopyBlock
+                label="Email subject"
+                text={copy.email_subject}
+                onCopy={() => copyToClipboard(copy.email_subject, "Subject")}
+              />
+              <CopyBlock
+                label="Email body"
+                text={copy.email_body}
+                onCopy={() => copyToClipboard(copy.email_body, "Email body")}
+              />
             </div>
           )}
         </CardContent>
@@ -476,10 +682,16 @@ function AITab() {
         {AI_SUGGESTIONS.map((s) => (
           <Card key={s.id} className="bg-gradient-to-br from-primary/5 to-pink-500/5">
             <CardContent className="p-4 space-y-3">
-              <Badge variant="outline" className="text-xs">{s.context}</Badge>
+              <Badge variant="outline" className="text-xs">
+                {s.context}
+              </Badge>
               <div className="font-semibold">{s.title}</div>
               <p className="text-sm text-muted-foreground">{s.body}</p>
-              <Button size="sm" className="w-full" onClick={() => toast.success("Suggestion applied")}>
+              <Button
+                size="sm"
+                className="w-full"
+                onClick={() => toast.success("Suggestion applied")}
+              >
                 <Sparkles className="h-3.5 w-3.5" /> {s.cta}
               </Button>
             </CardContent>
@@ -512,7 +724,9 @@ function CopyBlock({ label, text, onCopy }: { label: string; text: string; onCop
     <div className="bg-card border rounded-lg p-3 space-y-2">
       <div className="flex items-center justify-between">
         <Label className="text-xs uppercase tracking-wide">{label}</Label>
-        <Button size="sm" variant="ghost" onClick={onCopy}><Copy className="h-3.5 w-3.5" /> Copy</Button>
+        <Button size="sm" variant="ghost" onClick={onCopy}>
+          <Copy className="h-3.5 w-3.5" /> Copy
+        </Button>
       </div>
       <p className="text-sm whitespace-pre-wrap">{text}</p>
     </div>

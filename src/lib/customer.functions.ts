@@ -41,10 +41,7 @@ export const getCustomerDashboard = createServerFn({ method: "GET" })
           .order("created_at", { ascending: false })
           .limit(1)
           .maybeSingle(),
-        supabase
-          .from("referrals")
-          .select("id, status, reward_amount")
-          .eq("referrer_id", userId),
+        supabase.from("referrals").select("id, status, reward_amount").eq("referrer_id", userId),
       ]);
 
     if (profileRes.error) throw new Error(profileRes.error.message);
@@ -139,11 +136,7 @@ export const getReferrals = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const [profileRes, referralsRes] = await Promise.all([
-      supabase
-        .from("profiles")
-        .select("referral_code")
-        .eq("id", userId)
-        .maybeSingle(),
+      supabase.from("profiles").select("referral_code").eq("id", userId).maybeSingle(),
       supabase
         .from("referrals")
         .select("*")

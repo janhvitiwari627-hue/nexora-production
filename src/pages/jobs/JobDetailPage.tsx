@@ -73,7 +73,8 @@ function fromRealJob(j: JobRow & { employer?: { business_name: string } | null }
     postedDays: daysSince(j.published_at),
     applicants: j.applicants_count ?? 0,
     salary: fmtSalary(j.salary_min, j.salary_max, j.salary_period),
-    experience: j.experience_level === "flexible" ? "Flexible" : (j.experience_level ?? "Not specified"),
+    experience:
+      j.experience_level === "flexible" ? "Flexible" : (j.experience_level ?? "Not specified"),
     category: j.category,
     description: j.description,
     responsibilities: [],
@@ -141,7 +142,6 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
   const resumePreferred = portfolioMeta === "Resume preferred";
   const noPortfolio = portfolioMeta === "No portfolio needed";
 
-
   useEffect(() => {
     let alive = true;
     async function run() {
@@ -186,7 +186,32 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
         return;
       }
       setCheckingApplied(true);
-      const { data } = await (supabase as never as { from: (n: string) => { select: (c: string) => { eq: (c: string, v: string) => { eq: (c: string, v: string) => { maybeSingle: () => Promise<{ data: { id: string; cover_note: string | null; status: string; created_at: string } | null }> } } } } })
+      const { data } = await (
+        supabase as never as {
+          from: (n: string) => {
+            select: (c: string) => {
+              eq: (
+                c: string,
+                v: string,
+              ) => {
+                eq: (
+                  c: string,
+                  v: string,
+                ) => {
+                  maybeSingle: () => Promise<{
+                    data: {
+                      id: string;
+                      cover_note: string | null;
+                      status: string;
+                      created_at: string;
+                    } | null;
+                  }>;
+                };
+              };
+            };
+          };
+        }
+      )
         .from("job_applications")
         .select("id, cover_note, status, created_at")
         .eq("job_id", jobId)
@@ -370,11 +395,7 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
                   <Share2 className="h-4 w-4" /> Share
                 </Button>
                 {alreadyApplied ? (
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => setViewOpen(true)}
-                  >
+                  <Button size="sm" variant="secondary" onClick={() => setViewOpen(true)}>
                     <CheckCircle2 className="h-4 w-4" /> View Application
                   </Button>
                 ) : (
@@ -402,7 +423,9 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
               </Badge>
               <Badge variant="outline">
                 <MapPin className="mr-1 h-3 w-3" />
-                {job.area}{job.area && job.city ? ", " : ""}{job.city}
+                {job.area}
+                {job.area && job.city ? ", " : ""}
+                {job.city}
               </Badge>
               <Badge variant="outline">
                 <Clock className="mr-1 h-3 w-3" />
@@ -497,9 +520,7 @@ export function JobDetailPage({ jobId }: { jobId: string }) {
                 disabled={applying}
                 aria-invalid={!!errors.fullName}
               />
-              {errors.fullName && (
-                <p className="text-destructive text-xs">{errors.fullName}</p>
-              )}
+              {errors.fullName && <p className="text-destructive text-xs">{errors.fullName}</p>}
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="apply-email">Email</Label>
@@ -694,13 +715,30 @@ function statusStyles(status: string): { label: string; className: string } {
   const s = status.toLowerCase();
   const map: Record<string, { label: string; className: string }> = {
     submitted: { label: "Submitted", className: "bg-primary/10 text-primary border-primary/30" },
-    shortlisted: { label: "Shortlisted", className: "bg-blue-500/10 text-blue-600 border-blue-500/30" },
-    interviewing: { label: "Interviewing", className: "bg-amber-500/10 text-amber-600 border-amber-500/30" },
-    hired: { label: "Hired", className: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30" },
-    rejected: { label: "Not selected", className: "bg-destructive/10 text-destructive border-destructive/30" },
+    shortlisted: {
+      label: "Shortlisted",
+      className: "bg-blue-500/10 text-blue-600 border-blue-500/30",
+    },
+    interviewing: {
+      label: "Interviewing",
+      className: "bg-amber-500/10 text-amber-600 border-amber-500/30",
+    },
+    hired: {
+      label: "Hired",
+      className: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
+    },
+    rejected: {
+      label: "Not selected",
+      className: "bg-destructive/10 text-destructive border-destructive/30",
+    },
     withdrawn: { label: "Withdrawn", className: "bg-muted text-muted-foreground border-border" },
   };
-  return map[s] ?? { label: status || "Submitted", className: "bg-muted text-muted-foreground border-border" };
+  return (
+    map[s] ?? {
+      label: status || "Submitted",
+      className: "bg-muted text-muted-foreground border-border",
+    }
+  );
 }
 
 function ViewApplicationModal({
@@ -733,9 +771,7 @@ function ViewApplicationModal({
       <div className="space-y-5 p-6">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <div className="text-muted-foreground text-xs uppercase tracking-wider">
-              Applied to
-            </div>
+            <div className="text-muted-foreground text-xs uppercase tracking-wider">Applied to</div>
             <div className="text-heading text-lg font-bold">{job.title}</div>
             <div className="text-muted-foreground text-sm">{job.business}</div>
           </div>
@@ -757,9 +793,7 @@ function ViewApplicationModal({
         </div>
 
         <div>
-          <div className="text-muted-foreground text-xs uppercase tracking-wider">
-            Cover letter
-          </div>
+          <div className="text-muted-foreground text-xs uppercase tracking-wider">Cover letter</div>
           <div className="bg-muted/30 border-border mt-1 whitespace-pre-line rounded-md border p-3 text-sm">
             {parsed.letter?.trim() ? parsed.letter : "— No cover letter provided —"}
           </div>

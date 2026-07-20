@@ -2,7 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { CheckCircle2, CloudUpload, Loader2, RefreshCw, Save, Trash2, TriangleAlert, X } from "lucide-react";
+import {
+  CheckCircle2,
+  CloudUpload,
+  Loader2,
+  RefreshCw,
+  Save,
+  Trash2,
+  TriangleAlert,
+  X,
+} from "lucide-react";
 import { flush, removeTask, type QueueTask, type QueueTaskStatus } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/lib/offline-queue.hooks";
 import {
@@ -151,13 +160,7 @@ function formatWhen(date: string, time: string) {
   }
 }
 
-function QueuedBookingCard({
-  task,
-  compact,
-}: {
-  task: BookingTask;
-  compact?: boolean;
-}) {
+function QueuedBookingCard({ task, compact }: { task: BookingTask; compact?: boolean }) {
   const online = useOnlineStatus();
   const stage = stageOf(task, online);
   const meta = STAGE_META[stage];
@@ -194,7 +197,8 @@ function QueuedBookingCard({
             )}
           </div>
           <div className={"mt-1 truncate font-medium " + (compact ? "text-xs" : "text-sm")}>
-            {payload.shop_name ?? "Your booking"} · {formatWhen(payload.booking_date, payload.booking_time)}
+            {payload.shop_name ?? "Your booking"} ·{" "}
+            {formatWhen(payload.booking_date, payload.booking_time)}
           </div>
           <div className="text-muted-foreground mt-0.5 truncate text-[11px]">
             {payload.service_name}
@@ -238,9 +242,7 @@ function QueuedBookingCard({
       </div>
 
       {!compact && <ProgressRail stage={stage} />}
-      {!compact && (
-        <p className="text-muted-foreground mt-2 text-[11px]">{meta.hint}</p>
-      )}
+      {!compact && <p className="text-muted-foreground mt-2 text-[11px]">{meta.hint}</p>}
 
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
@@ -251,12 +253,12 @@ function QueuedBookingCard({
               <span className="font-semibold text-heading">
                 {formatWhen(payload.booking_date, payload.booking_time)}
               </span>{" "}
-              hasn't been sent yet. Cancelling removes it from this device and it
-              won't sync. This can't be undone.
+              hasn't been sent yet. Cancelling removes it from this device and it won't sync. This
+              can't be undone.
               {stage === "syncing" && (
                 <span className="mt-2 block text-xs text-amber-700">
-                  A sync is in progress — if it completes before you confirm, the
-                  booking may still go through.
+                  A sync is in progress — if it completes before you confirm, the booking may still
+                  go through.
                 </span>
               )}
             </AlertDialogDescription>
@@ -292,18 +294,14 @@ export function QueuedBookingsList({
   const router = useRouter();
   const queryClient = useQueryClient();
   const notifiedRef = useRef<Set<string>>(new Set());
-  const tasks = queue.filter(
-    (t) => t.type === TASK_CREATE_AND_CONFIRM_BOOKING,
-  ) as BookingTask[];
+  const tasks = queue.filter((t) => t.type === TASK_CREATE_AND_CONFIRM_BOOKING) as BookingTask[];
 
   useEffect(() => {
     if (!autoNavigateOnConfirm) return;
     const seenKey = "nx_offline_queue_navigated_v1";
     let seen: Set<string>;
     try {
-      seen = new Set<string>(
-        JSON.parse(sessionStorage.getItem(seenKey) || "[]") as string[],
-      );
+      seen = new Set<string>(JSON.parse(sessionStorage.getItem(seenKey) || "[]") as string[]);
     } catch {
       seen = new Set<string>();
     }
@@ -341,19 +339,17 @@ export function QueuedBookingsList({
     queryClient.invalidateQueries({ queryKey: ["bookings"] });
 
     if (alreadyThere) {
-      toast.success(
-        ref ? `Booking #${ref} confirmed` : "Your booking is confirmed",
-        { description: "Refreshing your booking details…" },
-      );
+      toast.success(ref ? `Booking #${ref} confirmed` : "Your booking is confirmed", {
+        description: "Refreshing your booking details…",
+      });
       const endRefresh = beginBookingRefresh(bookingId);
       void Promise.resolve(router.invalidate()).finally(endRefresh);
       return;
     }
 
-    toast.success(
-      ref ? `Booking #${ref} confirmed` : "Your booking is confirmed",
-      { description: "Opening your booking details…" },
-    );
+    toast.success(ref ? `Booking #${ref} confirmed` : "Your booking is confirmed", {
+      description: "Opening your booking details…",
+    });
     void navigate({
       to: "/dashboard/bookings/$id",
       params: { id: bookingId },
@@ -362,9 +358,7 @@ export function QueuedBookingsList({
     });
   }, [tasks, autoNavigateOnConfirm, navigate, router, queryClient]);
 
-
   if (tasks.length === 0) return null;
-
 
   const list = limit ? tasks.slice(0, limit) : tasks;
   const pending = tasks.filter((t) => t.status !== "succeeded" && t.status !== "failed").length;
@@ -380,9 +374,7 @@ export function QueuedBookingsList({
             <span
               className={
                 "ml-auto rounded-full px-2 py-0.5 text-[10px] " +
-                (online
-                  ? "bg-primary/10 text-primary"
-                  : "bg-amber-100 text-amber-900")
+                (online ? "bg-primary/10 text-primary" : "bg-amber-100 text-amber-900")
               }
             >
               {online ? "Syncing" : "Waiting for internet"}

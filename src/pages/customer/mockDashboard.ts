@@ -7,11 +7,7 @@ export interface MembershipStatus {
 export const mockMembership: MembershipStatus = {
   tier: "Silver",
   expiresOn: new Date(Date.now() + 1000 * 60 * 60 * 24 * 23).toISOString(),
-  benefits: [
-    "5% off all bookings",
-    "Priority slot reservation",
-    "Free birthday service",
-  ],
+  benefits: ["5% off all bookings", "Priority slot reservation", "Free birthday service"],
 };
 
 export interface FavoriteShop {

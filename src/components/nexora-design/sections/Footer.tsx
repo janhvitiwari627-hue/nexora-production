@@ -26,8 +26,8 @@ export default function Footer() {
               </span>
             </p>
             <p className="mt-4 text-sm text-slate-400">
-              India's Beauty Industry Operating System. Trusted by customers, shop
-              owners, brands, distributors and investors.
+              India's Beauty Industry Operating System. Trusted by customers, shop owners, brands,
+              distributors and investors.
             </p>
             <div className="mt-6 flex items-center gap-4">
               {[Globe, AtSign, MessageCircle, Video].map((Icon, i) => (

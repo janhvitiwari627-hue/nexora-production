@@ -225,7 +225,10 @@ export function GrowthPartnerPage() {
               long-term growth banao.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <a href="#partner-application" className="inline-flex items-center gap-2 rounded-xl bg-[#0B1330] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_10px_30px_-10px_rgba(11,19,48,0.5)] transition-transform hover:-translate-y-0.5">
+              <a
+                href="#partner-application"
+                className="inline-flex items-center gap-2 rounded-xl bg-[#0B1330] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_10px_30px_-10px_rgba(11,19,48,0.5)] transition-transform hover:-translate-y-0.5"
+              >
                 Apply as Growth Partner <ArrowRight className="h-4 w-4" />
               </a>
               <a
@@ -498,8 +501,24 @@ export function GrowthPartnerPage() {
 
           <div className="mx-auto mt-8 max-w-4xl overflow-hidden rounded-3xl border border-indigo-100 bg-[#EEF2FF] text-left shadow-[0_28px_70px_-38px_rgba(79,70,229,.6)]">
             <div className="grid sm:grid-cols-[0.9fr_1.1fr]">
-              <img src={partnerHeroSalon} alt="Nexora Growth Partner helping a salon business grow" className="h-48 w-full object-cover sm:h-full" loading="lazy" />
-              <div className="p-5 sm:p-6"><div className="text-[10px] font-bold uppercase tracking-[.14em] text-[#4F46E5]">Growth that keeps working</div><p className="mt-2 text-base font-black leading-snug text-[#0B1330]">Ek verified, published aur active shop aapke liye long-term platform revenue share create kar sakti hai.</p><div className="mt-3 inline-flex rounded-lg bg-white px-3 py-2 text-xs font-bold text-[#312E81]">Platform revenue only · customer ke total bill par nahi</div></div>
+              <img
+                src={partnerHeroSalon}
+                alt="Nexora Growth Partner helping a salon business grow"
+                className="h-48 w-full object-cover sm:h-full"
+                loading="lazy"
+              />
+              <div className="p-5 sm:p-6">
+                <div className="text-[10px] font-bold uppercase tracking-[.14em] text-[#4F46E5]">
+                  Growth that keeps working
+                </div>
+                <p className="mt-2 text-base font-black leading-snug text-[#0B1330]">
+                  Ek verified, published aur active shop aapke liye long-term platform revenue share
+                  create kar sakti hai.
+                </p>
+                <div className="mt-3 inline-flex rounded-lg bg-white px-3 py-2 text-xs font-bold text-[#312E81]">
+                  Platform revenue only · customer ke total bill par nahi
+                </div>
+              </div>
             </div>
           </div>
 
@@ -680,9 +699,16 @@ export function GrowthPartnerPage() {
                 className={`relative overflow-hidden rounded-3xl border border-slate-200/70 bg-white p-8 ring-1 ${t.ring}`}
               >
                 <div className="relative -mx-3 -mt-3 mb-6 h-36 overflow-hidden rounded-2xl">
-                  <img src={t.image} alt={t.caption} className="h-full w-full object-cover" loading="lazy" />
+                  <img
+                    src={t.image}
+                    alt={t.caption}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
                   <div className={`absolute inset-0 bg-gradient-to-t ${t.tone} opacity-40`} />
-                  <span className="absolute bottom-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-[10px] font-black text-[#0B1330]">{t.caption}</span>
+                  <span className="absolute bottom-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-[10px] font-black text-[#0B1330]">
+                    {t.caption}
+                  </span>
                 </div>
                 <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
                   {t.tier}
@@ -917,40 +943,108 @@ export function GrowthPartnerPage() {
       <section className="mx-auto max-w-7xl px-6 py-24">
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm md:p-9">
-            <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[#4F46E5]"><FileCheck2 className="h-4 w-4" /> Eligibility & requirements</span>
-            <h2 className="mt-4 text-3xl font-black tracking-tight text-[#0B1330]">Ready before you apply.</h2>
-            <p className="mt-3 text-sm leading-relaxed text-slate-600">Application review ke liye ye basic details aur commitments zaroori hain.</p>
+            <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[#4F46E5]">
+              <FileCheck2 className="h-4 w-4" /> Eligibility & requirements
+            </span>
+            <h2 className="mt-4 text-3xl font-black tracking-tight text-[#0B1330]">
+              Ready before you apply.
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-slate-600">
+              Application review ke liye ye basic details aur commitments zaroori hain.
+            </p>
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               {[
-                "Minimum 18 years", "Valid mobile number", "Identity verification", "Bank account after approval",
-                "District selection", "Agreement acceptance", "Training completion", "Admin approval",
-              ].map((item) => <div key={item} className="flex items-center gap-2 rounded-xl bg-[#FAFBFF] p-3 text-sm font-semibold text-[#0B1330]"><CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />{item}</div>)}
+                "Minimum 18 years",
+                "Valid mobile number",
+                "Identity verification",
+                "Bank account after approval",
+                "District selection",
+                "Agreement acceptance",
+                "Training completion",
+                "Admin approval",
+              ].map((item) => (
+                <div
+                  key={item}
+                  className="flex items-center gap-2 rounded-xl bg-[#FAFBFF] p-3 text-sm font-semibold text-[#0B1330]"
+                >
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+                  {item}
+                </div>
+              ))}
             </div>
           </div>
           <div className="rounded-3xl bg-[#0B1330] p-7 text-white shadow-[0_24px_60px_-28px_rgba(11,19,48,.7)] md:p-9">
-            <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-indigo-200"><ShieldAlert className="h-4 w-4" /> Program terms</span>
+            <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-indigo-200">
+              <ShieldAlert className="h-4 w-4" /> Program terms
+            </span>
             <h2 className="mt-4 text-3xl font-black tracking-tight">Fair earning. Clear rules.</h2>
             <ul className="mt-6 space-y-3 text-sm leading-relaxed text-slate-200">
               {[
-                "No salary guarantee or fake earning promise.", "Commission only on verified, active shops and successful Nexora platform revenue.",
-                "Refunded, fraudulent or cancelled transactions are not payable.", "Company may hold payouts during a fraud or policy review.",
+                "No salary guarantee or fake earning promise.",
+                "Commission only on verified, active shops and successful Nexora platform revenue.",
+                "Refunded, fraudulent or cancelled transactions are not payable.",
+                "Company may hold payouts during a fraud or policy review.",
                 "Partners must follow Nexora brand policy; reward and dispute decisions follow company policy.",
-              ].map((item) => <li key={item} className="flex gap-3"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" />{item}</li>)}
+              ].map((item) => (
+                <li key={item} className="flex gap-3">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" />
+                  {item}
+                </li>
+              ))}
             </ul>
           </div>
         </div>
 
         <div className="mt-16 mx-auto max-w-4xl">
-          <div className="text-center"><span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#4F46E5]">FAQs</span><h2 className="mt-3 text-3xl font-black tracking-tight text-[#0B1330] md:text-4xl">Questions, answered clearly.</h2></div>
+          <div className="text-center">
+            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#4F46E5]">
+              FAQs
+            </span>
+            <h2 className="mt-3 text-3xl font-black tracking-tight text-[#0B1330] md:text-4xl">
+              Questions, answered clearly.
+            </h2>
+          </div>
           <div className="mt-8 space-y-3">
             {[
-              ["Is this a job, salary plan or franchise?", "No. This is a performance-based Growth Partner program, not a job, salary plan, franchise or MLM."],
-              ["How do I earn?", "You earn commission only from successful Nexora platform revenue of shops you personally onboard that become verified, published and active."],
-              ["When is payout processed?", "Commission is calculated daily. Eligible balance is processed in the weekly payout cycle; available balance may be requested as per policy."],
-              ["What is an active shop?", "A verified, published, QR/payment-active and fraud-free shop with at least one successful collection in the last 30 days."],
-              ["What happens if a transaction is refunded?", "Refunded, cancelled, suspicious or fraudulent transactions are excluded and may be held for review."],
-              ["Can I onboard shops in another district?", "Work is normally mapped to your approved district. Any territory change needs Nexora team approval."],
-            ].map(([question, answer]) => <details key={question} className="group rounded-2xl border border-slate-200 bg-white p-5 open:border-[#4F46E5]/30"><summary className="cursor-pointer list-none pr-8 text-sm font-bold text-[#0B1330]">{question}<span className="float-right text-lg text-[#4F46E5] group-open:hidden">+</span><span className="float-right hidden text-lg text-[#4F46E5] group-open:inline">−</span></summary><p className="mt-3 text-sm leading-relaxed text-slate-600">{answer}</p></details>)}
+              [
+                "Is this a job, salary plan or franchise?",
+                "No. This is a performance-based Growth Partner program, not a job, salary plan, franchise or MLM.",
+              ],
+              [
+                "How do I earn?",
+                "You earn commission only from successful Nexora platform revenue of shops you personally onboard that become verified, published and active.",
+              ],
+              [
+                "When is payout processed?",
+                "Commission is calculated daily. Eligible balance is processed in the weekly payout cycle; available balance may be requested as per policy.",
+              ],
+              [
+                "What is an active shop?",
+                "A verified, published, QR/payment-active and fraud-free shop with at least one successful collection in the last 30 days.",
+              ],
+              [
+                "What happens if a transaction is refunded?",
+                "Refunded, cancelled, suspicious or fraudulent transactions are excluded and may be held for review.",
+              ],
+              [
+                "Can I onboard shops in another district?",
+                "Work is normally mapped to your approved district. Any territory change needs Nexora team approval.",
+              ],
+            ].map(([question, answer]) => (
+              <details
+                key={question}
+                className="group rounded-2xl border border-slate-200 bg-white p-5 open:border-[#4F46E5]/30"
+              >
+                <summary className="cursor-pointer list-none pr-8 text-sm font-bold text-[#0B1330]">
+                  {question}
+                  <span className="float-right text-lg text-[#4F46E5] group-open:hidden">+</span>
+                  <span className="float-right hidden text-lg text-[#4F46E5] group-open:inline">
+                    −
+                  </span>
+                </summary>
+                <p className="mt-3 text-sm leading-relaxed text-slate-600">{answer}</p>
+              </details>
+            ))}
           </div>
         </div>
       </section>
@@ -1107,7 +1201,11 @@ export function GrowthPartnerPage() {
             </div>
           </div>
 
-          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
             <GrowthPartnerApplicationForm />
           </motion.div>
         </div>
@@ -1136,7 +1234,10 @@ export function GrowthPartnerPage() {
                 share earn karo.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <a href="#partner-application" className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-[#0B1330] transition-transform hover:-translate-y-0.5">
+                <a
+                  href="#partner-application"
+                  className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-[#0B1330] transition-transform hover:-translate-y-0.5"
+                >
                   Apply as Growth Partner <ArrowRight className="h-4 w-4" />
                 </a>
                 <a

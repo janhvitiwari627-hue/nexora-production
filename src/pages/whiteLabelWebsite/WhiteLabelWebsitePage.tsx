@@ -19,7 +19,11 @@ import {
   type TemplateKey,
 } from "@/components/whiteLabelWebsite/templates";
 import { getSalonBySlug } from "@/lib/salons.functions";
-import { expandMockBusiness, getMockBusinesses, getMockBusinessBySlug } from "@/lib/mock-businesses";
+import {
+  expandMockBusiness,
+  getMockBusinesses,
+  getMockBusinessBySlug,
+} from "@/lib/mock-businesses";
 import { AlertTriangle, Check, Loader2, Paintbrush } from "lucide-react";
 import { toast } from "sonner";
 
@@ -75,7 +79,12 @@ export function WhiteLabelWebsitePage({
   slug?: string;
   routeSearch?: { t?: string; preview?: 1; live?: 1 };
 }) {
-  const { data: rawData, isLoading, isFetching, refetch } = useQuery({
+  const {
+    data: rawData,
+    isLoading,
+    isFetching,
+    refetch,
+  } = useQuery({
     queryKey: ["white-label-site", _slug],
     queryFn: () => (_slug ? getSalonBySlug({ data: { slug: _slug } }) : Promise.resolve(null)),
     enabled: !!_slug,
@@ -88,7 +97,8 @@ export function WhiteLabelWebsitePage({
 
   const isLiveMode =
     routeSearch?.live === 1 ||
-    (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("live") === "1");
+    (typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).get("live") === "1");
 
   // Listen for owner "Edit & Live" postMessage patches so unsaved edits render
   // instantly inside the preview iframe without hitting the DB.
@@ -145,8 +155,16 @@ export function WhiteLabelWebsitePage({
     };
     const channel = supabase
       .channel(`site-${salonId}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "salons", filter: `id=eq.${salonId}` }, onChange)
-      .on("postgres_changes", { event: "*", schema: "public", table: "services", filter: `salon_id=eq.${salonId}` }, onChange)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "salons", filter: `id=eq.${salonId}` },
+        onChange,
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "services", filter: `salon_id=eq.${salonId}` },
+        onChange,
+      )
       .subscribe();
     return () => {
       supabase.removeChannel(channel);
@@ -270,9 +288,14 @@ export function WhiteLabelWebsitePage({
   const config: WebsiteConfig = {
     template: templateKey,
     branding: {
-      logo: data?.salon?.owner_profile_image_url ?? liveOverrides?.owner_profile_image_url ?? undefined,
-      primaryColor: data?.salon?.brand_primary ?? liveOverrides?.brand_primary ?? baseTemplate.colors.primary,
-      secondaryColor: data?.salon?.brand_secondary ?? liveOverrides?.brand_secondary ?? baseTemplate.colors.secondary,
+      logo:
+        data?.salon?.owner_profile_image_url ?? liveOverrides?.owner_profile_image_url ?? undefined,
+      primaryColor:
+        data?.salon?.brand_primary ?? liveOverrides?.brand_primary ?? baseTemplate.colors.primary,
+      secondaryColor:
+        data?.salon?.brand_secondary ??
+        liveOverrides?.brand_secondary ??
+        baseTemplate.colors.secondary,
       font: baseTemplate.font,
     },
     sections: DEFAULT_SECTIONS,

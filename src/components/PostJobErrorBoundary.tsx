@@ -51,11 +51,10 @@ export class PostJobErrorBoundary extends Component<Props, State> {
             Something went wrong on this page
           </h1>
           <p className="text-sm text-muted-foreground mb-1">
-            Don't worry — your progress is saved as a draft. You can try again, reload the page, or clear the draft if the issue persists.
+            Don't worry — your progress is saved as a draft. You can try again, reload the page, or
+            clear the draft if the issue persists.
           </p>
-          <p className="text-xs text-muted-foreground/80 font-mono mb-6 break-words">
-            {message}
-          </p>
+          <p className="text-xs text-muted-foreground/80 font-mono mb-6 break-words">{message}</p>
           <div className="flex flex-col sm:flex-row gap-2 justify-center">
             <Button onClick={this.handleReset} variant="default" className="gap-2">
               <RefreshCw className="h-4 w-4" /> Try again

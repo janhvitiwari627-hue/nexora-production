@@ -1,13 +1,29 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Smartphone, Sparkles, Calendar, QrCode, Wallet, Gift, Bell, Star, ArrowRight, Mail, CheckCircle2 } from "lucide-react";
+import {
+  Smartphone,
+  Sparkles,
+  Calendar,
+  QrCode,
+  Wallet,
+  Gift,
+  Bell,
+  Star,
+  ArrowRight,
+  Mail,
+  CheckCircle2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 const BENEFITS = [
-  { icon: Calendar, title: "60-Second Booking", desc: "From search to confirmed slot in under a minute." },
+  {
+    icon: Calendar,
+    title: "60-Second Booking",
+    desc: "From search to confirmed slot in under a minute.",
+  },
   { icon: QrCode, title: "Scan & Pay", desc: "Nexora QR checkout at partner salons." },
   { icon: Wallet, title: "Wallet & Rewards", desc: "Earn cashback and redeem instantly." },
   { icon: Gift, title: "Exclusive Offers", desc: "App-only deals near you every week." },
@@ -45,9 +61,8 @@ export default function DownloadAppPage() {
               Nexora Customer App
             </h1>
             <p className="mt-4 text-lg text-muted-foreground">
-              A dedicated mobile app is launching separately for customers to
-              discover salons, book instantly, pay via QR and earn rewards.
-              Join the waitlist to be first in line.
+              A dedicated mobile app is launching separately for customers to discover salons, book
+              instantly, pay via QR and earn rewards. Join the waitlist to be first in line.
             </p>
 
             {joined ? (
@@ -86,8 +101,8 @@ export default function DownloadAppPage() {
               </Button>
             </div>
             <p className="mt-4 text-xs text-muted-foreground">
-              The Customer App will ship as a separate Android, iOS and web
-              product. This website remains the Nexora public site.
+              The Customer App will ship as a separate Android, iOS and web product. This website
+              remains the Nexora public site.
             </p>
           </div>
 

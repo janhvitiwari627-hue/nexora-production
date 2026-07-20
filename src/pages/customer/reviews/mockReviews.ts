@@ -31,9 +31,7 @@ export const mockReviews: MyReview[] = [
     shopImage: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=200&q=80",
     rating: 5,
     text: "Best haircut I've had in years. Priya nailed exactly what I wanted and the hair spa was so relaxing.",
-    photos: [
-      "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=300&q=80",
-    ],
+    photos: ["https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=300&q=80"],
     dateISO: d(4),
     status: "published",
   },

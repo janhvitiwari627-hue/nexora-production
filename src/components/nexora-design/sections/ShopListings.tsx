@@ -6,7 +6,8 @@ const shops = [
   {
     id: 1,
     name: "The Glam House",
-    image: "https://images.pexels.com/photos/7195802/pexels-photo-7195802.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=800",
+    image:
+      "https://images.pexels.com/photos/7195802/pexels-photo-7195802.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=800",
     rating: 4.9,
     reviews: 324,
     distance: "1.2 km",
@@ -17,7 +18,8 @@ const shops = [
   {
     id: 2,
     name: "Royal Wellness Spa",
-    image: "https://images.pexels.com/photos/7031704/pexels-photo-7031704.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=800",
+    image:
+      "https://images.pexels.com/photos/7031704/pexels-photo-7031704.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=800",
     rating: 4.8,
     reviews: 186,
     distance: "2.5 km",
@@ -28,7 +30,8 @@ const shops = [
   {
     id: 3,
     name: "Ink Culture Studio",
-    image: "https://images.pexels.com/photos/28991646/pexels-photo-28991646.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=800",
+    image:
+      "https://images.pexels.com/photos/28991646/pexels-photo-28991646.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=800",
     rating: 4.7,
     reviews: 112,
     distance: "3.1 km",
@@ -39,7 +42,8 @@ const shops = [
   {
     id: 4,
     name: "Nouveau Nail Bar",
-    image: "https://images.pexels.com/photos/7755224/pexels-photo-7755224.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=800",
+    image:
+      "https://images.pexels.com/photos/7755224/pexels-photo-7755224.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=800",
     rating: 4.9,
     reviews: 245,
     distance: "0.9 km",
@@ -50,7 +54,8 @@ const shops = [
   {
     id: 5,
     name: "Bridal Glow by Priya",
-    image: "https://images.pexels.com/photos/13779727/pexels-photo-13779727.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=800",
+    image:
+      "https://images.pexels.com/photos/13779727/pexels-photo-13779727.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=800",
     rating: 5.0,
     reviews: 89,
     distance: "4.0 km",
@@ -61,7 +66,8 @@ const shops = [
   {
     id: 6,
     name: "Urban Mane Salon",
-    image: "https://images.pexels.com/photos/7195800/pexels-photo-7195800.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=800",
+    image:
+      "https://images.pexels.com/photos/7195800/pexels-photo-7195800.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=600&w=800",
     rating: 4.6,
     reviews: 512,
     distance: "1.8 km",
@@ -75,9 +81,7 @@ export default function ShopListings() {
   const [saved, setSaved] = useState<number[]>([]);
 
   const toggleSave = (id: number) => {
-    setSaved((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
+    setSaved((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
 
   return (
@@ -93,10 +97,7 @@ export default function ShopListings() {
                 Handpicked salons & studios trusted by thousands.
               </p>
             </div>
-            <a
-              href="#"
-              className="text-sm font-semibold text-indigo-600 hover:text-indigo-700"
-            >
+            <a href="#" className="text-sm font-semibold text-indigo-600 hover:text-indigo-700">
               View all →
             </a>
           </div>
@@ -118,9 +119,7 @@ export default function ShopListings() {
                   >
                     <Heart
                       className={`h-4 w-4 ${
-                        saved.includes(shop.id)
-                          ? "fill-rose-500 text-rose-500"
-                          : ""
+                        saved.includes(shop.id) ? "fill-rose-500 text-rose-500" : ""
                       }`}
                     />
                   </button>
@@ -132,9 +131,7 @@ export default function ShopListings() {
                 <div className="p-5">
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <h3 className="text-lg font-bold text-slate-900">
-                        {shop.name}
-                      </h3>
+                      <h3 className="text-lg font-bold text-slate-900">{shop.name}</h3>
                       <div className="mt-1 flex items-center gap-3 text-sm text-slate-500">
                         <span className="inline-flex items-center gap-1">
                           <MapPin className="h-3.5 w-3.5" />
@@ -143,16 +140,12 @@ export default function ShopListings() {
                         <span>{shop.reviews} reviews</span>
                       </div>
                     </div>
-                    {shop.verified && (
-                      <BadgeCheck className="h-5 w-5 shrink-0 text-indigo-600" />
-                    )}
+                    {shop.verified && <BadgeCheck className="h-5 w-5 shrink-0 text-indigo-600" />}
                   </div>
                   <p className="mt-3 text-sm text-slate-500">{shop.services}</p>
                   <div className="mt-5 flex items-center justify-between">
                     <div>
-                      <span className="text-lg font-bold text-slate-900">
-                        {shop.price}
-                      </span>
+                      <span className="text-lg font-bold text-slate-900">{shop.price}</span>
                       <span className="text-xs text-slate-400"> onwards</span>
                     </div>
                     <button className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition-transform hover:scale-105 active:scale-95">

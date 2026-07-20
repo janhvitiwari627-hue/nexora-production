@@ -9,22 +9,33 @@ export function OfflineFallbackPage({ cachedShops = [] as { name: string; slug: 
           <WifiOff className="text-muted-foreground h-8 w-8" />
         </div>
         <h1 className="text-heading text-2xl font-bold">You're offline</h1>
-        <p className="text-muted-foreground mt-2 text-sm">This page isn't cached. Please reconnect to load fresh content.</p>
+        <p className="text-muted-foreground mt-2 text-sm">
+          This page isn't cached. Please reconnect to load fresh content.
+        </p>
 
         {cachedShops.length > 0 && (
           <div className="mt-6 text-left">
-            <div className="text-muted-foreground mb-2 text-xs uppercase tracking-wider">Recently viewed (cached)</div>
+            <div className="text-muted-foreground mb-2 text-xs uppercase tracking-wider">
+              Recently viewed (cached)
+            </div>
             <ul className="space-y-2">
-              {cachedShops.map(s => (
+              {cachedShops.map((s) => (
                 <li key={s.slug}>
-                  <a href={`/site/${s.slug}`} className="hover:bg-muted block rounded-lg border px-4 py-3 text-sm">{s.name}</a>
+                  <a
+                    href={`/site/${s.slug}`}
+                    className="hover:bg-muted block rounded-lg border px-4 py-3 text-sm"
+                  >
+                    {s.name}
+                  </a>
                 </li>
               ))}
             </ul>
           </div>
         )}
 
-        <Button className="mt-6" onClick={() => window.location.reload()}>Try Again</Button>
+        <Button className="mt-6" onClick={() => window.location.reload()}>
+          Try Again
+        </Button>
       </div>
     </div>
   );

@@ -88,10 +88,7 @@ export function MyReviewsPage() {
           ) : (
             <ul className="space-y-3">
               {reviews.map((r) => (
-                <li
-                  key={r.id}
-                  className="rounded-2xl border bg-card p-4 shadow-sm sm:p-5"
-                >
+                <li key={r.id} className="rounded-2xl border bg-card p-4 shadow-sm sm:p-5">
                   <div className="flex gap-4">
                     <img
                       src={r.shopImage}
@@ -155,9 +152,7 @@ export function MyReviewsPage() {
                         </button>
                         <button
                           type="button"
-                          onClick={() =>
-                            setReviews((rs) => rs.filter((x) => x.id !== r.id))
-                          }
+                          onClick={() => setReviews((rs) => rs.filter((x) => x.id !== r.id))}
                           className="inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-semibold text-rose-600 transition hover:border-rose-300 hover:bg-rose-50"
                         >
                           <Trash2 className="h-3.5 w-3.5" /> Delete
@@ -182,9 +177,7 @@ export function MyReviewsPage() {
             if (!editing) return;
             setReviews((rs) =>
               rs.map((r) =>
-                r.id === editing.id
-                  ? { ...r, rating, text, photos, status: "pending" }
-                  : r,
+                r.id === editing.id ? { ...r, rating, text, photos, status: "pending" } : r,
               ),
             );
             setEditing(null);

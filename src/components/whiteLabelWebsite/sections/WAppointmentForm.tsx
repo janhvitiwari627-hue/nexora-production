@@ -26,7 +26,9 @@ export function WAppointmentForm({ shop, template }: { shop: ShopData; template:
     } catch (err) {
       // User cancelled share sheet — not an error worth surfacing.
       if (err instanceof Error && err.name === "AbortError") return;
-      toast.error("Could not copy link", { description: "Please copy it manually from the address bar." });
+      toast.error("Could not copy link", {
+        description: "Please copy it manually from the address bar.",
+      });
     }
   };
 
@@ -52,7 +54,11 @@ export function WAppointmentForm({ shop, template }: { shop: ShopData; template:
               borderRadius: template.radius,
             }}
           >
-            <Link to="/site/$slug/book" params={{ slug: shop.slug }} search={{ service: undefined }}>
+            <Link
+              to="/site/$slug/book"
+              params={{ slug: shop.slug }}
+              search={{ service: undefined }}
+            >
               <Calendar className="h-4 w-4" /> Start Booking
             </Link>
           </Button>

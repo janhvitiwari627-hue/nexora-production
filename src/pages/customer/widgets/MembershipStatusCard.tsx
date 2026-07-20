@@ -6,8 +6,7 @@ import { mockMembership } from "../mockDashboard";
 const TIER_BG: Record<string, string> = {
   Silver: "bg-[linear-gradient(135deg,#cfd6df,#8a95a5)] text-slate-900",
   Gold: "bg-gradient-to-br from-amber-300 via-yellow-400 to-orange-500 text-amber-950",
-  Platinum:
-    "bg-[linear-gradient(135deg,oklch(0.32_0.08_280),oklch(0.18_0.05_260))] text-white",
+  Platinum: "bg-[linear-gradient(135deg,oklch(0.32_0.08_280),oklch(0.18_0.05_260))] text-white",
 };
 
 const NEXT_TIER: Record<string, "Gold" | "Platinum" | null> = {

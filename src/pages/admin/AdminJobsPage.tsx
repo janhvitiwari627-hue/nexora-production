@@ -6,11 +6,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import {
-  Briefcase, Users, CheckCircle2, XCircle, Search, CalendarClock,
-  UserCheck, TrendingUp, Ban, Loader2,
+  Briefcase,
+  Users,
+  CheckCircle2,
+  XCircle,
+  Search,
+  CalendarClock,
+  UserCheck,
+  TrendingUp,
+  Ban,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,7 +47,11 @@ type AppRow = {
   created_at: string;
   cover_note: string | null;
   jobs: { title: string | null; business_name: string | null } | null;
-  candidate_profiles: { full_name: string | null; city: string | null; experience_years: number | null } | null;
+  candidate_profiles: {
+    full_name: string | null;
+    city: string | null;
+    experience_years: number | null;
+  } | null;
 };
 
 const JOB_STATUS_STYLES: Record<string, string> = {
@@ -90,15 +107,19 @@ export function AdminJobsPage() {
   const jobs = jobsQ.data ?? [];
   const apps = appsQ.data ?? [];
 
-  const stats = useMemo(() => ({
-    totalJobs: jobs.length,
-    activeJobs: jobs.filter((j) => j.status === "published").length,
-    pendingJobs: jobs.filter((j) => j.status === "pending_approval" || j.status === "draft").length,
-    totalApplicants: apps.length,
-    interviews: apps.filter((a) => a.status === "interview" || a.status === "screening").length,
-    offers: apps.filter((a) => a.status === "offer").length,
-    hired: apps.filter((a) => a.status === "hired").length,
-  }), [jobs, apps]);
+  const stats = useMemo(
+    () => ({
+      totalJobs: jobs.length,
+      activeJobs: jobs.filter((j) => j.status === "published").length,
+      pendingJobs: jobs.filter((j) => j.status === "pending_approval" || j.status === "draft")
+        .length,
+      totalApplicants: apps.length,
+      interviews: apps.filter((a) => a.status === "interview" || a.status === "screening").length,
+      offers: apps.filter((a) => a.status === "offer").length,
+      hired: apps.filter((a) => a.status === "hired").length,
+    }),
+    [jobs, apps],
+  );
 
   const updateJob = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
@@ -137,7 +158,12 @@ export function AdminJobsPage() {
   const KPIS = [
     { label: "Total Jobs", value: stats.totalJobs, icon: Briefcase, color: "text-indigo-600" },
     { label: "Published", value: stats.activeJobs, icon: TrendingUp, color: "text-emerald-600" },
-    { label: "Pending Approval", value: stats.pendingJobs, icon: CalendarClock, color: "text-amber-600" },
+    {
+      label: "Pending Approval",
+      value: stats.pendingJobs,
+      icon: CalendarClock,
+      color: "text-amber-600",
+    },
     { label: "Applicants", value: stats.totalApplicants, icon: Users, color: "text-violet-600" },
     { label: "Interviews", value: stats.interviews, icon: CalendarClock, color: "text-blue-600" },
     { label: "Offers", value: stats.offers, icon: UserCheck, color: "text-fuchsia-600" },
@@ -149,7 +175,8 @@ export function AdminJobsPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Jobs &amp; Hiring Control</h1>
         <p className="text-sm text-muted-foreground">
-          Live view of every job posting, application, interview and hire request across the platform.
+          Live view of every job posting, application, interview and hire request across the
+          platform.
         </p>
       </div>
 
@@ -216,19 +243,33 @@ export function AdminJobsPage() {
                           <Badge variant="secondary">{j.applicants_count ?? 0}</Badge>
                         </TableCell>
                         <TableCell>
-                          <Badge className={JOB_STATUS_STYLES[j.status ?? ""] ?? "bg-slate-100 text-slate-700"}>
+                          <Badge
+                            className={
+                              JOB_STATUS_STYLES[j.status ?? ""] ?? "bg-slate-100 text-slate-700"
+                            }
+                          >
                             {j.status ?? "unknown"}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="inline-flex gap-1">
                             {j.status !== "published" && (
-                              <Button size="sm" variant="ghost" className="text-emerald-600" onClick={() => updateJob.mutate({ id: j.id, status: "published" })}>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="text-emerald-600"
+                                onClick={() => updateJob.mutate({ id: j.id, status: "published" })}
+                              >
                                 <CheckCircle2 className="h-4 w-4" />
                               </Button>
                             )}
                             {j.status !== "closed" && (
-                              <Button size="sm" variant="ghost" className="text-rose-600" onClick={() => updateJob.mutate({ id: j.id, status: "closed" })}>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="text-rose-600"
+                                onClick={() => updateJob.mutate({ id: j.id, status: "closed" })}
+                              >
                                 <Ban className="h-4 w-4" />
                               </Button>
                             )}
@@ -238,7 +279,10 @@ export function AdminJobsPage() {
                     ))}
                     {filteredJobs.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={6} className="py-8 text-center text-sm text-muted-foreground">
+                        <TableCell
+                          colSpan={6}
+                          className="py-8 text-center text-sm text-muted-foreground"
+                        >
                           No jobs found.
                         </TableCell>
                       </TableRow>
@@ -251,7 +295,11 @@ export function AdminJobsPage() {
         </TabsContent>
 
         <TabsContent value="applications" className="mt-4">
-          <ApplicationsTable data={apps} loading={appsQ.isLoading} onSet={(id, s) => updateApp.mutate({ id, status: s })} />
+          <ApplicationsTable
+            data={apps}
+            loading={appsQ.isLoading}
+            onSet={(id, s) => updateApp.mutate({ id, status: s })}
+          />
         </TabsContent>
 
         <TabsContent value="interviews" className="mt-4">
@@ -334,13 +382,28 @@ function ApplicationsTable({
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="inline-flex gap-1">
-                      <Button size="sm" variant="ghost" className="text-blue-600" onClick={() => onSet(a.id, "interview")}>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-blue-600"
+                        onClick={() => onSet(a.id, "interview")}
+                      >
                         Interview
                       </Button>
-                      <Button size="sm" variant="ghost" className="text-emerald-600" onClick={() => onSet(a.id, "hired")}>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-emerald-600"
+                        onClick={() => onSet(a.id, "hired")}
+                      >
                         <CheckCircle2 className="h-4 w-4" />
                       </Button>
-                      <Button size="sm" variant="ghost" className="text-rose-600" onClick={() => onSet(a.id, "rejected")}>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-rose-600"
+                        onClick={() => onSet(a.id, "rejected")}
+                      >
                         <XCircle className="h-4 w-4" />
                       </Button>
                     </div>

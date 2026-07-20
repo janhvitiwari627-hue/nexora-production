@@ -14,8 +14,7 @@ const REASONS = {
   "create-website": {
     icon: Store,
     title: "Let's build your shop website",
-    subtitle:
-      "You'll register your business first, then pick a template. Redirecting now…",
+    subtitle: "You'll register your business first, then pick a template. Redirecting now…",
     cta: "Opening the website builder…",
   },
   default: {
@@ -37,10 +36,7 @@ export const Route = createFileRoute("/auth-notice")({
   validateSearch: (s) => searchSchema.parse(s),
   component: AuthNoticePage,
   head: () => ({
-    meta: [
-      { title: "Redirecting — Nexora" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Redirecting — Nexora" }, { name: "robots", content: "noindex" }],
   }),
 });
 
@@ -63,12 +59,8 @@ function AuthNoticePage() {
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-200">
           <Icon className="h-6 w-6" />
         </div>
-        <h1 className="mt-5 text-xl font-bold tracking-tight text-slate-900">
-          {meta.title}
-        </h1>
-        <p className="mt-2 text-sm leading-relaxed text-slate-500">
-          {meta.subtitle}
-        </p>
+        <h1 className="mt-5 text-xl font-bold tracking-tight text-slate-900">{meta.title}</h1>
+        <p className="mt-2 text-sm leading-relaxed text-slate-500">{meta.subtitle}</p>
         <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-slate-50 px-4 py-2 text-xs font-semibold text-slate-600">
           <Loader2 className="h-3.5 w-3.5 animate-spin text-indigo-600" />
           {meta.cta}

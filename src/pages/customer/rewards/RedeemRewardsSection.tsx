@@ -64,7 +64,9 @@ export function RedeemRewardsSection() {
                 disabled={!enough}
                 className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-primary px-3 py-2 text-xs font-bold text-primary-foreground transition hover:opacity-90 disabled:bg-muted disabled:text-muted-foreground"
               >
-                {enough ? "Redeem" : `Need ${(o.points - mockPoints.available).toLocaleString()} more`}
+                {enough
+                  ? "Redeem"
+                  : `Need ${(o.points - mockPoints.available).toLocaleString()} more`}
               </button>
             </div>
           );

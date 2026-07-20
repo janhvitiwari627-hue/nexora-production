@@ -9,11 +9,22 @@ export function WBlog({ shop, template }: { shop: ShopData; template: TemplateCo
   return (
     <section id="blog" className="px-6 py-16 md:px-12">
       <SectionTitle font={template.headingFont}>Latest from the Blog</SectionTitle>
-      <p className="text-muted-foreground mt-2 text-center text-sm">Tips, trends and beauty inspiration.</p>
+      <p className="text-muted-foreground mt-2 text-center text-sm">
+        Tips, trends and beauty inspiration.
+      </p>
       <div className="mx-auto mt-8 grid max-w-6xl gap-5 md:grid-cols-3">
         {shop.blog.map((post) => (
-          <article key={post.id} className="overflow-hidden border bg-white shadow-sm transition-transform hover:-translate-y-1" style={{ borderRadius: template.radius }}>
-            <img src={post.image} alt={post.title} loading="lazy" className="aspect-video w-full object-cover" />
+          <article
+            key={post.id}
+            className="overflow-hidden border bg-white shadow-sm transition-transform hover:-translate-y-1"
+            style={{ borderRadius: template.radius }}
+          >
+            <img
+              src={post.image}
+              alt={post.title}
+              loading="lazy"
+              className="aspect-video w-full object-cover"
+            />
             <div className="space-y-2 p-5">
               <div className="text-muted-foreground flex items-center gap-1 text-xs">
                 <Calendar className="h-3 w-3" /> {post.date}

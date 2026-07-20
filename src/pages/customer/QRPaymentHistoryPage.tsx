@@ -1,24 +1,19 @@
 import { useMemo, useState } from "react";
-import {
-  ChevronDown,
-  Download,
-  Filter,
-  QrCode,
-  Sparkles,
-  Wallet,
-} from "lucide-react";
+import { ChevronDown, Download, Filter, QrCode, Sparkles, Wallet } from "lucide-react";
 import { QR_PAYMENTS, type QRPayment, type RewardStatus } from "./qr/mockQRPayments";
 
-const fmtINR = (n: number) =>
-  `₹${n.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+const fmtINR = (n: number) => `₹${n.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
 
 const fmtDate = (iso: string) =>
   new Date(iso).toLocaleDateString("en-IN", {
-    day: "numeric", month: "short", year: "numeric",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
   });
 const fmtTime = (iso: string) =>
   new Date(iso).toLocaleTimeString("en-IN", {
-    hour: "numeric", minute: "2-digit",
+    hour: "numeric",
+    minute: "2-digit",
   });
 
 const STATUS_STYLES: Record<RewardStatus, string> = {
@@ -40,10 +35,7 @@ export function QRPaymentHistoryPage() {
   const [status, setStatus] = useState<RewardStatus | "all">("all");
   const [openId, setOpenId] = useState<string | null>(null);
 
-  const shops = useMemo(
-    () => Array.from(new Set(QR_PAYMENTS.map((p) => p.shopName))).sort(),
-    [],
-  );
+  const shops = useMemo(() => Array.from(new Set(QR_PAYMENTS.map((p) => p.shopName))).sort(), []);
 
   const filtered = useMemo(() => {
     const now = Date.now();
@@ -53,17 +45,14 @@ export function QRPaymentHistoryPage() {
       if (shop !== "all" && p.shopName !== shop) return false;
       if (status !== "all" && p.rewardStatus !== status) return false;
       return true;
-    }).sort(
-      (a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime(),
-    );
+    }).sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime());
   }, [range, shop, status]);
 
   const totals = useMemo(() => {
     return filtered.reduce(
       (acc, p) => ({
         spend: acc.spend + p.amount,
-        rewards:
-          acc.rewards + (p.rewardStatus === "credited" ? p.rewardEarned : 0),
+        rewards: acc.rewards + (p.rewardStatus === "credited" ? p.rewardEarned : 0),
         count: acc.count + 1,
       }),
       { spend: 0, rewards: 0, count: 0 },
@@ -84,17 +73,20 @@ export function QRPaymentHistoryPage() {
       {/* Summary */}
       <div className="grid gap-3 sm:grid-cols-3">
         <SummaryCard
-          icon={Wallet} label="Total QR Spend"
+          icon={Wallet}
+          label="Total QR Spend"
           value={fmtINR(totals.spend)}
           tint="from-indigo-500 to-violet-500"
         />
         <SummaryCard
-          icon={Sparkles} label="Rewards from QR"
+          icon={Sparkles}
+          label="Rewards from QR"
           value={`${totals.rewards} pts`}
           tint="from-amber-500 to-orange-500"
         />
         <SummaryCard
-          icon={QrCode} label="Transactions"
+          icon={QrCode}
+          label="Transactions"
           value={String(totals.count)}
           tint="from-emerald-500 to-teal-500"
         />
@@ -106,18 +98,21 @@ export function QRPaymentHistoryPage() {
           <Filter className="size-4" /> Filters
         </span>
         <FilterSelect
-          value={range} onChange={(v) => setRange(v as typeof range)}
+          value={range}
+          onChange={(v) => setRange(v as typeof range)}
           options={RANGES.map((r) => ({ value: r.key, label: r.label }))}
         />
         <FilterSelect
-          value={shop} onChange={setShop}
+          value={shop}
+          onChange={setShop}
           options={[
             { value: "all", label: "All shops" },
             ...shops.map((s) => ({ value: s, label: s })),
           ]}
         />
         <FilterSelect
-          value={status} onChange={(v) => setStatus(v as RewardStatus | "all")}
+          value={status}
+          onChange={(v) => setStatus(v as RewardStatus | "all")}
           options={[
             { value: "all", label: "All rewards" },
             { value: "credited", label: "Credited" },
@@ -136,7 +131,8 @@ export function QRPaymentHistoryPage() {
         )}
         {filtered.map((p) => (
           <TxnRow
-            key={p.id} payment={p}
+            key={p.id}
+            payment={p}
             open={openId === p.id}
             onToggle={() => setOpenId(openId === p.id ? null : p.id)}
           />
@@ -147,13 +143,21 @@ export function QRPaymentHistoryPage() {
 }
 
 function SummaryCard({
-  icon: Icon, label, value, tint,
+  icon: Icon,
+  label,
+  value,
+  tint,
 }: {
-  icon: typeof QrCode; label: string; value: string; tint: string;
+  icon: typeof QrCode;
+  label: string;
+  value: string;
+  tint: string;
 }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-4 flex items-center gap-4">
-      <span className={`grid place-items-center size-11 rounded-xl text-white bg-gradient-to-br ${tint}`}>
+      <span
+        className={`grid place-items-center size-11 rounded-xl text-white bg-gradient-to-br ${tint}`}
+      >
         <Icon className="size-5" />
       </span>
       <div>
@@ -165,7 +169,9 @@ function SummaryCard({
 }
 
 function FilterSelect({
-  value, onChange, options,
+  value,
+  onChange,
+  options,
 }: {
   value: string;
   onChange: (v: string) => void;
@@ -178,24 +184,34 @@ function FilterSelect({
       className="text-sm rounded-lg border border-border bg-background px-3 py-1.5 hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary/30"
     >
       {options.map((o) => (
-        <option key={o.value} value={o.value}>{o.label}</option>
+        <option key={o.value} value={o.value}>
+          {o.label}
+        </option>
       ))}
     </select>
   );
 }
 
 function TxnRow({
-  payment, open, onToggle,
-}: { payment: QRPayment; open: boolean; onToggle: () => void }) {
+  payment,
+  open,
+  onToggle,
+}: {
+  payment: QRPayment;
+  open: boolean;
+  onToggle: () => void;
+}) {
   return (
     <li className="bg-card">
       <button
-        type="button" onClick={onToggle}
+        type="button"
+        onClick={onToggle}
         className="w-full flex items-center gap-3 sm:gap-4 p-4 text-left hover:bg-muted/40 transition"
         aria-expanded={open}
       >
         <img
-          src={payment.shopThumbnail} alt=""
+          src={payment.shopThumbnail}
+          alt=""
           className="size-12 rounded-xl object-cover bg-muted shrink-0"
           loading="lazy"
         />
@@ -216,8 +232,8 @@ function TxnRow({
             {payment.rewardStatus === "credited"
               ? `+${payment.rewardEarned} pts`
               : payment.rewardStatus === "pending"
-              ? `${payment.rewardEarned} pts pending`
-              : "Reward failed"}
+                ? `${payment.rewardEarned} pts pending`
+                : "Reward failed"}
           </span>
         </div>
         <ChevronDown
@@ -230,7 +246,10 @@ function TxnRow({
           <div className="rounded-xl bg-muted/40 border border-border p-4 grid gap-3 sm:grid-cols-2 text-sm">
             <Detail label="Transaction ID" value={payment.txnId} mono />
             <Detail label="Payment Method" value={payment.paymentMethod} />
-            <Detail label="Date & Time" value={`${fmtDate(payment.dateTime)} · ${fmtTime(payment.dateTime)}`} />
+            <Detail
+              label="Date & Time"
+              value={`${fmtDate(payment.dateTime)} · ${fmtTime(payment.dateTime)}`}
+            />
             <Detail label="Amount Paid" value={fmtINR(payment.amount)} />
             <Detail
               label="Reward Earned"
@@ -238,8 +257,8 @@ function TxnRow({
                 payment.rewardStatus === "credited"
                   ? `${payment.rewardEarned} pts`
                   : payment.rewardStatus === "pending"
-                  ? `${payment.rewardEarned} pts (pending)`
-                  : "—"
+                    ? `${payment.rewardEarned} pts (pending)`
+                    : "—"
               }
             />
             <Detail label="Category" value={payment.category} />
@@ -247,7 +266,8 @@ function TxnRow({
             <div className="sm:col-span-2 flex justify-end pt-1">
               {payment.invoiceUrl ? (
                 <a
-                  href={payment.invoiceUrl} download
+                  href={payment.invoiceUrl}
+                  download
                   className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg border border-border bg-background hover:bg-muted transition"
                 >
                   <Download className="size-4" /> Download Invoice

@@ -43,7 +43,7 @@ if (LOG_DIR) {
 const REDACT_HEADERS = new Set(["authorization", "apikey", "x-connection-api-key", "cookie"]);
 function redactHeaders(headers) {
   const out = {};
-  const h = headers instanceof Headers ? Object.fromEntries(headers.entries()) : headers ?? {};
+  const h = headers instanceof Headers ? Object.fromEntries(headers.entries()) : (headers ?? {});
   for (const [k, v] of Object.entries(h)) {
     out[k] = REDACT_HEADERS.has(k.toLowerCase()) ? "[redacted]" : v;
   }
@@ -52,7 +52,8 @@ function redactHeaders(headers) {
 
 async function loggingFetch(input, init = {}) {
   const started = Date.now();
-  const method = init.method ?? (typeof input === "object" && "method" in input ? input.method : "GET");
+  const method =
+    init.method ?? (typeof input === "object" && "method" in input ? input.method : "GET");
   const url = typeof input === "string" ? input : input.url;
   let res, err;
   try {
@@ -181,8 +182,7 @@ async function createUser(label) {
     auth: { persistSession: false, autoRefreshToken: false },
   });
   const { data: sess, error: sErr } = await signIn.auth.signInWithPassword({ email, password });
-  if (sErr || !sess?.session)
-    throw new Error(`signIn ${label}: ${sErr?.message ?? "no session"}`);
+  if (sErr || !sess?.session) throw new Error(`signIn ${label}: ${sErr?.message ?? "no session"}`);
   return { id: data.user.id, email, accessToken: sess.session.access_token };
 }
 

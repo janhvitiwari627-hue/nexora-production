@@ -28,8 +28,7 @@ function PreviewRoute() {
     "professional-beauty": ["Makeup Studio", "Nail Studio", "Beauty Parlour", "Salon"],
   };
   const cats = pickFor[tplKey] ?? [];
-  const demo =
-    all.find((b) => cats.includes(b.category)) ?? all[0];
+  const demo = all.find((b) => cats.includes(b.category)) ?? all[0];
   const slug = demo?.slug ?? "demo";
   return (
     <>

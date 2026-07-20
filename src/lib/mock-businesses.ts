@@ -100,10 +100,36 @@ const COVERS: Record<CategoryName, string[]> = {
 };
 
 const NAME_PREFIXES = [
-  "Glow", "Royal", "Elite", "Bliss", "Aura", "Lotus", "Velvet", "Serene", "Urban",
-  "Luxe", "Pristine", "Opulent", "Mystique", "Crown", "Pearl", "Ivory", "Rose",
-  "Sapphire", "Marigold", "Jasmine", "Pink Petal", "Golden", "Mirage", "Bella",
-  "Studio 11", "Halo", "Vogue", "Charm", "Allure", "Radiance",
+  "Glow",
+  "Royal",
+  "Elite",
+  "Bliss",
+  "Aura",
+  "Lotus",
+  "Velvet",
+  "Serene",
+  "Urban",
+  "Luxe",
+  "Pristine",
+  "Opulent",
+  "Mystique",
+  "Crown",
+  "Pearl",
+  "Ivory",
+  "Rose",
+  "Sapphire",
+  "Marigold",
+  "Jasmine",
+  "Pink Petal",
+  "Golden",
+  "Mirage",
+  "Bella",
+  "Studio 11",
+  "Halo",
+  "Vogue",
+  "Charm",
+  "Allure",
+  "Radiance",
 ];
 
 const SUFFIX_BY_CAT: Record<CategoryName, string[]> = {
@@ -154,7 +180,10 @@ const GENDER_BY_CAT: Record<CategoryName, Seed["gender"]> = {
   "Barber Shop": "male",
 };
 
-const SERVICES_BY_CAT: Record<CategoryName, { name: string; mult: number; mins: number; desc: string }[]> = {
+const SERVICES_BY_CAT: Record<
+  CategoryName,
+  { name: string; mult: number; mins: number; desc: string }[]
+> = {
   Salon: [
     { name: "Haircut & Style", mult: 1, mins: 45, desc: "Expert cut & finish." },
     { name: "Hair Color", mult: 3.5, mins: 90, desc: "Global / highlights." },
@@ -320,7 +349,7 @@ export function getMockBusinesses(): MockBusiness[] {
   if (_catalog) return _catalog;
   const seen = new Set<string>();
   _catalog = buildSeeds().map((s) => {
-    let base = slugify(`${s.name}-${s.area}`);
+    const base = slugify(`${s.name}-${s.area}`);
     let slug = base;
     let n = 2;
     while (seen.has(slug)) slug = `${base}-${n++}`;
@@ -392,7 +421,7 @@ export function expandMockBusiness(b: MockBusiness): ShopData {
       id: `${b.slug}-s${i}`,
       name: s.name,
       price,
-      discountPrice: i % 3 === 0 ? Math.round(price * 0.85 / 10) * 10 : undefined,
+      discountPrice: i % 3 === 0 ? Math.round((price * 0.85) / 10) * 10 : undefined,
       duration: s.mins,
       desc: s.desc,
       image: pick(COVERS[b.category], i + 1),
@@ -412,12 +441,40 @@ export function expandMockBusiness(b: MockBusiness): ShopData {
     available: i !== 2,
   }));
 
-  const phone = `+91 99${String(7000000 + (b.slug.length * 9301 + 7) % 999999).slice(-7)}`;
+  const phone = `+91 99${String(7000000 + ((b.slug.length * 9301 + 7) % 999999)).slice(-7)}`;
   const reviews = [
-    { id: `${b.slug}-r1`, author: "Priya", rating: 5, text: "Loved the experience — staff is super professional!", date: "1w ago", source: "site" as const },
-    { id: `${b.slug}-r2`, author: "Riya", rating: 5, text: "Worth every rupee. Will visit again.", date: "2w ago", source: "google" as const },
-    { id: `${b.slug}-r3`, author: "Anjali", rating: 4, text: "Great ambience and friendly team.", date: "3w ago", source: "site" as const },
-    { id: `${b.slug}-r4`, author: "Sneha", rating: 5, text: "Best in Jaipur for this kind of service.", date: "1mo ago", source: "google" as const },
+    {
+      id: `${b.slug}-r1`,
+      author: "Priya",
+      rating: 5,
+      text: "Loved the experience — staff is super professional!",
+      date: "1w ago",
+      source: "site" as const,
+    },
+    {
+      id: `${b.slug}-r2`,
+      author: "Riya",
+      rating: 5,
+      text: "Worth every rupee. Will visit again.",
+      date: "2w ago",
+      source: "google" as const,
+    },
+    {
+      id: `${b.slug}-r3`,
+      author: "Anjali",
+      rating: 4,
+      text: "Great ambience and friendly team.",
+      date: "3w ago",
+      source: "site" as const,
+    },
+    {
+      id: `${b.slug}-r4`,
+      author: "Sneha",
+      rating: 5,
+      text: "Best in Jaipur for this kind of service.",
+      date: "1mo ago",
+      source: "google" as const,
+    },
   ];
 
   return {
@@ -440,12 +497,28 @@ export function expandMockBusiness(b: MockBusiness): ShopData {
     reviews,
     faqs: [
       { q: "Do you accept walk-ins?", a: "Yes, but we recommend booking ahead." },
-      { q: "Do you have offers for first-time customers?", a: "Yes — 15% off on your first visit." },
-      { q: "What's your cancellation policy?", a: "Free cancellation up to 2 hours before your slot." },
+      {
+        q: "Do you have offers for first-time customers?",
+        a: "Yes — 15% off on your first visit.",
+      },
+      {
+        q: "What's your cancellation policy?",
+        a: "Free cancellation up to 2 hours before your slot.",
+      },
     ],
     offers: [
-      { id: `${b.slug}-o1`, title: "First Visit", description: "15% off your first booking", discount: "15%" },
-      { id: `${b.slug}-o2`, title: "Weekday Glow", description: "10% off Mon–Thu services", discount: "10%" },
+      {
+        id: `${b.slug}-o1`,
+        title: "First Visit",
+        description: "15% off your first booking",
+        discount: "15%",
+      },
+      {
+        id: `${b.slug}-o2`,
+        title: "Weekday Glow",
+        description: "10% off Mon–Thu services",
+        discount: "10%",
+      },
     ],
     packages: [
       {
@@ -458,11 +531,32 @@ export function expandMockBusiness(b: MockBusiness): ShopData {
       },
     ],
     memberships: [
-      { id: `${b.slug}-m1`, tier: "Silver", price: 499, benefits: ["5% off all services", "Priority booking"] },
-      { id: `${b.slug}-m2`, tier: "Gold", price: 999, benefits: ["10% off all", "1 free service/month", "Birthday voucher"], popular: true },
-      { id: `${b.slug}-m3`, tier: "Platinum", price: 1999, benefits: ["15% off", "Home visits", "VIP concierge"] },
+      {
+        id: `${b.slug}-m1`,
+        tier: "Silver",
+        price: 499,
+        benefits: ["5% off all services", "Priority booking"],
+      },
+      {
+        id: `${b.slug}-m2`,
+        tier: "Gold",
+        price: 999,
+        benefits: ["10% off all", "1 free service/month", "Birthday voucher"],
+        popular: true,
+      },
+      {
+        id: `${b.slug}-m3`,
+        tier: "Platinum",
+        price: 1999,
+        benefits: ["15% off", "Home visits", "VIP concierge"],
+      },
     ],
-    loyalty: { pointsPerVisit: 50, referralPoints: 200, birthdayReward: "Free service worth ₹999", festivalReward: "Up to 25% off festival packs" },
+    loyalty: {
+      pointsPerVisit: 50,
+      referralPoints: 200,
+      birthdayReward: "Free service worth ₹999",
+      festivalReward: "Up to 25% off festival packs",
+    },
     blog: [],
     coupons: [
       { id: `${b.slug}-c1`, code: "WELCOME15", discount: "15% off" },
@@ -472,8 +566,16 @@ export function expandMockBusiness(b: MockBusiness): ShopData {
     brands: [{ name: "L'Oréal" }, { name: "Schwarzkopf" }, { name: "Wella" }, { name: "Olaplex" }],
     beforeAfter: [],
     testimonials: [
-      { id: `${b.slug}-t1`, author: "Aarav M.", text: `${b.name} is my go-to in ${b.area} — never disappoints.` },
-      { id: `${b.slug}-t2`, author: "Neha R.", text: "Hygiene is top-notch and staff is truly skilled." },
+      {
+        id: `${b.slug}-t1`,
+        author: "Aarav M.",
+        text: `${b.name} is my go-to in ${b.area} — never disappoints.`,
+      },
+      {
+        id: `${b.slug}-t2`,
+        author: "Neha R.",
+        text: "Hygiene is top-notch and staff is truly skilled.",
+      },
     ],
     socialLinks: {
       instagram: `https://instagram.com/${b.slug}`,
@@ -486,6 +588,9 @@ export function expandMockBusiness(b: MockBusiness): ShopData {
       open: "10:00",
       close: d === "Sun" ? "20:00" : "21:00",
     })),
-    location: { lat: 26.9124 + ((b.slug.length % 9) - 4) * 0.01, lng: 75.7873 + ((b.slug.length % 11) - 5) * 0.01 },
+    location: {
+      lat: 26.9124 + ((b.slug.length % 9) - 4) * 0.01,
+      lng: 75.7873 + ((b.slug.length % 11) - 5) * 0.01,
+    },
   };
 }

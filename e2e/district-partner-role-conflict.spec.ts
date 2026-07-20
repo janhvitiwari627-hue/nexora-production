@@ -35,8 +35,6 @@ const test = base.extend<{ harPath: string }>({
   },
 });
 
-
-
 /**
  * Verifies the "one email = one role" guard on the District Partner signup
  * flow (/register?role=district_partner).
@@ -74,10 +72,7 @@ async function gotoDistrictPartnerSignup(page: Page) {
 }
 
 test.describe("/register?role=district_partner — one-email-one-role guard", () => {
-  test.skip(
-    !EXISTING_EMAIL,
-    "SUPABASE_E2E_EXISTING_EMAIL not set; skipping role-conflict test.",
-  );
+  test.skip(!EXISTING_EMAIL, "SUPABASE_E2E_EXISTING_EMAIL not set; skipping role-conflict test.");
 
   test("blocks signup and shows the friendly role-conflict message when the email is already registered under another role", async ({
     page,
@@ -91,18 +86,14 @@ test.describe("/register?role=district_partner — one-email-one-role guard", ()
     await page.getByLabel(/Confirm password/i).fill("StrongP@ss123");
     await page.getByLabel(/^District$/i).fill("Test District");
 
-    await page
-      .getByRole("button", { name: /Apply as District Partner|Create account/i })
-      .click();
+    await page.getByRole("button", { name: /Apply as District Partner|Create account/i }).click();
 
     const alert = page.getByRole("alert").filter({ hasText: /already registered as/i });
     await expect(alert).toBeVisible({ timeout: 15_000 });
 
     const text = ((await alert.textContent()) ?? "").trim();
     // Friendly message mentions the EXISTING role and the ATTEMPTED role.
-    expect(text).toMatch(
-      new RegExp(`already registered as ${EXISTING_ROLE_LABEL}`, "i"),
-    );
+    expect(text).toMatch(new RegExp(`already registered as ${EXISTING_ROLE_LABEL}`, "i"));
     expect(text).toMatch(/District Partner/i);
     // MUST NOT leak raw JSON / `{}`.
     expect(text).not.toBe("{}");

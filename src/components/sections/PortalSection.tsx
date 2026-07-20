@@ -1,5 +1,15 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Building2, Megaphone, Package, Star, Tag, Target, Truck, Users } from "lucide-react";
+import {
+  ArrowRight,
+  Building2,
+  Megaphone,
+  Package,
+  Star,
+  Tag,
+  Target,
+  Truck,
+  Users,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const ITEMS = [
@@ -27,17 +37,29 @@ export function PortalSection() {
               Distributor & Brand Portal
             </h2>
             <p className="mt-3 max-w-xl text-body">
-              Promote your brand, products and distribution network across thousands of beauty businesses on Nexora.
+              Promote your brand, products and distribution network across thousands of beauty
+              businesses on Nexora.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
-              <Button asChild className="bg-gradient-cta text-primary-foreground"><Link to="/portal/brands/register">Register as Brand</Link></Button>
-              <Button asChild variant="outline"><Link to="/portal/distributors/register">Register as Distributor</Link></Button>
-              <Button asChild variant="ghost"><Link to="/portal">Explore Directory <ArrowRight className="ml-1 h-4 w-4" /></Link></Button>
+              <Button asChild className="bg-gradient-cta text-primary-foreground">
+                <Link to="/portal/brands/register">Register as Brand</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/portal/distributors/register">Register as Distributor</Link>
+              </Button>
+              <Button asChild variant="ghost">
+                <Link to="/portal">
+                  Explore Directory <ArrowRight className="ml-1 h-4 w-4" />
+                </Link>
+              </Button>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
             {ITEMS.map((it) => (
-              <div key={it.label} className="flex items-center gap-2 rounded-xl border border-border/60 bg-background/60 p-3">
+              <div
+                key={it.label}
+                className="flex items-center gap-2 rounded-xl border border-border/60 bg-background/60 p-3"
+              >
                 <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-cta text-primary-foreground">
                   <it.icon className="h-4 w-4" />
                 </div>

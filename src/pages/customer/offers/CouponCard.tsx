@@ -10,8 +10,7 @@ const fmtDate = (iso: string) =>
     year: "numeric",
   });
 
-const daysLeft = (iso: string) =>
-  Math.ceil((new Date(iso).getTime() - Date.now()) / 86400000);
+const daysLeft = (iso: string) => Math.ceil((new Date(iso).getTime() - Date.now()) / 86400000);
 
 export function CouponCard({ coupon }: { coupon: Coupon }) {
   const expired = coupon.category === "expired";
@@ -44,9 +43,7 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
           <div className="flex items-start justify-between gap-3">
             <div>
               <h3 className="font-semibold text-foreground">{coupon.title}</h3>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                {coupon.description}
-              </p>
+              <p className="text-sm text-muted-foreground mt-0.5">{coupon.description}</p>
             </div>
             {urgent && (
               <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300 px-2 py-0.5 rounded-full">

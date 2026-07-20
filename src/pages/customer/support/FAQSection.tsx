@@ -17,9 +17,7 @@ export function FAQSection() {
     return FAQS.filter((f) => {
       const matchCat = activeCat === "All" || f.category === activeCat;
       const matchQ =
-        !term ||
-        f.question.toLowerCase().includes(term) ||
-        f.answer.toLowerCase().includes(term);
+        !term || f.question.toLowerCase().includes(term) || f.answer.toLowerCase().includes(term);
       return matchCat && matchQ;
     });
   }, [q, activeCat]);
@@ -70,9 +68,7 @@ export function FAQSection() {
       <div className="mt-5 space-y-5">
         {FAQ_CATEGORIES.filter((c) => grouped.has(c)).map((cat) => (
           <div key={cat}>
-            <h3 className="text-heading mb-1 text-sm font-bold uppercase tracking-wide">
-              {cat}
-            </h3>
+            <h3 className="text-heading mb-1 text-sm font-bold uppercase tracking-wide">{cat}</h3>
             <Accordion type="single" collapsible className="border-border rounded-xl border px-4">
               {(grouped.get(cat) ?? []).map((f) => (
                 <AccordionItem key={f.id} value={f.id}>

@@ -27,10 +27,7 @@ test("simulated redeploy: browser fetches new manifest + icon URLs", async ({ pa
   // Visit 1: capture the currently-deployed manifest + icon URLs.
   await page.goto("/", { waitUntil: "domcontentloaded" });
 
-  const manifestHref = await page
-    .locator("link[rel='manifest']")
-    .first()
-    .getAttribute("href");
+  const manifestHref = await page.locator("link[rel='manifest']").first().getAttribute("href");
   expect(manifestHref).toBeTruthy();
   const manifestUrl = new URL(manifestHref!, page.url()).toString();
 
@@ -48,7 +45,10 @@ test("simulated redeploy: browser fetches new manifest + icon URLs", async ({ pa
   // keep serving the old manifest after a deploy.
   const cc = (beforeResp.headers()["cache-control"] ?? "").toLowerCase();
   expect(
-    cc.includes("no-cache") || cc.includes("no-store") || cc.includes("must-revalidate") || cc.includes("max-age=0"),
+    cc.includes("no-cache") ||
+      cc.includes("no-store") ||
+      cc.includes("must-revalidate") ||
+      cc.includes("max-age=0"),
     `manifest cache-control must revalidate; got "${cc}"`,
   ).toBe(true);
 
@@ -92,9 +92,7 @@ test("simulated redeploy: browser fetches new manifest + icon URLs", async ({ pa
 
   const afterIcons = (afterResp.body as { icons: Array<{ src: string }> }).icons;
   const afterIconUrls = afterIcons.map((i) => i.src);
-  expect(afterIconUrls).toEqual(
-    beforeIconUrls.map((u) => u.replace(UUID_RE, NEW_UUID)),
-  );
+  expect(afterIconUrls).toEqual(beforeIconUrls.map((u) => u.replace(UUID_RE, NEW_UUID)));
   for (const src of afterIconUrls) {
     expect(src).toContain(NEW_UUID);
     expect(src).not.toContain(beforeUuid!);
@@ -106,7 +104,8 @@ test("simulated redeploy: browser fetches new manifest + icon URLs", async ({ pa
   // UUIDs in the manifest. Stale HTTP caches can't win because the
   // manifest is served no-cache and the icon URLs themselves change.
   for (const src of afterIconUrls) {
-    expect(src, "post-deploy manifest must not still reference the old UUID").not.toContain(beforeUuid!);
+    expect(src, "post-deploy manifest must not still reference the old UUID").not.toContain(
+      beforeUuid!,
+    );
   }
-
 });

@@ -56,21 +56,86 @@ export const PROFILE = {
 };
 
 export const ADDRESSES: Address[] = [
-  { id: "a1", label: "Home", line1: "B-204, Skyline Residency, HSR Layout", city: "Bengaluru", state: "Karnataka", pincode: "560102", isDefault: true },
-  { id: "a2", label: "Work", line1: "5th Floor, Innov8, Koramangala", city: "Bengaluru", state: "Karnataka", pincode: "560034", isDefault: false },
+  {
+    id: "a1",
+    label: "Home",
+    line1: "B-204, Skyline Residency, HSR Layout",
+    city: "Bengaluru",
+    state: "Karnataka",
+    pincode: "560102",
+    isDefault: true,
+  },
+  {
+    id: "a2",
+    label: "Work",
+    line1: "5th Floor, Innov8, Koramangala",
+    city: "Bengaluru",
+    state: "Karnataka",
+    pincode: "560034",
+    isDefault: false,
+  },
 ];
 
 export const ACTIVE_DEVICES: ActiveDevice[] = [
-  { id: "d1", device: "iPhone 15 Pro", browser: "Safari", location: "Bengaluru, IN", lastSeen: "2026-06-19T11:14:00Z", current: true },
-  { id: "d2", device: "MacBook Pro", browser: "Chrome 128", location: "Bengaluru, IN", lastSeen: "2026-06-18T20:02:00Z", current: false },
-  { id: "d3", device: "Pixel 8", browser: "Chrome Mobile", location: "Mumbai, IN", lastSeen: "2026-06-14T08:30:00Z", current: false },
+  {
+    id: "d1",
+    device: "iPhone 15 Pro",
+    browser: "Safari",
+    location: "Bengaluru, IN",
+    lastSeen: "2026-06-19T11:14:00Z",
+    current: true,
+  },
+  {
+    id: "d2",
+    device: "MacBook Pro",
+    browser: "Chrome 128",
+    location: "Bengaluru, IN",
+    lastSeen: "2026-06-18T20:02:00Z",
+    current: false,
+  },
+  {
+    id: "d3",
+    device: "Pixel 8",
+    browser: "Chrome Mobile",
+    location: "Mumbai, IN",
+    lastSeen: "2026-06-14T08:30:00Z",
+    current: false,
+  },
 ];
 
 export const LOGIN_HISTORY: LoginEntry[] = [
-  { id: "l1", at: "2026-06-19T11:14:00Z", device: "iPhone 15 Pro · Safari", ip: "103.21.x.x", location: "Bengaluru, IN", status: "success" },
-  { id: "l2", at: "2026-06-18T20:02:00Z", device: "MacBook Pro · Chrome", ip: "103.21.x.x", location: "Bengaluru, IN", status: "success" },
-  { id: "l3", at: "2026-06-17T07:45:00Z", device: "Unknown · Firefox", ip: "45.118.x.x", location: "Hyderabad, IN", status: "failed" },
-  { id: "l4", at: "2026-06-14T08:30:00Z", device: "Pixel 8 · Chrome Mobile", ip: "49.207.x.x", location: "Mumbai, IN", status: "success" },
+  {
+    id: "l1",
+    at: "2026-06-19T11:14:00Z",
+    device: "iPhone 15 Pro · Safari",
+    ip: "103.21.x.x",
+    location: "Bengaluru, IN",
+    status: "success",
+  },
+  {
+    id: "l2",
+    at: "2026-06-18T20:02:00Z",
+    device: "MacBook Pro · Chrome",
+    ip: "103.21.x.x",
+    location: "Bengaluru, IN",
+    status: "success",
+  },
+  {
+    id: "l3",
+    at: "2026-06-17T07:45:00Z",
+    device: "Unknown · Firefox",
+    ip: "45.118.x.x",
+    location: "Hyderabad, IN",
+    status: "failed",
+  },
+  {
+    id: "l4",
+    at: "2026-06-14T08:30:00Z",
+    device: "Pixel 8 · Chrome Mobile",
+    ip: "49.207.x.x",
+    location: "Mumbai, IN",
+    status: "success",
+  },
 ];
 
 export const UPI_IDS: UpiId[] = [

@@ -21,10 +21,34 @@ const kpis = [
 const chartData = [45, 62, 38, 74, 56, 88, 72, 94, 68, 84, 58, 96];
 
 const transactions = [
-  { id: "#TRX-9821", customer: "Aanya Sharma", service: "Bridal Makeup", amount: "₹8,500", status: "Completed" },
-  { id: "#TRX-9820", customer: "Rohit Meena", service: "Haircut + Beard", amount: "₹650", status: "Completed" },
-  { id: "#TRX-9819", customer: "Priya Gupta", service: "Spa Therapy", amount: "₹2,400", status: "Upcoming" },
-  { id: "#TRX-9818", customer: "Kunal Singh", service: "Tattoo Session", amount: "₹4,000", status: "Completed" },
+  {
+    id: "#TRX-9821",
+    customer: "Aanya Sharma",
+    service: "Bridal Makeup",
+    amount: "₹8,500",
+    status: "Completed",
+  },
+  {
+    id: "#TRX-9820",
+    customer: "Rohit Meena",
+    service: "Haircut + Beard",
+    amount: "₹650",
+    status: "Completed",
+  },
+  {
+    id: "#TRX-9819",
+    customer: "Priya Gupta",
+    service: "Spa Therapy",
+    amount: "₹2,400",
+    status: "Upcoming",
+  },
+  {
+    id: "#TRX-9818",
+    customer: "Kunal Singh",
+    service: "Tattoo Session",
+    amount: "₹4,000",
+    status: "Completed",
+  },
 ];
 
 export default function ShopOwnerDashboard() {
@@ -40,8 +64,8 @@ export default function ShopOwnerDashboard() {
               Your business command center.
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-500">
-              Track revenue, manage bookings, and grow faster with Stripe-inspired
-              analytics built for India's beauty industry.
+              Track revenue, manage bookings, and grow faster with Stripe-inspired analytics built
+              for India's beauty industry.
             </p>
           </div>
         </FadeIn>
@@ -57,9 +81,7 @@ export default function ShopOwnerDashboard() {
                   </div>
                   <span
                     className={`inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-bold ${
-                      kpi.up
-                        ? "bg-emerald-50 text-emerald-600"
-                        : "bg-rose-50 text-rose-600"
+                      kpi.up ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"
                     }`}
                   >
                     {kpi.up ? (

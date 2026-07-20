@@ -19,13 +19,7 @@ export const SHOP_TABS = [
 
 export type ShopTab = (typeof SHOP_TABS)[number];
 
-export function TabNav({
-  active,
-  onChange,
-}: {
-  active: ShopTab;
-  onChange: (t: ShopTab) => void;
-}) {
+export function TabNav({ active, onChange }: { active: ShopTab; onChange: (t: ShopTab) => void }) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

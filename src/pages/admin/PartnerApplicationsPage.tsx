@@ -66,14 +66,20 @@ type KycReview = {
 
 function extractKycReview(app: { metadata: Record<string, unknown> | null }): KycReview {
   const m = app.metadata;
-  const fallback: KycReview = { status: "pending", notes: "", reviewed_at: null, reviewed_by: null };
+  const fallback: KycReview = {
+    status: "pending",
+    notes: "",
+    reviewed_at: null,
+    reviewed_by: null,
+  };
   if (!m || typeof m !== "object") return fallback;
   const kyc = (m as Record<string, unknown>).kyc_review;
   if (!kyc || typeof kyc !== "object") return fallback;
   const k = kyc as Record<string, unknown>;
-  const status = typeof k.status === "string" && (KYC_STATUSES as readonly string[]).includes(k.status)
-    ? (k.status as KycStatus)
-    : "pending";
+  const status =
+    typeof k.status === "string" && (KYC_STATUSES as readonly string[]).includes(k.status)
+      ? (k.status as KycStatus)
+      : "pending";
   return {
     status,
     notes: typeof k.notes === "string" ? k.notes : "",
@@ -87,7 +93,6 @@ const KYC_TONE: Record<KycStatus, string> = {
   approved: "bg-emerald-100 text-emerald-700 border-emerald-200",
   rejected: "bg-red-100 text-red-700 border-red-200",
 };
-
 
 const STATUSES = ["pending", "verified", "rejected", "suspended"] as const;
 type Status = (typeof STATUSES)[number];
@@ -125,7 +130,11 @@ export function PartnerApplicationsPage() {
   const [rejectReason, setRejectReason] = useState("");
   const [rejectOpen, setRejectOpen] = useState<PartnerApp | null>(null);
   const [kycNotesDraft, setKycNotesDraft] = useState("");
-  const [kycConfirm, setKycConfirm] = useState<{ app: PartnerApp; status: KycStatus; notes: string } | null>(null);
+  const [kycConfirm, setKycConfirm] = useState<{
+    app: PartnerApp;
+    status: KycStatus;
+    notes: string;
+  } | null>(null);
   const [kycRejectReason, setKycRejectReason] = useState("");
   const [kycRejectReasonError, setKycRejectReasonError] = useState<string | null>(null);
 
@@ -134,7 +143,6 @@ export function PartnerApplicationsPage() {
     if (current === next) return;
     setKycConfirm({ app, status: next, notes });
   };
-
 
   const { data = [], isLoading } = useQuery({
     queryKey: ["admin", "partner-applications-dbp"],
@@ -162,7 +170,8 @@ export function PartnerApplicationsPage() {
       if (status !== "all" && l.status !== status) return false;
       if (district !== "all" && (l.district ?? "").trim() !== district) return false;
       if (query) {
-        const hay = `${l.full_name} ${l.mobile ?? ""} ${l.email ?? ""} ${l.tagline ?? ""}`.toLowerCase();
+        const hay =
+          `${l.full_name} ${l.mobile ?? ""} ${l.email ?? ""} ${l.tagline ?? ""}`.toLowerCase();
         if (!hay.includes(query)) return false;
       }
       return true;
@@ -247,7 +256,6 @@ export function PartnerApplicationsPage() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
-
 
   useEffect(() => {
     if (detail) setKycNotesDraft(extractKycReview(detail).notes);
@@ -458,18 +466,12 @@ export function PartnerApplicationsPage() {
                             <div className="flex justify-end gap-2">
                               <Button
                                 size="sm"
-                                onClick={() =>
-                                  review.mutate({ id: l.id, approve: true })
-                                }
+                                onClick={() => review.mutate({ id: l.id, approve: true })}
                                 disabled={review.isPending}
                               >
                                 Approve
                               </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => setRejectOpen(l)}
-                              >
+                              <Button size="sm" variant="outline" onClick={() => setRejectOpen(l)}>
                                 Reject
                               </Button>
                             </div>
@@ -478,9 +480,7 @@ export function PartnerApplicationsPage() {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() =>
-                                suspend.mutate({ id: l.id, next: "suspended" })
-                              }
+                              onClick={() => suspend.mutate({ id: l.id, next: "suspended" })}
                               disabled={suspend.isPending}
                             >
                               Suspend
@@ -490,20 +490,14 @@ export function PartnerApplicationsPage() {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() =>
-                                suspend.mutate({ id: l.id, next: "verified" })
-                              }
+                              onClick={() => suspend.mutate({ id: l.id, next: "verified" })}
                               disabled={suspend.isPending}
                             >
                               Reactivate
                             </Button>
                           )}
                           {l.status === "rejected" && (
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => setDetail(l)}
-                            >
+                            <Button size="sm" variant="ghost" onClick={() => setDetail(l)}>
                               View
                             </Button>
                           )}
@@ -575,9 +569,7 @@ export function PartnerApplicationsPage() {
                   variant="inline"
                 />
                 <div className="space-y-2">
-                  <div className="text-xs font-semibold text-muted-foreground">
-                    Reviewer notes
-                  </div>
+                  <div className="text-xs font-semibold text-muted-foreground">Reviewer notes</div>
                   <Textarea
                     value={kycNotesDraft}
                     onChange={(e) => setKycNotesDraft(e.target.value)}
@@ -591,11 +583,15 @@ export function PartnerApplicationsPage() {
                         <Button
                           key={s}
                           size="sm"
-                          variant={s === "approved" ? "default" : s === "rejected" ? "destructive" : "outline"}
-                          disabled={setKyc.isPending}
-                          onClick={() =>
-                            requestKycChange(detail, s, kycNotesDraft.trim())
+                          variant={
+                            s === "approved"
+                              ? "default"
+                              : s === "rejected"
+                                ? "destructive"
+                                : "outline"
                           }
+                          disabled={setKyc.isPending}
+                          onClick={() => requestKycChange(detail, s, kycNotesDraft.trim())}
                         >
                           {current && "✓ "}Mark {s}
                         </Button>
@@ -687,8 +683,8 @@ export function PartnerApplicationsPage() {
               {kycConfirm?.status === "approved"
                 ? "Approve KYC document?"
                 : kycConfirm?.status === "rejected"
-                ? "Reject KYC document?"
-                : "Mark KYC as pending?"}
+                  ? "Reject KYC document?"
+                  : "Mark KYC as pending?"}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {kycConfirm && (
@@ -720,13 +716,20 @@ export function PartnerApplicationsPage() {
                 placeholder="Explain why this KYC is being rejected (e.g. Aadhaar blurry, name mismatch, expired document)…"
                 aria-invalid={!!kycRejectReasonError}
                 aria-describedby="kyc-reject-reason-help"
-                className={kycRejectReasonError ? "border-destructive focus-visible:ring-destructive" : ""}
+                className={
+                  kycRejectReasonError ? "border-destructive focus-visible:ring-destructive" : ""
+                }
               />
               <div id="kyc-reject-reason-help" className="flex justify-between text-xs">
-                <span className={kycRejectReasonError ? "text-destructive" : "text-muted-foreground"}>
-                  {kycRejectReasonError ?? "Required — shared with the applicant and saved in reviewer notes."}
+                <span
+                  className={kycRejectReasonError ? "text-destructive" : "text-muted-foreground"}
+                >
+                  {kycRejectReasonError ??
+                    "Required — shared with the applicant and saved in reviewer notes."}
                 </span>
-                <span className="text-muted-foreground tabular-nums">{kycRejectReason.length}/500</span>
+                <span className="text-muted-foreground tabular-nums">
+                  {kycRejectReason.length}/500
+                </span>
               </div>
             </div>
           )}
@@ -750,7 +753,7 @@ export function PartnerApplicationsPage() {
                     setKycRejectReasonError(
                       reason.length === 0
                         ? "Please enter a rejection reason before confirming."
-                        : "Reason must be at least 5 characters."
+                        : "Reason must be at least 5 characters.",
                     );
                     return;
                   }

@@ -15,7 +15,11 @@ export function RankingsManagementPage() {
   const runRecompute = useServerFn(triggerRankingRecompute);
   const [filter, setFilter] = useState("");
 
-  const { data: salons, isLoading, error } = useQuery({
+  const {
+    data: salons,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["admin", "rankings"],
     queryFn: () => fetchLeaderboard(),
   });
@@ -59,7 +63,11 @@ export function RankingsManagementPage() {
           </p>
         </div>
         <Button onClick={() => mutation.mutate()} disabled={mutation.isPending}>
-          {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+          {mutation.isPending ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <RefreshCw className="h-4 w-4" />
+          )}
           Recompute now
         </Button>
       </header>
@@ -109,7 +117,8 @@ export function RankingsManagementPage() {
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-medium text-heading">{s.name}</p>
                         <p className="truncate text-xs text-muted-foreground">
-                          {s.category ?? "Salon"} · ★ {s.rating?.toFixed(1) ?? "—"} ({s.reviews_count ?? 0})
+                          {s.category ?? "Salon"} · ★ {s.rating?.toFixed(1) ?? "—"} (
+                          {s.reviews_count ?? 0})
                         </p>
                       </div>
                       <Badge variant="outline" className="font-mono">

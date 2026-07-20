@@ -13,8 +13,7 @@ export const Route = createFileRoute("/growth-partner")({
       { property: "og:title", content: "Nexora Growth Partner Program" },
       {
         property: "og:description",
-        content:
-          "Own your district. Onboard salons. Earn recurring income with Nexora SalonOS.",
+        content: "Own your district. Onboard salons. Earn recurring income with Nexora SalonOS.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

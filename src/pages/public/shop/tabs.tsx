@@ -1,6 +1,11 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Lightbox } from "@/components/shared/Lightbox";
 import { Modal } from "@/components/shared/Modal";
 import { ReviewCard } from "@/components/shared/ReviewCard";
@@ -135,14 +140,22 @@ function MiniMap({ lat, lng, address }: { lat: number; lng: number; address: str
       <div
         className="relative h-48 w-full"
         style={{
-          background:
-            "linear-gradient(135deg,#dbeafe 0%,#e0e7ff 50%,#fce7f3 100%)",
+          background: "linear-gradient(135deg,#dbeafe 0%,#e0e7ff 50%,#fce7f3 100%)",
         }}
       >
         <svg viewBox="0 0 400 200" className="absolute inset-0 h-full w-full opacity-30">
-          <path d="M0 100 Q100 60 200 100 T400 100" stroke="#0A2540" strokeWidth="1.5" fill="none" />
+          <path
+            d="M0 100 Q100 60 200 100 T400 100"
+            stroke="#0A2540"
+            strokeWidth="1.5"
+            fill="none"
+          />
           <path d="M0 140 Q100 100 200 140 T400 140" stroke="#0A2540" strokeWidth="1" fill="none" />
-          <path d="M50 0 L50 200 M150 0 L150 200 M250 0 L250 200 M350 0 L350 200" stroke="#0A2540" strokeWidth="0.5" />
+          <path
+            d="M50 0 L50 200 M150 0 L150 200 M250 0 L250 200 M350 0 L350 200"
+            stroke="#0A2540"
+            strokeWidth="0.5"
+          />
         </svg>
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full">
           <div className="bg-primary text-primary-foreground grid h-9 w-9 place-items-center rounded-full shadow-lg ring-4 ring-white">
@@ -175,9 +188,7 @@ export function ServicesTab({ shop }: { shop: MockShop }) {
     return shop.service_categories
       .map((c) => ({
         ...c,
-        items: term
-          ? c.items.filter((i) => i.name.toLowerCase().includes(term))
-          : c.items,
+        items: term ? c.items.filter((i) => i.name.toLowerCase().includes(term)) : c.items,
       }))
       .filter((c) => c.items.length > 0);
   }, [q, shop.service_categories]);
@@ -212,7 +223,8 @@ export function ServicesTab({ shop }: { shop: MockShop }) {
                     onToggle={(id, next) => {
                       setSelected((prev) => {
                         const n = new Set(prev);
-                        next ? n.add(id) : n.delete(id);
+                        if (next) n.add(id);
+                        else n.delete(id);
                         return n;
                       });
                     }}
@@ -277,12 +289,7 @@ export function GalleryTab({ shop }: { shop: MockShop }) {
               onClick={() => setLightboxIndex(i)}
               className="mb-3 block w-full overflow-hidden rounded-2xl"
             >
-              <img
-                src={p}
-                alt=""
-                loading="lazy"
-                className="w-full transition hover:scale-105"
-              />
+              <img src={p} alt="" loading="lazy" className="w-full transition hover:scale-105" />
             </button>
           ))}
         </div>
@@ -343,7 +350,9 @@ export function ReviewsTab({ shop }: { shop: MockShop }) {
     return counts;
   }, [shop.reviews]);
   const total = shop.reviews.length || 1;
-  const visible = filter ? shop.reviews.filter((r) => Math.round(r.rating) === filter) : shop.reviews;
+  const visible = filter
+    ? shop.reviews.filter((r) => Math.round(r.rating) === filter)
+    : shop.reviews;
 
   return (
     <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
@@ -371,7 +380,10 @@ export function ReviewsTab({ shop }: { shop: MockShop }) {
                 <span className="w-3 font-semibold text-heading">{r}</span>
                 <Star className="h-3 w-3 fill-warning text-warning" />
                 <div className="bg-muted relative h-2 flex-1 overflow-hidden rounded-full">
-                  <div className="bg-gradient-cta absolute inset-y-0 left-0" style={{ width: `${pct}%` }} />
+                  <div
+                    className="bg-gradient-cta absolute inset-y-0 left-0"
+                    style={{ width: `${pct}%` }}
+                  />
                 </div>
                 <span className="text-muted-foreground w-6 text-right">{breakdown[r - 1]}</span>
               </button>
@@ -465,10 +477,15 @@ export function MembershipTab({ shop }: { shop: MockShop }) {
             savings_inr: tier === "Platinum" ? 18000 : tier === "Gold" ? 9000 : 3500,
             benefits:
               tier === "Platinum"
-                ? ["25% off all services", "Priority booking", "Free monthly facial", "Birthday gift"]
+                ? [
+                    "25% off all services",
+                    "Priority booking",
+                    "Free monthly facial",
+                    "Birthday gift",
+                  ]
                 : tier === "Gold"
-                ? ["15% off all services", "Priority booking", "Birthday gift"]
-                : ["10% off all services", "Member events"],
+                  ? ["15% off all services", "Priority booking", "Birthday gift"]
+                  : ["10% off all services", "Member events"],
             is_active: true,
           }}
         />
@@ -599,10 +616,28 @@ export function FAQsTab({ shop }: { shop: MockShop }) {
 export function ContactTab({ shop }: { shop: MockShop }) {
   const waNum = shop.whatsapp.replace(/\D/g, "");
   const items = [
-    { icon: Phone, label: "Phone", value: shop.phone, href: `tel:${shop.phone.replace(/\s/g, "")}`, cta: "Call" },
-    { icon: MessageCircle, label: "WhatsApp", value: shop.whatsapp, href: `https://wa.me/${waNum}`, cta: "Chat" },
+    {
+      icon: Phone,
+      label: "Phone",
+      value: shop.phone,
+      href: `tel:${shop.phone.replace(/\s/g, "")}`,
+      cta: "Call",
+    },
+    {
+      icon: MessageCircle,
+      label: "WhatsApp",
+      value: shop.whatsapp,
+      href: `https://wa.me/${waNum}`,
+      cta: "Chat",
+    },
     { icon: Mail, label: "Email", value: shop.email, href: `mailto:${shop.email}`, cta: "Mail" },
-    { icon: Globe, label: "Website", value: shop.website.replace(/^https?:\/\//, ""), href: shop.website, cta: "Visit" },
+    {
+      icon: Globe,
+      label: "Website",
+      value: shop.website.replace(/^https?:\/\//, ""),
+      href: shop.website,
+      cta: "Visit",
+    },
     { icon: Clock, label: "Hours", value: shop.open_hours },
     { icon: MapPin, label: "Address", value: shop.address },
   ];
@@ -618,7 +653,9 @@ export function ContactTab({ shop }: { shop: MockShop }) {
               <Icon className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <div className="text-muted-foreground text-[11px] uppercase tracking-wider">{label}</div>
+              <div className="text-muted-foreground text-[11px] uppercase tracking-wider">
+                {label}
+              </div>
               <div className="text-heading truncate text-sm font-semibold">{value}</div>
             </div>
           </div>

@@ -71,7 +71,10 @@ function OwnerPendingPage() {
           ) : (
             <div className="rounded-lg border border-dashed p-4 text-center text-sm text-muted-foreground">
               No salon registered yet.{" "}
-              <Link to="/owner/onboarding" className="text-primary underline-offset-4 hover:underline">
+              <Link
+                to="/owner/onboarding"
+                className="text-primary underline-offset-4 hover:underline"
+              >
                 Register your business
               </Link>
               .
@@ -81,8 +84,8 @@ function OwnerPendingPage() {
           <div className="flex items-start gap-3 rounded-lg bg-muted/40 p-3 text-sm text-muted-foreground">
             <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
             <div>
-              While you wait, you can continue using your customer account. We'll notify you the moment your owner access
-              is approved.
+              While you wait, you can continue using your customer account. We'll notify you the
+              moment your owner access is approved.
             </div>
           </div>
 

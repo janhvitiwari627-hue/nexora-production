@@ -6,9 +6,17 @@
     <meta name="theme-color" content="#2563eb" />
     <title>Offline — Nexora</title>
     <style>
-      :root { color-scheme: light; }
-      * { box-sizing: border-box; }
-      html, body { margin: 0; height: 100%; }
+      :root {
+        color-scheme: light;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+      }
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
         background: #f8fafc;
@@ -27,27 +35,56 @@
         box-shadow: 0 10px 40px rgba(15, 23, 42, 0.06);
       }
       .badge {
-        width: 64px; height: 64px; border-radius: 18px;
+        width: 64px;
+        height: 64px;
+        border-radius: 18px;
         background: linear-gradient(135deg, #2563eb, #7c3aed);
-        color: #fff; font-weight: 800; font-size: 30px;
-        display: grid; place-items: center; margin: 0 auto 16px;
+        color: #fff;
+        font-weight: 800;
+        font-size: 30px;
+        display: grid;
+        place-items: center;
+        margin: 0 auto 16px;
       }
-      h1 { font-size: 20px; margin: 0 0 8px; }
-      p { color: #475569; font-size: 14px; line-height: 1.5; margin: 0 0 20px; }
+      h1 {
+        font-size: 20px;
+        margin: 0 0 8px;
+      }
+      p {
+        color: #475569;
+        font-size: 14px;
+        line-height: 1.5;
+        margin: 0 0 20px;
+      }
       button {
-        appearance: none; border: 0; cursor: pointer;
-        background: #2563eb; color: #fff; font-weight: 600;
-        padding: 12px 20px; border-radius: 12px; font-size: 14px;
+        appearance: none;
+        border: 0;
+        cursor: pointer;
+        background: #2563eb;
+        color: #fff;
+        font-weight: 600;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: 14px;
       }
-      button:hover { background: #1d4ed8; }
-      .hint { margin-top: 14px; font-size: 12px; color: #94a3b8; }
+      button:hover {
+        background: #1d4ed8;
+      }
+      .hint {
+        margin-top: 14px;
+        font-size: 12px;
+        color: #94a3b8;
+      }
     </style>
   </head>
   <body>
     <div class="card">
       <div class="badge">N</div>
       <h1>You're offline</h1>
-      <p>We can't reach Nexora right now. Check your connection and try again — your saved bookings will be here when you're back.</p>
+      <p>
+        We can't reach Nexora right now. Check your connection and try again — your saved bookings
+        will be here when you're back.
+      </p>
       <button onclick="location.reload()">Try again</button>
       <div class="hint">Nexora SalonOS · Offline mode</div>
     </div>

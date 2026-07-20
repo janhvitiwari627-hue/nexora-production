@@ -27,8 +27,7 @@ import {
   VISIT_DAYS,
 } from "./activity/mockActivity";
 
-const fmtINR = (n: number) =>
-  `₹${n.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+const fmtINR = (n: number) => `₹${n.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
 
 export function MyActivityPage() {
   return (
@@ -44,11 +43,36 @@ export function MyActivityPage() {
 
       {/* Stats */}
       <div className="grid gap-3 grid-cols-2 lg:grid-cols-5">
-        <StatCard icon={CalendarHeart} label="Total Bookings" value={String(ACTIVITY_STATS.totalBookings)} tint="from-indigo-500 to-violet-500" />
-        <StatCard icon={Wallet} label="Total Spending" value={fmtINR(ACTIVITY_STATS.totalSpending)} tint="from-emerald-500 to-teal-500" />
-        <StatCard icon={Sparkles} label="Total Rewards" value={`${ACTIVITY_STATS.totalRewards} pts`} tint="from-amber-500 to-orange-500" />
-        <StatCard icon={HeartHandshake} label="Favorite Category" value={ACTIVITY_STATS.favoriteCategory} tint="from-pink-500 to-rose-500" />
-        <StatCard icon={TrendingUp} label="Visits This Month" value={String(ACTIVITY_STATS.visitsThisMonth)} tint="from-sky-500 to-cyan-500" />
+        <StatCard
+          icon={CalendarHeart}
+          label="Total Bookings"
+          value={String(ACTIVITY_STATS.totalBookings)}
+          tint="from-indigo-500 to-violet-500"
+        />
+        <StatCard
+          icon={Wallet}
+          label="Total Spending"
+          value={fmtINR(ACTIVITY_STATS.totalSpending)}
+          tint="from-emerald-500 to-teal-500"
+        />
+        <StatCard
+          icon={Sparkles}
+          label="Total Rewards"
+          value={`${ACTIVITY_STATS.totalRewards} pts`}
+          tint="from-amber-500 to-orange-500"
+        />
+        <StatCard
+          icon={HeartHandshake}
+          label="Favorite Category"
+          value={ACTIVITY_STATS.favoriteCategory}
+          tint="from-pink-500 to-rose-500"
+        />
+        <StatCard
+          icon={TrendingUp}
+          label="Visits This Month"
+          value={String(ACTIVITY_STATS.visitsThisMonth)}
+          tint="from-sky-500 to-cyan-500"
+        />
       </div>
 
       {/* Charts row */}
@@ -57,11 +81,28 @@ export function MyActivityPage() {
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={MONTHLY_SPEND} margin={{ top: 10, right: 8, left: -10, bottom: 0 }}>
-                <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" tickLine={false} axisLine={false} tickFormatter={(v) => `₹${v / 1000}k`} />
+                <XAxis
+                  dataKey="month"
+                  tick={{ fontSize: 12 }}
+                  stroke="hsl(var(--muted-foreground))"
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  tick={{ fontSize: 12 }}
+                  stroke="hsl(var(--muted-foreground))"
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(v) => `₹${v / 1000}k`}
+                />
                 <Tooltip
                   cursor={{ fill: "hsl(var(--muted) / 0.4)" }}
-                  contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
+                  contentStyle={{
+                    background: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: 8,
+                    fontSize: 12,
+                  }}
                   formatter={(v: number) => fmtINR(v)}
                 />
                 <Bar dataKey="amount" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
@@ -74,11 +115,25 @@ export function MyActivityPage() {
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={CATEGORY_SHARE} dataKey="value" nameKey="name" innerRadius={50} outerRadius={80} paddingAngle={2}>
-                  {CATEGORY_SHARE.map((c) => <Cell key={c.name} fill={c.color} />)}
+                <Pie
+                  data={CATEGORY_SHARE}
+                  dataKey="value"
+                  nameKey="name"
+                  innerRadius={50}
+                  outerRadius={80}
+                  paddingAngle={2}
+                >
+                  {CATEGORY_SHARE.map((c) => (
+                    <Cell key={c.name} fill={c.color} />
+                  ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
+                  contentStyle={{
+                    background: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: 8,
+                    fontSize: 12,
+                  }}
                 />
                 <Legend wrapperStyle={{ fontSize: 12 }} iconSize={8} />
               </PieChart>
@@ -100,7 +155,12 @@ export function MyActivityPage() {
                 <span className="grid place-items-center size-7 rounded-full bg-primary/10 text-primary font-bold text-sm">
                   {i + 1}
                 </span>
-                <img src={s.thumbnail} alt="" className="size-11 rounded-lg object-cover bg-muted" loading="lazy" />
+                <img
+                  src={s.thumbnail}
+                  alt=""
+                  className="size-11 rounded-lg object-cover bg-muted"
+                  loading="lazy"
+                />
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-foreground truncate">{s.name}</p>
                   <p className="text-xs text-muted-foreground">
@@ -122,11 +182,30 @@ export function MyActivityPage() {
               layout="vertical"
               margin={{ top: 4, right: 20, left: 10, bottom: 0 }}
             >
-              <XAxis type="number" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" tickLine={false} axisLine={false} />
-              <YAxis dataKey="service" type="category" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" tickLine={false} axisLine={false} width={110} />
+              <XAxis
+                type="number"
+                tick={{ fontSize: 12 }}
+                stroke="hsl(var(--muted-foreground))"
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis
+                dataKey="service"
+                type="category"
+                tick={{ fontSize: 12 }}
+                stroke="hsl(var(--muted-foreground))"
+                tickLine={false}
+                axisLine={false}
+                width={110}
+              />
               <Tooltip
                 cursor={{ fill: "hsl(var(--muted) / 0.4)" }}
-                contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
+                contentStyle={{
+                  background: "hsl(var(--card))",
+                  border: "1px solid hsl(var(--border))",
+                  borderRadius: 8,
+                  fontSize: 12,
+                }}
               />
               <Bar dataKey="bookings" fill="hsl(var(--primary))" radius={[0, 6, 6, 0]} />
             </BarChart>
@@ -138,13 +217,21 @@ export function MyActivityPage() {
 }
 
 function StatCard({
-  icon: Icon, label, value, tint,
+  icon: Icon,
+  label,
+  value,
+  tint,
 }: {
-  icon: typeof Activity; label: string; value: string; tint: string;
+  icon: typeof Activity;
+  label: string;
+  value: string;
+  tint: string;
 }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-4">
-      <span className={`grid place-items-center size-9 rounded-lg text-white bg-gradient-to-br ${tint}`}>
+      <span
+        className={`grid place-items-center size-9 rounded-lg text-white bg-gradient-to-br ${tint}`}
+      >
         <Icon className="size-4" />
       </span>
       <p className="text-[11px] uppercase tracking-wide text-muted-foreground mt-3">{label}</p>
@@ -154,9 +241,15 @@ function StatCard({
 }
 
 function Card({
-  title, subtitle, children, className = "",
+  title,
+  subtitle,
+  children,
+  className = "",
 }: {
-  title: string; subtitle?: string; children: React.ReactNode; className?: string;
+  title: string;
+  subtitle?: string;
+  children: React.ReactNode;
+  className?: string;
 }) {
   return (
     <section className={`rounded-2xl border border-border bg-card p-4 sm:p-5 ${className}`}>
@@ -191,7 +284,9 @@ function VisitHeatmap() {
       <p className="text-xs text-muted-foreground mb-2">{monthName}</p>
       <div className="grid grid-cols-7 gap-1 text-[10px] text-muted-foreground mb-1">
         {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
-          <span key={i} className="text-center">{d}</span>
+          <span key={i} className="text-center">
+            {d}
+          </span>
         ))}
       </div>
       <div className="grid grid-cols-7 gap-1">

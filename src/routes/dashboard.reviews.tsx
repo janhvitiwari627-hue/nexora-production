@@ -7,8 +7,7 @@ export const Route = createFileRoute("/dashboard/reviews")({
       { title: "My Reviews — Nexora" },
       {
         name: "description",
-        content:
-          "View, edit and write reviews for the shops you've visited on Nexora.",
+        content: "View, edit and write reviews for the shops you've visited on Nexora.",
       },
       { property: "og:title", content: "My Reviews — Nexora" },
     ],

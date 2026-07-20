@@ -3,9 +3,24 @@ import { cn } from "@/lib/utils";
 import { mockActivePlan, type Tier } from "./mockMembership";
 
 const TIERS: { id: Tier; tagline: string; grad: string; text: string }[] = [
-  { id: "Silver", tagline: "Essentials", grad: "from-slate-300 to-slate-500", text: "text-slate-900" },
-  { id: "Gold", tagline: "Most popular", grad: "from-amber-300 to-orange-500", text: "text-amber-950" },
-  { id: "Platinum", tagline: "Ultimate", grad: "from-indigo-500 via-fuchsia-500 to-rose-500", text: "text-white" },
+  {
+    id: "Silver",
+    tagline: "Essentials",
+    grad: "from-slate-300 to-slate-500",
+    text: "text-slate-900",
+  },
+  {
+    id: "Gold",
+    tagline: "Most popular",
+    grad: "from-amber-300 to-orange-500",
+    text: "text-amber-950",
+  },
+  {
+    id: "Platinum",
+    tagline: "Ultimate",
+    grad: "from-indigo-500 via-fuchsia-500 to-rose-500",
+    text: "text-white",
+  },
 ];
 
 export function UpgradePathVisual() {
@@ -24,7 +39,8 @@ export function UpgradePathVisual() {
                   "relative flex-1 rounded-2xl bg-gradient-to-br p-4 text-center transition",
                   t.grad,
                   t.text,
-                  isCurrent && "ring-4 ring-primary ring-offset-2 ring-offset-background scale-[1.02] shadow-lg",
+                  isCurrent &&
+                    "ring-4 ring-primary ring-offset-2 ring-offset-background scale-[1.02] shadow-lg",
                   !isCurrent && !isPast && "opacity-80",
                   isPast && "opacity-60",
                 )}

@@ -12,13 +12,25 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Modal } from "@/components/shared/Modal";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { useOwnerContext } from "@/hooks/use-owner-context";
 import { ownerStaffQuery } from "@/lib/owner.queries";
 import { deleteOwnerStaff, upsertOwnerStaff } from "@/lib/owner.functions";
 
-const ROLES = ["Stylist", "Senior Stylist", "Colorist", "Therapist", "Makeup Artist", "Nail Artist", "Manager"];
+const ROLES = [
+  "Stylist",
+  "Senior Stylist",
+  "Colorist",
+  "Therapist",
+  "Makeup Artist",
+  "Nail Artist",
+  "Manager",
+];
 
 type StaffRow = {
   id: string;
@@ -32,7 +44,15 @@ type StaffRow = {
 };
 
 function emptyStaff(salonId: string): Partial<StaffRow> {
-  return { salon_id: salonId, name: "", role: "Stylist", bio: "", avatar_url: "", rating: 5, is_active: true };
+  return {
+    salon_id: salonId,
+    name: "",
+    role: "Stylist",
+    bio: "",
+    avatar_url: "",
+    rating: 5,
+    is_active: true,
+  };
 }
 
 export function OwnerStaffPage() {
@@ -65,9 +85,7 @@ export function OwnerStaffPage() {
   }, [list, query, filter]);
 
   const activeCount = list.filter((s) => s.is_active).length;
-  const avgRating = list.length
-    ? list.reduce((a, s) => a + (s.rating || 0), 0) / list.length
-    : 0;
+  const avgRating = list.length ? list.reduce((a, s) => a + (s.rating || 0), 0) / list.length : 0;
 
   const upsertMut = useMutation({
     mutationFn: (input: Partial<StaffRow>) => upsertFn({ data: input as never }),
@@ -113,7 +131,9 @@ export function OwnerStaffPage() {
             <p className="text-sm text-muted-foreground">
               Complete onboarding to manage your team here.
             </p>
-            <Button asChild><a href="/owner/onboarding">Start onboarding</a></Button>
+            <Button asChild>
+              <a href="/owner/onboarding">Start onboarding</a>
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -125,30 +145,51 @@ export function OwnerStaffPage() {
       <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
         <header className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            
             <h1 className="text-heading text-2xl font-bold">Staff</h1>
             <p className="text-muted-foreground text-sm">
-              {activeSalon?.name ?? "Your salon"} · {list.length} team member{list.length === 1 ? "" : "s"}
+              {activeSalon?.name ?? "Your salon"} · {list.length} team member
+              {list.length === 1 ? "" : "s"}
             </p>
           </div>
-          <Button onClick={openAdd}><Plus className="h-4 w-4" /> Add Staff</Button>
+          <Button onClick={openAdd}>
+            <Plus className="h-4 w-4" /> Add Staff
+          </Button>
         </header>
 
         {/* KPI strip */}
         <div className="grid gap-3 sm:grid-cols-3">
-          <KPI icon={<Users className="h-4 w-4" />} label="Total staff" value={list.length.toString()} />
-          <KPI icon={<BadgeCheck className="h-4 w-4 text-emerald-600" />} label="Active" value={activeCount.toString()} />
-          <KPI icon={<TrendingUp className="h-4 w-4" />} label="Avg rating" value={avgRating ? avgRating.toFixed(1) : "—"} />
+          <KPI
+            icon={<Users className="h-4 w-4" />}
+            label="Total staff"
+            value={list.length.toString()}
+          />
+          <KPI
+            icon={<BadgeCheck className="h-4 w-4 text-emerald-600" />}
+            label="Active"
+            value={activeCount.toString()}
+          />
+          <KPI
+            icon={<TrendingUp className="h-4 w-4" />}
+            label="Avg rating"
+            value={avgRating ? avgRating.toFixed(1) : "—"}
+          />
         </div>
 
         {/* Toolbar */}
         <div className="bg-card border-border flex flex-wrap items-center gap-3 rounded-xl border p-3">
           <div className="relative min-w-[240px] flex-1">
             <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-            <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search by name or role" className="pl-9" />
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search by name or role"
+              className="pl-9"
+            />
           </div>
           <Select value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
-            <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All staff</SelectItem>
               <SelectItem value="active">Active</SelectItem>
@@ -162,19 +203,31 @@ export function OwnerStaffPage() {
           <div className="text-muted-foreground p-8 text-center">Loading staff…</div>
         ) : filtered.length === 0 ? (
           <div className="bg-card border-border text-muted-foreground rounded-xl border p-12 text-center">
-            {list.length === 0 ? "No staff yet. Click 'Add Staff' to get started." : "No staff match your filters."}
+            {list.length === 0
+              ? "No staff yet. Click 'Add Staff' to get started."
+              : "No staff match your filters."}
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {filtered.map((s) => (
-              <StaffCard key={s.id} staff={s} onEdit={() => openEdit(s)} onDelete={() => setDeleting(s)} />
+              <StaffCard
+                key={s.id}
+                staff={s}
+                onEdit={() => openEdit(s)}
+                onDelete={() => setDeleting(s)}
+              />
             ))}
           </div>
         )}
       </div>
 
       {/* Add/Edit Modal */}
-      <Modal open={editOpen} onClose={() => setEditOpen(false)} title={editing?.id ? "Edit Staff" : "Add Staff"} size="lg">
+      <Modal
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        title={editing?.id ? "Edit Staff" : "Add Staff"}
+        size="lg"
+      >
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -232,16 +285,25 @@ export function OwnerStaffPage() {
                 value={editing?.role ?? "Stylist"}
                 onValueChange={(v) => setEditing((p) => ({ ...p, role: v }))}
               >
-                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
-                  {ROLES.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+                  {ROLES.map((r) => (
+                    <SelectItem key={r} value={r}>
+                      {r}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
               <Label className="text-xs uppercase tracking-wide">Rating (0-5)</Label>
               <Input
-                type="number" min={0} max={5} step={0.1}
+                type="number"
+                min={0}
+                max={5}
+                step={0.1}
                 value={editing?.rating ?? 5}
                 onChange={(e) => setEditing((p) => ({ ...p, rating: Number(e.target.value) }))}
                 className="mt-1"
@@ -271,7 +333,9 @@ export function OwnerStaffPage() {
           </div>
 
           <div className="flex justify-end gap-2 border-t pt-4">
-            <Button type="button" variant="outline" onClick={() => setEditOpen(false)}>Cancel</Button>
+            <Button type="button" variant="outline" onClick={() => setEditOpen(false)}>
+              Cancel
+            </Button>
             <Button type="submit" disabled={upsertMut.isPending}>
               {upsertMut.isPending ? "Saving…" : editing?.id ? "Save changes" : "Add staff"}
             </Button>
@@ -286,7 +350,9 @@ export function OwnerStaffPage() {
             Permanently delete <strong>{deleting?.name}</strong>? This cannot be undone.
           </p>
           <div className="flex justify-end gap-2 border-t pt-4">
-            <Button variant="outline" onClick={() => setDeleting(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setDeleting(null)}>
+              Cancel
+            </Button>
             <Button
               className="bg-danger hover:bg-danger/90 text-white"
               disabled={deleteMut.isPending}
@@ -314,19 +380,33 @@ function KPI({ icon, label, value }: { icon: React.ReactNode; label: string; val
   );
 }
 
-function StaffCard({ staff, onEdit, onDelete }: { staff: StaffRow; onEdit: () => void; onDelete: () => void }) {
+function StaffCard({
+  staff,
+  onEdit,
+  onDelete,
+}: {
+  staff: StaffRow;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
   return (
     <div className="bg-card border-border flex flex-col rounded-2xl border p-5 shadow-sm transition hover:shadow-md">
       <div className="flex items-start gap-4">
         <div className="relative">
           {staff.avatar_url ? (
-            <img src={staff.avatar_url} alt={staff.name} className="border-border h-20 w-20 rounded-2xl border object-cover" />
+            <img
+              src={staff.avatar_url}
+              alt={staff.name}
+              className="border-border h-20 w-20 rounded-2xl border object-cover"
+            />
           ) : (
             <div className="border-border bg-muted text-muted-foreground grid h-20 w-20 place-items-center rounded-2xl border text-2xl font-bold">
               {staff.name[0]?.toUpperCase()}
             </div>
           )}
-          <span className={`border-card absolute -right-1 -bottom-1 h-4 w-4 rounded-full border-2 ${staff.is_active ? "bg-emerald-500" : "bg-zinc-400"}`} />
+          <span
+            className={`border-card absolute -right-1 -bottom-1 h-4 w-4 rounded-full border-2 ${staff.is_active ? "bg-emerald-500" : "bg-zinc-400"}`}
+          />
         </div>
         <div className="min-w-0 flex-1">
           <h3 className="truncate text-base font-bold">{staff.name}</h3>
@@ -343,15 +423,19 @@ function StaffCard({ staff, onEdit, onDelete }: { staff: StaffRow; onEdit: () =>
         </div>
       </div>
 
-      {staff.bio && (
-        <p className="text-muted-foreground mt-3 line-clamp-3 text-xs">{staff.bio}</p>
-      )}
+      {staff.bio && <p className="text-muted-foreground mt-3 line-clamp-3 text-xs">{staff.bio}</p>}
 
       <div className="border-border mt-4 flex gap-1 border-t pt-3">
         <Button size="sm" variant="ghost" className="flex-1" onClick={onEdit}>
           <Pencil className="h-4 w-4" /> Edit
         </Button>
-        <Button size="icon" variant="ghost" className="text-danger hover:bg-danger/10" onClick={onDelete} aria-label="Delete">
+        <Button
+          size="icon"
+          variant="ghost"
+          className="text-danger hover:bg-danger/10"
+          onClick={onDelete}
+          aria-label="Delete"
+        >
           <Trash2 className="h-4 w-4" />
         </Button>
       </div>

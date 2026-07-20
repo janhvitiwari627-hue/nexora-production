@@ -1,11 +1,4 @@
-import {
-  Calendar,
-  Star,
-  Sparkles,
-  Tag,
-  Users,
-  type LucideIcon,
-} from "lucide-react";
+import { Calendar, Star, Sparkles, Tag, Users, type LucideIcon } from "lucide-react";
 import { mockActivity, type ActivityType } from "../mockDashboard";
 
 const ICONS: Record<ActivityType, { Icon: LucideIcon; bg: string; fg: string }> = {

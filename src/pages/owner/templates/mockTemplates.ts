@@ -8,7 +8,13 @@ export type Template = {
 };
 
 export const TEMPLATE_CATEGORIES = [
-  "All", "Premium Salon", "Salon", "Makeup Studio", "Spa", "Barber", "Nails",
+  "All",
+  "Premium Salon",
+  "Salon",
+  "Makeup Studio",
+  "Spa",
+  "Barber",
+  "Nails",
 ];
 
 export const TEMPLATES: Template[] = [
@@ -18,7 +24,8 @@ export const TEMPLATES: Template[] = [
     category: ["Premium Salon", "Spa"],
     screenshot: "",
     demoUrl: "/site/luxe-hair-spa",
-    description: "Luxury black & gold with full-screen video hero, glassmorphism cards and premium animations.",
+    description:
+      "Luxury black & gold with full-screen video hero, glassmorphism cards and premium animations.",
   },
   {
     id: "modern-salon",
@@ -26,7 +33,8 @@ export const TEMPLATES: Template[] = [
     category: ["Salon", "Barber"],
     screenshot: "",
     demoUrl: "/site/luxe-hair-spa",
-    description: "Perfect for salons, beauty parlours and barber shops with clean cards and fast booking CTA.",
+    description:
+      "Perfect for salons, beauty parlours and barber shops with clean cards and fast booking CTA.",
   },
   {
     id: "professional-beauty",
@@ -34,7 +42,8 @@ export const TEMPLATES: Template[] = [
     category: ["Makeup Studio", "Nails"],
     screenshot: "",
     demoUrl: "/site/luxe-hair-spa",
-    description: "Best for makeup artists, nail studios and beauty professionals with elegant portfolio sections.",
+    description:
+      "Best for makeup artists, nail studios and beauty professionals with elegant portfolio sections.",
   },
 ];
 

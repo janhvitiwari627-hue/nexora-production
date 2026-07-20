@@ -46,10 +46,7 @@ test.describe("Quick actions — anonymous visit stashes redirect target", () =>
       // final /login.
       await page.waitForURL(/\/(login|auth-notice)/, { timeout: 10_000 });
       await page.waitForURL(/\/login/, { timeout: 10_000 }).catch(() => null);
-      const pending = await page.evaluate(
-        (k) => window.sessionStorage.getItem(k),
-        PENDING_KEY,
-      );
+      const pending = await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
       expect(pending).toBe(target);
       // No dashboard content leaked before redirect.
       expect(new URL(page.url()).pathname.startsWith("/owner/")).toBe(false);
@@ -77,10 +74,7 @@ test.describe("Quick actions — signed-in login flow resumes stashed target", (
       expect(new URL(page.url()).pathname).toBe(target);
 
       // Pending key must be consumed exactly once.
-      const pending = await page.evaluate(
-        (k) => window.sessionStorage.getItem(k),
-        PENDING_KEY,
-      );
+      const pending = await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
       expect(pending).toBeNull();
 
       // No login form is visible — user was not prompted again.

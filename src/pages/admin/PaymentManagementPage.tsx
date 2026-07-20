@@ -5,8 +5,22 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,7 +31,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Check, X, RefreshCcw, Search, Loader2, AlertTriangle } from "lucide-react";
@@ -161,7 +181,11 @@ export function PaymentManagementPage() {
   const paymentsQ = useQuery({
     queryKey: ["admin-payments", statusFilter],
     queryFn: async () => {
-      let q = supabase.from("payments").select("*").order("created_at", { ascending: false }).limit(500);
+      let q = supabase
+        .from("payments")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(500);
       if (statusFilter !== "all") q = q.eq("status", statusFilter);
       const { data, error } = await q;
       if (error) throw error;
@@ -235,11 +259,7 @@ export function PaymentManagementPage() {
       if (error) throw error;
       await recordAdminAction({
         action:
-          status === "SUCCESS"
-            ? "mark_success"
-            : status === "FAILED"
-              ? "mark_failed"
-              : "adjust",
+          status === "SUCCESS" ? "mark_success" : status === "FAILED" ? "mark_failed" : "adjust",
         entity: "payment",
         entityId: id,
         reason,
@@ -302,12 +322,7 @@ export function PaymentManagementPage() {
         .eq("id", id);
       if (error) throw error;
       await recordAdminAction({
-        action:
-          status === "REJECTED"
-            ? "reject"
-            : status === "COMPLETED"
-              ? "mark_paid"
-              : "approve",
+        action: status === "REJECTED" ? "reject" : status === "COMPLETED" ? "mark_paid" : "approve",
         entity: "withdrawal",
         entityId: id,
         reason,
@@ -449,7 +464,9 @@ export function PaymentManagementPage() {
               />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All statuses</SelectItem>
                 <SelectItem value="CREATED">Created</SelectItem>
@@ -465,9 +482,13 @@ export function PaymentManagementPage() {
           <Card>
             <CardContent className="p-0">
               {paymentsQ.isLoading ? (
-                <div className="flex justify-center p-10"><Loader2 className="h-6 w-6 animate-spin" /></div>
+                <div className="flex justify-center p-10">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                </div>
               ) : filteredPayments.length === 0 ? (
-                <div className="text-muted-foreground p-10 text-center text-sm">No transactions found</div>
+                <div className="text-muted-foreground p-10 text-center text-sm">
+                  No transactions found
+                </div>
               ) : (
                 <Table>
                   <TableHeader>
@@ -488,8 +509,12 @@ export function PaymentManagementPage() {
                         <TableCell>{p.payment_type ?? "—"}</TableCell>
                         <TableCell className="font-semibold">{fmtINR(Number(p.amount))}</TableCell>
                         <TableCell>{p.payment_method ?? "—"}</TableCell>
-                        <TableCell><Badge variant={statusVariant(p.status)}>{p.status}</Badge></TableCell>
-                        <TableCell className="text-muted-foreground text-xs">{fmtDate(p.created_at)}</TableCell>
+                        <TableCell>
+                          <Badge variant={statusVariant(p.status)}>{p.status}</Badge>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground text-xs">
+                          {fmtDate(p.created_at)}
+                        </TableCell>
                         <TableCell className="text-right space-x-1">
                           {p.status === "SUCCESS" && (
                             <Button size="sm" variant="outline" onClick={() => setRefundTarget(p)}>
@@ -543,9 +568,13 @@ export function PaymentManagementPage() {
           <Card>
             <CardContent className="p-0">
               {pendingQ.isLoading ? (
-                <div className="flex justify-center p-10"><Loader2 className="h-6 w-6 animate-spin" /></div>
+                <div className="flex justify-center p-10">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                </div>
               ) : (pendingQ.data ?? []).length === 0 ? (
-                <div className="text-muted-foreground p-10 text-center text-sm">No pending verifications</div>
+                <div className="text-muted-foreground p-10 text-center text-sm">
+                  No pending verifications
+                </div>
               ) : (
                 <Table>
                   <TableHeader>
@@ -563,17 +592,32 @@ export function PaymentManagementPage() {
                     {(pendingQ.data ?? []).map((p) => (
                       <TableRow key={p.id}>
                         <TableCell className="font-mono text-xs">{p.transaction_id}</TableCell>
-                        <TableCell className="font-mono text-xs">{p.user_id.slice(0, 8)}…</TableCell>
-                        <TableCell className="font-mono text-xs">{p.booking_id ? p.booking_id.slice(0, 8) + "…" : "—"}</TableCell>
+                        <TableCell className="font-mono text-xs">
+                          {p.user_id.slice(0, 8)}…
+                        </TableCell>
+                        <TableCell className="font-mono text-xs">
+                          {p.booking_id ? p.booking_id.slice(0, 8) + "…" : "—"}
+                        </TableCell>
                         <TableCell>
                           {p.screenshot_url ? (
-                            <a href={p.screenshot_url} target="_blank" rel="noreferrer" className="text-primary text-xs underline">
+                            <a
+                              href={p.screenshot_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-primary text-xs underline"
+                            >
                               View
                             </a>
-                          ) : "—"}
+                          ) : (
+                            "—"
+                          )}
                         </TableCell>
-                        <TableCell><Badge variant={statusVariant(p.status)}>{p.status}</Badge></TableCell>
-                        <TableCell className="text-muted-foreground text-xs">{fmtDate(p.created_at)}</TableCell>
+                        <TableCell>
+                          <Badge variant={statusVariant(p.status)}>{p.status}</Badge>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground text-xs">
+                          {fmtDate(p.created_at)}
+                        </TableCell>
                         <TableCell className="text-right space-x-1">
                           {p.status === "pending" && (
                             <>
@@ -621,9 +665,13 @@ export function PaymentManagementPage() {
           <Card>
             <CardContent className="p-0">
               {withdrawalsQ.isLoading ? (
-                <div className="flex justify-center p-10"><Loader2 className="h-6 w-6 animate-spin" /></div>
+                <div className="flex justify-center p-10">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                </div>
               ) : (withdrawalsQ.data ?? []).length === 0 ? (
-                <div className="text-muted-foreground p-10 text-center text-sm">No withdrawal requests</div>
+                <div className="text-muted-foreground p-10 text-center text-sm">
+                  No withdrawal requests
+                </div>
               ) : (
                 <Table>
                   <TableHeader>
@@ -639,21 +687,30 @@ export function PaymentManagementPage() {
                   <TableBody>
                     {(withdrawalsQ.data ?? []).map((w) => {
                       const bank = (w.bank_account_details ?? {}) as {
-                        accountName?: string; accountNumber?: string; ifsc?: string;
+                        accountName?: string;
+                        accountNumber?: string;
+                        ifsc?: string;
                       };
                       const amountLabel = fmtINR(Number(w.amount));
                       return (
                         <TableRow key={w.id}>
-                          <TableCell className="font-mono text-xs">{w.salon_id.slice(0, 8)}…</TableCell>
+                          <TableCell className="font-mono text-xs">
+                            {w.salon_id.slice(0, 8)}…
+                          </TableCell>
                           <TableCell className="font-semibold">{amountLabel}</TableCell>
                           <TableCell className="text-xs">
-                            {bank.accountName ?? "—"}<br />
+                            {bank.accountName ?? "—"}
+                            <br />
                             <span className="text-muted-foreground">
                               {bank.accountNumber ?? ""} {bank.ifsc ? `· ${bank.ifsc}` : ""}
                             </span>
                           </TableCell>
-                          <TableCell><Badge variant={statusVariant(w.status)}>{w.status}</Badge></TableCell>
-                          <TableCell className="text-muted-foreground text-xs">{fmtDate(w.created_at)}</TableCell>
+                          <TableCell>
+                            <Badge variant={statusVariant(w.status)}>{w.status}</Badge>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground text-xs">
+                            {fmtDate(w.created_at)}
+                          </TableCell>
                           <TableCell className="text-right space-x-1">
                             {w.status === "PENDING" && (
                               <Button
@@ -665,7 +722,10 @@ export function PaymentManagementPage() {
                                     description: `Move ${amountLabel} to PROCESSING for salon ${w.salon_id.slice(0, 8)}…. You can then mark it Paid once the transfer is completed.`,
                                     confirmLabel: "Approve",
                                     onConfirm: () =>
-                                      setWithdrawalStatus.mutate({ id: w.id, status: "PROCESSING" }),
+                                      setWithdrawalStatus.mutate({
+                                        id: w.id,
+                                        status: "PROCESSING",
+                                      }),
                                   })
                                 }
                               >
@@ -682,7 +742,10 @@ export function PaymentManagementPage() {
                                       description: `Confirm that ${amountLabel} has been transferred to ${bank.accountName ?? "the salon"}${bank.accountNumber ? ` (A/C ${bank.accountNumber})` : ""}. This action is final.`,
                                       confirmLabel: "Mark Paid",
                                       onConfirm: () =>
-                                        setWithdrawalStatus.mutate({ id: w.id, status: "COMPLETED" }),
+                                        setWithdrawalStatus.mutate({
+                                          id: w.id,
+                                          status: "COMPLETED",
+                                        }),
                                     })
                                   }
                                 >
@@ -723,7 +786,8 @@ export function PaymentManagementPage() {
               <AlertTriangle className="h-5 w-5 text-amber-500" /> Refund Payment
             </DialogTitle>
             <DialogDescription>
-              Refunds are permanent and will be visible to the customer. Please provide a clear reason for audit.
+              Refunds are permanent and will be visible to the customer. Please provide a clear
+              reason for audit.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3 text-sm">
@@ -733,7 +797,9 @@ export function PaymentManagementPage() {
             </div>
             <div>
               <span className="text-muted-foreground">Amount: </span>
-              <span className="font-semibold">{refundTarget ? fmtINR(Number(refundTarget.amount)) : ""}</span>
+              <span className="font-semibold">
+                {refundTarget ? fmtINR(Number(refundTarget.amount)) : ""}
+              </span>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="refund-reason">
@@ -767,7 +833,11 @@ export function PaymentManagementPage() {
               onClick={submitRefund}
               disabled={refundPayment.isPending || refundReason.trim().length < MIN_REASON}
             >
-              {refundPayment.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Confirm Refund"}
+              {refundPayment.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Confirm Refund"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -786,8 +856,8 @@ export function PaymentManagementPage() {
                   : "Reject Payment Verification"}
             </DialogTitle>
             <DialogDescription>
-              This action is destructive and cannot be silently reversed. A reason is required and will be
-              recorded for audit.
+              This action is destructive and cannot be silently reversed. A reason is required and
+              will be recorded for audit.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3 text-sm">
@@ -837,10 +907,7 @@ export function PaymentManagementPage() {
       </Dialog>
 
       {/* Generic confirm dialog for non-destructive / positive actions */}
-      <AlertDialog
-        open={!!confirmTarget}
-        onOpenChange={(o) => !o && setConfirmTarget(null)}
-      >
+      <AlertDialog open={!!confirmTarget} onOpenChange={(o) => !o && setConfirmTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{confirmTarget?.title}</AlertDialogTitle>

@@ -1,6 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { AlertCircle, Briefcase, GraduationCap, Loader2, MapPin, RefreshCw, Search, Sparkles, Star, TrendingUp } from "lucide-react";
+import {
+  AlertCircle,
+  Briefcase,
+  GraduationCap,
+  Loader2,
+  MapPin,
+  RefreshCw,
+  Search,
+  Sparkles,
+  Star,
+  TrendingUp,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BackButton } from "@/components/shared/BackButton";
 import { useAuthStore } from "@/stores/authStore";
@@ -215,7 +226,9 @@ export function JobPortalPage({ initialRole = "seeker" }: { initialRole?: "seeke
               to="/jobs"
               className={cn(
                 "rounded-full px-5 py-2 text-sm font-bold transition",
-                role === "seeker" ? "bg-gradient-cta text-primary-foreground" : "text-muted-foreground",
+                role === "seeker"
+                  ? "bg-gradient-cta text-primary-foreground"
+                  : "text-muted-foreground",
               )}
             >
               Find a job
@@ -224,7 +237,9 @@ export function JobPortalPage({ initialRole = "seeker" }: { initialRole?: "seeke
               to="/hire"
               className={cn(
                 "rounded-full px-5 py-2 text-sm font-bold transition",
-                role === "employer" ? "bg-gradient-cta text-primary-foreground" : "text-muted-foreground",
+                role === "employer"
+                  ? "bg-gradient-cta text-primary-foreground"
+                  : "text-muted-foreground",
               )}
             >
               Hire talent
@@ -330,10 +345,7 @@ export function JobPortalPage({ initialRole = "seeker" }: { initialRole?: "seeke
         </div>
       </section>
 
-      <EmployerSetupModal
-        open={showEmployerModal}
-        onClose={() => setShowEmployerModal(false)}
-      />
+      <EmployerSetupModal open={showEmployerModal} onClose={() => setShowEmployerModal(false)} />
 
       {/* Featured carousel */}
       <section className="mx-auto max-w-7xl px-4 py-12 md:px-6">

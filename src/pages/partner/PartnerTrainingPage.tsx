@@ -16,15 +16,70 @@ import {
 import { PartnerPageShell } from "./PartnerAppLayout";
 
 const MODULES = [
-  { title: "Nexora Introduction", desc: "Platform overview aur mission.", icon: Sparkles, mins: 6, done: true },
-  { title: "How to explain Nexora", desc: "30-second pitch aur objection handling.", icon: MessageCircle, mins: 8, done: true },
-  { title: "Shop onboarding", desc: "KYC, business setup aur verification steps.", icon: Store, mins: 12, done: true },
-  { title: "Website setup", desc: "Template selection aur go-live process.", icon: BookOpen, mins: 10, done: false, current: true },
-  { title: "QR / payment process", desc: "Nexora QR activation aur collection flow.", icon: QrCode, mins: 7, done: false },
-  { title: "Commission rules", desc: "Activation aur recurring growth share.", icon: IndianRupee, mins: 9, done: false },
-  { title: "Payout rules", desc: "Weekly cycles, withdrawal aur holds.", icon: Wallet, mins: 6, done: false },
-  { title: "Fraud policy", desc: "Suspicious activity aur reversal rules.", icon: ShieldAlert, mins: 8, done: false },
-  { title: "Brand policy", desc: "Nexora brand usage guidelines.", icon: CircleDollarSign, mins: 5, done: false },
+  {
+    title: "Nexora Introduction",
+    desc: "Platform overview aur mission.",
+    icon: Sparkles,
+    mins: 6,
+    done: true,
+  },
+  {
+    title: "How to explain Nexora",
+    desc: "30-second pitch aur objection handling.",
+    icon: MessageCircle,
+    mins: 8,
+    done: true,
+  },
+  {
+    title: "Shop onboarding",
+    desc: "KYC, business setup aur verification steps.",
+    icon: Store,
+    mins: 12,
+    done: true,
+  },
+  {
+    title: "Website setup",
+    desc: "Template selection aur go-live process.",
+    icon: BookOpen,
+    mins: 10,
+    done: false,
+    current: true,
+  },
+  {
+    title: "QR / payment process",
+    desc: "Nexora QR activation aur collection flow.",
+    icon: QrCode,
+    mins: 7,
+    done: false,
+  },
+  {
+    title: "Commission rules",
+    desc: "Activation aur recurring growth share.",
+    icon: IndianRupee,
+    mins: 9,
+    done: false,
+  },
+  {
+    title: "Payout rules",
+    desc: "Weekly cycles, withdrawal aur holds.",
+    icon: Wallet,
+    mins: 6,
+    done: false,
+  },
+  {
+    title: "Fraud policy",
+    desc: "Suspicious activity aur reversal rules.",
+    icon: ShieldAlert,
+    mins: 8,
+    done: false,
+  },
+  {
+    title: "Brand policy",
+    desc: "Nexora brand usage guidelines.",
+    icon: CircleDollarSign,
+    mins: 5,
+    done: false,
+  },
 ];
 
 export function PartnerTrainingPage() {

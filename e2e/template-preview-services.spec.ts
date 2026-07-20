@@ -88,9 +88,7 @@ for (const key of TEMPLATE_KEYS) {
     expect(page.url()).toContain("service=");
     expect(page.url()).not.toMatch(/\/site\/(undefined|null)\//);
     // Booking form must actually render (not the "Booking not enabled yet" fallback).
-    await expect(
-      page.getByRole("heading", { level: 1, name: /^book at /i }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /^book at /i })).toBeVisible();
     // The service query param should be preserved verbatim from the /services page.
     const search = new URL(page.url()).search;
     const expectedService = new URL(href!, "http://x").searchParams.get("service");

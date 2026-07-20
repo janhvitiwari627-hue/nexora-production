@@ -1,11 +1,6 @@
 import { Clock } from "lucide-react";
 import type { BookingState } from "./state";
-import {
-  selectedServices,
-  subtotal,
-  totalDuration,
-  formatINR,
-} from "./state";
+import { selectedServices, subtotal, totalDuration, formatINR } from "./state";
 
 export function SummarySidebar({
   booking,

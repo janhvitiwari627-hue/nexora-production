@@ -788,12 +788,32 @@ function QuickActionsRow() {
     });
 
   const actions: { icon: typeof Plus; label: string; onClick: () => void }[] = [
-    { icon: Plus, label: "Add Service", onClick: () => requireOwner("Add Service", "/owner/services") },
-    { icon: UserPlus, label: "Add Staff", onClick: () => requireOwner("Add Staff", "/owner/staff") },
-    { icon: Tag, label: "Create Offer", onClick: () => requireOwner("Create Offer", "/owner/marketing") },
+    {
+      icon: Plus,
+      label: "Add Service",
+      onClick: () => requireOwner("Add Service", "/owner/services"),
+    },
+    {
+      icon: UserPlus,
+      label: "Add Staff",
+      onClick: () => requireOwner("Add Staff", "/owner/staff"),
+    },
+    {
+      icon: Tag,
+      label: "Create Offer",
+      onClick: () => requireOwner("Create Offer", "/owner/marketing"),
+    },
     { icon: Share2, label: "Share Website", onClick: handleShare },
-    { icon: QrCode, label: "Generate QR", onClick: () => requireOwner("Generate QR", "/owner/website") },
-    { icon: BarChart3, label: "View Analytics", onClick: () => requireOwner("View Analytics", "/owner/analytics") },
+    {
+      icon: QrCode,
+      label: "Generate QR",
+      onClick: () => requireOwner("Generate QR", "/owner/website"),
+    },
+    {
+      icon: BarChart3,
+      label: "View Analytics",
+      onClick: () => requireOwner("View Analytics", "/owner/analytics"),
+    },
   ];
   return (
     <Card className="p-4">

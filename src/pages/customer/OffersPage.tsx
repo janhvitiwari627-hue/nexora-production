@@ -12,17 +12,51 @@ interface Section {
 }
 
 const SECTIONS: Section[] = [
-  { key: "available", title: "Available Coupons", subtitle: "Ready to apply on your next booking", icon: Ticket, defaultOpen: true },
-  { key: "membership", title: "Membership Offers", subtitle: "Exclusive perks for your tier", icon: Crown, defaultOpen: true },
-  { key: "festival", title: "Festival Offers", subtitle: "Limited-time festive savings", icon: PartyPopper, defaultOpen: true },
-  { key: "partner", title: "Partner Offers", subtitle: "Brought to you by our partners", icon: Handshake, defaultOpen: true },
-  { key: "expired", title: "Expired Coupons", subtitle: "Past offers for your reference", icon: Gift, defaultOpen: false },
+  {
+    key: "available",
+    title: "Available Coupons",
+    subtitle: "Ready to apply on your next booking",
+    icon: Ticket,
+    defaultOpen: true,
+  },
+  {
+    key: "membership",
+    title: "Membership Offers",
+    subtitle: "Exclusive perks for your tier",
+    icon: Crown,
+    defaultOpen: true,
+  },
+  {
+    key: "festival",
+    title: "Festival Offers",
+    subtitle: "Limited-time festive savings",
+    icon: PartyPopper,
+    defaultOpen: true,
+  },
+  {
+    key: "partner",
+    title: "Partner Offers",
+    subtitle: "Brought to you by our partners",
+    icon: Handshake,
+    defaultOpen: true,
+  },
+  {
+    key: "expired",
+    title: "Expired Coupons",
+    subtitle: "Past offers for your reference",
+    icon: Gift,
+    defaultOpen: false,
+  },
 ];
 
 export function OffersPage() {
   const grouped = useMemo(() => {
     const map: Record<OfferCategory, typeof COUPONS> = {
-      available: [], membership: [], festival: [], partner: [], expired: [],
+      available: [],
+      membership: [],
+      festival: [],
+      partner: [],
+      expired: [],
     };
     for (const c of COUPONS) map[c.category].push(c);
     return map;
@@ -45,7 +79,9 @@ export function OffersPage() {
             </p>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2">
-              {grouped[s.key].map((c) => <CouponCard key={c.id} coupon={c} />)}
+              {grouped[s.key].map((c) => (
+                <CouponCard key={c.id} coupon={c} />
+              ))}
             </div>
           )}
         </CollapsibleSection>
@@ -55,8 +91,14 @@ export function OffersPage() {
 }
 
 function CollapsibleSection({
-  section, count, children,
-}: { section: Section; count: number; children: React.ReactNode }) {
+  section,
+  count,
+  children,
+}: {
+  section: Section;
+  count: number;
+  children: React.ReactNode;
+}) {
   const [open, setOpen] = useState(section.defaultOpen);
   const Icon = section.icon;
   return (

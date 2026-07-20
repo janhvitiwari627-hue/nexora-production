@@ -12,7 +12,9 @@ export const Route = createFileRoute("/portal/distributors/$slug")({
   },
   head: ({ params, loaderData }) => {
     const d = loaderData?.distributor;
-    const title = d ? `${d.company_name} — Beauty Distributor on Nexora` : "Distributor — Nexora Portal";
+    const title = d
+      ? `${d.company_name} — Beauty Distributor on Nexora`
+      : "Distributor — Nexora Portal";
     const region = d ? [d.city, d.state].filter(Boolean).join(", ") : "";
     const desc =
       d?.description?.slice(0, 155) ||

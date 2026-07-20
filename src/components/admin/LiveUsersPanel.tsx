@@ -94,7 +94,9 @@ export function LiveUsersPanel() {
                     </Avatar>
                     <div>
                       <div className="font-medium">{u.full_name ?? "—"}</div>
-                      <div className="text-muted-foreground text-xs">{u.email ?? u.mobile ?? "—"}</div>
+                      <div className="text-muted-foreground text-xs">
+                        {u.email ?? u.mobile ?? "—"}
+                      </div>
                     </div>
                   </div>
                 </TableCell>
@@ -104,10 +106,7 @@ export function LiveUsersPanel() {
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <Badge
-                    variant={u.is_active ? "default" : "destructive"}
-                    className="capitalize"
-                  >
+                  <Badge variant={u.is_active ? "default" : "destructive"} className="capitalize">
                     {u.is_active ? "Active" : "Suspended"}
                   </Badge>
                 </TableCell>

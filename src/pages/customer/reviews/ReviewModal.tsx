@@ -96,10 +96,7 @@ export function ReviewModal({
             </p>
             <div className="mt-2 flex flex-wrap gap-2">
               {photos.map((p, i) => (
-                <div
-                  key={i}
-                  className="group relative h-16 w-16 overflow-hidden rounded-xl border"
-                >
+                <div key={i} className="group relative h-16 w-16 overflow-hidden rounded-xl border">
                   <img src={p} alt="" className="h-full w-full object-cover" />
                   <button
                     type="button"

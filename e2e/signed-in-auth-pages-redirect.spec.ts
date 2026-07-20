@@ -53,29 +53,20 @@ test.describe("Signed-in users skip auth pages", () => {
       await page.goto(authPage);
 
       // Wait until we're no longer on the auth page.
-      await page.waitForFunction(
-        (p) => !window.location.pathname.startsWith(p),
-        authPage,
-        { timeout: 10_000 },
-      );
+      await page.waitForFunction((p) => !window.location.pathname.startsWith(p), authPage, {
+        timeout: 10_000,
+      });
 
       const landed = new URL(page.url()).pathname;
       expect(landed.startsWith(authPage)).toBe(false);
-      expect(
-        ROLE_TARGETS.some((t) => landed === t || landed.startsWith(t + "/")),
-      ).toBe(true);
+      expect(ROLE_TARGETS.some((t) => landed === t || landed.startsWith(t + "/"))).toBe(true);
 
       // No auth form should be visible — user was not asked to sign in again.
-      const passwordFields = await page
-        .locator('input[type="password"]')
-        .count();
+      const passwordFields = await page.locator('input[type="password"]').count();
       expect(passwordFields).toBe(0);
 
       // Pending redirect key must not linger.
-      const pending = await page.evaluate(
-        (k) => window.sessionStorage.getItem(k),
-        PENDING_KEY,
-      );
+      const pending = await page.evaluate((k) => window.sessionStorage.getItem(k), PENDING_KEY);
       expect(pending).toBeNull();
     });
   }
@@ -83,11 +74,9 @@ test.describe("Signed-in users skip auth pages", () => {
   test("landing on role dashboard does not bounce back to /login", async ({ page }) => {
     await seedSession(page);
     await page.goto("/login");
-    await page.waitForFunction(
-      () => !window.location.pathname.startsWith("/login"),
-      undefined,
-      { timeout: 10_000 },
-    );
+    await page.waitForFunction(() => !window.location.pathname.startsWith("/login"), undefined, {
+      timeout: 10_000,
+    });
     // Give the app a moment; ensure no async redirect throws user back to auth.
     await page.waitForTimeout(500);
     expect(new URL(page.url()).pathname.startsWith("/login")).toBe(false);

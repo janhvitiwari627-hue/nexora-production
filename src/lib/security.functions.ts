@@ -45,7 +45,6 @@ export const recordLoginEvent = createServerFn({ method: "POST" })
     return { id: row.id, skipped: false as const };
   });
 
-
 export const listMyLoginEvents = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {

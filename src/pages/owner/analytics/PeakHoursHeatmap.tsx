@@ -7,7 +7,10 @@ export function PeakHoursHeatmap() {
   return (
     <div className="overflow-x-auto">
       <div className="min-w-[720px]">
-        <div className="grid gap-1" style={{ gridTemplateColumns: "48px repeat(24, minmax(0, 1fr))" }}>
+        <div
+          className="grid gap-1"
+          style={{ gridTemplateColumns: "48px repeat(24, minmax(0, 1fr))" }}
+        >
           <div />
           {Array.from({ length: 24 }, (_, h) => (
             <div key={h} className="text-[10px] text-muted-foreground text-center">
@@ -16,9 +19,7 @@ export function PeakHoursHeatmap() {
           ))}
           {peakHours.map((row, d) => (
             <Fragment key={d}>
-              <div className="text-xs text-muted-foreground flex items-center">
-                {DAYS[d]}
-              </div>
+              <div className="text-xs text-muted-foreground flex items-center">{DAYS[d]}</div>
               {row.map((v, h) => (
                 <div
                   key={`${d}-${h}`}

@@ -59,7 +59,9 @@ export function StaffManagementCard({
           </span>
         ))}
         {staff.specializations.length > 4 && (
-          <span className="text-muted-foreground text-[11px]">+{staff.specializations.length - 4}</span>
+          <span className="text-muted-foreground text-[11px]">
+            +{staff.specializations.length - 4}
+          </span>
         )}
       </div>
 

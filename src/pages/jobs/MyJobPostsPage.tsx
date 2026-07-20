@@ -98,7 +98,12 @@ export function MyJobPostsPage() {
     setPendingId(id);
     try {
       await setJobStatus(id, user.id, next);
-      const label = next === "closed" ? "Job closed" : next === "published" ? "Job published" : "Moved to drafts";
+      const label =
+        next === "closed"
+          ? "Job closed"
+          : next === "published"
+            ? "Job published"
+            : "Moved to drafts";
       toast.success(label);
       setPosts((prev) =>
         prev.map((p) =>
@@ -119,7 +124,6 @@ export function MyJobPostsPage() {
     }
   };
 
-
   return (
     <div className="min-h-screen bg-background">
       <PublicPageHeader />
@@ -127,7 +131,9 @@ export function MyJobPostsPage() {
       <div className="mx-auto max-w-5xl px-4 py-8">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Employer</p>
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Employer
+            </p>
             <h1 className="text-2xl font-bold text-heading">My Job Posts</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               Manage every job you've posted, track applications and close roles you've filled.

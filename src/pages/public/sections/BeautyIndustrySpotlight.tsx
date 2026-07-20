@@ -1,5 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { Play, Sparkles, ChevronLeft, ChevronRight, ExternalLink, Bookmark, Share2, X } from "lucide-react";
+import {
+  Play,
+  Sparkles,
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  Bookmark,
+  Share2,
+  X,
+} from "lucide-react";
 
 /**
  * Beauty Industry Spotlight — premium sponsored video showcase.
@@ -32,7 +41,8 @@ const VIDEOS: SpotlightVideo[] = [
     category: "Bridal Beauty",
     duration: "0:45",
     tier: "Diamond",
-    description: "A 4-step professional bridal ritual crafted by Lakmé's master artists — trusted by 8,000+ salons across India.",
+    description:
+      "A 4-step professional bridal ritual crafted by Lakmé's master artists — trusted by 8,000+ salons across India.",
     ctaLabel: "Explore Lakmé Pro",
     ctaHref: "/portal/brands",
   },
@@ -44,7 +54,8 @@ const VIDEOS: SpotlightVideo[] = [
     category: "Salon Equipment",
     duration: "1:12",
     tier: "Platinum",
-    description: "The new Wahl Cordless Magic Clip — engineered for the perfect fade in under 8 minutes.",
+    description:
+      "The new Wahl Cordless Magic Clip — engineered for the perfect fade in under 8 minutes.",
     ctaLabel: "Shop Wahl",
     ctaHref: "/portal/brands",
   },
@@ -56,7 +67,8 @@ const VIDEOS: SpotlightVideo[] = [
     category: "Hair Care",
     duration: "1:00",
     tier: "Diamond",
-    description: "Majirel Glow — the industry-first light-reflecting colour system used in premium salons worldwide.",
+    description:
+      "Majirel Glow — the industry-first light-reflecting colour system used in premium salons worldwide.",
     ctaLabel: "Discover Majirel",
     ctaHref: "/portal/brands",
   },
@@ -68,7 +80,8 @@ const VIDEOS: SpotlightVideo[] = [
     category: "Spa & Wellness",
     duration: "0:58",
     tier: "Gold",
-    description: "Ayurvedic-inspired spa rituals crafted with pure botanicals for India's luxury wellness destinations.",
+    description:
+      "Ayurvedic-inspired spa rituals crafted with pure botanicals for India's luxury wellness destinations.",
     ctaLabel: "Partner With Us",
     ctaHref: "/portal/brands",
   },
@@ -80,7 +93,8 @@ const VIDEOS: SpotlightVideo[] = [
     category: "Nail Studio",
     duration: "1:30",
     tier: "Platinum",
-    description: "The season's most-booked nail looks — from chrome mirror finishes to sculpted 3D art.",
+    description:
+      "The season's most-booked nail looks — from chrome mirror finishes to sculpted 3D art.",
     ctaLabel: "View OPI Range",
     ctaHref: "/portal/brands",
   },
@@ -119,7 +133,8 @@ export function BeautyIndustrySpotlight() {
   const toggleSave = (id: string) =>
     setSaved((prev) => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
 
@@ -174,9 +189,7 @@ export function BeautyIndustrySpotlight() {
         ))}
       </div>
 
-      {active && (
-        <FullViewer video={active} onClose={() => setActive(null)} />
-      )}
+      {active && <FullViewer video={active} onClose={() => setActive(null)} />}
     </section>
   );
 }
@@ -359,7 +372,9 @@ function FullViewer({ video, onClose }: { video: SpotlightVideo; onClose: () => 
               <span className="rounded-full bg-slate-900 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
                 Sponsored
               </span>
-              <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${TIER_STYLE[video.tier]}`}>
+              <span
+                className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${TIER_STYLE[video.tier]}`}
+              >
                 {video.tier} Sponsor
               </span>
             </div>
@@ -399,7 +414,9 @@ function FullViewer({ video, onClose }: { video: SpotlightVideo; onClose: () => 
                     </div>
                     <div className="min-w-0">
                       <p className="truncate text-[13px] font-semibold text-slate-900">{r.title}</p>
-                      <p className="text-[11px] text-slate-500">{r.brand} · {r.duration}</p>
+                      <p className="text-[11px] text-slate-500">
+                        {r.brand} · {r.duration}
+                      </p>
                     </div>
                   </a>
                 ))}
