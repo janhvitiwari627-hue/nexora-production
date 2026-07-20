@@ -11,6 +11,9 @@
     "binding": "ASSETS",
     "directory": ".output/public"
   },
+  "vars": {
+    "SUPABASE_JWKS_URL": "https://hbqcsjmdyoosmidkzcjj.supabase.co/auth/v1/.well-known/jwks.json"
+  },
   "routes": [
     {
       "pattern": "meripahalfasthelp.online",
