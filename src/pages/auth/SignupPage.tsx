@@ -14,7 +14,6 @@ import {
   PasswordStrengthIndicator,
   scorePassword,
 } from "@/components/auth/PasswordStrengthIndicator";
-import { BackButton } from "@/components/shared/BackButton";
 import { useAuthStore } from "@/stores/authStore";
 import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
 import { requestPasswordReset } from "@/lib/password-reset";
@@ -298,7 +297,6 @@ export default function SignupPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12">
         <div className="w-full max-w-md">
-          <BackButton className="mb-3" />
           <Card className="w-full">
             <CardHeader className="text-center">
               <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
@@ -332,7 +330,6 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md">
-        <BackButton className="mb-3" />
         <Card className="w-full">
           <CardHeader>
             <CardTitle className="text-2xl">Create your account</CardTitle>
