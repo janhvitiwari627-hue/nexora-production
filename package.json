@@ -9,6 +9,7 @@
     "build": "vite build",
     "prebuild:dev": "node scripts/check-forbidden-refs.mjs && node scripts/check-customer-layout-isolation.mjs && node scripts/check-pwa-standalone-guard.mjs",
     "build:dev": "vite build --mode development",
+    "deploy:cloudflare": "npm run build && wrangler deploy --config wrangler.jsonc",
     "preview": "vite preview",
     "lint": "eslint .",
     "check:forbidden": "node scripts/check-forbidden-refs.mjs",
@@ -120,7 +121,8 @@
     "prettier": "^3.7.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
-    "vite": "^8.0.16"
+    "vite": "^8.0.16",
+    "wrangler": "^4.112.0"
   },
   "pnpm": {
     "overrides": {
