@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Camera, ChevronRight, Crown, Heart, LifeBuoy, LogIn, Settings, Users } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
+import { CustomerAppInstallPanel } from "@/pages/customer/settings/CustomerAppInstallPanel";
 import { CustomerAvatar } from "./CustomerAvatar";
 
 const LINKS = [
@@ -67,6 +68,9 @@ export function CustomerAppProfile() {
         <Camera className="h-4 w-4" />
         {currentProfile?.avatar_url ? "Change profile photo" : "Choose profile photo"}
       </Link>
+      <div className="mt-6">
+        <CustomerAppInstallPanel />
+      </div>
       <div className="mt-6 overflow-hidden rounded-2xl border bg-white">
         {LINKS.map((item) => (
           <Link

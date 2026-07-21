@@ -17,6 +17,7 @@ const files = [
   "src/pages/customer/app/CustomerAppRewards.tsx",
   "src/pages/customer/app/CustomerAppProfile.tsx",
   "src/pages/customer/app/CustomerAvatar.tsx",
+  "src/pages/customer/settings/CustomerAppInstallPanel.tsx",
   "supabase/migrations/20260716130000_customer_pwa_staff_booking.sql",
   "supabase/migrations/20260716130020_persist_customer_gender.sql",
 ];
@@ -29,6 +30,9 @@ for (const file of files) {
 const shell = readFileSync("src/pages/customer/app/CustomerAppShell.tsx", "utf8");
 for (const label of ["Home", "Search", "Bookings", "Rewards", "Profile"]) {
   if (!shell.includes(`label: "${label}"`)) failures.push(`Bottom navigation is missing ${label}`);
+}
+if (!shell.includes('from "@/stores/authStore"')) {
+  failures.push("Customer app shell must reuse the platform Supabase auth store");
 }
 
 const liveSalons = readFileSync("src/lib/customer-app.ts", "utf8");
@@ -56,8 +60,33 @@ if (
 }
 
 const profile = readFileSync("src/pages/customer/app/CustomerAppProfile.tsx", "utf8");
-if (!profile.includes("Nexora member") || !profile.includes("Choose profile photo")) {
-  failures.push("Customer profile must show the member ID and photo chooser");
+if (
+  !profile.includes("Nexora member") ||
+  !profile.includes("Choose profile photo") ||
+  !profile.includes("CustomerAppInstallPanel") ||
+  !profile.includes('from "@/stores/authStore"')
+) {
+  failures.push(
+    "Customer profile must reuse platform auth and show the member ID, photo chooser and install action",
+  );
+}
+
+const customerLanding = readFileSync("src/routes/customer-app.tsx", "utf8");
+if (customerLanding.includes("Coming Soon") || !customerLanding.includes("existing Nexora login")) {
+  failures.push("Customer app landing metadata must describe the live shared-login app");
+}
+
+const installPanel = readFileSync(
+  "src/pages/customer/settings/CustomerAppInstallPanel.tsx",
+  "utf8",
+);
+if (!installPanel.includes('kind="customer"') || !installPanel.includes("/app/customer")) {
+  failures.push("Customer profile must expose the customer-specific PWA install action");
+}
+
+const accountSettings = readFileSync("src/pages/customer/AccountSettingsPage.tsx", "utf8");
+if (!accountSettings.includes('label: "Install customer app"')) {
+  failures.push("Customer account settings must include the PWA install section");
 }
 
 const staffMigration = readFileSync(
