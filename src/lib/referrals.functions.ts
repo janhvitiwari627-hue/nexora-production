@@ -10,60 +10,43 @@ export interface ReferralAttribution {
   status: ReferralAttributionStatus;
 }
 
+type LiveReferralRow = {
+  id: string;
+  referred_customer_id: string | null;
+  signed_up_at: string | null;
+  created_at: string;
+  status: string;
+};
+
 export const getMyReferrals = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<ReferralAttribution[]> => {
-    const [attributionsResult, legacyResult] = await Promise.all([
-      context.supabase
-        .from("referral_attributions")
-        .select("id, referred_user_id, validated_at, status")
-        .eq("referrer_user_id", context.userId)
-        .order("validated_at", { ascending: false })
-        .limit(200),
-      context.supabase
-        .from("referrals")
-        .select("id, referred_user_id, created_at, status")
-        .eq("referrer_id", context.userId)
-        .order("created_at", { ascending: false })
-        .limit(200),
-    ]);
+    // The production referral ledger uses customer-oriented column names.
+    // Cast only at this query boundary until the generated database types are
+    // refreshed from the live project.
+    const referralsResult = await context.supabase
+      .from("referrals")
+      .select("id, referred_customer_id, signed_up_at, created_at, status")
+      .eq("referrer_customer_id" as never, context.userId)
+      .order("created_at", { ascending: false })
+      .limit(200);
 
-    // Both tables are protected by RLS and expose only this signed-in user's
-    // referrals. The user's token removes the need for an admin secret here.
-    if (attributionsResult.error && legacyResult.error) {
-      console.error("[Referrals] Attribution query failed", {
-        attributionCode: attributionsResult.error.code,
-        legacyCode: legacyResult.error.code,
+    // RLS exposes only this signed-in user's rows. The user's token removes the
+    // need for an admin secret here.
+    if (referralsResult.error) {
+      console.error("[Referrals] Ledger query failed", {
+        code: referralsResult.error.code,
       });
       throw new Error("Could not load referral activity");
     }
 
-    const rows = new Map<string, ReferralAttribution>();
-
-    for (const row of attributionsResult.data ?? []) {
-      const key = row.referred_user_id || row.id;
-      rows.set(key, {
+    return ((referralsResult.data ?? []) as unknown as LiveReferralRow[])
+      .map((row) => ({
         id: row.id,
         name: "Nexora member",
-        signedUpAt: row.validated_at,
+        signedUpAt: row.signed_up_at ?? row.created_at,
         status: row.status === "rewarded" ? "rewarded" : "joined",
-      });
-    }
-
-    // Keep the original referrals table as a fallback for accounts created
-    // before referral_attributions was introduced.
-    for (const row of legacyResult.data ?? []) {
-      const key = row.referred_user_id || row.id;
-      if (rows.has(key)) continue;
-      rows.set(key, {
-        id: row.id,
-        name: "Nexora member",
-        signedUpAt: row.created_at,
-        status: row.status === "rewarded" ? "rewarded" : "joined",
-      });
-    }
-
-    return [...rows.values()]
+      }))
       .sort((a, b) => Date.parse(b.signedUpAt) - Date.parse(a.signedUpAt))
       .slice(0, 200);
   });
