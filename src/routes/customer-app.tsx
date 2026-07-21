@@ -4,16 +4,19 @@ import CustomerAppPage from "@/pages/public/CustomerAppPage";
 export const Route = createFileRoute("/customer-app")({
   head: () => ({
     meta: [
-      { title: "Nexora Customer App — Coming Soon" },
+      { title: "Nexora Customer App — Search, book and earn rewards" },
       {
         name: "description",
         content:
-          "The Nexora Customer App is launching separately. Join the waitlist to book salons, scan-and-pay and earn rewards on Android, iOS and web.",
+          "Install or open the Nexora Customer App to discover published salons, manage bookings and access rewards with your existing Nexora login.",
       },
-      { property: "og:title", content: "Nexora Customer App — Coming Soon" },
+      {
+        property: "og:title",
+        content: "Nexora Customer App — Search, book and earn rewards",
+      },
       {
         property: "og:description",
-        content: "The Nexora Customer App is launching separately. Join the waitlist.",
+        content: "Install or continue in the browser with your existing Nexora account.",
       },
       { property: "og:url", content: "https://meripahalfasthelp.online/customer-app" },
       { property: "og:type", content: "website" },
