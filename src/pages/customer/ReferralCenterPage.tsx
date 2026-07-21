@@ -43,11 +43,38 @@ export function ReferralCenterPage() {
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [showFallback, setShowFallback] = useState(false);
+  const [isResolvingCode, setIsResolvingCode] = useState(true);
+  const [referralError, setReferralError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
-    if (!user || currentProfile) return;
-    void refreshProfile();
-  }, [currentProfile, refreshProfile, user]);
+    if (!user) {
+      setIsResolvingCode(false);
+      return;
+    }
+    if (referralCode) {
+      setIsResolvingCode(false);
+      setReferralError(null);
+      return;
+    }
+
+    let cancelled = false;
+    setIsResolvingCode(true);
+    setReferralError(null);
+    void refreshProfile()
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        console.error("[Referral Center] Profile refresh failed", error);
+        setReferralError("We couldn't load your referral code. Please try again.");
+      })
+      .finally(() => {
+        if (!cancelled) setIsResolvingCode(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [referralCode, refreshProfile, retryCount, user]);
 
   const shareText = `Join me on Nexora and we both earn 100 points. Use code ${referralCode}: ${referralLink}`;
 
@@ -134,16 +161,41 @@ export function ReferralCenterPage() {
   const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(referralLink)}`;
   const emailUrl = `mailto:?subject=${encodeURIComponent("Join me on Nexora")}&body=${encodeURIComponent(shareText)}`;
 
-  if (!referralCode) {
+  if (!user || !referralCode) {
     return (
       <div className="min-h-screen bg-background">
         <PublicHeader />
         <main className="mx-auto w-full max-w-6xl px-4 py-10">
           <div className="rounded-2xl border bg-card p-6 text-center shadow-sm">
-            <h1 className="text-xl font-black">Loading your referral code…</h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              We are securely loading the referral code for your signed-in account.
-            </p>
+            {isResolvingCode ? (
+              <>
+                <h1 className="text-xl font-black">Loading your referral code…</h1>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  We are securely loading the referral code for your signed-in account.
+                </p>
+              </>
+            ) : !user ? (
+              <>
+                <h1 className="text-xl font-black">Sign in to view your referral code</h1>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Your personal code is available after you sign in.
+                </p>
+              </>
+            ) : (
+              <>
+                <h1 className="text-xl font-black">Referral code couldn't be loaded</h1>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {referralError ?? "Your account is ready, but its referral code is unavailable."}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setRetryCount((count) => count + 1)}
+                  className="mt-4 rounded-full bg-primary px-5 py-2 text-sm font-bold text-primary-foreground"
+                >
+                  Try again
+                </button>
+              </>
+            )}
           </div>
         </main>
         <PublicFooter />
