@@ -14,6 +14,7 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ShopOwnerAppRouteImport } from './routes/shop-owner-app'
+import { Route as ShopOwnerRouteImport } from './routes/shop-owner'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SalonsRouteImport } from './routes/salons'
 import { Route as RoleSelectionRouteImport } from './routes/role-selection'
@@ -219,6 +220,11 @@ const SignupRoute = SignupRouteImport.update({
 const ShopOwnerAppRoute = ShopOwnerAppRouteImport.update({
   id: '/shop-owner-app',
   path: '/shop-owner-app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopOwnerRoute = ShopOwnerRouteImport.update({
+  id: '/shop-owner',
+  path: '/shop-owner',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SearchRoute = SearchRouteImport.update({
@@ -1176,6 +1182,7 @@ export interface FileRoutesByFullPath {
   '/role-selection': typeof RoleSelectionRoute
   '/salons': typeof SalonsRoute
   '/search': typeof SearchRoute
+  '/shop-owner': typeof ShopOwnerRoute
   '/shop-owner-app': typeof ShopOwnerAppRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -1360,6 +1367,7 @@ export interface FileRoutesByTo {
   '/role-selection': typeof RoleSelectionRoute
   '/salons': typeof SalonsRoute
   '/search': typeof SearchRoute
+  '/shop-owner': typeof ShopOwnerRoute
   '/shop-owner-app': typeof ShopOwnerAppRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -1545,6 +1553,7 @@ export interface FileRoutesById {
   '/role-selection': typeof RoleSelectionRoute
   '/salons': typeof SalonsRoute
   '/search': typeof SearchRoute
+  '/shop-owner': typeof ShopOwnerRoute
   '/shop-owner-app': typeof ShopOwnerAppRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -1735,6 +1744,7 @@ export interface FileRouteTypes {
     | '/role-selection'
     | '/salons'
     | '/search'
+    | '/shop-owner'
     | '/shop-owner-app'
     | '/signup'
     | '/sitemap.xml'
@@ -1919,6 +1929,7 @@ export interface FileRouteTypes {
     | '/role-selection'
     | '/salons'
     | '/search'
+    | '/shop-owner'
     | '/shop-owner-app'
     | '/signup'
     | '/sitemap.xml'
@@ -2103,6 +2114,7 @@ export interface FileRouteTypes {
     | '/role-selection'
     | '/salons'
     | '/search'
+    | '/shop-owner'
     | '/shop-owner-app'
     | '/signup'
     | '/sitemap.xml'
@@ -2292,6 +2304,7 @@ export interface RootRouteChildren {
   RoleSelectionRoute: typeof RoleSelectionRoute
   SalonsRoute: typeof SalonsRoute
   SearchRoute: typeof SearchRoute
+  ShopOwnerRoute: typeof ShopOwnerRoute
   ShopOwnerAppRoute: typeof ShopOwnerAppRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -2389,6 +2402,13 @@ declare module '@tanstack/react-router' {
       path: '/shop-owner-app'
       fullPath: '/shop-owner-app'
       preLoaderRoute: typeof ShopOwnerAppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shop-owner': {
+      id: '/shop-owner'
+      path: '/shop-owner'
+      fullPath: '/shop-owner'
+      preLoaderRoute: typeof ShopOwnerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/search': {
@@ -3989,6 +4009,7 @@ const rootRouteChildren: RootRouteChildren = {
   RoleSelectionRoute: RoleSelectionRoute,
   SalonsRoute: SalonsRoute,
   SearchRoute: SearchRoute,
+  ShopOwnerRoute: ShopOwnerRoute,
   ShopOwnerAppRoute: ShopOwnerAppRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

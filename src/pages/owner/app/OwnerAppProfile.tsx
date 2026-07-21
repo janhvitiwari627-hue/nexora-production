@@ -3,6 +3,7 @@ import {
   BarChart3,
   ChevronRight,
   CircleHelp,
+  Download,
   Image,
   MessageSquareText,
   Scissors,
@@ -15,6 +16,7 @@ import {
 } from "lucide-react";
 import { useOwnerContext } from "@/hooks/use-owner-context";
 import { useAuthStore } from "@/stores/authStore";
+import { InstallAppButton } from "@/components/pwa/InstallAppButton";
 
 const MODULES = [
   {
@@ -88,6 +90,22 @@ export function OwnerAppProfile() {
           {profile?.full_name || "Salon owner"}
           {profile?.nexora_id ? ` · ID ${profile.nexora_id}` : ""}
         </p>
+      </section>
+
+      {/* Install the Shop Owner app on this device (only when supported). */}
+      <section className="mt-5 flex flex-col gap-3 rounded-2xl border bg-white p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-violet-100 text-violet-700">
+            <Download className="h-5 w-5" />
+          </span>
+          <div className="min-w-0">
+            <p className="font-bold">Install Shop Owner app</p>
+            <p className="text-xs text-slate-500">
+              Add Nexora Owner to your home screen for a full-screen app experience.
+            </p>
+          </div>
+        </div>
+        <InstallAppButton kind="owner" fallbackHref="/app/owner" className="shrink-0" />
       </section>
 
       <div className="mt-5 overflow-hidden rounded-2xl border bg-white">
