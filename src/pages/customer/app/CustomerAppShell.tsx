@@ -1,9 +1,13 @@
+import { useCallback, useEffect, useState } from "react";
 import { Outlet, Link, useRouterState } from "@tanstack/react-router";
 import { CalendarDays, Gift, Home, Search, UserRound } from "lucide-react";
-import nexoraLogo from "@/assets/nexora-logo.jpg.asset.json";
 import { LocationPermissionModal } from "@/components/auth/LocationPermissionModal";
 import { useAuthStore } from "@/stores/authStore";
 import { CustomerAvatar } from "./CustomerAvatar";
+
+const CUSTOMER_ICON = "/customer-pwa-icon-192.png";
+const CUSTOMER_SPLASH = "/customer-pwa-splash.jpg";
+const SPLASH_SESSION_KEY = "nexora:customer-launch-splash:v1";
 
 const NAV = [
   { to: "/app/customer", label: "Home", icon: Home, exact: true },
@@ -17,14 +21,62 @@ export function CustomerAppShell() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const user = useAuthStore((state) => state.user);
   const profile = useAuthStore((state) => state.profile);
+  const [showLaunchSplash, setShowLaunchSplash] = useState(false);
+
+  const dismissLaunchSplash = useCallback(() => {
+    setShowLaunchSplash(false);
+    try {
+      window.sessionStorage.setItem(SPLASH_SESSION_KEY, "shown");
+    } catch {
+      // Restricted storage should not prevent the app from opening.
+    }
+  }, []);
+
+  useEffect(() => {
+    let alreadyShown = false;
+    try {
+      alreadyShown = window.sessionStorage.getItem(SPLASH_SESSION_KEY) === "shown";
+    } catch {
+      // Restricted storage should not prevent the app from opening.
+    }
+    if (alreadyShown) return;
+
+    setShowLaunchSplash(true);
+    const timer = window.setTimeout(dismissLaunchSplash, 2600);
+    return () => window.clearTimeout(timer);
+  }, [dismissLaunchSplash]);
 
   return (
     <div className="nexora-pwa-surface customer-app min-h-[100dvh] w-full max-w-full overflow-x-hidden bg-slate-50 text-slate-950">
+      {showLaunchSplash ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Nexora Customer App launch screen"
+          className="fixed inset-0 z-[100] grid min-h-[100dvh] place-items-center overflow-hidden bg-black"
+          onClick={dismissLaunchSplash}
+        >
+          <img
+            src={CUSTOMER_SPLASH}
+            alt="Nexora SalONOS — Salon ja rahe ho? Nexora kiya?"
+            className="h-full w-full object-contain"
+            fetchPriority="high"
+          />
+          <button
+            type="button"
+            onClick={dismissLaunchSplash}
+            className="absolute right-4 top-[max(1rem,env(safe-area-inset-top))] rounded-full border border-amber-300/40 bg-black/70 px-4 py-2 text-xs font-bold text-amber-100 backdrop-blur"
+          >
+            Skip
+          </button>
+        </div>
+      ) : null}
+
       <header className="sticky top-0 z-40 w-full max-w-full overflow-x-hidden border-b bg-white/95 backdrop-blur">
         <div className="mx-auto grid w-full max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3">
           <Link to="/app/customer" className="flex min-w-0 items-center gap-2">
             <img
-              src={nexoraLogo.url}
+              src={CUSTOMER_ICON}
               alt="Nexora"
               className="h-10 w-10 shrink-0 rounded-xl object-cover"
             />

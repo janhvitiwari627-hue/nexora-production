@@ -9,6 +9,15 @@ const APP_MANIFESTS: Record<NexoraAppKind, string> = {
   jobs: "/manifests/jobs.webmanifest",
 };
 
+const APP_TOUCH_ICONS: Record<NexoraAppKind, string> = {
+  master: "/icon-192.png",
+  customer: "/customer-pwa-icon-192.png",
+  owner: "/icon-192.png",
+  partner: "/icon-192.png",
+  distributor: "/icon-192.png",
+  jobs: "/icon-192.png",
+};
+
 export function appKindForPath(pathname: string): NexoraAppKind {
   if (pathname.startsWith("/app/customer")) return "customer";
   if (pathname.startsWith("/app/owner")) return "owner";
@@ -31,4 +40,10 @@ export function appKindForPath(pathname: string): NexoraAppKind {
 export function activateRoleManifest(kind: NexoraAppKind) {
   const manifest = document.querySelector<HTMLLinkElement>('link[rel="manifest"]');
   if (manifest) manifest.href = APP_MANIFESTS[kind];
+
+  const touchIcon = document.querySelector<HTMLLinkElement>('link[rel="apple-touch-icon"]');
+  if (touchIcon) {
+    touchIcon.href = APP_TOUCH_ICONS[kind];
+    touchIcon.type = "image/png";
+  }
 }
