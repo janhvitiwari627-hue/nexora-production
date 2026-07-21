@@ -109,6 +109,17 @@ const manifest = JSON.parse(readFileSync("public/manifests/customer.webmanifest"
 if (!String(manifest.start_url).startsWith("/app/customer")) {
   failures.push("Customer PWA manifest must open /app/customer");
 }
+for (const size of ["192x192", "512x512"]) {
+  if (!manifest.icons?.some((icon) => icon.src === `/customer-pwa-icon-${size.split("x")[0]}.png` && icon.sizes === size)) {
+    failures.push(`Customer PWA manifest must include the supplied Nexora ${size} install icon`);
+  }
+}
+if (!manifest.screenshots?.some((shot) => shot.src === "/customer-pwa-splash.jpg")) {
+  failures.push("Customer PWA manifest must include the supplied launch artwork");
+}
+if (!shell.includes("CUSTOMER_SPLASH") || !shell.includes("showLaunchSplash")) {
+  failures.push("Customer app shell must show the branded launch splash once per session");
+}
 
 if (failures.length) {
   console.error("Customer PWA audit failed:");
