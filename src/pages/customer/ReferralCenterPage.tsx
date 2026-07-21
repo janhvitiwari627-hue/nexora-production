@@ -223,7 +223,7 @@ export function ReferralCenterPage() {
                 <Sparkles className="h-3.5 w-3.5" /> Your Referral Code
               </p>
               <div className="relative mt-3 flex flex-wrap items-end gap-4">
-                <p className="font-mono text-5xl font-black tracking-[0.18em] sm:text-6xl">
+                <p className="max-w-full break-all font-mono text-[clamp(1.75rem,8vw,3.75rem)] font-black tracking-[0.12em] sm:tracking-[0.18em]">
                   {referralCode}
                 </p>
                 <button
