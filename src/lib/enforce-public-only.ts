@@ -1,14 +1,13 @@
 /**
- * Runtime guard: kept for backwards compatibility.
- *
- * The Customer App has been removed from this project — it ships as a
- * separate product. This guard now always allows public-website layout
- * components to render.
+ * Protected customer dashboard routes own their header and mobile navigation,
+ * so public marketing chrome must not render inside them.
  */
 export function isCustomerRoute(): boolean {
-  return false;
+  if (typeof window === "undefined") return false;
+  const pathname = window.location.pathname;
+  return pathname === "/dashboard" || pathname.startsWith("/dashboard/");
 }
 
 export function assertPublicOnly(_componentName: string): boolean {
-  return false;
+  return isCustomerRoute();
 }

@@ -27,7 +27,6 @@ import {
   Users,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import nexoraLogo from "@/assets/nexora-logo.jpg.asset.json";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -178,7 +177,7 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
           {showBackButton && <BackButton size="icon" className="shrink-0" aria-label="Go back" />}
           <Link to="/" className="flex min-w-0 items-center gap-2">
             <img
-              src={nexoraLogo.url}
+              src="/customer-pwa-icon-192.png"
               alt="Nexora SalonOS"
               className="h-9 w-9 shrink-0 rounded-xl object-cover shadow-[var(--shadow-glow)] sm:h-10 sm:w-10"
             />
