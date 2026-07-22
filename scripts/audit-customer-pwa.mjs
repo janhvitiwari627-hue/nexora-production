@@ -52,6 +52,8 @@ if (!liveSalons.includes('input?.gender === "male"') || !liveSalons.includes('"B
 }
 
 const home = readFileSync("src/pages/customer/app/CustomerAppHome.tsx", "utf8");
+const locationGate = readFileSync("src/components/auth/LocationPermissionModal.tsx", "utf8");
+const referralPopup = readFileSync("src/components/referral/ReferralWelcomePopup.tsx", "utf8");
 const locationDialog = readFileSync("src/pages/customer/app/CustomerLocationDialog.tsx", "utf8");
 const customerLocation = readFileSync("src/lib/customer-location.ts", "utf8");
 const locationMigration = readFileSync(
@@ -65,6 +67,20 @@ if (
   !locationDialog.includes("Confirm & save")
 ) {
   failures.push("Customer app must provide precise GPS and draggable map confirmation");
+}
+if (
+  !locationGate.includes("autoLocate") ||
+  !locationGate.includes("required") ||
+  locationGate.includes("Not now") ||
+  !locationDialog.includes("GPS denied?") ||
+  !shell.includes('aria-label="Change current location"') ||
+  !shell.includes("location?.label") ||
+  !referralPopup.includes("needsCustomerLocation") ||
+  !referralPopup.includes("CUSTOMER_LOCATION_ONBOARDING_KEY")
+) {
+  failures.push(
+    "Customer app must require first-run auto location and keep the saved location in the header",
+  );
 }
 if (
   !customerLocation.includes("reverseGeocodeLocation") ||
@@ -86,9 +102,10 @@ if (
 const signup = readFileSync("src/pages/auth/SignupPage.tsx", "utf8");
 if (
   !signup.includes('gender: z.enum(["male", "female"]') ||
-  !signup.includes("gender: parsed.data.gender")
+  !signup.includes("gender: parsed.data.gender") ||
+  !signup.includes("CUSTOMER_LOCATION_ONBOARDING_KEY")
 ) {
-  failures.push("Customer signup must require and persist gender");
+  failures.push("Customer signup must persist gender and start required location onboarding");
 }
 
 const profile = readFileSync("src/pages/customer/app/CustomerAppProfile.tsx", "utf8");

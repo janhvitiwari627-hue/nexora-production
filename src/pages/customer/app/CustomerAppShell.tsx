@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { Outlet, Link, useRouterState } from "@tanstack/react-router";
-import { CalendarDays, Gift, Home, Search, UserRound } from "lucide-react";
+import { CalendarDays, ChevronDown, Gift, Home, MapPin, Search, UserRound } from "lucide-react";
 import { LocationPermissionModal } from "@/components/auth/LocationPermissionModal";
+import { useCustomerLocation } from "@/hooks/useCustomerLocation";
+import { CUSTOMER_LOCATION_ONBOARDING_KEY } from "@/lib/customer-location";
 import { useAuthStore } from "@/stores/authStore";
 import { CustomerAvatar } from "./CustomerAvatar";
+import { CustomerLocationDialog } from "./CustomerLocationDialog";
 
 const CUSTOMER_ICON = "/customer-pwa-icon-192.png";
 const CUSTOMER_SPLASH = "/customer-pwa-splash.jpg";
@@ -21,7 +24,9 @@ export function CustomerAppShell() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const user = useAuthStore((state) => state.user);
   const profile = useAuthStore((state) => state.profile);
+  const { location, save: saveLocation } = useCustomerLocation();
   const [showLaunchSplash, setShowLaunchSplash] = useState(false);
+  const [locationOpen, setLocationOpen] = useState(false);
 
   const dismissLaunchSplash = useCallback(() => {
     setShowLaunchSplash(false);
@@ -36,6 +41,10 @@ export function CustomerAppShell() {
     let alreadyShown = false;
     try {
       alreadyShown = window.sessionStorage.getItem(SPLASH_SESSION_KEY) === "shown";
+      if (window.sessionStorage.getItem(CUSTOMER_LOCATION_ONBOARDING_KEY) === "required") {
+        window.sessionStorage.setItem(SPLASH_SESSION_KEY, "shown");
+        return;
+      }
     } catch {
       // Restricted storage should not prevent the app from opening.
     }
@@ -109,6 +118,32 @@ export function CustomerAppShell() {
             </div>
           )}
         </div>
+        {user ? (
+          <div className="border-t border-[#efe3c4] bg-[#fff8e7] px-4 py-2">
+            <button
+              type="button"
+              onClick={() => setLocationOpen(true)}
+              aria-label="Change current location"
+              className="mx-auto flex w-full max-w-6xl items-center gap-2 rounded-xl px-1 py-1 text-left transition hover:bg-[#fff0c2]"
+            >
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#0b0a08] text-[#f3cf70]">
+                <MapPin className="h-4 w-4" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[9px] font-black uppercase tracking-[0.15em] text-[#9a6b16]">
+                  Current location
+                </span>
+                <span className="block truncate text-sm font-black text-[#20190d]">
+                  {location?.label ?? "Set your location"}
+                </span>
+              </span>
+              <span className="hidden text-xs font-bold text-[#9a6b16] sm:inline">
+                {location ? "Change" : "Set now"}
+              </span>
+              <ChevronDown className="h-4 w-4 shrink-0 text-[#9a6b16]" />
+            </button>
+          </div>
+        ) : null}
       </header>
 
       <div className="w-full max-w-full overflow-x-hidden pb-24">
@@ -149,6 +184,12 @@ export function CustomerAppShell() {
         </ul>
       </nav>
       <LocationPermissionModal />
+      <CustomerLocationDialog
+        open={locationOpen}
+        onOpenChange={setLocationOpen}
+        initialLocation={location}
+        onSave={saveLocation}
+      />
     </div>
   );
 }

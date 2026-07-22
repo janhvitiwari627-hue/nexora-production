@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 const LOCATION_STORAGE_KEY = "nx_customer_location_v2";
+export const CUSTOMER_LOCATION_ONBOARDING_KEY = "nexora:customer-location-onboarding:v1";
 const GEOCODE_CACHE_PREFIX = "nx_geocode_v1:";
 const CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 const GEOCODER_BASE_URL = (
@@ -179,12 +180,17 @@ export async function searchCustomerLocations(query: string) {
   return results.map(customerLocationFromResult);
 }
 
-export function readStoredCustomerLocation(): CustomerLocation | null {
-  if (!storageAvailable()) return null;
+export function readStoredCustomerLocation(
+  userId: string | null | undefined,
+): CustomerLocation | null {
+  if (!storageAvailable() || !userId) return null;
   try {
-    const location = JSON.parse(
-      localStorage.getItem(LOCATION_STORAGE_KEY) || "null",
-    ) as CustomerLocation | null;
+    const stored = JSON.parse(localStorage.getItem(LOCATION_STORAGE_KEY) || "null") as {
+      userId?: string;
+      location?: CustomerLocation;
+    } | null;
+    if (!stored || stored.userId !== userId || !stored.location) return null;
+    const location = stored.location;
     if (!location || !validCoordinates(location.latitude, location.longitude)) return null;
     return location;
   } catch {
@@ -251,6 +257,8 @@ export async function saveCustomerLocation(location: CustomerLocation) {
     .eq("id", data.user.id);
   if (error) throw error;
 
-  if (storageAvailable()) localStorage.setItem(LOCATION_STORAGE_KEY, JSON.stringify(location));
+  if (storageAvailable()) {
+    localStorage.setItem(LOCATION_STORAGE_KEY, JSON.stringify({ userId: data.user.id, location }));
+  }
   return location;
 }

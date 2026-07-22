@@ -24,6 +24,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/stores/authStore";
 import { buildReferralSignupUrl } from "@/lib/public-app-url";
+import { CUSTOMER_LOCATION_ONBOARDING_KEY } from "@/lib/customer-location";
 
 export function ReferralWelcomePopup() {
   const user = useAuthStore((s) => s.user);
@@ -41,16 +42,20 @@ export function ReferralWelcomePopup() {
     pathname.startsWith("/owner") ||
     pathname.startsWith("/app/owner") ||
     pathname.startsWith("/admin");
+  const needsCustomerLocation =
+    pathname.startsWith("/app/customer") &&
+    (profile?.latitude == null || profile?.longitude == null);
 
   const code = profile?.referral_code ?? null;
   const link = code ? buildReferralSignupUrl(code) : "";
   const shareText = `Join me on Nexora & build your own salon website in minutes! Use my referral code ${code}: ${link}`;
 
   useEffect(() => {
-    if (isWorkspaceRoute) return;
+    if (isWorkspaceRoute || needsCustomerLocation) return;
     if (!isInitialized || !user || !code) return;
     const key = `nexora_ref_popup_shown_${user.id}`;
     if (typeof window === "undefined") return;
+    if (window.sessionStorage.getItem(CUSTOMER_LOCATION_ONBOARDING_KEY) === "required") return;
     if (window.sessionStorage.getItem(key)) return;
     // small delay so it doesn't collide with login redirects
     const t = setTimeout(() => {
@@ -58,9 +63,9 @@ export function ReferralWelcomePopup() {
       window.sessionStorage.setItem(key, "1");
     }, 900);
     return () => clearTimeout(t);
-  }, [isInitialized, user, code, isWorkspaceRoute]);
+  }, [isInitialized, user, code, isWorkspaceRoute, needsCustomerLocation]);
 
-  if (!code || isWorkspaceRoute) return null;
+  if (!code || isWorkspaceRoute || needsCustomerLocation) return null;
 
   const copy = async (value: string, label: string) => {
     try {
