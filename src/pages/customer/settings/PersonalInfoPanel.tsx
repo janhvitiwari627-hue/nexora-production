@@ -716,10 +716,14 @@ export function SaveBar({
   onSave,
   onCancel,
   saving,
+  saveLabel = "Save changes",
+  cancelLabel = "Cancel",
 }: {
   onSave?: () => void;
   onCancel?: () => void;
   saving?: boolean;
+  saveLabel?: string;
+  cancelLabel?: string;
 }) {
   return (
     <div className="border-border mt-6 flex justify-end gap-2 border-t pt-4">
@@ -729,7 +733,7 @@ export function SaveBar({
         disabled={saving}
         className="border-border hover:bg-accent rounded-md border px-4 py-2 text-sm font-semibold disabled:opacity-60"
       >
-        Cancel
+        {cancelLabel}
       </button>
       <button
         type="button"
@@ -738,7 +742,7 @@ export function SaveBar({
         className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-bold shadow-sm disabled:opacity-60"
       >
         {saving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-        {saving ? "Saving…" : "Save changes"}
+        {saving ? "Saving…" : saveLabel}
       </button>
     </div>
   );

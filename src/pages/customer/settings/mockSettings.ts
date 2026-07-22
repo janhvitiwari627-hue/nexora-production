@@ -178,9 +178,9 @@ export const CONNECTED_ACCOUNTS = [
 ];
 
 export const TIMEZONES = [
-  "Asia/Kolkata (IST, UTC+5:30)",
-  "Asia/Dubai (GST, UTC+4:00)",
-  "Asia/Singapore (SGT, UTC+8:00)",
-  "Europe/London (GMT, UTC+0:00)",
-  "America/New_York (EST, UTC-5:00)",
-];
+  { value: "Asia/Kolkata", label: "India — Kolkata (IST, UTC+5:30)" },
+  { value: "Asia/Dubai", label: "UAE — Dubai (GST, UTC+4:00)" },
+  { value: "Asia/Singapore", label: "Singapore (SGT, UTC+8:00)" },
+  { value: "Europe/London", label: "United Kingdom — London" },
+  { value: "America/New_York", label: "United States — New York" },
+] as const;
