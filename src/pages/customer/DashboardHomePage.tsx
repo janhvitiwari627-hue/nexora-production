@@ -9,7 +9,6 @@ import { FavoriteShopsCarousel } from "./widgets/FavoriteShopsCarousel";
 import { RecentActivityFeed } from "./widgets/RecentActivityFeed";
 import { RecommendedServicesSection } from "./widgets/RecommendedServicesSection";
 import { ExclusiveOffersSection } from "./widgets/ExclusiveOffersSection";
-import { MyApplicationsWidget } from "./widgets/MyApplicationsWidget";
 
 export function DashboardHomePage() {
   return (
@@ -40,8 +39,6 @@ export function DashboardHomePage() {
             <RecommendedServicesSection />
             <RecentActivityFeed />
           </div>
-
-          <MyApplicationsWidget />
 
           <ExclusiveOffersSection />
         </div>

@@ -1,13 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { Crown, Check, ArrowUpRight } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ArrowUpRight, Check, Crown, Wifi } from "lucide-react";
+import { QRCodeCanvas } from "qrcode.react";
+import { useAuthStore } from "@/stores/authStore";
 import { mockMembership } from "../mockDashboard";
-
-const TIER_BG: Record<string, string> = {
-  Silver: "bg-[linear-gradient(135deg,#cfd6df,#8a95a5)] text-slate-900",
-  Gold: "bg-gradient-to-br from-amber-300 via-yellow-400 to-orange-500 text-amber-950",
-  Platinum: "bg-[linear-gradient(135deg,oklch(0.32_0.08_280),oklch(0.18_0.05_260))] text-white",
-};
 
 const NEXT_TIER: Record<string, "Gold" | "Platinum" | null> = {
   Silver: "Gold",
@@ -19,51 +14,121 @@ function daysUntil(iso: string) {
   return Math.max(0, Math.ceil((new Date(iso).getTime() - Date.now()) / 86400000));
 }
 
-export function MembershipStatusCard() {
-  const m = mockMembership;
-  const next = NEXT_TIER[m.tier];
-  const days = daysUntil(m.expiresOn);
-  return (
-    <div
-      className={cn(
-        "relative overflow-hidden rounded-3xl p-5 shadow-[var(--shadow-float)]",
-        TIER_BG[m.tier],
-      )}
-    >
-      <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/20 blur-2xl" />
-      <div className="absolute -bottom-12 -left-8 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
+function formatExpiry(iso: string) {
+  return new Intl.DateTimeFormat("en", { month: "2-digit", year: "2-digit" }).format(new Date(iso));
+}
 
-      <div className="relative flex items-start justify-between gap-3">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] opacity-80">
-            Membership
-          </p>
-          <h3 className="mt-1 flex items-center gap-2 text-2xl font-black">
-            <Crown className="h-5 w-5" /> {m.tier}
-          </h3>
+export function MembershipStatusCard() {
+  const profile = useAuthStore((state) => state.profile);
+  const user = useAuthStore((state) => state.user);
+  const membership = mockMembership;
+  const nextTier = NEXT_TIER[membership.tier];
+  const memberName = profile?.full_name || user?.email?.split("@")[0] || "Nexora Member";
+  const memberId = profile?.nexora_id || `NX-${user?.id.slice(0, 8).toUpperCase() || "MEMBER"}`;
+  const installUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/download-app?source=membership-card`
+      : "https://meripahalfasthelp.online/download-app?source=membership-card";
+
+  return (
+    <section className="space-y-3" aria-labelledby="membership-card-title">
+      <div className="relative aspect-[1.586/1] min-h-[230px] overflow-hidden rounded-[1.75rem] border border-white/70 bg-[linear-gradient(135deg,#eef2f7_0%,#b7c0cc_42%,#7f8b9b_100%)] p-5 text-slate-950 shadow-[0_20px_50px_-24px_rgba(15,23,42,0.65)]">
+        <div className="relative flex h-full flex-col">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <img
+                src="/customer-pwa-icon-192.png"
+                alt="Nexora"
+                className="h-10 w-10 shrink-0 rounded-xl object-cover shadow-md ring-1 ring-white/70"
+              />
+              <div className="min-w-0">
+                <p className="truncate text-sm font-black tracking-tight">Nexora SalonOS</p>
+                <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-slate-700">
+                  Beauty membership
+                </p>
+              </div>
+            </div>
+            <Wifi className="h-7 w-7 shrink-0 rotate-90 text-slate-700" aria-hidden="true" />
+          </div>
+
+          <div className="mt-3 flex items-center justify-between gap-3">
+            <div>
+              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-700">
+                Membership tier
+              </p>
+              <h2
+                id="membership-card-title"
+                className="mt-0.5 flex items-center gap-1.5 text-2xl font-black"
+              >
+                <Crown className="h-5 w-5" /> {membership.tier}
+              </h2>
+            </div>
+            <span className="rounded-full border border-slate-600/20 bg-white/35 px-2.5 py-1 text-[10px] font-black backdrop-blur-sm">
+              {daysUntil(membership.expiresOn)} days left
+            </span>
+          </div>
+
+          <div className="mt-auto flex items-end justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="font-mono text-sm font-black tracking-[0.12em] sm:text-base">
+                {memberId}
+              </p>
+              <div className="mt-2 flex items-end justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="text-[8px] font-bold uppercase tracking-[0.18em] text-slate-700">
+                    Member name
+                  </p>
+                  <p className="truncate text-xs font-black uppercase">{memberName}</p>
+                </div>
+                <div className="shrink-0">
+                  <p className="text-[8px] font-bold uppercase tracking-[0.18em] text-slate-700">
+                    Valid thru
+                  </p>
+                  <p className="text-xs font-black">{formatExpiry(membership.expiresOn)}</p>
+                </div>
+              </div>
+            </div>
+
+            <Link
+              to="/download-app"
+              aria-label="Open Nexora app installation page"
+              className="shrink-0 rounded-xl bg-white p-1.5 shadow-md ring-1 ring-slate-900/10 transition hover:scale-105"
+            >
+              <QRCodeCanvas
+                value={installUrl}
+                size={54}
+                level="H"
+                bgColor="#ffffff"
+                fgColor="#0f172a"
+                marginSize={1}
+                title="Scan to install Nexora"
+              />
+              <span className="mt-0.5 block text-center text-[7px] font-black uppercase tracking-wide">
+                Get app
+              </span>
+            </Link>
+          </div>
         </div>
-        <span className="rounded-full bg-black/15 px-2.5 py-1 text-[11px] font-bold">
-          {days} days left
-        </span>
       </div>
 
-      <ul className="relative mt-4 space-y-1.5 text-sm font-medium">
-        {m.benefits.map((b) => (
-          <li key={b} className="flex items-center gap-2">
-            <Check className="h-4 w-4 shrink-0" />
-            <span>{b}</span>
-          </li>
-        ))}
-      </ul>
-
-      {next && (
-        <Link
-          to="/membership"
-          className="relative mt-5 inline-flex w-full items-center justify-center gap-1 rounded-full bg-white/95 px-4 py-2.5 text-sm font-bold text-heading transition hover:bg-white"
-        >
-          Upgrade to {next} <ArrowUpRight className="h-4 w-4" />
-        </Link>
-      )}
-    </div>
+      <div className="rounded-2xl border bg-card p-3 shadow-sm">
+        <ul className="grid gap-1.5 text-xs font-semibold text-muted-foreground sm:grid-cols-3 lg:grid-cols-1">
+          {membership.benefits.map((benefit) => (
+            <li key={benefit} className="flex items-center gap-2">
+              <Check className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
+              <span>{benefit}</span>
+            </li>
+          ))}
+        </ul>
+        {nextTier && (
+          <Link
+            to="/dashboard/membership"
+            className="mt-3 inline-flex w-full items-center justify-center gap-1 rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-black text-white transition hover:bg-slate-800"
+          >
+            Upgrade to {nextTier} <ArrowUpRight className="h-4 w-4" />
+          </Link>
+        )}
+      </div>
+    </section>
   );
 }
