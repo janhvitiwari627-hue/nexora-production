@@ -4,6 +4,51 @@
 
 @custom-variant dark (&:is(.dark *));
 
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+img,
+video,
+canvas {
+  max-width: 100%;
+}
+
+/* Discovery collection cards stay in one compact, swipeable row on every viewport. */
+.nexora-discovery-home section[id^="cat-"] .mt-5.grid {
+  display: flex;
+  grid-template-columns: none;
+  gap: 1rem;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  padding-bottom: 0.75rem;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  touch-action: pan-x;
+}
+
+.nexora-discovery-home section[id^="cat-"] .mt-5.grid::-webkit-scrollbar {
+  display: none;
+}
+
+.nexora-discovery-home section[id^="cat-"] .mt-5.grid > * {
+  width: min(82vw, 280px);
+  min-width: 0;
+  flex: 0 0 min(82vw, 280px);
+  scroll-snap-align: start;
+}
+
+@media (min-width: 1024px) {
+  .nexora-discovery-home section[id^="cat-"] .mt-5.grid > * {
+    width: 300px;
+    flex-basis: 300px;
+  }
+}
+
 /* =====================================================================
  * Nexora SalonOS — Design System
  * Tokens defined as oklch with hex source-of-truth in comments.

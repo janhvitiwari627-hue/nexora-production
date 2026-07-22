@@ -108,15 +108,15 @@ export function ShopCard({
   );
 
   const Body = (
-    <div className={cn("flex flex-col gap-2", isList ? "p-4 md:p-5" : "pt-3")}>
-      <div className="flex items-start justify-between gap-2">
+    <div className={cn("flex min-w-0 flex-col gap-2", isList ? "p-4 md:p-5" : "pt-3")}>
+      <div className="flex min-w-0 flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-2">
         <h3
-          className="truncate text-base font-semibold text-heading"
+          className="min-w-0 truncate text-base font-semibold text-heading"
           style={{ fontFamily: "Inter, sans-serif" }}
         >
           {shop.name}
         </h3>
-        <span className="text-heading text-sm font-semibold whitespace-nowrap">
+        <span className="text-heading min-w-0 text-sm font-semibold sm:max-w-[52%] sm:text-right">
           {formatStartingPrice(shop)}
         </span>
       </div>
@@ -159,7 +159,7 @@ export function ShopCard({
       whileTap={{ scale: 0.985 }}
       transition={{ type: "spring", stiffness: 320, damping: 24 }}
       className={cn(
-        "group rounded-[var(--radius-card)] transition",
+        "group min-w-0 max-w-full rounded-[var(--radius-card)] transition",
         "hover:shadow-[var(--shadow-glow)] hover:ring-1 hover:ring-primary/60",
       )}
     >
@@ -168,7 +168,7 @@ export function ShopCard({
         params={{ slug: shop.slug }}
         aria-label={shop.name}
         className={cn(
-          "bg-card block overflow-hidden rounded-[var(--radius-card)]",
+          "bg-card block w-full min-w-0 max-w-full overflow-hidden rounded-[var(--radius-card)]",
           isList ? "grid grid-cols-1 gap-0 md:grid-cols-[minmax(0,260px)_1fr]" : "p-2",
           variant === "carousel" && "min-w-[280px] max-w-[320px]",
         )}
