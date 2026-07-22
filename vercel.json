@@ -1,12 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "redirects": [
-    {
-      "source": "/:path*",
-      "destination": "https://www.meripahalfasthelp.online/:path*",
-      "permanent": true
-    }
-  ],
   "headers": [
     {
       "source": "/pwa-sw.js",
