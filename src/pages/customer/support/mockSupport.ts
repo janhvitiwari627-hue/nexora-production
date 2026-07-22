@@ -203,5 +203,4 @@ export const MY_TICKETS: SupportTicket[] = [
   },
 ];
 
-export const WHATSAPP_NUMBER = "918000012345";
 export const WHATSAPP_PREFILL = "Hi Nexora Support, I need help with my account.";

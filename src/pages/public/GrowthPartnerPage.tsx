@@ -34,6 +34,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
+import { NEXORA_WHATSAPP_URL } from "@/config/contact";
 import { GrowthPartnerApplicationForm } from "@/components/partner/GrowthPartnerApplicationForm";
 import rewardWelcomeKit from "@/assets/reward-welcome-kit.jpg";
 import rewardTablet from "@/assets/reward-tablet-badge.jpg";
@@ -232,7 +233,7 @@ export function GrowthPartnerPage() {
                 Apply as Growth Partner <ArrowRight className="h-4 w-4" />
               </a>
               <a
-                href="https://wa.me/919999999999"
+                href={NEXORA_WHATSAPP_URL}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3.5 text-sm font-semibold text-[#0B1330] transition-colors hover:border-slate-300"
@@ -1241,7 +1242,7 @@ export function GrowthPartnerPage() {
                   Apply as Growth Partner <ArrowRight className="h-4 w-4" />
                 </a>
                 <a
-                  href="https://wa.me/919999999999"
+                  href={NEXORA_WHATSAPP_URL}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-6 py-3.5 text-sm font-bold text-white hover:bg-white/10"

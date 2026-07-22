@@ -8,6 +8,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
+import { NEXORA_CALL_DISPLAY, NEXORA_CALL_URL, NEXORA_WHATSAPP_URL } from "@/config/contact";
 
 const TOPICS = [
   { name: "Bookings", icon: "📅" },
@@ -115,18 +116,25 @@ export function HelpPage() {
           <h2 className="text-heading text-2xl font-black">Still need help?</h2>
           <div className="mt-5 grid gap-3 md:grid-cols-3">
             {[
-              { icon: MessageCircle, label: "Chat with us", sub: "Replies in minutes", href: "#" },
+              {
+                icon: MessageCircle,
+                label: "WhatsApp us",
+                sub: "Replies in minutes",
+                href: NEXORA_WHATSAPP_URL,
+              },
               {
                 icon: Mail,
                 label: "Email support",
                 sub: "support@nexora.in",
                 href: "mailto:support@nexora.in",
               },
-              { icon: Phone, label: "Call us", sub: "+91 80000 12345", href: "tel:+918000012345" },
+              { icon: Phone, label: "Call us", sub: NEXORA_CALL_DISPLAY, href: NEXORA_CALL_URL },
             ].map((c) => (
               <a
                 key={c.label}
                 href={c.href}
+                target={c.href.startsWith("https://") ? "_blank" : undefined}
+                rel={c.href.startsWith("https://") ? "noopener noreferrer" : undefined}
                 className="border-border bg-card hover:border-primary/40 flex items-center gap-3 rounded-[var(--radius-card)] border p-5 transition"
               >
                 <div className="bg-primary/10 text-primary grid h-11 w-11 place-items-center rounded-xl">
