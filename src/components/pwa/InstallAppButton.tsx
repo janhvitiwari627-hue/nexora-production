@@ -38,10 +38,12 @@ export function InstallAppButton({
   kind,
   fallbackHref,
   className,
+  hideWhenInstalled = false,
 }: {
   kind: NexoraAppKind;
   fallbackHref: string;
   className?: string;
+  hideWhenInstalled?: boolean;
 }) {
   // Keep server and browser markup identical. The subscription publishes the
   // real browser capability immediately after hydration.
@@ -108,6 +110,8 @@ export function InstallAppButton({
       : available
         ? `Install ${appName}`
         : `How to install ${appName}`;
+
+  if (installed && hideWhenInstalled) return null;
 
   return (
     <>
@@ -181,7 +185,7 @@ export function InstallAppButton({
                   ? "Safari installs this app from its Share menu."
                   : embeddedBrowser
                     ? "This app was opened inside another app. Android installs it from Chrome."
-                    : "Use your browser's Install app or Add to Home screen option."}
+                    : "Install Nexora from Chrome or Edge to open it in its own desktop window."}
             </DialogDescription>
           </DialogHeader>
           {state === "ios" ? (
@@ -207,10 +211,13 @@ export function InstallAppButton({
           ) : (
             <div className="space-y-3 text-sm text-slate-700">
               <p>
-                On Android or desktop, open the browser menu and choose Install app. If Chrome has
-                just opened the page, tap once and wait briefly for the install option to appear.
+                On desktop Chrome or Edge, select the Install icon in the address bar. You can also
+                open the browser menu and choose Install Nexora Customer App.
               </p>
-              <p>No APK is downloaded. Nexora installs securely from this website.</p>
+              <p>
+                Nexora will open in its own window and appear in your Start menu or applications
+                list. No APK or separate setup file is needed.
+              </p>
             </div>
           )}
           <div className="flex flex-col gap-2 pt-2 sm:flex-row sm:justify-end">

@@ -3,7 +3,7 @@ import { useRouterState } from "@tanstack/react-router";
 import { activateRoleManifest, appKindForPath } from "@/lib/role-pwa";
 import { getPwaInstallState, initializePwaInstall } from "@/lib/pwa-install";
 
-const PWA_RELEASE = "2026-07-22-transparent-icon-install-v6";
+const PWA_RELEASE = "2026-07-22-desktop-install-v7";
 const PWA_RELEASE_KEY = "nexora:pwa-release";
 const PWA_WORKER_URL = `/pwa-sw.js?release=${encodeURIComponent(PWA_RELEASE)}`;
 

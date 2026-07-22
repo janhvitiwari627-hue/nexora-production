@@ -1,4 +1,4 @@
-const CACHE_NAME = "nexora-role-apps-v7";
+const CACHE_NAME = "nexora-role-apps-v8";
 const OFFLINE_URL = "/offline.html";
 
 self.addEventListener("install", (event) => {
