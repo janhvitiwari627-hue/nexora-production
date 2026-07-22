@@ -64,7 +64,10 @@ if (
   !locationDialog.includes("geolocation.getCurrentPosition") ||
   !locationDialog.includes("enableHighAccuracy: true") ||
   !locationDialog.includes("dragend") ||
-  !locationDialog.includes("Confirm & save")
+  !locationDialog.includes("Confirm & save") ||
+  !locationDialog.includes("Location permission is turned off") ||
+  !locationDialog.includes("focusManualSearch") ||
+  locationDialog.includes("Allow precise location in your browser settings")
 ) {
   failures.push("Customer app must provide precise GPS and draggable map confirmation");
 }
