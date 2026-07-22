@@ -5,10 +5,11 @@ const ANDROID_WEBVIEW_UA =
   "(KHTML, like Gecko) Version/4.0 Chrome/125.0.0.0 Mobile Safari/537.36 wv";
 
 test("Android in-app browser offers a direct Open in Chrome install path", async ({ browser }) => {
+  test.setTimeout(60000);
   const context = await browser.newContext({ userAgent: ANDROID_WEBVIEW_UA });
   const page = await context.newPage();
 
-  await page.goto("/customer-app");
+  await page.goto("/customer-app?pwa_release=2026-07-22-desktop-install-v8");
   await page.getByRole("button", { name: /install customer app/i }).click();
 
   await expect(

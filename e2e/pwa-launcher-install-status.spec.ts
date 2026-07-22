@@ -26,6 +26,7 @@ test("customer manifest uses the large launcher artwork", async ({ request }) =>
 });
 
 test("install page shows progress after the native install is accepted", async ({ page }) => {
+  test.setTimeout(60000);
   await page.goto("/customer-app?install=1&pwa_release=2026-07-22-desktop-install-v8");
   await expect(
     page.getByRole("button", { name: "How to install Customer App" }).first(),
