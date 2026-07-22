@@ -1,4 +1,4 @@
-const CACHE_NAME = "nexora-role-apps-v3";
+const CACHE_NAME = "nexora-role-apps-v4";
 const OFFLINE_URL = "/offline.html";
 
 self.addEventListener("install", (event) => {
@@ -16,6 +16,7 @@ self.addEventListener("install", (event) => {
         ]),
       ),
   );
+  self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
@@ -26,7 +27,7 @@ self.addEventListener("activate", (event) => {
         Promise.all(names.filter((name) => name !== CACHE_NAME).map((name) => caches.delete(name))),
       ),
   );
-  self.clients.claim();
+  event.waitUntil(self.clients.claim());
 });
 
 self.addEventListener("fetch", (event) => {

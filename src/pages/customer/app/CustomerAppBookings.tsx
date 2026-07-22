@@ -28,19 +28,22 @@ export function CustomerAppBookings() {
   if (!user) {
     return (
       <main className="mx-auto max-w-xl px-4 py-16 text-center">
-        <CalendarDays className="mx-auto h-10 w-10 text-violet-700" />
+        <CalendarDays className="mx-auto h-10 w-10 text-[#9a6b16]" />
         <h1 className="mt-4 text-2xl font-black">Login to view bookings</h1>
-        <p className="mt-2 text-sm text-slate-500">
+        <p className="mt-2 text-sm text-[#7a746a]">
           Your upcoming and past bookings will appear here.
         </p>
         <div className="mt-6 flex justify-center gap-3">
           <Link
             to="/login"
-            className="rounded-full bg-violet-700 px-5 py-2.5 text-sm font-bold text-white"
+            className="rounded-full bg-[#0b0a08] px-5 py-2.5 text-sm font-bold text-[#f3cf70]"
           >
             Login
           </Link>
-          <Link to="/signup" className="rounded-full border bg-white px-5 py-2.5 text-sm font-bold">
+          <Link
+            to="/signup"
+            className="rounded-full border border-[#e8e0d2] bg-white px-5 py-2.5 text-sm font-bold"
+          >
             Signup
           </Link>
         </div>
@@ -51,10 +54,10 @@ export function CustomerAppBookings() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-6 sm:py-10">
       <h1 className="text-3xl font-black">My bookings</h1>
-      <p className="mt-1 text-sm text-slate-500">Upcoming appointments and booking history.</p>
+      <p className="mt-1 text-sm text-[#7a746a]">Upcoming appointments and booking history.</p>
       {bookings.isLoading ? (
         <div className="grid min-h-64 place-items-center">
-          <LoaderCircle className="h-6 w-6 animate-spin text-violet-700" />
+          <LoaderCircle className="h-6 w-6 animate-spin text-[#9a6b16]" />
         </div>
       ) : bookings.isError ? (
         <p className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">
@@ -66,11 +69,14 @@ export function CustomerAppBookings() {
             const salon = Array.isArray(booking.salons) ? booking.salons[0] : booking.salons;
             const staff = Array.isArray(booking.staff) ? booking.staff[0] : booking.staff;
             return (
-              <article key={booking.id} className="rounded-2xl border bg-white p-5 shadow-sm">
+              <article
+                key={booking.id}
+                className="rounded-2xl border border-[#e8e0d2] bg-white p-5 shadow-sm"
+              >
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h2 className="font-bold">{booking.service_name}</h2>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-[#7a746a]">
                       {salon?.name ?? "Salon"} · {staff?.name ?? "Any professional"}
                     </p>
                   </div>
@@ -80,7 +86,7 @@ export function CustomerAppBookings() {
                       : booking.status.replaceAll("_", " ")}
                   </span>
                 </div>
-                <div className="mt-4 flex flex-wrap gap-4 text-sm text-slate-600">
+                <div className="mt-4 flex flex-wrap gap-4 text-sm text-[#655f56]">
                   <span className="inline-flex items-center gap-2">
                     <CalendarDays className="h-4 w-4" />
                     {booking.booking_date}
@@ -98,11 +104,11 @@ export function CustomerAppBookings() {
           })}
         </div>
       ) : (
-        <div className="mt-8 rounded-2xl border bg-white p-8 text-center">
+        <div className="mt-8 rounded-2xl border border-[#e8e0d2] bg-white p-8 text-center">
           <p className="font-bold">No bookings yet</p>
           <Link
             to="/app/customer/search"
-            className="mt-4 inline-flex rounded-full bg-violet-700 px-5 py-2.5 text-sm font-bold text-white"
+            className="mt-4 inline-flex rounded-full bg-[#0b0a08] px-5 py-2.5 text-sm font-bold text-[#f3cf70]"
           >
             Find a salon
           </Link>

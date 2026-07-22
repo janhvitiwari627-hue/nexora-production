@@ -44,7 +44,7 @@ export function CustomerAvatar({
       <img
         src={avatarUrl}
         alt={`${displayName || "Customer"} profile`}
-        className={`${className} shrink-0 rounded-full object-cover ring-2 ring-violet-200`}
+        className={`${className} shrink-0 rounded-full object-cover ring-2 ring-[#e6c76f]`}
         onError={() => setImageFailed(true)}
       />
     );
@@ -53,7 +53,7 @@ export function CustomerAvatar({
   return (
     <span
       aria-label={`${displayName || "Customer"} profile`}
-      className={`${className} grid shrink-0 place-items-center rounded-full bg-violet-100 font-black text-violet-700`}
+      className={`${className} grid shrink-0 place-items-center rounded-full bg-[#fff0c2] font-black text-[#8a5c12]`}
     >
       {displayName ? initials : <UserRound className={iconClassName} />}
     </span>

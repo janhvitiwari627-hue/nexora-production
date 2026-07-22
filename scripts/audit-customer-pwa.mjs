@@ -110,7 +110,11 @@ if (!String(manifest.start_url).startsWith("/app/customer")) {
   failures.push("Customer PWA manifest must open /app/customer");
 }
 for (const size of ["192x192", "512x512"]) {
-  if (!manifest.icons?.some((icon) => icon.src === `/customer-pwa-icon-${size.split("x")[0]}.png` && icon.sizes === size)) {
+  if (
+    !manifest.icons?.some(
+      (icon) => icon.src === `/customer-pwa-icon-${size.split("x")[0]}.png` && icon.sizes === size,
+    )
+  ) {
     failures.push(`Customer PWA manifest must include the supplied Nexora ${size} install icon`);
   }
 }
@@ -119,6 +123,28 @@ if (!manifest.screenshots?.some((shot) => shot.src === "/customer-pwa-splash.jpg
 }
 if (!shell.includes("CUSTOMER_SPLASH") || !shell.includes("showLaunchSplash")) {
   failures.push("Customer app shell must show the branded launch splash once per session");
+}
+
+const pwaManager = readFileSync("src/components/pwa/RolePwaManager.tsx", "utf8");
+const serviceWorker = readFileSync("public/pwa-sw.js", "utf8");
+if (
+  !pwaManager.includes('updateViaCache: "none"') ||
+  !pwaManager.includes('"controllerchange"') ||
+  !pwaManager.includes("window.location.reload()") ||
+  !pwaManager.includes("registration?.update()")
+) {
+  failures.push(
+    "Installed customer PWA must check for deployments and reload onto the latest app version",
+  );
+}
+if (
+  !serviceWorker.includes("self.skipWaiting()") ||
+  !serviceWorker.includes("self.clients.claim()")
+) {
+  failures.push("Customer PWA service worker must activate new deployments immediately");
+}
+if (!shell.includes("bg-[#fff9ed]") || !shell.includes("text-[#9a6b16]")) {
+  failures.push("Customer PWA shell must use the approved premium black, gold and ivory theme");
 }
 
 if (failures.length) {

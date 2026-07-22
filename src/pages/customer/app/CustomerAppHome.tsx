@@ -67,8 +67,9 @@ export function CustomerAppHome() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-6 sm:py-10">
-      <section className="overflow-hidden rounded-3xl bg-gradient-to-br from-violet-700 via-indigo-700 to-blue-600 p-6 text-white sm:p-10">
-        <p className="text-sm font-bold text-violet-100">Beauty services near you</p>
+      <section className="relative overflow-hidden rounded-3xl border border-[#d7a93b]/35 bg-[linear-gradient(135deg,#0b0a08_0%,#241b0d_58%,#9a6b16_100%)] p-6 text-white shadow-[0_22px_60px_rgba(53,38,11,0.24)] sm:p-10">
+        <div className="pointer-events-none absolute -right-14 -top-16 h-48 w-48 rounded-full border border-[#f1cf73]/25" />
+        <p className="relative text-sm font-bold text-[#f1cf73]">Beauty services near you</p>
         <h1 className="mt-2 max-w-2xl text-3xl font-black tracking-tight sm:text-5xl">
           Apna salon, service aur time choose karein.
         </h1>
@@ -98,7 +99,7 @@ export function CustomerAppHome() {
       <section className="mt-8">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-black">Categories</h2>
-          <Link to="/app/customer/search" className="text-sm font-bold text-violet-700">
+          <Link to="/app/customer/search" className="text-sm font-bold text-[#9a6b16]">
             View all
           </Link>
         </div>
@@ -108,7 +109,7 @@ export function CustomerAppHome() {
               key={category}
               to="/app/customer/search"
               search={{ q: "", category }}
-              className="shrink-0 rounded-full border bg-white px-4 py-2.5 text-sm font-bold"
+              className="shrink-0 rounded-full border border-[#e8e0d2] bg-white px-4 py-2.5 text-sm font-bold shadow-sm"
             >
               {category}
             </Link>
@@ -119,7 +120,7 @@ export function CustomerAppHome() {
       <section className="mt-8">
         <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="text-sm font-bold text-violet-700">
+            <p className="text-sm font-bold text-[#9a6b16]">
               {gender ? `Recommended for ${gender === "male" ? "men" : "women"}` : "Nearby salons"}
             </p>
             <h2 className="mt-1 text-2xl font-black">Popular around you</h2>
@@ -133,7 +134,7 @@ export function CustomerAppHome() {
         </div>
         {shops.isLoading ? (
           <div className="grid min-h-48 place-items-center">
-            <LoaderCircle className="h-6 w-6 animate-spin text-violet-700" />
+            <LoaderCircle className="h-6 w-6 animate-spin text-[#9a6b16]" />
           </div>
         ) : shops.isError ? (
           <p className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">
