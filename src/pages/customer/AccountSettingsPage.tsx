@@ -60,6 +60,7 @@ const SECTIONS = [
 ] as const;
 
 type SectionId = (typeof SECTIONS)[number]["id"];
+const LAST_SECTION_ID: SectionId = SECTIONS[SECTIONS.length - 1].id;
 
 export function AccountSettingsPage() {
   const [active, setActive] = useState<SectionId>("personal");
@@ -68,6 +69,7 @@ export function AccountSettingsPage() {
   const signOut = useAuthStore((s) => s.signOut);
   const navigate = useNavigate();
   const ActiveComp = SECTIONS.find((s) => s.id === active)!.Comp;
+  const showLogout = active === LAST_SECTION_ID;
 
   const handleLogout = async () => {
     try {
@@ -139,32 +141,37 @@ export function AccountSettingsPage() {
                   );
                 })}
 
-                <div className="border-border my-2 border-t" />
-
-                <button
-                  onClick={() => setLogoutOpen(true)}
-                  className="text-foreground hover:bg-destructive/5 hover:text-destructive flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm font-semibold transition"
-                >
-                  <LogOut className="h-4 w-4" />
-                  Logout
-                </button>
+                {showLogout ? (
+                  <>
+                    <div className="border-border my-2 border-t" />
+                    <button
+                      onClick={() => setLogoutOpen(true)}
+                      className="text-foreground hover:bg-destructive/5 hover:text-destructive flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm font-semibold transition"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Logout
+                    </button>
+                  </>
+                ) : null}
               </nav>
             </aside>
 
             <div className="min-w-0">
               <ActiveComp />
 
-              {/* Mobile logout */}
-              <div className="mt-6 md:hidden">
-                <Button
-                  variant="outline"
-                  onClick={() => setLogoutOpen(true)}
-                  className="hover:border-destructive/40 hover:text-destructive w-full gap-2"
-                >
-                  <LogOut className="h-4 w-4" />
-                  Logout
-                </Button>
-              </div>
+              {/* Mobile logout — only after the final settings section */}
+              {showLogout ? (
+                <div className="mt-6 md:hidden">
+                  <Button
+                    variant="outline"
+                    onClick={() => setLogoutOpen(true)}
+                    className="hover:border-destructive/40 hover:text-destructive w-full gap-2"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Logout
+                  </Button>
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
