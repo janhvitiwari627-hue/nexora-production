@@ -9,6 +9,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Loader2, Eye, EyeOff, CheckCircle2, AlertTriangle } from "lucide-react";
 import {
   PasswordStrengthIndicator,
@@ -94,6 +102,9 @@ export default function SignupPage() {
   const [resetSubmitting, setResetSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [alreadyRegisteredEmail, setAlreadyRegisteredEmail] = useState<string | null>(null);
+  const [existingAccountOpen, setExistingAccountOpen] = useState(false);
+  const [emailChecking, setEmailChecking] = useState(false);
+  const [availableEmail, setAvailableEmail] = useState<string | null>(null);
   const [resetSent, setResetSent] = useState(false);
   const [success, setSuccess] = useState<null | "verify" | "signed_in">(null);
   const [showPw, setShowPw] = useState(false);
@@ -103,6 +114,46 @@ export default function SignupPage() {
   const checkEmailRoleFn = useServerFn(getEmailRole);
   const referralPending = /^[A-Z0-9]{3,20}$/.test(referredBy);
   const referralMalformed = Boolean(referredBy && !referralPending);
+
+  useEffect(() => {
+    const email = normalizeEmail(form.email);
+    const parsed = emailOnlySchema.safeParse(email);
+    if (!parsed.success) {
+      setEmailChecking(false);
+      setAvailableEmail(null);
+      return;
+    }
+
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      setEmailChecking(true);
+      void checkEmailRoleFn({ data: { email } })
+        .then((check) => {
+          if (cancelled) return;
+          if (check.exists) {
+            setAlreadyRegisteredEmail(email);
+            setAvailableEmail(null);
+            setResetSent(false);
+            setExistingAccountOpen(true);
+          } else {
+            setAlreadyRegisteredEmail(null);
+            setAvailableEmail(email);
+          }
+        })
+        .catch(() => {
+          // Submit-time Supabase validation remains the final duplicate guard.
+          if (!cancelled) setAvailableEmail(null);
+        })
+        .finally(() => {
+          if (!cancelled) setEmailChecking(false);
+        });
+    }, 650);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [checkEmailRoleFn, form.email]);
 
   useEffect(() => {
     if (!isInitialized || !user) return;
@@ -121,6 +172,8 @@ export default function SignupPage() {
     if (serverError) setServerError(null);
     if (key === "email") {
       setAlreadyRegisteredEmail(null);
+      setExistingAccountOpen(false);
+      setAvailableEmail(null);
       setResetSent(false);
     }
     if (errors[key]) setErrors((p) => ({ ...p, [key]: "" }));
@@ -180,6 +233,7 @@ export default function SignupPage() {
         if (check.exists) {
           cancelReferralWelcomeAfterAuth();
           setAlreadyRegisteredEmail(email);
+          setExistingAccountOpen(true);
           setServerError(roleConflictMessage(check.roleLabel, "Customer"));
           return;
         }
@@ -213,6 +267,7 @@ export default function SignupPage() {
           msg =
             "Email already registered hai. Please sign in karein, ya password bhool gaye hain to reset link bhejein.";
           setAlreadyRegisteredEmail(email);
+          setExistingAccountOpen(true);
           setResetSent(false);
         } else if (/weak password|pwned|breach/i.test(raw)) {
           msg = "Password is too weak or commonly used. Choose a stronger one.";
@@ -289,6 +344,44 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12">
+      <Dialog open={existingAccountOpen} onOpenChange={setExistingAccountOpen}>
+        <DialogContent className="w-[calc(100vw-2rem)] max-w-md rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>This email already has an account</DialogTitle>
+            <DialogDescription>
+              You do not need to create a new account. Sign in with this email, or reset the
+              password if you do not remember it.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="rounded-xl border bg-muted/40 px-4 py-3 text-sm font-medium break-all">
+            {alreadyRegisteredEmail}
+          </div>
+          {resetSent ? (
+            <Alert className="border-primary/20 bg-primary/5">
+              <CheckCircle2 className="h-4 w-4 text-primary" />
+              <AlertDescription>
+                Reset link sent. Please check your inbox and spam folder.
+              </AlertDescription>
+            </Alert>
+          ) : null}
+          <DialogFooter className="gap-2 sm:space-x-0">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={sendResetLink}
+              disabled={resetSubmitting}
+            >
+              {resetSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Forgot password
+            </Button>
+            <Button type="button" asChild>
+              <Link to="/login" search={{ email: alreadyRegisteredEmail ?? "" }}>
+                Go to login
+              </Link>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <div className="w-full max-w-md">
         <Card className="w-full">
           <CardHeader>
@@ -395,6 +488,16 @@ export default function SignupPage() {
                   disabled={submitting}
                 />
                 {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+                {!errors.email && emailChecking ? (
+                  <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" /> Checking email…
+                  </p>
+                ) : null}
+                {!errors.email && availableEmail === normalizeEmail(form.email) ? (
+                  <p className="flex items-center gap-1.5 text-xs text-emerald-700">
+                    <CheckCircle2 className="h-3.5 w-3.5" /> Email is available
+                  </p>
+                ) : null}
               </div>
 
               <div className="space-y-1.5">

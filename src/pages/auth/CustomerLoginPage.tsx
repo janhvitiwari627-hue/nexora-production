@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -37,9 +37,10 @@ const loginSchema = z.object({
 
 export default function CustomerLoginPage() {
   const navigate = useNavigate();
+  const search = useSearch({ from: "/login" });
   const user = useAuthStore((s) => s.user);
   const isInitialized = useAuthStore((s) => s.isInitialized);
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ email: normalizeEmail(search.email ?? ""), password: "" });
   const [rememberMe, setRememberMe] = useState(true);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);

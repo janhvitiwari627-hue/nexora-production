@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useSearch } from "@tanstack/react-router";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,8 @@ const schema = z.object({
 const normalizeEmail = (value: string) => value.trim().toLowerCase();
 
 export default function ForgotPasswordPage() {
-  const [email, setEmail] = useState("");
+  const search = useSearch({ from: "/forgot-password" });
+  const [email, setEmail] = useState(normalizeEmail(search.email ?? ""));
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
