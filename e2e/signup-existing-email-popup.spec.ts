@@ -24,6 +24,6 @@ test.describe("signup existing-email early warning", () => {
 
     await dialog.getByRole("link", { name: "Go to login" }).click();
     await expect(page).toHaveURL(/\/login\?email=/);
-    await expect(page.getByLabel("Email")).toHaveValue(REGISTERED_EMAIL!);
+    await expect(page.getByLabel("Email", { exact: true })).toHaveValue(REGISTERED_EMAIL!);
   });
 });
