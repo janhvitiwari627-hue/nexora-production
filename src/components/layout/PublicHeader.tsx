@@ -344,7 +344,7 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
         </div>
 
         {/* Mobile */}
-        <div className="flex items-center gap-0.5 md:hidden">
+        <div className="col-start-3 flex items-center justify-self-end gap-0.5 md:hidden">
           <Button
             variant="ghost"
             size="icon"
