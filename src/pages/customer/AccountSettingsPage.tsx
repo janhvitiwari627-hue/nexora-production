@@ -84,7 +84,7 @@ export function AccountSettingsPage() {
 
   return (
     <>
-      <div className="bg-background min-h-screen">
+      <div className="customer-brand-surface min-h-screen bg-background">
         <div className="mx-auto max-w-6xl px-4 py-8 md:px-6 md:py-10">
           <header className="mb-6">
             <div className="mb-3 flex flex-wrap items-center gap-2">

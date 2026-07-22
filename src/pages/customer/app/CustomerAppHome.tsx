@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { ArrowRight, LoaderCircle, MapPin, Search } from "lucide-react";
+import { ArrowRight, LoaderCircle, MapPin, RefreshCw, Search, Store } from "lucide-react";
 import { toast } from "sonner";
 import { listCustomerAppSalons } from "@/lib/customer-app";
 import { supabase } from "@/integrations/supabase/client";
@@ -70,7 +70,7 @@ export function CustomerAppHome() {
       <section className="relative overflow-hidden rounded-3xl border border-[#d7a93b]/35 bg-[linear-gradient(135deg,#0b0a08_0%,#241b0d_58%,#9a6b16_100%)] p-6 text-white shadow-[0_22px_60px_rgba(53,38,11,0.24)] sm:p-10">
         <div className="pointer-events-none absolute -right-14 -top-16 h-48 w-48 rounded-full border border-[#f1cf73]/25" />
         <p className="relative text-sm font-bold text-[#f1cf73]">Beauty services near you</p>
-        <h1 className="mt-2 max-w-2xl text-3xl font-black tracking-tight sm:text-5xl">
+        <h1 className="mt-2 max-w-2xl text-3xl font-black tracking-tight !text-white sm:text-5xl">
           Apna salon, service aur time choose karein.
         </h1>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -137,14 +137,43 @@ export function CustomerAppHome() {
             <LoaderCircle className="h-6 w-6 animate-spin text-[#9a6b16]" />
           </div>
         ) : shops.isError ? (
-          <p className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">
-            Salons could not be loaded. Please try again.
-          </p>
-        ) : (
+          <div className="mt-6 flex flex-col items-center rounded-3xl border border-[#ead49b] bg-white p-8 text-center shadow-sm">
+            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[#fff0c2] text-[#9a6b16]">
+              <Store className="h-6 w-6" />
+            </span>
+            <p className="mt-4 font-black">We couldn't refresh salons right now</p>
+            <p className="mt-1 max-w-md text-sm text-[#7a746a]">
+              Your app is connected. Please retry to load the latest published salons.
+            </p>
+            <button
+              type="button"
+              onClick={() => shops.refetch()}
+              className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#0b0a08] px-5 py-2.5 text-sm font-bold text-[#f3cf70]"
+            >
+              <RefreshCw className="h-4 w-4" /> Retry
+            </button>
+          </div>
+        ) : shops.data?.length ? (
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {shops.data?.map((shop) => (
               <CustomerSalonCard key={shop.slug} shop={shop} />
             ))}
+          </div>
+        ) : (
+          <div className="mt-6 flex flex-col items-center rounded-3xl border border-[#ead49b] bg-white p-8 text-center shadow-sm">
+            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[#fff0c2] text-[#9a6b16]">
+              <Store className="h-6 w-6" />
+            </span>
+            <p className="mt-4 font-black">New salons are coming to your area</p>
+            <p className="mt-1 max-w-md text-sm text-[#7a746a]">
+              Verified and published salons will appear here automatically.
+            </p>
+            <Link
+              to="/app/customer/search"
+              className="mt-4 rounded-full bg-[#0b0a08] px-5 py-2.5 text-sm font-bold text-[#f3cf70]"
+            >
+              Explore categories
+            </Link>
           </div>
         )}
       </section>

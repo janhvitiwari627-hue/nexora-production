@@ -190,7 +190,8 @@ canvas {
  * variables here re-themes every utility (bg-background, text-foreground,
  * border-border, bg-primary, etc.) for the customer-app subtree only.
  * ------------------------------------------------------------------------- */
-.customer-app {
+.customer-app,
+.customer-brand-surface {
   --background: #fff9ed;
   --foreground: #0b0a08;
   --heading: #0b0a08;
