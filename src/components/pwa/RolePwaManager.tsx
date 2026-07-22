@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { activateRoleManifest, appKindForPath } from "@/lib/role-pwa";
-import { initializePwaInstall } from "@/lib/pwa-install";
+import { getPwaInstallState, initializePwaInstall } from "@/lib/pwa-install";
 
 const PWA_RELEASE = "2026-07-22-transparent-icon-install-v6";
 const PWA_RELEASE_KEY = "nexora:pwa-release";
@@ -30,6 +30,7 @@ export function RolePwaManager() {
 
     const reloadWithLatestVersion = () => {
       if (reloading) return;
+      if (getPwaInstallState() === "installing") return;
       reloading = true;
       window.location.reload();
     };
