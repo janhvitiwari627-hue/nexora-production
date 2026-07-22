@@ -13,6 +13,7 @@ const files = [
   "src/pages/customer/app/CustomerAppShell.tsx",
   "src/pages/customer/app/CustomerAppHome.tsx",
   "src/pages/customer/app/CustomerAppSearch.tsx",
+  "src/pages/customer/app/CustomerLocationDialog.tsx",
   "src/pages/customer/app/CustomerAppBookings.tsx",
   "src/pages/customer/app/CustomerAppRewards.tsx",
   "src/pages/customer/app/CustomerAppProfile.tsx",
@@ -20,6 +21,7 @@ const files = [
   "src/pages/customer/settings/CustomerAppInstallPanel.tsx",
   "supabase/migrations/20260716130000_customer_pwa_staff_booking.sql",
   "supabase/migrations/20260716130020_persist_customer_gender.sql",
+  "supabase/migrations/20260722070221_customer_location_nearby_salons.sql",
 ];
 
 const failures = [];
@@ -50,8 +52,35 @@ if (!liveSalons.includes('input?.gender === "male"') || !liveSalons.includes('"B
 }
 
 const home = readFileSync("src/pages/customer/app/CustomerAppHome.tsx", "utf8");
-if (!home.includes("geolocation.getCurrentPosition")) {
-  failures.push("Customer app must request real location permission");
+const locationDialog = readFileSync("src/pages/customer/app/CustomerLocationDialog.tsx", "utf8");
+const customerLocation = readFileSync("src/lib/customer-location.ts", "utf8");
+const locationMigration = readFileSync(
+  "supabase/migrations/20260722070221_customer_location_nearby_salons.sql",
+  "utf8",
+);
+if (
+  !locationDialog.includes("geolocation.getCurrentPosition") ||
+  !locationDialog.includes("enableHighAccuracy: true") ||
+  !locationDialog.includes("dragend") ||
+  !locationDialog.includes("Confirm & save")
+) {
+  failures.push("Customer app must provide precise GPS and draggable map confirmation");
+}
+if (
+  !customerLocation.includes("reverseGeocodeLocation") ||
+  !customerLocation.includes("searchCustomerLocations") ||
+  !customerLocation.includes('countrycodes", "in"') ||
+  !customerLocation.includes("CACHE_TTL_MS")
+) {
+  failures.push("Customer location must support cached address conversion and manual search");
+}
+if (
+  !locationMigration.includes("SECURITY INVOKER") ||
+  !locationMigration.includes("nearby_public_salon_cards") ||
+  !locationMigration.includes("distance_km") ||
+  !/\.rpc\(\s*["']nearby_public_salon_cards["']/.test(liveSalons)
+) {
+  failures.push("Nearby salons must use the RLS-safe distance-sorted database query");
 }
 
 const signup = readFileSync("src/pages/auth/SignupPage.tsx", "utf8");
@@ -129,12 +158,9 @@ if (
   failures.push("Customer salon discovery must expose the secure shops compatibility view");
 }
 
-const languageSettings = readFileSync(
-  "src/pages/customer/settings/LanguagePanel.tsx",
-  "utf8",
-);
+const languageSettings = readFileSync("src/pages/customer/settings/LanguagePanel.tsx", "utf8");
 if (
-  !languageSettings.includes('preferred_language: lang') ||
+  !languageSettings.includes("preferred_language: lang") ||
   !languageSettings.includes("timezone,") ||
   !languageSettings.includes("onSave={handleSave}") ||
   !languageSettings.includes("Intl.DateTimeFormat")

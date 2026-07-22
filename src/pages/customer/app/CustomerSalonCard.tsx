@@ -25,6 +25,13 @@ export function CustomerSalonCard({ shop }: { shop: Shop }) {
                 {shop.area ? `${shop.area}, ` : ""}
                 {shop.city}
               </p>
+              {typeof shop.distance_km === "number" ? (
+                <p className="mt-1 text-xs font-bold text-[#9a6b16]">
+                  {shop.distance_km < 1
+                    ? `${Math.max(1, Math.round(shop.distance_km * 1000))} m away`
+                    : `${shop.distance_km.toFixed(1)} km away`}
+                </p>
+              ) : null}
             </div>
             <span className="flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-xs font-bold text-amber-800">
               <Star className="h-3 w-3 fill-current" /> {shop.rating.toFixed(1)}
