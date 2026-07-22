@@ -602,27 +602,6 @@ function SearchPanel() {
           );
         })}
       </div>
-      {/* Locality chips */}
-      <div className="mt-3 flex flex-wrap gap-2.5">
-        {AREAS.map((a) => {
-          const active = selectedLocation === a;
-          return (
-            <button
-              key={a}
-              type="button"
-              onClick={() => pickLocation(a)}
-              className={`rounded-full px-4 py-2 text-[13px] font-medium transition ${
-                active
-                  ? "bg-slate-900 text-white"
-                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-              }`}
-            >
-              {a}
-            </button>
-          );
-        })}
-      </div>
-
       {/* Inline results */}
       {hasSearched && (
         <div ref={resultsRef} className="mt-10 scroll-mt-24">
@@ -751,7 +730,10 @@ function CategoryGrid() {
       title="Discover by category"
       subtitle="Premium tiles for every beauty experience in Jaipur."
     >
-      <div className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
+      <div
+        aria-label="Beauty categories"
+        className="-mx-1 flex touch-pan-x snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain px-1 pb-3 [scrollbar-width:none] sm:gap-5 [&::-webkit-scrollbar]:hidden"
+      >
         {CATEGORIES.map(({ name, desc, Icon, gradient }) => {
           const count = counts[name] ?? 0;
           const img = CATEGORY_IMAGES[name];
@@ -760,7 +742,7 @@ function CategoryGrid() {
               key={name}
               to="/search"
               search={{ category: name } as never}
-              className="group relative overflow-hidden rounded-[24px] border border-slate-200 bg-white transition hover:-translate-y-1 hover:border-slate-300 hover:shadow-xl"
+              className="group relative w-[min(78vw,280px)] shrink-0 snap-start overflow-hidden rounded-[24px] border border-slate-200 bg-white transition hover:-translate-y-1 hover:border-slate-300 hover:shadow-xl lg:w-[300px]"
             >
               <div className="relative h-[120px] w-full overflow-hidden">
                 {img && (

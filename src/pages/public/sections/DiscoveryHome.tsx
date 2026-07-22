@@ -512,7 +512,7 @@ export function DiscoveryHome({
   }
 
   return (
-    <div className="space-y-14 px-5 py-12 sm:px-8 sm:py-16">
+    <div className="nexora-discovery-home min-w-0 space-y-14 px-5 py-12 sm:px-8 sm:py-16">
       <div className="mx-auto max-w-[1400px] space-y-14">
         <QuickJumpBar />
 
