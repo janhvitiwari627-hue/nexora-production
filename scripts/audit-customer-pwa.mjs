@@ -52,6 +52,7 @@ if (!liveSalons.includes('input?.gender === "male"') || !liveSalons.includes('"B
 }
 
 const home = readFileSync("src/pages/customer/app/CustomerAppHome.tsx", "utf8");
+const search = readFileSync("src/pages/customer/app/CustomerAppSearch.tsx", "utf8");
 const locationGate = readFileSync("src/components/auth/LocationPermissionModal.tsx", "utf8");
 const referralPopup = readFileSync("src/components/referral/ReferralWelcomePopup.tsx", "utf8");
 const locationDialog = readFileSync("src/pages/customer/app/CustomerLocationDialog.tsx", "utf8");
@@ -100,6 +101,14 @@ if (
   !/\.rpc\(\s*["']nearby_public_salon_cards["']/.test(liveSalons)
 ) {
   failures.push("Nearby salons must use the RLS-safe distance-sorted database query");
+}
+if (
+  !search.includes("[3, 5, 10, 15, 20, 25, 30]") ||
+  search.includes("[10, 25, 50, 100]") ||
+  search.includes("CustomerLocationDialog") ||
+  search.includes("Nearest first from ${location.label}")
+) {
+  failures.push("Customer search must use one header location and the final 3-30 km filters");
 }
 
 const signup = readFileSync("src/pages/auth/SignupPage.tsx", "utf8");
