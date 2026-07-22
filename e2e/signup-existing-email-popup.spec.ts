@@ -10,6 +10,9 @@ test.describe("signup existing-email early warning", () => {
 
   test("shows the account popup before the user completes the form", async ({ page }) => {
     await page.goto("/signup", { waitUntil: "domcontentloaded" });
+    // The PWA release guard can add its cache-busting query once on first load.
+    await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(1_000);
     await page.getByLabel("Email").fill(REGISTERED_EMAIL!);
 
     const dialog = page.getByRole("dialog", {
