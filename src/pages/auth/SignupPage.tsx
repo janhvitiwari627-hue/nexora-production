@@ -17,6 +17,7 @@ import {
 import { useAuthStore } from "@/stores/authStore";
 import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
 import { requestPasswordReset } from "@/lib/password-reset";
+import { CUSTOMER_LOCATION_ONBOARDING_KEY } from "@/lib/customer-location";
 
 const normalizeEmail = (value: string) => value.trim().toLowerCase();
 
@@ -230,6 +231,7 @@ export default function SignupPage() {
         await useAuthStore.getState().refreshProfile();
         try {
           window.sessionStorage.removeItem("nexora_pending_ref");
+          window.sessionStorage.setItem(CUSTOMER_LOCATION_ONBOARDING_KEY, "required");
         } catch {
           /* ignore */
         }

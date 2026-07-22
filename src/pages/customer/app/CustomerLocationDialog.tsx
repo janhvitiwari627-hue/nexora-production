@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Map as LeafletMap, Marker as LeafletMarker } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
@@ -30,15 +30,20 @@ export function CustomerLocationDialog({
   onOpenChange,
   initialLocation,
   onSave,
+  autoLocate = false,
+  required = false,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialLocation: CustomerLocation | null;
   onSave: (location: CustomerLocation) => Promise<unknown>;
+  autoLocate?: boolean;
+  required?: boolean;
 }) {
   const mapElementRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const markerRef = useRef<LeafletMarker | null>(null);
+  const autoLocateRequestedRef = useRef(false);
   const [selected, setSelected] = useState<CustomerLocation | null>(initialLocation);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<CustomerLocation[]>([]);
@@ -46,11 +51,11 @@ export function CustomerLocationDialog({
   const [locating, setLocating] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const movePin = (location: CustomerLocation, zoom = 16) => {
+  const movePin = useCallback((location: CustomerLocation, zoom = 16) => {
     setSelected(location);
     mapRef.current?.setView([location.latitude, location.longitude], zoom);
     markerRef.current?.setLatLng([location.latitude, location.longitude]);
-  };
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -119,7 +124,7 @@ export function CustomerLocationDialog({
     };
   }, [initialLocation, open]);
 
-  const useDeviceLocation = () => {
+  const useDeviceLocation = useCallback(() => {
     if (!("geolocation" in navigator)) {
       toast.error("Location is not supported on this device.");
       return;
@@ -147,7 +152,18 @@ export function CustomerLocationDialog({
       },
       { enableHighAccuracy: true, timeout: 15_000, maximumAge: 30_000 },
     );
-  };
+  }, [movePin]);
+
+  useEffect(() => {
+    if (!open) {
+      autoLocateRequestedRef.current = false;
+      return;
+    }
+    if (!autoLocate || autoLocateRequestedRef.current) return;
+    autoLocateRequestedRef.current = true;
+    const timer = window.setTimeout(useDeviceLocation, 300);
+    return () => window.clearTimeout(timer);
+  }, [autoLocate, open, useDeviceLocation]);
 
   const searchAddress = async () => {
     setSearching(true);
@@ -184,17 +200,34 @@ export function CustomerLocationDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="customer-brand-surface max-h-[92dvh] overflow-y-auto border-[#d9c38a] bg-[#fffaf0] sm:max-w-3xl">
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen && required) return;
+        onOpenChange(nextOpen);
+      }}
+    >
+      <DialogContent
+        onEscapeKeyDown={(event) => required && event.preventDefault()}
+        onPointerDownOutside={(event) => required && event.preventDefault()}
+        onInteractOutside={(event) => required && event.preventDefault()}
+        className={`customer-brand-surface max-h-[92dvh] overflow-y-auto border-[#d9c38a] bg-[#fffaf0] sm:max-w-3xl ${
+          required ? "[&>button.absolute]:hidden" : ""
+        }`}
+      >
         <DialogHeader>
           <div className="flex items-center gap-3">
             <span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#0b0a08] text-[#f3cf70]">
               <MapPinned className="h-5 w-5" />
             </span>
             <div>
-              <DialogTitle className="text-left text-xl font-black">Set your location</DialogTitle>
+              <DialogTitle className="text-left text-xl font-black">
+                {required ? "Enable location to continue" : "Set your location"}
+              </DialogTitle>
               <DialogDescription className="text-left">
-                Use GPS, search an address, or move the map pin before confirming.
+                {required
+                  ? "Nexora uses your confirmed location to show the nearest salons and accurate distance. Allow GPS, then verify the map pin."
+                  : "Use GPS, search an address, or move the map pin before confirming."}
               </DialogDescription>
             </div>
           </div>
@@ -290,9 +323,15 @@ export function CustomerLocationDialog({
         </div>
 
         <DialogFooter className="gap-2 sm:justify-between">
-          <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
+          {required ? (
+            <p className="max-w-sm text-center text-xs text-[#7a746a] sm:text-left">
+              GPS denied? Search your area or pincode above and confirm the map pin manually.
+            </p>
+          ) : (
+            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+          )}
           <Button
             type="button"
             onClick={() => void confirmLocation()}
