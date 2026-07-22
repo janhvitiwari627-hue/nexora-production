@@ -194,6 +194,7 @@ import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/em
 import { Route as ApiPublicHooksReleaseExpiredBookingsRouteImport } from './routes/api/public/hooks/release-expired-bookings'
 import { Route as ApiPublicHooksRecomputeRankingsRouteImport } from './routes/api/public/hooks/recompute-rankings'
 import { Route as ApiPublicHooksRecomputeInsightsRouteImport } from './routes/api/public/hooks/recompute-insights'
+import { Route as ApiPublicHooksRazorpayRouteImport } from './routes/api/public/hooks/razorpay'
 import { Route as ApiPublicHooksProcessSettlementsRouteImport } from './routes/api/public/hooks/process-settlements'
 import { Route as ApiPublicAuthForgotPasswordRouteImport } from './routes/api/public/auth/forgot-password'
 
@@ -1131,6 +1132,11 @@ const ApiPublicHooksRecomputeInsightsRoute =
     path: '/api/public/hooks/recompute-insights',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksRazorpayRoute = ApiPublicHooksRazorpayRouteImport.update({
+  id: '/api/public/hooks/razorpay',
+  path: '/api/public/hooks/razorpay',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHooksProcessSettlementsRoute =
   ApiPublicHooksProcessSettlementsRouteImport.update({
     id: '/api/public/hooks/process-settlements',
@@ -1326,6 +1332,7 @@ export interface FileRoutesByFullPath {
   '/portal/distributors/': typeof PortalDistributorsIndexRoute
   '/api/public/auth/forgot-password': typeof ApiPublicAuthForgotPasswordRoute
   '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
+  '/api/public/hooks/razorpay': typeof ApiPublicHooksRazorpayRoute
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
   '/api/public/hooks/recompute-rankings': typeof ApiPublicHooksRecomputeRankingsRoute
   '/api/public/hooks/release-expired-bookings': typeof ApiPublicHooksReleaseExpiredBookingsRoute
@@ -1507,6 +1514,7 @@ export interface FileRoutesByTo {
   '/portal/distributors': typeof PortalDistributorsIndexRoute
   '/api/public/auth/forgot-password': typeof ApiPublicAuthForgotPasswordRoute
   '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
+  '/api/public/hooks/razorpay': typeof ApiPublicHooksRazorpayRoute
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
   '/api/public/hooks/recompute-rankings': typeof ApiPublicHooksRecomputeRankingsRoute
   '/api/public/hooks/release-expired-bookings': typeof ApiPublicHooksReleaseExpiredBookingsRoute
@@ -1697,6 +1705,7 @@ export interface FileRoutesById {
   '/portal/distributors/': typeof PortalDistributorsIndexRoute
   '/api/public/auth/forgot-password': typeof ApiPublicAuthForgotPasswordRoute
   '/api/public/hooks/process-settlements': typeof ApiPublicHooksProcessSettlementsRoute
+  '/api/public/hooks/razorpay': typeof ApiPublicHooksRazorpayRoute
   '/api/public/hooks/recompute-insights': typeof ApiPublicHooksRecomputeInsightsRoute
   '/api/public/hooks/recompute-rankings': typeof ApiPublicHooksRecomputeRankingsRoute
   '/api/public/hooks/release-expired-bookings': typeof ApiPublicHooksReleaseExpiredBookingsRoute
@@ -1888,6 +1897,7 @@ export interface FileRouteTypes {
     | '/portal/distributors/'
     | '/api/public/auth/forgot-password'
     | '/api/public/hooks/process-settlements'
+    | '/api/public/hooks/razorpay'
     | '/api/public/hooks/recompute-insights'
     | '/api/public/hooks/recompute-rankings'
     | '/api/public/hooks/release-expired-bookings'
@@ -2069,6 +2079,7 @@ export interface FileRouteTypes {
     | '/portal/distributors'
     | '/api/public/auth/forgot-password'
     | '/api/public/hooks/process-settlements'
+    | '/api/public/hooks/razorpay'
     | '/api/public/hooks/recompute-insights'
     | '/api/public/hooks/recompute-rankings'
     | '/api/public/hooks/release-expired-bookings'
@@ -2258,6 +2269,7 @@ export interface FileRouteTypes {
     | '/portal/distributors/'
     | '/api/public/auth/forgot-password'
     | '/api/public/hooks/process-settlements'
+    | '/api/public/hooks/razorpay'
     | '/api/public/hooks/recompute-insights'
     | '/api/public/hooks/recompute-rankings'
     | '/api/public/hooks/release-expired-bookings'
@@ -2359,6 +2371,7 @@ export interface RootRouteChildren {
   PortalDistributorsIndexRoute: typeof PortalDistributorsIndexRoute
   ApiPublicAuthForgotPasswordRoute: typeof ApiPublicAuthForgotPasswordRoute
   ApiPublicHooksProcessSettlementsRoute: typeof ApiPublicHooksProcessSettlementsRoute
+  ApiPublicHooksRazorpayRoute: typeof ApiPublicHooksRazorpayRoute
   ApiPublicHooksRecomputeInsightsRoute: typeof ApiPublicHooksRecomputeInsightsRoute
   ApiPublicHooksRecomputeRankingsRoute: typeof ApiPublicHooksRecomputeRankingsRoute
   ApiPublicHooksReleaseExpiredBookingsRoute: typeof ApiPublicHooksReleaseExpiredBookingsRoute
@@ -3664,6 +3677,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksRecomputeInsightsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/razorpay': {
+      id: '/api/public/hooks/razorpay'
+      path: '/api/public/hooks/razorpay'
+      fullPath: '/api/public/hooks/razorpay'
+      preLoaderRoute: typeof ApiPublicHooksRazorpayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/process-settlements': {
       id: '/api/public/hooks/process-settlements'
       path: '/api/public/hooks/process-settlements'
@@ -4065,6 +4085,7 @@ const rootRouteChildren: RootRouteChildren = {
   PortalDistributorsIndexRoute: PortalDistributorsIndexRoute,
   ApiPublicAuthForgotPasswordRoute: ApiPublicAuthForgotPasswordRoute,
   ApiPublicHooksProcessSettlementsRoute: ApiPublicHooksProcessSettlementsRoute,
+  ApiPublicHooksRazorpayRoute: ApiPublicHooksRazorpayRoute,
   ApiPublicHooksRecomputeInsightsRoute: ApiPublicHooksRecomputeInsightsRoute,
   ApiPublicHooksRecomputeRankingsRoute: ApiPublicHooksRecomputeRankingsRoute,
   ApiPublicHooksReleaseExpiredBookingsRoute:

@@ -23,7 +23,8 @@ import {
 } from "./booking/state";
 import type { Service } from "@/components/shared/ServiceCard";
 import type { Staff } from "@/components/shared/StaffCard";
-import { createBooking, confirmBookingPayment } from "@/lib/bookings.functions";
+import { createBooking } from "@/lib/bookings.functions";
+import { createRazorpayAdvanceOrder, verifyRazorpayAdvance } from "@/lib/razorpay.functions";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 import { OfflineBanner, OfflinePill } from "@/components/shared/OfflineBanner";
 import { QueuedBookingsList } from "@/components/shared/QueuedBookingsList";
@@ -42,11 +43,94 @@ function isUuid(s: string) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
 }
 
+type RazorpayCheckoutResponse = {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+};
+
+type RazorpayOrderPayload = {
+  keyId: string;
+  orderId: string;
+  amount: number;
+  currency: string;
+  testMode: boolean;
+};
+
+async function openRazorpayCheckout(
+  order: RazorpayOrderPayload,
+  shopName: string,
+): Promise<RazorpayCheckoutResponse> {
+  if (typeof window === "undefined") throw new Error("Payment can only be opened in the app.");
+  const razorpayWindow = window as typeof window & {
+    Razorpay?: new (options: Record<string, unknown>) => {
+      open: () => void;
+      on: (
+        event: string,
+        callback: (response: { error?: { description?: string } }) => void,
+      ) => void;
+    };
+  };
+  if (!razorpayWindow.Razorpay) {
+    await new Promise<void>((resolve, reject) => {
+      const existing = document.querySelector<HTMLScriptElement>(
+        'script[src="https://checkout.razorpay.com/v1/checkout.js"]',
+      );
+      if (existing) {
+        existing.addEventListener("load", () => resolve(), { once: true });
+        existing.addEventListener(
+          "error",
+          () => reject(new Error("Payment screen could not load.")),
+          {
+            once: true,
+          },
+        );
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.async = true;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error("Payment screen could not load."));
+      document.head.appendChild(script);
+    });
+  }
+  if (!razorpayWindow.Razorpay) throw new Error("Razorpay Checkout is unavailable.");
+
+  return new Promise<RazorpayCheckoutResponse>((resolve, reject) => {
+    let completed = false;
+    const checkout = new razorpayWindow.Razorpay!({
+      key: order.keyId,
+      amount: order.amount,
+      currency: order.currency,
+      name: "Nexora Salons",
+      description: `25% booking advance for ${shopName}`,
+      order_id: order.orderId,
+      image: "/nexora-final-logo.jpg",
+      handler: (response: RazorpayCheckoutResponse) => {
+        completed = true;
+        resolve(response);
+      },
+      modal: {
+        ondismiss: () => {
+          if (!completed) reject(new Error("Payment was cancelled."));
+        },
+      },
+      theme: { color: "#C79222" },
+    });
+    checkout.on("payment.failed", (response) => {
+      if (!completed) reject(new Error(response.error?.description || "Payment failed."));
+    });
+    checkout.open();
+  });
+}
+
 export function BookingFlowPage({ salon }: { salon?: RealSalonRef } = {}) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const createFn = useServerFn(createBooking);
-  const confirmFn = useServerFn(confirmBookingPayment);
+  const createOrderFn = useServerFn(createRazorpayAdvanceOrder);
+  const verifyPaymentFn = useServerFn(verifyRazorpayAdvance);
   const online = useOnlineStatus();
 
   const shop = MOCK_SHOP;
@@ -125,17 +209,20 @@ export function BookingFlowPage({ salon }: { salon?: RealSalonRef } = {}) {
           booking_time: booking.time,
         },
       });
-      const advance = Number(
-        (created as { advance_amount?: number }).advance_amount ?? totalPrice * 0.25,
-      );
-      const confirmedRow = await confirmFn({
+      const bookingId = (created as { id: string }).id;
+      const order = (await createOrderFn({
+        data: { bookingId },
+      })) as RazorpayOrderPayload;
+      const checkoutResult = await openRazorpayCheckout(order, booking.shopName);
+      const verification = await verifyPaymentFn({
         data: {
-          id: (created as { id: string }).id,
-          amount_paid: advance,
-          payment_reference: `MOCK-${Date.now()}`,
+          bookingId,
+          razorpayOrderId: checkoutResult.razorpay_order_id,
+          razorpayPaymentId: checkoutResult.razorpay_payment_id,
+          razorpaySignature: checkoutResult.razorpay_signature,
         },
       });
-      return confirmedRow as { id: string };
+      return (verification as { booking: { id: string } }).booking;
     },
     onSuccess: (row) => {
       queryClient.invalidateQueries({ queryKey: ["my-bookings"] });

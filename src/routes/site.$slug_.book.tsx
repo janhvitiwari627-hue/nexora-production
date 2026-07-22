@@ -9,6 +9,9 @@ import { PublishedSiteShell } from "@/pages/public/site/PublishedSiteShell";
 import { SalonNotFound } from "@/pages/public/site/SalonNotFound";
 import { isBookingMockDisabled } from "@/lib/mock-booking-availability";
 import { createMockBooking } from "@/lib/mock-bookings";
+import { BookingFlowPage, type RealSalonRef } from "@/pages/public/BookingFlowPage";
+import type { Service } from "@/components/shared/ServiceCard";
+import type { Staff } from "@/components/shared/StaffCard";
 
 const TIMES = [
   "10:00",
@@ -110,6 +113,36 @@ function PublishedBookingPageInner({ slug }: { slug: string }) {
   }
 
   const isMock = isMockSalonId(data.salon.id);
+
+  if (!isMock) {
+    const salon: RealSalonRef = {
+      id: data.salon.id,
+      name: data.salon.name,
+      address: data.salon.address ?? data.salon.location ?? "",
+      services: services.map(
+        (service): Service => ({
+          id: service.id,
+          name: service.name,
+          duration_minutes: service.duration_minutes ?? 30,
+          price: Number(service.price),
+          description: service.description ?? null,
+        }),
+      ),
+      staff: data.staff.map(
+        (member): Staff => ({
+          id: member.id,
+          name: member.name,
+          designation: member.role ?? "Stylist",
+          avatar_url: member.avatar_url ?? null,
+          experience_years: 0,
+          specializations: [],
+          rating: Number(member.rating ?? 4.5),
+          available: true,
+        }),
+      ),
+    };
+    return <BookingFlowPage salon={salon} />;
+  }
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();

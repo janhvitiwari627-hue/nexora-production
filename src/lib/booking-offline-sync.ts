@@ -4,7 +4,7 @@
  * Registers runners for booking actions and exposes typed `enqueue*` helpers.
  * Import `initBookingOfflineSync()` once at app bootstrap.
  */
-import { createBooking, confirmBookingPayment } from "@/lib/bookings.functions";
+import { createBooking } from "@/lib/bookings.functions";
 import { enqueue, initOfflineQueue, registerRunner } from "./offline-queue";
 
 export const TASK_CREATE_AND_CONFIRM_BOOKING = "booking:create_and_confirm";
@@ -53,17 +53,9 @@ export function initBookingOfflineSync() {
       },
     })) as { id: string; advance_amount?: number };
 
-    const advance = Number(created.advance_amount ?? p.advance_amount ?? p.price * 0.25);
-    const confirmed = (await confirmBookingPayment({
-      data: {
-        id: created.id,
-        amount_paid: advance,
-        payment_reference: p.payment_reference ?? `OFFLINE-SYNC-${Date.now()}`,
-      },
-    })) as { id: string; booking_reference?: string };
     return {
-      booking_id: confirmed.id,
-      booking_reference: confirmed.booking_reference ?? null,
+      booking_id: created.id,
+      booking_reference: null,
     };
   });
 
