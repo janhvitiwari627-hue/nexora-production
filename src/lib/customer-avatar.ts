@@ -3,7 +3,7 @@ export type CustomerAvatarKey = "male" | "female" | "neutral";
 const DEFAULT_CUSTOMER_AVATARS: Record<CustomerAvatarKey, string> = {
   male: "/default-customer-male.jpg",
   female: "/default-customer-female.jpg",
-  neutral: "/customer-pwa-launcher-192.png",
+  neutral: "/customer-pwa-transparent-192.png?v=20260722-transparent-v4",
 };
 
 export function getCustomerAvatarKey(

@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/dialog";
 import { activateRoleManifest, type NexoraAppKind } from "@/lib/role-pwa";
 import {
-  getPwaInstallState,
   isAndroidDevice,
   isInAppBrowser,
   showPwaInstallPrompt,
@@ -44,14 +43,30 @@ export function InstallAppButton({
   fallbackHref: string;
   className?: string;
 }) {
-  const [state, setState] = useState<InstallState>(getPwaInstallState());
+  // Keep server and browser markup identical. The subscription publishes the
+  // real browser capability immediately after hydration.
+  const [state, setState] = useState<InstallState>("checking");
   const [helpOpen, setHelpOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [startedHere, setStartedHere] = useState(false);
+  const [showInstalledNotice, setShowInstalledNotice] = useState(false);
 
   useEffect(() => {
     activateRoleManifest(kind);
     return subscribeToPwaInstall(setState);
   }, [kind]);
+
+  useEffect(() => {
+    if (state === "cancelled") setStartedHere(false);
+    if (state !== "installed" || !startedHere) return;
+
+    setShowInstalledNotice(true);
+    const timer = window.setTimeout(() => {
+      setShowInstalledNotice(false);
+      setStartedHere(false);
+    }, 4500);
+    return () => window.clearTimeout(timer);
+  }, [startedHere, state]);
 
   const install = async () => {
     if (state === "installed") {
@@ -63,7 +78,9 @@ export function InstallAppButton({
       setHelpOpen(true);
       return;
     }
+    setStartedHere(true);
     if (!(await showPwaInstallPrompt())) {
+      setStartedHere(false);
       setHelpOpen(true);
     }
   };
@@ -116,31 +133,35 @@ export function InstallAppButton({
         {label}
       </button>
 
-      {installing ? (
+      {startedHere && (installing || showInstalledNotice) ? (
         <div
-          className="mt-3 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950"
+          className={`fixed bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] left-1/2 z-[100] w-[calc(100vw-2rem)] max-w-sm -translate-x-1/2 rounded-2xl border p-4 text-sm shadow-2xl backdrop-blur sm:bottom-6 ${
+            installing
+              ? "border-amber-300 bg-amber-50/95 text-amber-950"
+              : "border-emerald-200 bg-emerald-50/95 text-emerald-900"
+          }`}
           role="status"
           aria-live="polite"
         >
-          <div className="flex items-center gap-2 font-bold">
-            <Loader2 className="h-4 w-4 animate-spin" /> Installing Nexora…
-          </div>
-          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-amber-200">
-            <div className="h-full w-2/3 animate-pulse rounded-full bg-amber-600" />
-          </div>
-          <p className="mt-2 text-xs leading-5">
-            Please wait. Android will confirm when the app has been added to your home screen.
-          </p>
+          {installing ? (
+            <>
+              <div className="flex items-center gap-2 font-bold">
+                <Loader2 className="h-5 w-5 animate-spin" /> Installing Nexora…
+              </div>
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-amber-200">
+                <div className="h-full w-2/3 animate-pulse rounded-full bg-amber-600" />
+              </div>
+              <p className="mt-2 text-xs leading-5">
+                Please wait. Android or your desktop browser will confirm when Nexora is ready.
+              </p>
+            </>
+          ) : (
+            <p className="flex items-center gap-2 font-bold">
+              <CheckCircle2 className="h-5 w-5" /> App installed successfully. Nexora is ready to
+              open.
+            </p>
+          )}
         </div>
-      ) : installed ? (
-        <p
-          className="mt-3 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm font-bold text-emerald-800"
-          role="status"
-          aria-live="polite"
-        >
-          <CheckCircle2 className="h-4 w-4" /> App installed successfully. Nexora is on your home
-          screen.
-        </p>
       ) : null}
 
       <Dialog open={helpOpen} onOpenChange={setHelpOpen}>

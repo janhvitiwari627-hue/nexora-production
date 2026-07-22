@@ -15,11 +15,34 @@ export type InstallState =
 let deferredPrompt: InstallPromptEvent | null = null;
 let currentState: InstallState = "checking";
 let listenersReady = false;
+let installPromptPending = false;
+let installAcceptedAt = 0;
+let installCompletionTimer: number | null = null;
 const subscribers = new Set<(state: InstallState) => void>();
+const MINIMUM_VISIBLE_INSTALL_MS = 2200;
 
 function publish(state: InstallState) {
   currentState = state;
   subscribers.forEach((subscriber) => subscriber(state));
+}
+
+function publishInstalledAfterProgress() {
+  deferredPrompt = null;
+
+  if (installPromptPending) return;
+  if (!installAcceptedAt) {
+    publish("installed");
+    return;
+  }
+
+  if (installCompletionTimer !== null) window.clearTimeout(installCompletionTimer);
+  const elapsed = Date.now() - installAcceptedAt;
+  const remaining = Math.max(0, MINIMUM_VISIBLE_INSTALL_MS - elapsed);
+  installCompletionTimer = window.setTimeout(() => {
+    installCompletionTimer = null;
+    installAcceptedAt = 0;
+    publish("installed");
+  }, remaining);
 }
 
 export function isStandalonePwa() {
@@ -61,12 +84,9 @@ export function initializePwaInstall() {
     deferredPrompt = event as InstallPromptEvent;
     publish("available");
   });
-  window.addEventListener("appinstalled", () => {
-    deferredPrompt = null;
-    publish("installed");
-  });
+  window.addEventListener("appinstalled", publishInstalledAfterProgress);
   window.matchMedia("(display-mode: standalone)").addEventListener?.("change", (event) => {
-    if (event.matches) publish("installed");
+    if (event.matches) publishInstalledAfterProgress();
   });
 }
 
@@ -87,9 +107,26 @@ export async function showPwaInstallPrompt() {
   if (!deferredPrompt) return false;
   const prompt = deferredPrompt;
   deferredPrompt = null;
+  installPromptPending = true;
+  publish("installing");
+
+  // Paint the progress state before the browser opens its native install UI.
+  await new Promise<void>((resolve) => window.setTimeout(resolve, 75));
   await prompt.prompt();
   const choice = await prompt.userChoice;
-  publish(choice.outcome === "accepted" ? "installing" : "cancelled");
+  installPromptPending = false;
+
+  if (choice.outcome === "dismissed") {
+    installAcceptedAt = 0;
+    publish("cancelled");
+    return true;
+  }
+
+  // Chromium may emit `appinstalled` before `userChoice` resolves. Starting
+  // the timer here keeps the progress confirmation visible after acceptance.
+  installAcceptedAt = Date.now();
+  publish("installing");
+  publishInstalledAfterProgress();
   return true;
 }
 
