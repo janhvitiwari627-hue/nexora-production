@@ -238,6 +238,11 @@ export default function CustomerLoginPage() {
       <div className="w-full max-w-md">
         <Card className="w-full">
           <CardHeader>
+            <img
+              src="/nexora-final-logo.jpg"
+              alt="Nexora SalonOS"
+              className="mb-3 h-20 w-20 rounded-2xl object-cover shadow-md"
+            />
             <CardTitle className="text-2xl">Welcome back</CardTitle>
             <CardDescription>Sign in to manage bookings, rewards and more.</CardDescription>
           </CardHeader>

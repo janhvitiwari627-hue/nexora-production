@@ -34,6 +34,9 @@ for (const label of ["Home", "Search", "Bookings", "Rewards", "Profile"]) {
 if (!shell.includes('from "@/stores/authStore"')) {
   failures.push("Customer app shell must reuse the platform Supabase auth store");
 }
+if (!existsSync("public/nexora-final-logo.jpg")) {
+  failures.push("The approved final Nexora SalonOS logo must be included in the customer app");
+}
 
 const liveSalons = readFileSync("src/lib/customer-app.ts", "utf8");
 if (!liveSalons.includes('.eq("website_created", true)')) {
@@ -63,12 +66,22 @@ const profile = readFileSync("src/pages/customer/app/CustomerAppProfile.tsx", "u
 if (
   !profile.includes("Nexora member") ||
   !profile.includes("Choose profile photo") ||
+  !profile.includes("<CustomerAvatar") ||
+  !profile.includes("currentProfile?.full_name") ||
   !profile.includes("CustomerAppInstallPanel") ||
   !profile.includes('from "@/stores/authStore"')
 ) {
   failures.push(
     "Customer profile must reuse platform auth and show the member ID, photo chooser and install action",
   );
+}
+
+const customerLogin = readFileSync("src/pages/auth/CustomerLoginPage.tsx", "utf8");
+if (!customerLogin.includes("/nexora-final-logo.jpg")) {
+  failures.push("Customer login must show the approved Nexora SalonOS logo");
+}
+if (!signup.includes("/nexora-final-logo.jpg")) {
+  failures.push("Customer signup must show the approved Nexora SalonOS logo");
 }
 
 const customerLanding = readFileSync("src/routes/customer-app.tsx", "utf8");
