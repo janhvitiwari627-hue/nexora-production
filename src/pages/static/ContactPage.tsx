@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Facebook, Instagram, Linkedin, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { toast } from "sonner";
+import { NEXORA_CALL_DISPLAY, NEXORA_CALL_URL, NEXORA_WHATSAPP_URL } from "@/config/contact";
 
 export function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
@@ -25,12 +26,17 @@ export function ContactPage() {
                 label="Office"
                 value="WeWork Galaxy, Bangalore — 560008"
               />
-              <Info icon={<Phone className="h-5 w-5" />} label="Phone" value="+91 80 4000 1234" />
+              <Info
+                icon={<Phone className="h-5 w-5" />}
+                label="Phone"
+                value={NEXORA_CALL_DISPLAY}
+                href={NEXORA_CALL_URL}
+              />
               <Info icon={<Mail className="h-5 w-5" />} label="Email" value="hello@nexora.app" />
             </CardContent>
           </Card>
           <Button className="w-full bg-emerald-500 hover:bg-emerald-600" asChild>
-            <a href="https://wa.me/918040001234" target="_blank" rel="noopener noreferrer">
+            <a href={NEXORA_WHATSAPP_URL} target="_blank" rel="noopener noreferrer">
               <MessageCircle className="h-4 w-4" /> WhatsApp Support
             </a>
           </Button>
@@ -143,13 +149,29 @@ export function ContactPage() {
   );
 }
 
-function Info({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function Info({
+  icon,
+  label,
+  value,
+  href,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  href?: string;
+}) {
   return (
     <div className="flex gap-3">
       <div className="text-primary mt-0.5">{icon}</div>
       <div>
         <div className="text-muted-foreground text-xs uppercase tracking-wider">{label}</div>
-        <div className="font-medium">{value}</div>
+        {href ? (
+          <a href={href} className="font-medium hover:text-primary hover:underline">
+            {value}
+          </a>
+        ) : (
+          <div className="font-medium">{value}</div>
+        )}
       </div>
     </div>
   );

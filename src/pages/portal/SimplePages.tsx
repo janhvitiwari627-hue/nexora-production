@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Building2, Check, Mail, Megaphone, Phone, Star, Target } from "lucide-react";
 import { PortalLayout, PortalHeading, EmptyHint } from "./PortalLayout";
+import { NEXORA_CALL_DISPLAY, NEXORA_CALL_URL } from "@/config/contact";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -191,7 +192,10 @@ export function PortalContactPage() {
               <Mail className="h-4 w-4 text-primary" /> partners@nexora.app
             </li>
             <li className="flex items-center gap-2">
-              <Phone className="h-4 w-4 text-primary" /> +91 80000 00000
+              <Phone className="h-4 w-4 text-primary" />
+              <a href={NEXORA_CALL_URL} className="hover:text-primary hover:underline">
+                {NEXORA_CALL_DISPLAY}
+              </a>
             </li>
             <li className="flex items-center gap-2">
               <Building2 className="h-4 w-4 text-primary" /> Nexora HQ, India

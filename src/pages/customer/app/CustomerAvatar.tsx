@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { UserRound } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
+import { getCustomerAvatarUrl } from "@/lib/customer-avatar";
 
 type CustomerAvatarProps = {
   className?: string;
@@ -22,7 +23,11 @@ export function CustomerAvatar({
       : typeof user?.user_metadata?.picture === "string"
         ? user.user_metadata.picture
         : null;
-  const avatarUrl = metadataAvatar || currentProfile?.avatar_url;
+  const avatarUrl = getCustomerAvatarUrl({
+    avatarUrl: metadataAvatar || currentProfile?.avatar_url,
+    gender: currentProfile?.gender,
+    defaultAvatarKey: currentProfile?.default_avatar_key,
+  });
   const metadataName =
     typeof user?.user_metadata?.full_name === "string" ? user.user_metadata.full_name.trim() : "";
   const displayName = metadataName || currentProfile?.full_name || user?.email?.split("@")[0] || "";
@@ -39,7 +44,7 @@ export function CustomerAvatar({
     setImageFailed(false);
   }, [avatarUrl]);
 
-  if (avatarUrl && !imageFailed) {
+  if (!imageFailed) {
     return (
       <img
         src={avatarUrl}

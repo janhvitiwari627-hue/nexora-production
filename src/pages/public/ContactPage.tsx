@@ -2,6 +2,12 @@ import { useState } from "react";
 import { z } from "zod";
 import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
+import {
+  NEXORA_CALL_DISPLAY,
+  NEXORA_CALL_URL,
+  NEXORA_WHATSAPP_DISPLAY,
+  NEXORA_WHATSAPP_URL,
+} from "@/config/contact";
 
 const schema = z.object({
   name: z.string().trim().min(2, "Please enter your name").max(80),
@@ -111,9 +117,19 @@ export function ContactPage() {
 
         <aside className="space-y-3">
           {[
-            { icon: Phone, label: "Phone", value: "+91 80000 12345" },
-            { icon: Mail, label: "Email", value: "hello@nexora.in" },
-            { icon: MessageCircle, label: "WhatsApp", value: "+91 80000 12345" },
+            { icon: Phone, label: "Phone", value: NEXORA_CALL_DISPLAY, href: NEXORA_CALL_URL },
+            {
+              icon: Mail,
+              label: "Email",
+              value: "hello@nexora.in",
+              href: "mailto:hello@nexora.in",
+            },
+            {
+              icon: MessageCircle,
+              label: "WhatsApp",
+              value: NEXORA_WHATSAPP_DISPLAY,
+              href: NEXORA_WHATSAPP_URL,
+            },
             { icon: MapPin, label: "Office", value: "Jaipur · Bengaluru · Mumbai" },
           ].map((c) => (
             <div
@@ -127,7 +143,18 @@ export function ContactPage() {
                 <div className="text-muted-foreground text-[11px] uppercase tracking-wider">
                   {c.label}
                 </div>
-                <div className="text-heading text-sm font-semibold">{c.value}</div>
+                {c.href ? (
+                  <a
+                    href={c.href}
+                    target={c.href.startsWith("https://") ? "_blank" : undefined}
+                    rel={c.href.startsWith("https://") ? "noopener noreferrer" : undefined}
+                    className="text-heading text-sm font-semibold hover:text-primary hover:underline"
+                  >
+                    {c.value}
+                  </a>
+                ) : (
+                  <div className="text-heading text-sm font-semibold">{c.value}</div>
+                )}
               </div>
             </div>
           ))}

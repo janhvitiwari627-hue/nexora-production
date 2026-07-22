@@ -2,6 +2,7 @@ import { create } from "zustand";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { claimReferralWelcomeForUser } from "@/lib/referral-welcome";
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type UserRole = Database["public"]["Enums"]["app_role"];
@@ -129,6 +130,7 @@ export const useAuthStore = create<AuthStore>((set, get) => {
     }
 
     if (session?.user) {
+      claimReferralWelcomeForUser(session.user.id);
       // Resolve the header and public pages immediately from the persisted
       // session. Profile/role hydration must never block first paint.
       set({
@@ -272,6 +274,7 @@ export const useAuthStore = create<AuthStore>((set, get) => {
 
         if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
           const userId = nextSession.user.id;
+          if (event === "SIGNED_IN") claimReferralWelcomeForUser(userId);
           setTimeout(async () => {
             console.log("[Auth Store] Loading profile and roles for user:", userId);
             const { profile, roles } = await ensureProfileExists(nextSession.user);

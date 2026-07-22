@@ -11,6 +11,9 @@ import {
   Award,
   Wallet,
   ArrowRight,
+  AtSign,
+  IdCard,
+  ShieldCheck,
 } from "lucide-react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { toast } from "sonner";
@@ -25,9 +28,16 @@ import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/stores/authStore";
 import { buildReferralSignupUrl } from "@/lib/public-app-url";
 import { CUSTOMER_LOCATION_ONBOARDING_KEY } from "@/lib/customer-location";
+import {
+  buildBrandedReferralShareData,
+  buildReferralShareMessage,
+  consumePendingReferralWelcome,
+  hasPendingReferralWelcome,
+} from "@/lib/referral-welcome";
 
 export function ReferralWelcomePopup() {
   const user = useAuthStore((s) => s.user);
+  const session = useAuthStore((s) => s.session);
   const profile = useAuthStore((s) => s.profile);
   const isInitialized = useAuthStore((s) => s.isInitialized);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
@@ -42,17 +52,26 @@ export function ReferralWelcomePopup() {
     pathname.startsWith("/owner") ||
     pathname.startsWith("/app/owner") ||
     pathname.startsWith("/admin");
+  const authenticated = Boolean(user && session?.user.id === user.id);
+  const currentProfile = authenticated && profile?.id === user?.id ? profile : null;
   const needsCustomerLocation =
     pathname.startsWith("/app/customer") &&
-    (profile?.latitude == null || profile?.longitude == null);
+    (currentProfile?.latitude == null || currentProfile?.longitude == null);
 
-  const code = profile?.referral_code ?? null;
+  const code = currentProfile?.referral_code?.trim() ?? null;
   const link = code ? buildReferralSignupUrl(code) : "";
-  const shareText = `Join me on Nexora & build your own salon website in minutes! Use my referral code ${code}: ${link}`;
+  const displayName =
+    currentProfile?.full_name?.trim() || user?.email?.split("@")[0] || "Nexora member";
+  const username = currentProfile?.username?.trim() || user?.email?.split("@")[0] || "member";
+  const memberId = currentProfile?.nexora_id?.trim() || user?.id || "";
+  const shareText = code
+    ? buildReferralShareMessage({ displayName, referralCode: code, referralLink: link })
+    : "";
 
   useEffect(() => {
     if (isWorkspaceRoute || needsCustomerLocation) return;
-    if (!isInitialized || !user || !code) return;
+    if (!isInitialized || !authenticated || !user || !code) return;
+    if (!hasPendingReferralWelcome(user.id)) return;
     const key = `nexora_ref_popup_shown_${user.id}`;
     if (typeof window === "undefined") return;
     if (window.sessionStorage.getItem(CUSTOMER_LOCATION_ONBOARDING_KEY) === "required") return;
@@ -60,12 +79,13 @@ export function ReferralWelcomePopup() {
     // small delay so it doesn't collide with login redirects
     const t = setTimeout(() => {
       setOpen(true);
+      consumePendingReferralWelcome(user.id);
       window.sessionStorage.setItem(key, "1");
     }, 900);
     return () => clearTimeout(t);
-  }, [isInitialized, user, code, isWorkspaceRoute, needsCustomerLocation]);
+  }, [authenticated, isInitialized, user, code, isWorkspaceRoute, needsCustomerLocation]);
 
-  if (!code || isWorkspaceRoute || needsCustomerLocation) return null;
+  if (!authenticated || !user || !code || isWorkspaceRoute || needsCustomerLocation) return null;
 
   const copy = async (value: string, label: string) => {
     try {
@@ -79,11 +99,12 @@ export function ReferralWelcomePopup() {
   const share = async () => {
     try {
       if (typeof navigator !== "undefined" && navigator.share) {
-        await navigator.share({
-          title: "Build your own salon website — Nexora",
-          text: shareText,
-          url: link,
+        const shareData = await buildBrandedReferralShareData({
+          displayName,
+          referralCode: code,
+          referralLink: link,
         });
+        await navigator.share(shareData);
       } else {
         await navigator.clipboard.writeText(shareText);
         toast.success("Referral message copied");
@@ -96,18 +117,20 @@ export function ReferralWelcomePopup() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-h-[calc(100dvh-1.5rem)] w-[calc(100vw-1.5rem)] max-w-md overflow-x-hidden overflow-y-auto rounded-xl p-0">
-        <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 px-6 py-6 text-white">
+        <div className="bg-[linear-gradient(135deg,#080704_0%,#2b1c08_60%,#a16c12_100%)] px-6 py-6 text-white">
           <div className="flex min-w-0 items-center gap-2 pr-5">
-            <div className="grid h-10 w-10 place-items-center rounded-full bg-white/20 backdrop-blur">
-              <Sparkles className="h-5 w-5" />
-            </div>
+            <img
+              src="/nexora-final-logo.jpg"
+              alt="Nexora Salons"
+              className="h-12 w-12 rounded-2xl border border-[#f1cf73]/50 object-cover shadow-lg"
+            />
             <div className="min-w-0 flex-1">
               <DialogHeader className="space-y-0.5">
                 <DialogTitle className="text-balance text-lg font-bold leading-snug text-white">
-                  Refer & Earn 100 points per friend
+                  Welcome, {displayName}!
                 </DialogTitle>
                 <DialogDescription className="text-white/85 text-xs">
-                  Share your link — friends sign up & build their own salon website.
+                  Your Nexora account is ready. Save your login securely, then invite friends.
                 </DialogDescription>
               </DialogHeader>
             </div>
@@ -115,6 +138,40 @@ export function ReferralWelcomePopup() {
         </div>
 
         <div className="min-w-0 space-y-4 px-4 pb-5 pt-4 sm:px-6 sm:pb-6">
+          <div className="rounded-xl border border-[#d7a93b]/35 bg-[#fffaf0] p-3 text-slate-900">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-black">{displayName}</p>
+                <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-slate-600">
+                  <AtSign className="h-3.5 w-3.5" /> {username}
+                </p>
+              </div>
+              <Button size="sm" variant="outline" onClick={() => copy(username, "Username")}>
+                <Copy className="mr-1 h-3.5 w-3.5" /> Copy
+              </Button>
+            </div>
+            <div className="mt-3 flex items-center justify-between gap-3 border-t border-[#d7a93b]/25 pt-3">
+              <p className="min-w-0 truncate font-mono text-xs font-bold" title={memberId}>
+                <IdCard className="mr-1 inline h-3.5 w-3.5" /> ID: {memberId}
+              </p>
+              <button
+                type="button"
+                onClick={() => copy(memberId, "Member ID")}
+                className="shrink-0 text-xs font-bold text-[#80570d]"
+              >
+                Copy ID
+              </button>
+            </div>
+          </div>
+
+          <div className="flex gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-900">
+            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
+            <p>
+              <strong>Password stays private.</strong> When Chrome or your phone asks, choose Save
+              password. Nexora never displays or shares it.
+            </p>
+          </div>
+
           <div className="rounded-lg border-2 border-dashed border-primary/40 bg-primary/5 p-3">
             <div className="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider">
               Your referral code
@@ -149,29 +206,29 @@ export function ReferralWelcomePopup() {
             <li className="flex items-start gap-2">
               <Gift className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               <span>
-                <strong className="font-semibold">You get 100 points</strong> when your friend signs
-                up with your code.
+                <strong className="font-semibold">You can earn ₹100 reward credit</strong> after
+                your friend completes an eligible first booking.
               </span>
             </li>
             <li className="flex items-start gap-2">
               <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               <span>
-                <strong className="font-semibold">Your friend gets 100 points</strong> as a welcome
-                bonus.
+                <strong className="font-semibold">Your friend can get up to ₹100 credit</strong> on
+                an eligible first booking.
               </span>
             </li>
             <li className="flex items-start gap-2">
               <Globe className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               <span>
-                <strong className="font-semibold">Free salon website</strong> — they can build one
-                in minutes.
+                <strong className="font-semibold">Easy mobile booking</strong> with nearby salons,
+                rewards and booking history in one place.
               </span>
             </li>
           </ul>
 
           <div className="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
             <Button className="w-full min-w-0" onClick={share}>
-              <Share2 className="mr-1.5 h-4 w-4" /> Share now
+              <Share2 className="mr-1.5 h-4 w-4" /> Share welcome & benefits
             </Button>
             <Button className="w-full sm:w-auto" variant="outline" onClick={() => setOpen(false)}>
               Later
@@ -197,7 +254,7 @@ export function ReferralWelcomePopup() {
               How referrals work
             </DialogTitle>
             <DialogDescription>
-              Simple 4-step flow — earn 100 points every time a friend joins with your code.
+              Share your verified link and track each eligible referral from your account.
             </DialogDescription>
           </DialogHeader>
 
@@ -215,13 +272,13 @@ export function ReferralWelcomePopup() {
               },
               {
                 icon: Award,
-                title: "3. You both get 100 points",
-                desc: "Points are credited instantly the moment their account is created and verified.",
+                title: "3. Friend completes an eligible booking",
+                desc: "The referral qualifies after the first eligible booking is completed.",
               },
               {
                 icon: Wallet,
                 title: "4. Track & redeem",
-                desc: "See every referral (pending / converted) in your Referral Center and use points on bookings & services.",
+                desc: "See pending and converted referrals, then use eligible reward credit on Nexora.",
               },
             ].map(({ icon: Icon, title, desc }) => (
               <li key={title} className="flex gap-3 rounded-lg border bg-muted/30 p-3">
@@ -239,8 +296,8 @@ export function ReferralWelcomePopup() {
           <div className="rounded-md border border-primary/30 bg-primary/5 p-3 text-xs">
             <div className="font-semibold text-primary">Where points are awarded</div>
             <ul className="text-muted-foreground mt-1 list-disc space-y-0.5 pl-4">
-              <li>Referrer (you): +100 points on friend's successful signup</li>
-              <li>New user (friend): +100 welcome points once they sign up with your code</li>
+              <li>Referrer: up to ₹100 credit after the eligible first booking</li>
+              <li>New user: up to ₹100 eligible welcome booking benefit</li>
               <li>
                 Status becomes <strong>Converted</strong> after their first booking
               </li>

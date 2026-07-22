@@ -117,13 +117,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         property: "og:image",
-        content:
-          "https://storage.googleapis.com/gpt-engineer-file-uploads/4Aw7bpKI5ubBovpSR654qvAsfD53/social-images/social-1784208883865-photo_2026-07-14_15-33-48.webp",
+        content: "https://www.meripahalfasthelp.online/nexora-final-logo.jpg",
       },
       {
         name: "twitter:image",
-        content:
-          "https://storage.googleapis.com/gpt-engineer-file-uploads/4Aw7bpKI5ubBovpSR654qvAsfD53/social-images/social-1784208883865-photo_2026-07-14_15-33-48.webp",
+        content: "https://www.meripahalfasthelp.online/nexora-final-logo.jpg",
       },
     ],
     links: [

@@ -11,6 +11,8 @@ export type ProfileImageUploadProps = {
   onRemove?: () => void | Promise<void>;
   /** Fallback text shown when no image is set (e.g. initials). */
   fallback?: string;
+  /** Automatic avatar shown when the customer has not uploaded a photo. */
+  fallbackImageUrl?: string;
   /** Show the loader overlay. */
   uploading?: boolean;
   /** Max file size in MB. Defaults to 5. */
@@ -35,6 +37,7 @@ export function ProfileImageUpload({
   onFile,
   onRemove,
   fallback,
+  fallbackImageUrl,
   uploading = false,
   maxSizeMB = 5,
   accept = "image/*",
@@ -106,9 +109,13 @@ export function ProfileImageUpload({
           disabled && "opacity-60 cursor-not-allowed",
         )}
       >
-        {value ? (
+        {value || fallbackImageUrl ? (
           <>
-            <img src={value} alt="Profile" className="h-full w-full object-cover" />
+            <img
+              src={value || fallbackImageUrl}
+              alt={value ? "Profile" : "Automatic profile avatar"}
+              className="h-full w-full object-cover"
+            />
             <span className="absolute inset-0 grid place-items-center bg-black/40 text-white opacity-0 transition-opacity group-hover:opacity-100">
               <ImagePlus className="h-6 w-6" />
             </span>

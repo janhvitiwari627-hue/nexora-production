@@ -1,8 +1,9 @@
 import { MessageCircle, Phone } from "lucide-react";
-import { WHATSAPP_NUMBER, WHATSAPP_PREFILL } from "./mockSupport";
+import { NEXORA_CALL_DISPLAY, NEXORA_CALL_URL, NEXORA_WHATSAPP_URL } from "@/config/contact";
+import { WHATSAPP_PREFILL } from "./mockSupport";
 
 export function ContactChannels() {
-  const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_PREFILL)}`;
+  const waUrl = `${NEXORA_WHATSAPP_URL}?text=${encodeURIComponent(WHATSAPP_PREFILL)}`;
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
@@ -49,11 +50,11 @@ export function ContactChannels() {
             Chat on WhatsApp
           </a>
           <a
-            href="tel:+918000012345"
+            href={NEXORA_CALL_URL}
             className="border-border bg-background hover:bg-accent inline-flex w-full items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-bold transition"
           >
             <Phone className="h-4 w-4" />
-            +91 80000 12345
+            {NEXORA_CALL_DISPLAY}
           </a>
           <p className="text-muted-foreground mt-1 text-center text-xs">Mon–Sat, 9 AM – 9 PM IST</p>
         </div>

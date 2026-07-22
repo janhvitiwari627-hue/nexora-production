@@ -53,6 +53,7 @@ import { LocationChip } from "./LocationChip";
 import { useAuthStore } from "@/stores/authStore";
 import { pickPrimaryRole, routeForRole } from "@/lib/auth-redirect";
 import { BackButton } from "@/components/shared/BackButton";
+import { getCustomerAvatarUrl } from "@/lib/customer-avatar";
 
 const ROLE_DASH_LABEL: Record<string, string> = {
   admin: "Admin Panel",
@@ -148,11 +149,16 @@ export function PublicHeader({ showBackButton = true }: { showBackButton?: boole
     currentProfile?.full_name ||
     (user?.email ? user.email.split("@")[0] : "Account");
   const email = user?.email ?? "";
-  const avatarUrl =
-    (user?.user_metadata?.avatar_url as string | undefined) ||
-    (user?.user_metadata?.picture as string | undefined) ||
-    currentProfile?.avatar_url ||
-    "";
+  const avatarUrl = user
+    ? getCustomerAvatarUrl({
+        avatarUrl:
+          (user.user_metadata?.avatar_url as string | undefined) ||
+          (user.user_metadata?.picture as string | undefined) ||
+          currentProfile?.avatar_url,
+        gender: currentProfile?.gender,
+        defaultAvatarKey: currentProfile?.default_avatar_key,
+      })
+    : "";
   const initials =
     displayName
       .split(" ")

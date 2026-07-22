@@ -11,7 +11,7 @@ const APP_MANIFESTS: Record<NexoraAppKind, string> = {
 
 const APP_TOUCH_ICONS: Record<NexoraAppKind, string> = {
   master: "/icon-192.png",
-  customer: "/customer-pwa-icon-192.png?v=20260722-final-2",
+  customer: "/customer-pwa-transparent-192.png?v=20260722-transparent-v4",
   owner: "/icon-192.png",
   partner: "/icon-192.png",
   distributor: "/icon-192.png",

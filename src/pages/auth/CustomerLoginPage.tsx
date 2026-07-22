@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,10 @@ import { Loader2, Eye, EyeOff } from "lucide-react";
 import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
 import { useAuthStore } from "@/stores/authStore";
 import { requestPasswordReset } from "@/lib/password-reset";
+import {
+  beginReferralWelcomeAfterAuth,
+  cancelReferralWelcomeAfterAuth,
+} from "@/lib/referral-welcome";
 
 const normalizeEmail = (value: string) => value.trim().toLowerCase();
 const RECOVERY_ERROR_MESSAGE =
@@ -33,9 +37,10 @@ const loginSchema = z.object({
 
 export default function CustomerLoginPage() {
   const navigate = useNavigate();
+  const search = useSearch({ from: "/login" });
   const user = useAuthStore((s) => s.user);
   const isInitialized = useAuthStore((s) => s.isInitialized);
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ email: normalizeEmail(search.email ?? ""), password: "" });
   const [rememberMe, setRememberMe] = useState(true);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -116,6 +121,7 @@ export default function CustomerLoginPage() {
     const email = normalizeEmail(parsed.data.email);
 
     setSubmitting(true);
+    beginReferralWelcomeAfterAuth();
     console.log("[Login] Attempting sign in with email:", email);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -126,6 +132,7 @@ export default function CustomerLoginPage() {
       console.log("[Login] Supabase response:", { data: !!data.user, error: error?.message });
 
       if (error) {
+        cancelReferralWelcomeAfterAuth();
         // Provide specific error messages based on Supabase error codes
         let errorMessage = "Invalid email or password";
         if (
@@ -150,6 +157,7 @@ export default function CustomerLoginPage() {
       }
 
       if (!data.user) {
+        cancelReferralWelcomeAfterAuth();
         console.error("[Login] No user returned from Supabase");
         setServerError("Sign in failed. Please try again.");
         return;
@@ -187,6 +195,7 @@ export default function CustomerLoginPage() {
       const redirectTo = await resolvePostLoginRedirect(data.user.id);
       navigate({ to: redirectTo });
     } catch (err) {
+      cancelReferralWelcomeAfterAuth();
       console.error("[Login] Unexpected error:", err);
       setServerError(safeAuthErrorMessage(err, "Sign in failed"));
     } finally {
@@ -197,6 +206,7 @@ export default function CustomerLoginPage() {
   const handleGoogle = async () => {
     setServerError(null);
     setGoogleSubmitting(true);
+    beginReferralWelcomeAfterAuth();
     try {
       const { data: oauthData, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
@@ -206,6 +216,7 @@ export default function CustomerLoginPage() {
       });
 
       if (error) {
+        cancelReferralWelcomeAfterAuth();
         console.error("[Login] Google OAuth error:", error.message);
         setServerError("Google sign-in failed. Please try again.");
         return;
@@ -226,6 +237,7 @@ export default function CustomerLoginPage() {
         navigate({ to: "/", replace: true });
       }
     } catch (err) {
+      cancelReferralWelcomeAfterAuth();
       console.error("[Login] Google OAuth unexpected error:", err);
       setServerError(safeAuthErrorMessage(err, "Google sign-in failed"));
     } finally {
@@ -299,6 +311,7 @@ export default function CustomerLoginPage() {
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
+                  name="username"
                   type="email"
                   value={form.email}
                   onChange={update("email")}
@@ -317,6 +330,7 @@ export default function CustomerLoginPage() {
                 <div className="relative">
                   <Input
                     id="password"
+                    name="password"
                     type={showPassword ? "text" : "password"}
                     value={form.password}
                     onChange={update("password")}

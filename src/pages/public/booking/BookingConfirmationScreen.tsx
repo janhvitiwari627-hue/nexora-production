@@ -1,9 +1,12 @@
 import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { QRCodeCanvas } from "qrcode.react";
 import { motion } from "framer-motion";
-import { Calendar, Check, CheckCircle2, Copy, MessageCircle } from "lucide-react";
+import { Calendar, Check, CheckCircle2, Copy, Loader2, MessageCircle, QrCode } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { createRemainingPaymentQr } from "@/lib/razorpay.functions";
 import { QueuedBookingsList } from "@/components/shared/QueuedBookingsList";
 import {
   advancePayable,
@@ -206,7 +209,75 @@ export function BookingConfirmationScreen({
           </Link>
         </div>
       </div>
+
+      <RemainingPaymentQr bookingId={bookingId} fallbackAmount={Math.max(0, total - advance)} />
     </div>
+  );
+}
+
+function RemainingPaymentQr({
+  bookingId,
+  fallbackAmount,
+}: {
+  bookingId: string;
+  fallbackAmount: number;
+}) {
+  const createQr = useServerFn(createRemainingPaymentQr);
+  const qrQuery = useQuery({
+    queryKey: ["razorpay-remaining-qr", bookingId],
+    queryFn: () => createQr({ data: { bookingId } }),
+    retry: false,
+    staleTime: 25 * 60 * 1000,
+  });
+  const qr = qrQuery.data as
+    | { imageUrl: string; amount: number; expiresAt: string | null; testMode: boolean }
+    | undefined;
+
+  return (
+    <section className="border-border bg-card mt-6 rounded-[var(--radius-card-lg)] border p-6 shadow-[var(--shadow-card)]">
+      <div className="flex items-start gap-3">
+        <div className="bg-primary/10 text-primary grid h-10 w-10 shrink-0 place-items-center rounded-xl">
+          <QrCode className="h-5 w-5" />
+        </div>
+        <div>
+          <h3 className="text-heading font-black">Remaining 75% payment QR</h3>
+          <p className="text-muted-foreground mt-1 text-xs">
+            Fixed amount: {formatINR(qr?.amount ?? fallbackAmount)}. This single-use QR is for this
+            booking only.
+          </p>
+        </div>
+      </div>
+
+      {qrQuery.isLoading && (
+        <div className="text-muted-foreground mt-5 inline-flex items-center gap-2 text-sm">
+          <Loader2 className="h-4 w-4 animate-spin" /> Generating secure Razorpay QR…
+        </div>
+      )}
+      {qrQuery.isError && (
+        <div className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs font-semibold text-amber-900">
+          QR is not available yet. Razorpay QR Code API must be enabled for the Test account. Your
+          booking and 25% advance remain confirmed.
+        </div>
+      )}
+      {qr && (
+        <div className="mt-5 grid gap-4 sm:grid-cols-[220px_1fr] sm:items-center">
+          <div className="grid place-items-center rounded-2xl border bg-white p-3">
+            <img src={qr.imageUrl} alt="Razorpay remaining payment QR" className="h-48 w-48" />
+          </div>
+          <div className="space-y-2 text-sm">
+            <div className="text-primary text-2xl font-black">{formatINR(qr.amount)}</div>
+            <p className="text-muted-foreground text-xs">
+              {qr.testMode ? "TEST MODE — no real money will be charged." : "Live payment QR"}
+            </p>
+            {qr.expiresAt && (
+              <p className="text-muted-foreground text-xs">
+                Expires: {new Date(qr.expiresAt).toLocaleString("en-IN")}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+    </section>
   );
 }
 

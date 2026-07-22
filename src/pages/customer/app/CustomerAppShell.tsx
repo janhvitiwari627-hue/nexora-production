@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Outlet, Link, useRouterState } from "@tanstack/react-router";
 import { CalendarDays, ChevronDown, Gift, Home, MapPin, Search, UserRound } from "lucide-react";
 import { LocationPermissionModal } from "@/components/auth/LocationPermissionModal";
+import { InstallAppButton } from "@/components/pwa/InstallAppButton";
 import { useCustomerLocation } from "@/hooks/useCustomerLocation";
 import { CUSTOMER_LOCATION_ONBOARDING_KEY } from "@/lib/customer-location";
 import { useAuthStore } from "@/stores/authStore";
@@ -96,27 +97,35 @@ export function CustomerAppShell() {
               </p>
             </div>
           </Link>
-          {user ? (
-            <Link
-              to="/app/customer/profile"
-              className="flex max-w-36 shrink-0 items-center gap-2 rounded-full border border-[#ead49b] bg-[#fff4d3] py-1 pl-1 pr-3 text-sm font-bold text-[#6d4a10] sm:max-w-44"
-            >
-              <CustomerAvatar className="h-8 w-8" iconClassName="h-4 w-4" />
-              <span className="truncate">{profile?.full_name || "My profile"}</span>
-            </Link>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Link to="/login" className="text-sm font-bold text-[#4f493f]">
-                Login
-              </Link>
+          <div className="flex min-w-0 items-center justify-end gap-2">
+            <InstallAppButton
+              kind="customer"
+              fallbackHref="/app/customer"
+              hideWhenInstalled
+              className="hidden min-h-10 shrink-0 items-center justify-center gap-2 rounded-full bg-[#0b0a08] px-4 text-xs font-black text-[#f3cf70] shadow-md transition hover:-translate-y-0.5 min-[520px]:inline-flex"
+            />
+            {user ? (
               <Link
-                to="/signup"
-                className="rounded-full bg-[#0b0a08] px-4 py-2 text-sm font-bold text-[#f3cf70]"
+                to="/app/customer/profile"
+                className="flex max-w-36 shrink-0 items-center gap-2 rounded-full border border-[#ead49b] bg-[#fff4d3] py-1 pl-1 pr-3 text-sm font-bold text-[#6d4a10] sm:max-w-44"
               >
-                Signup
+                <CustomerAvatar className="h-8 w-8" iconClassName="h-4 w-4" />
+                <span className="truncate">{profile?.full_name || "My profile"}</span>
               </Link>
-            </div>
-          )}
+            ) : (
+              <div className="flex items-center gap-2">
+                <Link to="/login" className="text-sm font-bold text-[#4f493f]">
+                  Login
+                </Link>
+                <Link
+                  to="/signup"
+                  className="rounded-full bg-[#0b0a08] px-4 py-2 text-sm font-bold text-[#f3cf70]"
+                >
+                  Signup
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
         {user ? (
           <div className="border-t border-[#efe3c4] bg-[#fff8e7] px-4 py-2">

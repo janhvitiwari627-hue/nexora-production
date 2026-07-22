@@ -45,6 +45,10 @@ import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
 import { getEmailRole, roleConflictMessage } from "@/lib/auth-check.functions";
 import { PublicPageHeader } from "@/components/shared/PublicPageHeader";
 import { requestPasswordReset } from "@/lib/password-reset";
+import {
+  beginReferralWelcomeAfterAuth,
+  cancelReferralWelcomeAfterAuth,
+} from "@/lib/referral-welcome";
 
 type AccountType = "customer" | "owner" | "district_partner";
 
@@ -311,12 +315,14 @@ export default function CustomerRegistrationPage() {
     const email = normalizeEmail(parsed.data.email);
 
     setSubmitting(true);
+    if (accountType === "customer") beginReferralWelcomeAfterAuth();
     console.log("[Register] Attempting sign up with email:", email, "accountType:", accountType);
     try {
       // Enforce one-email-one-role before creating the auth user
       try {
         const check = await checkEmailRoleFn({ data: { email } });
         if (check.exists) {
+          if (accountType === "customer") cancelReferralWelcomeAfterAuth();
           const attemptedLabel =
             accountType === "owner"
               ? "Salon Owner"
@@ -356,6 +362,7 @@ export default function CustomerRegistrationPage() {
       });
 
       if (error) {
+        if (accountType === "customer") cancelReferralWelcomeAfterAuth();
         const raw = parseErrorMessage(error);
         let errorMessage = raw;
         if (/user already registered|already registered|already exists/i.test(raw)) {
@@ -438,6 +445,7 @@ export default function CustomerRegistrationPage() {
         }
       }
     } catch (err) {
+      if (accountType === "customer") cancelReferralWelcomeAfterAuth();
       console.error("[Register] Unexpected error:", err);
       setServerError(parseErrorMessage(err));
     } finally {
@@ -453,6 +461,7 @@ export default function CustomerRegistrationPage() {
       return;
     }
     window.sessionStorage.setItem("nexora_pending_customer_gender", form.gender);
+    beginReferralWelcomeAfterAuth();
     setGoogleSubmitting(true);
     try {
       const { data: oauthData, error } = await supabase.auth.signInWithOAuth({
@@ -463,6 +472,7 @@ export default function CustomerRegistrationPage() {
       });
 
       if (error) {
+        cancelReferralWelcomeAfterAuth();
         console.error("[Register] Google OAuth error:", error.message);
         setServerError(parseErrorMessage(error));
         return;
@@ -483,6 +493,7 @@ export default function CustomerRegistrationPage() {
         navigate({ to: "/", replace: true });
       }
     } catch (err) {
+      cancelReferralWelcomeAfterAuth();
       console.error("[Register] Google OAuth unexpected error:", err);
       setServerError(parseErrorMessage(err));
     } finally {
@@ -858,6 +869,7 @@ export default function CustomerRegistrationPage() {
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
+                name="username"
                 type="email"
                 value={form.email}
                 onChange={update("email")}
@@ -1013,6 +1025,7 @@ export default function CustomerRegistrationPage() {
               <div className="relative">
                 <Input
                   id="password"
+                  name="new-password"
                   type={showPassword ? "text" : "password"}
                   value={form.password}
                   onChange={update("password")}
@@ -1082,6 +1095,7 @@ export default function CustomerRegistrationPage() {
               <Label htmlFor="confirm_password">Confirm password</Label>
               <Input
                 id="confirm_password"
+                name="confirm-password"
                 type={showPassword ? "text" : "password"}
                 value={form.confirm_password}
                 onChange={update("confirm_password")}
