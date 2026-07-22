@@ -101,6 +101,33 @@ const accountSettings = readFileSync("src/pages/customer/AccountSettingsPage.tsx
 if (!accountSettings.includes('label: "Install customer app"')) {
   failures.push("Customer account settings must include the PWA install section");
 }
+if (!accountSettings.includes("customer-brand-surface")) {
+  failures.push("Customer account settings must inherit the premium black, gold and ivory theme");
+}
+
+const rewards = readFileSync("src/pages/customer/app/CustomerAppRewards.tsx", "utf8");
+const referrals = readFileSync("src/pages/customer/ReferralCenterPage.tsx", "utf8");
+if (!home.includes("!text-white") || !rewards.includes("!text-white")) {
+  failures.push("Dark customer hero headings must keep accessible white contrast");
+}
+if (
+  !referrals.includes("customer-brand-surface") ||
+  referrals.includes("from-fuchsia-500 to-indigo-500")
+) {
+  failures.push("Referral Center must use the premium black and gold customer theme");
+}
+
+const salonCompatibilityMigration = readFileSync(
+  "supabase/migrations/20260722101500_restore_public_salon_cards_compatibility.sql",
+  "utf8",
+);
+if (
+  !salonCompatibilityMigration.includes("CREATE VIEW public.public_salon_cards") ||
+  !salonCompatibilityMigration.includes("security_invoker = true") ||
+  !salonCompatibilityMigration.includes("FROM public.shops AS shop")
+) {
+  failures.push("Customer salon discovery must expose the secure shops compatibility view");
+}
 
 const languageSettings = readFileSync(
   "src/pages/customer/settings/LanguagePanel.tsx",

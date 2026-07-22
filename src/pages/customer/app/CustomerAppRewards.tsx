@@ -26,9 +26,9 @@ export function CustomerAppRewards() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-6 sm:py-10">
       <section className="rounded-3xl border border-[#d7a93b]/35 bg-[linear-gradient(135deg,#0b0a08_0%,#241b0d_62%,#9a6b16_100%)] p-7 text-white shadow-[0_22px_60px_rgba(53,38,11,0.2)]">
-        <Sparkles className="h-8 w-8" />
+        <Sparkles className="h-8 w-8 text-white" />
         <p className="mt-10 text-sm font-bold text-[#f1cf73]">Nexora benefits</p>
-        <h1 className="mt-2 text-3xl font-black">Rewards, referrals and membership.</h1>
+        <h1 className="mt-2 text-3xl font-black !text-white">Rewards, referrals and membership.</h1>
         <p className="mt-3 text-sm leading-6 text-white/75">
           Eligible benefits आपके account और completed activity के आधार पर दिखाई देंगे.
         </p>
