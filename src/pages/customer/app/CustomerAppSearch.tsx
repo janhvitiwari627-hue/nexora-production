@@ -36,12 +36,12 @@ export function CustomerAppSearch({
     <main className="mx-auto max-w-6xl px-4 py-6 sm:py-10">
       <h1 className="text-3xl font-black">Search salons</h1>
       <label className="relative mt-5 block">
-        <Search className="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-slate-400" />
+        <Search className="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-[#8c857a]" />
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Salon, spa, service or area"
-          className="h-13 w-full rounded-2xl border bg-white pr-4 pl-12 text-sm outline-none focus:border-violet-500"
+          className="h-13 w-full rounded-2xl border border-[#e8e0d2] bg-white pr-4 pl-12 text-sm outline-none focus:border-[#d7a93b] focus:ring-2 focus:ring-[#d7a93b]/20"
         />
       </label>
       <div className="mt-4 flex gap-2 overflow-x-auto pb-2">
@@ -52,8 +52,8 @@ export function CustomerAppSearch({
             onClick={() => setCategory(item)}
             className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold ${
               category === item || (!category && item === "All")
-                ? "bg-violet-700 text-white"
-                : "border bg-white"
+                ? "bg-[#0b0a08] text-[#f3cf70]"
+                : "border border-[#e8e0d2] bg-white"
             }`}
           >
             {item}
@@ -63,7 +63,7 @@ export function CustomerAppSearch({
 
       {shops.isLoading ? (
         <div className="grid min-h-64 place-items-center">
-          <LoaderCircle className="h-6 w-6 animate-spin text-violet-700" />
+          <LoaderCircle className="h-6 w-6 animate-spin text-[#9a6b16]" />
         </div>
       ) : shops.data?.length ? (
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -72,9 +72,9 @@ export function CustomerAppSearch({
           ))}
         </div>
       ) : (
-        <div className="mt-8 rounded-2xl border bg-white p-8 text-center">
+        <div className="mt-8 rounded-2xl border border-[#e8e0d2] bg-white p-8 text-center">
           <p className="font-bold">No salons found</p>
-          <p className="mt-1 text-sm text-slate-500">Try another category or search term.</p>
+          <p className="mt-1 text-sm text-[#7a746a]">Try another category or search term.</p>
         </div>
       )}
     </main>

@@ -47,7 +47,7 @@ export function CustomerAppShell() {
   }, [dismissLaunchSplash]);
 
   return (
-    <div className="nexora-pwa-surface customer-app min-h-[100dvh] w-full max-w-full overflow-x-hidden bg-slate-50 text-slate-950">
+    <div className="nexora-pwa-surface customer-app min-h-[100dvh] w-full max-w-full overflow-x-hidden bg-[#fff9ed] text-[#0b0a08]">
       {showLaunchSplash ? (
         <div
           role="dialog"
@@ -72,7 +72,7 @@ export function CustomerAppShell() {
         </div>
       ) : null}
 
-      <header className="sticky top-0 z-40 w-full max-w-full overflow-x-hidden border-b bg-white/95 backdrop-blur">
+      <header className="sticky top-0 z-40 w-full max-w-full overflow-x-hidden border-b border-[#e8e0d2] bg-[#fffdf8]/95 shadow-[0_8px_30px_rgba(69,49,12,0.06)] backdrop-blur">
         <div className="mx-auto grid w-full max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3">
           <Link to="/app/customer" className="flex min-w-0 items-center gap-2">
             <img
@@ -82,7 +82,7 @@ export function CustomerAppShell() {
             />
             <div className="min-w-0">
               <p className="font-black leading-none">Nexora</p>
-              <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-violet-700">
+              <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#9a6b16]">
                 Customer App
               </p>
             </div>
@@ -90,19 +90,19 @@ export function CustomerAppShell() {
           {user ? (
             <Link
               to="/app/customer/profile"
-              className="flex max-w-36 shrink-0 items-center gap-2 rounded-full border border-violet-200 bg-violet-50 py-1 pl-1 pr-3 text-sm font-bold text-violet-800 sm:max-w-44"
+              className="flex max-w-36 shrink-0 items-center gap-2 rounded-full border border-[#ead49b] bg-[#fff4d3] py-1 pl-1 pr-3 text-sm font-bold text-[#6d4a10] sm:max-w-44"
             >
               <CustomerAvatar className="h-8 w-8" iconClassName="h-4 w-4" />
               <span className="truncate">{profile?.full_name || "My profile"}</span>
             </Link>
           ) : (
             <div className="flex items-center gap-2">
-              <Link to="/login" className="text-sm font-bold text-slate-700">
+              <Link to="/login" className="text-sm font-bold text-[#4f493f]">
                 Login
               </Link>
               <Link
                 to="/signup"
-                className="rounded-full bg-violet-700 px-4 py-2 text-sm font-bold text-white"
+                className="rounded-full bg-[#0b0a08] px-4 py-2 text-sm font-bold text-[#f3cf70]"
               >
                 Signup
               </Link>
@@ -117,7 +117,7 @@ export function CustomerAppShell() {
 
       <nav
         aria-label="Customer app navigation"
-        className="pwa-bottom-nav fixed inset-x-0 bottom-0 z-50 w-full max-w-full overflow-x-hidden border-t bg-white/95 backdrop-blur"
+        className="pwa-bottom-nav fixed inset-x-0 bottom-0 z-50 w-full max-w-full overflow-x-hidden border-t border-[#e8e0d2] bg-[#fffdf8]/95 shadow-[0_-8px_30px_rgba(69,49,12,0.08)] backdrop-blur"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         <ul className="mx-auto grid w-full max-w-xl grid-cols-5">
@@ -131,10 +131,10 @@ export function CustomerAppShell() {
                 <Link
                   to={item.to}
                   className={`flex min-h-16 min-w-0 flex-col items-center justify-center gap-1 text-[10px] font-bold sm:text-[11px] ${
-                    active ? "text-violet-700" : "text-slate-500"
+                    active ? "text-[#9a6b16]" : "text-[#7a746a]"
                   }`}
                 >
-                  <span className={`rounded-full px-3 py-1 ${active ? "bg-violet-100" : ""}`}>
+                  <span className={`rounded-full px-3 py-1 ${active ? "bg-[#fff0c2]" : ""}`}>
                     {item.label === "Profile" && user ? (
                       <CustomerAvatar className="h-6 w-6" iconClassName="h-3.5 w-3.5" />
                     ) : (

@@ -191,41 +191,41 @@ canvas {
  * border-border, bg-primary, etc.) for the customer-app subtree only.
  * ------------------------------------------------------------------------- */
 .customer-app {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --heading: #0f172a;
-  --body: #0f172a;
+  --background: #fff9ed;
+  --foreground: #0b0a08;
+  --heading: #0b0a08;
+  --body: #29251f;
 
   --card: #ffffff;
-  --card-foreground: #0f172a;
+  --card-foreground: #0b0a08;
   --popover: #ffffff;
-  --popover-foreground: #0f172a;
+  --popover-foreground: #0b0a08;
 
-  --primary: #2563eb;
-  --primary-foreground: #ffffff;
-  --primary-dark: #1d4ed8;
-  --secondary: #6d28d9;
+  --primary: #d7a93b;
+  --primary-foreground: #0b0a08;
+  --primary-dark: #9a6b16;
+  --secondary: #5b36d6;
   --secondary-foreground: #ffffff;
-  --accent: #3b82f6;
+  --accent: #5b36d6;
   --accent-foreground: #ffffff;
 
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #2563eb;
+  --muted: #f6efe2;
+  --muted-foreground: #7a746a;
+  --border: #e8e0d2;
+  --input: #e8e0d2;
+  --ring: #d7a93b;
 
   --sidebar: #ffffff;
-  --sidebar-foreground: #0f172a;
-  --sidebar-primary: #2563eb;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f1f5f9;
-  --sidebar-accent-foreground: #0f172a;
-  --sidebar-border: #e2e8f0;
-  --sidebar-ring: #2563eb;
+  --sidebar-foreground: #0b0a08;
+  --sidebar-primary: #d7a93b;
+  --sidebar-primary-foreground: #0b0a08;
+  --sidebar-accent: #f6efe2;
+  --sidebar-accent-foreground: #0b0a08;
+  --sidebar-border: #e8e0d2;
+  --sidebar-ring: #d7a93b;
 
-  --gradient-hero: linear-gradient(135deg, #2563eb 0%, #6d28d9 100%);
-  --gradient-cta: linear-gradient(135deg, #2563eb, #3b82f6);
+  --gradient-hero: linear-gradient(135deg, #0b0a08 0%, #241b0d 58%, #9a6b16 100%);
+  --gradient-cta: linear-gradient(135deg, #d7a93b, #f0ce72);
 
   color: var(--foreground);
   background-color: var(--background);
