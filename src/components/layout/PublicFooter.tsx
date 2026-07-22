@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { Facebook, Instagram, Linkedin, Mail, Sparkles, Twitter, Youtube } from "lucide-react";
 
 type Col = { title: string; links: { label: string; to: string }[] };
@@ -63,7 +63,10 @@ const SOCIALS = [
 import { assertPublicOnly } from "@/lib/enforce-public-only";
 
 export function PublicFooter() {
-  if (assertPublicOnly("PublicFooter")) return null;
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+
+  // The marketing footer belongs to the main landing page only.
+  if (pathname !== "/" || assertPublicOnly("PublicFooter")) return null;
   return (
     <footer data-testid="public-footer" className="border-border bg-card mt-24 border-t">
       <div className="mx-auto max-w-7xl px-4 pt-14 pb-10 md:px-6">
