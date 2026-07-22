@@ -102,7 +102,7 @@ export function CustomerAppShell() {
               kind="customer"
               fallbackHref="/app/customer"
               hideWhenInstalled
-              className="hidden min-h-10 shrink-0 items-center justify-center gap-2 rounded-full bg-[#0b0a08] px-4 text-xs font-black text-[#f3cf70] shadow-md transition hover:-translate-y-0.5 md:inline-flex"
+              className="hidden min-h-10 shrink-0 items-center justify-center gap-2 rounded-full bg-[#0b0a08] px-4 text-xs font-black text-[#f3cf70] shadow-md transition hover:-translate-y-0.5 min-[520px]:inline-flex"
             />
             {user ? (
               <Link

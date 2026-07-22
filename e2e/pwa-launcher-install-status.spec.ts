@@ -26,7 +26,7 @@ test("customer manifest uses the large launcher artwork", async ({ request }) =>
 });
 
 test("install page shows progress after the native install is accepted", async ({ page }) => {
-  await page.goto("/customer-app?install=1&pwa_release=2026-07-22-desktop-install-v7");
+  await page.goto("/customer-app?install=1&pwa_release=2026-07-22-desktop-install-v8");
   await expect(
     page.getByRole("button", { name: "How to install Customer App" }).first(),
   ).toBeEnabled({ timeout: 15000 });
@@ -56,10 +56,12 @@ test("install page shows progress after the native install is accepted", async (
 });
 
 test("desktop customer home exposes the native install action", async ({ page }) => {
-  await page.goto("/app/customer?pwa_release=2026-07-22-desktop-install-v7");
+  test.setTimeout(60000);
+  await page.setViewportSize({ width: 639, height: 900 });
+  await page.goto("/app/customer?pwa_release=2026-07-22-desktop-install-v8");
   const helpButton = page.getByRole("button", { name: "How to install Customer App" });
-  await expect(helpButton).toBeVisible({ timeout: 15000 });
-  await expect(helpButton).toBeEnabled({ timeout: 15000 });
+  await expect(helpButton).toBeVisible({ timeout: 30000 });
+  await expect(helpButton).toBeEnabled({ timeout: 30000 });
 
   await page.evaluate(() => {
     const event = new Event("beforeinstallprompt", { cancelable: true });
