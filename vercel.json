@@ -6,5 +6,20 @@
       "destination": "https://www.meripahalfasthelp.online/:path*",
       "permanent": true
     }
+  ],
+  "headers": [
+    {
+      "source": "/pwa-sw.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" },
+        { "key": "Service-Worker-Allowed", "value": "/" }
+      ]
+    },
+    {
+      "source": "/manifests/:path*",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    }
   ]
 }
