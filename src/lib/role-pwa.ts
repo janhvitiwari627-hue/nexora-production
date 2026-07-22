@@ -11,11 +11,20 @@ const APP_MANIFESTS: Record<NexoraAppKind, string> = {
 
 const APP_TOUCH_ICONS: Record<NexoraAppKind, string> = {
   master: "/icon-192.png",
-  customer: "/customer-pwa-icon-192.png",
+  customer: "/customer-pwa-icon-192.png?v=20260722-final-2",
   owner: "/icon-192.png",
   partner: "/icon-192.png",
   distributor: "/icon-192.png",
   jobs: "/icon-192.png",
+};
+
+const APP_THEME_COLORS: Record<NexoraAppKind, string> = {
+  master: "#2563eb",
+  customer: "#050505",
+  owner: "#6d28d9",
+  partner: "#7c3aed",
+  distributor: "#0f766e",
+  jobs: "#ea580c",
 };
 
 export function appKindForPath(pathname: string): NexoraAppKind {
@@ -46,4 +55,7 @@ export function activateRoleManifest(kind: NexoraAppKind) {
     touchIcon.href = APP_TOUCH_ICONS[kind];
     touchIcon.type = "image/png";
   }
+
+  const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+  if (themeColor) themeColor.content = APP_THEME_COLORS[kind];
 }

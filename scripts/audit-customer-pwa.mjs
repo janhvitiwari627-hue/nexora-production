@@ -125,7 +125,9 @@ if (!String(manifest.start_url).startsWith("/app/customer")) {
 for (const size of ["192x192", "512x512"]) {
   if (
     !manifest.icons?.some(
-      (icon) => icon.src === `/customer-pwa-icon-${size.split("x")[0]}.png` && icon.sizes === size,
+      (icon) =>
+        icon.src.startsWith(`/customer-pwa-icon-${size.split("x")[0]}.png?v=`) &&
+        icon.sizes === size,
     )
   ) {
     failures.push(`Customer PWA manifest must include the supplied Nexora ${size} install icon`);
@@ -142,6 +144,9 @@ const pwaManager = readFileSync("src/components/pwa/RolePwaManager.tsx", "utf8")
 const serviceWorker = readFileSync("public/pwa-sw.js", "utf8");
 if (
   !pwaManager.includes('updateViaCache: "none"') ||
+  !pwaManager.includes("PWA_RELEASE") ||
+  !pwaManager.includes("getRegistrations()") ||
+  !pwaManager.includes("isLegacyWorker") ||
   !pwaManager.includes('"controllerchange"') ||
   !pwaManager.includes("window.location.reload()") ||
   !pwaManager.includes("registration?.update()")
