@@ -41,6 +41,7 @@ export function CustomerLocationDialog({
   required?: boolean;
 }) {
   const mapElementRef = useRef<HTMLDivElement | null>(null);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const markerRef = useRef<LeafletMarker | null>(null);
   const autoLocateRequestedRef = useRef(false);
@@ -50,6 +51,7 @@ export function CustomerLocationDialog({
   const [searching, setSearching] = useState(false);
   const [locating, setLocating] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [locationIssue, setLocationIssue] = useState<"denied" | "unavailable" | null>(null);
 
   const movePin = useCallback((location: CustomerLocation, zoom = 16) => {
     setSelected(location);
@@ -124,16 +126,37 @@ export function CustomerLocationDialog({
     };
   }, [initialLocation, open]);
 
-  const useDeviceLocation = useCallback(() => {
+  const focusManualSearch = useCallback(() => {
+    window.setTimeout(() => searchInputRef.current?.focus(), 100);
+  }, []);
+
+  const handleDeviceLocation = useCallback(async () => {
     if (!("geolocation" in navigator)) {
-      toast.error("Location is not supported on this device.");
+      setLocationIssue("unavailable");
+      focusManualSearch();
       return;
     }
+
+    try {
+      const permission = await navigator.permissions?.query({
+        name: "geolocation" as PermissionName,
+      });
+      if (permission?.state === "denied") {
+        setLocationIssue("denied");
+        focusManualSearch();
+        return;
+      }
+    } catch {
+      // Some browsers expose geolocation without the Permissions API.
+    }
+
+    setLocationIssue(null);
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
       async ({ coords }) => {
         try {
           const location = await reverseGeocodeLocation(coords.latitude, coords.longitude);
+          setLocationIssue(null);
           movePin(location, 17);
           toast.success("Current location found. Confirm the map pin to save it.");
         } catch (error) {
@@ -144,15 +167,12 @@ export function CustomerLocationDialog({
       },
       (error) => {
         setLocating(false);
-        toast.error(
-          error.code === error.PERMISSION_DENIED
-            ? "Allow precise location in your browser settings, or search manually."
-            : "Current location could not be detected. Search manually instead.",
-        );
+        setLocationIssue(error.code === error.PERMISSION_DENIED ? "denied" : "unavailable");
+        focusManualSearch();
       },
       { enableHighAccuracy: true, timeout: 15_000, maximumAge: 30_000 },
     );
-  }, [movePin]);
+  }, [focusManualSearch, movePin]);
 
   useEffect(() => {
     if (!open) {
@@ -161,9 +181,9 @@ export function CustomerLocationDialog({
     }
     if (!autoLocate || autoLocateRequestedRef.current) return;
     autoLocateRequestedRef.current = true;
-    const timer = window.setTimeout(useDeviceLocation, 300);
+    const timer = window.setTimeout(() => void handleDeviceLocation(), 300);
     return () => window.clearTimeout(timer);
-  }, [autoLocate, open, useDeviceLocation]);
+  }, [autoLocate, handleDeviceLocation, open]);
 
   const searchAddress = async () => {
     setSearching(true);
@@ -237,7 +257,7 @@ export function CustomerLocationDialog({
           <section className="space-y-4">
             <Button
               type="button"
-              onClick={useDeviceLocation}
+              onClick={() => void handleDeviceLocation()}
               disabled={locating}
               className="h-12 w-full rounded-2xl bg-[#0b0a08] font-bold text-[#f3cf70] hover:bg-[#241b0d]"
             >
@@ -246,8 +266,30 @@ export function CustomerLocationDialog({
               ) : (
                 <LocateFixed className="mr-2 h-4 w-4" />
               )}
-              {locating ? "Finding precise location…" : "Use current location"}
+              {locating
+                ? "Finding precise location…"
+                : locationIssue === "denied"
+                  ? "Try GPS again"
+                  : "Use current location"}
             </Button>
+
+            {locationIssue ? (
+              <div
+                role="status"
+                className="rounded-2xl border border-[#e4c164] bg-[#fff4d2] p-3 text-sm text-[#6d4a10]"
+              >
+                <p className="font-black">
+                  {locationIssue === "denied"
+                    ? "Location permission is turned off"
+                    : "GPS location is not available right now"}
+                </p>
+                <p className="mt-1 text-xs leading-relaxed">
+                  {locationIssue === "denied"
+                    ? "Enable Location for this site in your browser or app settings, then tap Try GPS again. You can also search your area or pincode below."
+                    : "Check that device Location is on and try again, or search your area or pincode below."}
+                </p>
+              </div>
+            ) : null}
 
             <form
               className="flex gap-2"
@@ -259,6 +301,7 @@ export function CustomerLocationDialog({
               <label className="relative min-w-0 flex-1">
                 <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-[#8c857a]" />
                 <input
+                  ref={searchInputRef}
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder="Area, city or pincode"
