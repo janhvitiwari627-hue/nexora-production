@@ -37,6 +37,7 @@ import { ConnectedAccountsPanel } from "./settings/ConnectedAccountsPanel";
 import { PaymentMethodsPanel } from "./settings/PaymentMethodsPanel";
 import { ReferralPanel } from "./settings/ReferralPanel";
 import { CustomerAppInstallPanel } from "./settings/CustomerAppInstallPanel";
+import { getCustomerAvatarUrl } from "@/lib/customer-avatar";
 
 const SECTIONS = [
   { id: "personal", label: "Personal info", icon: User, Comp: PersonalInfoPanel },
@@ -234,6 +235,13 @@ function ProfilePreviewPanel() {
       .join("")
       .toUpperCase() || "U";
   const isLoading = authLoading && !user;
+  const avatarUrl = profile
+    ? getCustomerAvatarUrl({
+        avatarUrl: profile.avatar_url,
+        gender: profile.gender,
+        defaultAvatarKey: profile.default_avatar_key,
+      })
+    : null;
 
   return (
     <section className="bg-card border-border rounded-[var(--radius-card-lg)] border p-6">
@@ -249,9 +257,9 @@ function ProfilePreviewPanel() {
         </div>
       ) : (
         <div className="border-border bg-background mt-5 flex items-center gap-4 rounded-xl border p-4">
-          {profile?.avatar_url ? (
+          {avatarUrl ? (
             <img
-              src={profile.avatar_url}
+              src={avatarUrl}
               alt={`${displayName} profile`}
               className="h-16 w-16 shrink-0 rounded-full object-cover ring-2 ring-primary/20"
             />

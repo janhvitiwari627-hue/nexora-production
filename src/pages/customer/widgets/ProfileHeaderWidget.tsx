@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { mockUser, tierGradient } from "../mockUser";
 import { useAuthStore } from "@/stores/authStore";
+import { getCustomerAvatarUrl } from "@/lib/customer-avatar";
 
 function computeGreeting() {
   const h = new Date().getHours();
@@ -24,7 +25,13 @@ export function ProfileHeaderWidget() {
     profile?.full_name ||
     profile?.username ||
     (user?.email ? user.email.split("@")[0] : user ? "Member" : "Guest");
-  const avatar = profile?.avatar_url || (user ? "" : mockUser.avatar);
+  const avatar = user
+    ? getCustomerAvatarUrl({
+        avatarUrl: profile?.avatar_url,
+        gender: profile?.gender,
+        defaultAvatarKey: profile?.default_avatar_key,
+      })
+    : mockUser.avatar;
   const initials =
     displayName
       .split(" ")

@@ -2900,12 +2900,14 @@ export type Database = {
       };
       profiles: {
         Row: {
+          avatar_mode: string;
           avatar_url: string | null;
           block: string | null;
           city: string | null;
           country: string | null;
           created_at: string;
           date_of_birth: string | null;
+          default_avatar_key: string;
           district: string | null;
           email: string | null;
           full_name: string | null;
@@ -2929,12 +2931,14 @@ export type Database = {
           username: string | null;
         };
         Insert: {
+          avatar_mode?: string;
           avatar_url?: string | null;
           block?: string | null;
           city?: string | null;
           country?: string | null;
           created_at?: string;
           date_of_birth?: string | null;
+          default_avatar_key?: string;
           district?: string | null;
           email?: string | null;
           full_name?: string | null;
@@ -2958,12 +2962,14 @@ export type Database = {
           username?: string | null;
         };
         Update: {
+          avatar_mode?: string;
           avatar_url?: string | null;
           block?: string | null;
           city?: string | null;
           country?: string | null;
           created_at?: string;
           date_of_birth?: string | null;
+          default_avatar_key?: string;
           district?: string | null;
           email?: string | null;
           full_name?: string | null;

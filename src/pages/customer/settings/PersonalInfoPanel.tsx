@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileImageUpload } from "@/components/shared/ProfileImageUpload";
+import { getDefaultCustomerAvatarUrl } from "@/lib/customer-avatar";
 
 function slugifyUsername(name: string) {
   return name
@@ -346,6 +347,8 @@ export function PersonalInfoPanel() {
     setSaveError(null);
     try {
       const username = snapshot.username.trim() || null;
+      const storedGender =
+        snapshot.gender === "male" || snapshot.gender === "female" ? snapshot.gender : null;
       const { data: savedProfile, error } = await supabase
         .from("profiles")
         .upsert(
@@ -354,7 +357,7 @@ export function PersonalInfoPanel() {
             email: activeUser.email ?? profile?.email ?? null,
             full_name: snapshot.fullName.trim() || null,
             username,
-            gender: snapshot.gender || null,
+            gender: storedGender,
             date_of_birth: snapshot.dob || null,
             state: snapshot.state || null,
             district: snapshot.district || null,
@@ -472,6 +475,7 @@ export function PersonalInfoPanel() {
     <PanelShell title="Personal information" subtitle="How you appear across Nexora.">
       <ProfileImageUpload
         value={avatar}
+        fallbackImageUrl={getDefaultCustomerAvatarUrl(form.gender, profile?.default_avatar_key)}
         onFile={handleAvatarFile}
         onRemove={handleAvatarRemove}
         fallback={initials}
@@ -479,6 +483,11 @@ export function PersonalInfoPanel() {
         maxSizeMB={5}
         error={uploadError}
       />
+      {!avatar ? (
+        <p className="mt-2 text-xs font-medium text-amber-800">
+          Automatic Nexora avatar is active. Uploading a personal photo is optional.
+        </p>
+      ) : null}
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <Field label="Full name">

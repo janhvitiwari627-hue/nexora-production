@@ -14,6 +14,8 @@ self.addEventListener("install", (event) => {
           "/customer-pwa-icon-512.png",
           "/customer-pwa-launcher-192.png",
           "/customer-pwa-launcher-512.png",
+          "/default-customer-male.jpg",
+          "/default-customer-female.jpg",
           "/nexora-final-logo.jpg",
           "/customer-pwa-splash.jpg",
         ]),
