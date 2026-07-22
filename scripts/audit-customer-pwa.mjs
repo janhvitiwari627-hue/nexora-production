@@ -21,7 +21,7 @@ const files = [
   "src/pages/customer/settings/CustomerAppInstallPanel.tsx",
   "supabase/migrations/20260716130000_customer_pwa_staff_booking.sql",
   "supabase/migrations/20260716130020_persist_customer_gender.sql",
-  "supabase/migrations/20260722070221_customer_location_nearby_salons.sql",
+  "supabase/migrations/20260722071407_customer_location_nearby_salons.sql",
 ];
 
 const failures = [];
@@ -55,7 +55,7 @@ const home = readFileSync("src/pages/customer/app/CustomerAppHome.tsx", "utf8");
 const locationDialog = readFileSync("src/pages/customer/app/CustomerLocationDialog.tsx", "utf8");
 const customerLocation = readFileSync("src/lib/customer-location.ts", "utf8");
 const locationMigration = readFileSync(
-  "supabase/migrations/20260722070221_customer_location_nearby_salons.sql",
+  "supabase/migrations/20260722071407_customer_location_nearby_salons.sql",
   "utf8",
 );
 if (
