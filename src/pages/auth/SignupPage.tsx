@@ -18,6 +18,10 @@ import { useAuthStore } from "@/stores/authStore";
 import { resolvePostLoginRedirect } from "@/lib/auth-redirect";
 import { requestPasswordReset } from "@/lib/password-reset";
 import { CUSTOMER_LOCATION_ONBOARDING_KEY } from "@/lib/customer-location";
+import {
+  beginReferralWelcomeAfterAuth,
+  cancelReferralWelcomeAfterAuth,
+} from "@/lib/referral-welcome";
 
 const normalizeEmail = (value: string) => value.trim().toLowerCase();
 
@@ -166,6 +170,7 @@ export default function SignupPage() {
     }
 
     setSubmitting(true);
+    beginReferralWelcomeAfterAuth();
     try {
       const email = normalizeEmail(parsed.data.email);
 
@@ -173,6 +178,7 @@ export default function SignupPage() {
       try {
         const check = await checkEmailRoleFn({ data: { email } });
         if (check.exists) {
+          cancelReferralWelcomeAfterAuth();
           setAlreadyRegisteredEmail(email);
           setServerError(roleConflictMessage(check.roleLabel, "Customer"));
           return;
@@ -200,6 +206,7 @@ export default function SignupPage() {
       });
 
       if (error) {
+        cancelReferralWelcomeAfterAuth();
         const raw = parseErr(error);
         let msg = raw;
         if (/already registered|already exists/i.test(raw)) {
@@ -240,6 +247,7 @@ export default function SignupPage() {
         setTimeout(() => navigate({ to: redirectTo, replace: true }), 1500);
       }
     } catch (err) {
+      cancelReferralWelcomeAfterAuth();
       setServerError(parseErr(err));
     } finally {
       setSubmitting(false);
@@ -379,6 +387,7 @@ export default function SignupPage() {
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
+                  name="username"
                   type="email"
                   autoComplete="email"
                   value={form.email}
@@ -441,6 +450,7 @@ export default function SignupPage() {
                 <div className="relative">
                   <Input
                     id="password"
+                    name="new-password"
                     type={showPw ? "text" : "password"}
                     autoComplete="new-password"
                     value={form.password}
@@ -465,6 +475,7 @@ export default function SignupPage() {
                 <div className="relative">
                   <Input
                     id="confirm_password"
+                    name="confirm-password"
                     type={showConfirm ? "text" : "password"}
                     autoComplete="new-password"
                     value={form.confirm_password}

@@ -22,6 +22,7 @@ import { PublicHeader } from "@/components/layout/PublicHeader";
 import { MyReferralsSection } from "@/components/referral/MyReferralsSection";
 import { useAuthStore } from "@/stores/authStore";
 import { buildReferralSignupUrl } from "@/lib/public-app-url";
+import { buildBrandedReferralShareData, buildReferralShareMessage } from "@/lib/referral-welcome";
 import type { ReferralStatus } from "./referral/mockReferral";
 
 const STATUS: Record<ReferralStatus, { label: string; classes: string }> = {
@@ -38,6 +39,8 @@ export function ReferralCenterPage() {
   const currentProfile = profile?.id === user?.id ? profile : null;
   const referralCode = currentProfile?.referral_code?.trim() ?? "";
   const referralLink = referralCode ? buildReferralSignupUrl(referralCode) : "";
+  const displayName =
+    currentProfile?.full_name?.trim() || user?.email?.split("@")[0] || "Nexora member";
   const qrRef = useRef<HTMLDivElement>(null);
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
@@ -75,7 +78,9 @@ export function ReferralCenterPage() {
     };
   }, [referralCode, refreshProfile, retryCount, user]);
 
-  const shareText = `Join me on Nexora and we both earn 100 points. Use code ${referralCode}: ${referralLink}`;
+  const shareText = referralCode
+    ? buildReferralShareMessage({ displayName, referralCode, referralLink })
+    : "";
 
   const writeToClipboard = async (value: string): Promise<boolean> => {
     try {
@@ -136,7 +141,12 @@ export function ReferralCenterPage() {
   const shareNative = async () => {
     if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
       try {
-        await navigator.share({ title: "Join Nexora", text: shareText, url: referralLink });
+        const shareData = await buildBrandedReferralShareData({
+          displayName,
+          referralCode,
+          referralLink,
+        });
+        await navigator.share(shareData);
         toast.success("Thanks for sharing!");
         return;
       } catch (err) {
