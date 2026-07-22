@@ -2919,10 +2919,12 @@ export type Database = {
           mobile: string | null;
           nexora_id: string | null;
           pincode: string | null;
+          preferred_language: string;
           referral_code: string | null;
           referred_by: string | null;
           referred_by_user_id: string | null;
           state: string | null;
+          timezone: string;
           updated_at: string;
           username: string | null;
         };
@@ -2946,10 +2948,12 @@ export type Database = {
           mobile?: string | null;
           nexora_id?: string | null;
           pincode?: string | null;
+          preferred_language?: string;
           referral_code?: string | null;
           referred_by?: string | null;
           referred_by_user_id?: string | null;
           state?: string | null;
+          timezone?: string;
           updated_at?: string;
           username?: string | null;
         };
@@ -2973,10 +2977,12 @@ export type Database = {
           mobile?: string | null;
           nexora_id?: string | null;
           pincode?: string | null;
+          preferred_language?: string;
           referral_code?: string | null;
           referred_by?: string | null;
           referred_by_user_id?: string | null;
           state?: string | null;
+          timezone?: string;
           updated_at?: string;
           username?: string | null;
         };

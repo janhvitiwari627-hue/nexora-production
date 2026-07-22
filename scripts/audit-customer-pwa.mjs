@@ -102,6 +102,19 @@ if (!accountSettings.includes('label: "Install customer app"')) {
   failures.push("Customer account settings must include the PWA install section");
 }
 
+const languageSettings = readFileSync(
+  "src/pages/customer/settings/LanguagePanel.tsx",
+  "utf8",
+);
+if (
+  !languageSettings.includes('preferred_language: lang') ||
+  !languageSettings.includes("timezone,") ||
+  !languageSettings.includes("onSave={handleSave}") ||
+  !languageSettings.includes("Intl.DateTimeFormat")
+) {
+  failures.push("Language and region settings must persist and preview customer preferences");
+}
+
 const staffMigration = readFileSync(
   "supabase/migrations/20260716130000_customer_pwa_staff_booking.sql",
   "utf8",
