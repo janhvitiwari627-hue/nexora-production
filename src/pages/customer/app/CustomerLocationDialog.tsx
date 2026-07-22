@@ -269,7 +269,7 @@ export function CustomerLocationDialog({
               {locating
                 ? "Finding precise location…"
                 : locationIssue === "denied"
-                  ? "Try GPS again"
+                  ? "Retry GPS"
                   : "Use current location"}
             </Button>
 
@@ -280,13 +280,13 @@ export function CustomerLocationDialog({
               >
                 <p className="font-black">
                   {locationIssue === "denied"
-                    ? "Location permission is turned off"
+                    ? "Search se location select karein"
                     : "GPS location is not available right now"}
                 </p>
                 <p className="mt-1 text-xs leading-relaxed">
                   {locationIssue === "denied"
-                    ? "Enable Location for this site in your browser or app settings, then tap Try GPS again. You can also search your area or pincode below."
-                    : "Check that device Location is on and try again, or search your area or pincode below."}
+                    ? "Area, city ya pincode enter karke map pin confirm karein. GPS use karne ke liye site Location permission Allow karke Retry GPS tap karein."
+                    : "Device Location on karke Retry GPS tap karein, ya area aur pincode se location select karein."}
                 </p>
               </div>
             ) : null}
