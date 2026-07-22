@@ -11,7 +11,10 @@ export function FavoriteShopsCarousel() {
           <Heart className="h-4 w-4 fill-rose-500 text-rose-500" />
           Your Favorites
         </h2>
-        <Link to="/dashboard" className="text-xs font-semibold text-primary hover:underline">
+        <Link
+          to="/dashboard/favorites"
+          className="rounded-full px-2 py-1 text-xs font-semibold text-primary transition hover:bg-primary/10 hover:underline"
+        >
           See all
         </Link>
       </div>

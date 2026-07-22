@@ -1,4 +1,5 @@
 import { Bell, Calendar, Smartphone, WifiOff } from "lucide-react";
+import { QRCodeCanvas } from "qrcode.react";
 import { InstallAppButton } from "@/components/pwa/InstallAppButton";
 
 const BENEFITS = [
@@ -8,13 +9,10 @@ const BENEFITS = [
 ];
 
 export function AppDownloadSection() {
-  const pwaUrl =
+  const installUrl =
     typeof window !== "undefined"
-      ? `${window.location.origin}/app/customer`
-      : "https://nexora.app/app/customer";
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-    pwaUrl,
-  )}&color=0A2540&bgcolor=FFFFFF&margin=10`;
+      ? `${window.location.origin}/download-app`
+      : "https://meripahalfasthelp.online/download-app";
 
   return (
     <section className="mx-auto mt-20 max-w-7xl px-4 md:px-6">
@@ -100,7 +98,17 @@ export function AppDownloadSection() {
 
             {/* QR */}
             <div className="absolute -right-2 -bottom-2 hidden flex-col items-center rounded-2xl border border-border bg-white p-3 shadow-xl md:flex">
-              <img src={qrUrl} alt="Scan to install Nexora" className="h-24 w-24 rounded" />
+              <a href={installUrl} aria-label="Open Nexora app installation page">
+                <QRCodeCanvas
+                  value={installUrl}
+                  size={96}
+                  level="H"
+                  bgColor="#ffffff"
+                  fgColor="#0A2540"
+                  marginSize={2}
+                  title="Scan to install Nexora"
+                />
+              </a>
               <div className="mt-1.5 text-center text-[10px] font-bold text-heading">
                 Scan to install
               </div>
