@@ -15,6 +15,7 @@ const files = [
   "src/pages/customer/app/CustomerAppSearch.tsx",
   "src/pages/customer/app/CustomerLocationDialog.tsx",
   "src/pages/customer/app/CustomerAppBookings.tsx",
+  "src/pages/customer/PublicBookingsPage.tsx",
   "src/pages/customer/app/CustomerAppRewards.tsx",
   "src/pages/customer/app/CustomerAppProfile.tsx",
   "src/pages/customer/app/CustomerAvatar.tsx",
@@ -121,6 +122,20 @@ if (
 }
 
 const profile = readFileSync("src/pages/customer/app/CustomerAppProfile.tsx", "utf8");
+const appBookings = readFileSync("src/pages/customer/app/CustomerAppBookings.tsx", "utf8");
+const publicBookings = readFileSync("src/pages/customer/PublicBookingsPage.tsx", "utf8");
+for (const bookingScreen of [appBookings, publicBookings]) {
+  if (
+    !bookingScreen.includes("shop:shops(name)") ||
+    !bookingScreen.includes("booking_items(service_name_snapshot)") ||
+    bookingScreen.includes("salons(name)") ||
+    bookingScreen.includes("Bookings could not be loaded")
+  ) {
+    failures.push(
+      "Customer booking screens must use the production shop schema without red errors",
+    );
+  }
+}
 if (
   !profile.includes("Nexora member") ||
   !profile.includes("Choose profile photo") ||

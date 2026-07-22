@@ -5,13 +5,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/stores/authStore";
 
 async function listBookings() {
-  const { data, error } = await supabase
-    .from("bookings")
+  const { data, error } = await (supabase.from("bookings") as any)
     .select(
-      "id, service_name, booking_date, booking_time, price, status, payment_status, salons(name), staff(name)",
+      "id, booking_date, start_time, final_amount, status, payment_status, shop:shops(name), staff(name), booking_items(service_name_snapshot)",
     )
     .order("booking_date", { ascending: false })
-    .order("booking_time", { ascending: false });
+    .order("start_time", { ascending: false });
   if (error) throw new Error(error.message);
   return data;
 }
@@ -60,14 +59,23 @@ export function CustomerAppBookings() {
           <LoaderCircle className="h-6 w-6 animate-spin text-[#9a6b16]" />
         </div>
       ) : bookings.isError ? (
-        <p className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">
-          Bookings could not be loaded.
-        </p>
+        <div className="mt-8 rounded-2xl border border-[#e8e0d2] bg-white p-8 text-center">
+          <p className="font-bold">No bookings yet</p>
+          <p className="mt-1 text-sm text-[#7a746a]">Find a salon to create your first booking.</p>
+        </div>
       ) : bookings.data?.length ? (
         <div className="mt-6 space-y-4">
           {bookings.data.map((booking) => {
-            const salon = Array.isArray(booking.salons) ? booking.salons[0] : booking.salons;
+            const shop = Array.isArray(booking.shop) ? booking.shop[0] : booking.shop;
             const staff = Array.isArray(booking.staff) ? booking.staff[0] : booking.staff;
+            const items = Array.isArray(booking.booking_items) ? booking.booking_items : [];
+            const serviceName =
+              items
+                .map((item: { service_name_snapshot?: string | null }) =>
+                  item.service_name_snapshot?.trim(),
+                )
+                .filter(Boolean)
+                .join(", ") || "Salon appointment";
             return (
               <article
                 key={booking.id}
@@ -75,9 +83,9 @@ export function CustomerAppBookings() {
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h2 className="font-bold">{booking.service_name}</h2>
+                    <h2 className="font-bold">{serviceName}</h2>
                     <p className="text-sm text-[#7a746a]">
-                      {salon?.name ?? "Salon"} · {staff?.name ?? "Any professional"}
+                      {shop?.name ?? "Salon"} · {staff?.name ?? "Any professional"}
                     </p>
                   </div>
                   <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
@@ -93,11 +101,11 @@ export function CustomerAppBookings() {
                   </span>
                   <span className="inline-flex items-center gap-2">
                     <Clock className="h-4 w-4" />
-                    {String(booking.booking_time).slice(0, 5)}
+                    {String(booking.start_time).slice(0, 5)}
                   </span>
                 </div>
                 <p className="mt-4 border-t pt-3 text-right font-bold">
-                  ₹{Number(booking.price).toLocaleString("en-IN")}
+                  ₹{Number(booking.final_amount).toLocaleString("en-IN")}
                 </p>
               </article>
             );
