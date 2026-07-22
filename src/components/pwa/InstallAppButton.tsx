@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { CheckCircle2, Copy, Download, ExternalLink, Share, Smartphone } from "lucide-react";
+import {
+  CheckCircle2,
+  Copy,
+  Download,
+  ExternalLink,
+  Loader2,
+  Share,
+  Smartphone,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -50,6 +58,7 @@ export function InstallAppButton({
       window.location.assign(fallbackHref);
       return;
     }
+    if (state === "installing" || state === "checking") return;
     if (state === "ios" || state === "unsupported" || state === "cancelled") {
       setHelpOpen(true);
       return;
@@ -73,18 +82,22 @@ export function InstallAppButton({
 
   const appName = APP_NAMES[kind];
   const installed = state === "installed";
+  const installing = state === "installing";
   const available = state === "available";
   const label = installed
     ? `Open ${appName}`
-    : available
-      ? `Install ${appName}`
-      : `How to install ${appName}`;
+    : installing
+      ? `Installing ${appName}...`
+      : available
+        ? `Install ${appName}`
+        : `How to install ${appName}`;
 
   return (
     <>
       <button
         type="button"
         onClick={install}
+        disabled={installing || state === "checking"}
         className={
           className ??
           "inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-slate-950 px-6 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-slate-800"
@@ -93,6 +106,8 @@ export function InstallAppButton({
       >
         {installed ? (
           <ExternalLink className="h-4 w-4" />
+        ) : installing || state === "checking" ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
         ) : available ? (
           <Download className="h-4 w-4" />
         ) : (
@@ -100,6 +115,33 @@ export function InstallAppButton({
         )}
         {label}
       </button>
+
+      {installing ? (
+        <div
+          className="mt-3 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="flex items-center gap-2 font-bold">
+            <Loader2 className="h-4 w-4 animate-spin" /> Installing Nexora…
+          </div>
+          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-amber-200">
+            <div className="h-full w-2/3 animate-pulse rounded-full bg-amber-600" />
+          </div>
+          <p className="mt-2 text-xs leading-5">
+            Please wait. Android will confirm when the app has been added to your home screen.
+          </p>
+        </div>
+      ) : installed ? (
+        <p
+          className="mt-3 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm font-bold text-emerald-800"
+          role="status"
+          aria-live="polite"
+        >
+          <CheckCircle2 className="h-4 w-4" /> App installed successfully. Nexora is on your home
+          screen.
+        </p>
+      ) : null}
 
       <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
         <DialogContent className="max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-md overflow-y-auto rounded-2xl">

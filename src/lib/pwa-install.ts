@@ -6,6 +6,7 @@ export type InstallPromptEvent = Event & {
 export type InstallState =
   | "checking"
   | "available"
+  | "installing"
   | "installed"
   | "ios"
   | "unsupported"
@@ -88,7 +89,7 @@ export async function showPwaInstallPrompt() {
   deferredPrompt = null;
   await prompt.prompt();
   const choice = await prompt.userChoice;
-  publish(choice.outcome === "accepted" ? "checking" : "cancelled");
+  publish(choice.outcome === "accepted" ? "installing" : "cancelled");
   return true;
 }
 
