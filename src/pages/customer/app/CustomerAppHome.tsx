@@ -2,10 +2,10 @@ import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { ArrowRight, LoaderCircle, MapPin, RefreshCw, Search, Store } from "lucide-react";
-import { toast } from "sonner";
+import { useCustomerLocation } from "@/hooks/useCustomerLocation";
 import { listCustomerAppSalons } from "@/lib/customer-app";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/stores/authStore";
+import { CustomerLocationDialog } from "./CustomerLocationDialog";
 import { CustomerSalonCard } from "./CustomerSalonCard";
 
 const CATEGORIES = [
@@ -18,52 +18,24 @@ const CATEGORIES = [
 ];
 
 export function CustomerAppHome() {
-  const [locating, setLocating] = useState(false);
+  const [locationOpen, setLocationOpen] = useState(false);
+  const { location, save: saveLocation } = useCustomerLocation();
   const gender = useAuthStore((state) =>
     state.profile?.gender === "male" || state.profile?.gender === "female"
       ? state.profile.gender
       : null,
   );
   const shops = useQuery({
-    queryKey: ["customer-app", "salons", "home", gender],
-    queryFn: () => listCustomerAppSalons({ gender, limit: 6 }),
+    queryKey: ["customer-app", "salons", "home", gender, location?.latitude, location?.longitude],
+    queryFn: () =>
+      listCustomerAppSalons({
+        gender,
+        limit: 6,
+        location: location
+          ? { latitude: location.latitude, longitude: location.longitude, radiusKm: 50 }
+          : null,
+      }),
   });
-
-  const requestLocation = () => {
-    if (!("geolocation" in navigator)) {
-      toast.error("Location is not supported on this device.");
-      return;
-    }
-    setLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      async ({ coords }) => {
-        try {
-          const { data } = await supabase.auth.getUser();
-          if (data.user) {
-            const { error } = await supabase
-              .from("profiles")
-              .update({
-                latitude: coords.latitude,
-                longitude: coords.longitude,
-                location_captured_at: new Date().toISOString(),
-              })
-              .eq("id", data.user.id);
-            if (error) throw error;
-          }
-          toast.success("Location enabled for nearby salons.");
-        } catch {
-          toast.error("Location was received but could not be saved.");
-        } finally {
-          setLocating(false);
-        }
-      },
-      () => {
-        setLocating(false);
-        toast.error("Location permission was not granted.");
-      },
-      { enableHighAccuracy: false, timeout: 10_000, maximumAge: 60_000 },
-    );
-  };
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-6 sm:py-10">
@@ -82,16 +54,11 @@ export function CustomerAppHome() {
           </Link>
           <button
             type="button"
-            onClick={requestLocation}
-            disabled={locating}
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-white/15 px-5 text-sm font-bold backdrop-blur"
+            onClick={() => setLocationOpen(true)}
+            className="inline-flex min-h-12 max-w-full items-center justify-center gap-2 rounded-2xl bg-white/15 px-5 text-sm font-bold backdrop-blur sm:max-w-72"
           >
-            {locating ? (
-              <LoaderCircle className="h-4 w-4 animate-spin" />
-            ) : (
-              <MapPin className="h-4 w-4" />
-            )}
-            {locating ? "Finding you…" : "Use my location"}
+            <MapPin className="h-4 w-4 shrink-0" />
+            <span className="truncate">{location?.label ?? "Set my location"}</span>
           </button>
         </div>
       </section>
@@ -164,19 +131,42 @@ export function CustomerAppHome() {
             <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[#fff0c2] text-[#9a6b16]">
               <Store className="h-6 w-6" />
             </span>
-            <p className="mt-4 font-black">New salons are coming to your area</p>
-            <p className="mt-1 max-w-md text-sm text-[#7a746a]">
-              Verified and published salons will appear here automatically.
+            <p className="mt-4 font-black">
+              {location
+                ? `No published salons within 50 km of ${location.label}`
+                : "Set your location to find nearby salons"}
             </p>
-            <Link
-              to="/app/customer/search"
-              className="mt-4 rounded-full bg-[#0b0a08] px-5 py-2.5 text-sm font-bold text-[#f3cf70]"
-            >
-              Explore categories
-            </Link>
+            <p className="mt-1 max-w-md text-sm text-[#7a746a]">
+              {location
+                ? "New verified salons will appear here automatically when they publish their map location."
+                : "Confirm your map pin and we will sort every published salon by distance."}
+            </p>
+            {location ? (
+              <Link
+                to="/app/customer/search"
+                className="mt-4 rounded-full bg-[#0b0a08] px-5 py-2.5 text-sm font-bold text-[#f3cf70]"
+              >
+                Explore categories
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setLocationOpen(true)}
+                className="mt-4 rounded-full bg-[#0b0a08] px-5 py-2.5 text-sm font-bold text-[#f3cf70]"
+              >
+                Choose location
+              </button>
+            )}
           </div>
         )}
       </section>
+
+      <CustomerLocationDialog
+        open={locationOpen}
+        onOpenChange={setLocationOpen}
+        initialLocation={location}
+        onSave={saveLocation}
+      />
     </main>
   );
 }

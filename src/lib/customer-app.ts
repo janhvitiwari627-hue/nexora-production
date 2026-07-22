@@ -6,7 +6,27 @@ export async function listCustomerAppSalons(input?: {
   category?: string;
   gender?: "male" | "female" | null;
   limit?: number;
+  location?: { latitude: number; longitude: number; radiusKm?: number } | null;
 }): Promise<Shop[]> {
+  if (input?.location) {
+    const term = input.q?.trim().replace(/[%_,]/g, "") || null;
+    const { data, error } = await supabase.rpc(
+      "nearby_public_salon_cards" as never,
+      {
+        _latitude: input.location.latitude,
+        _longitude: input.location.longitude,
+        _radius_km: input.location.radiusKm ?? 50,
+        _limit: input.limit ?? 50,
+        _query: term,
+        _category: input.category && input.category !== "All" ? input.category : null,
+        _gender: input.gender ?? null,
+      } as never,
+    );
+    if (error) throw new Error(error.message);
+
+    return ((data ?? []) as unknown as CustomerSalonRow[]).map(mapCustomerSalon);
+  }
+
   let query = supabase
     .from("public_salon_cards")
     .select(
@@ -39,7 +59,26 @@ export async function listCustomerAppSalons(input?: {
   const { data, error } = await query;
   if (error) throw new Error(error.message);
 
-  return (data ?? []).map((salon) => ({
+  return (data ?? []).map(mapCustomerSalon);
+}
+
+interface CustomerSalonRow {
+  slug: string | null;
+  name: string | null;
+  tagline: string | null;
+  category: string | null;
+  city: string | null;
+  location: string | null;
+  cover_image_url: string | null;
+  image_url: string | null;
+  rating: number | null;
+  reviews_count: number | null;
+  is_verified: boolean | null;
+  distance_km?: number | null;
+}
+
+function mapCustomerSalon(salon: CustomerSalonRow): Shop {
+  return {
     slug: salon.slug ?? "",
     name: salon.name ?? "Salon",
     tagline: salon.tagline,
@@ -51,9 +90,9 @@ export async function listCustomerAppSalons(input?: {
     review_count: salon.reviews_count ?? 0,
     price_level: 0,
     is_verified: Boolean(salon.is_verified),
-    distance_km: null,
+    distance_km: salon.distance_km ?? null,
     membership_perk: null,
     starting_price: null,
     gender: null,
-  }));
+  };
 }
